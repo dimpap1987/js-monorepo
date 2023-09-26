@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "nx affected:lint --all",
     "format": "npx prettier --write .",
-    "next-dev": "nx serve next-app",
+    "dev:next": "nx serve next-app",
+    "start:next": "cd dist/apps/next-app && npx next start",
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
     "build:next-app": "nx build next-app"
