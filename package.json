@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "lint": "nx affected:lint --all --verbose",
+    "lint": "nx affected:lint --all",
     "format": "npx prettier --write .",
     "next-dev": "nx serve next-app",
     "format:check": "nx format:check --all",
