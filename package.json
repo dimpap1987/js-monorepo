@@ -6,7 +6,9 @@
     "lint": "nx affected:lint --all --verbose",
     "format": "npx prettier --write .",
     "next-dev": "nx serve next-app",
-    "format:check": "nx format:check --all"
+    "format:check": "nx format:check --all",
+    "test": "nx affected:test --all",
+    "build:next-app": "nx build next-app"
   },
   "private": true,
   "dependencies": {
