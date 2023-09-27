@@ -30,7 +30,7 @@
         "plugin:prettier/recommended"
       ],
       "rules": {
-        "prettier/prettier": "error",
+        "prettier/prettier": ["error", { "endOfLine": "auto" }],
         "import/no-extraneous-dependencies": [
           "error",
           { "devDependencies": true }
@@ -46,7 +46,7 @@
         "plugin:prettier/recommended"
       ],
       "rules": {
-        "prettier/prettier": "error"
+        "prettier/prettier": ["error", { "endOfLine": "auto" }]
       }
     }
   ]
