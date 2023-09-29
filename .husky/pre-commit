@@ -3,3 +3,4 @@
 
 echo "Precommit Triggered..."
 npm run format
+npm run lint
