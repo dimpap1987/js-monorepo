@@ -1,10 +1,13 @@
-import { Loader } from '@js-monorepo/loader'
+import { LoaderProvider } from '@js-monorepo/loader'
+import Main from '../components/main'
+import { NotificationProvider } from '@js-monorepo/notification'
 
-export default async function Index() {
+export default function Index() {
   return (
-    <main>
-      <h1> Hello everyone...</h1>
-      <Loader message="Waiting for transcation" show={false}></Loader>
-    </main>
+    <LoaderProvider>
+      <NotificationProvider>
+        <Main></Main>
+      </NotificationProvider>
+    </LoaderProvider>
   )
 }

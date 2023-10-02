@@ -1,7 +1,7 @@
 {
   "name": "loader",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/shared/ui/src",
+  "sourceRoot": "libs/shared/ui/loader/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -9,7 +9,7 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/shared/ui/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["libs/shared/ui/loader/**/*.{ts,tsx,js,jsx}"]
       }
     }
   }

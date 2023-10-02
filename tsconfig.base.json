@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@js-monorepo/loader": ["libs/shared/ui/src/index.ts"]
+      "@js-monorepo/loader": ["libs/shared/ui/loader/src/index.ts"],
+      "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
