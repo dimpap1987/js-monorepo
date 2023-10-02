@@ -5,7 +5,7 @@ export interface LoaderProps {
   show?: boolean
 }
 
-export function Loader({ message = '', show = false }: LoaderProps) {
+export function Loader({ message, show }: LoaderProps) {
   return (
     <div
       className={`fixed top-0 left-0 w-screen h-screen
