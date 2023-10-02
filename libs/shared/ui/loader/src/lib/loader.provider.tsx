@@ -1,6 +1,12 @@
 'use client'
 
-import React, { ReactNode, createContext, useContext, useState } from 'react'
+import React, {
+  ReactNode,
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+} from 'react'
 import Loader from './loader'
 
 interface LoaderProps {
@@ -37,8 +43,15 @@ export const LoaderProvider: React.FC<LoaderProviderPros> = ({ children }) => {
     message: '',
   })
 
+  const contextValue = useMemo(() => {
+    return {
+      loaderState,
+      setLoaderState,
+    }
+  }, [loaderState, setLoaderState])
+
   return (
-    <LoaderContext.Provider value={{ loaderState, setLoaderState }}>
+    <LoaderContext.Provider value={contextValue}>
       {children}
       {loaderState.show && (
         <Loader message={loaderState.message} show={loaderState.show} />
