@@ -12,6 +12,12 @@
     "build:next-app": "nx build next-app",
     "prepare": "husky install"
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "nx affected:lint --base=HEAD~1 --head=HEAD"
+    ]
+  },
   "private": true,
   "dependencies": {
     "@nx/next": "16.9.1",
