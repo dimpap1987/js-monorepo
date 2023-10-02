@@ -48,7 +48,7 @@ export const useNotifications = (): [
 }
 
 // NotificationProvider
-export const NotificationProvider: React.FC<NotificationProviderPros> = ({
+export const NotificationComponent: React.FC<NotificationProviderPros> = ({
   children,
 }) => {
   const [notifications, setNotifications] = useState<NotificationType[]>([])
@@ -104,4 +104,4 @@ export const NotificationProvider: React.FC<NotificationProviderPros> = ({
   )
 }
 
-export default NotificationProvider
+export default NotificationComponent
