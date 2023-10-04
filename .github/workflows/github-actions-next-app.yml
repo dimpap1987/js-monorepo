@@ -23,7 +23,7 @@ jobs:
       - run: npm ci
 
       - name: Lint check
-        run: npx nx affected:lint
+        run: npx nx affected:lint --base=${{ github.event.before }} --head=${{ github.sha }}
 
       - name: Run Tests
         run: npm test
