@@ -1,14 +1,19 @@
-import React, { useMemo } from 'react'
-import { ReactNode } from 'react'
-
+import React, { ReactNode, useMemo } from 'react'
+import LoginButtonComponent from './components/login-button'
+import LogoutButtonComponent from './components/logout-button'
+import styles from './navbar.module.css'
 export interface NavbarProps {
   children?: ReactNode
+  menuItems?: MenuItem[]
 }
-
-export function NavbarComponent({ children }: NavbarProps) {
-  const { logo, menu } = useMemo(() => {
+export type MenuItem = {
+  name: string
+  link: string
+}
+// TODO move menu and log here
+export function NavbarComponent({ children, menuItems }: NavbarProps) {
+  const { logo } = useMemo(() => {
     let logoElement: ReactNode | null = null
-    let menuElement: ReactNode | null = null
 
     React.Children.forEach(children, (child) => {
       if (React.isValidElement(child) && typeof child.type !== 'string') {
@@ -16,120 +21,126 @@ export function NavbarComponent({ children }: NavbarProps) {
           case 'LogoComponent':
             logoElement = child
             break
-          case 'MenuComponent':
-            menuElement = child
-            break
           default:
             break
         }
       }
     })
-
-    return { logo: logoElement, menu: menuElement }
+    return { logo: logoElement }
   }, [children])
 
   return (
-    <nav className="flex justify-between bg-gray-900 text-white w-screen z-50">
-      <div className="px-5 xl:px-12 py-6 flex w-full items-center">
-        {logo}
+    <nav>
+      <div
+        className={`flex justify-between ${styles.bgCustomDefault} text-white w-screen h-14`}
+      >
+        <div className="px-5 xl:px-12 py-2 flex w-full items-center">
+          {/* options on the left*/}
+          {logo}
 
-        <ul className="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
-          {menu}
-        </ul>
+          {/* options on the center*/}
+          {menuItems && menuItems.length > 0 && (
+            <ul className="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
+              {menuItems.map((item, index) => (
+                <li key={index}>
+                  <a className="hover:text-gray-200" href={item.link}>
+                    {item.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
 
-        <div className="hidden xl:flex items-center space-x-5 items-center">
-          <a className="hover:text-gray-200" href="#">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          {/* options on the right*/}
+          <div className="hidden md:flex items-center space-x-5 items-center">
+            <LoginButtonComponent></LoginButtonComponent>
+            {/* when logged in */}
+            <label
+              htmlFor="userOptionsToggle"
+              className="flex items-center hover:text-gray-200 cursor-pointer select-none"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </a>
-          <a className="flex items-center hover:text-gray-200" href="#">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <span className="flex absolute -mt-5 ml-4">
-              <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-pink-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
-            </span>
-          </a>
-
-          <a className="flex items-center hover:text-gray-200" href="#">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 hover:text-gray-200"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </a>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 hover:text-gray-200"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </label>
+          </div>
         </div>
+
+        {/* Dropdown icon */}
+        <label
+          htmlFor="menuToggle"
+          className="navbar-burger self-center mr-6 md:hidden cursor-pointer select-none py-2 px-4"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 hover:text-gray-200"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </label>
       </div>
 
-      <a className="xl:hidden flex mr-6 items-center" href="#">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 hover:text-gray-200"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-        <span className="flex absolute -mt-5 ml-4">
-          <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-pink-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
-        </span>
-      </a>
-      <a className="navbar-burger self-center mr-12 xl:hidden" href="#">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 hover:text-gray-200"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
-      </a>
+      {/* Hidden input to toggle dropdown options */}
+      <input
+        id="menuToggle"
+        type="checkbox"
+        className={`${styles.menuToggleChecked} hidden absolute select-none`}
+      ></input>
+      {/* Dropdown */}
+      <div
+        className={`dropdownMenu absolute w-52 right-0 p-2 shadow-lg ${styles.bgCustomDefault} text-white ${styles.dropdownMenu}`}
+      >
+        {menuItems && menuItems.length > 0 && (
+          <ul className="mx-auto font-semibold font-heading">
+            {menuItems.map((item, index) => (
+              <li
+                key={index}
+                className="text-center py-2 duration-200 ease-in-out hover:bg-blue-900 w-full flex justify-center"
+              >
+                <a className="hover:text-gray-200" href={item.link}>
+                  {item.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+        <hr className="my-2" />
+        <LoginButtonComponent></LoginButtonComponent>
+        <LogoutButtonComponent></LogoutButtonComponent>
+      </div>
+
+      {/* User options hidden input*/}
+      <input
+        id="userOptionsToggle"
+        type="checkbox"
+        className={`${styles.userOptionsToggleChecked} hidden absolute select-none`}
+      ></input>
+      {/* User options Dropdown */}
+      <div
+        className={`dropdownUserOptions absolute w-44 grid grid-cols-2 gap-4 right-0 p-2 shadow-lg ${styles.bgCustomDefault} text-white ${styles.dropdownUserOptions}`}
+      >
+        <LoginButtonComponent></LoginButtonComponent>
+        <LogoutButtonComponent></LogoutButtonComponent>
+      </div>
     </nav>
   )
 }

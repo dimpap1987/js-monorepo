@@ -1,7 +1,33 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+.dropdownMenu {
+  display: none;
+}
+
+.menuToggleChecked:checked + .dropdownMenu {
+  display: block;
+}
+
+/* Adjust 768px based on the exact breakpoint you consider as medium */
+@media (min-width: 768px) {
+  .dropdownMenu {
+    display: none !important;
+  }
+}
+
+.dropdownUserOptions {
+  display: none;
+}
+
+.userOptionsToggleChecked:checked + .dropdownUserOptions {
+  display: block;
+}
+
+/* Adjust 768px based on the exact breakpoint you consider as medium */
+@media (max-width: 768px) {
+  .dropdownUserOptions {
+    display: none !important;
+  }
+}
+
+.bgCustomDefault {
+  background-color: var(--bg-navbar--color, rgb(17 24 39));
+}

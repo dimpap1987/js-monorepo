@@ -1,31 +1,25 @@
 import { LoaderComponent } from '@js-monorepo/loader'
-import Main from '../components/main'
+import { LogoComponent, MenuItem, NavbarComponent } from '@js-monorepo/navbar'
 import { NotificationComponent } from '@js-monorepo/notification'
-import {
-  NavbarComponent,
-  MenuItem,
-  MenuComponent,
-  LogoComponent,
-} from '@js-monorepo/navbar'
+import Main from '../components/main'
 
 export default function Index() {
   const menuItems: MenuItem[] = [
     {
       link: 'https://www.google.com',
-      name: 'Menu 1',
+      name: 'Home',
     },
     {
       link: 'https://www.youtube.com',
-      name: 'Menu 2',
+      name: 'About',
     },
   ]
   return (
     <>
-      <NavbarComponent>
+      <NavbarComponent menuItems={menuItems}>
         <LogoComponent>
           <h1>DimPap</h1>
         </LogoComponent>
-        <MenuComponent menuItems={menuItems}></MenuComponent>
       </NavbarComponent>
       <LoaderComponent>
         <NotificationComponent>
