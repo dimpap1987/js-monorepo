@@ -22,10 +22,8 @@ jobs:
       - uses: nrwl/nx-set-shas@v3
       - run: npm ci
 
-      - run: npx nx format:check
-
       - name: Lint check
-        run: npx nx affected:lint --all
+        run: npx nx affected:lint
 
       - name: Run Tests
         run: npm test

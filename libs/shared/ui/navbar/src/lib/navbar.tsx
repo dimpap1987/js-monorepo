@@ -42,8 +42,8 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
           {menuItems && menuItems.length > 0 && (
             <ul className="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
               {menuItems.map((item, index) => (
-                <li key={index}>
-                  <a className="hover:text-gray-200" href={item.link}>
+                <li key={index} className={styles.underlineEffect}>
+                  <a className="py-2 px-4" href={item.link}>
                     {item.name}
                   </a>
                 </li>
@@ -57,7 +57,7 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
             {/* when logged in */}
             <label
               htmlFor="userOptionsToggle"
-              className="flex items-center hover:text-gray-200 cursor-pointer select-none"
+              className="flex items-center hover:text-gray-200 cursor-pointer select-none transition duration-300 ease-in-out hover:scale-125"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -114,11 +114,9 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
             {menuItems.map((item, index) => (
               <li
                 key={index}
-                className="text-center py-2 duration-200 ease-in-out hover:bg-blue-900 w-full flex justify-center"
+                className="text-center py-2 hover:bg-blue-900 w-full flex justify-center"
               >
-                <a className="hover:text-gray-200" href={item.link}>
-                  {item.name}
-                </a>
+                <a href={item.link}>{item.name}</a>
               </li>
             ))}
           </ul>
