@@ -22,9 +22,6 @@ jobs:
       - uses: nrwl/nx-set-shas@v3
       - run: npm ci
 
-      - name: Fetch all history for all tags and branches
-        run: git fetch --unshallow
-
       - name: Lint check
         run: npx nx affected:lint
 
