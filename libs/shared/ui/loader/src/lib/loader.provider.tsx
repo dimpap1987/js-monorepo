@@ -37,7 +37,7 @@ export const useLoader = (): [
   return [context.loaderState, context.setLoaderState]
 }
 
-export const LoaderProvider: React.FC<LoaderProviderPros> = ({ children }) => {
+export const LoaderComponent: React.FC<LoaderProviderPros> = ({ children }) => {
   const [loaderState, setLoaderState] = useState<LoaderProps>({
     show: false,
     message: '',
@@ -52,12 +52,12 @@ export const LoaderProvider: React.FC<LoaderProviderPros> = ({ children }) => {
 
   return (
     <LoaderContext.Provider value={contextValue}>
-      {children}
       {loaderState.show && (
         <Loader message={loaderState.message} show={loaderState.show} />
       )}
+      {children}
     </LoaderContext.Provider>
   )
 }
 
-export default LoaderProvider
+export default LoaderComponent

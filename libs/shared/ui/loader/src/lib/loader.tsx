@@ -8,12 +8,12 @@ export interface LoaderProps {
 export function Loader({ message, show }: LoaderProps) {
   return (
     <div
-      className={`fixed top-0 left-0 w-screen h-screen
+      className={`fixed left-0 w-screen h-screen
       flex items-center justify-center bg-black 
-      bg-opacity-70 transform transition-transform
+      bg-opacity-80 transform transition-transform
       duration-200 ${show ? 'scale-100' : 'scale-0'}`}
     >
-      <div className="text-white flex flex-col items-center justify-center">
+      <div className="text-white flex flex-col items-center justify-center transform -translate-y-20">
         <div
           aria-label="Loading..."
           role="status"

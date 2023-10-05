@@ -10,7 +10,7 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
@@ -22,13 +22,11 @@ jobs:
       - uses: nrwl/nx-set-shas@v3
       - run: npm ci
 
-      - run: npx nx format:check
-      - run: npx nx affected -t lint --parallel=3
-      - run: npx nx affected -t test --parallel=3
-      - run: npx nx affected -t build --parallel=3
+      - name: Lint check
+        run: npx nx affected:lint --base=${{ github.event.before }} --head=${{ github.sha }}
 
       - name: Run Tests
-        run: npm test
+        run: npx nx affected:test --base=${{ github.event.before }} --head=${{ github.sha }}
 
       - name: Build Next.js App
         run: npm run build:next-app

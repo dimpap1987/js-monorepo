@@ -5,13 +5,14 @@ import { ReactNode } from 'react'
 
 interface MainProps {
   children?: ReactNode
+  className?: string
 }
 
-export default function Main({ children }: MainProps) {
+export default function Main({ children, className }: MainProps) {
   const [, setLoaderState] = useLoader()
   const [, , addNotification] = useNotifications()
   return (
-    <>
+    <section className={className}>
       {children}
       <div className="flex flex-col justify-center align-items gap-2">
         <button
@@ -69,6 +70,6 @@ export default function Main({ children }: MainProps) {
           Spinner notification
         </button>
       </div>
-    </>
+    </section>
   )
 }

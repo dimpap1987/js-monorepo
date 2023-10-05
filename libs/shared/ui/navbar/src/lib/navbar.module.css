@@ -1,0 +1,47 @@
+.dropdownMenu {
+  display: none;
+}
+
+.menuToggleChecked:checked + .dropdownMenu {
+  display: block;
+}
+
+/* Adjust 768px based on the exact breakpoint you consider as medium */
+@media (min-width: 768px) {
+  .dropdownMenu {
+    display: none !important;
+  }
+}
+
+.dropdownUserOptions {
+  display: none;
+}
+
+.userOptionsToggleChecked:checked + .dropdownUserOptions {
+  display: block;
+}
+
+.bgCustomDefault {
+  background-color: var(--bg-navbar--color, rgb(17 24 39));
+}
+
+.underlineEffect::after {
+  content: '';
+  display: block;
+  width: 0; /* initial width is 0, so the underline isn't visible */
+  height: 0.09rem;
+  background: currentColor; /* Use the current text color */
+  transition: width 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.underlineEffect:hover::after {
+  margin: 0 auto;
+  width: 80%; /* Expand to the full width on hover */
+}
+
+/* Adjust 768px based on the exact breakpoint you consider as medium */
+@media (max-width: 768px) {
+  .dropdownUserOptions {
+    display: none !important;
+  }
+}
