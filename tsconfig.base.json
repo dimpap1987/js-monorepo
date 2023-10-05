@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@js-monorepo/loader": ["libs/shared/ui/loader/src/index.ts"],
+      "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"]
     }
   },

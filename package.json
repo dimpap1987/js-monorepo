@@ -15,7 +15,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "prettier --write",
-      "nx affected:lint --base=HEAD~1 --head=HEAD"
+      "nx affected:lint --all"
     ]
   },
   "private": true,

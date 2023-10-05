@@ -34,7 +34,8 @@
         "import/no-extraneous-dependencies": [
           "error",
           { "devDependencies": true }
-        ]
+        ],
+        "react/jsx-no-useless-fragment": "off"
       }
     },
     {
