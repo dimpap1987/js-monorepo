@@ -26,7 +26,7 @@ jobs:
         run: npx nx affected:lint --base=${{ github.event.before }} --head=${{ github.sha }}
 
       - name: Run Tests
-        run: npm test
+        run: npx nx affected:test --base=${{ github.event.before }} --head=${{ github.sha }}
 
       - name: Build Next.js App
         run: npm run build:next-app
