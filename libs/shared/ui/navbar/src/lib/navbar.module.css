@@ -21,10 +21,6 @@
   display: block;
 }
 
-.bgCustomDefault {
-  background-color: var(--bg-navbar--color, rgb(17 24 39));
-}
-
 .underlineEffect::after {
   content: '';
   display: block;
