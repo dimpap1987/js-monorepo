@@ -18,17 +18,16 @@ export function ButtonComponent({
   ...props
 }: ButtonProps) {
   //disabled classes
-  const disabledStyles = 'bg-gray-300 cursor-not-allowed opacity-50'
+  const disabledStyles = 'cursor-not-allowed opacity-50'
   // base styles
   const baseStyles = `relative px-12 py-2 rounded font-bold focus:outline-none flex items-center ${
     loading ? disabledStyles : ''
   }`
   // Variant styles
   const variantStyles = {
-    primary: 'bg-blue-500 text-white hover:bg-blue-600',
+    primary: 'bg-primary-color text-white hover:bg-primary-color-hover',
     secondary: 'bg-gray-200 text-black hover:bg-gray-300',
     danger: 'bg-red-500 text-white hover:bg-red-600',
-    // Add more variants as needed
   }
 
   // Size styles

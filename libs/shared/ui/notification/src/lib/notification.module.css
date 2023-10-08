@@ -2,7 +2,6 @@
   display: inline-block;
   position: relative;
 }
-/* background-color: rgb(31 41 55 / var(--tw-bg-opacity)) */
 
 .spinner:after {
   content: ' ';
@@ -57,11 +56,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   word-wrap: break-word;
-  background-color: var(
-    --notifications--background,
-    rgb(31 41 55 / var(--tw-bg-opacity))
-  );
-
   border-image: var(
     --notifications--border,
     linear-gradient(rgb(214, 10, 190) 1%, rgba(0, 255, 255, 1)) 30%
