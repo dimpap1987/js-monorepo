@@ -10,10 +10,13 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
+      - name: Setup Remote Tracking
+        run: git fetch origin +refs/heads/*:refs/remotes/origin/*
+      
       - name: Use Node.js 18.x
         uses: actions/setup-node@v2
         with:
@@ -23,10 +26,10 @@ jobs:
       - run: npm ci
 
       - name: Lint check
-        run: npx nx affected:lint --base=${{ github.event.before }} --head=${{ github.sha }}
+        run: npx nx affected:lint --base=origin/main --head=${{ github.sha }}
 
       - name: Run Tests
-        run: npx nx affected:test --base=${{ github.event.before }} --head=${{ github.sha }}
+        run: npx nx affected:test --base=origin/main --head=${{ github.sha }}
 
       - name: Build Next.js App
         run: npm run build:next-app
