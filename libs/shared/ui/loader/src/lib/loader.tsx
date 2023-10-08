@@ -11,7 +11,7 @@ export function Loader({ message, show }: LoaderProps) {
       className={`fixed left-0 w-screen h-screen
       flex items-center justify-center bg-black 
       bg-opacity-80 transform transition-transform
-      duration-200 ${show ? 'scale-100' : 'scale-0'}`}
+      duration-200 ${show ? 'scale-100' : 'scale-0'} z-20`}
     >
       <div className="text-white flex flex-col items-center justify-center transform -translate-y-20">
         <div
@@ -93,7 +93,7 @@ export function Loader({ message, show }: LoaderProps) {
               strokeWidth="24"
             ></line>
           </svg>
-          <div className={styles.loadingText}>Loading...</div>
+          <div className={`$styles.loadingText ml-1`}>Loading...</div>
         </div>
         {message && (
           <p>

@@ -10,7 +10,17 @@ module.exports = {
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundColor: {
+        'primary-color': 'rgb(17, 24, 39)',
+        'primary-color-hover': 'rgb(37, 44, 59)',
+      },
+    },
+  },
+  variants: {
+    extend: {
+      backgroundColor: ['hover'],
+    },
   },
   plugins: [],
 }
