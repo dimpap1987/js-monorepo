@@ -1,7 +1,8 @@
 'use client'
+import { ButtonComponent } from '@js-monorepo/button'
 import { useLoader } from '@js-monorepo/loader'
 import { useNotifications } from '@js-monorepo/notification'
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 
 interface MainProps {
   children?: ReactNode
@@ -11,6 +12,7 @@ interface MainProps {
 export default function Main({ children, className }: MainProps) {
   const [, setLoaderState] = useLoader()
   const [, , addNotification] = useNotifications()
+  const [loading, setLoading] = useState(false)
   return (
     <section className={className}>
       {children}
@@ -69,6 +71,19 @@ export default function Main({ children, className }: MainProps) {
         >
           Spinner notification
         </button>
+        <div>
+          <ButtonComponent
+            loading={loading}
+            onClick={() => {
+              setLoading((prev) => !prev)
+              setTimeout(() => {
+                setLoading((prev) => !prev)
+              }, 2000)
+            }}
+          >
+            Click me
+          </ButtonComponent>
+        </div>
       </div>
     </section>
   )
