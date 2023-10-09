@@ -1,10 +1,10 @@
 # Install dependencies only when needed
 FROM docker.io/node:lts-alpine as deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++ alpine-sdk && rm -rf /var/cache/apk/*
 WORKDIR /usr/src/app
 COPY .npmrc dist/apps/next-app/package*.json ./
-RUN npm install --omit=dev
+RUN npm ci --only=production
 
 # Production image, copy all the files and run next
 FROM docker.io/node:lts-alpine as runner

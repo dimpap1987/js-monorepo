@@ -11,16 +11,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        name: Checkout [Pull Request]
+        if: ${{ github.event_name == 'pull_request' }}
         with:
+          # By default, PRs will be checked-out based on the Merge Commit, but we want the actual branch HEAD.
+          ref: ${{ github.event.pull_request.head.sha }}
+          # We need to fetch all branches and commits so that Nx affected has a base to compare against.
+          fetch-depth: 0
+
+      - uses: actions/checkout@v3
+        name: Checkout [Default Branch]
+        if: ${{ github.event_name != 'pull_request' }}
+        with:
+          # We need to fetch all branches and commits so that Nx affected has a base to compare against.
           fetch-depth: 0
 
       - name: Setup Remote Tracking
         run: git fetch origin +refs/heads/*:refs/remotes/origin/*
-      
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v2
+
+      - name: Use the package manager cache if available
+        uses: actions/cache@v3
         with:
-          node-version: '18.x'
+          path: ~/.npm
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-
 
       - uses: nrwl/nx-set-shas@v3
       - run: npm ci
@@ -34,14 +49,33 @@ jobs:
       - name: Build Next.js App
         run: npm run build:next-app
 
-      - name: Build Docker image
-        if: github.ref == 'refs/heads/main'
-        run: docker build -t dimpap/next-app:latest apps/next-app/
+      - name: Extract version from package.json
+        # if: github.ref == 'refs/heads/main'
+        id: extract_version
+        run: |
+          echo "::set-output name=version::$(node -p "require('./package.json').version")"
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: Login to Docker Hub
-        if: github.ref == 'refs/heads/main'
+        # if: github.ref == 'refs/heads/main'
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Push Docker image to Docker Hub
-        if: github.ref == 'refs/heads/main'
-        run: docker push dimpap/next-app:latest
+      - name: Build Docker image using Buildx and Push to Docker Hub
+        # if: github.ref == 'refs/heads/main'
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 -t dimpap/next-app:${{ steps.extract_version.outputs.version }} -f apps/next-app/Dockerfile . --push
+      
+      # - name: Build Docker image
+      #   if: github.ref == 'refs/heads/main'
+      #   run: docker build -t dimpap/next-app:${{ steps.extract_version.outputs.version }} -f apps/next-app/Dockerfile .
+
+      # - name: Login to Docker Hub
+      #   if: github.ref == 'refs/heads/main'
+      #   run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      # - name: Push Docker image to Docker Hub
+      #   if: github.ref == 'refs/heads/main'
+      #   run: docker push dimpap/next-app:${{ steps.extract_version.outputs.version }}
