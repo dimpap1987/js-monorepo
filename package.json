@@ -1,6 +1,6 @@
 {
   "name": "@js-monorepo/source",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "scripts": {
     "lint": "nx affected:lint --all",
@@ -10,7 +10,8 @@
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
     "build:next-app": "nx build next-app",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "docker-compose:dev": "npm run build:next-app && docker-compose -f docker-compose.dev.yml up -d --build"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
