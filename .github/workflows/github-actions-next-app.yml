@@ -22,6 +22,12 @@ jobs:
         with:
           node-version: '18.x'
 
+      - name: Restore NX cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/nx
+          key: nx-cache-${{ runner.os }}-${{ hashFiles('**/nx.json') }}
+
       - uses: nrwl/nx-set-shas@v3
       - run: npm ci
 
@@ -35,13 +41,13 @@ jobs:
         run: npm run build:next-app
 
       - name: Build Docker image
-        if: github.ref == 'refs/heads/main'
-        run: docker build -t dimpap/next-app:latest apps/next-app/
+        # if: github.ref == 'refs/heads/main'
+        run: docker build -t dimpap/next-app:latest -f apps/next-app/ .
 
       - name: Login to Docker Hub
-        if: github.ref == 'refs/heads/main'
+        # if: github.ref == 'refs/heads/main'
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Push Docker image to Docker Hub
-        if: github.ref == 'refs/heads/main'
+        # if: github.ref == 'refs/heads/main'
         run: docker push dimpap/next-app:latest
