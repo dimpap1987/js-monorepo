@@ -2,7 +2,7 @@ FROM docker.io/node:lts-alpine as deps
 RUN apk add --no-cache libc6-compat python3 make g++ alpine-sdk && rm -rf /var/cache/apk/*
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install --omit=dev --ignore-scripts
 
 # Production image, copy all the files and run next
 FROM docker.io/node:lts-alpine as runner
