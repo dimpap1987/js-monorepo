@@ -1,17 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "files": [],
-  // "include": ["src/**/*.ts", "src/webhook.utils.ts"],
+  "include": ["src/**/*.ts", "src/webhook.utils.ts"],
   "exclude": ["node_modules", "**/*.spec.ts", "jest.config.ts"],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ],
   "compilerOptions": {
-    "esModuleInterop": true
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "dist/",
+    "sourceMap": true
   }
 }
