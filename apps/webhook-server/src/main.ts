@@ -5,6 +5,10 @@ import { executeDockerCompose, validateWebhookRequest } from './webhook.utils'
 const port = process.env.PORT || 3333
 
 const app: Express = express()
+
+// Morgan logger setup
+app.use(morgan('combined'))
+
 app.use(bodyParser.json())
 
 app.post('/api/:project', (req: Request, res) => {

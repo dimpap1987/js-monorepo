@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  next-app:
+    image: dimpap/webhook-server:0.0.2
+    container_name: webhook-server-container
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+
+# In order to build the image you need to `nx build webhook-server`
