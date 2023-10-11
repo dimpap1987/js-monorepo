@@ -2,8 +2,8 @@ name: Webhook - Build and Push Docker Image
 
 on:
   push:
-    paths:
-    - 'apps/webhook-server/**'
+    # paths:
+    # - 'apps/webhook-server/**'
 
 jobs:
   build:

@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "files": [],
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/webhook.utils.ts"],
   "exclude": ["node_modules", "**/*.spec.ts", "jest.config.ts"],
   "references": [
     {
@@ -13,6 +13,7 @@
   ],
   "compilerOptions": {
     "esModuleInterop": true,
-    "composite": true
+    "composite": true,
+    "declaration": true,
   }
 }
