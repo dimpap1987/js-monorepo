@@ -33,7 +33,10 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-
-            
+
+      - uses: nrwl/nx-set-shas@v3
+      - run: npm ci
+           
       - name: Build Webhook App
         run: npx nx build webhook-server
 
