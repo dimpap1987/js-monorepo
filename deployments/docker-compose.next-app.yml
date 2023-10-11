@@ -5,6 +5,6 @@ services:
     image: dimpap/next-app:latest
     container_name: next-app-container
     ports:
-      - '3000:3000'
+      - '8000:3000'
     environment:
       - NODE_ENV=production

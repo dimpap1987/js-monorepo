@@ -23,17 +23,17 @@ app.post('/api/:project', (req: Request, res) => {
   executeDockerCompose(
     project,
     () => {
-      return res.send({ message: 'Docker Compose started successfully.' })
+      res.send({ message: 'Docker Compose started successfully.' })
     },
     () => {
-      return res
-        .status(500)
-        .send({ message: 'Failed to start Docker Compose.' })
+      res.status(500).send({
+        message: `Failed to start Docker Compose with project name: ${project}`,
+      })
     }
   )
 })
 
 const server = app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}/api !!!`)
+  console.log(`Listening at http://localhost:${port}/api`)
 })
 server.on('error', console.error)
