@@ -1,18 +1,14 @@
-name: Next-app - CI
+name: Webhook - Build and Push Docker Image
 
 on:
   push:
     paths:
-    - 'apps/next-app/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-    - 'apps/next-app/**'
+    - 'apps/webhook-server/**'
 
 jobs:
-  main:
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
         name: Checkout [Pull Request]
@@ -30,9 +26,6 @@ jobs:
           # We need to fetch all branches and commits so that Nx affected has a base to compare against.
           fetch-depth: 0
 
-      - name: Setup Remote Tracking
-        run: git fetch origin +refs/heads/*:refs/remotes/origin/*
-
       - name: Use the package manager cache if available
         uses: actions/cache@v3
         with:
@@ -44,14 +37,8 @@ jobs:
       - uses: nrwl/nx-set-shas@v3
       - run: npm ci
 
-      - name: Lint check
-        run: npx nx affected:lint --base=origin/main --head=${{ github.sha }}
-
-      - name: Run Tests
-        run: npx nx affected:test --base=origin/main --head=${{ github.sha }}
-
-      - name: Build Next.js App
-        run: npm run build:next-app
+      - name: Build Webhook App
+        run: npx nx build webhook-server
 
       - name: Extract version from package.json
         if: github.ref == 'refs/heads/main'
@@ -70,5 +57,4 @@ jobs:
       - name: Build Docker image using Buildx and Push to Docker Hub
         if: github.ref == 'refs/heads/main'
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 -t dimpap/next-app:${{ steps.extract_version.outputs.version }} -f apps/next-app/Dockerfile . --push
-
+          docker buildx build --platform linux/amd64,linux/arm64 -t dimpap/webhook-server:${{ steps.extract_version.outputs.version }} -f apps/webhook-server/Dockerfile . --push
