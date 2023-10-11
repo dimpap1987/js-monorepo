@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0
 
       - name: Build Webhook App
-        run: npx nx build webhook-server
+        run: nx build webhook-server
 
       - name: Extract version from package.json
         # if: github.ref == 'refs/heads/main'
