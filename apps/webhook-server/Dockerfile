@@ -5,4 +5,4 @@ RUN npm install
 COPY . .
 EXPOSE 3333
 RUN npx tsc
-CMD ["node", "/dist/index.js"]
+CMD ["node", "/dist/apps/webhook-server/main.js"]
