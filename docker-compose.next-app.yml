@@ -2,14 +2,9 @@ version: '3.8'
 
 services:
   next-app:
-    build:
-      context: .
-      dockerfile: apps/next-app/Dockerfile
-    image: my-next-app:latest
+    image: dimpap/next-app:latest
     container_name: next-app-container
     ports:
       - '3000:3000'
     environment:
       - NODE_ENV=production
-
-# In order to build the image you need to `nx build next-app`
