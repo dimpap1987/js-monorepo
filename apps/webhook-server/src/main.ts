@@ -1,5 +1,5 @@
 import express, { Request, Express } from 'express'
-import bodyParser from 'body-parser'
+// import bodyParser from 'body-parser'
 import morgan from 'morgan'
 import { executeDockerCompose, validateWebhookRequest } from './webhook.utils'
 
@@ -10,7 +10,7 @@ const app: Express = express()
 // Morgan logger setup
 app.use(morgan('combined'))
 
-app.use(bodyParser.json())
+// app.use(bodyParser.json())
 
 app.post('/api/:project', (req: Request, res) => {
   try {
