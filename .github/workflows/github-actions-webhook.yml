@@ -10,18 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
+      - uses: actions/checkout@v3
+        name: Checkout [Pull Request]
+        if: ${{ github.event_name == 'pull_request' }}
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          # By default, PRs will be checked-out based on the Merge Commit, but we want the actual branch HEAD.
+          ref: ${{ github.event.pull_request.head.sha }}
+          # We need to fetch all branches and commits so that Nx affected has a base to compare against.
+          fetch-depth: 0
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
+      - uses: actions/checkout@v3
+        name: Checkout [Default Branch]
+        if: ${{ github.event_name != 'pull_request' }}
         with:
-          push: true
-          tags: dimpap/webhook:latest
-          file: ./apps/webhook-server/Dockerfile
+          # We need to fetch all branches and commits so that Nx affected has a base to compare against.
+          fetch-depth: 0
+
+      - name: Build Webhook App
+        run: npx nx build webhook-server
+
+      - name: Extract version from package.json
+        # if: github.ref == 'refs/heads/main'
+        id: extract_version
+        run: |
+          echo "::set-output name=version::$(node -p "require('./package.json').version")"
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Docker Hub
+        # if: github.ref == 'refs/heads/main'
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build Docker image using Buildx and Push to Docker Hub
+        # if: github.ref == 'refs/heads/main'
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 -t dimpap/webhook-server:${{ steps.extract_version.outputs.version }} -f apps/webhook-server/Dockerfile . --push
