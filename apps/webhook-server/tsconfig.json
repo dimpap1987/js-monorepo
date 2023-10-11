@@ -4,9 +4,5 @@
   "include": ["src/**/*.ts", "src/webhook.utils.ts"],
   "exclude": ["node_modules", "**/*.spec.ts", "jest.config.ts"],
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "outDir": "dist/",
-    "sourceMap": true
   }
 }
