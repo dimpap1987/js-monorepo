@@ -6,12 +6,14 @@
     "lint": "nx affected:lint --all",
     "format": "npx prettier --write .",
     "dev:next": "nx serve next-app",
+    "dev:webhook": "nx serve webhook-server",
     "start:next": "cd dist/apps/next-app && npx next start",
+    "start:webhook": "cd dist/apps/webhook-server && node main.js",
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
     "build:next-app": "nx build next-app",
-    "prepare": "if [ \"$NODE_ENV\" = \"development\" ]; then husky install; fi",
-    "docker-compose:dev": "npm run build:next-app && docker-compose -f docker-compose.dev.yml up -d --build"
+    "build:webhook": "nx build webhook-server",
+    "prepare": "if [ \"$NODE_ENV\" = \"development\" ]; then husky install; fi"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -25,6 +27,7 @@
     "axios": "^1.0.0",
     "body-parser": "^1.20.2",
     "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
     "express": "^4.18.1",
     "morgan": "^1.10.0",
     "next": "13.4.1",
