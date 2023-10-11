@@ -1,5 +1,6 @@
 import express, { Request, Express } from 'express'
 import bodyParser from 'body-parser'
+import morgan from 'morgan'
 import { executeDockerCompose, validateWebhookRequest } from './webhook.utils'
 
 const port = process.env.PORT || 3333
@@ -15,17 +16,19 @@ app.post('/api/:project', (req: Request, res) => {
   try {
     validateWebhookRequest(req)
   } catch (err) {
-    return res.status(401).send('Unauthorized')
+    return res.status(401).send({ message: 'Unauthorized' })
   }
   const project = req.params.project
 
   executeDockerCompose(
     project,
     () => {
-      return res.send('Docker Compose started successfully.')
+      return res.send({ message: 'Docker Compose started successfully.' })
     },
     () => {
-      return res.status(500).send('Failed to start Docker Compose.')
+      return res
+        .status(500)
+        .send({ message: 'Failed to start Docker Compose.' })
     }
   )
 })
