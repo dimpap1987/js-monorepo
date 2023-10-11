@@ -9,7 +9,14 @@ services:
     container_name: next-app-container
     ports:
       - '3000:3000'
-    environment:
-      - NODE_ENV=production
 
-# In order to build the image you need to `nx build next-app`
+  webhook:
+    build:
+      context: .
+      dockerfile: apps/webhook-server/Dockerfile
+    image: =webhook-server:latest
+    container_name: webhook-server-container
+    ports:
+      - '3333:3333'
+
+# In order to build the image you need to `nx build next-app` and `nx build webhook-server`
