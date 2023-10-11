@@ -33,8 +33,8 @@ const executeDockerCompose = (
   errorCallBack: () => void
 ) => {
   exec(
-    `docker-compose -f docker-compose.${project}.yml up -d`,
-    (error, stdout, stderr) => {
+    `docker compose -f docker-compose.${project}.yml up -d`,
+    (error, _stdout, _stderr) => {
       if (error) {
         errorCallBack()
       }
