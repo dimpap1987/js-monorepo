@@ -1,10 +1,14 @@
-name: CI
+name: Next-app - CI
 
 on:
   push:
+    paths:
+    - 'apps/next-app/**'
   pull_request:
     branches:
       - main
+    paths:
+    - 'apps/next-app/**'
 
 jobs:
   main:
@@ -67,15 +71,4 @@ jobs:
         # if: github.ref == 'refs/heads/main'
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 -t dimpap/next-app:${{ steps.extract_version.outputs.version }} -f apps/next-app/Dockerfile . --push
-      
-      # - name: Build Docker image
-      #   if: github.ref == 'refs/heads/main'
-      #   run: docker build -t dimpap/next-app:${{ steps.extract_version.outputs.version }} -f apps/next-app/Dockerfile .
 
-      # - name: Login to Docker Hub
-      #   if: github.ref == 'refs/heads/main'
-      #   run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      # - name: Push Docker image to Docker Hub
-      #   if: github.ref == 'refs/heads/main'
-      #   run: docker push dimpap/next-app:${{ steps.extract_version.outputs.version }}

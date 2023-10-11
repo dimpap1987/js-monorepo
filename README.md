@@ -20,4 +20,4 @@
 
 ## How to run the docker container in prod mode
 
-docker-compose -f docker-compose.prod.yml up -d --build
+`docker-compose -f docker-compose.prod.yml up -d --build`

@@ -4,7 +4,7 @@ FROM docker.io/node:lts-alpine as deps
 RUN apk add --no-cache libc6-compat python3 make g++ alpine-sdk && rm -rf /var/cache/apk/*
 WORKDIR /usr/src/app
 COPY .npmrc dist/apps/next-app/package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Production image, copy all the files and run next
 FROM docker.io/node:lts-alpine as runner
@@ -19,10 +19,5 @@ COPY dist/apps/next-app/.next ./.next
 RUN chown -R node:node .
 USER node
 EXPOSE 3000
-# COPY --chown=node:node ./tools/scripts/entrypoints/api.sh /usr/local/bin/docker-entrypoint.sh
-# ENTRYPOINT [ "docker-entrypoint.sh" ]
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry.
 ENV NEXT_TELEMETRY_DISABLED 1
 CMD ["dumb-init", "node_modules/.bin/next", "start"]
