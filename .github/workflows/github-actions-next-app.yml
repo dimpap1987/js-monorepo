@@ -54,7 +54,7 @@ jobs:
         run: npm run build:next-app
 
       - name: Extract version from package.json
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         id: extract_version
         run: |
           echo "::set-output name=version::$(node -p "require('./package.json').version")"
@@ -64,11 +64,11 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Login to Docker Hub
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build Docker image using Buildx and Push to Docker Hub
-        # if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 -t dimpap/next-app:${{ steps.extract_version.outputs.version }} -f apps/next-app/Dockerfile . --push
 

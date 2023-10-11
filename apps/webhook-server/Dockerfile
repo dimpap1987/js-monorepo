@@ -4,5 +4,5 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 3333
-RUN npm run ts-build
+RUN npx tsc
 CMD ["node", "/dist/index.js"]
