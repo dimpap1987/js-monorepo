@@ -19,7 +19,7 @@ export default function Index() {
     <>
       <NavbarComponent menuItems={menuItems}>
         <LogoComponent>
-          <h1>DimPap</h1>
+          <h1>DPap</h1>
         </LogoComponent>
       </NavbarComponent>
       <LoaderComponent>
