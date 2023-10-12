@@ -16,7 +16,7 @@ export default function NotificationList({
           {notifications.map((notification, index) => (
             <div
               key={notification.id || index}
-              className={`${styles.notificationContainer} bg-primary-color my-1.5 p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
+              className={`${styles.notificationContainer} bg-primary-dark my-1.5 p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
             >
               <Notification notification={notification} />
             </div>

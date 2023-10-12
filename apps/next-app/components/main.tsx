@@ -14,10 +14,10 @@ export default function Main({ children, className }: MainProps) {
   const [, , addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   return (
-    <section className={className}>
+    <main className={className}>
       {children}
       <div className="flex flex-col justify-center align-items gap-2">
-        <button
+        <ButtonComponent
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
           onClick={() => {
             setLoaderState({ show: true })
@@ -28,63 +28,68 @@ export default function Main({ children, className }: MainProps) {
           }}
         >
           Trigger loading
-        </button>
-        {/* Success */}
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-          onClick={() => {
-            addNotification({
-              id: Math.floor(Math.random() * 1000000),
-              message: 'This is a success message',
-              type: 'success',
-              duration: 4000,
-            })
-          }}
-        >
-          Success notification
-        </button>
-        {/* Error  */}
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-          onClick={() => {
-            addNotification({
-              id: Math.floor(Math.random() * 1000000),
-              message: 'This is an error message',
-              type: 'error',
-              duration: 4000,
-            })
-          }}
-        >
-          Error notification
-        </button>
-        {/* Spinner */}
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-          onClick={() => {
-            addNotification({
-              id: Math.floor(Math.random() * 1000000),
-              message: 'This is a spinner',
-              type: 'spinner',
-              duration: 4000,
-            })
-          }}
-        >
-          Spinner notification
-        </button>
-        <div>
+        </ButtonComponent>
+
+        <div className="flex gap-2">
           <ButtonComponent
-            loading={loading}
+            className="flex-1"
+            variant="primary"
             onClick={() => {
-              setLoading((prev) => !prev)
-              setTimeout(() => {
-                setLoading((prev) => !prev)
-              }, 2000)
+              addNotification({
+                id: Math.floor(Math.random() * 1000000),
+                message: 'This is a success message',
+                type: 'success',
+                duration: 4000,
+              })
             }}
           >
-            Click me
+            Success notification
+          </ButtonComponent>
+          {/* Error  */}
+          <ButtonComponent
+            className="flex-1"
+            variant="danger"
+            onClick={() => {
+              addNotification({
+                id: Math.floor(Math.random() * 1000000),
+                message: 'This is an error message',
+                type: 'error',
+                duration: 4000,
+              })
+            }}
+          >
+            Error notification
+          </ButtonComponent>
+          {/* Spinner */}
+          <ButtonComponent
+            className="flex-1"
+            variant="secondary"
+            onClick={() => {
+              addNotification({
+                id: Math.floor(Math.random() * 1000000),
+                message: 'This is a spinner',
+                type: 'spinner',
+                duration: 4000,
+              })
+            }}
+          >
+            Spinner notification
           </ButtonComponent>
         </div>
+        {/* Success */}
+        <ButtonComponent
+          loading={loading}
+          onClick={() => {
+            setLoading((prev) => !prev)
+            setTimeout(() => {
+              setLoading((prev) => !prev)
+            }, 2000)
+          }}
+        >
+          Disable when Clicked
+        </ButtonComponent>
+        <div></div>
       </div>
-    </section>
+    </main>
   )
 }

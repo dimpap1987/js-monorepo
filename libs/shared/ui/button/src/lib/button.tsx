@@ -20,14 +20,16 @@ export function ButtonComponent({
   //disabled classes
   const disabledStyles = 'cursor-not-allowed opacity-50'
   // base styles
-  const baseStyles = `relative px-12 py-2 rounded font-bold focus:outline-none flex items-center ${
+  const baseStyles = `px-12 py-2 rounded font-bold focus:outline-none flex items-center justify-center ${
     loading ? disabledStyles : ''
   }`
   // Variant styles
   const variantStyles = {
-    primary: 'bg-primary-color text-white hover:bg-primary-color-hover',
-    secondary: 'bg-gray-200 text-black hover:bg-gray-300',
-    danger: 'bg-red-500 text-white hover:bg-red-600',
+    primary:
+      'bg-turquoise border-turquoise text-dark-charcoal hover:bg-turquoise-hover',
+    secondary:
+      'bg-goldenrod border-goldenrod text-dark-charcoal hover:bg-goldenrod-hover',
+    danger: 'bg-pink border-pink text-dark-charcoal hover:bg-pink-hover',
   }
 
   // Size styles
