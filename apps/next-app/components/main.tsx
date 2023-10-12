@@ -30,7 +30,7 @@ export default function Main({ children, className }: MainProps) {
           Trigger loading
         </ButtonComponent>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <ButtonComponent
             className="flex-1"
             variant="primary"
