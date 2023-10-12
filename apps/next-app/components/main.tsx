@@ -18,7 +18,7 @@ export default function Main({ children, className }: MainProps) {
       {children}
       <div className="flex flex-col justify-center align-items gap-2">
         <ButtonComponent
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+          className="bg-blue-500 hover:bg-blue-700 font-bold py-2 px-4 border border-blue-700 rounded"
           onClick={() => {
             setLoaderState({ show: true })
             const timeoutId = setTimeout(() => {
@@ -36,7 +36,6 @@ export default function Main({ children, className }: MainProps) {
             variant="primary"
             onClick={() => {
               addNotification({
-                id: Math.floor(Math.random() * 1000000),
                 message: 'This is a success message',
                 type: 'success',
                 duration: 4000,
@@ -51,7 +50,6 @@ export default function Main({ children, className }: MainProps) {
             variant="danger"
             onClick={() => {
               addNotification({
-                id: Math.floor(Math.random() * 1000000),
                 message: 'This is an error message',
                 type: 'error',
                 duration: 4000,
@@ -66,7 +64,6 @@ export default function Main({ children, className }: MainProps) {
             variant="secondary"
             onClick={() => {
               addNotification({
-                id: Math.floor(Math.random() * 1000000),
                 message: 'This is a spinner',
                 type: 'spinner',
                 duration: 4000,

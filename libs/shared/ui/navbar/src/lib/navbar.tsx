@@ -30,10 +30,8 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
   }, [children])
 
   return (
-    <nav>
-      <div
-        className={`flex justify-between bg-primary-dark text-white w-screen h-14 z-40`}
-      >
+    <nav className="z-40 bg-primary-dark text-white w-screen">
+      <div className={`flex justify-between h-14`}>
         <div className="px-5 xl:px-12 py-2 flex w-full items-center">
           {/* options on the left*/}
           {logo}
@@ -107,7 +105,7 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
       ></input>
       {/* Dropdown */}
       <div
-        className={`dropdownMenu absolute w-52 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 ${styles.dropdownMenu}`}
+        className={`dropdownMenu absolute w-52 right-0 p-2 shadow-lg bg-primary-dark text-white ${styles.dropdownMenu}`}
       >
         {menuItems && menuItems.length > 0 && (
           <ul className="mx-auto font-semibold font-heading">

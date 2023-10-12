@@ -55,7 +55,8 @@ export const NotificationComponent: React.FC<NotificationProviderPros> = ({
 
   //useCallback hook which will ensure that the addNotification function itself is memoized and not recreated on every render
   const addNotification = useCallback((notification: NotificationType) => {
-    setNotifications((prev) => [...prev, notification])
+    const { id = Math.floor(Math.random() * 1000000) } = notification
+    setNotifications((prev) => [...prev, { ...notification, id }])
   }, [])
 
   const timeoutsRef = useRef<Record<number | string, NodeJS.Timeout>>({})
@@ -73,7 +74,7 @@ export const NotificationComponent: React.FC<NotificationProviderPros> = ({
 
     notifications.forEach((notification) => {
       // If we already have a timeout for this notification, skip setting another
-      if (timeoutsRef.current[notification.id]) return
+      if (!notification.id || timeoutsRef.current[notification.id]) return
 
       const timeoutId = setTimeout(
         () => {
