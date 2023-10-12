@@ -14,7 +14,7 @@ app.use(morgan('combined'))
 
 app.post('/api/:project', (req: Request, res) => {
   try {
-    validateWebhookRequest(req)
+    // validateWebhookRequest(req) //TODO
   } catch (err) {
     return res.status(401).send({ message: 'Unauthorized' })
   }
