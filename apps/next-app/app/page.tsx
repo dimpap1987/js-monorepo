@@ -1,6 +1,7 @@
 import { LoaderComponent } from '@js-monorepo/loader'
 import { LogoComponent, MenuItem, NavbarComponent } from '@js-monorepo/navbar'
 import { NotificationComponent } from '@js-monorepo/notification'
+import { VersionComponent } from '@js-monorepo/version'
 import Main from '../components/main'
 
 export default function Index() {
@@ -23,7 +24,10 @@ export default function Index() {
       </NavbarComponent>
       <LoaderComponent>
         <NotificationComponent>
-          <Main className="p-2"></Main>
+          <Main className="p-2 flex-grow"></Main>
+          <footer className="text-center py-4">
+            <VersionComponent></VersionComponent>
+          </footer>
         </NotificationComponent>
       </LoaderComponent>
     </>

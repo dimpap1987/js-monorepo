@@ -32,7 +32,7 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
   return (
     <nav>
       <div
-        className={`flex justify-between bg-primary-color text-white w-screen h-14 z-40`}
+        className={`flex justify-between bg-primary-dark text-white w-screen h-14 z-40`}
       >
         <div className="px-5 xl:px-12 py-2 flex w-full items-center">
           {/* options on the left*/}
@@ -107,7 +107,7 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
       ></input>
       {/* Dropdown */}
       <div
-        className={`dropdownMenu absolute w-52 right-0 p-2 shadow-lg bg-primary-color text-white z-40 ${styles.dropdownMenu}`}
+        className={`dropdownMenu absolute w-52 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 ${styles.dropdownMenu}`}
       >
         {menuItems && menuItems.length > 0 && (
           <ul className="mx-auto font-semibold font-heading">
@@ -134,7 +134,7 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
       ></input>
       {/* User options Dropdown */}
       <div
-        className={`dropdownUserOptions absolute w-44 grid grid-cols-2 gap-4 right-0 p-2 shadow-lg bg-primary-color text-white z-40 ${styles.dropdownUserOptions}`}
+        className={`dropdownUserOptions absolute w-44 grid grid-cols-2 gap-4 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 ${styles.dropdownUserOptions}`}
       >
         <LoginButtonComponent></LoginButtonComponent>
         <LogoutButtonComponent></LogoutButtonComponent>
