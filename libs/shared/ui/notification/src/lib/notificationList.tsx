@@ -12,11 +12,11 @@ export default function NotificationList({
     notifications &&
     notifications.length > 0 && (
       <section>
-        <div className="fixed right-2 p-2 z-30 flex flex-col-reverse">
+        <div className="fixed right-2 p-2 z-30 flex flex-col-reverse gap-2">
           {notifications.map((notification, index) => (
             <div
               key={notification.id || index}
-              className={`${styles.notificationContainer} bg-primary-dark my-1.5 p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
+              className={`${styles.notificationContainer} bg-primary-dark p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
             >
               <Notification notification={notification} />
             </div>

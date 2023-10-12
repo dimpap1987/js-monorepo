@@ -30,7 +30,10 @@ module.exports = {
       },
       textColor: {
         primary: 'rgb(26, 35, 53)',
-        'dark-charcoal': '#333333',
+        'dark-charcoal': ' rgb(19 45 62)',
+      },
+      minHeight: {
+        '100svh': '100svh',
       },
     },
   },

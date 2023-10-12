@@ -6,3 +6,8 @@
   /* --bg-navbar--color: red; */
   /* --primary-dark: #3498db; */
 }
+
+.min-h-100svh {
+  min-height: 100vh;
+  min-height: 100svh;
+}

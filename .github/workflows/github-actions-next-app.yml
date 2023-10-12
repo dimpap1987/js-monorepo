@@ -74,10 +74,10 @@ jobs:
           -t dimpap/next-app:latest \
           -f apps/next-app/Dockerfile . --push
 
-      - name: Invoke deployment hook
-        if: github.ref == 'refs/heads/main'
-        uses: distributhor/workflow-webhook@v3
-        env:
-          webhook_type: 'json-extended'
-          webhook_url: ${{ secrets.WEBHOOK_URL }}next-app
-          webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+      # - name: Invoke deployment hook
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: distributhor/workflow-webhook@v3
+      #   env:
+      #     webhook_type: 'json-extended'
+      #     webhook_url: ${{ secrets.WEBHOOK_URL }}next-app
+      #     webhook_secret: ${{ secrets.WEBHOOK_SECRET }}

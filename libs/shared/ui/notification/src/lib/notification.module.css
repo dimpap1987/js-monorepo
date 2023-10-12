@@ -1,6 +1,7 @@
 .spinner {
   display: inline-block;
   position: relative;
+  vertical-align: middle;
 }
 
 .spinner:after {
@@ -9,9 +10,9 @@
   border-radius: 50%;
   width: 0;
   height: 0;
-  margin: 5px;
+  margin: 2px;
   box-sizing: border-box;
-  border: 10px solid #fff;
+  border: 9px solid #fff;
   border-color: #fff transparent #fff transparent;
   animation: spinnerAnimation 1.2s infinite;
 }
@@ -34,7 +35,7 @@
 
 .containerGrid {
   display: grid;
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-rows: repeat(1, 1fr);
 }
 
 .spinnerGrid {
@@ -51,6 +52,7 @@
   max-width: 250px;
   width: 250px;
   max-height: 211px;
+  min-height: 57px;
   animation: slideRight 300ms linear;
   animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   overflow: hidden;
