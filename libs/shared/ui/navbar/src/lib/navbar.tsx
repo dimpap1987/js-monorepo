@@ -2,6 +2,7 @@ import React, { ReactNode, useMemo } from 'react'
 import LoginButtonComponent from './components/login-button'
 import LogoutButtonComponent from './components/logout-button'
 import styles from './navbar.module.css'
+import Link from 'next/link'
 export interface NavbarProps {
   children?: ReactNode
   menuItems?: MenuItem[]
@@ -10,8 +11,23 @@ export type MenuItem = {
   name: string
   link: string
 }
+
+const menuItemsDefault: MenuItem[] = [
+  {
+    link: '/',
+    name: 'Home',
+  },
+  {
+    link: 'about',
+    name: 'About',
+  },
+]
+
 // TODO move menu and log here
-export function NavbarComponent({ children, menuItems }: NavbarProps) {
+export function NavbarComponent({
+  children,
+  menuItems = menuItemsDefault,
+}: NavbarProps) {
   const { logo } = useMemo(() => {
     let logoElement: ReactNode | null = null
 
@@ -41,9 +57,9 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
             <ul className="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
               {menuItems.map((item, index) => (
                 <li key={index} className={styles.underlineEffect}>
-                  <a className="py-2 px-4" href={item.link}>
+                  <Link className="py-2 px-4" href={item.link}>
                     {item.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -105,7 +121,7 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
       ></input>
       {/* Dropdown */}
       <div
-        className={`dropdownMenu absolute w-52 right-0 p-2 shadow-lg bg-primary-dark text-white ${styles.dropdownMenu}`}
+        className={`hidden absolute w-52 right-0 p-2 shadow-lg bg-primary-dark text-white ${styles.dropdownMenu}`}
       >
         {menuItems && menuItems.length > 0 && (
           <ul className="mx-auto font-semibold font-heading">
@@ -114,7 +130,7 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
                 key={index}
                 className="text-center py-2 hover:bg-blue-900 w-full flex justify-center"
               >
-                <a href={item.link}>{item.name}</a>
+                <Link href={item.link}>{item.name}</Link>
               </li>
             ))}
           </ul>
@@ -132,7 +148,7 @@ export function NavbarComponent({ children, menuItems }: NavbarProps) {
       ></input>
       {/* User options Dropdown */}
       <div
-        className={`dropdownUserOptions absolute w-44 grid grid-cols-2 gap-4 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 ${styles.dropdownUserOptions}`}
+        className={`hidden absolute w-44 grid grid-cols-2 gap-4 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 ${styles.dropdownUserOptions}`}
       >
         <LoginButtonComponent></LoginButtonComponent>
         <LogoutButtonComponent></LogoutButtonComponent>

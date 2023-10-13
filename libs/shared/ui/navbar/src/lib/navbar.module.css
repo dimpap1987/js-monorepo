@@ -1,21 +1,8 @@
-.dropdownMenu {
-  display: none;
-}
-
 .menuToggleChecked:checked + .dropdownMenu {
   display: block;
 }
 
 /* Adjust 768px based on the exact breakpoint you consider as medium */
-@media (min-width: 768px) {
-  .dropdownMenu {
-    display: none !important;
-  }
-}
-
-.dropdownUserOptions {
-  display: none;
-}
 
 .userOptionsToggleChecked:checked + .dropdownUserOptions {
   display: block;
@@ -38,6 +25,12 @@
 /* Adjust 768px based on the exact breakpoint you consider as medium */
 @media (max-width: 768px) {
   .dropdownUserOptions {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .dropdownMenu {
     display: none !important;
   }
 }
