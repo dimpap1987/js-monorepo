@@ -1,24 +1,24 @@
+import { NavLink } from '@js-monorepo/nav-link'
 import React, { ReactNode, useMemo } from 'react'
 import LoginButtonComponent from './components/login-button'
 import LogoutButtonComponent from './components/logout-button'
 import styles from './navbar.module.css'
-import Link from 'next/link'
 export interface NavbarProps {
   children?: ReactNode
   menuItems?: MenuItem[]
 }
 export type MenuItem = {
   name: string
-  link: string
+  href: string
 }
 
 const menuItemsDefault: MenuItem[] = [
   {
-    link: '/',
+    href: '/',
     name: 'Home',
   },
   {
-    link: 'about',
+    href: '/about',
     name: 'About',
   },
 ]
@@ -57,9 +57,9 @@ export function NavbarComponent({
             <ul className="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
               {menuItems.map((item, index) => (
                 <li key={index} className={styles.underlineEffect}>
-                  <Link className="py-2 px-4" href={item.link}>
+                  <NavLink className="py-2 px-4" href={item.href}>
                     {item.name}
-                  </Link>
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -130,7 +130,9 @@ export function NavbarComponent({
                 key={index}
                 className="text-center py-2 hover:bg-blue-900 w-full flex justify-center"
               >
-                <Link href={item.link}>{item.name}</Link>
+                <NavLink className="py-2 px-4" href={item.href}>
+                  {item.name}
+                </NavLink>
               </li>
             ))}
           </ul>

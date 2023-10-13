@@ -18,10 +18,11 @@
     "paths": {
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
       "@js-monorepo/loader": ["libs/shared/ui/loader/src/index.ts"],
+      "@js-monorepo/nav-link": ["libs/shared/ui/nav-link/src/index.ts"],
       "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
-      "@js-monorepo/version": ["libs/shared/ui/version/src/index.ts"],
-      "@js-monorepo/package.json": ["package.json"]
+      "@js-monorepo/package.json": ["package.json"],
+      "@js-monorepo/version": ["libs/shared/ui/version/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
