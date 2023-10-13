@@ -1,3 +1,4 @@
+import MainTemplate from '../components/main.template'
 import './global.css'
 
 export const metadata = {
@@ -12,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex flex-col min-h-100svh bg-primary">{children}</body>
+      <body className="flex flex-col min-h-100svh bg-primary">
+        <MainTemplate>{children}</MainTemplate>
+      </body>
     </html>
   )
 }

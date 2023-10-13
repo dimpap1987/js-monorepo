@@ -14,7 +14,7 @@ export default function Main({ children, className }: MainProps) {
   const [, , addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   return (
-    <main className={className}>
+    <section className={className}>
       {children}
       <div className="flex flex-col justify-center align-items gap-2">
         <ButtonComponent
@@ -87,6 +87,6 @@ export default function Main({ children, className }: MainProps) {
         </ButtonComponent>
         <div></div>
       </div>
-    </main>
+    </section>
   )
 }
