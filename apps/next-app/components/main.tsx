@@ -105,13 +105,13 @@ export default function Main({ children, className }: MainProps) {
         onClose={() => setOpenDialog(false)}
         onCancel={() => setOpenDialog(false)}
         onConfirm={async () => {
-          await loadForTwoSecond()
           setOpenDialog(false)
-          addNotification({
-            message: 'Successfully submitted !!!',
-            type: 'success',
-            duration: 4000,
-          })
+          // await loadForTwoSecond()
+          // addNotification({
+          //   message: 'Successfully submitted !!!',
+          //   type: 'success',
+          //   duration: 4000,
+          // })
         }}
       ></ConfirmationDialogComponent>
     </section>
