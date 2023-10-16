@@ -20,7 +20,7 @@ export function ButtonComponent({
   //disabled classes
   const disabledStyles = 'cursor-not-allowed opacity-50'
   // base styles
-  const baseStyles = `px-12 py-2 rounded font-bold focus:outline-none flex items-center justify-center ${
+  const baseStyles = `px-12 py-2 rounded font-bold focus:outline-none flex items-center justify-center w-full whitespace-nowrap overflow-hidden ${
     loading ? disabledStyles : ''
   }`
   // Variant styles
