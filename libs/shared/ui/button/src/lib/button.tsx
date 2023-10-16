@@ -20,7 +20,7 @@ export function ButtonComponent({
   //disabled classes
   const disabledStyles = 'cursor-not-allowed opacity-50'
   // base styles
-  const baseStyles = `px-12 py-2 rounded font-bold focus:outline-none flex items-center justify-center w-full whitespace-nowrap overflow-hidden ${
+  const baseStyles = `relative px-12 py-2 rounded font-bold focus:outline-none flex items-center justify-center w-full whitespace-nowrap ${
     loading ? disabledStyles : ''
   }`
   // Variant styles
@@ -50,7 +50,7 @@ export function ButtonComponent({
   const buttonContent = children ?? 'Press button'
   const loadingContent = loading && (
     <div
-      className="inline-block absolute left-4 h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent  motion-reduce:animate-[spin_1.5s_linear_infinite] mr-3"
+      className="absolute left-3  h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent  motion-reduce:animate-[spin_1.5s_linear_infinite] mr-3"
       role="status"
     ></div>
   )
