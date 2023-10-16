@@ -22,6 +22,8 @@ module.exports = {
         'turquoise-hover': 'rgb(44, 204, 188)',
         goldenrod: 'rgb(255, 223, 85)',
         'goldenrod-hover': 'rgb(235, 203, 65)',
+        gray: 'rgb(200, 200, 200)',
+        'gray-hover': 'rgb(180, 180, 180)',
       },
       borderColor: {
         pink: 'rgb(150, 125, 210)',
