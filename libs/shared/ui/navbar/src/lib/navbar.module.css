@@ -2,12 +2,6 @@
   display: block;
 }
 
-/* Adjust 768px based on the exact breakpoint you consider as medium */
-
-.userOptionsToggleChecked:checked + .dropdownUserOptions {
-  display: block;
-}
-
 .underlineEffect::after {
   content: '';
   display: block;
@@ -22,12 +16,6 @@
   width: 80%; /* Expand to the full width on hover */
 }
 
-/* Adjust 768px based on the exact breakpoint you consider as medium */
-@media (max-width: 768px) {
-  .dropdownUserOptions {
-    display: none !important;
-  }
-}
 
 @media (min-width: 768px) {
   .dropdownMenu {

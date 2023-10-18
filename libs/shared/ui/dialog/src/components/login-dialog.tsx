@@ -15,13 +15,13 @@ function LoginDialogComponent({
     <DialogComponent
       isOpen={isOpen}
       onClose={onClose}
-      className="text-black max-w-[90%] shadow-2xl shadow-cyan-500/50"
+      className="text-black shadow-2xl shadow-cyan-500/50"
     >
       <DialogHeader className="justify-center">Sign in with</DialogHeader>
-      <DialogContent className="md:w-[300px]">
+      <DialogContent className="md:w-[280px]">
         <div className="flex flex-col items-center text-xs gap-2 md:text-sm font-medium text-white">
           <button
-            className="bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black inline-flex items-center hover:bg-zinc-300 mr-2"
+            className="bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black inline-flex items-center hover:bg-zinc-300 mr-2 focus:ring-4 focus:ring-[#24292F]/50 dark:focus:ring-[#3b5998]/55"
             onClick={() => loginRequest('google')}
           >
             <svg
