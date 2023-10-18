@@ -1,9 +1,9 @@
+import { LoginDialogComponent } from '@js-monorepo/dialog'
 import { NavLink } from '@js-monorepo/nav-link'
-import React, { ReactNode, useMemo, useState } from 'react'
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import LoginButtonComponent from './components/login-button'
 import LogoutButtonComponent from './components/logout-button'
 import styles from './navbar.module.css'
-import { LoginDialogComponent } from '@js-monorepo/dialog'
 export interface NavbarProps {
   children?: ReactNode
   menuItems?: MenuItem[]
@@ -31,6 +31,9 @@ export function NavbarComponent({
 }: NavbarProps) {
   //state
   const [isLoginDialog, setLoginDialog] = useState(false)
+  const [isDropdownRefVisible, setIsDropdownRefVisible] = useState(false) // State to show/hide div
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const dropdownIconRef = useRef<SVGSVGElement | null>(null)
 
   const { logo } = useMemo(() => {
     let logoElement: ReactNode | null = null
@@ -48,6 +51,26 @@ export function NavbarComponent({
     })
     return { logo: logoElement }
   }, [children])
+
+  useEffect(() => {
+    // Click handler to check if clicks are outside of the referenced div
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        !dropdownRef.current?.contains(event.target as Node) &&
+        !dropdownIconRef.current?.contains(event.target as Node) &&
+        event.target !== dropdownIconRef.current
+      ) {
+        setIsDropdownRefVisible(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+
+    // Cleanup - remove the listener when the component unmounts
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
 
   return (
     <nav className="z-40 bg-primary-dark text-white w-screen">
@@ -80,6 +103,10 @@ export function NavbarComponent({
               className="flex items-center hover:text-gray-200 cursor-pointer select-none transition duration-300 ease-in-out hover:scale-125"
             >
               <svg
+                ref={dropdownIconRef}
+                onClick={() => {
+                  setIsDropdownRefVisible((prev) => !prev)
+                }}
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 hover:text-gray-200"
                 fill="none"
@@ -151,21 +178,18 @@ export function NavbarComponent({
       </div>
 
       {/* User options hidden input*/}
-      <input
-        id="userOptionsToggle"
-        type="checkbox"
-        className={`${styles.userOptionsToggleChecked} hidden absolute select-none`}
-      ></input>
-      {/* User options Dropdown */}
-      <div
-        className={`hidden absolute w-44 grid grid-cols-2 gap-4 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 ${styles.dropdownUserOptions}`}
-      >
-        <LogoutButtonComponent></LogoutButtonComponent>
-      </div>
+      {isDropdownRefVisible && (
+        <div
+          ref={dropdownRef}
+          className={`absolute w-44 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 hidden md:block`}
+        >
+          <LogoutButtonComponent></LogoutButtonComponent>
+        </div>
+      )}
 
       <LoginDialogComponent
         isOpen={isLoginDialog}
-        onClose={() => setLoginDialog((prev) => !prev)}
+        onClose={() => setLoginDialog(false)}
       ></LoginDialogComponent>
     </nav>
   )
