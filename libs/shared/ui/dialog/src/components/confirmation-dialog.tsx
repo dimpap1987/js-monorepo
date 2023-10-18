@@ -31,7 +31,11 @@ function ConfirmationDialogComponent({
   onCancel,
 }: ConfirmationDialogComponentProps) {
   return (
-    <DialogComponent isOpen={isOpen} onClose={onClose} className={className}>
+    <DialogComponent
+      isOpen={isOpen}
+      onClose={onClose}
+      className={`${className} shadow-2xl shadow-cyan-500/50`}
+    >
       {title && <DialogHeader>{title}</DialogHeader>}
       {content && <DialogContent>{content}</DialogContent>}
       <DialogFooter>

@@ -1,8 +1,9 @@
 import { NavLink } from '@js-monorepo/nav-link'
-import React, { ReactNode, useMemo } from 'react'
+import React, { ReactNode, useMemo, useState } from 'react'
 import LoginButtonComponent from './components/login-button'
 import LogoutButtonComponent from './components/logout-button'
 import styles from './navbar.module.css'
+import { LoginDialogComponent } from '@js-monorepo/dialog'
 export interface NavbarProps {
   children?: ReactNode
   menuItems?: MenuItem[]
@@ -28,6 +29,9 @@ export function NavbarComponent({
   children,
   menuItems = menuItemsDefault,
 }: NavbarProps) {
+  //state
+  const [isLoginDialog, setLoginDialog] = useState(false)
+
   const { logo } = useMemo(() => {
     let logoElement: ReactNode | null = null
 
@@ -67,7 +71,9 @@ export function NavbarComponent({
 
           {/* options on the right*/}
           <div className="hidden md:flex items-center space-x-5 items-center">
-            <LoginButtonComponent></LoginButtonComponent>
+            <LoginButtonComponent
+              onClick={() => setLoginDialog((prev) => !prev)}
+            ></LoginButtonComponent>
             {/* when logged in */}
             <label
               htmlFor="userOptionsToggle"
@@ -138,7 +144,9 @@ export function NavbarComponent({
           </ul>
         )}
         <hr className="my-2" />
-        <LoginButtonComponent></LoginButtonComponent>
+        <LoginButtonComponent
+          onClick={() => setLoginDialog((prev) => !prev)}
+        ></LoginButtonComponent>
         <LogoutButtonComponent></LogoutButtonComponent>
       </div>
 
@@ -152,9 +160,13 @@ export function NavbarComponent({
       <div
         className={`hidden absolute w-44 grid grid-cols-2 gap-4 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 ${styles.dropdownUserOptions}`}
       >
-        <LoginButtonComponent></LoginButtonComponent>
         <LogoutButtonComponent></LogoutButtonComponent>
       </div>
+
+      <LoginDialogComponent
+        isOpen={isLoginDialog}
+        onClose={() => setLoginDialog((prev) => !prev)}
+      ></LoginDialogComponent>
     </nav>
   )
 }

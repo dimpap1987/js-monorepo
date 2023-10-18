@@ -1,21 +1,22 @@
 'use client'
-import React, { ReactNode, useMemo, useEffect, useState } from 'react'
-import { twMerge } from 'tailwind-merge'
-import DialogContent from '../components/content'
-import DialogHeader from '../components/header'
-import DialogFooter from '../components/footer'
-import ConfirmationDialogComponent from '../components/confirmation-dialog'
+import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { AiFillCloseCircle } from 'react-icons/ai'
+import { twMerge } from 'tailwind-merge'
+import ConfirmationDialogComponent from '../components/confirmation-dialog'
+import DialogContent from '../components/content'
+import DialogFooter from '../components/footer'
+import DialogHeader from '../components/header'
+import LoginDialogComponent from '../components/login-dialog'
 
 export interface DialogComponentProps {
-  isOpen: boolean
+  isOpen?: boolean
   onClose: () => void
   children: React.ReactNode
   className?: string
 }
 
 function DialogComponent({
-  isOpen = false,
+  isOpen = true,
   onClose,
   children,
   className,
@@ -43,10 +44,8 @@ function DialogComponent({
       }
     })
 
-    if (!footerElement || !contentElement) {
-      throw new Error(
-        'Dialog requires DialogFooter, DialogHeader, and DialogContent as children.'
-      )
+    if (!contentElement) {
+      throw new Error('Dialog requires  DialogContent as children.')
     }
     return {
       footer: footerElement,
@@ -72,16 +71,16 @@ function DialogComponent({
     <div
       data-dialog-backdrop="dialog"
       data-dialog-backdrop-close="true"
-      className={twMerge(
-        `fixed inset-0 z-20 grid h-screen w-screen place-items-center bg-black bg-opacity-20 backdrop-blur-sm transition-opacity duration-300 pointer-events-all`,
-        className
-      )}
+      className={`fixed inset-0 z-20 grid h-screen w-screen place-items-center pointer-events-all bg-black bg-opacity-50`}
+      onClick={onClose}
     >
       <div
         data-dialog="dialog"
+        onClick={(e) => e.stopPropagation()}
         className={twMerge(
-          `relative min-w-[200px] w-2/5 max-w-[40%] rounded-lg bg-slate-100 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased shadow-2xl pointer-events-auto transition ease-out duration-300 transform`,
-          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full'
+          `relative p-3 mb-20 min-w-[200px] md:max-w-[40%] max-w-[90%] rounded-lg bg-slate-100 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform`,
+          isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full',
+          className
         )}
       >
         <button
@@ -92,7 +91,17 @@ function DialogComponent({
           <AiFillCloseCircle></AiFillCloseCircle>
         </button>
         {header}
-        {content}
+        {content && (
+          <div
+            className={`relative ${
+              header ? ' border-t border-t-blue-gray-100 ' : ''
+            }
+              ${footer ? ' border-b border-b-blue-gray-100 ' : ''} 
+               p-4 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased`}
+          >
+            {content}
+          </div>
+        )}
         {footer}
       </div>
     </div>
@@ -100,9 +109,10 @@ function DialogComponent({
 }
 
 export {
+  ConfirmationDialogComponent,
   DialogComponent,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  ConfirmationDialogComponent,
+  LoginDialogComponent,
 }

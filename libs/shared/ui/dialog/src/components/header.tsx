@@ -11,7 +11,7 @@ function DialogHeader({ children, className }: DialogHeaderProps) {
     children && (
       <div
         className={twMerge(
-          'flex shrink-0 items-center p-4 font-sans text-xl font-semibold leading-snug text-blue-gray-900 antialiased',
+          'flex shrink-0 items-center p-3 text-xl font-semibold font-heading space-x-12 leading-snug text-blue-gray-900 antialiased',
           className
         )}
       >
