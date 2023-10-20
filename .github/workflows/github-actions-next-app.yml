@@ -3,12 +3,13 @@ name: Next-app - CI
 on:
   push:
     paths:
-    - 'apps/next-app/**'
+      - 'apps/next-app/**'
+      - 'package.json'
   pull_request:
     branches:
       - main
     paths:
-    - 'apps/next-app/**'
+      - 'apps/next-app/**'
 
 jobs:
   main:
