@@ -1,7 +1,3 @@
-.menuToggleChecked:checked + .dropdownMenu {
-  display: block;
-}
-
 .underlineEffect::after {
   content: '';
   display: block;
@@ -14,11 +10,4 @@
 .underlineEffect:hover::after {
   margin: 0 auto;
   width: 80%; /* Expand to the full width on hover */
-}
-
-
-@media (min-width: 768px) {
-  .dropdownMenu {
-    display: none !important;
-  }
 }
