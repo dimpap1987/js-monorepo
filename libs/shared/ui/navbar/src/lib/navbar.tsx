@@ -7,10 +7,21 @@ import styles from './navbar.module.css'
 export interface NavbarProps {
   children?: ReactNode
   menuItems?: MenuItem[]
+  user?: UserNavProps
+  socialLogin?: UserNavSocial[]
+  onLogout?: () => void
 }
 export type MenuItem = {
   name: string
   href: string
+}
+export type UserNavProps = {
+  username?: string
+  isLoggedIn: boolean
+}
+export type UserNavSocial = {
+  type: 'google' | 'github' | 'facebook'
+  onLogin: () => void
 }
 
 const menuItemsDefault: MenuItem[] = [
@@ -24,10 +35,12 @@ const menuItemsDefault: MenuItem[] = [
   },
 ]
 
-// TODO move menu and log here
 export function NavbarComponent({
   children,
   menuItems = menuItemsDefault,
+  user,
+  socialLogin,
+  onLogout,
 }: NavbarProps) {
   //state
   const [isLoginDialog, setLoginDialog] = useState(false)
@@ -106,33 +119,45 @@ export function NavbarComponent({
           )}
 
           {/* options on the right*/}
-          <div className="hidden md:flex items-center space-x-5 items-center">
-            <LoginButtonComponent
-              onClick={() => setLoginDialog((prev) => !prev)}
-            ></LoginButtonComponent>
+          <div className="hidden md:flex space-x-5 items-center w-1/6 justify-end text-center">
+            {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
+              <LoginButtonComponent
+                className="bg-blue-800 rounded-full shadow hover:bg-blue-700 transition-all duration-300"
+                onClick={() => setLoginDialog((prev) => !prev)}
+              ></LoginButtonComponent>
+            )}
             {/* when logged in */}
-            <div
-              className="flex items-center hover:text-gray-200 cursor-pointer select-none transition duration-300 ease-in-out hover:scale-125"
-              onClick={() => {
-                setIsDropdownLoggedOptionsRefVisible((prev) => !prev)
-              }}
-            >
-              <svg
-                ref={dropdownIconRef}
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 hover:text-gray-200"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
+            {user?.isLoggedIn && (
+              <>
+                {user.username && (
+                  <span className="text-md font-bold text-white bg-blue-800 px-3 py-1 rounded-full shadow hover:bg-blue-700 transition-all duration-300">
+                    {user.username}
+                  </span>
+                )}
+                <div
+                  className="flex items-center hover:text-gray-200 cursor-pointer select-none transition duration-300 ease-in-out hover:scale-125"
+                  onClick={() => {
+                    setIsDropdownLoggedOptionsRefVisible((prev) => !prev)
+                  }}
+                >
+                  <svg
+                    ref={dropdownIconRef}
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 hover:text-gray-200"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -180,28 +205,43 @@ export function NavbarComponent({
               ))}
             </ul>
           )}
-          <hr className="my-2" />
-          <LoginButtonComponent
-            onClick={() => setLoginDialog((prev) => !prev)}
-          ></LoginButtonComponent>
-          <LogoutButtonComponent></LogoutButtonComponent>
+          {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
+            <>
+              <hr className="my-2" />
+              <LoginButtonComponent
+                onClick={() => setLoginDialog((prev) => !prev)}
+              ></LoginButtonComponent>
+            </>
+          )}
+          {user?.isLoggedIn && (
+            <LogoutButtonComponent
+              onClick={() => onLogout?.()}
+            ></LogoutButtonComponent>
+          )}
         </div>
       )}
 
       {/* User options hidden input*/}
-      {isDropdownLoggedOptionsRefVisible && (
+      {user?.isLoggedIn && isDropdownLoggedOptionsRefVisible && (
         <div
           ref={dropdownLoggedOptionsRef}
           className="absolute w-44 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 hidden md:block"
         >
-          <LogoutButtonComponent></LogoutButtonComponent>
+          {user?.isLoggedIn && (
+            <LogoutButtonComponent
+              onClick={() => onLogout?.()}
+            ></LogoutButtonComponent>
+          )}
         </div>
       )}
 
-      <LoginDialogComponent
-        isOpen={isLoginDialog}
-        onClose={() => setLoginDialog(false)}
-      ></LoginDialogComponent>
+      {socialLogin && socialLogin.length > 0 && (
+        <LoginDialogComponent
+          socialConfig={socialLogin}
+          isOpen={isLoginDialog}
+          onClose={() => setLoginDialog(false)}
+        ></LoginDialogComponent>
+      )}
     </nav>
   )
 }
