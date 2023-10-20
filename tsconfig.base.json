@@ -23,6 +23,7 @@
       "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
       "@js-monorepo/package.json": ["package.json"],
+      "@js-monorepo/store": ["libs/shared/store/src/index.ts"],
       "@js-monorepo/version": ["libs/shared/ui/version/src/index.ts"]
     }
   },
