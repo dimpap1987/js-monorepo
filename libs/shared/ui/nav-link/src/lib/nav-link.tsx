@@ -5,9 +5,10 @@ export interface NavLinkProps {
   href: string
   children: React.ReactNode
   className: string
+  onClick?: () => void
 }
 
-export function NavLink({ href, children, className }: NavLinkProps) {
+export function NavLink({ href, children, className, onClick }: NavLinkProps) {
   const router = useRouter()
   return (
     <span
@@ -15,6 +16,7 @@ export function NavLink({ href, children, className }: NavLinkProps) {
       onClick={() => {
         router.push(href)
         // router.back()
+        onClick?.()
       }}
     >
       {children}
