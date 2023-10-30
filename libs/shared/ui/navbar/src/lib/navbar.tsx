@@ -186,54 +186,66 @@ export function NavbarComponent({
         </div>
       </div>
 
-      {isDropdownMenuRefVisible && (
-        <div
-          className="absolute w-52 right-0 p-2 shadow-lg bg-primary-dark text-white block md:hidden"
-          ref={dropdownMenuRef}
-        >
-          {menuItems && menuItems.length > 0 && (
-            <ul className="mx-auto font-semibold font-heading">
-              {menuItems.map((item, index) => (
-                <li
-                  key={index}
-                  className="text-center py-2 hover:bg-blue-900 w-full flex justify-center"
+      <div
+        ref={dropdownMenuRef}
+        className={`absolute w-3/4 sm:w-52 right-0 bg-primary-light border border-turquoise rounded text-white z-40 block md:hidden 
+        ${styles.dropdownAnimation} 
+        ${isDropdownMenuRefVisible ? styles.dropdownVisible : ''}`}
+      >
+        {menuItems && menuItems.length > 0 && (
+          <ul className="mx-auto font-semibold font-heading">
+            {menuItems.map((item, index) => (
+              <li
+                key={index}
+                className="text-center py-2 hover:bg-blue-900 w-full flex justify-center"
+              >
+                <NavLink
+                  className="py-1 px-3"
+                  href={item.href}
+                  onClick={() => setIsDropdownMenuRefVisible(false)}
                 >
-                  <NavLink className="py-2 px-4" href={item.href}>
-                    {item.name}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          )}
-          {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
-            <>
-              <hr className="my-2" />
-              <LoginButtonComponent
-                onClick={() => setLoginDialog((prev) => !prev)}
-              ></LoginButtonComponent>
-            </>
-          )}
-          {user?.isLoggedIn && (
+                  {item.name}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        )}
+        {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
+          <>
+            <hr className="" />
+            <LoginButtonComponent
+              onClick={() => {
+                setLoginDialog((prev) => !prev)
+                setIsDropdownMenuRefVisible(false)
+              }}
+            ></LoginButtonComponent>
+          </>
+        )}
+        {user?.isLoggedIn && (
+          <>
+            <hr className="" />
             <LogoutButtonComponent
               onClick={() => onLogout?.()}
             ></LogoutButtonComponent>
-          )}
-        </div>
-      )}
+          </>
+        )}
+      </div>
 
       {/* User options hidden input*/}
-      {user?.isLoggedIn && isDropdownLoggedOptionsRefVisible && (
-        <div
-          ref={dropdownLoggedOptionsRef}
-          className="absolute w-44 right-0 p-2 shadow-lg bg-primary-dark text-white z-40 hidden md:block"
-        >
-          {user?.isLoggedIn && (
+      <div
+        ref={dropdownLoggedOptionsRef}
+        className={`absolute w-44 right-0 bg-primary-light border border-turquoise rounded text-white z-40 hidden md:block ${
+          styles.dropdownAnimation
+        } ${isDropdownLoggedOptionsRefVisible ? styles.dropdownVisible : ''}`}
+      >
+        {user?.isLoggedIn && (
+          <>
             <LogoutButtonComponent
               onClick={() => onLogout?.()}
             ></LogoutButtonComponent>
-          )}
-        </div>
-      )}
+          </>
+        )}
+      </div>
 
       {socialLogin && socialLogin.length > 0 && (
         <LoginDialogComponent

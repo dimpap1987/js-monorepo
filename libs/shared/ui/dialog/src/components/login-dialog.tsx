@@ -29,10 +29,10 @@ function LoginDialogComponent({
     <DialogComponent
       isOpen={isOpen}
       onClose={onClose}
-      className="text-black shadow-2xl shadow-cyan-500/50"
+      className="text-black shadow-2xl shadow-cyan-500/50 w-full sm:w-[380px]"
     >
       <DialogHeader className="justify-center">Sign in with</DialogHeader>
-      <DialogContent className="md:w-[280px]">
+      <DialogContent className="">
         <div className="flex flex-col items-center text-xs gap-2 md:text-sm font-medium text-white">
           {socialConfig?.map((social) => (
             <React.Fragment key={social.type}>
