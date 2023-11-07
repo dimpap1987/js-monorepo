@@ -2,6 +2,7 @@
 import { ButtonComponent } from '@js-monorepo/button'
 import { ConfirmationDialogComponent } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
+import { MapComponent, Marker, Popup } from '@js-monorepo/map'
 import { useNotifications } from '@js-monorepo/notification'
 import { ReactNode, useState } from 'react'
 
@@ -114,6 +115,26 @@ export default function Main({ children, className }: MainProps) {
           // })
         }}
       ></ConfirmationDialogComponent>
+
+      {/* Map component */}
+
+      <div className="mt-2 h-[400px]">
+        <MapComponent
+          mapContainerProps={{
+            center: { lat: 37.98381, lng: 23.727539 },
+            zoom: 10,
+          }}
+        >
+          <Marker
+            position={{
+              lat: 37.98381,
+              lng: 23.727539,
+            }}
+          >
+            <Popup>You are here</Popup>
+          </Marker>
+        </MapComponent>
+      </div>
     </section>
   )
 }
