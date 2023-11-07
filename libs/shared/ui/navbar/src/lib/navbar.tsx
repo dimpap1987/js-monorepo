@@ -101,7 +101,7 @@ export function NavbarComponent({
   }, [])
 
   return (
-    <nav className="z-40 bg-primary-dark text-white w-screen">
+    <nav className="z-40 bg-primary-dark text-white w-full">
       <div className="flex justify-between h-14">
         <div className="px-5 xl:px-12 py-2 flex w-full items-center">
           {logo}
