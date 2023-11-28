@@ -5,11 +5,11 @@ import LoginButtonComponent from './components/login-button'
 import LogoutButtonComponent from './components/logout-button'
 import styles from './navbar.module.css'
 export interface NavbarProps {
-  children?: ReactNode
-  menuItems?: MenuItem[]
-  user?: UserNavProps
-  socialLogin?: UserNavSocial[]
-  onLogout?: () => void
+  readonly children?: ReactNode
+  readonly menuItems?: MenuItem[]
+  readonly user?: UserNavProps
+  readonly socialLogin?: UserNavSocial[]
+  readonly onLogout?: () => void
 }
 export type MenuItem = {
   name: string
@@ -119,7 +119,7 @@ export function NavbarComponent({
           )}
 
           {/* options on the right*/}
-          <div className="hidden md:flex space-x-5 items-center w-1/6 justify-end text-center">
+          <div className="hidden md:flex items-center gap-2 w-40 justify-end text-center">
             {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
               <LoginButtonComponent
                 className="bg-blue-800 rounded-full shadow hover:bg-blue-700 transition-all duration-300"
@@ -130,12 +130,12 @@ export function NavbarComponent({
             {user?.isLoggedIn && (
               <>
                 {user.username && (
-                  <span className="text-md font-bold text-white bg-blue-800 px-3 py-1 rounded-full shadow hover:bg-blue-700 transition-all duration-300">
+                  <div className="text-md font-bold text-white bg-blue-800 px-3 py-1 rounded-full shadow hover:bg-blue-700 transition-all duration-300">
                     {user.username}
-                  </span>
+                  </div>
                 )}
                 <div
-                  className="flex items-center hover:text-gray-200 cursor-pointer select-none transition duration-300 ease-in-out hover:scale-125"
+                  className="hover:text-gray-200 cursor-pointer select-none transition duration-300 ease-in-out hover:scale-125"
                   onClick={() => {
                     setIsDropdownLoggedOptionsRefVisible((prev) => !prev)
                   }}
@@ -239,11 +239,9 @@ export function NavbarComponent({
         } ${isDropdownLoggedOptionsRefVisible ? styles.dropdownVisible : ''}`}
       >
         {user?.isLoggedIn && (
-          <>
-            <LogoutButtonComponent
-              onClick={() => onLogout?.()}
-            ></LogoutButtonComponent>
-          </>
+          <LogoutButtonComponent
+            onClick={() => onLogout?.()}
+          ></LogoutButtonComponent>
         )}
       </div>
 

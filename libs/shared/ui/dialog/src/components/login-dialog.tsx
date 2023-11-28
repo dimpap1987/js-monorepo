@@ -7,9 +7,9 @@ export type SocialConfig = {
 }
 
 export type LoginDialogProps = {
-  isOpen: boolean
-  onClose: () => void
-  socialConfig: SocialConfig[]
+  readonly isOpen: boolean
+  readonly onClose: () => void
+  readonly socialConfig: SocialConfig[]
 }
 
 async function handleSocialLogin(

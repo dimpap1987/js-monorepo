@@ -11,8 +11,8 @@
     "start:webhook": "cd dist/apps/webhook-server && node main.js",
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
-    "build:next-app": "nx build next-app",
-    "build:webhook": "nx build webhook-server",
+    "build:next-app": "nx build next-app --prod",
+    "build:webhook": "nx build webhook-server --prod",
     "prepare": "if [ \"$NODE_ENV\" = \"development\" ]; then husky install; fi"
   },
   "lint-staged": {
