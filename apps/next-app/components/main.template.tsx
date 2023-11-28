@@ -48,7 +48,7 @@ export default function MainTemplate({ children }: MainTemplateProps) {
           removeUser()
         }}
       >
-        <LogoComponent>
+        <LogoComponent href="/">
           <h1>DPap</h1>
         </LogoComponent>
       </NavbarComponent>
