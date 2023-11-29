@@ -26,6 +26,7 @@
       "@js-monorepo/package.json": ["package.json"],
       "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
       "@js-monorepo/store": ["libs/shared/store/src/index.ts"],
+      "@js-monorepo/utils": ["libs/shared/utils/src/index.ts"],
       "@js-monorepo/version": ["libs/shared/ui/version/src/index.ts"]
     }
   },
