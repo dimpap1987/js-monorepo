@@ -6,6 +6,8 @@ import { MapComponent, Marker, Popup } from '@js-monorepo/map'
 import { useNotifications } from '@js-monorepo/notification'
 import { ReactNode, useState } from 'react'
 import { EmbeddedCheckoutComponentDialog } from '@js-monorepo/payment'
+import { checkoutSessionClient } from '@js-monorepo/utils'
+import { useUserStore } from '@js-monorepo/store'
 interface MainProps {
   children?: ReactNode
   className?: string
@@ -17,6 +19,7 @@ export default function Main({ children, className }: MainProps) {
   const [loading, setLoading] = useState(false)
   const [isOpenDialog, setOpenDialog] = useState(false)
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
+  const { data: user } = useUserStore()
 
   async function loadForTwoSecond() {
     setLoaderState({ show: true })
@@ -148,11 +151,19 @@ export default function Main({ children, className }: MainProps) {
 
         <EmbeddedCheckoutComponentDialog
           stripePublishableKey={
-            process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
+            process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
           }
           isOpen={isOpenCheckoutDialog}
           onClose={() => setOpenCheckoutDialog(false)}
-          price={500}
+          checkOutPromise={() =>
+            checkoutSessionClient({
+              username: user.username as string,
+              url: '/api/checkout_sessions',
+              customSubmitMessage: 'Thank you for your support',
+              isDonate: true,
+              price: 500,
+            })
+          }
         />
       </div>
     </section>
