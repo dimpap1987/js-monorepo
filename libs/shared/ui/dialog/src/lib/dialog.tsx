@@ -78,22 +78,24 @@ function DialogComponent({
         data-dialog="dialog"
         onClick={(e) => e.stopPropagation()}
         className={twMerge(
-          `relative p-3 mb-20 min-w-[200px] md:max-w-[40%] max-w-[90%] rounded-lg bg-slate-100 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform`,
+          `relative mb-20 min-w-[200px] md:max-w-[40%] max-w-[90%] max-h-[80%] overflow-y-auto m-auto rounded-lg bg-slate-100 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform`,
           isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full',
           className
         )}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-2xl cursor-pointer hover:scale-125"
-          aria-label="Close dialog"
-        >
-          <AiFillCloseCircle></AiFillCloseCircle>
-        </button>
+        <div className="flex justify-end p-1">
+          <button
+            onClick={onClose}
+            className=" text-2xl cursor-pointer hover:scale-125"
+            aria-label="Close dialog"
+          >
+            <AiFillCloseCircle></AiFillCloseCircle>
+          </button>
+        </div>
         {header}
         {content && (
           <div
-            className={`relative ${
+            className={`relative p-3 ${
               header ? ' border-t border-t-blue-gray-100 ' : ''
             }
               ${footer ? ' border-b border-b-blue-gray-100 ' : ''} 

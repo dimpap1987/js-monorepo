@@ -5,7 +5,7 @@ import { useLoader } from '@js-monorepo/loader'
 import { MapComponent, Marker, Popup } from '@js-monorepo/map'
 import { useNotifications } from '@js-monorepo/notification'
 import { ReactNode, useState } from 'react'
-
+import { EmbeddedCheckoutComponentDialog } from '@js-monorepo/payment'
 interface MainProps {
   children?: ReactNode
   className?: string
@@ -16,6 +16,7 @@ export default function Main({ children, className }: MainProps) {
   const [, , addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   const [isOpenDialog, setOpenDialog] = useState(false)
+  const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
 
   async function loadForTwoSecond() {
     setLoaderState({ show: true })
@@ -117,7 +118,7 @@ export default function Main({ children, className }: MainProps) {
       ></ConfirmationDialogComponent>
 
       {/* Map component */}
-
+      {/* 
       <div className="mt-2 h-[400px]">
         <MapComponent
           mapContainerProps={{
@@ -134,6 +135,25 @@ export default function Main({ children, className }: MainProps) {
             <Popup>You are here</Popup>
           </Marker>
         </MapComponent>
+      </div> */}
+
+      <div className="mt-2">
+        <ButtonComponent
+          variant="secondary"
+          onClick={() => setOpenCheckoutDialog(true)}
+          loading={isOpenCheckoutDialog}
+        >
+          Donate 5 &euro;
+        </ButtonComponent>
+
+        <EmbeddedCheckoutComponentDialog
+          stripePublishableKey={
+            process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
+          }
+          isOpen={isOpenCheckoutDialog}
+          onClose={() => setOpenCheckoutDialog(false)}
+          price={500}
+        />
       </div>
     </section>
   )
