@@ -3,6 +3,7 @@ import {
   createCheckoutSession,
 } from '@js-monorepo/utils'
 import { stripe } from '../../lib/stripe'
+import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
   try {
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
       isDonate,
     })
 
-    return Response.json({
+    return NextResponse.json({
       clientSecret: session.client_secret,
     })
   } catch (error: any) {
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
       message = 'Something went wrong with your request'
     }
 
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message,
       }),
