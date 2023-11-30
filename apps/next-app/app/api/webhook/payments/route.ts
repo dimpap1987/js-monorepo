@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server'
 import { stripe } from '../../../lib/stripe'
 
 export async function POST(req: Request) {
@@ -24,8 +25,8 @@ export async function POST(req: Request) {
   } catch (e) {
     if (e instanceof Error) {
       console.error(e.message)
-      return Response.json({ message: e.message }, { status: 400 })
+      return NextResponse.json({ message: e.message }, { status: 400 })
     }
   }
-  return Response.json({ received: true })
+  return NextResponse.json({ received: true })
 }
