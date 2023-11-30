@@ -103,7 +103,7 @@ export function NavbarComponent({
   return (
     <nav className="z-40 bg-primary-dark text-white w-full">
       <div className="flex justify-between h-14">
-        <div className="px-5 xl:px-12 py-2 flex w-full items-center">
+        <div className="px-5 py-2 flex w-full items-center">
           {logo}
 
           {menuItems && menuItems.length > 0 && (
@@ -119,7 +119,7 @@ export function NavbarComponent({
           )}
 
           {/* options on the right*/}
-          <div className="hidden md:flex items-center gap-2 w-40 justify-end text-center">
+          <div className="hidden md:flex items-center gap-4 w-40 justify-end text-center">
             {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
               <LoginButtonComponent
                 className="bg-blue-800 rounded-full shadow hover:bg-blue-700 transition-all duration-300"
@@ -163,7 +163,7 @@ export function NavbarComponent({
 
         {/* Dropdown icon */}
         <div
-          className="navbar-burger self-center mr-6 md:hidden cursor-pointer select-none py-2 px-4"
+          className="navbar-burger self-center md:hidden cursor-pointer select-none py-2 px-4"
           ref={dropDownMenuIconRef}
           onClick={() =>
             setIsDropdownMenuRefVisible(() => !isDropdownMenuRefVisible)
@@ -200,7 +200,7 @@ export function NavbarComponent({
                 className="text-center py-2 hover:bg-blue-900 w-full flex justify-center"
               >
                 <NavLink
-                  className="py-1 px-3"
+                  className="py-1 px-3 w-full"
                   href={item.href}
                   onClick={() => setIsDropdownMenuRefVisible(false)}
                 >

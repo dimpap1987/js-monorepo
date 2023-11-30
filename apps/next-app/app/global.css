@@ -7,6 +7,10 @@
   /* --primary-dark: #3498db; */
 }
 
+html {
+  scrollbar-gutter: stable both-edges;
+}
+
 .min-h-100svh {
   min-height: 100vh;
   min-height: 100svh;
@@ -29,7 +33,7 @@ picture,
 svg,
 video {
   display: block;
-  max-width: 100%;
+  /* max-width: 100%; */
 }
 
 /* custom scrollbar */
