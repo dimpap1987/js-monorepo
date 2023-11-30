@@ -120,26 +120,6 @@ export default function Main({ children, className }: MainProps) {
         }}
       ></ConfirmationDialogComponent>
 
-      {/* Map component */}
-      {/* 
-      <div className="mt-2 h-[400px]">
-        <MapComponent
-          mapContainerProps={{
-            center: { lat: 37.98381, lng: 23.727539 },
-            zoom: 10,
-          }}
-        >
-          <Marker
-            position={{
-              lat: 37.98381,
-              lng: 23.727539,
-            }}
-          >
-            <Popup>You are here</Popup>
-          </Marker>
-        </MapComponent>
-      </div> */}
-
       <div className="mt-2">
         <ButtonComponent
           variant="secondary"
@@ -165,6 +145,25 @@ export default function Main({ children, className }: MainProps) {
             })
           }
         />
+      </div>
+
+      {/* Map component */}
+      <div className="mt-2 h-[400px]">
+        <MapComponent
+          mapContainerProps={{
+            center: { lat: 37.98381, lng: 23.727539 },
+            zoom: 10,
+          }}
+        >
+          <Marker
+            position={{
+              lat: 37.98381,
+              lng: 23.727539,
+            }}
+          >
+            <Popup>You are here</Popup>
+          </Marker>
+        </MapComponent>
       </div>
     </section>
   )
