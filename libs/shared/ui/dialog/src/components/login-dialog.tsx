@@ -31,8 +31,8 @@ function LoginDialogComponent({
       onClose={onClose}
       className="text-black shadow-2xl shadow-cyan-500/50 w-full min-w-[330px] md:w-[30%] p-2"
     >
-      <DialogHeader className="justify-center">Sign in with</DialogHeader>
-      <DialogContent className="p-5">
+      <DialogHeader className="justify-center pt-0">Sign in with</DialogHeader>
+      <DialogContent className="p-3">
         <div className="flex flex-col items-center text-xs gap-2 md:text-sm font-medium text-white">
           {socialConfig?.map((social) => (
             <React.Fragment key={social.type}>

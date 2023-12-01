@@ -8,7 +8,7 @@
 }
 
 html {
-  scrollbar-gutter: stable both-edges;
+  scrollbar-gutter: stable;
 }
 
 .min-h-100svh {

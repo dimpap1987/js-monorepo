@@ -8,15 +8,15 @@ import {
 } from '../lib/dialog'
 
 export interface ConfirmationDialogComponentProps {
-  className?: string
-  isOpen: boolean
-  onClose: () => void
-  title?: string // Header content
-  content?: string | ReactNode // Main content
-  confirmLabel?: string // Confirm button label
-  onConfirm?: () => void // Confirm button action
-  cancelLabel?: string // Cancel button label
-  onCancel?: () => void // Cancel button action
+  readonly className?: string
+  readonly isOpen: boolean
+  readonly onClose: () => void
+  readonly title?: string // Header content
+  readonly content?: string | ReactNode // Main content
+  readonly confirmLabel?: string // Confirm button label
+  readonly onConfirm?: () => void // Confirm button action
+  readonly cancelLabel?: string // Cancel button label
+  readonly onCancel?: () => void // Cancel button action
 }
 
 function ConfirmationDialogComponent({
