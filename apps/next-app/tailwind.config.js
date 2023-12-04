@@ -29,6 +29,7 @@ module.exports = {
         pink: 'rgb(150, 125, 210)',
         turquoise: 'rgb(25, 160, 150)',
         goldenrod: 'rgb(220, 180, 40)',
+        primary: 'rgb(200, 200, 200)',
       },
       textColor: {
         primary: 'rgb(26, 35, 53)',

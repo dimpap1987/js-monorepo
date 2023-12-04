@@ -5,8 +5,16 @@ import {
   EmbeddedCheckout,
   EmbeddedCheckoutProvider,
 } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
 import { useEffect, useState } from 'react'
+import { loadStripe } from '@stripe/stripe-js/pure'
+
+async function initStripe(isOpen: boolean, stripePublishableKey: string) {
+  if (isOpen) {
+    loadStripe.setLoadParameters({ advancedFraudSignals: false })
+    return loadStripe(stripePublishableKey)
+  }
+  return null
+}
 
 function EmbeddedCheckoutComponentDialog({
   stripePublishableKey,
@@ -37,7 +45,7 @@ function EmbeddedCheckoutComponentDialog({
         return res.json()
       })
       .then((data) => {
-        setResponse(data)
+        setResponse({ ...data })
       })
       .catch((error) => {
         console.error('Error fetching client secret:', error)
@@ -49,7 +57,10 @@ function EmbeddedCheckoutComponentDialog({
         })
         onClose()
       })
-  }, [isOpen, checkOutPromise])
+    return () => {
+      setResponse(null)
+    }
+  }, [isOpen])
 
   return (
     <DialogComponent
@@ -59,7 +70,7 @@ function EmbeddedCheckoutComponentDialog({
     >
       <DialogContent className="p-4">
         <EmbeddedCheckoutProvider
-          stripe={loadStripe(stripePublishableKey)}
+          stripe={initStripe(isOpen, stripePublishableKey)}
           options={{
             clientSecret: response?.clientSecret ?? '',
             onComplete: () => {
