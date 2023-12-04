@@ -10,7 +10,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex flex-col min-h-100svh bg-primary">
+      <body
+        className="flex flex-col min-h-100svh bg-primary"
+        suppressHydrationWarning={true}
+      >
         <MainTemplate>{children}</MainTemplate>
         <ProgressBar
           height="2px"

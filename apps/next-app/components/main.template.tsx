@@ -54,7 +54,7 @@ export default function MainTemplate({ children }: MainTemplateProps) {
       </NavbarComponent>
       <LoaderComponent>
         <NotificationComponent>
-          <main className="p-2 flex-grow container mx-auto min-w-[200px]">
+          <main className="p-3 flex-grow container mx-auto min-w-[200px]">
             {children}
           </main>
           <footer className="text-center py-4">
