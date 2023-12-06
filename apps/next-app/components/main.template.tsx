@@ -41,17 +41,19 @@ export default function MainTemplate({ children }: MainTemplateProps) {
       {/* <StoreInitializer
         userStore={{ data: user, setUser, removeUser }}
       ></StoreInitializer> */}
-      <NavbarComponent
-        user={{ isLoggedIn: user.isLoggedIn, username: user.username }}
-        socialLogin={socials}
-        onLogout={() => {
-          removeUser()
-        }}
-      >
-        <LogoComponent href="/">
-          <h1>DPap</h1>
-        </LogoComponent>
-      </NavbarComponent>
+      <header className="z-40">
+        <NavbarComponent
+          user={{ isLoggedIn: user.isLoggedIn, username: user.username }}
+          socialLogin={socials}
+          onLogout={() => {
+            removeUser()
+          }}
+        >
+          <LogoComponent href="/">
+            <h1>DPap</h1>
+          </LogoComponent>
+        </NavbarComponent>
+      </header>
       <LoaderComponent>
         <NotificationComponent>
           <main className="p-3 flex-grow container mx-auto min-w-[200px]">

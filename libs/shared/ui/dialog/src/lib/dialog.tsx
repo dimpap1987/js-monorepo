@@ -78,7 +78,7 @@ function DialogComponent({
         data-dialog="dialog"
         onClick={(e) => e.stopPropagation()}
         className={twMerge(
-          `relative border border-turquoise mb-20 min-w-[200px] max-w-[90%] md:max-w-[70%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform `,
+          `relative border border-primary mb-20 min-w-[200px] max-w-[90%] md:max-w-[70%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform `,
           isOpen
             ? 'opacity-100 translate-y-0 '
             : 'opacity-0 -translate-y-full ',

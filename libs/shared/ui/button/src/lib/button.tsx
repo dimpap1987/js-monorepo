@@ -26,10 +26,11 @@ export function ButtonComponent({
   // Variant styles
   const variantStyles = {
     primary:
-      'bg-turquoise border-turquoise text-dark-charcoal hover:bg-turquoise-hover',
+      'bg-primary border-primary-border text-primary-foreground hover:bg-primary-hover',
     secondary:
-      'bg-goldenrod border-goldenrod text-dark-charcoal hover:bg-goldenrod-hover',
-    danger: 'bg-pink border-pink text-dark-charcoal hover:bg-pink-hover',
+      'bg-secondary border-secondary-border text-secondary-foreground hover:bg-secondary-hover',
+    danger:
+      'bg-danger border-danger-border text-danger-foreground hover:bg-danger-hover',
   }
 
   // Size styles

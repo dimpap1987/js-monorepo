@@ -101,7 +101,7 @@ export function NavbarComponent({
   }, [])
 
   return (
-    <nav className="z-40 bg-primary-dark text-white w-full border-b border-primary">
+    <nav className="bg-background text-white w-full border-b border-border sm:px-12">
       <div className="flex justify-between h-14">
         <div className="px-5 py-2 flex w-full items-center">
           {logo}
@@ -122,7 +122,6 @@ export function NavbarComponent({
           <div className="hidden md:flex items-center gap-4 w-40 justify-end text-center">
             {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
               <LoginButtonComponent
-                className="bg-blue-800 rounded-full shadow hover:bg-blue-700 transition-all duration-300"
                 onClick={() => setLoginDialog((prev) => !prev)}
               ></LoginButtonComponent>
             )}
@@ -130,7 +129,7 @@ export function NavbarComponent({
             {user?.isLoggedIn && (
               <>
                 {user.username && (
-                  <div className="text-md font-bold text-white bg-blue-800 px-3 py-1 rounded-full shadow hover:bg-blue-700 transition-all duration-300">
+                  <div className="text-sm font-bold text-white bg-accent px-3 py-1 rounded-full shadow transition-all duration-300">
                     {user.username}
                   </div>
                 )}
@@ -188,7 +187,7 @@ export function NavbarComponent({
 
       <div
         ref={dropdownMenuRef}
-        className={`absolute w-3/4 sm:w-52 right-0 bg-primary-light border border-turquoise rounded text-white z-40 block md:hidden 
+        className={`absolute w-3/4 sm:w-52 right-0 bg-foreground border border-primary-border rounded text-white z-40 block md:hidden 
         ${styles.dropdownAnimation} 
         ${isDropdownMenuRefVisible ? styles.dropdownVisible : ''}`}
       >
@@ -197,7 +196,7 @@ export function NavbarComponent({
             {menuItems.map((item, index) => (
               <li
                 key={index}
-                className="text-center py-2 hover:bg-blue-900 w-full flex justify-center"
+                className="text-center py-2 hover:bg-accent-hover w-full flex justify-center"
               >
                 <NavLink
                   className="py-1 px-3 w-full"
@@ -214,6 +213,7 @@ export function NavbarComponent({
           <>
             <hr className="" />
             <LoginButtonComponent
+              className="rounded-none bg-transparent hover:bg-accent-hover border-none"
               onClick={() => {
                 setLoginDialog((prev) => !prev)
                 setIsDropdownMenuRefVisible(false)
@@ -234,7 +234,7 @@ export function NavbarComponent({
       {/* User options hidden input*/}
       <div
         ref={dropdownLoggedOptionsRef}
-        className={`absolute w-44 right-0 bg-primary-light border border-turquoise rounded text-white z-40 hidden md:block ${
+        className={`absolute w-44 right-0 bg-foreground border border-primary-border rounded text-white z-40 hidden md:block ${
           styles.dropdownAnimation
         } ${isDropdownLoggedOptionsRefVisible ? styles.dropdownVisible : ''}`}
       >
