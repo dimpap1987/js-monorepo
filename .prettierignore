@@ -1,3 +1,9 @@
 # Add files here to ignore them from prettier formatting
 /dist
 /coverage
+.env
+.next
+.github
+.next
+node_modules
+*.log

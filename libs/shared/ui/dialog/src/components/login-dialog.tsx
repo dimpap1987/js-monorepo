@@ -29,11 +29,11 @@ function LoginDialogComponent({
     <DialogComponent
       isOpen={isOpen}
       onClose={onClose}
-      className="text-black shadow-2xl shadow-cyan-500/50 w-full min-w-[330px] md:w-[30%] p-2"
+      className="text-black shadow-2xl shadow-cyan-500/50 w-full min-w-[330px] md:w-[35%] p-2"
     >
       <DialogHeader className="justify-center pt-0">Sign in with</DialogHeader>
       <DialogContent className="p-3">
-        <div className="flex flex-col items-center text-xs gap-2 md:text-sm font-medium text-white">
+        <div className="flex flex-col items-center text-sm gap-2 font-medium">
           {socialConfig?.map((social) => (
             <React.Fragment key={social.type}>
               {/* GOOGLE */}
@@ -76,7 +76,7 @@ function LoginDialogComponent({
               {social.type === 'github' && (
                 <button
                   type="button"
-                  className="bg-[#24292F] w-full hover:bg-[#24292F]/90 focus:ring-4 focus:ring-[#24292F]/50 rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 mr-2"
+                  className="bg-[#24292F] w-full text-white hover:bg-[#24292F]/90 focus:ring-4 focus:ring-[#24292F]/50 rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 mr-2"
                   onClick={() => handleSocialLogin(social.onLogin, onClose)}
                 >
                   <svg
@@ -102,7 +102,7 @@ function LoginDialogComponent({
               {social.type === 'facebook' && (
                 <button
                   type="button"
-                  className="bg-[#3b5998] w-full hover:bg-[#3b5998]/90 focus:ring-4 focus:ring-[#3b5998]/50 rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2"
+                  className="bg-[#3b5998] w-full hover:bg-[#3b5998]/90 text-white focus:ring-4 focus:ring-[#3b5998]/50 rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2"
                   onClick={() => handleSocialLogin(social.onLogin, onClose)}
                 >
                   <svg

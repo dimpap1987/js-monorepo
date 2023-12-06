@@ -1,5 +1,6 @@
 const { createGlobPatternsForDependencies } = require('@nx/react/tailwind')
 const { join } = require('path')
+const { fontFamily } = require('tailwindcss/defaultTheme')
 
 module.exports = {
   content: [
@@ -11,32 +12,59 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundColor: {
-        'primary-dark': 'rgb(17, 24, 39)',
-        'primary-light': 'rgb(36, 48, 71)',
-        primary: 'rgb(26, 35, 53)',
-        'primary-hover': 'rgb(37, 44, 59)',
-        pink: 'rgb(255, 182, 193)',
-        'pink-hover': 'rgb(245, 172, 183)',
-        turquoise: 'rgb(64, 224, 208)',
-        'turquoise-hover': 'rgb(44, 204, 188)',
-        goldenrod: 'rgb(255, 223, 85)',
-        'goldenrod-hover': 'rgb(235, 203, 65)',
-        gray: 'rgb(200, 200, 200)',
-        'gray-hover': 'rgb(180, 180, 180)',
-      },
-      borderColor: {
-        pink: 'rgb(150, 125, 210)',
-        turquoise: 'rgb(25, 160, 150)',
-        goldenrod: 'rgb(220, 180, 40)',
-        primary: 'rgb(200, 200, 200)',
-      },
-      textColor: {
-        primary: 'rgb(26, 35, 53)',
-        'dark-charcoal': ' rgb(19 45 62)',
+      colors: {
+        border: 'hsl(var(--border))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+          hover: 'hsl(var(--primary-hover))',
+          border: 'hsl(var(--primary-border))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+          hover: 'hsl(var(--secondary-hover))',
+          border: 'hsl(var(--secondary-border))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+          hover: 'hsl(var(--accent-hover))',
+          border: 'hsl(var(--accent-border))',
+        },
+        danger: {
+          DEFAULT: 'hsl(var(--danger))',
+          foreground: 'hsl(var(--danger-foreground))',
+          hover: 'hsl(var(--danger-hover))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          hover: 'hsl(var(--destructive-hover))',
+        },
       },
       minHeight: {
         '100svh': '100svh',
+      },
+      fontFamily: {
+        sans: ['var(--font-sans)', ...fontFamily.sans],
+      },
+      animation: {
+        bubble: 'bubble ease-in-out infinite',
+      },
+      keyframes: {
+        bubble: {
+          '0%': {
+            transform: 'translateY(0)',
+          },
+          '50%': {
+            transform: 'translateY(-100%)',
+          },
+          '100%': {
+            transform: 'translateY(0)',
+          },
+        },
       },
     },
   },
@@ -45,5 +73,6 @@ module.exports = {
       backgroundColor: ['hover'],
     },
   },
-  plugins: [],
+  // eslint-disable-next-line global-require
+  plugins: [require('tailwindcss-animate')],
 }

@@ -15,8 +15,8 @@ function LoginButtonComponent({
       {...props}
       title="Sign in"
       className={twMerge(
-        className,
-        'flex gap-1 py-2 px-4 font-semibold transition-colors duration-200 ease-in-out hover:bg-blue-900 mx-auto w-full flex justify-center'
+        'rounded-full shadow duration-300 flex gap-1 py-2 px-4 font-semibold transition-colors ease-in-out bg-accent-hover border border-accent-border hover:bg-background w-full flex justify-center',
+        className
       )}
     >
       <BiLogInCircle className="text-green-400 text-2xl" />

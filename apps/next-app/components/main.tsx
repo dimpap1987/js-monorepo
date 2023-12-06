@@ -8,6 +8,7 @@ import { ReactNode, useState } from 'react'
 import { EmbeddedCheckoutComponentDialog } from '@js-monorepo/payment'
 import { checkoutSessionClient } from '@js-monorepo/utils'
 import { useUserStore } from '@js-monorepo/store'
+import BannerSVG from './banner-svg'
 interface MainProps {
   children?: ReactNode
   className?: string
@@ -33,9 +34,12 @@ export default function Main({ children, className }: MainProps) {
   return (
     <section className={className}>
       {children}
+      <div className="relative min-h-[200px] md:min-h-[30vh] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
+        <BannerSVG />
+      </div>
       <div className="flex flex-col justify-center align-items gap-2">
         <ButtonComponent
-          className="bg-blue-500 hover:bg-blue-700 font-bold py-2 px-4 border border-blue-700 rounded"
+          className="bg-accent hover:bg-accent-hover font-bold py-2 px-4 border border-accent-border rounded"
           onClick={loadForTwoSecond}
         >
           Trigger loading

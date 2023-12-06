@@ -51,7 +51,7 @@ function ConfirmationDialogComponent({
             {confirmLabel}
           </ButtonComponent>
           <ButtonComponent
-            className="lg:col-start-4 lg:col-end-5 bg-gray hover:bg-gray-hover"
+            className="lg:col-start-4 lg:col-end-5 bg-destructive hover:bg-destructive-hover"
             data-ripple-dark="true"
             data-dialog-close="true"
             onClick={() => {

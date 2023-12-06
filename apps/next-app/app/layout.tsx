@@ -1,17 +1,24 @@
 'use client'
+import { AppProgressBar as ProgressBar } from 'next-nprogress-bar'
+import { Poppins } from 'next/font/google'
 import MainTemplate from '../components/main.template'
 import './global.css'
-import { AppProgressBar as ProgressBar } from 'next-nprogress-bar'
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-poppins',
+})
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  readonly children: React.ReactNode
 }) {
   return (
     <html lang="en">
       <body
-        className="flex flex-col min-h-100svh bg-primary"
+        className={`${poppins.className} flex flex-col min-h-100svh bg-background`}
         suppressHydrationWarning={true}
       >
         <MainTemplate>{children}</MainTemplate>

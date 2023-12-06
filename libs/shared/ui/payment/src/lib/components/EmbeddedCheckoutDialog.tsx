@@ -5,15 +5,12 @@ import {
   EmbeddedCheckout,
   EmbeddedCheckoutProvider,
 } from '@stripe/react-stripe-js'
-import { useEffect, useState } from 'react'
 import { loadStripe } from '@stripe/stripe-js/pure'
+import { useEffect, useMemo, useState } from 'react'
 
-async function initStripe(isOpen: boolean, stripePublishableKey: string) {
-  if (isOpen) {
-    loadStripe.setLoadParameters({ advancedFraudSignals: false })
-    return loadStripe(stripePublishableKey)
-  }
-  return null
+async function initStripe(stripePublishableKey: string) {
+  loadStripe.setLoadParameters({ advancedFraudSignals: false })
+  return loadStripe(stripePublishableKey)
 }
 
 function EmbeddedCheckoutComponentDialog({
@@ -31,6 +28,11 @@ function EmbeddedCheckoutComponentDialog({
     clientSecret: string
   } | null>(null)
   const [, , addNotification] = useNotifications()
+
+  const stripeInstance = useMemo(
+    () => initStripe(stripePublishableKey),
+    [stripePublishableKey]
+  )
 
   useEffect(() => {
     if (!isOpen) {
@@ -64,13 +66,15 @@ function EmbeddedCheckoutComponentDialog({
 
   return (
     <DialogComponent
-      isOpen={isOpen && response?.clientSecret != null}
+      isOpen={
+        isOpen && response?.clientSecret != null && stripeInstance !== undefined
+      }
       onClose={onClose}
       className="text-black shadow-2xl shadow-cyan-500/50 w-full sm:w-[460px] md:w-[60%]"
     >
       <DialogContent className="p-4">
         <EmbeddedCheckoutProvider
-          stripe={initStripe(isOpen, stripePublishableKey)}
+          stripe={stripeInstance}
           options={{
             clientSecret: response?.clientSecret ?? '',
             onComplete: () => {
