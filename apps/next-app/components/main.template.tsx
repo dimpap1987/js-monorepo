@@ -9,6 +9,7 @@ import { VersionComponent } from '@js-monorepo/version'
 import React from 'react'
 import { useUserStore } from '@js-monorepo/store'
 import StoreInitializer from './store.initializer'
+import SVGLogo from './logo-svg'
 
 export interface MainTemplateProps {
   children: React.ReactNode
@@ -50,7 +51,7 @@ export default function MainTemplate({ children }: MainTemplateProps) {
           }}
         >
           <LogoComponent href="/">
-            <h1>DPap</h1>
+            <SVGLogo></SVGLogo>
           </LogoComponent>
         </NavbarComponent>
       </header>

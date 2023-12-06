@@ -13,7 +13,7 @@ export function Loader({ message, show }: LoaderProps) {
       bg-opacity-80 transform transition-transform
       duration-200 ${show ? 'scale-100' : 'scale-0'} z-30 select-none`}
     >
-      <div className="text-white flex flex-col items-center justify-center transform -translate-y-20">
+      <div className="text-white mt-[100px] flex flex-col items-center justify-center transform -translate-y-20">
         <LoadingSpinnerComponent message="Loading..."></LoadingSpinnerComponent>
         {message && (
           <p>
