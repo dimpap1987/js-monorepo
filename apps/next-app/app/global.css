@@ -47,6 +47,7 @@ body,
 #__next,
 main {
   scroll-behavior: smooth;
+  font-size: 14px;
 }
 
 .min-h-100svh {
@@ -71,7 +72,8 @@ picture,
 svg,
 video {
   display: block;
-  /* max-width: 100%; */
+  max-width: 100%;
+  height: auto;
 }
 
 /* custom scrollbar */
