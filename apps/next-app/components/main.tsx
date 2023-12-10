@@ -54,6 +54,7 @@ export default function Main({ children, className }: MainProps) {
                 message: 'This is a success message',
                 type: 'success',
                 duration: 4000,
+                description: 'Everything went good',
               })
             }}
           >
