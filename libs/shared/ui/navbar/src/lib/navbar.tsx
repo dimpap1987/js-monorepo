@@ -24,20 +24,9 @@ export type UserNavSocial = {
   onLogin: () => void
 }
 
-const menuItemsDefault: MenuItem[] = [
-  {
-    href: '/',
-    name: 'Home',
-  },
-  {
-    href: '/about',
-    name: 'About',
-  },
-]
-
 export function NavbarComponent({
   children,
-  menuItems = menuItemsDefault,
+  menuItems = [],
   user,
   socialLogin,
   onLogout,
@@ -106,17 +95,17 @@ export function NavbarComponent({
         <div className="px-5 py-2 flex w-full items-center">
           {logo}
 
-          {menuItems && menuItems.length > 0 && (
-            <ul className="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
-              {menuItems.map((item, index) => (
+          <ul className="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
+            {menuItems &&
+              menuItems.length > 0 &&
+              menuItems.map((item, index) => (
                 <li key={index} className={styles.underlineEffect}>
                   <NavLink className="py-2 px-4" href={item.href}>
                     {item.name}
                   </NavLink>
                 </li>
               ))}
-            </ul>
-          )}
+          </ul>
 
           {/* options on the right*/}
           <div className="hidden md:flex items-center gap-4 w-40 justify-end text-center">
