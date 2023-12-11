@@ -11,7 +11,7 @@
     "start:webhook": "cd dist/apps/webhook-server && node main.js",
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
-    "build:next-app": "nx build next-app --prod",
+    "build:next-app": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 nx build next-app --prod",
     "build:webhook": "nx build webhook-server --prod",
     "prepare": "husky install"
   },
@@ -72,6 +72,7 @@
     "@typescript-eslint/parser": "^5.60.1",
     "autoprefixer": "^10.4.16",
     "babel-jest": "^29.4.1",
+    "cross-env": "^7.0.3",
     "cypress": "^13.0.0",
     "eslint": "^8.2.0",
     "eslint-config-airbnb": "^19.0.4",
