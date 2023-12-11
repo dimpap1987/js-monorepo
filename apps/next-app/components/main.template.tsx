@@ -1,6 +1,7 @@
 import { LoaderComponent } from '@js-monorepo/loader'
 import {
   LogoComponent,
+  MenuItem,
   NavbarComponent,
   UserNavSocial,
 } from '@js-monorepo/navbar'
@@ -12,7 +13,7 @@ import StoreInitializer from './store.initializer'
 import SVGLogo from './logo-svg'
 
 export interface MainTemplateProps {
-  children: React.ReactNode
+  readonly children: React.ReactNode
 }
 
 export default function MainTemplate({ children }: MainTemplateProps) {
@@ -37,6 +38,17 @@ export default function MainTemplate({ children }: MainTemplateProps) {
       },
     },
   ]
+
+  const menuItems: MenuItem[] = [
+    {
+      href: '/',
+      name: 'Home',
+    },
+    {
+      href: '/about',
+      name: 'About',
+    },
+  ]
   return (
     <>
       {/* <StoreInitializer
@@ -46,6 +58,7 @@ export default function MainTemplate({ children }: MainTemplateProps) {
         <NavbarComponent
           user={{ isLoggedIn: user.isLoggedIn, username: user.username }}
           socialLogin={socials}
+          menuItems={menuItems}
           onLogout={() => {
             removeUser()
           }}
