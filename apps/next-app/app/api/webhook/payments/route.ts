@@ -1,5 +1,5 @@
+import { stripe } from '@js-monorepo/utils'
 import { NextResponse } from 'next/server'
-import { stripe } from '../../../lib/stripe'
 
 export async function POST(req: Request) {
   const sig = req.headers.get('stripe-signature') as string

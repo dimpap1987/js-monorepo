@@ -2,8 +2,13 @@ import Stripe from 'stripe'
 import { CreateCheckoutSessionRequestBody } from '../types'
 import { calculateThirtyMinutesFromNow } from '../utils'
 
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2023-10-16',
+  maxNetworkRetries: 2,
+})
+
 export async function createCheckoutSession(
-  stripe: Stripe,
+  str: Stripe,
   {
     username,
     price,
@@ -82,5 +87,5 @@ export async function createCheckoutSession(
     }
   }
   // create stripe session
-  return stripe.checkout.sessions.create(sessionPayload)
+  return str.checkout.sessions.create(sessionPayload)
 }
