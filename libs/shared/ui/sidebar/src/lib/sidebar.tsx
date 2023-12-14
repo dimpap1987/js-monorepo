@@ -95,8 +95,7 @@ export function SidebarComponent({
               </button>
             </div>
             <ul>
-              {items.map((item, idx) => {
-                const { name, href, Icon } = item
+              {items.map(({ name, href, Icon }, idx) => {
                 return (
                   <li key={name}>
                     <NavLink
@@ -119,7 +118,9 @@ export function SidebarComponent({
                 )
               })}
             </ul>
-            {children && <div className="mt-auto mx-auto p-3">{children}</div>}
+            {children && (
+              <div className="mt-auto w-full text-center p-3">{children}</div>
+            )}
           </motion.div>
         </>
       )}

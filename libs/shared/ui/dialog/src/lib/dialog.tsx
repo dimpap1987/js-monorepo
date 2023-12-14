@@ -71,7 +71,7 @@ function DialogComponent({
     <div
       data-dialog-backdrop="dialog"
       data-dialog-backdrop-close="true"
-      className={`fixed inset-0 z-20 grid h-screen place-items-center pointer-events-all bg-black bg-opacity-50`}
+      className={`fixed inset-0 z-50 grid h-screen place-items-center pointer-events-all bg-black bg-opacity-50`}
       onClick={onClose}
     >
       <div
