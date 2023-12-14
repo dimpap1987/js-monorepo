@@ -5,8 +5,8 @@ function LogoComponent({
   children,
   href,
 }: {
-  children: ReactNode
-  href: string
+  readonly children: ReactNode
+  readonly href: string
 }) {
   return <NavLink href={href}>{children}</NavLink>
 }

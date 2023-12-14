@@ -1,7 +1,6 @@
 import { LoaderComponent } from '@js-monorepo/loader'
 import {
   LogoComponent,
-  MenuItem,
   NavbarComponent,
   UserNavSocial,
 } from '@js-monorepo/navbar'
@@ -11,6 +10,7 @@ import React from 'react'
 import { useUserStore } from '@js-monorepo/store'
 import StoreInitializer from './store.initializer'
 import SVGLogo from './logo-svg'
+import { MenuItem } from '@js-monorepo/sidebar'
 
 export interface MainTemplateProps {
   readonly children: React.ReactNode

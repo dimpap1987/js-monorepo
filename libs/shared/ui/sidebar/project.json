@@ -1,0 +1,16 @@
+{
+  "name": "sidebar",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/ui/sidebar/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/shared/ui/sidebar/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  }
+}

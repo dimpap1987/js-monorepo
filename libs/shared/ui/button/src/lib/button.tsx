@@ -2,11 +2,11 @@ import { twMerge } from 'tailwind-merge'
 
 /* eslint-disable-next-line */
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger'
-  size?: 'small' | 'medium' | 'large'
-  className?: string
-  children?: React.ReactNode
-  loading?: boolean
+  readonly variant?: 'primary' | 'secondary' | 'danger'
+  readonly size?: 'small' | 'medium' | 'large'
+  readonly className?: string
+  readonly children?: React.ReactNode
+  readonly loading?: boolean
 }
 
 export function ButtonComponent({
@@ -20,7 +20,7 @@ export function ButtonComponent({
   //disabled classes
   const disabledStyles = 'cursor-not-allowed opacity-50'
   // base styles
-  const baseStyles = `relative px-12 py-2 rounded font-bold focus:outline-none flex items-center justify-center w-full whitespace-nowrap ${
+  const baseStyles = `relative px-12 py-2 rounded font-bold flex items-center justify-center w-full whitespace-nowrap ${
     loading ? disabledStyles : ''
   }`
   // Variant styles
@@ -50,14 +50,11 @@ export function ButtonComponent({
 
   const buttonContent = children ?? 'Press button'
   const loadingContent = loading && (
-    <div
-      className="absolute left-3  h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent  motion-reduce:animate-[spin_1.5s_linear_infinite] mr-3"
-      role="status"
-    ></div>
+    <output className="absolute left-3  h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent  motion-reduce:animate-[spin_1.5s_linear_infinite] mr-3"></output>
   )
 
   return (
-    <button className={buttonClass} {...props} disabled={loading}>
+    <button className={buttonClass} {...props} disabled={loading} tabIndex={0}>
       {loadingContent}
       {buttonContent}
     </button>
