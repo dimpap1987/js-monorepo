@@ -153,7 +153,7 @@ export default function Main({ children, className }: MainProps) {
       </div>
 
       {/* Map component */}
-      <div className="mt-2 h-[300px]">
+      {/* <div className="mt-2 h-[300px]">
         <MapComponent
           mapContainerProps={{
             center: { lat: 37.98381, lng: 23.727539 },
@@ -169,7 +169,7 @@ export default function Main({ children, className }: MainProps) {
             <Popup>You are here</Popup>
           </Marker>
         </MapComponent>
-      </div>
+      </div> */}
     </section>
   )
 }

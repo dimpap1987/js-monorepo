@@ -11,19 +11,3 @@
   margin: 0 auto;
   width: 80%; /* Expand to the full width on hover */
 }
-
-.dropdownAnimation {
-  overflow: hidden;
-  transition:
-    transform 0.3s ease-out,
-    opacity 0.3s ease-out;
-  transform: scaleY(0);
-  transform-origin: top;
-  opacity: 0;
-}
-
-.dropdownVisible {
-  transform: scaleY(1);
-  opacity: 1;
-  padding: 2px;
-}

@@ -1,0 +1,27 @@
+{
+  "extends": ["plugin:@nx/react", "../../../../.eslintrc.json"],
+  "ignorePatterns": ["!**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "rules": {},
+      "parserOptions": {
+        "project": ["libs/shared/ui/sidebar/tsconfig.*?.json"]
+      }
+    },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {},
+      "parserOptions": {
+        "project": ["libs/shared/ui/sidebar/tsconfig.*?.json"]
+      }
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "rules": {},
+      "parserOptions": {
+        "project": ["libs/shared/ui/sidebar/tsconfig.*?.json"]
+      }
+    }
+  ]
+}
