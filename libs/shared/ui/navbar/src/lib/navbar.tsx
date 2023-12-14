@@ -140,7 +140,27 @@ export function NavbarComponent({
             position="right"
             items={menuItems}
           >
-            <VersionComponent></VersionComponent>
+            <div className="p-3">
+              {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
+                <LoginButtonComponent
+                  className="w-full rounded-none"
+                  onClick={() => setIsLoginDialog((prev) => !prev)}
+                ></LoginButtonComponent>
+              )}
+              {user?.isLoggedIn && (
+                <LogoutButtonComponent
+                  className="p-3"
+                  onClick={() => {
+                    onLogout?.()
+                    setOpenSideBar(false)
+                    setIsDropdownLoggedOptionsRefVisible(false)
+                  }}
+                ></LogoutButtonComponent>
+              )}
+            </div>
+            <div className="p-2">
+              <VersionComponent></VersionComponent>
+            </div>
           </SidebarComponent>
         </div>
       </div>
