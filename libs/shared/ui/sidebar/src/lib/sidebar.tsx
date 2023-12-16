@@ -74,13 +74,13 @@ export function SidebarComponent({
           <motion.div
             {...framerSidebarBackground}
             aria-hidden="true"
-            className="fixed bottom-0 left-0 right-0 top-0 z-40 bg-[rgba(0,0,0,0.1)] backdrop-blur-sm"
+            className="fixed bottom-0 left-0 right-0 top-0 z-40 bg-[rgba(0,0,0,0.1)] backdrop-blur-sm cursor-auto"
           ></motion.div>
           <motion.div
             {...framerSidebarPanel(position)}
             className={`fixed top-0 bottom-0 ${
               position === 'left' ? 'left-0' : 'right-0'
-            } z-50 w-full h-screen max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col`}
+            } z-50 w-full h-screen max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto`}
             ref={ref}
             aria-label="Sidebar"
           >
@@ -88,7 +88,7 @@ export function SidebarComponent({
               <span>{header}</span>
               <button
                 onClick={() => onClose()}
-                className="p-3 border-2 border-border rounded-xl"
+                className="p-3 border-2 border-border rounded-xl hover:bg-zinc-800"
                 aria-label="close sidebar"
               >
                 <AiOutlineRollback />
@@ -101,7 +101,7 @@ export function SidebarComponent({
                     <NavLink
                       className={`flex items-center w-full ${
                         position === 'right' ? 'flex-row-reverse' : ''
-                      } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-900 border-border`}
+                      } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-border`}
                       href={href}
                       onClick={() => onClose()}
                     >
