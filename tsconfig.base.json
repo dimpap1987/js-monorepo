@@ -24,6 +24,9 @@
       "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
       "@js-monorepo/package.json": ["package.json"],
+      "@js-monorepo/page-progress-bar": [
+        "libs/shared/ui/page-progress-bar/src/index.ts"
+      ],
       "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
       "@js-monorepo/sidebar": ["libs/shared/ui/sidebar/src/index.ts"],
       "@js-monorepo/store": ["libs/shared/store/src/index.ts"],

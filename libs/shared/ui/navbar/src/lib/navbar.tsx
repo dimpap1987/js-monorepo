@@ -1,3 +1,4 @@
+'use client'
 import { LoginDialogComponent } from '@js-monorepo/dialog'
 import { NavLink } from '@js-monorepo/nav-link'
 import { SidebarComponent, MenuItem } from '@js-monorepo/sidebar'

@@ -1,8 +1,12 @@
-'use client'
-import { AppProgressBar as ProgressBar } from 'next-nprogress-bar'
 import { Poppins } from 'next/font/google'
 import MainTemplate from '../components/main.template'
 import './global.css'
+import { PageProgressBar } from '@js-monorepo/page-progress-bar'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Nextjs App',
+}
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -23,13 +27,9 @@ export default function RootLayout({
         className={`${poppins.className} flex flex-col min-h-100svh bg-background`}
         suppressHydrationWarning={true}
       >
-        <MainTemplate>{children}</MainTemplate>
-        <ProgressBar
-          height="2px"
-          color="#fffd00"
-          options={{ showSpinner: false }}
-          shallowRouting
-        />
+        <PageProgressBar>
+          <MainTemplate>{children}</MainTemplate>
+        </PageProgressBar>
       </body>
     </html>
   )
