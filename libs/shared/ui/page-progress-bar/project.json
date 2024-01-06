@@ -1,0 +1,18 @@
+{
+  "name": "page-progress-bar",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/ui/page-progress-bar/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "libs/shared/ui/page-progress-bar/**/*.{ts,tsx,js,jsx}"
+        ]
+      }
+    }
+  }
+}

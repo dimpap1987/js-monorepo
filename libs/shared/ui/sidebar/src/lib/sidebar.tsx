@@ -1,3 +1,4 @@
+'use client'
 import { NavLink } from '@js-monorepo/nav-link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode, useRef } from 'react'

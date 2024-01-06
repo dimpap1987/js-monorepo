@@ -1,3 +1,4 @@
+'use client'
 import { useRouter } from 'next-nprogress-bar'
 import { twMerge } from 'tailwind-merge'
 

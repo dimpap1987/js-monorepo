@@ -1,3 +1,4 @@
+'use client'
 import { LoaderComponent } from '@js-monorepo/loader'
 import {
   LogoComponent,
