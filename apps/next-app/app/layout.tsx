@@ -6,7 +6,7 @@ import './global.css'
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '700'],
+  weight: ['200', '700'],
   variable: '--font-poppins',
   display: 'swap',
   adjustFontFallback: false,
