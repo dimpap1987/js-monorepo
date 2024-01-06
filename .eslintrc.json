@@ -30,12 +30,15 @@
         "plugin:prettier/recommended"
       ],
       "rules": {
-        "prettier/prettier": ["error", { "endOfLine": "auto" }],
+        "prettier/prettier": ["error", { "endOfLine": "lf" }],
         "import/no-extraneous-dependencies": [
           "error",
           { "devDependencies": true }
         ],
         "react/jsx-no-useless-fragment": "off"
+      },
+      "parserOptions": {
+        "project": ["tsconfig.*?.json"]
       }
     },
     {
@@ -47,7 +50,7 @@
         "plugin:prettier/recommended"
       ],
       "rules": {
-        "prettier/prettier": ["error", { "endOfLine": "auto" }],
+        "prettier/prettier": ["error", { "endOfLine": "lf" }],
         "import/no-extraneous-dependencies": [
           "error",
           { "devDependencies": true }
