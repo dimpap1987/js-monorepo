@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+h1 {
+  @apply text-2xl;
+  @apply font-bold;
+  @apply my-2;
+}
+
+h2 {
+  @apply text-xl;
+  @apply font-bold;
+  @apply my-2;
+}
+
+h3 {
+  @apply text-lg;
+  @apply font-bold;
+  @apply my-2;
+}
+
+h4 {
+  @apply text-lg;
+  @apply font-semibold;
+  @apply my-2;
+}
+
+p {
+  @apply my-2;
+}
+
 @layer base {
   :root {
     --border: 240 4% 16%;
@@ -42,6 +70,10 @@ html {
   /* scrollbar-gutter: stable; */
 }
 
+body {
+  margin: 0;
+}
+
 html,
 body,
 #__next,
@@ -62,8 +94,6 @@ main {
 }
 
 * {
-  margin: 0;
-  padding: 0;
   font: inherit;
 }
 
