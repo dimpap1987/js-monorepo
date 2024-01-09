@@ -1,7 +1,11 @@
-# version
+# VersionComponent
 
-This library was generated with [Nx](https://nx.dev).
+## Example
 
-## Running unit tests
+```jsx
+import { VersionComponent } from '@js-monorepo/version'
 
-Run `nx test version` to execute the unit tests via [Jest](https://jestjs.io).
+export function Example() {
+  return <VersionComponent></VersionComponent>
+}
+```

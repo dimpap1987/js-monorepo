@@ -96,7 +96,7 @@ export function SidebarComponent({
               </button>
             </div>
             <ul>
-              {items.map(({ name, href, Icon }, idx) => {
+              {items?.map(({ name, href, Icon }, idx) => {
                 return (
                   <li key={name}>
                     <NavLink

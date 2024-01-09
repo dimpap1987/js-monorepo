@@ -1,7 +1,19 @@
-# button
+# ButtonComponent
 
-This library was generated with [Nx](https://nx.dev).
+## Example
 
-## Running unit tests
+```tsx
+import { ButtonComponent } from '@js-monorepo/button'
 
-Run `nx test button` to execute the unit tests via [Jest](https://jestjs.io).
+export default function Example() {
+  return <ButtonComponent>Submit</ButtonComponent>
+}
+```
+
+## Properties
+
+- variant?: `'primary' | 'secondary' | 'danger'` ***-- default: 'primary'***
+- size?: `'small' | 'medium' | 'large'` ***-- default: 'medium'***
+- className?: `string`
+- children?: `React.ReactNode`
+- loading?: `boolean` ***-- default: false***

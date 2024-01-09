@@ -1,7 +1,31 @@
-# loader
+# LoaderComponent
 
-This library was generated with [Nx](https://nx.dev).
+## Example
 
-## Running unit tests
+```jsx
+// example.tsx
+import { LoaderComponent } from '@js-monorepo/loader'
 
-Run `nx test loader` to execute the unit tests via [Jest](https://jestjs.io).
+export function Example() {
+  return (
+    <LoaderComponent>
+      <Component></Component>
+    </LoaderComponent>
+  )
+}
+```
+
+```jsx
+// component.tsx
+import { useLoader } from '@js-monorepo/loader'
+
+export function Component() {
+  const [loaderState, setLoaderState] = useLoader()
+
+  return (
+    <button onClick={() => setLoaderState({ show: true, message: 'Loading' })}>
+      Trigger loading
+    </button>
+  )
+}
+```

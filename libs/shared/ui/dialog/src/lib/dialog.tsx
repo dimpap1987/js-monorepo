@@ -9,10 +9,10 @@ import DialogHeader from '../components/header'
 import LoginDialogComponent from '../components/login-dialog'
 
 export interface DialogComponentProps {
-  isOpen?: boolean
-  onClose: () => void
-  children: React.ReactNode
-  className?: string
+  readonly isOpen?: boolean
+  readonly onClose: () => void
+  readonly children: React.ReactNode
+  readonly className?: string
 }
 
 function DialogComponent({

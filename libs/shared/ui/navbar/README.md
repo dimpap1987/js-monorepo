@@ -1,7 +1,59 @@
-# navbar
+# NavbarComponent
 
-This library was generated with [Nx](https://nx.dev).
+## Example
 
-## Running unit tests
+```jsx
+import {
+  LogoComponent,
+  NavbarComponent,
+  UserNavSocial,
+} from '@js-monorepo/navbar'
 
-Run `nx test navbar` to execute the unit tests via [Jest](https://jestjs.io).
+export function Example() {
+
+    const socials: UserNavSocial[] = [
+        {
+            type: 'github',
+            onLogin: () => {},
+        },
+        {
+            type: 'google',
+            onLogin: () => {},
+        },
+        {
+            type: 'facebook',
+            onLogin: () => {},
+        },
+    ]
+    const menuItems: MenuItem[] = [
+        {
+            href: '/',
+            name: 'Home',
+        },
+        {
+            href: '/about',
+            name: 'About',
+        },
+    ]
+  return (
+    <NavbarComponent
+      user={{ isLoggedIn: true, username: 'username1' }}
+      socialLogin={socials}
+      menuItems={menuItems}
+      onLogout={() => console.log('logged out')}
+    >
+      <LogoComponent href="/">
+        <SVGLogo></SVGLogo>
+      </LogoComponent>
+    </NavbarComponent>
+  )
+}
+```
+
+## Properties
+
+- children?: `ReactNode`
+- menuItems?: `MenuItem[]`
+- user?: `UserNavProps`
+- socialLogin?: `UserNavSocial[]`
+- onLogout?: () => `void`

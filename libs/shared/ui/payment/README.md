@@ -1,7 +1,31 @@
-# payment
+# EmbeddedCheckoutComponentDialog
 
-This library was generated with [Nx](https://nx.dev).
+## Example
 
-## Running unit tests
+```jsx
+import { EmbeddedCheckoutComponentDialog } from '@js-monorepo/payment'
+import { checkoutSessionClient } from '@js-monorepo/utils'
 
-Run `nx test payment` to execute the unit tests via [Jest](https://jestjs.io).
+export function Example() {
+  const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
+
+  return (
+    <EmbeddedCheckoutComponentDialog
+      stripePublishableKey={
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
+      }
+      isOpen={isOpenCheckoutDialog}
+      onClose={() => setOpenCheckoutDialog(false)}
+      checkOutPromise={() =>
+        checkoutSessionClient({
+          username: 'username',
+          url: '/api/checkout_sessions',
+          customSubmitMessage: 'Thank you for your support',
+          isDonate: true,
+          price: 500,
+        })
+      }
+    />
+  )
+}
+```

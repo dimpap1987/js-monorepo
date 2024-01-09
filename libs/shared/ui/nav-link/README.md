@@ -1,7 +1,14 @@
-# nav-link
+# NavLink
 
-This library was generated with [Nx](https://nx.dev).
+## Example
 
-## Running unit tests
+```jsx
+import { NavLink } from '@js-monorepo/nav-link'
 
-Run `nx test nav-link` to execute the unit tests via [Jest](https://jestjs.io).
+export function Example() {
+  return <NavLink href={'/example'}>example</NavLink>
+}
+```
+
+**_IMPORTANT_**  
+If you want to use `<PageProgressBar>`, then you must use `<NavLink>`

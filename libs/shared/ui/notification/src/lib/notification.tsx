@@ -3,15 +3,15 @@ import { FaRegTimesCircle } from 'react-icons/fa'
 import { BsCheck2Circle } from 'react-icons/bs'
 
 export type NotificationType = {
-  id?: number
-  type: 'success' | 'error' | 'spinner'
-  message: string
-  description?: string
-  duration?: number
+  readonly id?: number
+  readonly type: 'success' | 'error' | 'spinner'
+  readonly message: string
+  readonly description?: string
+  readonly duration?: number
 }
 
 export type NotificationProps = {
-  notification: NotificationType
+  readonly notification: NotificationType
 }
 
 export default function Notification({ notification }: NotificationProps) {
