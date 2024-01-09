@@ -1,7 +1,25 @@
-# page-progress-bar
+# PageProgressBar
 
-This library was generated with [Nx](https://nx.dev).
+## Example
 
-## Running unit tests
+```jsx
+import { PageProgressBar } from '@js-monorepo/page-progress-bar'
 
-Run `nx test page-progress-bar` to execute the unit tests via [Jest](https://jestjs.io).
+export function Example() {
+  return <PageProgressBar color="red">{children}</PageProgressBar>
+}
+```
+
+**_IMPORTANT_**  
+If you want to use `<NavLink>`, then you must use `<PageProgressBar>`
+
+
+## Properties
+
+- children: `React.ReactNode`
+- color?: `string`
+- height?: `string`
+- options?: `Partial<NProgressOptions>`
+- shallowRouting?: `boolean`
+- delay?: `number`
+- style?: `string`

@@ -10,8 +10,8 @@ import React, {
 import Loader from './loader'
 
 interface LoaderProps {
-  message?: string
-  show?: boolean
+  readonly message?: string
+  readonly show?: boolean
 }
 
 type LoaderProviderPros = {

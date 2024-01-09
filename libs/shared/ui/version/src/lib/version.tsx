@@ -2,7 +2,7 @@ import pkg from '@js-monorepo/package.json'
 import { twMerge } from 'tailwind-merge'
 
 export interface VersionComponentProps {
-  className?: string
+  readonly className?: string
 }
 
 export function VersionComponent({ className }: VersionComponentProps) {

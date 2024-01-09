@@ -1,7 +1,28 @@
-# sidebar
+# SidebarComponent
 
-This library was generated with [Nx](https://nx.dev).
+## Example
 
-## Running unit tests
+```jsx
+import { SidebarComponent, MenuItem } from '@js-monorepo/sidebar'
 
-Run `nx test sidebar` to execute the unit tests via [Jest](https://jestjs.io).
+export function Example() {
+  const [openSideBar, setOpenSideBar] = useState(false)
+  return (
+    <SidebarComponent
+      isOpen={openSideBar}
+      onClose={() => setOpenSideBar(false)}
+      position="right"
+      items={menuItems}
+    ></SidebarComponent>
+  )
+}
+```
+
+## Properties
+
+- children?: `ReactNode`
+- isOpen: `boolean`
+- onClose: () => `void`
+- position?: `SidebarPositionType`
+- items: `MenuItem[]`
+- header?: `string`
