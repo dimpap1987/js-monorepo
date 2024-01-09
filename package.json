@@ -1,6 +1,6 @@
 {
   "name": "@js-monorepo/source",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "license": "MIT",
   "scripts": {
     "lint": "nx affected:lint --all",
