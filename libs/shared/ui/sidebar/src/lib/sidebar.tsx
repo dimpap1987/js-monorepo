@@ -16,7 +16,7 @@ export type MenuItem = {
 export interface SidebarComponentProps {
   readonly children?: ReactNode
   readonly isOpen: boolean
-  readonly onClose?: () => void
+  readonly onClose: () => void
   readonly position?: SidebarPositionType
   readonly items: MenuItem[]
   readonly header?: string
