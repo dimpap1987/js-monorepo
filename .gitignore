@@ -42,3 +42,5 @@ Thumbs.db
 .next
 .env
 .env*
+
+apps/docs/public/README.json
