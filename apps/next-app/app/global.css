@@ -1,34 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-h1 {
-  @apply text-2xl;
-  @apply font-bold;
-  @apply my-2;
-}
-
-h2 {
-  @apply text-xl;
-  @apply font-bold;
-  @apply my-2;
-}
-
-h3 {
-  @apply text-lg;
-  @apply font-bold;
-  @apply my-2;
-}
-
-h4 {
-  @apply text-lg;
-  @apply font-semibold;
-  @apply my-2;
-}
-
-p {
-  @apply my-2;
-}
+@import '@js-monorepo/tailwind';
+@import '@js-monorepo/base';
 
 @layer base {
   :root {
@@ -68,60 +39,4 @@ p {
 
 html {
   /* scrollbar-gutter: stable; */
-}
-
-body {
-  margin: 0;
-}
-
-html,
-body,
-#__next,
-main {
-  scroll-behavior: smooth;
-  font-size: 14px;
-}
-
-.min-h-100svh {
-  min-height: 100vh;
-  min-height: 100svh;
-}
-
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-}
-
-* {
-  font: inherit;
-}
-
-img,
-picture,
-svg,
-video {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-/* custom scrollbar */
-::-webkit-scrollbar {
-  width: 14px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #d6dee1;
-  border-radius: 20px;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #899597;
 }
