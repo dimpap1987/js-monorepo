@@ -44,3 +44,4 @@ Thumbs.db
 .env*
 
 apps/docs/public/README.json
+.nx/

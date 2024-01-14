@@ -20,6 +20,7 @@
       "@js-monorepo/dialog": ["libs/shared/ui/dialog/src/index.ts"],
       "@js-monorepo/loader": ["libs/shared/ui/loader/src/index.ts"],
       "@js-monorepo/map": ["libs/shared/ui/map/src/index.ts"],
+      "@js-monorepo/markdown": ["libs/shared/ui/markdown/src/index.ts"],
       "@js-monorepo/nav-link": ["libs/shared/ui/nav-link/src/index.ts"],
       "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],

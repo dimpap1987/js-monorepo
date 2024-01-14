@@ -36,7 +36,6 @@ body {
 
 html,
 body,
-#__next,
 main {
   scroll-behavior: smooth;
   font-size: 14px;
