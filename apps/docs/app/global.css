@@ -1,2 +1,29 @@
-@import '@js-monorepo/tailwind';
 @import '@js-monorepo/base';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+h1 {
+  @apply text-2xl;
+  @apply font-bold;
+}
+
+h2 {
+  @apply text-xl;
+  @apply font-bold;
+}
+
+h3 {
+  @apply text-lg;
+  @apply font-bold;
+}
+
+h4 {
+  @apply text-lg;
+  @apply font-semibold;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
