@@ -14,13 +14,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-100svh bg-slate-50 min-w-[300px]">
+      <body className="min-h-100svh bg-slate-50">
         <PageProgressBar color="red">
-          <section className="p-5 max-w-full">
-            <div className="fixed w-[200px]">
+          <section className="flex">
+            <div className="min-w-[200px] sticky top-0 h-screen bg-gray-200 p-4">
               {jsonData.map((json) => (
                 <NavLink
-                  className="block py-1 w-full text-left hover:bg-slate-200"
+                  className="block py-1 w-full text-left hover:bg-slate-300"
                   key={json.module}
                   href={`docs/${json.module}`}
                 >
@@ -28,7 +28,7 @@ export default function RootLayout({
                 </NavLink>
               ))}
             </div>
-            {children}
+            <div className="flex-1 p-4">{children}</div>
           </section>
         </PageProgressBar>
       </body>
