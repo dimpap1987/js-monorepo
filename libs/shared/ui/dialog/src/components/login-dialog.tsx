@@ -39,6 +39,7 @@ function LoginDialogComponent({
               {/* GOOGLE */}
               {social.type === 'google' && (
                 <button
+                  type="button"
                   className="bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black inline-flex items-center hover:bg-zinc-300 mr-2 focus:ring-4 focus:ring-[#24292F]/50 dark:focus:ring-[#3b5998]/55"
                   onClick={() => handleSocialLogin(social.onLogin, onClose)}
                 >

@@ -2,15 +2,13 @@
 
 ## How to use
 
-import styles like below
-
 ```css
-@import '@js-monorepo/tailwind';
 @import '@js-monorepo/base';
 ```
-***NOTE***   
-You need to create a typescript project in order to use them
-because they are being imported from tsconfig.*.json
+
+**_NOTE_**  
+You need to create a typescript project in order to use it
+because it is being imported from tsconfig.\*.json
 
 ## @js-monorepo/base
 
@@ -45,7 +43,7 @@ img {
 }
 ```
 
-## @js-monorepo/tailwind
+## import tailwind
 
 ```css
 @tailwind base;
