@@ -20,7 +20,7 @@ export function Example() {
 import { useNotifications } from '@js-monorepo/notification'
 
 export function Component() {
-  const [, , addNotification] = useNotifications()
+  const [addNotification] = useNotifications()
   return (
     <button
       onClick={() =>

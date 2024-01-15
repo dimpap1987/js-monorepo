@@ -16,7 +16,7 @@ interface MainProps {
 
 export default function Main({ children, className }: MainProps) {
   const [, setLoaderState] = useLoader()
-  const [, , addNotification] = useNotifications()
+  const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   const [isOpenDialog, setOpenDialog] = useState(false)
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
