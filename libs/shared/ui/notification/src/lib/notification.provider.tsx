@@ -21,18 +21,18 @@ type NotificationProviderPros = {
 // create context
 const NotificationsContext = createContext<
   | {
+      addNotification: (notification: NotificationType) => void
       notifications: NotificationType[]
       setNotifications: React.Dispatch<React.SetStateAction<NotificationType[]>>
-      addNotification: (notification: NotificationType) => void
     }
   | undefined
 >(undefined)
 
 // useNotifications hook
 export const useNotifications = (): [
+  (notification: NotificationType) => void,
   NotificationType[],
   React.Dispatch<React.SetStateAction<NotificationType[]>>,
-  (notification: NotificationType) => void,
 ] => {
   const context = useContext(NotificationsContext)
   if (!context) {
@@ -41,9 +41,9 @@ export const useNotifications = (): [
     )
   }
   return [
+    context.addNotification,
     context.notifications,
     context.setNotifications,
-    context.addNotification,
   ]
 }
 
@@ -91,9 +91,9 @@ export const NotificationComponent: React.FC<NotificationProviderPros> = ({
 
   const contextValue = useMemo(() => {
     return {
+      addNotification,
       notifications,
       setNotifications,
-      addNotification,
     }
   }, [notifications, setNotifications, addNotification])
 

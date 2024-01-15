@@ -20,7 +20,7 @@ export default function RootLayout({
             <div className="min-w-[200px] sticky top-0 h-screen bg-gray-200 p-4">
               {jsonData.map((json) => (
                 <NavLink
-                  className="block py-1 w-full text-left transition-colors duration-300 hover:bg-slate-300 focus:bg-slate-300"
+                  className="block p-2 w-full text-left transition-colors duration-300 hover:bg-slate-300 focus:bg-slate-300"
                   key={json.module}
                   href={`docs/${json.module}`}
                 >
