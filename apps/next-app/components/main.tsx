@@ -1,11 +1,11 @@
 'use client'
-import { ButtonComponent } from '@js-monorepo/button'
-import { ConfirmationDialogComponent } from '@js-monorepo/dialog'
+import { DpButton } from '@js-monorepo/button'
+import { DpConfirmationDialog } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
-import { MapComponent, Marker, Popup } from '@js-monorepo/map'
+// import { MapComponent, Marker, Popup } from '@js-monorepo/map'
 import { useNotifications } from '@js-monorepo/notification'
 import { ReactNode, useState } from 'react'
-import { EmbeddedCheckoutComponentDialog } from '@js-monorepo/payment'
+import { DpCheckoutDialog } from '@js-monorepo/payment'
 import { checkoutSessionClient } from '@js-monorepo/utils'
 import { useUserStore } from '@js-monorepo/store'
 import BannerSVG from './banner-svg'
@@ -38,15 +38,15 @@ export default function Main({ children, className }: MainProps) {
         <BannerSVG />
       </div>
       <div className="flex flex-col justify-center align-items gap-2">
-        <ButtonComponent
+        <DpButton
           className="bg-accent hover:bg-accent-hover font-bold py-2 px-4 border border-accent-border rounded"
           onClick={loadForTwoSecond}
         >
           Trigger loading
-        </ButtonComponent>
+        </DpButton>
 
         <div className="flex gap-2 flex-wrap">
-          <ButtonComponent
+          <DpButton
             className="flex-1"
             variant="primary"
             onClick={() => {
@@ -59,9 +59,9 @@ export default function Main({ children, className }: MainProps) {
             }}
           >
             Success notification
-          </ButtonComponent>
+          </DpButton>
           {/* Error  */}
-          <ButtonComponent
+          <DpButton
             className="flex-1"
             variant="danger"
             onClick={() => {
@@ -73,9 +73,9 @@ export default function Main({ children, className }: MainProps) {
             }}
           >
             Error notification
-          </ButtonComponent>
+          </DpButton>
           {/* Spinner */}
-          <ButtonComponent
+          <DpButton
             className="flex-1"
             variant="secondary"
             onClick={() => {
@@ -87,10 +87,10 @@ export default function Main({ children, className }: MainProps) {
             }}
           >
             Spinner notification
-          </ButtonComponent>
+          </DpButton>
         </div>
         {/* Success */}
-        <ButtonComponent
+        <DpButton
           loading={loading}
           onClick={() => {
             setLoading((prev) => !prev)
@@ -100,17 +100,17 @@ export default function Main({ children, className }: MainProps) {
           }}
         >
           Disable when Clicked
-        </ButtonComponent>
-        <ButtonComponent
+        </DpButton>
+        <DpButton
           onClick={() => {
             setOpenDialog((prev) => !prev)
           }}
         >
           Confirmation dialog
-        </ButtonComponent>
+        </DpButton>
       </div>
 
-      <ConfirmationDialogComponent
+      <DpConfirmationDialog
         isOpen={isOpenDialog}
         onClose={() => setOpenDialog(false)}
         onCancel={() => setOpenDialog(false)}
@@ -123,18 +123,18 @@ export default function Main({ children, className }: MainProps) {
           //   duration: 4000,
           // })
         }}
-      ></ConfirmationDialogComponent>
+      ></DpConfirmationDialog>
 
       <div className="mt-2">
-        <ButtonComponent
+        <DpButton
           variant="secondary"
           onClick={() => setOpenCheckoutDialog(true)}
           loading={isOpenCheckoutDialog}
         >
           Donate 5 &euro;
-        </ButtonComponent>
+        </DpButton>
 
-        <EmbeddedCheckoutComponentDialog
+        <DpCheckoutDialog
           stripePublishableKey={
             process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
           }

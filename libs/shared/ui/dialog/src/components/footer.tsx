@@ -1,13 +1,9 @@
-import { ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 
-export interface DialogFooterProps {
-  children: ReactNode
-}
-
-function DialogFooter({ children }: DialogFooterProps) {
+function DpDialogFooter({ children }: PropsWithChildren) {
   return children && children
 }
 
-DialogFooter.displayName = 'DialogFooter'
+DpDialogFooter.displayName = 'DpDialogFooter'
 
-export default DialogFooter
+export default DpDialogFooter

@@ -1,17 +1,17 @@
-# PageProgressBar
+<h1 style="display:inline"> DpNextPageProgressBar </h1> <sub>a nextjs library</sub>
 
 ## Example
 
 ```jsx
-import { PageProgressBar } from '@js-monorepo/page-progress-bar'
+import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 
 export function Example() {
-  return <PageProgressBar color="red">{children}</PageProgressBar>
+  return <DpNextPageProgressBar color="red">{children}</DpNextPageProgressBar>
 }
 ```
 
 **_IMPORTANT_**  
-If you want to use `<NavLink>`, then you must use `<PageProgressBar>`
+If you want to use `<DpNextNavLink>`, then you must use `<DpNextPageProgressBar>`
 
 
 ## Properties

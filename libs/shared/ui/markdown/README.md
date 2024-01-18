@@ -1,9 +1,9 @@
-# MarkdownComponent
+# DpMarkdown
 
 ## Example
 
 ```jsx
-import { MarkdownComponent } from '@js-monorepo/markdown'
+import { DpMarkdown } from '@js-monorepo/markdown'
 const markdownExample = `
     # Heading
     ## Sub heading
@@ -12,7 +12,7 @@ const markdownExample = `
   `
 
 export function Example() {
-  return <MarkdownComponent markdownCode={markdownExample}></MarkdownComponent>
+  return <DpMarkdown markdownCode={markdownExample}></DpMarkdown>
 }
 ```
 

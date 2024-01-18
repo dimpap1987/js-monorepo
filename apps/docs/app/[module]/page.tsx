@@ -1,28 +1,16 @@
-import { MarkdownComponent } from '@js-monorepo/markdown'
 import jsonData from '../../public/README.json'
+import DocPage from './DocPage'
 
-interface DocPageProps {
+interface PageProps {
   readonly params: {
     module: string
   }
 }
 
-function DocPage({ params: { module } }: DocPageProps) {
+function Page({ params: { module } }: PageProps) {
   const doc = jsonData.find((json) => json.module === module)
 
-  return (
-    doc && (
-      <div className="prose prose-lg mx-auto max-w-[82ch]">
-        <div className="flex gap-2 flex-wrap text-slate-500">
-          <span>This module is located at:</span>
-          <strong className="italic"> {doc.path}</strong>
-        </div>
-        <div>
-          <MarkdownComponent markdownCode={doc.data}></MarkdownComponent>
-        </div>
-      </div>
-    )
-  )
+  return doc && <DocPage data={doc.data} path={doc.path}></DocPage>
 }
 
-export default DocPage
+export default Page

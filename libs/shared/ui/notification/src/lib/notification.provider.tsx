@@ -1,38 +1,33 @@
-'use client'
-
 import React, {
+  PropsWithChildren,
   createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-  useRef,
-  useMemo,
   useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react'
-import { NotificationType } from './notification'
-import NotificationList from './notificationList'
-
-// types
-type NotificationProviderPros = {
-  children?: ReactNode
-}
+import { DpNotificationProps } from './notification'
+import DpNotificationList from './notificationList'
 
 // create context
 const NotificationsContext = createContext<
   | {
-      addNotification: (notification: NotificationType) => void
-      notifications: NotificationType[]
-      setNotifications: React.Dispatch<React.SetStateAction<NotificationType[]>>
+      addNotification: (notification: DpNotificationProps) => void
+      notifications: DpNotificationProps[]
+      setNotifications: React.Dispatch<
+        React.SetStateAction<DpNotificationProps[]>
+      >
     }
   | undefined
 >(undefined)
 
 // useNotifications hook
 export const useNotifications = (): [
-  (notification: NotificationType) => void,
-  NotificationType[],
-  React.Dispatch<React.SetStateAction<NotificationType[]>>,
+  (notification: DpNotificationProps) => void,
+  DpNotificationProps[],
+  React.Dispatch<React.SetStateAction<DpNotificationProps[]>>,
 ] => {
   const context = useContext(NotificationsContext)
   if (!context) {
@@ -48,13 +43,13 @@ export const useNotifications = (): [
 }
 
 // NotificationProvider
-export const NotificationComponent: React.FC<NotificationProviderPros> = ({
+export const DpNotificationProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const [notifications, setNotifications] = useState<NotificationType[]>([])
+  const [notifications, setNotifications] = useState<DpNotificationProps[]>([])
 
   //useCallback hook which will ensure that the addNotification function itself is memoized and not recreated on every render
-  const addNotification = useCallback((notification: NotificationType) => {
+  const addNotification = useCallback((notification: DpNotificationProps) => {
     const { id = Math.floor(Math.random() * 1000000) } = notification
     setNotifications((prev) => [...prev, { ...notification, id }])
   }, [])
@@ -99,10 +94,10 @@ export const NotificationComponent: React.FC<NotificationProviderPros> = ({
 
   return (
     <NotificationsContext.Provider value={contextValue}>
-      <NotificationList notifications={notifications} />
+      <DpNotificationList notifications={notifications} />
       {children}
     </NotificationsContext.Provider>
   )
 }
 
-export default NotificationComponent
+export default DpNotificationProvider

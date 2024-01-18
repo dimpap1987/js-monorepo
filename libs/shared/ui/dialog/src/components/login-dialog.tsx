@@ -1,12 +1,14 @@
-import { DialogComponent, DialogContent, DialogHeader } from '../lib/dialog'
 import React from 'react'
+import { DpDialog } from '../lib/dialog'
+import DpDialogHeader from './header'
+import DpDialogContent from './content'
 
 export type SocialConfig = {
   type: 'google' | 'github' | 'facebook'
   onLogin: () => void | Promise<void>
 }
 
-export type LoginDialogProps = {
+export type DpLoginDialogProps = {
   readonly isOpen: boolean
   readonly onClose: () => void
   readonly socialConfig: SocialConfig[]
@@ -20,19 +22,17 @@ async function handleSocialLogin(
   onClose()
 }
 
-function LoginDialogComponent({
-  isOpen,
-  onClose,
-  socialConfig,
-}: LoginDialogProps) {
+function DpLoginDialog({ isOpen, onClose, socialConfig }: DpLoginDialogProps) {
   return (
-    <DialogComponent
+    <DpDialog
       isOpen={isOpen}
       onClose={onClose}
       className="text-black shadow-2xl shadow-cyan-500/50 w-full min-w-[330px] md:w-[35%] p-2"
     >
-      <DialogHeader className="justify-center pt-0">Sign in with</DialogHeader>
-      <DialogContent className="p-3">
+      <DpDialogHeader className="justify-center pt-0">
+        Sign in with
+      </DpDialogHeader>
+      <DpDialogContent className="p-3">
         <div className="flex flex-col items-center text-sm gap-2 font-medium">
           {socialConfig?.map((social) => (
             <React.Fragment key={social.type}>
@@ -127,9 +127,9 @@ function LoginDialogComponent({
             </React.Fragment>
           ))}
         </div>
-      </DialogContent>
-    </DialogComponent>
+      </DpDialogContent>
+    </DpDialog>
   )
 }
 
-export default LoginDialogComponent
+export default DpLoginDialog

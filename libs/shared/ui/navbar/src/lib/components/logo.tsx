@@ -1,16 +1,9 @@
-import { NavLink } from '@js-monorepo/nav-link'
-import { ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 
-function LogoComponent({
-  children,
-  href,
-}: {
-  readonly children: ReactNode
-  readonly href: string
-}) {
-  return <NavLink href={href}>{children}</NavLink>
+function DpLogo({ children }: PropsWithChildren) {
+  return children
 }
 
-LogoComponent.displayName = 'LogoComponent'
+DpLogo.displayName = 'DpLogo'
 
-export { LogoComponent }
+export { DpLogo }

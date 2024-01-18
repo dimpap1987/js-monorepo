@@ -1,13 +1,13 @@
 import styles from './notification.module.css'
-import Notification, { NotificationType } from './notification'
+import Notification, { DpNotificationProps } from './notification'
 
-interface NotificationListProps {
-  notifications: NotificationType[]
+interface DpNotificationListProps {
+  notifications: DpNotificationProps[]
 }
 
-export default function NotificationList({
+export default function DpNotificationList({
   notifications,
-}: NotificationListProps) {
+}: DpNotificationListProps) {
   return (
     notifications &&
     notifications.length > 0 && (
@@ -18,7 +18,7 @@ export default function NotificationList({
               key={notification.id || index}
               className={`${styles.notificationContainer} flex bg-foreground p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
             >
-              <Notification notification={notification} />
+              <Notification {...notification} />
             </div>
           ))}
         </div>

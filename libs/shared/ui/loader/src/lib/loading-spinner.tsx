@@ -1,13 +1,21 @@
-import styles from './loader.module.css'
+import { CSSProperties } from 'react'
+import './loader.module.css'
 
-export type LoadingSpinnerProps = {
+export type DpLoadingProps = {
   message?: string
+  styles?: CSSProperties
+}
+const spinnerLoader = {
+  height: '1.7rem',
+  width: '1.7rem',
+  animation: 'spin 1s linear infinite',
+  stroke: 'white',
 }
 
-export function LoadingSpinnerComponent({ message }: LoadingSpinnerProps) {
+export function DpLoadingSpinner({ message, styles }: DpLoadingProps) {
   return (
     <div aria-label="Loading..." role="status" className="flex items-center">
-      <svg className={styles.icon} viewBox="0 0 256 256">
+      <svg style={{ ...spinnerLoader, ...styles }} viewBox="0 0 256 256">
         <line
           x1="128"
           y1="32"
@@ -86,4 +94,4 @@ export function LoadingSpinnerComponent({ message }: LoadingSpinnerProps) {
   )
 }
 
-export default LoadingSpinnerComponent
+export default DpLoadingSpinner

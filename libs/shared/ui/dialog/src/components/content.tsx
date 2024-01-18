@@ -1,14 +1,14 @@
 import { ReactNode } from 'react'
 
-export interface DialogContentProps {
+export interface DpDialogContentProps {
   children?: ReactNode
   className?: string
 }
 
-function DialogContent({ children, className }: DialogContentProps) {
+function DpDialogContent({ children, className }: DpDialogContentProps) {
   return children && <div className={className}>{children}</div>
 }
 
-DialogContent.displayName = 'DialogContent'
+DpDialogContent.displayName = 'DpDialogContent'
 
-export default DialogContent
+export default DpDialogContent

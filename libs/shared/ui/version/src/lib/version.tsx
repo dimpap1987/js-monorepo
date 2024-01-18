@@ -1,11 +1,11 @@
 import pkg from '@js-monorepo/package.json'
 import { twMerge } from 'tailwind-merge'
 
-export interface VersionComponentProps {
+export interface DpVersionProps {
   readonly className?: string
 }
 
-export function VersionComponent({ className }: VersionComponentProps) {
+export function DpVersion({ className }: DpVersionProps) {
   return (
     <span
       className={twMerge(
@@ -18,4 +18,4 @@ export function VersionComponent({ className }: VersionComponentProps) {
   )
 }
 
-export default VersionComponent
+export default DpVersion

@@ -1,11 +1,20 @@
-import LoadingSpinnerComponent from './loading-spinner'
+import { twMerge } from 'tailwind-merge'
+import DpLoadingSpinner from './loading-spinner'
+import { CSSProperties } from 'react'
 
-export interface LoaderProps {
+export interface DpLoaderProps {
   message?: string
   show?: boolean
+  className?: string
+  spinnerStyle?: CSSProperties
 }
 
-export function Loader({ message, show }: LoaderProps) {
+export function DpLoader({
+  message,
+  show,
+  className,
+  spinnerStyle,
+}: DpLoaderProps) {
   return (
     <div
       className={`fixed left-0 w-screen h-screen
@@ -13,8 +22,16 @@ export function Loader({ message, show }: LoaderProps) {
       bg-opacity-80 transform transition-transform
       duration-200 ${show ? 'scale-100' : 'scale-0'} z-30 select-none`}
     >
-      <div className="text-white mt-[100px] flex flex-col items-center justify-center transform -translate-y-20">
-        <LoadingSpinnerComponent message="Loading..."></LoadingSpinnerComponent>
+      <div
+        className={twMerge(
+          `text-white mt-[100px] flex flex-col items-center justify-center transform -translate-y-20`,
+          className
+        )}
+      >
+        <DpLoadingSpinner
+          message="Loading..."
+          styles={spinnerStyle}
+        ></DpLoadingSpinner>
         {message && (
           <p>
             <small>{message}</small>
@@ -25,4 +42,4 @@ export function Loader({ message, show }: LoaderProps) {
   )
 }
 
-export default Loader
+export default DpLoader

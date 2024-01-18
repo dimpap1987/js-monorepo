@@ -1,5 +1,5 @@
 'use client'
-import { NavLink } from '@js-monorepo/nav-link'
+import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
@@ -13,7 +13,7 @@ export type MenuItem = {
   href: string
   Icon?: IconType
 }
-export interface SidebarComponentProps {
+export interface DpNextSidebarProps {
   readonly children?: ReactNode
   readonly isOpen: boolean
   readonly onClose: () => void
@@ -57,14 +57,14 @@ const framerIcon = {
   },
 }
 
-export function SidebarComponent({
+export function DpNextSidebar({
   children,
   isOpen,
   onClose,
   items = [],
   position = 'left',
   header,
-}: SidebarComponentProps) {
+}: DpNextSidebarProps) {
   const ref = useRef(null)
   useClickAway(ref, () => onClose())
 
@@ -99,7 +99,7 @@ export function SidebarComponent({
               {items?.map(({ name, href, Icon }, idx) => {
                 return (
                   <li key={name}>
-                    <NavLink
+                    <DpNextNavLink
                       className={`flex items-center w-full ${
                         position === 'right' ? 'flex-row-reverse' : ''
                       } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-border`}
@@ -114,7 +114,7 @@ export function SidebarComponent({
                           <Icon className="text-2xl" />
                         </motion.div>
                       )}
-                    </NavLink>
+                    </DpNextNavLink>
                   </li>
                 )
               })}

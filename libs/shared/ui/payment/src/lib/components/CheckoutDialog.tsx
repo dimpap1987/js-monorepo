@@ -1,5 +1,4 @@
-'use client'
-import { DialogComponent, DialogContent } from '@js-monorepo/dialog'
+import { DpDialog, DpDialogContent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import {
   EmbeddedCheckout,
@@ -13,7 +12,7 @@ async function initStripe(stripePublishableKey: string) {
   return loadStripe(stripePublishableKey)
 }
 
-function EmbeddedCheckoutComponentDialog({
+function DpCheckoutDialog({
   stripePublishableKey,
   isOpen,
   onClose,
@@ -21,7 +20,7 @@ function EmbeddedCheckoutComponentDialog({
 }: {
   readonly stripePublishableKey: string
   readonly isOpen: boolean
-  readonly checkOutPromise: () => Promise<any>
+  readonly checkOutPromise: () => Promise<unknown>
   readonly onClose: () => void
 }) {
   const [response, setResponse] = useState<{
@@ -65,14 +64,14 @@ function EmbeddedCheckoutComponentDialog({
   }, [isOpen])
 
   return (
-    <DialogComponent
+    <DpDialog
       isOpen={
         isOpen && response?.clientSecret != null && stripeInstance !== undefined
       }
       onClose={onClose}
       className="text-black shadow-2xl shadow-cyan-500/50 w-full sm:w-[460px] md:w-[60%]"
     >
-      <DialogContent className="p-4">
+      <DpDialogContent className="p-4">
         <EmbeddedCheckoutProvider
           stripe={stripeInstance}
           options={{
@@ -84,9 +83,9 @@ function EmbeddedCheckoutComponentDialog({
         >
           <EmbeddedCheckout />
         </EmbeddedCheckoutProvider>
-      </DialogContent>
-    </DialogComponent>
+      </DpDialogContent>
+    </DpDialog>
   )
 }
 
-export default EmbeddedCheckoutComponentDialog
+export default DpCheckoutDialog
