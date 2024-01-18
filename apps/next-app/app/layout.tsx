@@ -1,7 +1,7 @@
 import { Poppins } from 'next/font/google'
 import MainTemplate from '../components/main.template'
 import './global.css'
-import { PageProgressBar } from '@js-monorepo/page-progress-bar'
+import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -27,9 +27,9 @@ export default function RootLayout({
         className={`${poppins.className} flex flex-col min-h-100svh bg-background`}
         suppressHydrationWarning={true}
       >
-        <PageProgressBar>
+        <DpNextPageProgressBar>
           <MainTemplate>{children}</MainTemplate>
-        </PageProgressBar>
+        </DpNextPageProgressBar>
       </body>
     </html>
   )

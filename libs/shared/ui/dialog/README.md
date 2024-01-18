@@ -1,24 +1,24 @@
-# DialogComponent
+# DpDialog
 
 ## Example
 
 ```jsx
 import {
-  DialogComponent,
-  DialogHeader,
-  DialogContent,
-  DialogFooter,
+  DpDialog,
+  DpDialogHeader,
+  DpDialogContent,
+  DpDialogFooter,
 } from '@js-monorepo/dialog'
 
 export default function Example() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <DialogComponent isOpen={isOpen} onClose={setIsOpen(false)}>
-      <DialogHeader>**Your Header**</DialogHeader>
-      <DialogContent>**Your content**</DialogContent>
-      <DialogFooter>**Your Footer**</DialogFooter>
-    </DialogComponent>
+    <DpDialog isOpen={isOpen} onClose={setIsOpen(false)}>
+      <DpDialogHeader>**Your Header**</DpDialogHeader>
+      <DpDialogContent>**Your content**</DpDialogContent>
+      <DpDialogFooter>**Your Footer**</DpDialogFooter>
+    </DpDialog>
   )
 }
 ```
@@ -30,12 +30,12 @@ export default function Example() {
 - children: `React.ReactNode`
 - className?: `string`
 
-# LoginDialogComponent
+# DpLoginDialog
 
 ## Example
 
 ```jsx
-import { LoginDialogComponent } from '@js-monorepo/dialog'
+import { DpLoginDialog } from '@js-monorepo/dialog'
 
 const socialLogin: SocialConfig[] = [
   {
@@ -55,11 +55,11 @@ export default function Example() {
   const [isLoginDialog, setIsLoginDialog] = useState(false)
 
   return (
-    <LoginDialogComponent
+    <DpLoginDialog
       socialConfig={socialLogin}
       isOpen={isLoginDialog}
       onClose={() => setIsLoginDialog(false)}
-    ></LoginDialogComponent>
+    ></DpLoginDialog>
   )
 }
 ```
@@ -70,7 +70,7 @@ export default function Example() {
 - onClose: () => `void`
 - socialConfig: `SocialConfig[]`
 
-# ConfirmationDialogComponent
+# DpConfirmationDialog
 
 ## Example
 
@@ -79,12 +79,12 @@ export default function Example() {
   const [isOpenDialog, setOpenDialog] = useState(false)
 
   return (
-    <ConfirmationDialogComponent
+    <DpConfirmationDialog
       isOpen={isOpenDialog}
       onClose={() => setOpenDialog(false)}
       onCancel={() => setOpenDialog(false)}
       onConfirm={async () => setOpenDialog(false)}
-    ></ConfirmationDialogComponent>
+    ></DpConfirmationDialog>
   )
 }
 ```

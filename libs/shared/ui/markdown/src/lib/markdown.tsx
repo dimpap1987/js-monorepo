@@ -1,19 +1,18 @@
-'use client'
 import Markdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import rehypeRaw from 'rehype-raw'
 import remarkGfm from 'remark-gfm'
 
-export interface MarkdownComponentProps {
+export interface DpMarkdownProps {
   readonly markdownCode: string
   readonly className?: string
 }
 
-export function MarkdownComponent({
+export function DpMarkdown({
   markdownCode,
   className: innerClassName,
-}: MarkdownComponentProps) {
+}: DpMarkdownProps) {
   return (
     markdownCode && (
       <Markdown
@@ -51,4 +50,4 @@ export function MarkdownComponent({
   )
 }
 
-export default MarkdownComponent
+export default DpMarkdown

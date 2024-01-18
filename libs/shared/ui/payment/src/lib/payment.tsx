@@ -1,3 +1,3 @@
-import EmbeddedCheckoutComponentDialog from './components/EmbeddedCheckoutDialog'
+import DpCheckoutDialog from './components/CheckoutDialog'
 
-export { EmbeddedCheckoutComponentDialog }
+export { DpCheckoutDialog }

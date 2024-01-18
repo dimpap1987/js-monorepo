@@ -1,12 +1,12 @@
-# ButtonComponent
+# DpButton
 
 ## Example
 
 ```tsx
-import { ButtonComponent } from '@js-monorepo/button'
+import { DpButton } from '@js-monorepo/button'
 
 export default function Example() {
-  return <ButtonComponent>Submit</ButtonComponent>
+  return <DpButton>Submit</DpButton>
 }
 ```
 

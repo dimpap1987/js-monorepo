@@ -3,17 +3,16 @@ import {
   AppProgressBar as ProgressBar,
   ProgressBarProps,
 } from 'next-nprogress-bar'
+import { PropsWithChildren } from 'react'
 
-export type PageProgressBarProps = {
-  children: React.ReactNode
-} & ProgressBarProps
+export type DpNextPageProgressBarProps = PropsWithChildren & ProgressBarProps
 
-export function PageProgressBar({
+export function DpNextPageProgressBar({
   children,
   height = '2px',
   color = '#fffd00',
   options = { showSpinner: false },
-}: PageProgressBarProps) {
+}: DpNextPageProgressBarProps) {
   return (
     <>
       <ProgressBar
@@ -27,4 +26,4 @@ export function PageProgressBar({
   )
 }
 
-export default PageProgressBar
+export default DpNextPageProgressBar

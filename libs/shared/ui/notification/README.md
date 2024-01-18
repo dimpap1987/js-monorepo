@@ -1,16 +1,16 @@
-# NotificationComponent
+# DpNotificationProvider
 
 ## Example
 
 ```jsx
 // example.tsx
-import { NotificationComponent } from '@js-monorepo/notification'
+import { DpNotificationProvider } from '@js-monorepo/notification'
 
 export function Example() {
   return (
-    <NotificationComponent>
+    <DpNotificationProvider>
       <Component></Component>
-    </NotificationComponent>
+    </DpNotificationProvider>
   )
 }
 ```

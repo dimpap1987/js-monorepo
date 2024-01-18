@@ -1,13 +1,13 @@
-import { ButtonComponent } from '@js-monorepo/button'
+import { DpButton } from '@js-monorepo/button'
 import { ReactNode } from 'react'
 import {
-  DialogComponent,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
+  DpDialog,
+  DpDialogContent,
+  DpDialogFooter,
+  DpDialogHeader,
 } from '../lib/dialog'
 
-export interface ConfirmationDialogComponentProps {
+export interface DpConfirmationDialogProps {
   readonly className?: string
   readonly isOpen: boolean
   readonly onClose: () => void
@@ -19,7 +19,7 @@ export interface ConfirmationDialogComponentProps {
   readonly onCancel?: () => void // Cancel button action
 }
 
-function ConfirmationDialogComponent({
+function DpConfirmationDialog({
   className,
   isOpen,
   onClose,
@@ -29,18 +29,18 @@ function ConfirmationDialogComponent({
   onConfirm,
   cancelLabel = 'Go Back',
   onCancel,
-}: ConfirmationDialogComponentProps) {
+}: DpConfirmationDialogProps) {
   return (
-    <DialogComponent
+    <DpDialog
       isOpen={isOpen}
       onClose={onClose}
       className={`${className} shadow-2xl shadow-cyan-500/50`}
     >
-      {title && <DialogHeader>{title}</DialogHeader>}
-      {content && <DialogContent>{content}</DialogContent>}
-      <DialogFooter>
+      {title && <DpDialogHeader>{title}</DpDialogHeader>}
+      {content && <DpDialogContent>{content}</DpDialogContent>}
+      <DpDialogFooter>
         <div className="grid gap-2 p-4 text-blue-gray-500 grid-cols-1 lg:grid-cols-4">
-          <ButtonComponent
+          <DpButton
             className="lg:col-start-3 lg:col-end-4"
             data-ripple-light="true"
             data-dialog-close="true"
@@ -49,8 +49,8 @@ function ConfirmationDialogComponent({
             }}
           >
             {confirmLabel}
-          </ButtonComponent>
-          <ButtonComponent
+          </DpButton>
+          <DpButton
             className="lg:col-start-4 lg:col-end-5 bg-destructive hover:bg-destructive-hover"
             data-ripple-dark="true"
             data-dialog-close="true"
@@ -59,11 +59,11 @@ function ConfirmationDialogComponent({
             }}
           >
             {cancelLabel}
-          </ButtonComponent>
+          </DpButton>
         </div>
-      </DialogFooter>
-    </DialogComponent>
+      </DpDialogFooter>
+    </DpDialog>
   )
 }
 
-export default ConfirmationDialogComponent
+export default DpConfirmationDialog

@@ -1,16 +1,16 @@
-# EmbeddedCheckoutComponentDialog
+# DpCheckoutDialog
 
 ## Example
 
 ```jsx
-import { EmbeddedCheckoutComponentDialog } from '@js-monorepo/payment'
+import { DpCheckoutDialog } from '@js-monorepo/payment'
 import { checkoutSessionClient } from '@js-monorepo/utils'
 
 export function Example() {
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
 
   return (
-    <EmbeddedCheckoutComponentDialog
+    <DpCheckoutDialog
       stripePublishableKey={
         process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
       }

@@ -1,16 +1,16 @@
-# LoaderComponent
+# DpLoaderProvider
 
 ## Example
 
 ```jsx
 // example.tsx
-import { LoaderComponent } from '@js-monorepo/loader'
+import { DpLoaderProvider } from '@js-monorepo/loader'
 
 export function Example() {
   return (
-    <LoaderComponent>
+    <DpLoaderProvider>
       <Component></Component>
-    </LoaderComponent>
+    </DpLoaderProvider>
   )
 }
 ```

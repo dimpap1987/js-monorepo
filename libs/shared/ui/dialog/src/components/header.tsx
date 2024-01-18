@@ -1,12 +1,12 @@
 import { ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 
-export interface DialogHeaderProps {
+export interface DpDialogHeaderProps {
   children: ReactNode
   className?: string
 }
 
-function DialogHeader({ children, className }: DialogHeaderProps) {
+function DpDialogHeader({ children, className }: DpDialogHeaderProps) {
   return (
     children && (
       <div
@@ -21,6 +21,6 @@ function DialogHeader({ children, className }: DialogHeaderProps) {
   )
 }
 
-DialogHeader.displayName = 'DialogHeader'
+DpDialogHeader.displayName = 'DpDialogHeader'
 
-export default DialogHeader
+export default DpDialogHeader

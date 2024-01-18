@@ -3,14 +3,19 @@ import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
 import { twMerge } from 'tailwind-merge'
 
-export interface NavLinkProps {
+export interface DpNextNavLinkProps {
   readonly href: string
   readonly children: React.ReactNode
   readonly className?: string
   readonly onClick?: () => void
 }
 
-export function NavLink({ href, children, className, onClick }: NavLinkProps) {
+export function DpNextNavLink({
+  href,
+  children,
+  className,
+  onClick,
+}: DpNextNavLinkProps) {
   const router = useRouter()
   const currentPath = usePathname()
   return (
@@ -32,4 +37,4 @@ export function NavLink({ href, children, className, onClick }: NavLinkProps) {
   )
 }
 
-export default NavLink
+export default DpNextNavLink

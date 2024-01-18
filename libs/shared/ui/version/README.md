@@ -1,11 +1,11 @@
-# VersionComponent
+# DpVersion
 
 ## Example
 
 ```jsx
-import { VersionComponent } from '@js-monorepo/version'
+import { DpVersion } from '@js-monorepo/version'
 
 export function Example() {
-  return <VersionComponent></VersionComponent>
+  return <DpVersion></DpVersion>
 }
 ```

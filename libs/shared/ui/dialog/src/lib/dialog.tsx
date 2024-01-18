@@ -1,26 +1,25 @@
-'use client'
 import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { AiFillCloseCircle } from 'react-icons/ai'
 import { twMerge } from 'tailwind-merge'
-import ConfirmationDialogComponent from '../components/confirmation-dialog'
-import DialogContent from '../components/content'
-import DialogFooter from '../components/footer'
-import DialogHeader from '../components/header'
-import LoginDialogComponent from '../components/login-dialog'
+import DpConfirmationDialog from '../components/confirmation-dialog'
+import DpDialogContent from '../components/content'
+import DpDialogFooter from '../components/footer'
+import DpDialogHeader from '../components/header'
+import DpLoginDialog from '../components/login-dialog'
 
-export interface DialogComponentProps {
+export interface DpDialogProps {
   readonly isOpen?: boolean
   readonly onClose: () => void
   readonly children: React.ReactNode
   readonly className?: string
 }
 
-function DialogComponent({
+function DpDialog({
   isOpen = true,
   onClose,
   children,
   className,
-}: DialogComponentProps) {
+}: DpDialogProps) {
   const { footer, header, content } = useMemo(() => {
     let footerElement: ReactNode | null = null
     let headerElement: ReactNode | null = null
@@ -29,13 +28,13 @@ function DialogComponent({
     React.Children.forEach(children, (child) => {
       if (React.isValidElement(child) && typeof child.type !== 'string') {
         switch ((child.type as React.ComponentType).displayName) {
-          case 'DialogFooter':
+          case 'DpDialogFooter':
             footerElement = child
             break
-          case 'DialogHeader':
+          case 'DpDialogHeader':
             headerElement = child
             break
-          case 'DialogContent':
+          case 'DpDialogContent':
             contentElement = child
             break
           default:
@@ -45,7 +44,7 @@ function DialogComponent({
     })
 
     if (!contentElement) {
-      throw new Error('Dialog requires  DialogContent as children.')
+      throw new Error('Dialog requires  DpDialogContent as children.')
     }
     return {
       footer: footerElement,
@@ -113,10 +112,10 @@ function DialogComponent({
 }
 
 export {
-  ConfirmationDialogComponent,
-  DialogComponent,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  LoginDialogComponent,
+  DpConfirmationDialog,
+  DpDialog,
+  DpDialogContent,
+  DpDialogFooter,
+  DpDialogHeader,
+  DpLoginDialog,
 }

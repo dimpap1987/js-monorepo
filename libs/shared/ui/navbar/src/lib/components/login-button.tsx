@@ -1,15 +1,12 @@
 import { BiLogInCircle } from 'react-icons/bi'
 import { twMerge } from 'tailwind-merge'
 
-interface LoginButtonComponentProps
+interface DpLoginButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
 }
 
-function LoginButtonComponent({
-  className,
-  ...props
-}: LoginButtonComponentProps) {
+function DpLoginButton({ className, ...props }: DpLoginButtonProps) {
   return (
     <button
       {...props}
@@ -25,4 +22,4 @@ function LoginButtonComponent({
   )
 }
 
-export default LoginButtonComponent
+export default DpLoginButton

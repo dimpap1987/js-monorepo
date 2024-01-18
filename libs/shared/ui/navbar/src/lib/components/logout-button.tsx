@@ -1,14 +1,11 @@
 import { BiLogOutCircle } from 'react-icons/bi'
 import { twMerge } from 'tailwind-merge'
-export interface LogoutButtonComponentProps
+export interface DpLogoutButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   readonly className: string
 }
 
-function LogoutButtonComponent({
-  className,
-  ...props
-}: LogoutButtonComponentProps) {
+function DpLogoutButton({ className, ...props }: DpLogoutButtonProps) {
   return (
     <button
       {...props}
@@ -24,4 +21,4 @@ function LogoutButtonComponent({
   )
 }
 
-export default LogoutButtonComponent
+export default DpLogoutButton

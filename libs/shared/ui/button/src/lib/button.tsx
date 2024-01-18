@@ -1,7 +1,6 @@
 import { twMerge } from 'tailwind-merge'
 
-/* eslint-disable-next-line */
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DpButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   readonly variant?: 'primary' | 'secondary' | 'danger'
   readonly size?: 'small' | 'medium' | 'large'
   readonly className?: string
@@ -9,14 +8,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   readonly loading?: boolean
 }
 
-export function ButtonComponent({
+export function DpButton({
   variant = 'primary',
   size = 'medium',
   className,
   children,
   loading = false,
   ...props
-}: ButtonProps) {
+}: DpButtonProps) {
   //disabled classes
   const disabledStyles = 'cursor-not-allowed opacity-50'
   // base styles
@@ -61,4 +60,4 @@ export function ButtonComponent({
   )
 }
 
-export default ButtonComponent
+export default DpButton
