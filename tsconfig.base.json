@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "paths": {
+      "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
       "@js-monorepo/dialog": ["libs/shared/ui/dialog/src/index.ts"],
       "@js-monorepo/loader": ["libs/shared/ui/loader/src/index.ts"],
@@ -31,7 +32,6 @@
       "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
       "@js-monorepo/sidebar": ["libs/shared/ui/sidebar/src/index.ts"],
       "@js-monorepo/store": ["libs/shared/store/src/index.ts"],
-      "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/ui/util": ["libs/shared/ui/utils/src/index.ts"],
       "@js-monorepo/utils": ["libs/shared/utils/src/index.ts"],
       "@js-monorepo/version": ["libs/shared/ui/version/src/index.ts"]
