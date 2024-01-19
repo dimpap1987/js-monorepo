@@ -20,7 +20,7 @@ function DpCheckoutDialog({
 }: {
   readonly stripePublishableKey: string
   readonly isOpen: boolean
-  readonly checkOutPromise: () => Promise<unknown>
+  readonly checkOutPromise: () => Promise<Response>
   readonly onClose: () => void
 }) {
   const [response, setResponse] = useState<{

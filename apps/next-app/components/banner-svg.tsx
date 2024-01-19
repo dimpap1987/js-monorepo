@@ -86,7 +86,7 @@ export default function BannerSVG() {
         animationDuration: `${dur}s`,
       })
     }
-    setBubbles((pre) => bubbleArray)
+    setBubbles(() => bubbleArray)
   }, [width])
 
   return (

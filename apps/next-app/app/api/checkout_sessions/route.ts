@@ -28,16 +28,15 @@ export async function POST(req: Request) {
     return NextResponse.json({
       clientSecret: session.client_secret,
     })
-  } catch (error: any) {
-    let message
-    if (error.message === 'INVALID_USER') {
-      message = 'No user provided'
-    } else if (error.message === 'INVALID_PRICE') {
-      message = 'Invalid price'
-    } else {
-      message = 'Something went wrong with your request'
+  } catch (error: unknown) {
+    let message = 'Something went wrong with your request'
+    if (error instanceof Error) {
+      if (error.message === 'INVALID_USER') {
+        message = 'No user provided'
+      } else if (error.message === 'INVALID_PRICE') {
+        message = 'Invalid price'
+      }
     }
-
     return new NextResponse(
       JSON.stringify({
         message,
