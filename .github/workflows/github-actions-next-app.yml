@@ -34,10 +34,10 @@ jobs:
       - name: Setup Remote Tracking
         run: git fetch origin +refs/heads/*:refs/remotes/origin/*
 
-      - name: Use Node.js 18
+      - name: Use Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Use the package manager cache if available
         uses: actions/cache@v3
