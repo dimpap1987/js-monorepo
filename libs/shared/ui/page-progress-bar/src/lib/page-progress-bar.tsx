@@ -3,7 +3,7 @@ import {
   AppProgressBar as ProgressBar,
   ProgressBarProps,
 } from 'next-nprogress-bar'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, Suspense } from 'react'
 
 export type DpNextPageProgressBarProps = PropsWithChildren & ProgressBarProps
 
@@ -15,12 +15,14 @@ export function DpNextPageProgressBar({
 }: DpNextPageProgressBarProps) {
   return (
     <>
-      <ProgressBar
-        height={height}
-        color={color}
-        options={options}
-        shallowRouting
-      />
+      <Suspense>
+        <ProgressBar
+          height={height}
+          color={color}
+          options={options}
+          shallowRouting
+        />
+      </Suspense>
       {children}
     </>
   )
