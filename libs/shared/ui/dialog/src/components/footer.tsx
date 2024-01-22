@@ -1,8 +1,16 @@
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, forwardRef, ForwardedRef } from 'react'
 
-function DpDialogFooter({ children }: PropsWithChildren) {
-  return children && children
-}
+interface DpDialogFooterProps extends PropsWithChildren {}
+
+const DpDialogFooter = forwardRef(
+  ({ children }: DpDialogFooterProps, ref: ForwardedRef<HTMLDivElement>) => {
+    return (
+      <div ref={ref} className="flex justify-end p-1">
+        {children}
+      </div>
+    )
+  }
+)
 
 DpDialogFooter.displayName = 'DpDialogFooter'
 
