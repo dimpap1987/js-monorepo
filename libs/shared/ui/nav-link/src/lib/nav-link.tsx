@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
+import React, { ForwardedRef, forwardRef } from 'react'
 import { twMerge } from 'tailwind-merge'
 
 export interface DpNextNavLinkProps {
@@ -10,31 +11,33 @@ export interface DpNextNavLinkProps {
   readonly onClick?: () => void
 }
 
-export function DpNextNavLink({
-  href,
-  children,
-  className,
-  onClick,
-}: DpNextNavLinkProps) {
-  const router = useRouter()
-  const currentPath = usePathname()
-  return (
-    <button
-      className={twMerge(className, 'cursor-pointer')}
-      onClick={() => {
-        if (`/${href}` === currentPath) {
-          router.replace(href)
-        } else {
-          router.push(href)
-        }
-        onClick?.()
-      }}
-      tabIndex={0}
-      type="button"
-    >
-      {children}
-    </button>
-  )
-}
+const DpNextNavLink = forwardRef(
+  (
+    { href, children, className, onClick }: DpNextNavLinkProps,
+    ref: ForwardedRef<HTMLAnchorElement>
+  ) => {
+    const router = useRouter()
+    const currentPath = usePathname()
 
-export default DpNextNavLink
+    return (
+      <a
+        ref={ref}
+        href={href}
+        className={twMerge(className, 'cursor-pointer')}
+        onClick={(e) => {
+          e.preventDefault()
+          if (`/${href}` === currentPath) {
+            router.replace(href)
+          } else {
+            router.push(href)
+          }
+          onClick?.()
+        }}
+      >
+        {children}
+      </a>
+    )
+  }
+)
+DpNextNavLink.displayName = 'DpNextNavLink'
+export { DpNextNavLink }

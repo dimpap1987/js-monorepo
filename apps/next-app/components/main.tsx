@@ -38,10 +38,7 @@ export default function Main({ children, className }: MainProps) {
         <BannerSVG />
       </div>
       <div className="flex flex-col justify-center align-items gap-2">
-        <DpButton
-          className="bg-accent hover:bg-accent-hover font-bold py-2 px-4 border border-accent-border rounded"
-          onClick={loadForTwoSecond}
-        >
+        <DpButton variant="accent" onClick={loadForTwoSecond}>
           Trigger loading
         </DpButton>
 

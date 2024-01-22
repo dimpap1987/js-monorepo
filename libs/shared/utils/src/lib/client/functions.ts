@@ -1,5 +1,16 @@
+import { twMerge } from 'tailwind-merge'
+
 export function cn(
-  ...classNames: (string | undefined | null | false)[]
+  ...classNames: (
+    | string
+    | undefined
+    | null
+    | false
+    | (string | undefined | null | false)[]
+  )[]
 ): string {
-  return classNames.filter(Boolean).join(' ')
+  const flattenedClassNames = classNames
+    .filter(Boolean)
+    .flat(Infinity) as string[]
+  return twMerge(...flattenedClassNames)
 }

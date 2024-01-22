@@ -34,25 +34,25 @@ h4 {
     /* Turquoise */
     --primary: 174 72% 56%;
     --primary-foreground: 0 0% 1%;
-    --primary-hover: 174 65% 49%;
+    --primary-hover: 174 65% 41%;
     --primary-border: 176 73% 36%;
 
     /* Gold */
     --secondary: 49 100% 67%;
     --secondary-foreground: 0 0% 1%;
-    --secondary-hover: 49 81% 59%;
+    --secondary-hover: 49 81% 51%;
     --secondary-border: 47 72% 51%;
 
     /* Blue */
-    --accent: 217, 91%, 60%;
+    --accent: 224 76% 54%;
     --accent-foreground: 0 0% 1%;
-    --accent-hover: 224 76% 48%;
-    --accent-border: 224 76% 48%;
+    --accent-hover: 224 76% 41%;
+    --accent-border: 224 76% 52%;
 
     /* Pink */
     --danger: 351 100% 86%;
     --danger-foreground: 0 0% 1%;
-    --danger-hover: 351 78% 82%;
+    --danger-hover: 351 72% 75%;
     --danger-border: 258 49% 66%;
 
     --destructive: 0 0% 78%;
