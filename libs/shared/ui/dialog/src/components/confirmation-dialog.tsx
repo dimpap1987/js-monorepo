@@ -47,9 +47,10 @@ const DpConfirmationDialog = forwardRef<
         {title && <DpDialogHeader>{title}</DpDialogHeader>}
         {content && <DpDialogContent>{content}</DpDialogContent>}
         <DpDialogFooter>
-          <div className="grid gap-2 p-4 text-blue-gray-500 grid-cols-1 lg:grid-cols-4">
+          <div className="grid gap-2 p-4 text-blue-gray-500 grid-cols-1 lg:grid-cols-4 w-full">
             <DpButton
-              className="lg:col-start-3 lg:col-end-4"
+              variant="primary"
+              className="lg:col-start-3 lg:col-end-4 w-full"
               data-ripple-light="true"
               data-dialog-close="true"
               onClick={() => {
@@ -59,7 +60,7 @@ const DpConfirmationDialog = forwardRef<
               {confirmLabel}
             </DpButton>
             <DpButton
-              className="lg:col-start-4 lg:col-end-5 bg-destructive hover:bg-destructive-hover"
+              className="lg:col-start-4 lg:col-end-5 bg-destructive hover:bg-destructive-hover w-full"
               data-ripple-dark="true"
               data-dialog-close="true"
               onClick={() => {
