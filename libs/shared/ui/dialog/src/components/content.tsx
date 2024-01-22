@@ -1,14 +1,19 @@
-import { ReactNode } from 'react'
+import { ReactNode, forwardRef } from 'react'
 
 export interface DpDialogContentProps {
   children?: ReactNode
   className?: string
 }
 
-function DpDialogContent({ children, className }: DpDialogContentProps) {
-  return children && <div className={className}>{children}</div>
-}
-
+const DpDialogContent = forwardRef<HTMLDivElement, DpDialogContentProps>(
+  ({ children, className }, ref) => {
+    return children ? (
+      <div ref={ref} className={className}>
+        {children}
+      </div>
+    ) : null
+  }
+)
 DpDialogContent.displayName = 'DpDialogContent'
 
 export default DpDialogContent
