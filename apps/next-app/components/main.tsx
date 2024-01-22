@@ -130,6 +130,7 @@ export default function Main({ children, className }: MainProps) {
           variant="secondary"
           onClick={() => setOpenCheckoutDialog(true)}
           loading={isOpenCheckoutDialog}
+          className="w-full"
         >
           Donate 5 &euro;
         </DpButton>
