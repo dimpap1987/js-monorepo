@@ -14,7 +14,7 @@ const DpLogoutButton = forwardRef<HTMLButtonElement, DpLogoutButtonProps>(
         {...props}
         title="Sign out"
         variant="accent"
-        className={twMerge('flex gap-1 py-2 px-4 w-full', className)}
+        className={twMerge('flex gap-1 py-2 px-4 w-full text-white', className)}
         ref={ref}
       >
         <BiLogOutCircle className="text-red-600 text-2xl" />

@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-
 
       - uses: nrwl/nx-set-shas@v3
-      - run: npm ci --omit-dev --ignore-scripts
+      - run: npm install
 
       - name: Lint check
         run: npx nx affected:lint --base=origin/main --head=${{ github.sha }}
