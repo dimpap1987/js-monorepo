@@ -80,7 +80,7 @@ const DpCheckoutDialog = forwardRef(
         className="text-black shadow-2xl shadow-cyan-500/50 w-full sm:w-[460px] md:w-[60%]"
         ref={ref}
       >
-        <DpDialogContent className="p-4">
+        <DpDialogContent>
           <EmbeddedCheckoutProvider
             stripe={stripeInstance}
             options={{

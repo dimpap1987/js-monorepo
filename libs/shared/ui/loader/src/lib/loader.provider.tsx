@@ -9,6 +9,7 @@ import DpLoader from './loader'
 
 interface LoaderProps {
   readonly message?: string
+  readonly description?: string
   readonly show?: boolean
 }
 
@@ -39,6 +40,7 @@ export const DpLoaderProvider: React.FC<LoaderProviderPros> = ({
   const [loaderState, setLoaderState] = useState<LoaderProps>({
     show: false,
     message: '',
+    description: '',
   })
 
   const contextValue = useMemo(() => {
@@ -51,7 +53,11 @@ export const DpLoaderProvider: React.FC<LoaderProviderPros> = ({
   return (
     <LoaderContext.Provider value={contextValue}>
       {loaderState.show && (
-        <DpLoader message={loaderState.message} show={loaderState.show} />
+        <DpLoader
+          message={loaderState.message}
+          description={loaderState.description}
+          show={loaderState.show}
+        />
       )}
       {children}
     </LoaderContext.Provider>

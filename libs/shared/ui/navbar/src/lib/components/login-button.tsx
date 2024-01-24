@@ -16,7 +16,7 @@ const DpLoginButton = forwardRef<HTMLButtonElement, DpLoginButtonProps>(
         title="Sign in"
         variant="accent"
         className={twMerge(
-          'rounded-full gap-1 py-2 px-4 w-full flex justify-center text-white',
+          'gap-1 py-2 px-4 w-full flex justify-center text-white',
           className
         )}
         ref={ref}
