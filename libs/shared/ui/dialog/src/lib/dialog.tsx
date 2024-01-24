@@ -83,7 +83,7 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
           data-dialog="dialog"
           onClick={(e) => e.stopPropagation()}
           className={twMerge(
-            `relative border border-primary mb-20 z-40 min-w-[200px] max-w-[90%] md:max-w-[70%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform `,
+            `relative border p-4 border-primary mb-20 z-40 min-w-[200px] max-w-[90%] md:max-w-[70%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform `,
             isOpen
               ? 'opacity-100 translate-y-0 '
               : 'opacity-0 -translate-y-full ',
@@ -91,7 +91,7 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
           )}
           ref={ref}
         >
-          <div className="flex justify-end p-1">
+          <div className="flex justify-end p-1 float-right">
             <button
               onClick={onClose}
               className=" text-3xl cursor-pointer"
@@ -100,12 +100,10 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
               <AiFillCloseCircle></AiFillCloseCircle>
             </button>
           </div>
-          {header}
+          {header ? header : <div className="h-10 p-3"></div>}
           {content && (
             <div
-              className={`relative p-3 ${
-                header ? ' border-t border-t-blue-gray-100 ' : ''
-              }
+              className={`relative p-3 border-t border-t-blue-gray-100
               ${footer ? ' border-b border-b-blue-gray-100 ' : ''} 
                p-4 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased`}
             >

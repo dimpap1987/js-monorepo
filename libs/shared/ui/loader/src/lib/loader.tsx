@@ -4,6 +4,7 @@ import { CSSProperties } from 'react'
 
 export interface DpLoaderProps {
   readonly message?: string
+  readonly description?: string
   readonly show?: boolean
   readonly className?: string
   readonly spinnerStyle?: CSSProperties
@@ -11,7 +12,8 @@ export interface DpLoaderProps {
 }
 
 export function DpLoader({
-  message,
+  message = 'Loading...',
+  description,
   show,
   className,
   spinnerStyle,
@@ -34,12 +36,12 @@ export function DpLoader({
         )}
       >
         <DpLoadingSpinner
-          message="Loading..."
+          message={message}
           styles={spinnerStyle}
         ></DpLoadingSpinner>
-        {message && (
+        {description && (
           <p>
-            <small>{message}</small>
+            <small>{description}</small>
           </p>
         )}
       </div>

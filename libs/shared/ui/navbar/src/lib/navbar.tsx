@@ -76,7 +76,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               <div className="hidden md:flex items-center gap-4 w-50 justify-end text-center">
                 {!user?.isLoggedIn && (
                   <DpNextNavLink href="/login">
-                    <DpLoginButton></DpLoginButton>
+                    <DpLoginButton className="rounded-full"></DpLoginButton>
                   </DpNextNavLink>
                 )}
                 {/* when logged in */}
