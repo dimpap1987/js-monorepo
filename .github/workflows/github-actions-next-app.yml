@@ -38,17 +38,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-
-      - name: Use the package manager cache if available
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-
+          cache: 'npm'
+      - run: npm install
+      # - name: Use the package manager cache if available
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.npm
+      #     key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-
 
       - uses: nrwl/nx-set-shas@v3
-      - run: npm install
+      # This line is needed for nx affected to work when CI is running on a PR
+      - run: git branch --track main origin/main
 
       - name: Lint check
         run: npx nx affected:lint --base=origin/main --head=${{ github.sha }}
