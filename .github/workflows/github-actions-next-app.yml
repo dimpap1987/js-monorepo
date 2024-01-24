@@ -39,16 +39,17 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm install
-      # - name: Use the package manager cache if available
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ~/.npm
-      #     key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-
+ 
+      - name: Use the package manager cache if available
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-
 
       - uses: nrwl/nx-set-shas@v3
+      - run: npm ci --omit-dev --ignore-scripts
       # This line is needed for nx affected to work when CI is running on a PR
       - run: git branch --track main origin/main
 

@@ -1,6 +1,6 @@
 {
   "name": "@js-monorepo/source",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "license": "MIT",
   "scripts": {
     "lint": "nx affected:lint --all",
@@ -113,5 +113,17 @@
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "typescript": "5.2.2"
+  },
+  "optionalDependencies": {
+    "@nx/nx-darwin-arm64": "16.10.0",
+    "@nx/nx-darwin-x64": "16.10.0",
+    "@nx/nx-freebsd-x64": "16.10.0",
+    "@nx/nx-linux-arm-gnueabihf": "16.10.0",
+    "@nx/nx-linux-arm64-gnu": "16.10.0",
+    "@nx/nx-linux-arm64-musl": "16.10.0",
+    "@nx/nx-linux-x64-gnu": "16.10.0",
+    "@nx/nx-linux-x64-musl": "16.10.0",
+    "@nx/nx-win32-arm64-msvc": "16.10.0",
+    "@nx/nx-win32-x64-msvc": "16.10.0"
   }
 }
