@@ -1,47 +1,29 @@
 'use client'
 import { DpLoaderProvider } from '@js-monorepo/loader'
-import { DpLogo, DpNextNavbar, UserNavSocial } from '@js-monorepo/navbar'
+import { DpLogo, DpNextNavbar } from '@js-monorepo/navbar'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpVersion } from '@js-monorepo/version'
 import React, { PropsWithChildren } from 'react'
-import { useUserStore } from '@js-monorepo/store'
 import StoreInitializer from './store.initializer'
 import SVGLogo from './logo-svg'
 import { MenuItem } from '@js-monorepo/sidebar'
+import { useCurrentUser } from '../app/hooks/use-current-user'
+import { logout } from '../actions/logout'
+
+const menuItems: MenuItem[] = [
+  {
+    href: '/',
+    name: 'Home',
+  },
+  {
+    href: '/about',
+    name: 'About',
+  },
+]
 
 export default function MainTemplate({ children }: PropsWithChildren) {
-  const { data: user, setUser, removeUser } = useUserStore()
-  const socials: UserNavSocial[] = [
-    {
-      type: 'github',
-      onLogin: () => {
-        setUser({ isLoggedIn: true, username: 'github_user' })
-      },
-    },
-    {
-      type: 'google',
-      onLogin: () => {
-        setUser({ isLoggedIn: true, username: 'google_user' })
-      },
-    },
-    {
-      type: 'facebook',
-      onLogin: () => {
-        setUser({ isLoggedIn: true, username: 'facebook_user' })
-      },
-    },
-  ]
+  const user = useCurrentUser()
 
-  const menuItems: MenuItem[] = [
-    {
-      href: '/',
-      name: 'Home',
-    },
-    {
-      href: '/about',
-      name: 'About',
-    },
-  ]
   return (
     <>
       {/* <StoreInitializer
@@ -49,11 +31,10 @@ export default function MainTemplate({ children }: PropsWithChildren) {
       ></StoreInitializer> */}
 
       <DpNextNavbar
-        user={{ isLoggedIn: user.isLoggedIn, username: user.username }}
-        socialLogin={socials}
+        user={{ isLoggedIn: !!user, username: user?.name }}
         menuItems={menuItems}
         onLogout={() => {
-          removeUser()
+          logout()
         }}
       >
         <DpLogo>

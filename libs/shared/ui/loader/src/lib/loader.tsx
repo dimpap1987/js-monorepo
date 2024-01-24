@@ -3,10 +3,11 @@ import DpLoadingSpinner from './loading-spinner'
 import { CSSProperties } from 'react'
 
 export interface DpLoaderProps {
-  message?: string
-  show?: boolean
-  className?: string
-  spinnerStyle?: CSSProperties
+  readonly message?: string
+  readonly show?: boolean
+  readonly className?: string
+  readonly spinnerStyle?: CSSProperties
+  readonly overlayClassName?: string
 }
 
 export function DpLoader({
@@ -14,13 +15,17 @@ export function DpLoader({
   show,
   className,
   spinnerStyle,
+  overlayClassName,
 }: DpLoaderProps) {
   return (
     <div
-      className={`fixed left-0 w-screen h-screen
+      className={twMerge(
+        `fixed left-0 w-screen h-screen
       flex items-center justify-center bg-black 
       bg-opacity-80 transform transition-transform
-      duration-200 ${show ? 'scale-100' : 'scale-0'} z-30 select-none`}
+      duration-200 ${show ? 'scale-100' : 'scale-0'} z-50 select-none`,
+        overlayClassName
+      )}
     >
       <div
         className={twMerge(

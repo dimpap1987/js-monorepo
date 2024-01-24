@@ -3,6 +3,9 @@ import MainTemplate from '../components/main.template'
 import './global.css'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import type { Metadata } from 'next'
+import { ReactNode } from 'react'
+import { SessionProvider } from 'next-auth/react'
+import { auth } from '../auth'
 
 export const metadata: Metadata = {
   title: 'Nextjs App',
@@ -16,21 +19,26 @@ const poppins = Poppins({
   adjustFontFallback: false,
 })
 
-export default function RootLayout({
-  children,
-}: {
-  readonly children: React.ReactNode
+export default async function RootLayout(props: {
+  readonly children: ReactNode
+  readonly auth: ReactNode
 }) {
+  const session = await auth()
   return (
-    <html lang="en">
-      <body
-        className={`${poppins.className} flex flex-col min-h-100svh bg-background`}
-        suppressHydrationWarning={true}
-      >
-        <DpNextPageProgressBar>
-          <MainTemplate>{children}</MainTemplate>
-        </DpNextPageProgressBar>
-      </body>
-    </html>
+    <SessionProvider session={session}>
+      <html lang="en">
+        <body
+          className={`${poppins.className} flex flex-col min-h-100svh bg-background`}
+          suppressHydrationWarning={true}
+        >
+          <DpNextPageProgressBar>
+            <MainTemplate>
+              {props.auth}
+              {props.children}
+            </MainTemplate>
+          </DpNextPageProgressBar>
+        </body>
+      </html>
+    </SessionProvider>
   )
 }

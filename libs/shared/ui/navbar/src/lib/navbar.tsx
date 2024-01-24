@@ -1,5 +1,4 @@
 'use client'
-import { DpLoginDialog } from '@js-monorepo/dialog'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpNextSidebar, MenuItem } from '@js-monorepo/sidebar'
 import { DpVersion } from '@js-monorepo/version'
@@ -13,11 +12,10 @@ export interface DpNextNavbarProps {
   readonly children?: ReactNode
   readonly menuItems?: MenuItem[]
   readonly user?: UserNavProps
-  readonly socialLogin?: UserNavSocial[]
   readonly onLogout?: () => void
 }
 export type UserNavProps = {
-  username?: string
+  username?: string | null | undefined
   isLoggedIn: boolean
 }
 export type UserNavSocial = {
@@ -26,9 +24,8 @@ export type UserNavSocial = {
 }
 
 const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
-  ({ children, menuItems = [], user, socialLogin, onLogout }, ref) => {
+  ({ children, menuItems = [], user, onLogout }, ref) => {
     //state
-    const [isLoginDialog, setIsLoginDialog] = useState(false)
     const [openSideBar, setOpenSideBar] = useState(false)
     const [
       isDropdownLoggedOptionsRefVisible,
@@ -54,7 +51,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     }, [children])
 
     return (
-      <header className="z-40">
+      <header className="z-30">
         <nav
           className="bg-background text-white w-full border-b border-border sm:px-8"
           ref={ref}
@@ -76,11 +73,11 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               </ul>
 
               {/* options on the right*/}
-              <div className="hidden md:flex items-center gap-4 w-40 justify-end text-center">
-                {!user?.isLoggedIn && socialLogin && socialLogin.length > 0 && (
-                  <DpLoginButton
-                    onClick={() => setIsLoginDialog((prev) => !prev)}
-                  ></DpLoginButton>
+              <div className="hidden md:flex items-center gap-4 w-50 justify-end text-center">
+                {!user?.isLoggedIn && (
+                  <DpNextNavLink href="/login">
+                    <DpLoginButton></DpLoginButton>
+                  </DpNextNavLink>
                 )}
                 {/* when logged in */}
                 {user?.isLoggedIn && (
@@ -139,14 +136,11 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 items={menuItems}
               >
                 <div className="p-3">
-                  {!user?.isLoggedIn &&
-                    socialLogin &&
-                    socialLogin.length > 0 && (
-                      <DpLoginButton
-                        className="w-full rounded-none"
-                        onClick={() => setIsLoginDialog((prev) => !prev)}
-                      ></DpLoginButton>
-                    )}
+                  {!user?.isLoggedIn && (
+                    <DpNextNavLink href="/login">
+                      <DpLoginButton></DpLoginButton>
+                    </DpNextNavLink>
+                  )}
                   {user?.isLoggedIn && (
                     <DpLogoutButton
                       className="p-3"
@@ -169,7 +163,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
           {isDropdownLoggedOptionsRefVisible && (
             <div
               ref={dropdownLoggedOptionsRef}
-              className={`absolute w-44 right-0 bg-zinc-900 border border-border rounded text-white z-40 hidden md:block`}
+              className={`absolute w-44 right-0 bg-zinc-900 border border-border rounded text-white z-30 hidden md:block`}
             >
               {user?.isLoggedIn && (
                 <DpLogoutButton
@@ -181,14 +175,6 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 ></DpLogoutButton>
               )}
             </div>
-          )}
-
-          {socialLogin && socialLogin.length > 0 && (
-            <DpLoginDialog
-              socialConfig={socialLogin}
-              isOpen={isLoginDialog}
-              onClose={() => setIsLoginDialog(false)}
-            ></DpLoginDialog>
           )}
         </nav>
       </header>
