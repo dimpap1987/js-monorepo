@@ -73,13 +73,13 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
             <motion.div
               {...framerSidebarBackground}
               aria-hidden="true"
-              className="fixed bottom-0 left-0 right-0 top-0 z-40 bg-[rgba(0,0,0,0.1)] backdrop-blur-sm cursor-auto"
+              className={`fixed bottom-0 left-0 right-0 top-0 bg-[rgba(0,0,0,0.1)] backdrop-blur-sm cursor-auto`}
             ></motion.div>
             <motion.div
               {...framerSidebarPanel(position)}
               className={`fixed top-0 bottom-0 ${
                 position === 'left' ? 'left-0' : 'right-0'
-              } z-50 w-full h-screen max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto`}
+              } w-full h-screen max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto`}
               ref={ref}
               aria-label="Sidebar"
             >

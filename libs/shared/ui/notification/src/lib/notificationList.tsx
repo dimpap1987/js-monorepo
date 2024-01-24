@@ -1,18 +1,26 @@
 import styles from './notification.module.css'
 import Notification, { DpNotificationProps } from './notification'
+import { twMerge } from 'tailwind-merge'
 
 interface DpNotificationListProps {
   notifications: DpNotificationProps[]
+  readonly overlayClassName?: string
 }
 
 export default function DpNotificationList({
   notifications,
+  overlayClassName,
 }: DpNotificationListProps) {
   return (
     notifications &&
     notifications.length > 0 && (
       <section>
-        <div className="fixed right-2 p-2 z-50 flex flex-col-reverse gap-2">
+        <div
+          className={twMerge(
+            `fixed right-2 p-2 z-30 flex flex-col-reverse gap-2`,
+            overlayClassName
+          )}
+        >
           {notifications.map((notification, index) => (
             <div
               key={notification.id || index}

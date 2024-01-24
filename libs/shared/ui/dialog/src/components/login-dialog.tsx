@@ -14,13 +14,10 @@ export type DpLoginDialogProps = {
   readonly socialConfig: SocialConfig[]
 }
 
-async function handleSocialLogin(
-  func: () => void | Promise<void>,
-  onClose: () => void
-) {
-  await func()
-  onClose()
+async function handleSocialLogin(func: () => void | Promise<void>) {
+  func()
 }
+
 const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
   ({ isOpen, onClose, socialConfig }, ref) => {
     return (
@@ -42,7 +39,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                   <button
                     type="button"
                     className="bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black inline-flex items-center hover:bg-zinc-300 mr-2 focus:ring-4 focus:ring-[#24292F]/50 dark:focus:ring-[#3b5998]/55"
-                    onClick={() => handleSocialLogin(social.onLogin, onClose)}
+                    onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <svg
                       width="1em"
@@ -79,7 +76,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                   <button
                     type="button"
                     className="bg-[#24292F] w-full text-white hover:bg-[#24292F]/90 focus:ring-4 focus:ring-[#24292F]/50 rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 mr-2"
-                    onClick={() => handleSocialLogin(social.onLogin, onClose)}
+                    onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <svg
                       className="mr-2 -ml-1 w-4 h-4"
@@ -105,7 +102,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                   <button
                     type="button"
                     className="bg-[#3b5998] w-full hover:bg-[#3b5998]/90 text-white focus:ring-4 focus:ring-[#3b5998]/50 rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2"
-                    onClick={() => handleSocialLogin(social.onLogin, onClose)}
+                    onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <svg
                       className="mr-2 -ml-1 w-4 h-4"

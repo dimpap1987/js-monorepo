@@ -18,10 +18,11 @@ export interface DpDialogProps {
   readonly onClose: () => void
   readonly children: React.ReactNode
   readonly className?: string
+  readonly overlayClassName?: string
 }
 
 const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
-  ({ isOpen = true, onClose, children, className }, ref) => {
+  ({ isOpen = true, onClose, children, className, overlayClassName }, ref) => {
     const { footer, header, content } = useMemo(() => {
       let footerElement: ReactNode | null = null
       let headerElement: ReactNode | null = null
@@ -72,14 +73,17 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
       <div
         data-dialog-backdrop="dialog"
         data-dialog-backdrop-close="true"
-        className={`fixed inset-0 z-50 grid h-screen place-items-center pointer-events-all bg-black bg-opacity-50`}
+        className={twMerge(
+          `absolute inset-0 z-40 grid h-screen place-items-center pointer-events-all bg-black bg-opacity-50`,
+          overlayClassName
+        )}
         onClick={onClose}
       >
         <div
           data-dialog="dialog"
           onClick={(e) => e.stopPropagation()}
           className={twMerge(
-            `relative border border-primary mb-20 min-w-[200px] max-w-[90%] md:max-w-[70%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform `,
+            `relative border border-primary mb-20 z-40 min-w-[200px] max-w-[90%] md:max-w-[70%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform `,
             isOpen
               ? 'opacity-100 translate-y-0 '
               : 'opacity-0 -translate-y-full ',
