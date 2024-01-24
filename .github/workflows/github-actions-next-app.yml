@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-
 
       - uses: nrwl/nx-set-shas@v3
-      - run: npm ci --omit-dev --ignore-scripts
+      - run: npm ci
       # This line is needed for nx affected to work when CI is running on a PR
       - run: git branch --track main origin/main
 
