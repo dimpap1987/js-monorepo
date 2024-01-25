@@ -1,9 +1,11 @@
 import { CSSProperties } from 'react'
 import './loader.module.css'
+import { twMerge } from 'tailwind-merge'
 
 export type DpLoadingProps = {
-  message?: string
-  styles?: CSSProperties
+  readonly message?: string
+  readonly styles?: CSSProperties
+  readonly className?: string
 }
 const spinnerLoader = {
   height: '1.7rem',
@@ -12,9 +14,17 @@ const spinnerLoader = {
   stroke: 'white',
 }
 
-export function DpLoadingSpinner({ message, styles }: DpLoadingProps) {
+export function DpLoadingSpinner({
+  message,
+  styles,
+  className,
+}: DpLoadingProps) {
   return (
-    <div aria-label="Loading..." role="status" className="flex items-center">
+    <div
+      aria-label="Loading..."
+      role="status"
+      className={twMerge('flex items-center', className)}
+    >
       <svg style={{ ...spinnerLoader, ...styles }} viewBox="0 0 256 256">
         <line
           x1="128"

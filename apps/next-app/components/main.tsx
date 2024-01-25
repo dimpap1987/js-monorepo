@@ -23,12 +23,16 @@ export default function Main({ children, className }: MainProps) {
   const { data: user } = useUserStore()
 
   async function loadForTwoSecond() {
-    setLoaderState({ show: true })
+    setLoaderState({
+      show: true,
+      message: 'logging in',
+      description: 'please wait',
+    })
     return new Promise((resolve) => {
       setTimeout(() => {
         setLoaderState({ show: false })
         resolve(true)
-      }, 4000)
+      }, 400000)
     })
   }
   return (
