@@ -24,14 +24,15 @@ export function DpLoader({
       className={twMerge(
         `fixed left-0 w-screen h-screen
       flex items-center justify-center bg-black 
-      bg-opacity-80 transform transition-transform
+      bg-opacity-70 transform transition-transform
       duration-200 ${show ? 'scale-100' : 'scale-0'} z-50 select-none`,
         overlayClassName
       )}
     >
       <div
         className={twMerge(
-          `text-white mt-[100px] flex flex-col items-center justify-center transform -translate-y-20`,
+          `text-white mt-[100px] flex flex-col items-center justify-center transform -translate-y-20 
+          p-[240px] bg-[radial-gradient(rgba(0,0,0,0.90)_0%,rgba(255,255,255,0.00)_72%)]`,
           className
         )}
       >

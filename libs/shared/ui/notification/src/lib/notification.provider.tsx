@@ -71,14 +71,9 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({
       // If we already have a timeout for this notification, skip setting another
       if (!notification.id || timeoutsRef.current[notification.id]) return
 
-      const timeoutId = setTimeout(
-        () => {
-          setNotifications((prev) =>
-            prev.filter((p) => p.id !== notification.id)
-          )
-        },
-        notification?.duration ?? 3000
-      )
+      const timeoutId = setTimeout(() => {
+        setNotifications((prev) => prev.filter((p) => p.id !== notification.id))
+      }, notification?.duration ?? 3000)
 
       timeoutsRef.current[notification.id] = timeoutId
     })
