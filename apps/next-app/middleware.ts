@@ -1,12 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { withError } from './app/middlewares/withError'
+import { withAuth } from './app/middlewares/withAuth'
+import { withPathName } from './app/middlewares/withPathName'
+import { NextResponse } from 'next/server'
 
-export function middleware(request: NextRequest) {
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-pathname', request.nextUrl.pathname)
+type MiddlewareWrapper<Middleware> = (
+  wrappedMiddleware: Middleware
+) => Middleware
 
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  })
+export const compose = <Middleware>(
+  firstMiddlewareWrapper: MiddlewareWrapper<Middleware>,
+  ...otherMiddlewareWrappers: MiddlewareWrapper<Middleware>[]
+): MiddlewareWrapper<Middleware> =>
+  otherMiddlewareWrappers.reduce(
+    (accumulatedMiddlewares, nextMiddleware) => (middleware) =>
+      accumulatedMiddlewares(nextMiddleware(middleware)),
+    firstMiddlewareWrapper
+  )
+
+const composedMiddlewares = compose(withPathName, withError, withAuth)
+
+export const middleware = composedMiddlewares(() => {
+  return NextResponse.next()
+})
+
+// Optionally, don't invoke Middleware on some paths
+export const config = {
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 }
