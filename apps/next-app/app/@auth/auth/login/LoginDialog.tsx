@@ -4,23 +4,24 @@ import { useLoader } from '@js-monorepo/loader'
 import { UserNavSocial } from '@js-monorepo/navbar'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next-nprogress-bar'
-import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 function LoginDialog() {
   const router = useRouter()
   const [, setLoaderState] = useLoader()
-  const [isLoading, setLoading] = useState(true)
+  const pathname = usePathname()
+
+  if (pathname !== '/auth/login') return null
 
   // TODO: replace base url
   const socials: UserNavSocial[] = [
     {
       type: 'github',
-      onLogin: () => {
-        setLoading(false)
+      onLogin: async () => {
         setLoaderState({
           show: true,
           message: 'Logging in...',
-          description: 'Sit back and relax',
+          description: 'Sit back and relax.',
         })
         signIn('github', {
           callbackUrl: 'http://localhost:3000',
@@ -30,11 +31,10 @@ function LoginDialog() {
     {
       type: 'google',
       onLogin: () => {
-        setLoading(false)
         setLoaderState({
           show: true,
           message: 'Logging in...',
-          description: 'Sit back and relax',
+          description: 'Sit back and relax.',
         })
         signIn('google', {
           callbackUrl: 'http://localhost:3000',
@@ -45,7 +45,7 @@ function LoginDialog() {
   return (
     <DpLoginDialog
       socialConfig={socials}
-      isOpen={isLoading}
+      isOpen={true}
       onClose={() => {
         router.back()
       }}

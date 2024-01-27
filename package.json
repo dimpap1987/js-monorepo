@@ -12,7 +12,7 @@
     "dev:next": "nx serve next-app",
     "dev:docs": "nx serve docs",
     "dev:webhook": "nx serve webhook-server",
-    "build:next-app": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 nx build next-app --prod",
+    "build:next": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 nx build next-app --prod",
     "build:webhook": "nx build webhook-server --prod",
     "build:docs": "npm run generate:docs && nx build docs --prod",
     "start:next": "cd dist/apps/next-app && npx next start",

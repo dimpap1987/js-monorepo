@@ -60,7 +60,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
             <div className="px-5 py-2 flex w-full items-center">
               {logo}
 
-              <ul className="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
+              <ul className="hidden md:flex px-4 font-semibold font-heading space-x-6 ml-[14%]">
                 {menuItems &&
                   menuItems.length > 0 &&
                   menuItems.map((item, index) => (
@@ -73,9 +73,9 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               </ul>
 
               {/* options on the right*/}
-              <div className="hidden md:flex items-center gap-4 w-50 justify-end text-center">
+              <div className="hidden md:flex items-center gap-4 w-50 justify-end text-center flex-1">
                 {!user?.isLoggedIn && (
-                  <DpNextNavLink href="/login">
+                  <DpNextNavLink href="/auth/login">
                     <DpLoginButton className="rounded-full"></DpLoginButton>
                   </DpNextNavLink>
                 )}
@@ -137,7 +137,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               >
                 <div className="p-3">
                   {!user?.isLoggedIn && (
-                    <DpNextNavLink href="/login">
+                    <DpNextNavLink href="/auth/login">
                       <DpLoginButton></DpLoginButton>
                     </DpNextNavLink>
                   )}
