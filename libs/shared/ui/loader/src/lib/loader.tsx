@@ -32,7 +32,7 @@ export function DpLoader({
       <div
         className={twMerge(
           `text-white mt-[100px] flex flex-col items-center justify-center transform -translate-y-20 
-          p-[240px] bg-[radial-gradient(rgba(0,0,0,0.90)_0%,rgba(255,255,255,0.00)_72%)]`,
+          p-[240px] bg-[radial-gradient(rgba(0,0,0,0.90)_0%,rgba(255,255,255,0.00)_25%)]`,
           className
         )}
       >

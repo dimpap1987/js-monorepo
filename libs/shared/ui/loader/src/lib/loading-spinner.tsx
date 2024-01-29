@@ -99,7 +99,9 @@ export function DpLoadingSpinner({
           strokeWidth="34"
         ></line>
       </svg>
-      {message && <div className="leading-4 font-bold ml-1">{message}</div>}
+      {message && (
+        <div className="leading-4 font-bold ml-2 text-nowrap">{message}</div>
+      )}
     </div>
   )
 }

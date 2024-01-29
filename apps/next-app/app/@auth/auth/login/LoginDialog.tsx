@@ -5,8 +5,10 @@ import { UserNavSocial } from '@js-monorepo/navbar'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 
-function LoginDialog() {
+function LoginDialog({ callbackUrl }: { callbackUrl: string }) {
+  const [isOpen, setIsOpen] = useState(true)
   const router = useRouter()
   const [, setLoaderState] = useLoader()
   const pathname = usePathname()
@@ -18,26 +20,28 @@ function LoginDialog() {
     {
       type: 'github',
       onLogin: async () => {
+        setIsOpen(false)
         setLoaderState({
           show: true,
           message: 'Logging in...',
           description: 'Sit back and relax.',
         })
         signIn('github', {
-          callbackUrl: 'http://localhost:3000',
+          callbackUrl: callbackUrl,
         })
       },
     },
     {
       type: 'google',
       onLogin: () => {
+        setIsOpen(false)
         setLoaderState({
           show: true,
           message: 'Logging in...',
           description: 'Sit back and relax.',
         })
         signIn('google', {
-          callbackUrl: 'http://localhost:3000',
+          callbackUrl: callbackUrl,
         })
       },
     },
@@ -45,7 +49,7 @@ function LoginDialog() {
   return (
     <DpLoginDialog
       socialConfig={socials}
-      isOpen={true}
+      isOpen={isOpen}
       onClose={() => {
         router.back()
       }}
