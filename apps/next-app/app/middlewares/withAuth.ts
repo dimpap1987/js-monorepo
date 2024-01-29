@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '../../auth'
 
-export const publicRoutes = ['/', '/about']
+export const publicRoutes = ['/', '/about', '/api/checkout_sessions']
 export const authRoutes = ['/auth/login', '/auth/register']
 export const apiAuthPrefix = '/api/auth'
 
@@ -24,7 +24,7 @@ export function withAuth(
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
     const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 
-    if (isApiAuthRoute) {
+    if (isApiAuthRoute || isPublicRoute) {
       return nextMiddleware(request)
     }
 

@@ -1,4 +1,4 @@
-import NextAuth, { NextAuthConfig, Session, User } from 'next-auth'
+import NextAuth, { NextAuthConfig, Session } from 'next-auth'
 import Github from 'next-auth/providers/github'
 import Google from 'next-auth/providers/google'
 import { ExtendedJWT } from './next-auth'

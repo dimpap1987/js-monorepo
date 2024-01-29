@@ -1,21 +1,6 @@
-import { withError } from './app/middlewares/withError'
-import { withAuth } from './app/middlewares/withAuth'
-import { withPathName } from './app/middlewares/withPathName'
+import { compose, withError, withPathName } from '@js-monorepo/utils'
 import { NextResponse } from 'next/server'
-
-type MiddlewareWrapper<Middleware> = (
-  wrappedMiddleware: Middleware
-) => Middleware
-
-export const compose = <Middleware>(
-  firstMiddlewareWrapper: MiddlewareWrapper<Middleware>,
-  ...otherMiddlewareWrappers: MiddlewareWrapper<Middleware>[]
-): MiddlewareWrapper<Middleware> =>
-  otherMiddlewareWrappers.reduce(
-    (accumulatedMiddlewares, nextMiddleware) => (middleware) =>
-      accumulatedMiddlewares(nextMiddleware(middleware)),
-    firstMiddlewareWrapper
-  )
+import { withAuth } from './app/middlewares/withAuth'
 
 const composedMiddlewares = compose(withPathName, withError, withAuth)
 

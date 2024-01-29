@@ -25,14 +25,14 @@ export default function Main({ children, className }: MainProps) {
   async function loadForTwoSecond() {
     setLoaderState({
       show: true,
-      message: 'logging in',
+      message: 'Loading..1..2..3',
       description: 'please wait',
     })
     return new Promise((resolve) => {
       setTimeout(() => {
         setLoaderState({ show: false })
         resolve(true)
-      }, 400000)
+      }, 4000)
     })
   }
   return (
