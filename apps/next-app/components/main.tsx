@@ -10,8 +10,8 @@ import { checkoutSessionClient } from '@js-monorepo/utils'
 import { useUserStore } from '@js-monorepo/store'
 import BannerSVG from './banner-svg'
 interface MainProps {
-  children?: ReactNode
-  className?: string
+  readonly children?: ReactNode
+  readonly className?: string
 }
 
 export default function Main({ children, className }: MainProps) {
@@ -38,7 +38,7 @@ export default function Main({ children, className }: MainProps) {
   return (
     <section className={className}>
       {children}
-      <div className="relative min-h-[200px] md:min-h-[30vh] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
+      <div className="relative min-h-[200px] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
         <BannerSVG />
       </div>
       <div className="flex flex-col justify-center align-items gap-2">

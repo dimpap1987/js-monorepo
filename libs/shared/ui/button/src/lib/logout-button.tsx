@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { DpButton } from './button'
 import { forwardRef } from 'react'
 import { BiLogOutCircle } from 'react-icons/bi'
 import { twMerge } from 'tailwind-merge'
@@ -26,4 +26,4 @@ const DpLogoutButton = forwardRef<HTMLButtonElement, DpLogoutButtonProps>(
 
 DpLogoutButton.displayName = 'DpLogoutButton'
 
-export default DpLogoutButton
+export { DpLogoutButton }

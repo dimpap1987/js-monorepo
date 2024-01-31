@@ -32,9 +32,9 @@ const DpButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className
         )}
         ref={ref}
-        {...props}
-        disabled={loading}
         tabIndex={0}
+        {...props}
+        disabled={loading || props.disabled}
       >
         {loadingContent}
         {children}

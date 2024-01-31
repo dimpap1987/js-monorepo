@@ -7,7 +7,7 @@ import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
-function LoginDialog({ callbackUrl }: { callbackUrl: string }) {
+function LoginDialog({ callbackUrl }: { readonly callbackUrl: string }) {
   const [isOpen, setIsOpen] = useState(true)
   const router = useRouter()
   const [, setLoaderState] = useLoader()

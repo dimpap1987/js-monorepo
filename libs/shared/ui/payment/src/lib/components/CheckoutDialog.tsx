@@ -77,7 +77,7 @@ const DpCheckoutDialog = forwardRef(
           stripeInstance !== undefined
         }
         onClose={onClose}
-        className="text-black shadow-2xl shadow-cyan-500/50 w-full sm:w-[460px] md:w-[60%]"
+        className="text-black top-24 shadow-2xl shadow-cyan-500/50 w-full sm:w-[460px] md:w-[60%]"
         ref={ref}
       >
         <DpDialogContent>

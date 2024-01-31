@@ -17,7 +17,7 @@ export default function DpNotificationList({
       <section>
         <div
           className={twMerge(
-            `fixed right-2 p-2 z-30 flex flex-col-reverse gap-2`,
+            `fixed right-2 p-2 z-40 flex flex-col-reverse gap-2`,
             overlayClassName
           )}
         >

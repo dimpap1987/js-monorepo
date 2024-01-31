@@ -14,7 +14,7 @@ export const buttonVariants = {
     size: {
       default: 'h-9 px-4 py-2', // Your default size styles
       small: 'h-8 rounded-md px-3 text-xs', // Your small size styles
-      large: 'h-10 rounded-md px-8', // Your large size styles
+      large: 'h-12 rounded-md px-8', // Your large size styles
     },
   },
   disabled: 'cursor-not-allowed opacity-50',

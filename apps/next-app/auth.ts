@@ -30,7 +30,7 @@ export const {
   callbacks: {
     async signIn({ account, user, email, profile }) {
       // throw new Error('ERROR_USER_NOT_REGISTERED')
-      return true
+      return false
     },
     async jwt({ token }) {
       token.roles = ['user']
