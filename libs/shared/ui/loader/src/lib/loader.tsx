@@ -22,10 +22,10 @@ export function DpLoader({
   return (
     <div
       className={twMerge(
-        `fixed left-0 w-screen h-screen
+        `fixed left-0 w-screen top-[50px] min-h-[calc(100vh-50px)]
       flex items-center justify-center bg-black 
       bg-opacity-70 transform transition-transform
-      duration-200 ${show ? 'scale-100' : 'scale-0'} z-50 select-none`,
+      duration-200 ${show ? 'scale-100' : 'scale-0'} z-40 select-none`,
         overlayClassName
       )}
     >

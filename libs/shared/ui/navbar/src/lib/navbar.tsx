@@ -1,18 +1,17 @@
 'use client'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { DpNextSidebar, MenuItem } from '@js-monorepo/sidebar'
-import { DpVersion } from '@js-monorepo/version'
+import { MenuItem } from '@js-monorepo/sidebar'
 import React, { ReactNode, forwardRef, useMemo, useRef, useState } from 'react'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { useClickAway } from 'react-use'
-import DpLoginButton from './components/login-button'
-import DpLogoutButton from './components/logout-button'
 import styles from './navbar.module.css'
+import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 export interface DpNextNavbarProps {
   readonly children?: ReactNode
   readonly menuItems?: MenuItem[]
   readonly user?: UserNavProps
   readonly onLogout?: () => void
+  readonly onSideBarClick?: () => void
 }
 export type UserNavProps = {
   username?: string | null | undefined
@@ -24,9 +23,8 @@ export type UserNavSocial = {
 }
 
 const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
-  ({ children, menuItems = [], user, onLogout }, ref) => {
+  ({ children, menuItems = [], user, onLogout, onSideBarClick }, ref) => {
     //state
-    const [openSideBar, setOpenSideBar] = useState(false)
     const [
       isDropdownLoggedOptionsRefVisible,
       setIsDropdownLoggedOptionsRefVisible,
@@ -51,7 +49,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     }, [children])
 
     return (
-      <header className="z-30">
+      <header className="z-20">
         <nav
           className="bg-background text-white w-full border-b border-border sm:px-8"
           ref={ref}
@@ -117,46 +115,21 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
             </div>
 
             {/* Dropdown icon */}
-            <div
-              className="navbar-burger self-center md:hidden cursor-pointer select-none py-2 px-4"
-              aria-label="user-options"
-            >
-              <button
-                onClick={() => setOpenSideBar((prev) => !prev)}
-                className="p-3 border-2 border-border rounded-xl text-2xl"
-                aria-label="toggle sidebar"
-                tabIndex={0}
+            {onSideBarClick && (
+              <div
+                className="navbar-burger self-center md:hidden cursor-pointer select-none py-2 px-4"
+                aria-label="user-options"
               >
-                <GiHamburgerMenu />
-              </button>
-              <DpNextSidebar
-                isOpen={openSideBar}
-                onClose={() => setOpenSideBar(false)}
-                position="right"
-                items={menuItems}
-              >
-                <div className="p-3">
-                  {!user?.isLoggedIn && (
-                    <DpNextNavLink href="/auth/login">
-                      <DpLoginButton></DpLoginButton>
-                    </DpNextNavLink>
-                  )}
-                  {user?.isLoggedIn && (
-                    <DpLogoutButton
-                      className="p-3"
-                      onClick={() => {
-                        onLogout?.()
-                        setOpenSideBar(false)
-                        setIsDropdownLoggedOptionsRefVisible(false)
-                      }}
-                    ></DpLogoutButton>
-                  )}
-                </div>
-                <div className="p-2">
-                  <DpVersion></DpVersion>
-                </div>
-              </DpNextSidebar>
-            </div>
+                <button
+                  onClick={onSideBarClick}
+                  className="p-3 border-2 border-border rounded-xl text-2xl"
+                  aria-label="toggle sidebar"
+                  tabIndex={0}
+                >
+                  <GiHamburgerMenu />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* User options hidden input*/}

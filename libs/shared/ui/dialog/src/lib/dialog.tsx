@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { AiFillCloseCircle } from 'react-icons/ai'
+import { GrFormClose } from 'react-icons/gr'
 import { twMerge } from 'tailwind-merge'
 import DpConfirmationDialog from '../components/confirmation-dialog'
 import DpDialogContent from '../components/content'
@@ -15,7 +15,7 @@ import DpLoginDialog from '../components/login-dialog'
 
 export interface DpDialogProps {
   readonly isOpen?: boolean
-  readonly onClose: () => void
+  readonly onClose?: () => void
   readonly children: React.ReactNode
   readonly className?: string
   readonly overlayClassName?: string
@@ -70,23 +70,23 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
     if (!shouldRender) return null
 
     return (
-      <div
-        data-dialog-backdrop="dialog"
-        data-dialog-backdrop-close="true"
-        className={twMerge(
-          `absolute inset-0 z-40 grid h-screen place-items-center pointer-events-all bg-black bg-opacity-50`,
-          overlayClassName
-        )}
-        onClick={onClose}
-      >
+      <>
+        <div
+          data-dialog-backdrop="dialog"
+          data-dialog-backdrop-close="true"
+          className={twMerge(
+            `absolute inset-0 z-10 top-[50px] min-h-[calc(100vh-50px)] pointer-events-all bg-black bg-opacity-50`,
+            overlayClassName
+          )}
+          onClick={onClose}
+        ></div>
         <div
           data-dialog="dialog"
+          role="dialog"
           onClick={(e) => e.stopPropagation()}
           className={twMerge(
-            `relative border p-4 border-primary mb-20 z-40 min-w-[200px] max-w-[90%] md:max-w-[70%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform `,
-            isOpen
-              ? 'opacity-100 translate-y-0 '
-              : 'opacity-0 -translate-y-full ',
+            `z-30 mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-50 dark:bg-gray-900 border p-4 border-primary mb-20 min-w-[200px] max-w-[90%] md:max-w-[70%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform 
+            ${isOpen ? ' opacity-100 translate-y-0 ' : ' opacity-0 -translate-y-full '} `,
             className
           )}
           ref={ref}
@@ -97,10 +97,10 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
               className=" text-3xl cursor-pointer"
               aria-label="Close dialog"
             >
-              <AiFillCloseCircle></AiFillCloseCircle>
+              <GrFormClose className=" text-slate-950 hover:text-slate-600" />
             </button>
           </div>
-          {header ? header : <div className="h-10 p-3"></div>}
+          {header ?? <div className="h-10 p-3"></div>}
           {content && (
             <div
               className={`relative p-3 border-t border-t-blue-gray-100
@@ -112,7 +112,7 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
           )}
           {footer}
         </div>
-      </div>
+      </>
     )
   }
 )

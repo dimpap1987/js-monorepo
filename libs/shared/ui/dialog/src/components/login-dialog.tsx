@@ -25,7 +25,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
         isOpen={isOpen}
         onClose={onClose}
         ref={ref}
-        className="text-black shadow-2xl shadow-cyan-500/50 w-full min-w-[330px] max-w-[370px] md:w-[35%] p-2"
+        className="z-40 text-black shadow-2xl shadow-cyan-500/50 w-full min-w-[330px] max-w-[370px] md:w-[35%] p-2"
       >
         <DpDialogHeader className="justify-center p-5">
           Sign in with

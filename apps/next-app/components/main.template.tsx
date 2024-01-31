@@ -1,14 +1,15 @@
 'use client'
+import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpLoaderProvider } from '@js-monorepo/loader'
+import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar } from '@js-monorepo/navbar'
 import { DpNotificationProvider } from '@js-monorepo/notification'
+import { DpNextSidebar, MenuItem } from '@js-monorepo/sidebar'
 import { DpVersion } from '@js-monorepo/version'
-import React, { PropsWithChildren } from 'react'
-import StoreInitializer from './store.initializer'
-import SVGLogo from './logo-svg'
-import { MenuItem } from '@js-monorepo/sidebar'
-import { useCurrentUser } from '../app/hooks/use-current-user'
+import { PropsWithChildren, useState } from 'react'
 import { logout } from '../actions/logout'
+import { useCurrentUser } from '../app/hooks/use-current-user'
+import SVGLogo from './logo-svg'
 
 const menuItems: MenuItem[] = [
   {
@@ -23,6 +24,7 @@ const menuItems: MenuItem[] = [
 
 export default function MainTemplate({ children }: PropsWithChildren) {
   const user = useCurrentUser()
+  const [openSideBar, setOpenSideBar] = useState(false)
 
   return (
     <>
@@ -33,6 +35,9 @@ export default function MainTemplate({ children }: PropsWithChildren) {
       <DpNextNavbar
         user={{ isLoggedIn: !!user, username: user?.name }}
         menuItems={menuItems}
+        onSideBarClick={() => {
+          setOpenSideBar((prev) => !prev)
+        }}
         onLogout={() => {
           logout()
         }}
@@ -41,6 +46,33 @@ export default function MainTemplate({ children }: PropsWithChildren) {
           <SVGLogo></SVGLogo>
         </DpLogo>
       </DpNextNavbar>
+
+      <DpNextSidebar
+        isOpen={openSideBar}
+        onClose={() => setOpenSideBar(false)}
+        position="right"
+        items={menuItems}
+      >
+        <div className="p-3">
+          {!user && (
+            <DpNextNavLink href="/auth/login">
+              <DpLoginButton></DpLoginButton>
+            </DpNextNavLink>
+          )}
+          {!!user && (
+            <DpLogoutButton
+              className="p-3"
+              onClick={() => {
+                logout()
+                setOpenSideBar(false)
+              }}
+            ></DpLogoutButton>
+          )}
+        </div>
+        <div className="p-2">
+          <DpVersion></DpVersion>
+        </div>
+      </DpNextSidebar>
 
       <DpLoaderProvider>
         <DpNotificationProvider>
