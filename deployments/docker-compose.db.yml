@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16.1-alpine3.19
+    container_name: my_postgres
+    environment:
+      POSTGRES_DB: ${AUTH_DATABASE_DB}
+      POSTGRES_USER: ${AUTH_DATABASE_USER}
+      POSTGRES_PASSWORD: ${AUTH_DATABASE_PASSWORD}
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - postgres:/data/postgres
+
+  adminer:
+    image: adminer:latest
+    container_name: my_adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres

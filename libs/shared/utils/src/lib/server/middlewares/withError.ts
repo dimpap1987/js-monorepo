@@ -11,9 +11,7 @@ export function withError(
     request: NextRequest
   ): Promise<NextResponse<unknown>> {
     const errorCode = request.nextUrl.searchParams.get('error')
-    if (errorCode === 'AuthorizedCallbackError') {
-      return NextResponse.redirect(new URL('/auth/register', request.url))
-    }
+    console.log(errorCode)
     return nextMiddleware(request)
   }
 }

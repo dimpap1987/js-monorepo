@@ -2,7 +2,7 @@ import { compose, withError, withPathName } from '@js-monorepo/utils'
 import { NextResponse } from 'next/server'
 import { withAuth } from './app/middlewares/withAuth'
 
-const composedMiddlewares = compose(withPathName, withError, withAuth)
+const composedMiddlewares = compose(withPathName, withAuth)
 
 export const middleware = composedMiddlewares(() => {
   return NextResponse.next()
