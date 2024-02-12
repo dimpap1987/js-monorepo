@@ -19,6 +19,7 @@
     "paths": {
       "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
+      "@js-monorepo/db": ["libs/prisma/db/src/index.ts"],
       "@js-monorepo/dialog": ["libs/shared/ui/dialog/src/index.ts"],
       "@js-monorepo/form": ["libs/shared/ui/form/src/index.ts"],
       "@js-monorepo/loader": ["libs/shared/ui/loader/src/index.ts"],
@@ -32,6 +33,7 @@
         "libs/shared/ui/page-progress-bar/src/index.ts"
       ],
       "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
+      "@js-monorepo/prisma-auth": ["libs/prisma/auth/src/index.ts"],
       "@js-monorepo/schemas": ["libs/shared/schemas/src/index.ts"],
       "@js-monorepo/sidebar": ["libs/shared/ui/sidebar/src/index.ts"],
       "@js-monorepo/store": ["libs/shared/store/src/index.ts"],

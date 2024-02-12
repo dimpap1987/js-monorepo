@@ -4,17 +4,21 @@ import { NextMiddleware } from 'next/server'
 
 export type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware
 
-export type UserRole = 'admin' | 'user'
+export enum UserRole {
+  ADMIN,
+  USER,
+}
 
 export type ExtendedUser =
   | (DefaultSession['user'] & {
       roles: UserRole[]
-      error?: string
+      createdAt?: string
     })
   | undefined
 
 export type ExtendedJWT = DefaultJWT & {
-  roles: UserRole[] // Adjust the type based on the actual structure of your roles
+  roles: UserRole[]
+  createdAt?: string
 }
 
 declare module 'next-auth' {

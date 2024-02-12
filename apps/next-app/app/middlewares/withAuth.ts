@@ -16,7 +16,6 @@ export function withAuth(
     request: NextRequest
   ): Promise<NextResponse<unknown>> {
     const session = await auth()
-
     const isLoggedIn = !!session
     const { nextUrl } = request
 
@@ -38,7 +37,6 @@ export function withAuth(
     if (!isLoggedIn && !isPublicRoute) {
       return NextResponse.redirect(new URL(`/auth/login`, nextUrl))
     }
-
     return nextMiddleware(request)
   }
 }

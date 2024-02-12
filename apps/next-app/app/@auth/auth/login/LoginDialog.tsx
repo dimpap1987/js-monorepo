@@ -15,7 +15,6 @@ function LoginDialog({ callbackUrl }: { readonly callbackUrl: string }) {
 
   if (pathname !== '/auth/login') return null
 
-  // TODO: replace base url
   const socials: UserNavSocial[] = [
     {
       type: 'github',
