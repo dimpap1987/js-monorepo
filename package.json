@@ -1,6 +1,6 @@
 {
   "name": "@js-monorepo/source",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "license": "MIT",
   "scripts": {
     "lint": "nx affected:lint --all",
@@ -20,7 +20,8 @@
     "start:docs": "cd dist/apps/docs && npx next start",
     "db:auth-migrate": "env-cmd --no-override -f .env npx prisma migrate dev --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
     "db:auth-create": "env-cmd --no-override -f .env npx prisma migrate dev --create-only --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
-    "db:auth-generate": "prisma generate --schema=libs/prisma/auth/src/lib/prisma/schema.prisma"
+    "db:auth-generate": "prisma generate --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
+    "db:next-generate": "npm run db:auth-generate"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

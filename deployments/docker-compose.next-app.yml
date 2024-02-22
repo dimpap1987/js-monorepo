@@ -1,11 +1,45 @@
 version: '3.8'
 
 services:
+
   next-app:
     image: dimpap/next-app:latest
     container_name: next-app-container
     ports:
       - '8000:3000'
     environment:
-      - NODE_ENV=production
+      NODE_ENV: production
+      AUTH_DATABASE_URL: ${AUTH_DATABASE_URL}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED}
+      LOGIN_REDIRECT: ${LOGIN_REDIRECT}
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_GITHUB_ID: ${AUTH_GITHUB_ID}
+      AUTH_GITHUB_SECRET: ${AUTH_GITHUB_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
     restart: always
+
+  postgres:
+    image: postgres:16.1-alpine3.19
+    container_name: my_postgres
+    environment:
+      POSTGRES_DB: ${AUTH_DATABASE_DB}
+      POSTGRES_USER: ${AUTH_DATABASE_USER}
+      POSTGRES_PASSWORD: ${AUTH_DATABASE_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - postgres:/data/postgres
+
+  adminer:
+    image: adminer:latest
+    container_name: my_adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres:
