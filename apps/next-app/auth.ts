@@ -50,7 +50,7 @@ export const {
                 email: userEmail,
                 username: user.name
                   ? user.name
-                  : `user${Math.floor(Math.random() * 1000)}`,
+                  : `guest-${Math.floor(Math.random() * 1000)}`,
               },
             })
             console.log(`New User: '${newUser.username}' created successfully`)
