@@ -14,6 +14,17 @@ on:
 jobs:
   main:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16.1-alpine3.19
+        ports:
+          - '5432:5432'
+        env:
+          POSTGRES_DB: auth
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: 1234
+
     steps:
       - uses: actions/checkout@v3
         name: Checkout [Pull Request]
@@ -56,12 +67,14 @@ jobs:
 
       - name: Run Tests
         run: npx nx affected:test --base=origin/main --head=${{ github.sha }}
+        
+      - name: Prisma Generate
+        run: AUTH_DATABASE_URL=postgresql://admin:1234@postgres:5432/auth npx prisma generate --schema=libs/prisma/auth/src/lib/prisma/schema.prisma
 
-      - name: Build Next.js App
-        run: npm run build:next
-
-      - name: Generate Prisma Client
-        run: npm run db:next-generate
+      - name: Build Next.js
+        env:
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+        run:  npm run build:next
 
       - name: Extract version from package.json
         id: extract_version
