@@ -3,24 +3,29 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16.1-alpine3.19
-    container_name: my_postgres
+    container_name: postgres_container
     environment:
       POSTGRES_DB: ${AUTH_DATABASE_DB}
       POSTGRES_USER: ${AUTH_DATABASE_USER}
       POSTGRES_PASSWORD: ${AUTH_DATABASE_PASSWORD}
+    restart: unless-stopped
     ports:
       - "5432:5432"
-    restart: unless-stopped
+    networks:
+      - postgres
     volumes:
-      - postgres:/data/postgres
+      - ${POSTGRES_VOLUME_PATH}:/var/lib/postgresql/data
 
   adminer:
     image: adminer:latest
     container_name: my_adminer
     ports:
-      - "8080:8080"
+      - ${ADMINER_PORT}:8080
+    networks:
+      - postgres
     depends_on:
       - postgres
 
-volumes:
+networks:
   postgres:
+    name: postgres_network
