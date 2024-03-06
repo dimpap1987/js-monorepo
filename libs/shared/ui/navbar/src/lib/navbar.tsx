@@ -1,11 +1,11 @@
 'use client'
+import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { MenuItem } from '@js-monorepo/sidebar'
+import { AnimatePresence, motion } from 'framer-motion'
 import React, { ReactNode, forwardRef, useMemo, useRef, useState } from 'react'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { useClickAway } from 'react-use'
-import styles from './navbar.module.css'
-import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 export interface DpNextNavbarProps {
   readonly children?: ReactNode
   readonly menuItems?: MenuItem[]
@@ -30,11 +30,17 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
       setIsDropdownLoggedOptionsRefVisible,
     ] = useState(false) // State to show/hide div
 
-    //Ref
+    //Refs
     const dropdownLoggedOptionsRef = useRef(null)
-    useClickAway(dropdownLoggedOptionsRef, () =>
+    const userProfileIconRef = useRef(null)
+
+    useClickAway(dropdownLoggedOptionsRef, (event) => {
+      const target = event.target as Node
+      const userProf = userProfileIconRef.current! as Node
+      if (userProf?.contains(target)) return
+
       setIsDropdownLoggedOptionsRefVisible(false)
-    )
+    })
 
     const { logo } = useMemo(() => {
       let logoElement: ReactNode | null = null
@@ -57,13 +63,16 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
           <div className="flex justify-between h-14">
             <div className="px-5 py-2 flex w-full items-center">
               {logo}
-
               <ul className="hidden md:flex px-4 font-semibold font-heading space-x-6 ml-[14%]">
                 {menuItems &&
                   menuItems.length > 0 &&
                   menuItems.map((item, index) => (
-                    <li key={index} className={styles.underlineEffect}>
-                      <DpNextNavLink className="py-2 px-4" href={item.href}>
+                    <li key={index} className="hover:text-secondary">
+                      <DpNextNavLink
+                        className="py-2 px-4"
+                        activeClassName="text-secondary underline-offset-8"
+                        href={item.href}
+                      >
                         {item.name}
                       </DpNextNavLink>
                     </li>
@@ -86,6 +95,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       </div>
                     )}
                     <button
+                      ref={userProfileIconRef}
                       className="cursor-pointer select-none scale-125"
                       aria-label="open-user-options"
                       onClick={() => {
@@ -133,22 +143,30 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
           </div>
 
           {/* User options hidden input*/}
-          {isDropdownLoggedOptionsRefVisible && (
-            <div
-              ref={dropdownLoggedOptionsRef}
-              className={`absolute w-44 right-0 bg-zinc-900 border border-border rounded text-white z-30 hidden md:block`}
-            >
-              {user?.isLoggedIn && (
-                <DpLogoutButton
-                  className="p-3"
-                  onClick={() => {
-                    onLogout?.()
-                    setIsDropdownLoggedOptionsRefVisible(false)
-                  }}
-                ></DpLogoutButton>
-              )}
-            </div>
-          )}
+          <AnimatePresence mode="wait" initial={false}>
+            {isDropdownLoggedOptionsRefVisible && (
+              <motion.div
+                {...{
+                  initial: { opacity: 0, y: 0 },
+                  animate: { opacity: 1, y: 0 },
+                  exit: { opacity: 0, y: '-100%', zIndex: -1 },
+                  transition: { duration: 0.4 },
+                }}
+                ref={dropdownLoggedOptionsRef}
+                className={`absolute w-44 right-0 bg-zinc-900 border border-border rounded text-white z-30 hidden md:block`}
+              >
+                {user?.isLoggedIn && (
+                  <DpLogoutButton
+                    className="p-3"
+                    onClick={() => {
+                      onLogout?.()
+                      setIsDropdownLoggedOptionsRefVisible(false)
+                    }}
+                  ></DpLogoutButton>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </nav>
       </header>
     )
