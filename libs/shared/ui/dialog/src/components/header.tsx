@@ -16,7 +16,7 @@ const DpDialogHeader = forwardRef(
         <div
           ref={ref}
           className={twMerge(
-            'flex shrink-0 items-center p-3 text-xl font-semibold font-heading space-x-12 leading-snug text-blue-gray-900 antialiased',
+            'flex shrink-0 items-center p-3 text-xl font-semibold font-heading leading-snug text-blue-gray-900 antialiased',
             className
           )}
         >

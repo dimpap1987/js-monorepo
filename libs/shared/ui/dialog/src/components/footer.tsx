@@ -5,7 +5,7 @@ interface DpDialogFooterProps extends PropsWithChildren {}
 const DpDialogFooter = forwardRef(
   ({ children }: DpDialogFooterProps, ref: ForwardedRef<HTMLDivElement>) => {
     return (
-      <div ref={ref} className="flex justify-end p-1">
+      <div ref={ref} className="flex justify-center p-1">
         {children}
       </div>
     )

@@ -25,8 +25,8 @@ export default function Main({ children, className }: MainProps) {
   async function loadForTwoSecond() {
     setLoaderState({
       show: true,
-      message: 'Loading..1..2..3',
-      description: 'please wait',
+      message: 'Loading...',
+      description: 'Please wait. . .  . .',
     })
     return new Promise((resolve) => {
       setTimeout(() => {

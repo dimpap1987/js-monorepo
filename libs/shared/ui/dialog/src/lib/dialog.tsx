@@ -85,7 +85,7 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
           role="dialog"
           onClick={(e) => e.stopPropagation()}
           className={twMerge(
-            `z-30 mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-50 dark:bg-gray-900 border p-4 border-primary mb-20 min-w-[200px] max-w-[90%] md:max-w-[60%] max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed text-blue-gray-500 antialiased pointer-events-auto transition ease-out duration-200 transform 
+            `z-30 mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border p-4 border-primary mb-20 max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed antialiased pointer-events-auto transition ease-out duration-200 transform 
             ${isOpen ? ' opacity-100 translate-y-0 ' : ' opacity-0 -translate-y-full '} `,
             className
           )}
@@ -94,10 +94,10 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
           <div className="flex justify-end p-1 float-right">
             <button
               onClick={onClose}
-              className=" text-3xl cursor-pointer"
+              className="text-3xl cursor-pointer"
               aria-label="Close dialog"
             >
-              <GrFormClose className=" text-slate-950 hover:text-slate-600" />
+              <GrFormClose className="text-slate-950 hover:text-slate-600" />
             </button>
           </div>
           {header ?? <div className="h-10 p-3"></div>}

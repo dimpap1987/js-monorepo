@@ -9,26 +9,29 @@ export interface DpNextNavLinkProps {
   readonly children: React.ReactNode
   readonly className?: string
   readonly onClick?: () => void
+  readonly activeClassName?: string
 }
 
 const DpNextNavLink = forwardRef(
   (
-    { href, children, className, onClick }: DpNextNavLinkProps,
+    { href, children, className, onClick, activeClassName }: DpNextNavLinkProps,
     ref: ForwardedRef<HTMLAnchorElement>
   ) => {
     const router = useRouter()
     const currentPath = usePathname()
+    const isSamePath = `${href}` === currentPath
 
     return (
       <a
         ref={ref}
         href={href}
-        className={twMerge(className, 'cursor-pointer')}
+        className={twMerge(
+          `cursor-pointer ${activeClassName && isSamePath ? activeClassName : ''}`,
+          className
+        )}
         onClick={(e) => {
           e.preventDefault()
-          if (`/${href}` === currentPath) {
-            router.replace(href)
-          } else {
+          if (!isSamePath) {
             router.push(href)
           }
           onClick?.()

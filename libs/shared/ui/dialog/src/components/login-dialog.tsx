@@ -1,7 +1,9 @@
+import { DpButton } from '@js-monorepo/button'
 import React, { forwardRef } from 'react'
 import { DpDialog } from '../lib/dialog'
-import DpDialogHeader from './header'
 import DpDialogContent from './content'
+import DpDialogHeader from './header'
+import './login-dialog.css'
 
 export type SocialConfig = {
   type: 'google' | 'github' | 'facebook'
@@ -25,20 +27,20 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
         isOpen={isOpen}
         onClose={onClose}
         ref={ref}
-        className="z-40 text-black shadow-2xl shadow-cyan-500/50 w-full min-w-[330px] md:w-[35%] max-w-[370px] p-2"
+        className="z-40 text-black shadow-2xl shadow-cyan-500/50 p-2 w-[80%] sm:w-[360px]"
       >
-        <DpDialogHeader className="justify-center p-5">
+        <DpDialogHeader className="justify-center font-bold">
           Sign in with
         </DpDialogHeader>
-        <DpDialogContent className="p-3">
-          <div className="flex flex-col items-center text-sm gap-2 font-medium">
+        <DpDialogContent className="p-3 pt-5 w-full">
+          <div className="flex flex-col items-center text-base gap-2 font-medium">
             {socialConfig?.map((social) => (
               <React.Fragment key={social.type}>
                 {/* GOOGLE */}
                 {social.type === 'google' && (
                   <button
                     type="button"
-                    className="bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black inline-flex items-center hover:bg-zinc-300 mr-2 focus:ring-4 focus:ring-[#24292F]/50 dark:focus:ring-[#3b5998]/55"
+                    className="bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black inline-flex items-center mr-2 shadow-effect"
                     onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <svg
@@ -75,7 +77,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'github' && (
                   <button
                     type="button"
-                    className="bg-[#24292F] w-full text-white hover:bg-[#24292F]/90 focus:ring-4 focus:ring-[#24292F]/50 rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-gray-500 dark:hover:bg-[#050708]/30 mr-2"
+                    className="bg-[#24292F] shadow-effect w-full text-white rounded-lg px-5 py-2.5 text-center inline-flex items-center mr-2"
                     onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <svg
@@ -101,7 +103,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'facebook' && (
                   <button
                     type="button"
-                    className="bg-[#3b5998] w-full hover:bg-[#3b5998]/90 text-white focus:ring-4 focus:ring-[#3b5998]/50 rounded-lg px-5 py-2.5 text-center inline-flex items-center dark:focus:ring-[#3b5998]/55 mr-2"
+                    className="bg-[#3b5998] w-full shadow-effect text-white rounded-lg px-5 py-2.5 text-center inline-flex items-center mr-2"
                     onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <svg
@@ -124,6 +126,29 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 )}
               </React.Fragment>
             ))}
+
+            <div className="inline-flex items-center w-full p-2">
+              <hr className="w-40 h-[2px] mx-auto my-4 bg-gray-200 border-0 rounded my-2" />
+              <div className="absolute px-4 -translate-x-1/2 left-1/2 bg-slate-100">
+                or
+              </div>
+              <hr className="w-40 h-[2px] mx-auto my-4 bg-gray-200 border-0 rounded my-2"></hr>
+            </div>
+
+            <div className="w-full">
+              <div className="text-sm text-center pb-4">
+                Don't have an account?
+              </div>
+              <DpButton
+                variant="accent"
+                className="w-full text-white"
+                onClick={() => {
+                  alert('Not implemented yet')
+                }}
+              >
+                Register
+              </DpButton>
+            </div>
           </div>
         </DpDialogContent>
       </DpDialog>
