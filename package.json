@@ -8,6 +8,8 @@
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
     "prepare": "husky install",
+    "graph": "nx graph --affected",
+    "affected": "nx show projects --affected",
     "generate:docs": "node scripts/build-readme-template.js",
     "dev:next": "nx serve next-app",
     "dev:docs": "nx serve docs",
