@@ -9,21 +9,20 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yaml'
     volumes:
-      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - ./config:/etc/prometheus
       - prometheus-data:/prometheus
     user: "root"
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:9.5.15
+    image: grafana/grafana-oss:latest
     container_name: grafana
     ports:
-      - '3000:3000'
+      - '8000:3000'
     user: "root"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/main.yaml
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
     env_file:
       - ./grafana/config.monitoring
     restart: unless-stopped
@@ -54,7 +53,6 @@ services:
       - /dev/kmsg
     privileged: true
     restart: unless-stopped
-
 
 networks:
   monitoring:
