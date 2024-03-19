@@ -9,8 +9,6 @@ services:
       POSTGRES_USER: ${AUTH_DATABASE_USER}
       POSTGRES_PASSWORD: ${AUTH_DATABASE_PASSWORD}
     restart: unless-stopped
-    ports:
-      - "5432:5432"
     networks:
       - postgres
     volumes:
