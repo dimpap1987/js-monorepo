@@ -33,3 +33,8 @@ services:
       - elk
     depends_on:
       - elasticsearch
+
+networks:
+  elk:
+    # driver: bridge
+    name: elk_network

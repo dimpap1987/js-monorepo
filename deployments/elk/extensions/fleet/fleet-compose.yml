@@ -45,3 +45,9 @@ services:
 
 volumes:
   fleet-server:
+
+
+networks:
+  elk:
+    # driver: bridge
+    name: elk_network
