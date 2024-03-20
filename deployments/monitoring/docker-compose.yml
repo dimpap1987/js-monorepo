@@ -4,14 +4,16 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    ports:
-      - 9090:9090
+    # ports:
+    #   - 9090:9090
     command:
       - '--config.file=/etc/prometheus/prometheus.yaml'
     volumes:
       - ./config:/etc/prometheus
       - prometheus-data:/prometheus
-    user: "root"
+    # user: "root"
+    networks:
+      - monitoring
     restart: unless-stopped
 
   grafana:
@@ -19,24 +21,28 @@ services:
     container_name: grafana
     ports:
       - '8000:3000'
-    user: "root"
+    # user: "root"
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     env_file:
       - ./grafana/config.monitoring
+    networks:
+      - monitoring
     restart: unless-stopped
 
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: node_exporter
     command: '--path.rootfs=/host'
-    ports:
-      - '9100:9100'
+    # ports:
+    #   - '9100:9100'
     pid: host
     restart: unless-stopped
     volumes:
       - /:/host:ro,rslave
+    networks:
+      - monitoring
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
@@ -53,10 +59,12 @@ services:
       - /dev/kmsg
     privileged: true
     restart: unless-stopped
+    networks:
+      - monitoring
 
 networks:
   monitoring:
-    driver: bridge
+    name: monitoring_network
 
 volumes:
   prometheus-data:
