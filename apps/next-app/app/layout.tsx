@@ -8,7 +8,7 @@ import { SessionProvider } from 'next-auth/react'
 import { auth } from '../auth'
 
 export const metadata: Metadata = {
-  title: 'Next-14 App',
+  title: 'Next-14 App ',
 }
 
 const poppins = Poppins({
