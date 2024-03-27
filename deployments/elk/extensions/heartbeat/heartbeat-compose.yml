@@ -22,7 +22,3 @@ services:
       - elk
     depends_on:
       - elasticsearch
-
-networks:
-  elk:
-    name: elk_network

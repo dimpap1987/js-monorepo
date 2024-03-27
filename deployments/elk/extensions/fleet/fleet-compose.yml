@@ -45,8 +45,3 @@ services:
 
 volumes:
   fleet-server:
-
-
-networks:
-  elk:
-    name: elk_network
