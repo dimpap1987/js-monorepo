@@ -10,15 +10,6 @@ filebeat.config:
     reload.enabled: false
 
 
-filebeat.inputs:
-  - type: log
-    enabled: true
-    paths:
-      - ${LOGS_FILENAME_NEXT_APP}  # Update this path to match your log file's location
-    fields:
-      type: winston_logs            # Optional: Add any additional fields you need
-
-
 filebeat.autodiscover:
   providers:
     # The Docker autodiscover provider automatically retrieves logs from Docker

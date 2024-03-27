@@ -3,6 +3,7 @@ import Github from 'next-auth/providers/github'
 import Google from 'next-auth/providers/google'
 import { ExtendedJWT } from './next-auth'
 import { dbClient } from '@js-monorepo/db'
+import { logger } from '@js-monorepo/logger'
 
 export const authProviders = {
   providers: [
@@ -31,7 +32,7 @@ export const {
   },
   events: {
     async signIn({ user }) {
-      console.log(`User: ${user.name} has been signed in`)
+      logger.info(`User: ${user.name} has been signed in`)
     },
   },
   callbacks: {
@@ -54,11 +55,10 @@ export const {
                   : `guest-${Math.floor(Math.random() * 1000)}`,
               },
             })
-            console.log(`New User: '${newUser.username}' created successfully`)
+            logger.info(`New User: '${newUser.username}' created successfully`)
           })
       } catch (err) {
-        console.log(`There was an error with user: ${user.email}`)
-        console.error(err)
+        logger.error(err, `There was an error with user: ${user.email}`)
         return false
       }
       return true
