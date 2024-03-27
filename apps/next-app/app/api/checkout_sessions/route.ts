@@ -5,6 +5,8 @@ import {
 } from '@js-monorepo/utils'
 import { NextResponse } from 'next/server'
 
+import logger from '@next-app/logger'
+
 export async function POST(req: Request) {
   try {
     const {
@@ -16,6 +18,7 @@ export async function POST(req: Request) {
       isDonate,
     } = (await req.json()) as CreateCheckoutSessionRequestBody
 
+    logger.info('Stripe Session creation')
     const session = await createCheckoutSession(stripe, {
       username,
       price,
