@@ -25,4 +25,4 @@ services:
 
 networks:
   elk:
-    driver: bridge
+    name: elk_network
