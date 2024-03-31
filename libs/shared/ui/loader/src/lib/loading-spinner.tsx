@@ -1,6 +1,6 @@
+import { cn } from '@js-monorepo/utils'
 import { CSSProperties } from 'react'
 import './loader.module.css'
-import { twMerge } from 'tailwind-merge'
 
 export type DpLoadingProps = {
   readonly message?: string
@@ -23,7 +23,7 @@ export function DpLoadingSpinner({
     <div
       aria-label="Loading..."
       role="status"
-      className={twMerge('flex items-center', className)}
+      className={cn('flex items-center', className)}
     >
       <svg style={{ ...spinnerLoader, ...styles }} viewBox="0 0 256 256">
         <line

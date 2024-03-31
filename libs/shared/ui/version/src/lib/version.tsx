@@ -1,6 +1,6 @@
 import pkg from '@js-monorepo/package.json'
+import { cn } from '@js-monorepo/utils'
 import { forwardRef } from 'react'
-import { twMerge } from 'tailwind-merge'
 
 export interface DpVersionProps {
   readonly className?: string
@@ -11,8 +11,8 @@ const DpVersion = forwardRef<HTMLSpanElement, DpVersionProps>(
     return (
       <span
         ref={ref}
-        className={twMerge(
-          'p-1 rounded-md text-gray-700 font-light text-sm text-white',
+        className={cn(
+          'p-1 rounded-md font-light text-sm text-foreground',
           className
         )}
         {...props}

@@ -1,5 +1,5 @@
-import { ReactNode, forwardRef, ForwardedRef } from 'react'
-import { twMerge } from 'tailwind-merge'
+import { cn } from '@js-monorepo/utils'
+import { ForwardedRef, ReactNode, forwardRef } from 'react'
 
 interface DpDialogHeaderProps {
   children: ReactNode
@@ -15,8 +15,8 @@ const DpDialogHeader = forwardRef(
       children && (
         <div
           ref={ref}
-          className={twMerge(
-            'flex shrink-0 items-center p-3 text-xl font-semibold font-heading leading-snug text-blue-gray-900 antialiased',
+          className={cn(
+            'flex shrink-0 items-center p-3 text-xl font-semibold font-heading leading-snug text-black antialiased',
             className
           )}
         >

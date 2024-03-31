@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import React, { ReactNode, forwardRef, useMemo, useRef, useState } from 'react'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { useClickAway } from 'react-use'
+import { ModeToggle } from '@js-monorepo/theme-provider'
 export interface DpNextNavbarProps {
   readonly children?: ReactNode
   readonly menuItems?: MenuItem[]
@@ -57,7 +58,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     return (
       <header className="z-20">
         <nav
-          className="bg-background text-white w-full border-b border-border sm:px-8"
+          className="text-foreground w-full border-b border-border sm:px-8"
           ref={ref}
         >
           <div className="flex justify-between h-14">
@@ -67,10 +68,10 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 {menuItems &&
                   menuItems.length > 0 &&
                   menuItems.map((item, index) => (
-                    <li key={index} className="hover:text-secondary">
+                    <li key={index} className="hover:text-foreground-hover">
                       <DpNextNavLink
                         className="py-2 px-4"
-                        activeClassName="text-secondary underline-offset-8"
+                        activeClassName="text-foreground-hover underline-offset-8"
                         href={item.href}
                       >
                         {item.name}
@@ -81,6 +82,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
 
               {/* options on the right*/}
               <div className="hidden md:flex items-center gap-4 w-50 justify-end text-center flex-1">
+                <ModeToggle></ModeToggle>
                 {!user?.isLoggedIn && (
                   <DpNextNavLink href="/auth/login">
                     <DpLoginButton className="rounded-full"></DpLoginButton>
@@ -104,9 +106,8 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       tabIndex={0}
                     >
                       <svg
-                        // ref={dropdownIconRef}
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 hover:text-gray-200"
+                        className="h-6 w-6 hover:text-foreground"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -132,7 +133,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               >
                 <button
                   onClick={onSideBarClick}
-                  className="p-3 border-2 border-border rounded-xl text-2xl"
+                  className="p-2 border-2 border-border rounded-xl"
                   aria-label="toggle sidebar"
                   tabIndex={0}
                 >
@@ -149,15 +150,15 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 {...{
                   initial: { opacity: 0, y: 0 },
                   animate: { opacity: 1, y: 0 },
-                  exit: { opacity: 0, y: '-100%', zIndex: -1 },
+                  exit: { opacity: 0, y: 0, zIndex: -1 },
                   transition: { duration: 0.4 },
                 }}
                 ref={dropdownLoggedOptionsRef}
-                className={`absolute w-44 right-0 bg-zinc-900 border border-border rounded text-white z-30 hidden md:block`}
+                className={`absolute w-44 right-0 p-1 border border-border rounded text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`}
               >
                 {user?.isLoggedIn && (
                   <DpLogoutButton
-                    className="p-3"
+                    className="p-3 text-inherit bg-inherit shadow-inner"
                     onClick={() => {
                       onLogout?.()
                       setIsDropdownLoggedOptionsRefVisible(false)

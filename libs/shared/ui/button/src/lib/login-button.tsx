@@ -1,3 +1,4 @@
+import { cn } from '@js-monorepo/utils'
 import { DpButton } from './button'
 import { forwardRef } from 'react'
 import { BiLogInCircle } from 'react-icons/bi'
@@ -15,7 +16,7 @@ const DpLoginButton = forwardRef<HTMLButtonElement, DpLoginButtonProps>(
         {...props}
         title="Sign in"
         variant="accent"
-        className={twMerge(
+        className={cn(
           'gap-1 py-2 px-4 w-full flex justify-center text-white',
           className
         )}

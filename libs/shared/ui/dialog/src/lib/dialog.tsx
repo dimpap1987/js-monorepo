@@ -1,3 +1,4 @@
+import { cn } from '@js-monorepo/utils'
 import React, {
   ReactNode,
   forwardRef,
@@ -6,7 +7,6 @@ import React, {
   useState,
 } from 'react'
 import { GrFormClose } from 'react-icons/gr'
-import { twMerge } from 'tailwind-merge'
 import DpConfirmationDialog from '../components/confirmation-dialog'
 import DpDialogContent from '../components/content'
 import DpDialogFooter from '../components/footer'
@@ -74,7 +74,7 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
         <div
           data-dialog-backdrop="dialog"
           data-dialog-backdrop-close="true"
-          className={twMerge(
+          className={cn(
             `absolute inset-0 z-10 top-[50px] min-h-[calc(100vh-50px)] pointer-events-all bg-black bg-opacity-50`,
             overlayClassName
           )}
@@ -84,9 +84,9 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
           data-dialog="dialog"
           role="dialog"
           onClick={(e) => e.stopPropagation()}
-          className={twMerge(
-            `z-30 mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border p-4 border-primary mb-20 max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed antialiased pointer-events-auto transition ease-out duration-200 transform 
-            ${isOpen ? ' opacity-100 translate-y-0 ' : ' opacity-0 -translate-y-full '} `,
+          className={cn(
+            `z-30 mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border p-4 border-primary mb-20 max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed antialiased pointer-events-auto transition ease-out duration-200 
+             ${isOpen ? ' opacity-100 translate-y-0 ' : ' opacity-0 -translate-y-full '} `,
             className
           )}
           ref={ref}

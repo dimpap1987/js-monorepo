@@ -1,6 +1,6 @@
-import styles from './notification.module.css'
+import { cn } from '@js-monorepo/utils'
 import Notification, { DpNotificationProps } from './notification'
-import { twMerge } from 'tailwind-merge'
+import styles from './notification.module.css'
 
 interface DpNotificationListProps {
   notifications: DpNotificationProps[]
@@ -16,7 +16,7 @@ export default function DpNotificationList({
     notifications.length > 0 && (
       <section>
         <div
-          className={twMerge(
+          className={cn(
             `fixed right-2 p-2 z-40 flex flex-col-reverse gap-2`,
             overlayClassName
           )}
@@ -24,7 +24,7 @@ export default function DpNotificationList({
           {notifications.map((notification, index) => (
             <div
               key={notification.id || index}
-              className={`${styles.notificationContainer} flex bg-foreground p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
+              className={`${styles.notificationContainer} flex bg-background-secondary p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
             >
               <Notification {...notification} />
             </div>
