@@ -26,10 +26,12 @@ h4 {
 
 @layer base {
   :root {
-    --border: 240 4% 16%;
+    --border: 240 4% 76%;
 
-    --background: 221 39% 11%;
-    --foreground: 219 33% 21%;
+    --background-primary: 0 0% 95%;
+    --foreground: 0 0% 0%;
+    --foreground-hover: 0 0% 35%;
+    --background-secondary: 219 33% 21%;
 
     /* Turquoise */
     --primary: 174 72% 56%;
@@ -58,8 +60,32 @@ h4 {
     --destructive: 0 0% 78%;
     --destructive-hover: 0 0% 71%;
   }
+
+  .dark {
+    --border: 240 4% 16%;
+
+    --background-primary: 221 39% 11%;
+    --foreground: 0 0% 100%;
+    --foreground-hover: 49 81% 51%;
+  }
 }
 
-html {
-  /* scrollbar-gutter: stable; */
+/* custom scrollbar */
+::-webkit-scrollbar {
+  width: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #899597;
 }

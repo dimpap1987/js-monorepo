@@ -1,8 +1,8 @@
 'use client'
+import { cn } from '@js-monorepo/utils'
 import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
 import React, { ForwardedRef, forwardRef } from 'react'
-import { twMerge } from 'tailwind-merge'
 
 export interface DpNextNavLinkProps {
   readonly href: string
@@ -25,7 +25,7 @@ const DpNextNavLink = forwardRef(
       <a
         ref={ref}
         href={href}
-        className={twMerge(
+        className={cn(
           `cursor-pointer ${activeClassName && isSamePath ? activeClassName : ''}`,
           className
         )}

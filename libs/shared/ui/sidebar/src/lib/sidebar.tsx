@@ -1,6 +1,7 @@
 'use client'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AnimatePresence, motion } from 'framer-motion'
+import { ModeToggle } from '@js-monorepo/theme-provider'
 import { ReactNode, RefObject, forwardRef, useEffect, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
 import { IconType } from 'react-icons/lib'
@@ -68,7 +69,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
         {isOpen && (
           <motion.div
             {...framerSidebarPanel(position)}
-            className={`fixed top-0 bottom-0 z-20 focus:z-50 ${
+            className={`fixed top-0 bottom-0 z-20 focus:z-50 dark ${
               position === 'left' ? 'left-0' : 'right-0'
             } w-full h-screen max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
             ref={localRef}
@@ -76,6 +77,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
             tabIndex={-1}
           >
             <div className="flex items-center justify-between p-5 border-b-2 border-border">
+              <ModeToggle className="text-right absolute left-0.5"></ModeToggle>
               <span>{header}</span>
               <button
                 onClick={() => onClose()}

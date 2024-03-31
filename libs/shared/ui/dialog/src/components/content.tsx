@@ -1,3 +1,4 @@
+import { cn } from '@js-monorepo/utils'
 import { ReactNode, forwardRef } from 'react'
 
 export interface DpDialogContentProps {
@@ -8,7 +9,7 @@ export interface DpDialogContentProps {
 const DpDialogContent = forwardRef<HTMLDivElement, DpDialogContentProps>(
   ({ children, className }, ref) => {
     return children ? (
-      <div ref={ref} className={className}>
+      <div ref={ref} className={cn('text-black', className)}>
         {children}
       </div>
     ) : null

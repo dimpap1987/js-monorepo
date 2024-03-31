@@ -22,7 +22,9 @@ const menuItems: MenuItem[] = [
   },
 ]
 
-export default function MainTemplate({ children }: PropsWithChildren) {
+export default function MainTemplate({
+  children,
+}: Readonly<PropsWithChildren>) {
   const user = useCurrentUser()
   const [openSideBar, setOpenSideBar] = useState(false)
 
@@ -70,7 +72,7 @@ export default function MainTemplate({ children }: PropsWithChildren) {
           )}
         </div>
         <div className="p-2">
-          <DpVersion></DpVersion>
+          <DpVersion className="text-white"></DpVersion>
         </div>
       </DpNextSidebar>
 

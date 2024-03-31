@@ -6,6 +6,7 @@ import type { Metadata } from 'next'
 import { ReactNode } from 'react'
 import { SessionProvider } from 'next-auth/react'
 import { auth } from '../auth'
+import { ThemeProvider } from '@js-monorepo/theme-provider'
 
 export const metadata: Metadata = {
   title: 'Next-14 App ',
@@ -28,14 +29,21 @@ export default async function RootLayout(props: {
     <SessionProvider session={session}>
       <html lang="en">
         <body
-          className={`${poppins.className} flex flex-col min-h-100svh bg-background`}
+          className={`${poppins.className} flex flex-col min-h-100svh bg-background-primary`}
           suppressHydrationWarning={true}
         >
           <DpNextPageProgressBar>
-            <MainTemplate>
-              {props.auth}
-              {props.children}
-            </MainTemplate>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <MainTemplate>
+                {props.auth}
+                {props.children}
+              </MainTemplate>
+            </ThemeProvider>
           </DpNextPageProgressBar>
         </body>
       </html>

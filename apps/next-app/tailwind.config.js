@@ -3,6 +3,7 @@ const { join } = require('path')
 const { fontFamily } = require('tailwindcss/defaultTheme')
 
 module.exports = {
+  darkMode: ['class'],
   content: [
     join(
       __dirname,
@@ -14,8 +15,10 @@ module.exports = {
     extend: {
       colors: {
         border: 'hsl(var(--border))',
-        background: 'hsl(var(--background))',
+        'background-primary': 'hsl(var(--background-primary))',
+        'background-secondary': 'hsl(var(--background-secondary))',
         foreground: 'hsl(var(--foreground))',
+        'foreground-hover': 'hsl(var(--foreground-hover))',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
