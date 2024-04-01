@@ -35,7 +35,12 @@ export default function MainTemplate({
       ></StoreInitializer> */}
 
       <DpNextNavbar
-        user={{ isLoggedIn: !!user, username: user?.name }}
+        user={{
+          isLoggedIn: !!user,
+          username: user?.name ?? undefined,
+          createdAt: user?.createdAt,
+          userProfileImage: user?.image ?? undefined,
+        }}
         menuItems={menuItems}
         onSideBarClick={() => {
           setOpenSideBar((prev) => !prev)
@@ -63,7 +68,7 @@ export default function MainTemplate({
           )}
           {!!user && (
             <DpLogoutButton
-              className="p-3"
+              className="p-3 justify-center text-white"
               onClick={() => {
                 logout()
                 setOpenSideBar(false)

@@ -13,8 +13,8 @@ const DpLogoutButton = forwardRef<HTMLButtonElement, DpLogoutButtonProps>(
       <DpButton
         {...props}
         title="Sign out"
-        variant="outline"
-        className={cn('flex gap-1 py-2 px-4 w-full', className)}
+        variant="accent"
+        className={cn('flex gap-1 py-5 justify-start w-full', className)}
         ref={ref}
       >
         <BiLogOutCircle className="text-red-600 text-2xl" />
