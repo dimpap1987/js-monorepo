@@ -2,11 +2,15 @@
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { MenuItem } from '@js-monorepo/sidebar'
+import { ModeToggle } from '@js-monorepo/theme-provider'
 import { AnimatePresence, motion } from 'framer-motion'
 import React, { ReactNode, forwardRef, useMemo, useRef, useState } from 'react'
+import { FaCircleUser } from 'react-icons/fa6'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import { TbUserFilled } from 'react-icons/tb'
 import { useClickAway } from 'react-use'
-import { ModeToggle } from '@js-monorepo/theme-provider'
+import UserMetadata from './components/user-metadata'
+
 export interface DpNextNavbarProps {
   readonly children?: ReactNode
   readonly menuItems?: MenuItem[]
@@ -15,9 +19,12 @@ export interface DpNextNavbarProps {
   readonly onSideBarClick?: () => void
 }
 export type UserNavProps = {
-  username?: string | null | undefined
+  username?: string
   isLoggedIn: boolean
+  userProfileImage?: string
+  createdAt?: string
 }
+
 export type UserNavSocial = {
   type: 'google' | 'github' | 'facebook'
   onLogin: () => void
@@ -105,20 +112,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       }}
                       tabIndex={0}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 hover:text-foreground"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
+                      <FaCircleUser className="text-xl" />
                     </button>
                   </>
                 )}
@@ -154,16 +148,39 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                   transition: { duration: 0.4 },
                 }}
                 ref={dropdownLoggedOptionsRef}
-                className={`absolute w-44 right-0 p-1 border border-border rounded text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`}
+                className={`absolute w-64 lg:w-80 right-0 p-1 border border-border rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`}
               >
                 {user?.isLoggedIn && (
-                  <DpLogoutButton
-                    className="p-3 text-inherit bg-inherit shadow-inner"
-                    onClick={() => {
-                      onLogout?.()
-                      setIsDropdownLoggedOptionsRefVisible(false)
-                    }}
-                  ></DpLogoutButton>
+                  <>
+                    {/* User information */}
+                    <UserMetadata
+                      profileImage={user.userProfileImage}
+                      username={user.username}
+                      createdAt={user.createdAt}
+                      className="mb-2 border-border border-b"
+                    ></UserMetadata>
+
+                    {/* Profile */}
+                    <DpNextNavLink
+                      href="/profile"
+                      onClick={() => {
+                        setIsDropdownLoggedOptionsRefVisible(false)
+                      }}
+                      className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2"
+                    >
+                      <TbUserFilled className="text-2xl" />
+                      <span>Profile</span>
+                    </DpNextNavLink>
+
+                    {/* Logout */}
+                    <DpLogoutButton
+                      className="text-inherit bg-inherit hover:shadow-inner"
+                      onClick={() => {
+                        onLogout?.()
+                        setIsDropdownLoggedOptionsRefVisible(false)
+                      }}
+                    ></DpLogoutButton>
+                  </>
                 )}
               </motion.div>
             )}
