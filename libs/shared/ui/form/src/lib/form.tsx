@@ -166,7 +166,7 @@ const FormMessage = React.forwardRef<
           ref={ref}
           id={formMessageId}
           className={cn(
-            'text-[0.8rem] font-medium text-destructive h-5',
+            'text-[0.8rem] font-medium text-foreground h-5',
             className
           )}
           {...props}
@@ -203,7 +203,7 @@ const FormError = React.forwardRef<HTMLInputElement, FormErrorProps>(
         {message && (
           <div
             className={cn(
-              'rounded-md flex items-center text-sm text-destructive gap-2',
+              'rounded-md flex items-center text-sm text-foreground gap-2',
               className
             )}
           >
