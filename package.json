@@ -68,6 +68,7 @@
     "react-use": "^17.4.2",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
+    "replicate": "^0.29.1",
     "rxjs": "^7.8.0",
     "sharp": "^0.33.3",
     "stripe": "^14.5.0",

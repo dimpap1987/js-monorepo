@@ -20,6 +20,7 @@ const FormItemContext = React.createContext<FormItemContextValue>(
 
 interface FormErrorProps {
   message?: string
+  className?: string
 }
 
 const Form = FormProvider
@@ -184,7 +185,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          'flex w-full rounded-md border border-input bg-transparent px-3 py-1 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+          'w-full mb-3 border-2 border-border rounded-lg text-foreground px-6 py-2 text-base hover:border-foreground cursor-pointer shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
           className
         )}
         ref={ref}
@@ -195,20 +196,25 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 )
 Input.displayName = 'Input'
 
-const FormError = ({ message }: FormErrorProps) => {
-  // if (!message) return null
-
-  return (
-    <div className="h-5">
-      {message && (
-        <div className="bg-destructive/15 rounded-md flex items-center text-sm text-destructive gap-x-1s">
-          <FaRegTimesCircle className="text-orange-600 text-2xl" />
-          <p className="ml-4 font-bold text-orange-600">{message}</p>
-        </div>
-      )}
-    </div>
-  )
-}
+const FormError = React.forwardRef<HTMLInputElement, FormErrorProps>(
+  ({ className, message }, ref) => {
+    return (
+      <div className="h-5">
+        {message && (
+          <div
+            className={cn(
+              'rounded-md flex items-center text-sm text-destructive gap-2',
+              className
+            )}
+          >
+            <FaRegTimesCircle className="text-red-600 text-2xl" />
+            <p className="font-bold">{message}</p>
+          </div>
+        )}
+      </div>
+    )
+  }
+)
 
 export {
   useFormField,

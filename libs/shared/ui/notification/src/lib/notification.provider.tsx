@@ -14,20 +14,22 @@ import DpNotificationList from './notificationList'
 // create context
 const NotificationsContext = createContext<
   | {
-      addNotification: (notification: DpNotificationProps) => void
+      addNotification: (notification: DpNotificationProps) => number
       notifications: DpNotificationProps[]
       setNotifications: React.Dispatch<
         React.SetStateAction<DpNotificationProps[]>
       >
+      removeNotification: (notificationId: number) => void
     }
   | undefined
 >(undefined)
 
 // useNotifications hook
 export const useNotifications = (): [
-  (notification: DpNotificationProps) => void,
+  (notification: DpNotificationProps) => number,
   DpNotificationProps[],
   React.Dispatch<React.SetStateAction<DpNotificationProps[]>>,
+  removeNotification: (notificationId: number) => void,
 ] => {
   const context = useContext(NotificationsContext)
   if (!context) {
@@ -39,6 +41,7 @@ export const useNotifications = (): [
     context.addNotification,
     context.notifications,
     context.setNotifications,
+    context.removeNotification,
   ]
 }
 
@@ -52,6 +55,13 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({
   const addNotification = useCallback((notification: DpNotificationProps) => {
     const { id = Math.floor(Math.random() * 1000000) } = notification
     setNotifications((prev) => [...prev, { ...notification, id }])
+    return id
+  }, [])
+
+  const removeNotification = useCallback((notificationId: number) => {
+    setNotifications((prev) => [
+      ...prev.filter((not) => not.id !== notificationId),
+    ])
   }, [])
 
   const timeoutsRef = useRef<Record<number | string, NodeJS.Timeout>>({})
@@ -84,8 +94,9 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({
       addNotification,
       notifications,
       setNotifications,
+      removeNotification,
     }
-  }, [notifications, setNotifications, addNotification])
+  }, [notifications, setNotifications, addNotification, removeNotification])
 
   return (
     <NotificationsContext.Provider value={contextValue}>
