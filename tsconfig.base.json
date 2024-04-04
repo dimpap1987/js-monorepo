@@ -16,6 +16,9 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "paths": {
+      "@js-monorepo/ai-image-generator": [
+        "libs/shared/ui/ai-image-generator/src/index.ts"
+      ],
       "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
       "@js-monorepo/db": ["libs/prisma/db/src/index.ts"],
