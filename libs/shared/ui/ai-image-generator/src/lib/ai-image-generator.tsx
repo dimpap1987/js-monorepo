@@ -2,11 +2,25 @@
 import { DpButton } from '@js-monorepo/button'
 import { FormError, Input } from '@js-monorepo/form'
 import { useNotifications } from '@js-monorepo/notification'
-import { predict } from '@next-app/actions/predict'
 import Image from 'next/image'
 import { useState } from 'react'
 
-export function AiGeneratorImage({ promptProps }: { promptProps?: string }) {
+export function AiGeneratorImage({
+  promptProps,
+  generateMethod,
+}: {
+  promptProps?: string
+  generateMethod: (prompt: string) => Promise<
+    | {
+        success: true
+        data: string[]
+      }
+    | {
+        success: false
+        message: string
+      }
+  >
+}) {
   const [addNotification, , , removeNotification] = useNotifications()
   const [predictions, setPrediction] = useState<string[] | null>(null)
   const [notificationId, setNotificationId] = useState<number | null>(null)
@@ -26,7 +40,7 @@ export function AiGeneratorImage({ promptProps }: { promptProps?: string }) {
 
     setNotificationId(notId)
 
-    const response = await predict(inputPrompt)
+    const response = await generateMethod(inputPrompt)
 
     if (response.success) {
       setPrediction(response.data)

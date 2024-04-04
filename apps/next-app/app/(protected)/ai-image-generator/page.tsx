@@ -1,10 +1,10 @@
 import { AiGeneratorImage } from '@js-monorepo/ai-image-generator'
-import React from 'react'
+import { predict } from '@next-app/actions/predict'
 
 export const metadata = {
   title: 'AI Image Generator',
 }
 
 export default function PageAiImageGenerator() {
-  return <AiGeneratorImage></AiGeneratorImage>
+  return <AiGeneratorImage generateMethod={predict}></AiGeneratorImage>
 }
