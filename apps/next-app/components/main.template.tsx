@@ -18,7 +18,7 @@ const menuItems: MenuItem[] = [
   },
   {
     href: '/ai-image-generator',
-    name: 'Ai Image Generator',
+    name: 'AI Image Generator',
   },
   {
     href: '/about',
