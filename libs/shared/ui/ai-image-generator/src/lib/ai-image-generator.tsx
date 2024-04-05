@@ -3,13 +3,12 @@ import { DpButton } from '@js-monorepo/button'
 import { FormError, Input } from '@js-monorepo/form'
 import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 export function AiGeneratorImage({
-  promptProps,
   generateMethod,
 }: {
-  promptProps?: string
   generateMethod: (prompt: string) => Promise<
     | {
         success: true
@@ -21,12 +20,15 @@ export function AiGeneratorImage({
       }
   >
 }) {
-  const [addNotification, , , removeNotification] = useNotifications()
   const [predictions, setPrediction] = useState<string[] | null>(null)
   const [notificationId, setNotificationId] = useState<number | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [prompt, setPrompt] = useState(promptProps ?? '')
   const [error, setError] = useState<string | null>()
+  const [loading, setLoading] = useState(false)
+
+  const [addNotification, , , removeNotification] = useNotifications()
+  const searchParams = useSearchParams()
+  const { replace } = useRouter()
+  const [prompt, setPrompt] = useState(searchParams.get('prompt') ?? '')
 
   async function handleFormSubmission(inputPrompt: string) {
     setLoading(true)
@@ -44,6 +46,9 @@ export function AiGeneratorImage({
 
     if (response.success) {
       setPrediction(response.data)
+      const params = new URLSearchParams(searchParams)
+      params.set('prompt', inputPrompt)
+      replace(`?${params.toString()}`)
     } else {
       setLoading(false)
       setError(response.message || 'Something went wrong, Please try again...')

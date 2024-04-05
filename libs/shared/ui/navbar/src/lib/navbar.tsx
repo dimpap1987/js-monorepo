@@ -71,11 +71,14 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
           <div className="flex justify-between h-14">
             <div className="px-5 py-2 flex w-full items-center">
               {logo}
-              <ul className="hidden md:flex px-4 font-semibold font-heading space-x-6 ml-[14%]">
+              <ul className="hidden md:flex px-4 font-semibold font-heading items-center space-x-6 ml-[14%]">
                 {menuItems &&
                   menuItems.length > 0 &&
                   menuItems.map((item, index) => (
-                    <li key={index} className="hover:text-foreground-hover">
+                    <li
+                      key={index}
+                      className="hover:text-foreground-hover text-center text-nowrap"
+                    >
                       <DpNextNavLink
                         className="py-2 px-4"
                         activeClassName="text-foreground-hover underline-offset-8"
@@ -148,7 +151,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                   transition: { duration: 0.4 },
                 }}
                 ref={dropdownLoggedOptionsRef}
-                className={`absolute w-64 lg:w-80 right-0 p-1 border border-border rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`}
+                className={`absolute w-80 right-0 p-1 border border-border rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`}
               >
                 {user?.isLoggedIn && (
                   <>
