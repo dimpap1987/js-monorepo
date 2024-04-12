@@ -11,7 +11,7 @@
     "graph": "nx graph --affected",
     "affected": "nx show projects --affected",
     "generate:docs": "node scripts/build-readme-template.js",
-    "dev:next": "nx serve next-app",
+    "dev:next": "npm run db:auth-generate && nx serve next-app",
     "dev:docs": "nx serve docs",
     "dev:webhook": "nx serve webhook-server",
     "build:next": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 nx build next-app --prod",

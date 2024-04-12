@@ -126,33 +126,35 @@ export default function Main({ children, className }: MainProps) {
         }}
       ></DpConfirmationDialog>
 
-      <div className="mt-2">
-        <DpButton
-          variant="secondary"
-          onClick={() => setOpenCheckoutDialog(true)}
-          loading={isOpenCheckoutDialog}
-          className="w-full"
-        >
-          Donate 5 &euro;
-        </DpButton>
+      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+        <div className="mt-2">
+          <DpButton
+            variant="secondary"
+            onClick={() => setOpenCheckoutDialog(true)}
+            loading={isOpenCheckoutDialog}
+            className="w-full"
+          >
+            Donate 5 &euro;
+          </DpButton>
 
-        <DpCheckoutDialog
-          stripePublishableKey={
-            process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
-          }
-          isOpen={isOpenCheckoutDialog}
-          onClose={() => setOpenCheckoutDialog(false)}
-          checkOutPromise={() =>
-            checkoutSessionClient({
-              username: user.username as string,
-              url: '/api/checkout_sessions',
-              customSubmitMessage: 'Thank you for your support',
-              isDonate: true,
-              price: 500,
-            })
-          }
-        />
-      </div>
+          <DpCheckoutDialog
+            stripePublishableKey={
+              process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
+            }
+            isOpen={isOpenCheckoutDialog}
+            onClose={() => setOpenCheckoutDialog(false)}
+            checkOutPromise={() =>
+              checkoutSessionClient({
+                username: user.username as string,
+                url: '/api/checkout_sessions',
+                customSubmitMessage: 'Thank you for your support',
+                isDonate: true,
+                price: 500,
+              })
+            }
+          />
+        </div>
+      )}
 
       {/* Map component */}
       {/* <div className="mt-2 h-[300px]">
