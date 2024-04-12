@@ -27,10 +27,9 @@ export default async function RootLayout(props: {
   const session = await auth()
   return (
     <SessionProvider session={session}>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning={true}>
         <body
           className={`${poppins.className} flex flex-col min-h-100svh bg-background-primary`}
-          suppressHydrationWarning={true}
         >
           <DpNextPageProgressBar>
             <ThemeProvider
