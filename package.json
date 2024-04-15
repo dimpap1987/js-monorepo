@@ -20,8 +20,8 @@
     "start:next": "cd dist/apps/next-app && npx next start",
     "start:webhook": "cd dist/apps/webhook-server && node main.js",
     "start:docs": "cd dist/apps/docs && npx next start",
-    "db:auth-migrate": "env-cmd --no-override -f .env npx prisma migrate dev --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
-    "db:auth-create": "env-cmd --no-override -f .env npx prisma migrate dev --create-only --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
+    "db:auth-migrate": "env-cmd --no-override -f libs/prisma/run_auth_migrations/.env npx prisma migrate dev --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
+    "db:auth-create": "env-cmd --no-override -f libs/prisma/run_auth_migrations/.env npx prisma migrate dev --create-only --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
     "db:auth-generate": "prisma generate --schema=libs/prisma/auth/src/lib/prisma/schema.prisma"
   },
   "lint-staged": {
