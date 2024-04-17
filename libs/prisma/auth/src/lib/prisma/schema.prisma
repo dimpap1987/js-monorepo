@@ -16,7 +16,20 @@ model AuthUser {
     roles     AuthRole[] @default([USER])
 }
 
+model UnRegisteredUser {
+    id        Int       @id @default(autoincrement())
+    createdAt DateTime  @default(now())
+    token     String    @unique
+    email     String    @unique
+    provider  Provider?
+}
+
 enum AuthRole {
     USER
     ADMIN
+}
+
+enum Provider {
+    GOOGLE
+    GITHUB
 }

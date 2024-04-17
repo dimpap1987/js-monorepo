@@ -1,6 +1,6 @@
 import { PropsWithChildren, forwardRef, ForwardedRef } from 'react'
 
-interface DpDialogFooterProps extends PropsWithChildren {}
+type DpDialogFooterProps = PropsWithChildren
 
 const DpDialogFooter = forwardRef(
   ({ children }: DpDialogFooterProps, ref: ForwardedRef<HTMLDivElement>) => {

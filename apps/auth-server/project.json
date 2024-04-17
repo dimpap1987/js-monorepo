@@ -1,7 +1,7 @@
 {
-  "name": "webhook-server",
+  "name": "auth-server",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/webhook-server/src",
+  "sourceRoot": "apps/auth-server/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -11,12 +11,12 @@
       "options": {
         "target": "node",
         "compiler": "tsc",
-        "outputPath": "dist/apps/webhook-server",
-        "main": "apps/webhook-server/src/main.ts",
-        "tsConfig": "apps/webhook-server/tsconfig.app.json",
+        "outputPath": "dist/apps/auth-server",
+        "main": "apps/auth-server/src/main.ts",
+        "tsConfig": "apps/auth-server/tsconfig.app.json",
         "assets": [],
         "isolatedConfig": true,
-        "webpackConfig": "apps/webhook-server/webpack.config.js"
+        "webpackConfig": "apps/auth-server/webpack.config.js"
       },
       "configurations": {
         "development": {},
@@ -27,14 +27,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "webhook-server:build"
+        "buildTarget": "auth-server:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "webhook-server:build:development"
+          "buildTarget": "auth-server:build:development"
         },
         "production": {
-          "buildTarget": "webhook-server:build:production"
+          "buildTarget": "auth-server:build:production"
         }
       }
     },
@@ -42,14 +42,14 @@
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/webhook-server/**/*.ts"]
+        "lintFilePatterns": ["apps/auth-server/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/webhook-server/jest.config.ts"
+        "jestConfig": "apps/auth-server/jest.config.ts"
       }
     }
   },
