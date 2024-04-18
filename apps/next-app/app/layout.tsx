@@ -1,12 +1,13 @@
+import { SessionProvider } from '@js-monorepo/auth-client'
+import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
+import { ThemeProvider } from '@js-monorepo/theme-provider'
+import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
+import { ReactNode } from 'react'
 import MainTemplate from '../components/main.template'
 import './global.css'
-import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
-import type { Metadata } from 'next'
-import { ReactNode } from 'react'
-import { SessionProvider } from 'next-auth/react'
-import { auth } from '../auth'
-import { ThemeProvider } from '@js-monorepo/theme-provider'
+import { getCurrentSession } from './hooks/use-current-user'
+import { signout } from '@js-monorepo/auth-server'
 
 export const metadata: Metadata = {
   title: 'Next-14 App ',
@@ -24,12 +25,19 @@ export default async function RootLayout(props: {
   readonly children: ReactNode
   readonly auth: ReactNode
 }) {
-  const session = await auth()
+  const session = await getCurrentSession()
+
   return (
-    <SessionProvider session={session}>
-      <html lang="en" suppressHydrationWarning={true}>
-        <body
-          className={`${poppins.className} flex flex-col min-h-100svh bg-background-primary`}
+    <html lang="en" suppressHydrationWarning={true}>
+      <body
+        className={`${poppins.className} flex flex-col min-h-100svh bg-background-primary`}
+      >
+        <SessionProvider
+          value={{
+            user: session?.user,
+            isLoggedIn: !!session?.user,
+          }}
+          logout={signout}
         >
           <DpNextPageProgressBar>
             <ThemeProvider
@@ -44,8 +52,8 @@ export default async function RootLayout(props: {
               </MainTemplate>
             </ThemeProvider>
           </DpNextPageProgressBar>
-        </body>
-      </html>
-    </SessionProvider>
+        </SessionProvider>
+      </body>
+    </html>
   )
 }
