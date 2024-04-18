@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
   HttpStatus,
   Logger,
   Post,
@@ -41,7 +40,7 @@ export class AuthController {
     return this.handleSocialRedirect(req, res, Provider.GOOGLE)
   }
 
-  @Get('/github/redirect')
+  @Get('github/redirect')
   @UseGuards(AuthGuard('github'))
   async githubAuthCallback(@Req() req: Request, @Res() res: Response) {
     return this.handleSocialRedirect(req, res, Provider.GITHUB)
@@ -51,16 +50,6 @@ export class AuthController {
   getUserMetadata(@Req() req: Request) {
     const accessToken = req.cookies.accessToken
     return this.authService.handleSessionRequest(accessToken)
-  }
-
-  @Get('/logout')
-  @HttpCode(204)
-  async logOut(@Res() res: Response) {
-    res.clearCookie('accessToken')
-    res.clearCookie('refreshToken')
-    res.clearCookie('_csrf')
-    res.clearCookie('XSRF-TOKEN')
-    res.send({})
   }
 
   @Post('/register')
@@ -125,7 +114,8 @@ export class AuthController {
         res
       )
       Logger.log(`User: ${user.username} successfully logged in !!!`)
-      const redirectURI = 'http://localhost:3000'
+      const redirectURI =
+        req.session['redirect-after-login'] ?? 'http://localhost:3000'
       res.redirect(redirectURI)
     } else {
       const unRegisteredUser = await this.userService.createUnRegisteredUser({
@@ -133,7 +123,9 @@ export class AuthController {
         provider: provider,
       })
       res.cookie('UNREGISTERED-USER', unRegisteredUser?.token)
-      const redirectURI = 'http://localhost:3000/auth/onboarding'
+      const redirectURI =
+        req.session['redirect-after-login'] ??
+        'http://localhost:3000/auth/onboarding'
       Logger.log(
         `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}' in order to be registered`
       )

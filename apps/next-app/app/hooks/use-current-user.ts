@@ -1,8 +1,6 @@
-import { ExtendedUser } from '../../next-auth'
-import { useSession } from 'next-auth/react'
+'use server'
+import { auth } from '@next-app/auth'
 
-export const useCurrentUser = (): ExtendedUser => {
-  const session = useSession()
-
-  return session.data?.user
+export const getCurrentSession = async () => {
+  return auth.getCurrentSession()
 }

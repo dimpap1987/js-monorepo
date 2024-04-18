@@ -1,4 +1,5 @@
 'use client'
+import { useSession } from '@js-monorepo/auth-client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpLoaderProvider } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
@@ -7,8 +8,6 @@ import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextSidebar, MenuItem } from '@js-monorepo/sidebar'
 import { DpVersion } from '@js-monorepo/version'
 import { PropsWithChildren, useState } from 'react'
-import { logout } from '../actions/logout'
-import { useCurrentUser } from '../app/hooks/use-current-user'
 import SVGLogo from './logo-svg'
 
 const menuItems: MenuItem[] = [
@@ -29,28 +28,24 @@ const menuItems: MenuItem[] = [
 export default function MainTemplate({
   children,
 }: Readonly<PropsWithChildren>) {
-  const user = useCurrentUser()
+  const { user, isLoggedIn, signout } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
 
   return (
     <>
-      {/* <StoreInitializer
-        userStore={{ data: user, setUser, removeUser }}
-      ></StoreInitializer> */}
-
       <DpNextNavbar
         user={{
-          isLoggedIn: !!user,
-          username: user?.name ?? undefined,
-          createdAt: user?.createdAt,
-          userProfileImage: user?.image ?? undefined,
+          isLoggedIn: isLoggedIn,
+          username: user?.username ?? undefined,
+          createdAt: user?.createdAt ?? undefined,
+          userProfileImage: user?.picture ?? undefined,
         }}
         menuItems={menuItems}
         onSideBarClick={() => {
           setOpenSideBar((prev) => !prev)
         }}
-        onLogout={() => {
-          logout()
+        onLogout={async () => {
+          signout()
         }}
       >
         <DpLogo>
@@ -73,8 +68,8 @@ export default function MainTemplate({
           {!!user && (
             <DpLogoutButton
               className="p-3 justify-center text-white"
-              onClick={() => {
-                logout()
+              onClick={async () => {
+                signout()
                 setOpenSideBar(false)
               }}
             ></DpLogoutButton>

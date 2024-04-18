@@ -1,5 +1,5 @@
+import { auth } from '@next-app/auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '../../auth'
 
 export const publicRoutes = ['/', '/about', '/api/checkout_sessions']
 export const authRoutes = ['/auth/login', '/auth/register']
@@ -15,8 +15,9 @@ export function withAuth(
   return async function middleAuth(
     request: NextRequest
   ): Promise<NextResponse<unknown>> {
-    const session = await auth()
-    const isLoggedIn = !!session
+    const session = await auth.getCurrentSession()
+
+    const isLoggedIn = !!session?.user
     const { nextUrl } = request
 
     const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)

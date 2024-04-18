@@ -1,0 +1,118 @@
+'use client'
+
+import { UserJWT } from '@js-monorepo/types'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+
+const SessionContext = createContext<{
+  user: UserJWT | null
+  isLoggedIn: boolean
+  signout: () => void
+}>({
+  user: null,
+  isLoggedIn: false,
+  signout: () => {},
+})
+
+const fetchSession = async (
+  successCallback: (user: any) => void,
+  errorCallback: (error?: any) => void
+) => {
+  try {
+    const response = await fetch('http://localhost:3333/api/auth/session', {
+      credentials: 'include',
+    })
+    if (response.ok) {
+      const reponse = await response.json()
+      successCallback(reponse.user)
+    } else {
+      errorCallback()
+    }
+  } catch (error) {
+    console.error('Error fetching session:', error)
+    errorCallback(error)
+  }
+}
+export const SessionProvider = ({
+  children,
+  value,
+  logout,
+}: {
+  readonly children?: React.ReactNode
+  readonly value: {
+    user: UserJWT | null
+    isLoggedIn: boolean
+  }
+  readonly logout: () => void
+}) => {
+  const [user, setUser] = useState(value.user)
+  const [isLoggedIn, setIsLoggedIn] = useState(value.isLoggedIn)
+
+  const refreshSession = () => {
+    fetchSession(
+      (userResponse) => {
+        setIsLoggedIn(!!userResponse)
+        setUser(userResponse)
+      },
+      () => {
+        setUser(null)
+        setIsLoggedIn(false)
+      }
+    )
+  }
+
+  const signout = useCallback(() => {
+    logout()
+    setUser(null)
+    setIsLoggedIn(false)
+  }, [logout])
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+    refreshSession()
+
+    const intervalId = setInterval(refreshSession, 60000)
+
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [isLoggedIn])
+
+  const contextValue = useMemo(() => {
+    return {
+      user,
+      isLoggedIn,
+      signout,
+    }
+  }, [user, isLoggedIn, signout])
+
+  return (
+    <SessionContext.Provider value={contextValue}>
+      {children}
+    </SessionContext.Provider>
+  )
+}
+
+export const useSession = () => {
+  const context = useContext(SessionContext)
+  if (!context) {
+    throw new Error('useSession must be used within a SessionProvider')
+  }
+  return context
+}
+
+export const getSession = async () => {
+  const response = await fetch('http://localhost:3333/api/auth/session', {
+    credentials: 'include',
+  })
+  if (response.ok) {
+    const session = await response.json()
+    return session
+  }
+}

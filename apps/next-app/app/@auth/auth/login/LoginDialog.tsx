@@ -2,12 +2,15 @@
 import { DpLoginDialog } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
 import { UserNavSocial } from '@js-monorepo/navbar'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
-function LoginDialog({ callbackUrl }: { readonly callbackUrl: string }) {
+function LoginDialog({
+  onLogin,
+}: {
+  onLogin: (provider: 'google' | 'github') => void
+}) {
   const [isOpen, setIsOpen] = useState(true)
   const router = useRouter()
   const [, setLoaderState] = useLoader()
@@ -25,23 +28,19 @@ function LoginDialog({ callbackUrl }: { readonly callbackUrl: string }) {
           message: 'Logging in...',
           description: 'Sit back and relax.',
         })
-        signIn('github', {
-          callbackUrl: callbackUrl,
-        })
+        onLogin('github')
       },
     },
     {
       type: 'google',
-      onLogin: () => {
+      onLogin: async () => {
         setIsOpen(false)
         setLoaderState({
           show: true,
           message: 'Logging in...',
           description: 'Sit back and relax.',
         })
-        signIn('google', {
-          callbackUrl: callbackUrl,
-        })
+        onLogin('google')
       },
     },
   ]
