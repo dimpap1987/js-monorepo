@@ -1,5 +1,6 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
+import { VerifyCallback } from 'jsonwebtoken'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 
 @Injectable()
@@ -8,10 +9,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: jwtSecret,
+      ignoreExpiration: false,
     })
   }
 
-  async validate(payload: any, done) {
+  async validate(payload: any, done: VerifyCallback) {
     try {
       done(null, payload)
     } catch (err) {

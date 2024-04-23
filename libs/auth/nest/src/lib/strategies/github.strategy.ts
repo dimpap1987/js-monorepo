@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { Octokit } from 'octokit'
 import { Strategy } from 'passport-github'
 import { GithubAuth } from '../types/auth.configuration'
+import { VerifyCallback } from 'jsonwebtoken'
 
 @Injectable()
 export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
@@ -19,7 +20,7 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
     accessToken: string,
     _refreshToken: string,
     profile: any,
-    done: any
+    done: VerifyCallback
   ) {
     const userEmails = await this.getUsersEmailsResponse(accessToken)
     const emailObj = userEmails?.data?.find(

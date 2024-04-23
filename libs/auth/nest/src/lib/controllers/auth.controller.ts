@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpStatus,
   Logger,
   Post,
@@ -53,6 +54,16 @@ export class AuthController {
   getUserMetadata(@Req() req: Request) {
     const accessToken = req.cookies.accessToken
     return this.authService.handleSessionRequest(accessToken)
+  }
+
+  @Get('logout')
+  @HttpCode(200)
+  async logOut(@Res() res: Response) {
+    res.clearCookie('accessToken')
+    res.clearCookie('refreshToken')
+    res.clearCookie('_csrf')
+    res.clearCookie('XSRF-TOKEN')
+    res.send({})
   }
 
   @Post('register')
