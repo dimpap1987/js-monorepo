@@ -7,3 +7,14 @@ export interface UserJWT {
   provider?: string
   roles?: string[]
 }
+
+export type ClientResponseType =
+  | {
+      ok: true
+      data: any
+    }
+  | {
+      ok: false
+      message?: string
+      errors?: string[]
+    }

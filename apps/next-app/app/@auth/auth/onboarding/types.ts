@@ -2,7 +2,6 @@ export type RegisterDialogType = {
   formInput: {
     email: string
   }
-  registerUrl: string
 }
 
 export type RegisterDialogErrorComponentType = {

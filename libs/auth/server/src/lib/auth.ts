@@ -25,3 +25,30 @@ export async function getCurrentSession() {
   }
   return null
 }
+
+export async function findUnregisteredUser() {
+  try {
+    const headers = new Headers()
+    cookies()
+      .getAll()
+      .forEach((cookie) => {
+        headers.append('Cookie', `${cookie.name}=${cookie.value}`)
+      })
+
+    const response = await fetch(
+      'http://localhost:3333/api/auth/unregistered-user',
+      {
+        method: 'GET',
+        headers: headers,
+        cache: 'no-store',
+      }
+    )
+    if (response.ok) {
+      const unRegisteredUser = await response.json()
+      return unRegisteredUser
+    }
+  } catch (e) {
+    console.error('Error in findUnregisteredUser', e)
+    return null
+  }
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { registerUser, useSession } from '@js-monorepo/auth-client'
 import { DpButton } from '@js-monorepo/button'
 import { DpDialog, DpDialogContent, DpDialogHeader } from '@js-monorepo/dialog'
 import {
@@ -15,7 +16,7 @@ import {
   RegisterUserSchema,
   registerUserSchemaConfig,
 } from '@js-monorepo/schemas'
-import { requestPOST } from '@js-monorepo/utils'
+import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -26,8 +27,6 @@ import { ImUser } from 'react-icons/im'
 import { IoMdInformationCircle } from 'react-icons/io'
 import { RegisterDialogErrorComponentType, RegisterDialogType } from './types'
 import { handleValidation } from './utils'
-import { useRouter } from 'next-nprogress-bar'
-import { useSession } from '@js-monorepo/auth-client'
 
 const initialRegisterValidations: RegisterDialogErrorComponentType[] = [
   {
@@ -75,7 +74,7 @@ const RegisterDialogErrorComponent = ({
   )
 }
 
-export function RegisterDialog({ formInput, registerUrl }: RegisterDialogType) {
+export function RegisterDialog({ formInput }: RegisterDialogType) {
   //hooks
   const [isOpen, setIsOpen] = useState(true)
   const [validations, setValidations] = useState(initialRegisterValidations)
@@ -100,7 +99,7 @@ export function RegisterDialog({ formInput, registerUrl }: RegisterDialogType) {
   const onSubmit = async (formData: any, e?: React.BaseSyntheticEvent) => {
     e?.preventDefault()
     form.clearErrors()
-    const response = await requestPOST(registerUrl, {
+    const response = await registerUser({
       username: formData.username,
     })
     if (response.ok) {

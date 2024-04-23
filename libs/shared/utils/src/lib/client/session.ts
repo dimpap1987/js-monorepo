@@ -1,15 +1,3 @@
-export function clearSessionRequest(clientSecret: string) {
-  return fetch('/api/clear_session', {
-    body: JSON.stringify({
-      clientSecret,
-    }),
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-}
-
 export async function checkoutSessionClient({
   username,
   url,

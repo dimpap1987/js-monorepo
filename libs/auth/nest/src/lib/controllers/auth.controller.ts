@@ -97,6 +97,7 @@ export class AuthController {
         },
         res
       )
+      res.clearCookie('UNREGISTERED-USER')
       res.send({
         success: true,
         message: 'User created Successfully',
@@ -111,7 +112,13 @@ export class AuthController {
     }
   }
 
-  handleLoggedInUser(
+  @Get('unregistered-user')
+  getUnRegisteredUser(@Req() req: Request) {
+    const token = req.cookies['UNREGISTERED-USER']
+    return this.userService.findUnRegisteredUserByToken(token)
+  }
+
+  private handleLoggedInUser(
     payload: { user: { username: string; roles: AuthRole[]; createdAt: Date } },
     res: Response
   ) {
@@ -120,7 +127,7 @@ export class AuthController {
     res.cookie('accessToken', tokens.accessToken, { httpOnly: true })
   }
 
-  async handleSocialRedirect(req: any, res: any, provider: Provider) {
+  private async handleSocialRedirect(req: any, res: any, provider: Provider) {
     const email = req.user?.email
 
     const user = await this.userService.findAuthUserByEmail(email)
