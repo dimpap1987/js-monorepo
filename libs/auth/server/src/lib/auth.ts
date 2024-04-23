@@ -11,11 +11,14 @@ export async function getCurrentSession() {
         headers.append('Cookie', `${cookie.name}=${cookie.value}`)
       })
 
-    const response = await fetch(`http://localhost:3333/api/auth/session`, {
-      method: 'GET',
-      headers: headers,
-      cache: 'no-store',
-    })
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`,
+      {
+        method: 'GET',
+        headers: headers,
+        cache: 'no-store',
+      }
+    )
     if (response.ok) {
       const session = await response.json()
       return session
@@ -36,7 +39,7 @@ export async function findUnregisteredUser() {
       })
 
     const response = await fetch(
-      'http://localhost:3333/api/auth/unregistered-user',
+      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/unregistered-user`,
       {
         method: 'GET',
         headers: headers,

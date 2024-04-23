@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 export default async function OnBoardingPage() {
   const unRegisteredUser = await findUnregisteredUser()
 
-  if (!unRegisteredUser.email) {
+  if (!unRegisteredUser?.email) {
     redirect('/')
   }
   return (

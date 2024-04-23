@@ -1,6 +1,7 @@
 import { dbClient } from '@js-monorepo/db'
 import {
   DynamicModule,
+  Inject,
   MiddlewareConsumer,
   Module,
   NestModule,
@@ -64,13 +65,17 @@ import { AuthConfiguration } from './types/auth.configuration'
       inject: [AuthService, REQUEST],
     },
     {
-      provide: 'PRISMA_CLIENT', // Provide token for your Prisma client
-      useValue: dbClient, // Use the imported Prisma client singleton
+      provide: 'PRISMA_CLIENT',
+      useValue: dbClient,
     },
   ],
   exports: ['jwt', JwtAuthGuard, RolesGuard, AuthService],
 })
 export class AuthModule implements NestModule {
+  constructor(
+    @Inject('SESSION_SECRET') private readonly sessionSecret: string
+  ) {}
+
   static forRoot(config: AuthConfiguration): DynamicModule {
     return {
       module: AuthModule,
@@ -100,7 +105,7 @@ export class AuthModule implements NestModule {
     consumer
       .apply(
         session({
-          secret: 'SESSION_SECRET',
+          secret: this.sessionSecret,
           resave: false,
           saveUninitialized: false,
         })

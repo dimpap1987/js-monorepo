@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { registerUser, useSession } from '@js-monorepo/auth-client'
+import { authClient, useSession } from '@js-monorepo/auth-client'
 import { DpButton } from '@js-monorepo/button'
 import { DpDialog, DpDialogContent, DpDialogHeader } from '@js-monorepo/dialog'
 import {
@@ -99,7 +99,7 @@ export function RegisterDialog({ formInput }: RegisterDialogType) {
   const onSubmit = async (formData: any, e?: React.BaseSyntheticEvent) => {
     e?.preventDefault()
     form.clearErrors()
-    const response = await registerUser({
+    const response = await authClient.registerUser({
       username: formData.username,
     })
     if (response.ok) {
