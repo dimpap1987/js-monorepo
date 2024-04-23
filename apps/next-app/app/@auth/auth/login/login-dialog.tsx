@@ -1,5 +1,5 @@
 'use client'
-import { login } from '@js-monorepo/auth-client'
+import { authClient } from '@js-monorepo/auth-client'
 import { DpLoginDialog } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
 import { UserNavSocial } from '@js-monorepo/navbar'
@@ -25,7 +25,7 @@ function LoginDialog() {
           message: 'Logging in...',
           description: 'Sit back and relax.',
         })
-        login('github')
+        authClient.login('github')
       },
     },
     {
@@ -37,7 +37,7 @@ function LoginDialog() {
           message: 'Logging in...',
           description: 'Sit back and relax.',
         })
-        login('google')
+        authClient.login('google')
       },
     },
   ]

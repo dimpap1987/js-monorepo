@@ -25,9 +25,12 @@ const fetchSession = async (
   errorCallback: (error?: any) => void
 ) => {
   try {
-    const response = await fetch('http://localhost:3333/api/auth/session', {
-      credentials: 'include',
-    })
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`,
+      {
+        credentials: 'include',
+      }
+    )
     if (response.ok) {
       const reponse = await response.json()
       successCallback(reponse.user)
@@ -101,9 +104,12 @@ export const useSession = () => {
 }
 
 export const getSession = async () => {
-  const response = await fetch('http://localhost:3333/api/auth/session', {
-    credentials: 'include',
-  })
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`,
+    {
+      credentials: 'include',
+    }
+  )
   if (response.ok) {
     const session = await response.json()
     return session

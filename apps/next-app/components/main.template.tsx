@@ -1,5 +1,5 @@
 'use client'
-import { logout, useSession } from '@js-monorepo/auth-client'
+import { authClient, useSession } from '@js-monorepo/auth-client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpLoaderProvider } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
@@ -45,7 +45,7 @@ export default function MainTemplate({
           setOpenSideBar((prev) => !prev)
         }}
         onLogout={async () => {
-          logout()
+          authClient.logout()
           window.location.reload()
         }}
       >
@@ -70,7 +70,7 @@ export default function MainTemplate({
             <DpLogoutButton
               className="p-3 justify-center text-white"
               onClick={async () => {
-                logout()
+                authClient.logout()
                 window.location.reload()
               }}
             ></DpLogoutButton>
