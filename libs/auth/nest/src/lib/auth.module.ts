@@ -106,10 +106,6 @@ export class AuthModule implements NestModule {
         })
       )
       .forRoutes('*')
-      // .apply(CsrfValidatorMiddleware)
-      // .forRoutes('*')
-      // .apply(CsrfGeneratorMiddleware)
-      // .forRoutes('*')
       .apply(RefererMiddleware)
       .forRoutes(
         { path: '*google/login*', method: RequestMethod.GET },

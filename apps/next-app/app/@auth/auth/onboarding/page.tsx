@@ -1,12 +1,18 @@
+import { findUnregisteredUser } from '@js-monorepo/auth-server'
 import { RegisterDialog } from './register-dialog'
+import { redirect } from 'next/navigation'
 
 export default async function OnBoardingPage() {
+  const unRegisteredUser = await findUnregisteredUser()
+
+  if (!unRegisteredUser.email) {
+    redirect('/')
+  }
   return (
     <RegisterDialog
       formInput={{
-        email: 'dim@pap.com',
+        email: unRegisteredUser.email,
       }}
-      registerUrl="http://localhost:3333/api/auth/register"
     ></RegisterDialog>
   )
 }
