@@ -1,4 +1,5 @@
 import { SessionProvider } from '@js-monorepo/auth-client'
+import { getCurrentSession } from '@js-monorepo/auth-server'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
 import type { Metadata } from 'next'
@@ -6,8 +7,6 @@ import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
 import MainTemplate from '../components/main.template'
 import './global.css'
-import { getCurrentSession } from './hooks/use-current-user'
-import { signout } from '@js-monorepo/auth-server'
 
 export const metadata: Metadata = {
   title: 'Next-14 App ',
@@ -37,7 +36,6 @@ export default async function RootLayout(props: {
             user: session?.user,
             isLoggedIn: !!session?.user,
           }}
-          logout={signout}
         >
           <DpNextPageProgressBar>
             <ThemeProvider

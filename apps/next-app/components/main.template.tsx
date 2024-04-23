@@ -1,5 +1,5 @@
 'use client'
-import { useSession } from '@js-monorepo/auth-client'
+import { logout, useSession } from '@js-monorepo/auth-client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpLoaderProvider } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
@@ -28,7 +28,7 @@ const menuItems: MenuItem[] = [
 export default function MainTemplate({
   children,
 }: Readonly<PropsWithChildren>) {
-  const { user, isLoggedIn, signout } = useSession()
+  const { user, isLoggedIn } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
 
   return (
@@ -45,7 +45,8 @@ export default function MainTemplate({
           setOpenSideBar((prev) => !prev)
         }}
         onLogout={async () => {
-          signout()
+          logout()
+          window.location.reload()
         }}
       >
         <DpLogo>
@@ -69,8 +70,8 @@ export default function MainTemplate({
             <DpLogoutButton
               className="p-3 justify-center text-white"
               onClick={async () => {
-                signout()
-                setOpenSideBar(false)
+                logout()
+                window.location.reload()
               }}
             ></DpLogoutButton>
           )}

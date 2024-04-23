@@ -13,12 +13,10 @@ import React, {
 const SessionContext = createContext<{
   user: UserJWT | null
   isLoggedIn: boolean
-  signout: () => void
   refreshSession: () => void
 }>({
   user: null,
   isLoggedIn: false,
-  signout: () => {},
   refreshSession: () => {},
 })
 
@@ -45,14 +43,12 @@ const fetchSession = async (
 export const SessionProvider = ({
   children,
   value,
-  logout,
 }: {
   readonly children?: React.ReactNode
   readonly value: {
     user: UserJWT | null
     isLoggedIn: boolean
   }
-  readonly logout: () => void
 }) => {
   const [user, setUser] = useState(value.user)
   const [isLoggedIn, setIsLoggedIn] = useState(value.isLoggedIn)
@@ -70,11 +66,6 @@ export const SessionProvider = ({
     )
   }, [])
 
-  const signout = useCallback(() => {
-    logout()
-    window.location.reload()
-  }, [logout])
-
   useEffect(() => {
     if (!isLoggedIn) return
     refreshSession()
@@ -90,10 +81,9 @@ export const SessionProvider = ({
     return {
       user,
       isLoggedIn,
-      signout,
       refreshSession,
     }
-  }, [user, isLoggedIn, signout, refreshSession])
+  }, [user, isLoggedIn, refreshSession])
 
   return (
     <SessionContext.Provider value={contextValue}>

@@ -1,4 +1,5 @@
 'use client'
+import { login } from '@js-monorepo/auth-client'
 import { DpLoginDialog } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
 import { UserNavSocial } from '@js-monorepo/navbar'
@@ -6,11 +7,7 @@ import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
-function LoginDialog({
-  onLogin,
-}: {
-  onLogin: (provider: 'google' | 'github') => void
-}) {
+function LoginDialog() {
   const [isOpen, setIsOpen] = useState(true)
   const router = useRouter()
   const [, setLoaderState] = useLoader()
@@ -28,7 +25,7 @@ function LoginDialog({
           message: 'Logging in...',
           description: 'Sit back and relax.',
         })
-        onLogin('github')
+        login('github')
       },
     },
     {
@@ -40,7 +37,7 @@ function LoginDialog({
           message: 'Logging in...',
           description: 'Sit back and relax.',
         })
-        onLogin('google')
+        login('google')
       },
     },
   ]

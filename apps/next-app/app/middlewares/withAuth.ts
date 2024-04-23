@@ -1,4 +1,4 @@
-import { auth } from '@next-app/auth'
+import { getCurrentSession } from '@js-monorepo/auth-server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const publicRoutes = ['/', '/about', '/api/checkout_sessions']
@@ -15,8 +15,7 @@ export function withAuth(
   return async function middleAuth(
     request: NextRequest
   ): Promise<NextResponse<unknown>> {
-    const session = await auth.getCurrentSession()
-
+    const session = await getCurrentSession()
     const isLoggedIn = !!session?.user
     const { nextUrl } = request
 
