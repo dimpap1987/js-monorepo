@@ -1,8 +1,6 @@
 import { signin } from '@next-app/actions/signin'
-import LoginDialog from './LoginDialog'
+import LoginDialog from './login-dialog'
 
-async function Login() {
+export default async function Login() {
   return <LoginDialog onLogin={signin}></LoginDialog>
 }
-
-export default Login

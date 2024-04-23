@@ -1,3 +1,4 @@
+import { RegisterUserDto, RegisterUserSchema } from '@js-monorepo/schemas'
 import {
   Body,
   Controller,
@@ -9,9 +10,11 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
 import { AuthRole, Provider } from '@prisma/client'
 import { Request, Response } from 'express'
+import { AuthGithub } from '../guards/github.guard'
+import { AuthGoogle } from '../guards/google.guard'
+import { ZodPipe } from '../pipes/zod.pipe'
 import { AuthService } from '../services/auth.service'
 import { UserService } from '../services/user.service'
 
@@ -23,25 +26,25 @@ export class AuthController {
   ) {}
 
   @Get('google/login')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(AuthGoogle)
   async googleAuth() {
     return HttpStatus.OK
   }
 
   @Get('github/login')
-  @UseGuards(AuthGuard('github'))
+  @UseGuards(AuthGithub)
   async githubAuth() {
     return HttpStatus.OK
   }
 
   @Get('google/redirect')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(AuthGoogle)
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     return this.handleSocialRedirect(req, res, Provider.GOOGLE)
   }
 
   @Get('github/redirect')
-  @UseGuards(AuthGuard('github'))
+  @UseGuards(AuthGithub)
   async githubAuthCallback(@Req() req: Request, @Res() res: Response) {
     return this.handleSocialRedirect(req, res, Provider.GITHUB)
   }
@@ -52,19 +55,26 @@ export class AuthController {
     return this.authService.handleSessionRequest(accessToken)
   }
 
-  @Post('/register')
+  @Post('register')
   async registerUser(
-    @Body() registerUserDto: { username: string; token: string },
-    @Res() res: Response
+    @Body(new ZodPipe(RegisterUserSchema))
+    { username }: RegisterUserDto,
+    @Res() res: Response,
+    @Req() req: Request
   ) {
-    const unregisteredUser = await this.userService.findUnRegisteredUserByToken(
-      registerUserDto.token
-    )
+    const token = req.cookies['UNREGISTERED-USER']
+
+    // Find unregistered user by token
+    const unregisteredUser =
+      await this.userService.findUnRegisteredUserByToken(token)
+
+    // create new user
     const user = await this.userService.createAuthUser({
-      username: registerUserDto.username,
+      username: username,
       email: unregisteredUser?.email as string,
       roles: [AuthRole.USER],
     })
+
     if (user) {
       this.handleLoggedInUser(
         {
@@ -77,12 +87,14 @@ export class AuthController {
         res
       )
       res.send({
+        success: true,
         message: 'User created Successfully',
       })
     } else {
       res
         .send({
-          message: 'Something went wrong',
+          success: false,
+          errors: ['Something went wrong'],
         })
         .status(400)
     }
@@ -123,11 +135,9 @@ export class AuthController {
         provider: provider,
       })
       res.cookie('UNREGISTERED-USER', unRegisteredUser?.token)
-      const redirectURI =
-        req.session['redirect-after-login'] ??
-        'http://localhost:3000/auth/onboarding'
+      const redirectURI = 'http://localhost:3000/auth/onboarding'
       Logger.log(
-        `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}' in order to be registered`
+        `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}'`
       )
       res.redirect(redirectURI)
     }

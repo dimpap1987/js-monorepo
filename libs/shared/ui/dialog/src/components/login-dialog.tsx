@@ -1,4 +1,3 @@
-import { DpButton } from '@js-monorepo/button'
 import React, { forwardRef } from 'react'
 import { DpDialog } from '../lib/dialog'
 import DpDialogContent from './content'
@@ -27,7 +26,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
         isOpen={isOpen}
         onClose={onClose}
         ref={ref}
-        className="z-40 text-black shadow-2xl shadow-cyan-500/50 p-2 w-[80%] sm:w-[360px] top-1/4"
+        className="z-40 sm:w-[360px] top-1/4"
       >
         <DpDialogHeader className="justify-center font-bold">
           Sign in with
@@ -126,29 +125,6 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 )}
               </React.Fragment>
             ))}
-
-            <div className="inline-flex items-center w-full p-2">
-              <hr className="w-40 h-[2px] mx-auto my-4 bg-gray-200 border-0 rounded my-2" />
-              <div className="absolute px-4 -translate-x-1/2 left-1/2 bg-slate-100">
-                or
-              </div>
-              <hr className="w-40 h-[2px] mx-auto my-4 bg-gray-200 border-0 rounded my-2"></hr>
-            </div>
-
-            <div className="w-full">
-              <div className="text-sm text-center pb-4">
-                Don't have an account?
-              </div>
-              <DpButton
-                variant="accent"
-                className="w-full text-white"
-                onClick={() => {
-                  alert('Not implemented yet')
-                }}
-              >
-                Register
-              </DpButton>
-            </div>
           </div>
         </DpDialogContent>
       </DpDialog>

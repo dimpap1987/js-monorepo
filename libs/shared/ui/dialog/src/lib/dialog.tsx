@@ -16,13 +16,24 @@ import DpLoginDialog from '../components/login-dialog'
 export interface DpDialogProps {
   readonly isOpen?: boolean
   readonly onClose?: () => void
+  readonly autoClose?: boolean
   readonly children: React.ReactNode
   readonly className?: string
   readonly overlayClassName?: string
 }
 
 const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
-  ({ isOpen = true, onClose, children, className, overlayClassName }, ref) => {
+  (
+    {
+      isOpen = true,
+      onClose,
+      autoClose = true,
+      children,
+      className,
+      overlayClassName,
+    },
+    ref
+  ) => {
     const { footer, header, content } = useMemo(() => {
       let footerElement: ReactNode | null = null
       let headerElement: ReactNode | null = null
@@ -78,23 +89,23 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
             `absolute inset-0 z-10 top-[50px] min-h-[calc(100vh-50px)] pointer-events-all bg-black bg-opacity-50`,
             overlayClassName
           )}
-          onClick={onClose}
+          onClick={() => autoClose && onClose?.()}
         ></div>
         <div
           data-dialog="dialog"
           role="dialog"
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            `z-30 mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border p-4 border-primary mb-20 max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed antialiased pointer-events-auto transition ease-out duration-200 
-             ${isOpen ? ' opacity-100 translate-y-0 ' : ' opacity-0 -translate-y-full '} `,
+            `z-30 w-[90%] sm:w-[50%] mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border border-primary mb-20 max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed antialiased pointer-events-auto transition ease-out duration-200 
+            text-black shadow-2xl shadow-cyan-500/50 p-2 ${isOpen ? ' opacity-100 translate-y-0 ' : ' opacity-0 -translate-y-full '} `,
             className
           )}
           ref={ref}
         >
-          <div className="flex justify-end p-1 float-right">
+          <div className="flex justify-end float-right p-3">
             <button
               onClick={onClose}
-              className="text-3xl cursor-pointer"
+              className="text-2xl cursor-pointer"
               aria-label="Close dialog"
             >
               <GrFormClose className="text-slate-950 hover:text-slate-600" />

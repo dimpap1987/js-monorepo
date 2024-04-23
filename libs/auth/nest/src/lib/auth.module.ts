@@ -1,4 +1,4 @@
-import { APP_FILTER, REQUEST } from '@nestjs/core'
+import { dbClient } from '@js-monorepo/db'
 import {
   DynamicModule,
   MiddlewareConsumer,
@@ -6,22 +6,25 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common'
+import { APP_FILTER, REQUEST } from '@nestjs/core'
 import session from 'express-session'
-import { CorsMiddleware } from './middlewares/cors.middleware'
-import { CsrfValidatorMiddleware } from './middlewares/csrf-validator.middleware'
-import { CsrfGeneratorMiddleware } from './middlewares/csrf-generator.middleware'
-import { RefererMiddleware } from './middlewares/referer.middleware'
-import { ApiExceptionFilter } from './exceptions/filter'
 import { AuthController } from './controllers/auth.controller'
-import { AuthConfiguration } from './types/auth.configuration'
-import { GoogleStrategy } from './strategies/google.strategy'
-import { GithubOauthStrategy } from './strategies/github.strategy'
-import { JwtStrategy } from './strategies/jwt.strategy'
-import { AuthService } from './services/auth.service'
-import { RolesGuard } from './guards/roles-guard'
+import {
+  AuthExceptionFilter,
+  BadRequestExceptionFilter,
+  HttpExceptionFilter,
+  PrismaClientExceptionFilter,
+  ZodExceptionFilter,
+} from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
-import { dbClient } from '@js-monorepo/db'
+import { RolesGuard } from './guards/roles-guard'
+import { RefererMiddleware } from './middlewares/referer.middleware'
+import { AuthService } from './services/auth.service'
 import { UserService } from './services/user.service'
+import { GithubOauthStrategy } from './strategies/github.strategy'
+import { GoogleStrategy } from './strategies/google.strategy'
+import { JwtStrategy } from './strategies/jwt.strategy'
+import { AuthConfiguration } from './types/auth.configuration'
 
 @Module({
   controllers: [AuthController],
@@ -35,7 +38,23 @@ import { UserService } from './services/user.service'
     RolesGuard,
     {
       provide: APP_FILTER,
-      useClass: ApiExceptionFilter,
+      useClass: BadRequestExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ZodExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: PrismaClientExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AuthExceptionFilter,
     },
     {
       provide: 'jwt',
@@ -87,12 +106,10 @@ export class AuthModule implements NestModule {
         })
       )
       .forRoutes('*')
-      .apply(CorsMiddleware)
-      .forRoutes('/')
-      .apply(CsrfValidatorMiddleware)
-      .forRoutes('/')
-      .apply(CsrfGeneratorMiddleware)
-      .forRoutes('/')
+      // .apply(CsrfValidatorMiddleware)
+      // .forRoutes('*')
+      // .apply(CsrfGeneratorMiddleware)
+      // .forRoutes('*')
       .apply(RefererMiddleware)
       .forRoutes(
         { path: '*google/login*', method: RequestMethod.GET },

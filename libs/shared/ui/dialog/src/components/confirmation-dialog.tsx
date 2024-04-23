@@ -41,7 +41,7 @@ const DpConfirmationDialog = forwardRef<
       <DpDialog
         isOpen={isOpen}
         onClose={onClose}
-        className={`${className} shadow-2xl shadow-cyan-500/50`}
+        className={`${className}`}
         ref={ref}
       >
         {title && <DpDialogHeader>{title}</DpDialogHeader>}
