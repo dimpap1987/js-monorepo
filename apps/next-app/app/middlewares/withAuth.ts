@@ -2,7 +2,7 @@ import { auth } from '@next-app/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const publicRoutes = ['/', '/about', '/api/checkout_sessions']
-export const authRoutes = ['/auth/login', '/auth/register']
+export const authRoutes = ['/auth/login', '/auth/register', '/auth/onboarding']
 export const apiAuthPrefix = '/api/auth'
 
 export function withAuth(

@@ -1,6 +1,6 @@
 'use client'
 import { DpButton } from '@js-monorepo/button'
-import { FormError, Input } from '@js-monorepo/form'
+import { FormErrorMessage, Input } from '@js-monorepo/form'
 import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -93,7 +93,7 @@ export function AiGeneratorImage({
 
       {error && (
         <section className="mt-8 flex justify-center">
-          <FormError message={error}></FormError>
+          <FormErrorMessage errors={[error]}></FormErrorMessage>
         </section>
       )}
 

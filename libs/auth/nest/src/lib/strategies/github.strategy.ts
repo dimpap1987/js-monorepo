@@ -12,7 +12,6 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
       clientSecret: config.clientSecret,
       callbackURL: config.callBackUrl,
       scope: ['read:project', 'user:email', 'read:user'],
-      prompt: 'select_account',
     })
   }
 
@@ -23,7 +22,9 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
     done: any
   ) {
     const userEmails = await this.getUsersEmailsResponse(accessToken)
-    const emailObj = userEmails?.data?.find((d) => d.primary && d.verified)
+    const emailObj = userEmails?.data?.find(
+      (d: { primary: any; verified: any }) => d.primary && d.verified
+    )
 
     const { username, profileUrl, photos, id } = profile
     done(null, {

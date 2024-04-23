@@ -151,7 +151,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                   transition: { duration: 0.4 },
                 }}
                 ref={dropdownLoggedOptionsRef}
-                className={`absolute w-80 right-0 p-1 border border-border rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`}
+                className={`absolute w-60 lg:w-80 right-0 p-1 border border-border rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`}
               >
                 {user?.isLoggedIn && (
                   <>
@@ -177,7 +177,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
 
                     {/* Logout */}
                     <DpLogoutButton
-                      className="text-inherit bg-inherit hover:shadow-inner"
+                      className="text-inherit bg-inherit hover:shadow-inner hover:text-white"
                       onClick={() => {
                         onLogout?.()
                         setIsDropdownLoggedOptionsRefVisible(false)

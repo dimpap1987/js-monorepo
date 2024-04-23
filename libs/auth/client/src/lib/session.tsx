@@ -14,10 +14,12 @@ const SessionContext = createContext<{
   user: UserJWT | null
   isLoggedIn: boolean
   signout: () => void
+  refreshSession: () => void
 }>({
   user: null,
   isLoggedIn: false,
   signout: () => {},
+  refreshSession: () => {},
 })
 
 const fetchSession = async (
@@ -39,6 +41,7 @@ const fetchSession = async (
     errorCallback(error)
   }
 }
+
 export const SessionProvider = ({
   children,
   value,
@@ -54,7 +57,7 @@ export const SessionProvider = ({
   const [user, setUser] = useState(value.user)
   const [isLoggedIn, setIsLoggedIn] = useState(value.isLoggedIn)
 
-  const refreshSession = () => {
+  const refreshSession = useCallback(() => {
     fetchSession(
       (userResponse) => {
         setIsLoggedIn(!!userResponse)
@@ -65,12 +68,11 @@ export const SessionProvider = ({
         setIsLoggedIn(false)
       }
     )
-  }
+  }, [])
 
   const signout = useCallback(() => {
     logout()
-    setUser(null)
-    setIsLoggedIn(false)
+    window.location.reload()
   }, [logout])
 
   useEffect(() => {
@@ -82,15 +84,16 @@ export const SessionProvider = ({
     return () => {
       clearInterval(intervalId)
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn, refreshSession])
 
   const contextValue = useMemo(() => {
     return {
       user,
       isLoggedIn,
       signout,
+      refreshSession,
     }
-  }, [user, isLoggedIn, signout])
+  }, [user, isLoggedIn, signout, refreshSession])
 
   return (
     <SessionContext.Provider value={contextValue}>

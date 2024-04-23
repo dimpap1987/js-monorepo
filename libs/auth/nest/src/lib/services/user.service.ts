@@ -1,18 +1,8 @@
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common'
-import {
-  AuthUser,
-  PrismaClient,
-  Provider,
-  UnRegisteredUser,
-} from '@prisma/client'
-import { RolesEnum } from '../types/auth.configuration'
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { AuthUser, PrismaClient, UnRegisteredUser } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
+import { RolesEnum } from '../types/auth.configuration'
+import { AuthException } from '../exceptions/api-exception'
 
 @Injectable()
 export class UserService {
@@ -23,7 +13,7 @@ export class UserService {
   async findAuthUserByEmail(email: string) {
     Logger.debug(`find user with email: '${email}'`)
     try {
-      return await this.prismaClient.authUser.findFirstOrThrow({
+      return await this.prismaClient.authUser.findUniqueOrThrow({
         where: { email: email },
       })
     } catch (e) {
@@ -81,11 +71,11 @@ export class UserService {
 
   async findUnRegisteredUserByToken(token: string) {
     try {
-      return await this.prismaClient.unRegisteredUser.findFirstOrThrow({
+      return await this.prismaClient.unRegisteredUser.findUniqueOrThrow({
         where: { token: token },
       })
     } catch (e) {
-      throw new HttpException('NOT_FOUND', HttpStatus.NOT_FOUND)
+      throw new AuthException(HttpStatus.BAD_REQUEST, 'Invalid token')
     }
   }
 }
