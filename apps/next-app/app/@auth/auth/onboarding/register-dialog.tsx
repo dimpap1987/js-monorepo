@@ -12,10 +12,7 @@ import {
   FormLabel,
   Input,
 } from '@js-monorepo/form'
-import {
-  RegisterUserSchema,
-  registerUserSchemaConfig,
-} from '@js-monorepo/schemas'
+import { RegisterUserSchema } from '@js-monorepo/schemas'
 import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -26,20 +23,11 @@ import { HiLockClosed } from 'react-icons/hi'
 import { ImUser } from 'react-icons/im'
 import { IoMdInformationCircle } from 'react-icons/io'
 import { RegisterDialogErrorComponentType, RegisterDialogType } from './types'
-import { handleValidation } from './utils'
-
-const initialRegisterValidations: RegisterDialogErrorComponentType[] = [
-  {
-    status: 'untouched',
-    type: 'too_small',
-    message: registerUserSchemaConfig.MIN_ERROR_MESSAGE,
-  },
-  {
-    status: 'untouched',
-    type: 'too_big',
-    message: registerUserSchemaConfig.MAX_ERROR_MESSAGE,
-  },
-]
+import {
+  handleValidation,
+  handleValidationErrros,
+  initialRegisterValidations,
+} from './utils'
 
 const RegisterDialogErrorComponent = ({
   validations,
@@ -91,8 +79,10 @@ export function RegisterDialog({ formInput }: RegisterDialogType) {
   })
 
   useEffect(() => {
-    handleValidation(form, setValidations)
-  }, [form.formState.isValid])
+    form.watch(() => {
+      setTimeout(() => handleValidation(form, setValidations))
+    })
+  }, [form])
 
   if (pathname !== '/auth/onboarding') return null
 
@@ -103,34 +93,18 @@ export function RegisterDialog({ formInput }: RegisterDialogType) {
       username: formData.username,
     })
     if (response.ok) {
-      refreshSession?.()
+      refreshSession()
       replace('/')
     } else {
       if (response.errors) {
-        const usernameErrors = Object.values(response.errors ?? {})
-        const newValidations: RegisterDialogErrorComponentType[] =
-          usernameErrors.map((error: any) => ({
-            status: 'invalid',
-            type: error?.code ?? 'custom',
-            message: error?.message ?? 'Unknown error',
-          }))
-
-        setValidations((prev) => {
-          const filteredValidations = prev.filter(
-            (validation) =>
-              !newValidations?.some(
-                (newValidation) => newValidation.type === validation.type
-              )
-          )
-          return [...filteredValidations, ...newValidations]
-        })
+        handleValidationErrros(response.errors, setValidations)
       }
     }
   }
 
   return (
     <DpDialog
-      className="top-1/4 sm:w-[375px]"
+      className="top-1/4 sm:w-[386px]"
       isOpen={isOpen}
       onClose={() => {
         setIsOpen(false)
@@ -145,8 +119,9 @@ export function RegisterDialog({ formInput }: RegisterDialogType) {
           <form
             onSubmit={form.handleSubmit(
               onSubmit,
-              (formData: any, e?: React.BaseSyntheticEvent) => {
+              (errors, e?: React.BaseSyntheticEvent) => {
                 e?.preventDefault()
+                handleValidationErrros(errors, setValidations)
               }
             )}
           >
@@ -188,10 +163,7 @@ export function RegisterDialog({ formInput }: RegisterDialogType) {
               )}
             />
             <div className="mt-7">
-              <DpButton
-                disabled={form.formState.isSubmitted && !form.formState.isValid}
-                className="w-full"
-              >
+              <DpButton disabled={!form.formState.isValid} className="w-full">
                 Sign Up
               </DpButton>
             </div>

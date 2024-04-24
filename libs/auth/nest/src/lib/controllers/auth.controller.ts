@@ -1,4 +1,8 @@
-import { RegisterUserDto, RegisterUserSchema } from '@js-monorepo/schemas'
+import {
+  RegisterUserDto,
+  RegisterUserSchema,
+  RegisterUserSchemaType,
+} from '@js-monorepo/schemas'
 import {
   Body,
   Controller,
@@ -69,7 +73,7 @@ export class AuthController {
   @Post('register')
   async registerUser(
     @Body(new ZodPipe(RegisterUserSchema))
-    { username }: RegisterUserDto,
+    { username }: RegisterUserSchemaType,
     @Res() res: Response,
     @Req() req: Request
   ) {

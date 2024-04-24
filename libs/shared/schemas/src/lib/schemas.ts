@@ -9,12 +9,18 @@ class RegisterUserSchemaConfig {
 
   public readonly MAX_ERROR_MESSAGE = `Username cannot exceed ${this.MAX_VALUE} characters.`
 
+  public readonly MAX_ERROR_REGEX = `Username must not contain special characters`
+
+  /* eslint-disable */
   getSchema() {
     return z.object({
       username: z
         .string()
         .min(this.MIN_VALUE, { message: this.MIN_ERROR_MESSAGE })
-        .max(this.MAX_VALUE, { message: this.MAX_ERROR_MESSAGE }),
+        .max(this.MAX_VALUE, { message: this.MAX_ERROR_MESSAGE })
+        .regex(/^[^\s!@#$%^&*()_+|~=`{}\[\]:";'<>?,.\/\\]+$/, {
+          message: this.MAX_ERROR_REGEX,
+        }),
     })
   }
 }
@@ -24,5 +30,3 @@ export const registerUserSchemaConfig = new RegisterUserSchemaConfig()
 export const RegisterUserSchema = registerUserSchemaConfig.getSchema()
 
 export type RegisterUserSchemaType = z.infer<typeof RegisterUserSchema>
-
-export type RegisterUserDto = z.TypeOf<typeof RegisterUserSchema>
