@@ -28,6 +28,7 @@ import {
   handleValidationErrros,
   initialRegisterValidations,
 } from './utils'
+import Image from 'next/image'
 
 const RegisterDialogErrorComponent = ({
   validations,
@@ -62,7 +63,10 @@ const RegisterDialogErrorComponent = ({
   )
 }
 
-export function RegisterDialog({ formInput }: RegisterDialogType) {
+export function RegisterDialog({
+  formInput,
+  userProfileImage,
+}: RegisterDialogType) {
   //hooks
   const [isOpen, setIsOpen] = useState(true)
   const [validations, setValidations] = useState(initialRegisterValidations)
@@ -115,6 +119,17 @@ export function RegisterDialog({ formInput }: RegisterDialogType) {
         Sign Up
       </DpDialogHeader>
       <DpDialogContent>
+        {userProfileImage && (
+          <div className="p-2 flex justify-center">
+            <Image
+              className="rounded-2xl"
+              width={80}
+              height={80}
+              alt="user profile"
+              src={userProfileImage}
+            ></Image>
+          </div>
+        )}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(

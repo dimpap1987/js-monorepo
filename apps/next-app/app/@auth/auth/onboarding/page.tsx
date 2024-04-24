@@ -13,6 +13,7 @@ export default async function OnBoardingPage() {
       formInput={{
         email: unRegisteredUser.email,
       }}
+      userProfileImage={unRegisteredUser.profileImage}
     ></RegisterDialog>
   )
 }

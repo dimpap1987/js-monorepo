@@ -25,6 +25,7 @@ const ENV = process.env.NODE_ENV
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callBackUrl: process.env.GOOGLE_REDIRECT_URL,
       },
+      redirectUiUrl: 'http://localhost:3000',
     }),
   ],
   controllers: [AppController],

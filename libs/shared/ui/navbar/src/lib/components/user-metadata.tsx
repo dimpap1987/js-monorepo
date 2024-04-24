@@ -7,28 +7,34 @@ export default function UserMetadata({
   createdAt,
   className,
 }: {
-  profileImage?: string
-  username?: string
-  createdAt?: string
-  className?: string
+  profileImage?: string | null
+  username?: string | null
+  createdAt?: string | null | Date
+  className?: string | null
 }) {
   return (
-    profileImage && (
+    (profileImage || createdAt) && (
       <>
         <div className={cn('p-1 flex gap-4 items-center', className)}>
-          <Image
-            src={profileImage}
-            width={50}
-            height={50}
-            alt="Picture of the user"
-            className="rounded-full mb-1"
-          />
-          <div>
-            <div className="mb-1 text-base font-semibold">{username}</div>
-            {createdAt && (
-              <div className="text-xs italic">joined &#x2022; {createdAt}</div>
-            )}
-          </div>
+          {profileImage && (
+            <Image
+              src={profileImage}
+              width={50}
+              height={50}
+              alt="Picture of the user"
+              className="rounded-full mb-1"
+            />
+          )}
+          {createdAt && (
+            <div>
+              <div className="mb-1 text-base font-semibold">{username}</div>
+              {createdAt && (
+                <div className="text-xs italic">
+                  created at &#x2022; {new Date(createdAt).toLocaleDateString()}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </>
     )

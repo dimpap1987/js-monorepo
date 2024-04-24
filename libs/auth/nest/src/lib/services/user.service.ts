@@ -1,7 +1,11 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { AuthUser, PrismaClient, UnRegisteredUser } from '@prisma/client'
+import {
+  AuthUser,
+  PrismaClient,
+  Provider,
+  UnRegisteredUser,
+} from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
-import { RolesEnum } from '../types/auth.configuration'
 import { AuthException } from '../exceptions/api-exception'
 
 @Injectable()
@@ -15,28 +19,31 @@ export class UserService {
     try {
       return await this.prismaClient.authUser.findUniqueOrThrow({
         where: { email: email },
+        include: {
+          providers: true,
+        },
       })
     } catch (e) {
       Logger.warn(`User not found with email: '${email}'`)
-      return null
+      throw new AuthException(HttpStatus.NOT_FOUND, 'USER NOT FOUND EXCEPTION')
     }
   }
 
-  async createAuthUser(authUserDTO: Omit<AuthUser, 'id' | 'createdAt'>) {
+  async createAuthUser(
+    authUserDTO: Omit<AuthUser, 'id' | 'createdAt' | 'roles'>
+  ) {
     try {
       const user = await this.prismaClient.authUser.create({
         data: {
-          email: authUserDTO.email,
-          username: authUserDTO.username,
-          roles: [RolesEnum.USER],
+          ...authUserDTO,
         },
       })
       Logger.log(`New User: '${authUserDTO.username}' created successfully`)
       return user
     } catch (err) {
       Logger.error(err, `There was an error with user: ${authUserDTO.username}`)
+      throw new AuthException(HttpStatus.BAD_REQUEST, 'CREATE USER EXCEPTION')
     }
-    return null
   }
 
   async createUnRegisteredUser(
@@ -48,12 +55,14 @@ export class UserService {
         update: {
           createdAt: new Date(),
           token: uuidv4(),
-          provider: unRegisteredUser.provider,
+          providerEnum: unRegisteredUser.providerEnum,
+          profileImage: unRegisteredUser.profileImage,
         },
         create: {
           email: unRegisteredUser.email,
           token: uuidv4(),
-          provider: unRegisteredUser.provider,
+          providerEnum: unRegisteredUser.providerEnum,
+          profileImage: unRegisteredUser.profileImage,
         },
       })
       Logger.log(
@@ -66,7 +75,10 @@ export class UserService {
         `There was an error with user: ${unRegisteredUser.email}`
       )
     }
-    return null
+    throw new AuthException(
+      HttpStatus.BAD_REQUEST,
+      'CREATE UNREGISTERED_USER EXCEPTION'
+    )
   }
 
   async findUnRegisteredUserByToken(token: string) {
@@ -76,6 +88,22 @@ export class UserService {
       })
     } catch (e) {
       throw new AuthException(HttpStatus.BAD_REQUEST, 'Invalid token')
+    }
+  }
+
+  async createProvider(provider: Omit<Provider, 'id'>) {
+    try {
+      return await this.prismaClient.provider.create({
+        data: {
+          ...provider,
+        },
+      })
+    } catch (err) {
+      Logger.error(err, `There was an error with provider: ${provider.type}`)
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'CREATE PROVIDER EXCEPTION'
+      )
     }
   }
 }

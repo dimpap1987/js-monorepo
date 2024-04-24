@@ -1,21 +1,22 @@
 import {
-  RegisterUserDto,
   RegisterUserSchema,
   RegisterUserSchemaType,
 } from '@js-monorepo/schemas'
+import { JwtPayload } from '@js-monorepo/types'
 import {
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Logger,
   Post,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { AuthRole, Provider } from '@prisma/client'
+import { ProviderEnum } from '@prisma/client'
 import { Request, Response } from 'express'
 import { AuthGithub } from '../guards/github.guard'
 import { AuthGoogle } from '../guards/google.guard'
@@ -27,7 +28,8 @@ import { UserService } from '../services/user.service'
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    @Inject('REDIRECT_UI_URL') private readonly redirectUrl: string
   ) {}
 
   @Get('google/login')
@@ -45,13 +47,13 @@ export class AuthController {
   @Get('google/redirect')
   @UseGuards(AuthGoogle)
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
-    return this.handleSocialRedirect(req, res, Provider.GOOGLE)
+    return this.handleSocialRedirect(req, res, ProviderEnum.GOOGLE)
   }
 
   @Get('github/redirect')
   @UseGuards(AuthGithub)
   async githubAuthCallback(@Req() req: Request, @Res() res: Response) {
-    return this.handleSocialRedirect(req, res, Provider.GITHUB)
+    return this.handleSocialRedirect(req, res, ProviderEnum.GITHUB)
   }
 
   @Get('session')
@@ -87,33 +89,32 @@ export class AuthController {
     const user = await this.userService.createAuthUser({
       username: username,
       email: unregisteredUser?.email as string,
-      roles: [AuthRole.USER],
     })
 
-    if (user) {
-      this.handleLoggedInUser(
-        {
-          user: {
-            username: user.username,
-            roles: user.roles,
-            createdAt: user.createdAt,
-          },
-        },
-        res
-      )
-      res.clearCookie('UNREGISTERED-USER')
-      res.send({
-        success: true,
-        message: 'User created Successfully',
+    if (unregisteredUser.providerEnum) {
+      await this.userService.createProvider({
+        profileImage: unregisteredUser.profileImage,
+        type: unregisteredUser.providerEnum,
+        userId: user?.id,
       })
-    } else {
-      res
-        .send({
-          success: false,
-          errors: ['Something went wrong'],
-        })
-        .status(400)
     }
+
+    this.handleLoggedInUser(
+      {
+        user: {
+          username: user.username,
+          roles: user.roles,
+          createdAt: user.createdAt,
+          picture: unregisteredUser.profileImage,
+        },
+      },
+      res
+    )
+    res.clearCookie('UNREGISTERED-USER')
+    res.send({
+      success: true,
+      message: 'User created Successfully',
+    })
   }
 
   @Get('unregistered-user')
@@ -122,16 +123,17 @@ export class AuthController {
     return this.userService.findUnRegisteredUserByToken(token)
   }
 
-  private handleLoggedInUser(
-    payload: { user: { username: string; roles: AuthRole[]; createdAt: Date } },
-    res: Response
-  ) {
+  private handleLoggedInUser(payload: JwtPayload, res: Response) {
     const tokens = this.authService.createJwtTokens(payload)
     res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true })
     res.cookie('accessToken', tokens.accessToken, { httpOnly: true })
   }
 
-  private async handleSocialRedirect(req: any, res: any, provider: Provider) {
+  private async handleSocialRedirect(
+    req: any,
+    res: any,
+    provider: ProviderEnum
+  ) {
     const email = req.user?.email
 
     const user = await this.userService.findAuthUserByEmail(email)
@@ -140,24 +142,26 @@ export class AuthController {
       this.handleLoggedInUser(
         {
           user: {
-            username: user?.username,
-            roles: user?.roles,
-            createdAt: user?.createdAt,
+            username: user.username,
+            roles: user.roles,
+            createdAt: user.createdAt,
+            picture: user.providers[0]?.profileImage,
           },
         },
         res
       )
       Logger.log(`User: ${user.username} successfully logged in !!!`)
       const redirectURI =
-        req.session['redirect-after-login'] ?? 'http://localhost:3000'
+        req.session['redirect-after-login'] ?? `${this.redirectUrl}`
       res.redirect(redirectURI)
     } else {
       const unRegisteredUser = await this.userService.createUnRegisteredUser({
         email: email,
-        provider: provider,
+        providerEnum: provider,
+        profileImage: req.user?.picture,
       })
       res.cookie('UNREGISTERED-USER', unRegisteredUser?.token)
-      const redirectURI = 'http://localhost:3000/auth/onboarding'
+      const redirectURI = `${this.redirectUrl}/auth/onboarding`
       Logger.log(
         `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}'`
       )
