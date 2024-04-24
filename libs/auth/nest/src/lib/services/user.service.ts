@@ -15,7 +15,6 @@ export class UserService {
   ) {}
 
   async findAuthUserByEmail(email: string) {
-    Logger.debug(`find user with email: '${email}'`)
     try {
       return await this.prismaClient.authUser.findUniqueOrThrow({
         where: { email: email },
@@ -25,7 +24,7 @@ export class UserService {
       })
     } catch (e) {
       Logger.warn(`User not found with email: '${email}'`)
-      throw new AuthException(HttpStatus.NOT_FOUND, 'USER NOT FOUND EXCEPTION')
+      return Promise.resolve(null)
     }
   }
 
