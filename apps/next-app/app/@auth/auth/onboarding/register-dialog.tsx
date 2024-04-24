@@ -108,7 +108,7 @@ export function RegisterDialog({
 
   return (
     <DpDialog
-      className="top-1/4 sm:w-[386px]"
+      className="top-[10%] sm:w-[386px]"
       isOpen={isOpen}
       onClose={() => {
         setIsOpen(false)
