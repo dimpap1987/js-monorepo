@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client'
+
 export interface UserJWT {
   username: string
   createdAt?: string | Date
@@ -21,3 +23,9 @@ export type ClientResponseType =
       message?: string
       errors?: string[]
     }
+
+export type AuthUserWithProviders = Prisma.AuthUserGetPayload<{
+  include: {
+    providers: true
+  }
+}>
