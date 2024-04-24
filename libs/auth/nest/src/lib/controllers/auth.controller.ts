@@ -18,6 +18,7 @@ import {
 } from '@nestjs/common'
 import { ProviderEnum } from '@prisma/client'
 import { Request, Response } from 'express'
+import { AuthException } from '../exceptions/api-exception'
 import { AuthGithub } from '../guards/github.guard'
 import { AuthGoogle } from '../guards/google.guard'
 import { ZodPipe } from '../pipes/zod.pipe'
@@ -131,14 +132,15 @@ export class AuthController {
 
   private async handleSocialRedirect(
     req: any,
-    res: any,
+    res: Response,
     provider: ProviderEnum
   ) {
     const email = req.user?.email
+    let redirectURI = this.redirectUrl
 
-    const user = await this.userService.findAuthUserByEmail(email)
-
-    if (user) {
+    try {
+      const user = await this.userService.findAuthUserByEmail(email)
+      // Handle Logged in user
       this.handleLoggedInUser(
         {
           user: {
@@ -151,20 +153,25 @@ export class AuthController {
         res
       )
       Logger.log(`User: ${user.username} successfully logged in !!!`)
-      const redirectURI =
-        req.session['redirect-after-login'] ?? `${this.redirectUrl}`
-      res.redirect(redirectURI)
-    } else {
-      const unRegisteredUser = await this.userService.createUnRegisteredUser({
-        email: email,
-        providerEnum: provider,
-        profileImage: req.user?.picture,
-      })
-      res.cookie('UNREGISTERED-USER', unRegisteredUser?.token)
-      const redirectURI = `${this.redirectUrl}/auth/onboarding`
-      Logger.log(
-        `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}'`
-      )
+      redirectURI = req.session['redirect-after-login'] ?? `${this.redirectUrl}`
+    } catch (e) {
+      if (
+        e instanceof AuthException &&
+        e.errorCode === 'NOT_FOUND_USER_EXCEPTION'
+      ) {
+        //Handle Unregistered User
+        const unRegisteredUser = await this.userService.createUnRegisteredUser({
+          email: email,
+          providerEnum: provider,
+          profileImage: req.user?.picture,
+        })
+        res.cookie('UNREGISTERED-USER', unRegisteredUser?.token)
+        redirectURI = `${this.redirectUrl}/auth/onboarding`
+        Logger.log(
+          `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}'`
+        )
+      }
+    } finally {
       res.redirect(redirectURI)
     }
   }
