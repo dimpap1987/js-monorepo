@@ -1,10 +1,75 @@
-import { UseFormReturn } from 'react-hook-form'
+import { FieldErrors, UseFormReturn } from 'react-hook-form'
 import { RegisterDialogErrorComponentType } from './types'
+import { registerUserSchemaConfig } from '@js-monorepo/schemas'
+
+export const initialRegisterValidations: RegisterDialogErrorComponentType[] = [
+  {
+    status: 'untouched',
+    type: 'too_small',
+    message: registerUserSchemaConfig.MIN_ERROR_MESSAGE,
+  },
+  {
+    status: 'untouched',
+    type: 'too_big',
+    message: registerUserSchemaConfig.MAX_ERROR_MESSAGE,
+  },
+  {
+    status: 'untouched',
+    type: 'invalid_string',
+    message: registerUserSchemaConfig.MAX_ERROR_REGEX,
+  },
+]
 
 export function isValidType(
   value: any
-): value is 'too_small' | 'too_big' | 'custom' {
-  return value === 'too_small' || value === 'too_big' || value === 'custom'
+): value is RegisterDialogErrorComponentType['type'] {
+  return initialRegisterValidations.some(
+    (validation) => validation.type === value || value === 'custom'
+  )
+}
+
+export const handleValidationErrros = (
+  errors: FieldErrors<any> | string[],
+  callback: React.Dispatch<
+    React.SetStateAction<RegisterDialogErrorComponentType[]>
+  >
+) => {
+  const formErrors = Object.values(errors ?? {})
+  const validationErrors: RegisterDialogErrorComponentType[] = formErrors.map(
+    (error: any) => ({
+      status: 'invalid',
+      type: (isValidType(error?.type) ? error?.type : 'custom') || 'custom',
+      message:
+        typeof error?.message === 'string' ? error?.message : 'Unknown error',
+    })
+  )
+
+  callback((prev) => {
+    // filter the validations with no error
+    const filteredValidations = prev.filter(
+      (validation) =>
+        !validationErrors?.some(
+          (newValidation) => newValidation.type === validation.type
+        )
+    )
+
+    // Map over filtered validations, update status to 'valid' for invalid ones
+    const updatedValidations: RegisterDialogErrorComponentType[] =
+      filteredValidations.map((validation) =>
+        validation.status === 'invalid'
+          ? { ...validation, status: 'valid' }
+          : validation
+      )
+
+    //Set ordering
+    const validationOrderTypes = initialRegisterValidations.map((v) => v.type)
+    const orderedVal = [...updatedValidations, ...validationErrors].sort(
+      (a, b) =>
+        validationOrderTypes.indexOf(a.type) -
+        validationOrderTypes.indexOf(b.type)
+    )
+    return orderedVal
+  })
 }
 
 export const handleValidation = async (
@@ -22,30 +87,6 @@ export const handleValidation = async (
       }))
     )
   } else if (!form.formState.isValid) {
-    const usernameErrors = Object.values(form.formState?.errors ?? {})
-
-    const newValidations: RegisterDialogErrorComponentType[] =
-      usernameErrors.map((error) => ({
-        status: 'invalid',
-        type: (isValidType(error?.type) ? error?.type : 'custom') || 'custom',
-        message:
-          typeof error?.message === 'string' ? error?.message : 'Unknown error',
-      }))
-
-    callback((prev) => {
-      const filteredValidations = prev.filter(
-        (validation) =>
-          !newValidations?.some(
-            (newValidation) => newValidation.type === validation.type
-          )
-      )
-      const validationOrder = ['too_small', 'too_big']
-
-      const orderedVal = [...newValidations, ...filteredValidations].sort(
-        (a, b) =>
-          validationOrder.indexOf(a.type) - validationOrder.indexOf(b.type)
-      )
-      return orderedVal
-    })
+    handleValidationErrros(form.formState?.errors, callback)
   }
 }

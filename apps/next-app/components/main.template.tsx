@@ -46,7 +46,6 @@ export default function MainTemplate({
         }}
         onLogout={async () => {
           authClient.logout()
-          window.location.reload()
         }}
       >
         <DpLogo>
@@ -71,7 +70,6 @@ export default function MainTemplate({
               className="p-3 justify-center text-white"
               onClick={async () => {
                 authClient.logout()
-                window.location.reload()
               }}
             ></DpLogoutButton>
           )}
