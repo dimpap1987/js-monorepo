@@ -19,10 +19,10 @@ export interface DpNextNavbarProps {
   readonly onSideBarClick?: () => void
 }
 export type UserNavProps = {
-  username?: string
+  username?: string | null
   isLoggedIn: boolean
-  userProfileImage?: string
-  createdAt?: string
+  userProfileImage?: string | null
+  createdAt?: string | null | Date
 }
 
 export type UserNavSocial = {

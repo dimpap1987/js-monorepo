@@ -36,9 +36,9 @@ export default function MainTemplate({
       <DpNextNavbar
         user={{
           isLoggedIn: isLoggedIn,
-          username: user?.username ?? undefined,
-          createdAt: user?.createdAt ?? undefined,
-          userProfileImage: user?.picture ?? undefined,
+          username: user?.username,
+          createdAt: user?.createdAt,
+          userProfileImage: user?.picture,
         }}
         menuItems={menuItems}
         onSideBarClick={() => {

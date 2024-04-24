@@ -1,12 +1,12 @@
+import { JwtPayload } from '@js-monorepo/types'
 import { decode, sign, verify } from '@js-monorepo/utils'
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
-import { JwtPayload } from 'jsonwebtoken'
 
 @Injectable()
 export class AuthService {
   constructor(@Inject('JWT_SECRET') private readonly jwtSecret: string) {}
 
-  createJwtTokens(payload: any) {
+  createJwtTokens(payload: JwtPayload) {
     try {
       const accessToken = this.createAccessToken(payload)
       const refreshToken = this.createRefreshToken(payload)

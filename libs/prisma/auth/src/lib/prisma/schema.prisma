@@ -14,14 +14,24 @@ model AuthUser {
     username  String     @unique
     email     String     @unique
     roles     AuthRole[] @default([USER])
+    providers Provider[]
 }
 
 model UnRegisteredUser {
-    id        Int       @id @default(autoincrement())
-    createdAt DateTime  @default(now())
-    token     String    @unique
-    email     String    @unique
-    provider  Provider?
+    id           Int          @id @default(autoincrement())
+    createdAt    DateTime     @default(now())
+    token        String       @unique
+    email        String       @unique
+    profileImage String?
+    providerEnum ProviderEnum
+}
+
+model Provider {
+    id           Int          @id @default(autoincrement())
+    type         ProviderEnum
+    profileImage String?
+    userId       Int
+    user         AuthUser     @relation(fields: [userId], references: [id])
 }
 
 enum AuthRole {
@@ -29,7 +39,7 @@ enum AuthRole {
     ADMIN
 }
 
-enum Provider {
+enum ProviderEnum {
     GOOGLE
     GITHUB
 }

@@ -1,11 +1,14 @@
 export interface UserJWT {
-  id: number
   username: string
-  createdAt?: string
-  lastLoggedIn?: string
-  picture?: string
-  provider?: string
+  createdAt?: string | Date
+  lastLoggedIn?: string | null
+  picture?: string | null
+  provider?: string | null
   roles?: string[]
+}
+
+export interface JwtPayload {
+  user: UserJWT
 }
 
 export type ClientResponseType =

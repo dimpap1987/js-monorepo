@@ -2,6 +2,7 @@ export type RegisterDialogType = {
   formInput: {
     email: string
   }
+  userProfileImage?: string
 }
 
 export type RegisterDialogErrorComponentType = {

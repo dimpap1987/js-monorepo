@@ -97,6 +97,10 @@ export class AuthModule implements NestModule {
           provide: 'GITHUB-AUTH',
           useValue: config.github,
         },
+        {
+          provide: 'REDIRECT_UI_URL',
+          useValue: config.redirectUiUrl,
+        },
       ],
     }
   }
