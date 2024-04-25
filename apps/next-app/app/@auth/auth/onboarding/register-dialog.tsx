@@ -71,7 +71,7 @@ export function RegisterDialog({
   const [isOpen, setIsOpen] = useState(true)
   const [validations, setValidations] = useState(initialRegisterValidations)
   const pathname = usePathname()
-  const { replace } = useRouter()
+  const { replace, push } = useRouter()
   const { refreshSession } = useSession()
   const form = useForm({
     resolver: zodResolver(RegisterUserSchema),
@@ -112,6 +112,7 @@ export function RegisterDialog({
       isOpen={isOpen}
       onClose={() => {
         setIsOpen(false)
+        push('/')
       }}
       autoClose={false}
     >
