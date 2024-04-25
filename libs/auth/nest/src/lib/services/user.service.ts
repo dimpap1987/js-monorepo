@@ -6,6 +6,7 @@ import {
   Provider,
   UnRegisteredUser,
 } from '@prisma/client'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { v4 as uuidv4 } from 'uuid'
 import { AuthException } from '../exceptions/api-exception'
 
@@ -34,18 +35,47 @@ export class UserService {
   }
 
   async createAuthUser(
-    authUserDTO: Omit<AuthUser, 'id' | 'createdAt' | 'roles'>
-  ): Promise<AuthUser> {
+    authUserDTO: Omit<AuthUser, 'id' | 'createdAt' | 'roles'>,
+    providerDTO: Omit<Provider, 'id' | 'userId'>
+  ) {
     try {
-      const user = await this.prismaClient.authUser.create({
-        data: {
-          ...authUserDTO,
-        },
+      return await this.prismaClient.$transaction(async (prisma) => {
+        if (providerDTO) {
+          return prisma.authUser.create({
+            data: {
+              email: authUserDTO.email,
+              username: authUserDTO.username,
+              providers: {
+                create: {
+                  type: providerDTO.type,
+                  profileImage: providerDTO.profileImage,
+                },
+              },
+            },
+          })
+        } else {
+          return prisma.authUser.create({
+            data: {
+              email: authUserDTO.email,
+              username: authUserDTO.username,
+            },
+          })
+        }
       })
-      Logger.log(`New User: '${authUserDTO.username}' created successfully`)
-      return user
-    } catch (err) {
-      Logger.error(err, `There was an error with user: ${authUserDTO.username}`)
+    } catch (err: any) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+          Logger.warn(`Username: '${authUserDTO.username}' already exists`)
+          throw new AuthException(
+            HttpStatus.BAD_REQUEST,
+            'Username already exists'
+          )
+        }
+      }
+      Logger.error(
+        err,
+        `There was an error when creating a user with username: ${authUserDTO.username}`
+      )
       throw new AuthException(HttpStatus.BAD_REQUEST, 'CREATE_USER_EXCEPTION')
     }
   }

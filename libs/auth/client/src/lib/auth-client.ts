@@ -40,8 +40,8 @@ export class AuthClient {
         credentials: 'include',
       })
 
-      const responseData = await response.json()
       if (!response.ok) {
+        const responseData = await response.json()
         return {
           ok: false,
           message: responseData.message,
@@ -50,7 +50,6 @@ export class AuthClient {
       } else {
         return {
           ok: true,
-          data: responseData,
         }
       }
     } catch (error) {
