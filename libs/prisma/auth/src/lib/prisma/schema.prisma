@@ -31,7 +31,7 @@ model Provider {
     type         ProviderEnum
     profileImage String?
     userId       Int
-    user         AuthUser     @relation(fields: [userId], references: [id])
+    user         AuthUser     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum AuthRole {

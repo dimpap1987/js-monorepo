@@ -80,11 +80,13 @@ export const handleValidation = async (
 ) => {
   if (form.formState.isValid) {
     callback((prev) =>
-      prev.map((v) => ({
-        message: v.message,
-        status: 'valid',
-        type: v.type,
-      }))
+      prev
+        .filter((v) => v.type !== 'custom')
+        .map((v) => ({
+          message: v.message,
+          status: 'valid',
+          type: v.type,
+        }))
     )
   } else if (!form.formState.isValid) {
     handleValidationErrros(form.formState?.errors, callback)

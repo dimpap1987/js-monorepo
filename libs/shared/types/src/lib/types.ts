@@ -16,7 +16,7 @@ export interface JwtPayload {
 export type ClientResponseType =
   | {
       ok: true
-      data: any
+      data?: any
     }
   | {
       ok: false

@@ -87,18 +87,16 @@ export class AuthController {
       await this.userService.findUnRegisteredUserByToken(token)
 
     // create new user
-    const user = await this.userService.createAuthUser({
-      username: username,
-      email: unregisteredUser?.email as string,
-    })
-
-    if (unregisteredUser.providerEnum) {
-      await this.userService.createProvider({
-        profileImage: unregisteredUser.profileImage,
+    const user = await this.userService.createAuthUser(
+      {
+        email: unregisteredUser.email,
+        username: username,
+      },
+      {
         type: unregisteredUser.providerEnum,
-        userId: user?.id,
-      })
-    }
+        profileImage: unregisteredUser.profileImage,
+      }
+    )
 
     this.handleLoggedInUser(
       {
@@ -112,10 +110,7 @@ export class AuthController {
       res
     )
     res.clearCookie('UNREGISTERED-USER')
-    res.send({
-      success: true,
-      message: 'User created Successfully',
-    })
+    res.status(HttpStatus.CREATED).send()
   }
 
   @Get('unregistered-user')

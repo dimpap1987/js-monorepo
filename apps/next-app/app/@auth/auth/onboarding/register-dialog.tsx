@@ -29,6 +29,7 @@ import {
   initialRegisterValidations,
 } from './utils'
 import Image from 'next/image'
+import { useNotifications } from '@js-monorepo/notification'
 
 const RegisterDialogErrorComponent = ({
   validations,
@@ -72,7 +73,8 @@ export function RegisterDialog({
   const [validations, setValidations] = useState(initialRegisterValidations)
   const pathname = usePathname()
   const { replace, push } = useRouter()
-  const { refreshSession } = useSession()
+  const { user, refreshSession } = useSession()
+  const [addNotification] = useNotifications()
   const form = useForm({
     resolver: zodResolver(RegisterUserSchema),
     mode: 'all',
@@ -87,6 +89,15 @@ export function RegisterDialog({
       setTimeout(() => handleValidation(form, setValidations))
     })
   }, [form])
+
+  useEffect(() => {
+    if (user?.username) {
+      addNotification({
+        message: `Welcome aboard, '${user.username}' ! 🚀`,
+        duration: 5000,
+      })
+    }
+  }, [user?.username])
 
   if (pathname !== '/auth/onboarding') return null
 
@@ -179,7 +190,11 @@ export function RegisterDialog({
               )}
             />
             <div className="mt-7">
-              <DpButton disabled={!form.formState.isValid} className="w-full">
+              <DpButton
+                disabled={!form.formState.isValid}
+                loading={form.formState.isSubmitting}
+                className="w-full"
+              >
                 Sign Up
               </DpButton>
             </div>
