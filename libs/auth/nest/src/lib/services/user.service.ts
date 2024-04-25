@@ -18,12 +18,13 @@ export class UserService {
 
   async findAuthUserByEmail(email: string): Promise<AuthUserWithProviders> {
     try {
-      return await this.prismaClient.authUser.findUniqueOrThrow({
+      const user = await this.prismaClient.authUser.findUniqueOrThrow({
         where: { email: email },
         include: {
           providers: true,
         },
       })
+      return user
     } catch (e) {
       Logger.warn(`User not found with email: '${email}'`)
       throw new AuthException(
@@ -39,7 +40,7 @@ export class UserService {
     providerDTO: Omit<Provider, 'id' | 'userId'>
   ) {
     try {
-      return await this.prismaClient.$transaction(async (prisma) => {
+      const user = await this.prismaClient.$transaction(async (prisma) => {
         if (providerDTO) {
           return prisma.authUser.create({
             data: {
@@ -62,6 +63,8 @@ export class UserService {
           })
         }
       })
+      Logger.log(`User: '${user.username}' created successfully`)
+      return user
     } catch (err: any) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002') {
@@ -117,27 +120,13 @@ export class UserService {
 
   async findUnRegisteredUserByToken(token: string): Promise<UnRegisteredUser> {
     try {
-      return await this.prismaClient.unRegisteredUser.findUniqueOrThrow({
-        where: { token: token },
-      })
+      const unregisteredUser =
+        await this.prismaClient.unRegisteredUser.findUniqueOrThrow({
+          where: { token: token },
+        })
+      return unregisteredUser
     } catch (e) {
       throw new AuthException(HttpStatus.BAD_REQUEST, 'INVALID_TOKEN_EXCEPTION')
-    }
-  }
-
-  async createProvider(provider: Omit<Provider, 'id'>): Promise<Provider> {
-    try {
-      return await this.prismaClient.provider.create({
-        data: {
-          ...provider,
-        },
-      })
-    } catch (err) {
-      Logger.error(err, `There was an error with provider: ${provider.type}`)
-      throw new AuthException(
-        HttpStatus.BAD_REQUEST,
-        'CREATE_PROVIDER_EXCEPTION'
-      )
     }
   }
 }
