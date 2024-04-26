@@ -75,7 +75,7 @@ export function AiGeneratorImage({
           />
 
           <DpButton
-            className="w-full"
+            className="mt-3 w-full"
             size="large"
             type="submit"
             loading={loading}
