@@ -96,7 +96,7 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
           role="dialog"
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            `z-30 w-[90%] sm:w-[50%] mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border border-primary mb-20 max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed antialiased pointer-events-auto transition ease-out duration-200 
+            `z-30 w-[90%] sm:w-[50%] min-w-[210px] mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border border-primary mb-20 max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed antialiased pointer-events-auto transition ease-out duration-200 
             text-black shadow-2xl shadow-cyan-500/50 p-2 ${isOpen ? ' opacity-100 translate-y-0 ' : ' opacity-0 -translate-y-full '} `,
             className
           )}

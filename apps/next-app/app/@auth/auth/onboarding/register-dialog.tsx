@@ -12,15 +12,17 @@ import {
   FormLabel,
   Input,
 } from '@js-monorepo/form'
+import { useNotifications } from '@js-monorepo/notification'
 import { RegisterUserSchema } from '@js-monorepo/schemas'
 import { useRouter } from 'next-nprogress-bar'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { BsCheck2Circle } from 'react-icons/bs'
 import { FaRegTimesCircle } from 'react-icons/fa'
+import { FaAt } from 'react-icons/fa6'
 import { HiLockClosed } from 'react-icons/hi'
-import { ImUser } from 'react-icons/im'
 import { IoMdInformationCircle } from 'react-icons/io'
 import { RegisterDialogErrorComponentType, RegisterDialogType } from './types'
 import {
@@ -28,8 +30,6 @@ import {
   handleValidationErrros,
   initialRegisterValidations,
 } from './utils'
-import Image from 'next/image'
-import { useNotifications } from '@js-monorepo/notification'
 
 const RegisterDialogErrorComponent = ({
   validations,
@@ -119,7 +119,7 @@ export function RegisterDialog({
 
   return (
     <DpDialog
-      className="top-[10%] sm:w-[386px]"
+      className="top-[20%] sm:w-[386px]"
       isOpen={isOpen}
       onClose={() => {
         setIsOpen(false)
@@ -127,7 +127,7 @@ export function RegisterDialog({
       }}
       autoClose={false}
     >
-      <DpDialogHeader className="font-bold justify-center ml-9">
+      <DpDialogHeader className="font-semibold justify-center ml-9">
         Sign Up
       </DpDialogHeader>
       <DpDialogContent>
@@ -178,7 +178,7 @@ export function RegisterDialog({
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl className="relative flex items-center">
-                    <ImUser className="absolute left-2 text-foreground" />
+                    <FaAt className="absolute left-2 text-foreground" />
                     <Input
                       placeholder="Type your username"
                       className="pl-7"
