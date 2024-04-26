@@ -1,7 +1,13 @@
 import { getCurrentSession } from '@js-monorepo/auth-server'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const publicRoutes = ['/', '/about', '/api/checkout_sessions']
+export const publicRoutes = [
+  '/',
+  '/about',
+  '/api/checkout_sessions',
+  '/privacy-cookie-statement',
+  '/terms-of-use',
+]
 export const authRoutes = ['/auth/login', '/auth/register', '/auth/onboarding']
 export const apiAuthPrefix = '/api/auth'
 

@@ -3,6 +3,7 @@ import { DpDialog, DpDialogFooter } from '../lib/dialog'
 import DpDialogContent from './content'
 import DpDialogHeader from './header'
 import './login-dialog.css'
+import { DpNextNavLink } from '@js-monorepo/nav-link'
 
 export type SocialConfig = {
   type: 'google' | 'github' | 'facebook'
@@ -132,16 +133,19 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
           </div>
         </DpDialogContent>
         <DpDialogFooter>
-          <div className="mt-2 text-gray-600 text-center">
+          <div className="mt-2 text-gray-600 text-center px-5">
             <p className="text-xs">
               By proceeding, you agree to our &nbsp;
-              <a href="#" className="underline">
+              <DpNextNavLink href="/terms-of-use" className="underline">
                 Terms of Use
-              </a>
-              &nbsp; and confirm you have read our &nbsp;
-              <a href="#" className="underline">
+              </DpNextNavLink>
+              &nbsp; and confirm that you have read our &nbsp;
+              <DpNextNavLink
+                href="/privacy-cookie-statement"
+                className="underline"
+              >
                 Privacy and Cookie Statement.
-              </a>
+              </DpNextNavLink>
             </p>
           </div>
         </DpDialogFooter>
