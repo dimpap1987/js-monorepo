@@ -160,7 +160,9 @@ export class AuthController {
           providerEnum: provider,
           profileImage: req.user?.picture,
         })
-        res.cookie('UNREGISTERED-USER', unRegisteredUser?.token)
+        res.cookie('UNREGISTERED-USER', unRegisteredUser?.token, {
+          httpOnly: true,
+        })
         redirectURI = `${this.redirectUrl}/auth/onboarding`
         Logger.log(
           `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}'`
