@@ -133,7 +133,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
           </div>
         </DpDialogContent>
         <DpDialogFooter>
-          <div className="mt-2 text-gray-600 text-center px-5">
+          <div className="mt-2 text-gray-600 text-center px-6">
             <p className="text-xs">
               By proceeding, you agree to our &nbsp;
               <DpNextNavLink href="/terms-of-use" className="underline">
