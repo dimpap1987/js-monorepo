@@ -1,4 +1,4 @@
-import { getCurrentSession } from '@js-monorepo/auth-server'
+import { validateAuthToken } from '@js-monorepo/auth-server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const publicRoutes = [
@@ -21,7 +21,7 @@ export function withAuth(
   return async function middleAuth(
     request: NextRequest
   ): Promise<NextResponse<unknown>> {
-    const session = await getCurrentSession()
+    const session = await validateAuthToken(process.env.JWT_SECRET_KEY ?? '')
     const isLoggedIn = !!session?.user
     const { nextUrl } = request
 

@@ -8,9 +8,9 @@ export class RefererMiddleware implements NestMiddleware {
       const referer = req.headers?.referer
 
       if (referer) {
-        Logger.debug(
-          `Referer set for 'redirect-after-login' with value: ${referer}`
-        )
+        // Logger.debug(
+        //   `Referer set for 'redirect-after-login' with value: ${referer}`
+        // )
         req.session['redirect-after-login'] = referer
       }
     } catch (error) {

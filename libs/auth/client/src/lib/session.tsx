@@ -11,7 +11,7 @@ import React, {
 } from 'react'
 
 const SessionContext = createContext<{
-  user: UserJWT | null
+  user: UserJWT | null | undefined
   isLoggedIn: boolean
   refreshSession: () => void
 }>({
@@ -49,7 +49,7 @@ export const SessionProvider = ({
 }: {
   readonly children?: React.ReactNode
   readonly value: {
-    user: UserJWT | null
+    user: UserJWT | null | undefined
     isLoggedIn: boolean
   }
 }) => {

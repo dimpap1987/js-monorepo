@@ -18,7 +18,7 @@ const DpLogoutButton = forwardRef<HTMLButtonElement, DpLogoutButtonProps>(
         ref={ref}
       >
         <BiLogOutCircle className="text-red-600 text-2xl" />
-        <span>Sign out</span>
+        <span className="ml-2">Sign out</span>
       </DpButton>
     )
   }
