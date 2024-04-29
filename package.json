@@ -59,6 +59,7 @@
     "framer-motion": "^10.16.16",
     "glob": "^10.3.10",
     "helmet": "^7.1.0",
+    "jose": "^5.2.4",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.2",
     "leaflet-defaulticon-compatibility": "^0.1.1",

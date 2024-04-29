@@ -164,7 +164,7 @@ export function RegisterDialog({
                     <Input
                       {...field}
                       readOnly
-                      className="pl-7 ring ring-primary"
+                      className="pl-7 ring ring-primary text-center"
                     />
                   </FormControl>
                 </FormItem>
@@ -181,7 +181,7 @@ export function RegisterDialog({
                     <FaAt className="absolute left-2 text-foreground" />
                     <Input
                       placeholder="Type your username"
-                      className="pl-7"
+                      className="pl-7 text-center"
                       autoFocus
                       {...field}
                     />

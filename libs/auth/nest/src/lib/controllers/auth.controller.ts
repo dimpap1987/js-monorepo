@@ -123,6 +123,7 @@ export class AuthController {
     const tokens = this.authService.createJwtTokens(payload)
     res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true })
     res.cookie('accessToken', tokens.accessToken, { httpOnly: true })
+    res.clearCookie('UNREGISTERED-USER')
   }
 
   private async handleSocialRedirect(

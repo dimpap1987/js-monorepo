@@ -172,7 +172,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2"
                     >
                       <TbUserFilled className="text-2xl" />
-                      <span>Profile</span>
+                      <span className="ml-2">Profile</span>
                     </DpNextNavLink>
 
                     {/* Logout */}
