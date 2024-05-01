@@ -29,7 +29,7 @@ export default async function RootLayout(props: {
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body
-        className={`${poppins.className} flex flex-col min-h-100svh bg-background-primary`}
+        className={`${poppins.className} flex flex-col min-h-100svh bg-background-primary overflow-hidden`}
       >
         <SessionProvider
           value={{

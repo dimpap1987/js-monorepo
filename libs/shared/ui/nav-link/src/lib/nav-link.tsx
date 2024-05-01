@@ -31,9 +31,7 @@ const DpNextNavLink = forwardRef(
         )}
         onClick={(e) => {
           e.preventDefault()
-          if (!isSamePath) {
-            router.push(href)
-          }
+          router.push(href, undefined, { disableSameURL: true })
           onClick?.()
         }}
       >
