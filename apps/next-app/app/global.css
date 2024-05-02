@@ -26,7 +26,7 @@ h4 {
 
 @layer base {
   :root {
-    --border: 240 4% 76%;
+    --border: 240 4% 56%;
 
     --background-primary: 0 0% 95%;
     --foreground: 0 0% 0%;
@@ -72,7 +72,7 @@ h4 {
 
 /* custom scrollbar */
 ::-webkit-scrollbar {
-  width: 14px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {

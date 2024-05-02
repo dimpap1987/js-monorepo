@@ -43,6 +43,7 @@
     "@nestjs/platform-express": "^10.0.2",
     "@nx/next": "17.2.8",
     "@prisma/client": "^5.9.1",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^2.2.0",
     "axios": "1.6.0",
