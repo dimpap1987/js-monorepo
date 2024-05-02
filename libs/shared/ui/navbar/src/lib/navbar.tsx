@@ -3,12 +3,13 @@ import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { MenuItem } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
-import { DpDropdown } from '@js-monorepo/dropdown'
 import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { TbUserFilled } from 'react-icons/tb'
+import DpNotificationBell from './components/notification-bell'
 import UserMetadata from './components/user-metadata'
+import { UserOptionsDropdown } from './components/user-options.component'
 
 export interface DpNextNavbarProps {
   readonly children?: ReactNode
@@ -73,6 +74,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
 
               {/* options on the right*/}
               <div className="hidden md:flex items-center gap-4 w-50 justify-end text-center flex-1">
+                <DpNotificationBell className="px-2"></DpNotificationBell>
                 <ModeToggle></ModeToggle>
                 {!user?.isLoggedIn && (
                   <DpNextNavLink href="/auth/login">
@@ -92,7 +94,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       </div>
                     )}
 
-                    <DpDropdown
+                    <UserOptionsDropdown
                       IconComponent={FaCircleUser}
                       className="w-60 lg:w-80 fixed right-0  mt-4"
                     >
@@ -122,7 +124,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                           ></DpLogoutButton>
                         </>
                       )}
-                    </DpDropdown>
+                    </UserOptionsDropdown>
                   </>
                 )}
               </div>

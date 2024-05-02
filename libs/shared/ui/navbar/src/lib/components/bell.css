@@ -1,0 +1,15 @@
+@keyframes bell {
+    0% {
+      transform: rotate(-15deg);
+    }
+    50% {
+      transform: rotate(15deg);
+    }
+    100% {
+      transform: rotate(-15deg);
+    }
+  }
+  
+  .animate-bell {
+    animation: bell 0.5s ease-in-out infinite;
+  }
