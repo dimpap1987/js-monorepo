@@ -4,11 +4,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@js-monorepo/dropdown'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdNotificationsActive } from 'react-icons/md'
 import './bell.css'
@@ -78,7 +79,7 @@ const notificationListDummy: NotificationType[] = [
 ]
 
 function DpNotificationBell({
-  notificationList = notificationListDummy,
+  notificationList = [],
   className,
 }: {
   notificationList?: NotificationType[]
@@ -88,6 +89,35 @@ function DpNotificationBell({
     useState<NotificationType[]>(notificationList)
   const notificationCount = notifications?.filter((n) => !n.isRead)?.length
   const isRinging = notificationCount > 0
+
+  useEffect(() => {
+    const eventSource = new EventSource(
+      `http://localhost:3333/api/notifications/events`,
+      { withCredentials: true }
+    )
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+
+      setNotifications((prev) => {
+        return [
+          {
+            id: data.id,
+            isRead: false,
+            timeAgo: 'now',
+            message: data.message,
+          },
+          ...prev,
+        ]
+      })
+    }
+    eventSource.onerror = (message) => {
+      console.log(message)
+    }
+
+    return () => {
+      eventSource.close()
+    }
+  }, [])
 
   return (
     <DropdownMenu>
@@ -107,36 +137,42 @@ function DpNotificationBell({
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="pl-2 bg-background-secondary mt-3 hidden md:block text-white h-[315px] overflow-y-auto">
-        {notifications &&
-          notifications.length > 0 &&
-          notifications.map((notification, index) => (
-            <Fragment key={notification.id}>
-              <DropdownMenuItem
-                className={`min-w-[300px] max-w-[450px] cursor-pointer focus:text-white ${notification.isRead ? 'opacity-35' : ''}`}
-                onSelect={(event) => {
-                  event.preventDefault()
-                  const notIndex = notifications.findIndex(
-                    (item) => item.id === notification.id
-                  )
-                  if (notIndex !== -1) {
-                    const newNotifications = [...notifications]
-                    newNotifications[notIndex] = {
-                      ...newNotifications[notIndex],
-                      isRead: true,
+      <DropdownMenuContent className="pl-2 bg-background-secondary mt-3 hidden md:block text-white w-[350px] max-w-[450px]">
+        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <div className="max-h-[305px] overflow-x-hidden overflow-y-auto">
+          {notifications?.length > 0 ? (
+            notifications.map((notification, index) => (
+              <Fragment key={notification.id}>
+                <DropdownMenuItem
+                  className={`cursor-pointer focus:text-white ${notification.isRead ? 'opacity-35' : ''}`}
+                  onSelect={(event) => {
+                    event.preventDefault()
+                    const notIndex = notifications.findIndex(
+                      (item) => item.id === notification.id
+                    )
+                    if (notIndex !== -1) {
+                      const newNotifications = [...notifications]
+                      newNotifications[notIndex] = {
+                        ...newNotifications[notIndex],
+                        isRead: true,
+                      }
+                      setNotifications(newNotifications)
                     }
-                    setNotifications(newNotifications)
-                  }
-                }}
-              >
-                <span>{notification.message}</span>
-                <DropdownMenuShortcut>
-                  {notification.timeAgo}
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
-              {index < notifications.length - 1 && <DropdownMenuSeparator />}
-            </Fragment>
-          ))}
+                  }}
+                >
+                  <span>{notification.message}</span>
+                  <DropdownMenuShortcut>
+                    {notification.timeAgo}
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+                {index < notifications.length - 1 && <DropdownMenuSeparator />}
+              </Fragment>
+            ))
+          ) : (
+            <div className="p-2">No notifications yet 😒</div>
+          )}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   )
