@@ -4,6 +4,8 @@ import { ConfigModule } from '@nestjs/config'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from '@js-monorepo/auth'
+import { NotificationController } from './controllers/notification.controller'
+import { EventsService } from './services/event.service'
 
 const ENV = process.env.NODE_ENV
 
@@ -28,7 +30,7 @@ const ENV = process.env.NODE_ENV
       redirectUiUrl: 'http://localhost:3000',
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, NotificationController],
+  providers: [AppService, EventsService],
 })
 export class AppModule {}
