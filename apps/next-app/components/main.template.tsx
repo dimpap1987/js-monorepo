@@ -3,9 +3,11 @@ import { authClient, useSession } from '@js-monorepo/auth-client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpLoaderProvider } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { DpLogo, DpNextNavbar } from '@js-monorepo/navbar'
+import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
 import { DpNotificationProvider } from '@js-monorepo/notification'
+import { DpNotificationBellComponent } from '@js-monorepo/notification-bell'
 import { DpNextSidebar, MenuItem } from '@js-monorepo/sidebar'
+import { ModeToggle } from '@js-monorepo/theme-provider'
 import { DpVersion } from '@js-monorepo/version'
 import { PropsWithChildren, useState } from 'react'
 import SVGLogo from './logo-svg'
@@ -51,6 +53,12 @@ export default function MainTemplate({
         <DpLogo>
           <SVGLogo></SVGLogo>
         </DpLogo>
+        <NavbarItems>
+          {isLoggedIn && (
+            <DpNotificationBellComponent></DpNotificationBellComponent>
+          )}
+          <ModeToggle></ModeToggle>
+        </NavbarItems>
       </DpNextNavbar>
 
       <DpNextSidebar

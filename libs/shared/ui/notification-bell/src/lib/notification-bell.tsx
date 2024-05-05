@@ -9,76 +9,22 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@js-monorepo/dropdown'
+import moment from 'moment'
 import { Fragment, useEffect, useState } from 'react'
-import { IoMdNotifications } from 'react-icons/io'
+import { IoMdInformationCircle, IoMdNotifications } from 'react-icons/io'
 import { MdNotificationsActive } from 'react-icons/md'
 import './bell.css'
+import { cn } from '@js-monorepo/utils'
 
 type NotificationType = {
   id: number
   message: string
   isRead: boolean
-  timeAgo: string
+  time: any
+  formattedTime: string
 }
 
-const notificationListDummy: NotificationType[] = [
-  {
-    id: 1,
-    message: 'User jim has logged in ❤️',
-    isRead: false,
-    timeAgo: '3days ago',
-  },
-  {
-    id: 2,
-    message: 'User dimpap has signed out 👌',
-    isRead: false,
-    timeAgo: '2days ago',
-  },
-  {
-    id: 3,
-    message: 'Panatha ole 🤩',
-    isRead: false,
-    timeAgo: '1day ago',
-  },
-  {
-    id: 4,
-    message: 'Panatha ole!!!!! 😁',
-    isRead: false,
-    timeAgo: '1min ago',
-  },
-  {
-    id: 5,
-    message: 'Panatha ole!!!!! 😁',
-    isRead: false,
-    timeAgo: '1min ago',
-  },
-  {
-    id: 6,
-    message: 'Panatha ole!!!!! 😁',
-    isRead: false,
-    timeAgo: '1min ago',
-  },
-  {
-    id: 7,
-    message: 'Panatha ole!!!!! 😁',
-    isRead: true,
-    timeAgo: '1min ago',
-  },
-  {
-    id: 8,
-    message: 'Panatha ole!!!!! 😁',
-    isRead: true,
-    timeAgo: '1min ago',
-  },
-  {
-    id: 9,
-    message: 'Panatha ole!!!!! 😁',
-    isRead: true,
-    timeAgo: '1min ago',
-  },
-]
-
-function DpNotificationBell({
+export function DpNotificationBellComponent({
   notificationList = [],
   className,
 }: {
@@ -87,45 +33,64 @@ function DpNotificationBell({
 }) {
   const [notifications, setNotifications] =
     useState<NotificationType[]>(notificationList)
-  const notificationCount = notifications?.filter((n) => !n.isRead)?.length
-  const isRinging = notificationCount > 0
+  const unreadNotificationCount = notifications?.filter(
+    (n) => !n.isRead
+  )?.length
+  const isRinging = unreadNotificationCount > 0
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `http://localhost:3333/api/notifications/events`,
+      process.env.NEXT_PUBLIC_NOTIFICATION_CONTROLLER ?? '',
       { withCredentials: true }
     )
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
+      const timeDifference = moment().diff(moment(data.time))
+      const formattedDifference = moment.duration(timeDifference).humanize()
 
       setNotifications((prev) => {
         return [
           {
             id: data.id,
             isRead: false,
-            timeAgo: 'now',
+            time: data.time,
+            formattedTime: formattedDifference,
             message: data.message,
           },
           ...prev,
         ]
       })
     }
-    eventSource.onerror = (message) => {
-      console.log(message)
-    }
-
     return () => {
       eventSource.close()
     }
   }, [])
 
+  useEffect(() => {
+    if (!(notifications?.length > 0)) return
+    const interval = setInterval(() => {
+      setNotifications((prev) => {
+        const newNotificaitons = prev.map((not) => {
+          const timeDifference = moment().diff(moment(not.time))
+          const formattedDifference = moment.duration(timeDifference).humanize()
+          return {
+            ...not,
+            formattedTime: formattedDifference,
+          }
+        })
+        return [...newNotificaitons]
+      })
+    }, 60000)
+    return () => clearInterval(interval)
+  }, [notifications])
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className={className}>
+      <DropdownMenuTrigger asChild className={cn('px-1', className)}>
         <button className="outline-none">
           {isRinging && (
             <div className="absolute rounded-full border w-[20px] h-[20px] transform translate-x-4 -translate-y-3 bg-orange-700 border-orange-700 text-white text-sm">
-              {notificationCount}
+              {unreadNotificationCount}
             </div>
           )}
 
@@ -137,15 +102,15 @@ function DpNotificationBell({
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="pl-2 bg-background-secondary mt-3 hidden md:block text-white w-[350px] max-w-[450px]">
+      <DropdownMenuContent className="p-1 bg-background-secondary mt-3 hidden md:block text-white w-[430px]">
         <DropdownMenuLabel>Notifications</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <div className="max-h-[305px] overflow-x-hidden overflow-y-auto">
+        <div className="max-h-[320px] overflow-x-hidden overflow-y-auto">
           {notifications?.length > 0 ? (
             notifications.map((notification, index) => (
               <Fragment key={notification.id}>
                 <DropdownMenuItem
-                  className={`cursor-pointer focus:text-white ${notification.isRead ? 'opacity-35' : ''}`}
+                  className={`cursor-pointer p-2 focus:text-white ${notification.isRead ? 'opacity-35' : 'bg-background-secondary--lighter'}`}
                   onSelect={(event) => {
                     event.preventDefault()
                     const notIndex = notifications.findIndex(
@@ -161,21 +126,27 @@ function DpNotificationBell({
                     }
                   }}
                 >
-                  <span>{notification.message}</span>
+                  <IoMdInformationCircle className="text-2xl mr-2 shrink-0" />
+                  <div className="p-0 max-line--height">
+                    {notification.message}
+                  </div>
                   <DropdownMenuShortcut>
-                    {notification.timeAgo}
+                    {notification.formattedTime}
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
                 {index < notifications.length - 1 && <DropdownMenuSeparator />}
               </Fragment>
             ))
           ) : (
-            <div className="p-2">No notifications yet 😒</div>
+            <div className="p-2 text-sm">
+              No notifications yet{' '}
+              <span role="img" aria-label="emoji-sad">
+                😒
+              </span>
+            </div>
           )}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
-
-export default DpNotificationBell

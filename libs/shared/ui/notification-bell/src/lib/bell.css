@@ -1,0 +1,24 @@
+@keyframes bell {
+  0% {
+    transform: rotate(-15deg);
+  }
+  50% {
+    transform: rotate(15deg);
+  }
+  100% {
+    transform: rotate(-15deg);
+  }
+}
+
+.animate-bell {
+  animation: bell 0.7s ease-in-out infinite;
+}
+
+.max-line--height {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  max-height: calc(1.6em * 3);
+}
