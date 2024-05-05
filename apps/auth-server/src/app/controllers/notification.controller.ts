@@ -22,7 +22,7 @@ export class NotificationController {
     this.eventsService.emit(username, {
       id: Math.random() * 1000,
       message: message,
-      emitting: new Date().toISOString(),
+      time: new Date(),
     })
     return { ok: true }
   }

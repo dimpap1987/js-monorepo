@@ -1,0 +1,8 @@
+{
+  "name": "notification-bell",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/ui/notification-bell/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {}
+}

@@ -2,12 +2,10 @@
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { MenuItem } from '@js-monorepo/sidebar'
-import { ModeToggle } from '@js-monorepo/theme-provider'
 import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { TbUserFilled } from 'react-icons/tb'
-import DpNotificationBell from './components/notification-bell'
 import UserMetadata from './components/user-metadata'
 import { UserOptionsDropdown } from './components/user-options.component'
 
@@ -32,16 +30,21 @@ export type UserNavSocial = {
 
 const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
   ({ children, menuItems = [], user, onLogout, onSideBarClick }, ref) => {
-    const { logo } = useMemo(() => {
+    const { logo, navbarItems } = useMemo(() => {
       let logoElement: ReactNode | null = null
+      let navbarItemsElement: ReactNode | null = null
       React.Children.forEach(children, (child) => {
         if (React.isValidElement(child) && typeof child.type !== 'string') {
           if ((child.type as React.ComponentType).displayName === 'DpLogo') {
             logoElement = child
+          } else if (
+            (child.type as React.ComponentType).displayName === 'NavbarItems'
+          ) {
+            navbarItemsElement = child
           }
         }
       })
-      return { logo: logoElement }
+      return { logo: logoElement, navbarItems: navbarItemsElement }
     }, [children])
 
     return (
@@ -74,8 +77,9 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
 
               {/* options on the right*/}
               <div className="hidden md:flex items-center gap-4 w-50 justify-end text-center flex-1">
-                <DpNotificationBell className="px-2"></DpNotificationBell>
-                <ModeToggle></ModeToggle>
+                <section className="flex justify-center items-center gap-3">
+                  {navbarItems}
+                </section>
                 {!user?.isLoggedIn && (
                   <DpNextNavLink href="/auth/login">
                     <DpLoginButton className="rounded-full"></DpLoginButton>
@@ -84,7 +88,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 {/* when logged in */}
                 {user?.isLoggedIn && (
                   <>
-                    {user.username && (
+                    {/* {user.username && (
                       <div
                         aria-label="user's username"
                         tabIndex={0}
@@ -92,7 +96,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       >
                         {user.username}
                       </div>
-                    )}
+                    )} */}
 
                     <UserOptionsDropdown
                       IconComponent={FaCircleUser}
