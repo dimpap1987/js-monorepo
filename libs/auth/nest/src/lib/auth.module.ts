@@ -1,4 +1,4 @@
-import { dbClient } from '@js-monorepo/db'
+import { authClient } from '@js-monorepo/db'
 import {
   DynamicModule,
   Inject,
@@ -66,7 +66,7 @@ import { AuthConfiguration } from './types/auth.configuration'
     },
     {
       provide: 'PRISMA_CLIENT',
-      useValue: dbClient,
+      useValue: authClient,
     },
   ],
   exports: ['jwt', JwtAuthGuard, RolesGuard, AuthService],

@@ -93,7 +93,7 @@ export function RegisterDialog({
   useEffect(() => {
     if (user?.username) {
       addNotification({
-        message: `Welcome aboard, ${user.username} ! 🚀`,
+        message: `Welcome aboard, ${user.username} 🚀`,
         duration: 5000,
       })
     }

@@ -9,12 +9,13 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@js-monorepo/dropdown'
+import { cn } from '@js-monorepo/utils'
 import moment from 'moment'
 import { Fragment, useEffect, useState } from 'react'
-import { IoMdInformationCircle, IoMdNotifications } from 'react-icons/io'
+import { GoDotFill } from 'react-icons/go'
+import { IoMdNotifications } from 'react-icons/io'
 import { MdNotificationsActive } from 'react-icons/md'
 import './bell.css'
-import { cn } from '@js-monorepo/utils'
 
 type NotificationType = {
   id: number
@@ -126,7 +127,9 @@ export function DpNotificationBellComponent({
                     }
                   }}
                 >
-                  <IoMdInformationCircle className="text-2xl mr-2 shrink-0" />
+                  <GoDotFill
+                    className={`text-2xl mr-2 shrink-0 ${notification.isRead ? ' text-gray-500' : 'text-white'}`}
+                  />
                   <div className="p-0 max-line--height">
                     {notification.message}
                   </div>

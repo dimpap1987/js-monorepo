@@ -1,1 +1,1 @@
-export { dbClient } from './lib/db'
+export { authClient } from './lib/db'

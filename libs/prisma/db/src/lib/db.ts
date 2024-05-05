@@ -6,11 +6,11 @@ const prismaClientSingleton = () => {
 
 declare global {
   // eslint-disable-next-line no-var
-  var dbClient: undefined | ReturnType<typeof prismaClientSingleton>
+  var authClient: undefined | ReturnType<typeof prismaClientSingleton>
 }
 
-const dbClient = globalThis.dbClient ?? prismaClientSingleton()
+const authClient = globalThis.authClient ?? prismaClientSingleton()
 
-export { dbClient }
+export { authClient }
 
-if (process.env.NODE_ENV !== 'production') globalThis.dbClient = dbClient
+if (process.env.NODE_ENV !== 'production') globalThis.authClient = authClient
