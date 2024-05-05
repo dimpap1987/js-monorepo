@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common'
 
+import { AuthModule } from '@js-monorepo/auth'
+import { authClient } from '@js-monorepo/db'
 import { ConfigModule } from '@nestjs/config'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { AuthModule } from '@js-monorepo/auth'
 import { NotificationController } from './controllers/notification.controller'
 import { EventsService } from './services/event.service'
 
@@ -15,6 +16,7 @@ const ENV = process.env.NODE_ENV
       envFilePath: ['.env', `.env.${ENV}`, `environments/.env.${ENV}`],
     }),
     AuthModule.forRoot({
+      authClient: authClient,
       sessionSecret: process.env.SESSION_SECRET,
       jwtSercret: process.env.JWT_SECRET_KEY,
       github: {

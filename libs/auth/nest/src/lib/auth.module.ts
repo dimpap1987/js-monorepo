@@ -1,4 +1,3 @@
-import { authClient } from '@js-monorepo/db'
 import {
   DynamicModule,
   Inject,
@@ -64,10 +63,6 @@ import { AuthConfiguration } from './types/auth.configuration'
       },
       inject: [AuthService, REQUEST],
     },
-    {
-      provide: 'PRISMA_CLIENT',
-      useValue: authClient,
-    },
   ],
   exports: ['jwt', JwtAuthGuard, RolesGuard, AuthService],
 })
@@ -100,6 +95,10 @@ export class AuthModule implements NestModule {
         {
           provide: 'REDIRECT_UI_URL',
           useValue: config.redirectUiUrl,
+        },
+        {
+          provide: 'AUTH_CLIENT',
+          useValue: config.authClient,
         },
       ],
     }

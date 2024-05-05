@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 
 export interface GoogleAuth {
@@ -11,17 +12,11 @@ export interface GithubAuth {
   callBackUrl?: string
 }
 
-export interface PostgresConfig {
-  username: string
-  password: string
-  url: string
-}
-
 export interface AuthConfiguration {
+  authClient: PrismaClient
   sessionSecret: string
   jwtSercret: string
   redirectUiUrl?: string
-  postgres?: PostgresConfig
   github?: GithubAuth
   google?: GoogleAuth
 }

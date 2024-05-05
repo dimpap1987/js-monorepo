@@ -13,12 +13,12 @@ import { AuthException } from '../exceptions/api-exception'
 @Injectable()
 export class UserService {
   constructor(
-    @Inject('PRISMA_CLIENT') private readonly prismaClient: PrismaClient
+    @Inject('AUTH_CLIENT') private readonly authClient: PrismaClient
   ) {}
 
   async findAuthUserByEmail(email: string): Promise<AuthUserWithProviders> {
     try {
-      const user = await this.prismaClient.authUser.findUniqueOrThrow({
+      const user = await this.authClient.authUser.findUniqueOrThrow({
         where: { email: email },
         include: {
           providers: true,
@@ -40,7 +40,7 @@ export class UserService {
     providerDTO: Omit<Provider, 'id' | 'userId'>
   ) {
     try {
-      const user = await this.prismaClient.$transaction(async (prisma) => {
+      const user = await this.authClient.$transaction(async (prisma) => {
         if (providerDTO) {
           return prisma.authUser.create({
             data: {
@@ -87,7 +87,7 @@ export class UserService {
     unRegisteredUser: Omit<UnRegisteredUser, 'id' | 'createdAt' | 'token'>
   ): Promise<UnRegisteredUser> {
     try {
-      const user = await this.prismaClient.unRegisteredUser.upsert({
+      const user = await this.authClient.unRegisteredUser.upsert({
         where: { email: unRegisteredUser.email },
         update: {
           createdAt: new Date(),
@@ -121,7 +121,7 @@ export class UserService {
   async findUnRegisteredUserByToken(token: string): Promise<UnRegisteredUser> {
     try {
       const unregisteredUser =
-        await this.prismaClient.unRegisteredUser.findUniqueOrThrow({
+        await this.authClient.unRegisteredUser.findUniqueOrThrow({
           where: { token: token },
         })
       return unregisteredUser

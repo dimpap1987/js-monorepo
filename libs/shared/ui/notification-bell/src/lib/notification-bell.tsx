@@ -142,7 +142,7 @@ export function DpNotificationBellComponent({
             ))
           ) : (
             <div className="p-2 text-sm">
-              No notifications yet{' '}
+              Nothing to show{' '}
               <span role="img" aria-label="emoji-sad">
                 😒
               </span>
