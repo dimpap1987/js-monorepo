@@ -63,7 +63,7 @@ const UserOptionsDropdown = forwardRef(
               }}
               ref={dropdownRef}
               className={cn(
-                `absolute mt-3 p-1 border border-border rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`,
+                `absolute mt-3 p-1 border border-gray-500 rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`,
                 className
               )}
             >
