@@ -9,7 +9,6 @@ module.exports = {
       __dirname,
       '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
     ),
-    '!**libs/auth/**',
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
@@ -18,8 +17,8 @@ module.exports = {
         border: 'hsl(var(--border))',
         'background-primary': 'hsl(var(--background-primary))',
         'background-secondary': 'hsl(var(--background-secondary))',
-        'background-secondary--lighter':
-          'hsl(var(--background-secondary--lighter))',
+        'background-secondary-lighter':
+          'hsl(var(--background-secondary-lighter))',
         foreground: 'hsl(var(--foreground))',
         'foreground-hover': 'hsl(var(--foreground-hover))',
         primary: {

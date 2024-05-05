@@ -4,7 +4,7 @@ services:
   prisma-migrate:
     container_name: prisma-migrate
     build:
-      context: ..  # Specify the path to the directory containing the Dockerfile
+      context: .. # Specify the path to the directory containing the Dockerfile
       dockerfile: run_auth_migrations/Dockerfile
     env_file:
       - .env

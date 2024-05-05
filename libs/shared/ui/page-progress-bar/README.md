@@ -13,7 +13,6 @@ export function Example() {
 **_IMPORTANT_**  
 If you want to use `<DpNextNavLink>`, then you must use `<DpNextPageProgressBar>`
 
-
 ## Properties
 
 - children: `React.ReactNode`

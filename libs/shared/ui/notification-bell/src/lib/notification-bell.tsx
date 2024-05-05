@@ -110,7 +110,7 @@ export function DpNotificationBellComponent({
             notifications.map((notification, index) => (
               <Fragment key={notification.id}>
                 <DropdownMenuItem
-                  className={`cursor-pointer p-2 focus:text-white ${notification.isRead ? 'opacity-35' : 'bg-background-secondary--lighter'}`}
+                  className={`cursor-pointer p-2 focus:text-white ${notification.isRead ? 'opacity-35' : 'bg-background-secondary-lighter'}`}
                   onSelect={(event) => {
                     event.preventDefault()
                     const notIndex = notifications.findIndex(

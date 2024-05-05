@@ -31,15 +31,8 @@ export async function getCurrentSession() {
   return null
 }
 
-export async function findUnregisteredUser() {
+export async function findUnregisteredUser(headers?: Headers) {
   try {
-    const headers = new Headers()
-    cookies()
-      .getAll()
-      .forEach((cookie) => {
-        headers.append('Cookie', `${cookie.name}=${cookie.value}`)
-      })
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/unregistered-user`,
       {

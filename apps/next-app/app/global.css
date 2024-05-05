@@ -32,7 +32,7 @@ h4 {
     --foreground: 0 0% 0%;
     --foreground-hover: 0 0% 35%;
     --background-secondary: 219 33% 21%;
-    --background-secondary--lighter: 219 33% 40%;
+    --background-secondary-lighter: 219 33% 40%;
 
     /* Turquoise */
     --primary: 174 72% 56%;

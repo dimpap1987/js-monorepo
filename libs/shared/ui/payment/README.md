@@ -11,9 +11,7 @@ export function Example() {
 
   return (
     <DpCheckoutDialog
-      stripePublishableKey={
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
-      }
+      stripePublishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''}
       isOpen={isOpenCheckoutDialog}
       onClose={() => setOpenCheckoutDialog(false)}
       checkOutPromise={() =>

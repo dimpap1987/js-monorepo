@@ -12,8 +12,8 @@ export default function Example() {
 
 ## Properties
 
-- variant?: `'primary' | 'secondary' | 'danger'` ***-- default: 'primary'***
-- size?: `'small' | 'medium' | 'large'` ***-- default: 'medium'***
+- variant?: `'primary' | 'secondary' | 'danger'` **_-- default: 'primary'_**
+- size?: `'small' | 'medium' | 'large'` **_-- default: 'medium'_**
 - className?: `string`
 - children?: `React.ReactNode`
-- loading?: `boolean` ***-- default: false***
+- loading?: `boolean` **_-- default: false_**

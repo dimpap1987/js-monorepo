@@ -97,7 +97,7 @@ export function RegisterDialog({
         duration: 5000,
       })
     }
-  }, [user?.username])
+  }, [user?.username, addNotification])
 
   if (pathname !== '/auth/onboarding') return null
 

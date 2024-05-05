@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   next-app:
     image: dimpap/next-app:latest
     container_name: next-app-container
