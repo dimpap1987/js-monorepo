@@ -10,16 +10,16 @@ export class NotificationController {
     @Inject('jwt') private readonly jwt: JwtPayload
   ) {}
 
-  @Sse('events')
+  @Sse('subscribe')
   @UseGuards(JwtAuthGuard)
   events() {
-    return this.eventsService.subscribe(this.jwt.user.username)
+    return this.eventsService.subscribe([this.jwt.user.username, 'global'])
   }
 
   @Post('emit')
   async emit(@Req() req: any) {
-    const { username, message } = req.body
-    this.eventsService.emit(username, {
+    const { channel, message } = req.body
+    this.eventsService.emit(channel, {
       id: Math.random() * 1000,
       message: message,
       time: new Date(),
