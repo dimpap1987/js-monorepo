@@ -1,7 +1,7 @@
 {
-  "name": "auth-server",
+  "name": "my-api",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/auth-server/src",
+  "sourceRoot": "apps/my-api/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -11,12 +11,12 @@
       "options": {
         "target": "node",
         "compiler": "tsc",
-        "outputPath": "dist/apps/auth-server",
-        "main": "apps/auth-server/src/main.ts",
-        "tsConfig": "apps/auth-server/tsconfig.app.json",
+        "outputPath": "dist/apps/my-api",
+        "main": "apps/my-api/src/main.ts",
+        "tsConfig": "apps/my-api/tsconfig.app.json",
         "assets": [],
         "isolatedConfig": true,
-        "webpackConfig": "apps/auth-server/webpack.config.js"
+        "webpackConfig": "apps/my-api/webpack.config.js"
       },
       "configurations": {
         "development": {},
@@ -27,14 +27,14 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "auth-server:build"
+        "buildTarget": "my-api:build"
       },
       "configurations": {
         "development": {
-          "buildTarget": "auth-server:build:development"
+          "buildTarget": "my-api:build:development"
         },
         "production": {
-          "buildTarget": "auth-server:build:production"
+          "buildTarget": "my-api:build:production"
         }
       }
     },
@@ -42,14 +42,14 @@
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/auth-server/**/*.ts"]
+        "lintFilePatterns": ["apps/my-api/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/auth-server/jest.config.ts"
+        "jestConfig": "apps/my-api/jest.config.ts"
       }
     }
   },
