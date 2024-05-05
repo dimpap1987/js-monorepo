@@ -1,11 +1,11 @@
 /* eslint-disable */
 export default {
-  displayName: 'auth-server',
+  displayName: 'my-api',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/apps/auth-server',
+  coverageDirectory: '../../coverage/apps/my-api',
 }
