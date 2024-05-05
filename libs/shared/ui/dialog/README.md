@@ -3,12 +3,7 @@
 ## Example
 
 ```jsx
-import {
-  DpDialog,
-  DpDialogHeader,
-  DpDialogContent,
-  DpDialogFooter,
-} from '@js-monorepo/dialog'
+import { DpDialog, DpDialogHeader, DpDialogContent, DpDialogFooter } from '@js-monorepo/dialog'
 
 export default function Example() {
   const [isOpen, setIsOpen] = useState(false)
@@ -78,14 +73,7 @@ export default function Example() {
 export default function Example() {
   const [isOpenDialog, setOpenDialog] = useState(false)
 
-  return (
-    <DpConfirmationDialog
-      isOpen={isOpenDialog}
-      onClose={() => setOpenDialog(false)}
-      onCancel={() => setOpenDialog(false)}
-      onConfirm={async () => setOpenDialog(false)}
-    ></DpConfirmationDialog>
-  )
+  return <DpConfirmationDialog isOpen={isOpenDialog} onClose={() => setOpenDialog(false)} onCancel={() => setOpenDialog(false)} onConfirm={async () => setOpenDialog(false)}></DpConfirmationDialog>
 }
 ```
 

@@ -11,5 +11,4 @@ services:
       - WEBHOOK_SECRET= ${WEBHOOK_SECRET}
       - DEPLOYMENT_PATH=${DEPLOYMENT_PATH}
     restart: always
-      
 # In order to build the image you need to `nx build webhook-server`

@@ -38,5 +38,4 @@ container: [Run Filebeat on Docker][filebeat-docker].
 [filebeat-config]: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-reference-yml.html
 [filebeat-docker]: https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html
 [filebeat-doc]: https://www.elastic.co/guide/en/beats/filebeat/current/index.html
-
 [setup]: ../../README.md#how-to-re-execute-the-setup
