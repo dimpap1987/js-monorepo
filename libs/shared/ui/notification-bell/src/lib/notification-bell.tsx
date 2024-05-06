@@ -90,7 +90,7 @@ export function DpNotificationBellComponent({
       <DropdownMenuTrigger asChild className={cn('px-1', className)}>
         <button className="outline-none">
           {isRinging && (
-            <div className="absolute rounded-full border w-[20px] h-[20px] transform translate-x-4 -translate-y-3 bg-orange-700 border-orange-700 text-white text-sm">
+            <div className="absolute z-10 rounded-full border w-[20px] h-[20px] transform translate-x-[0.65rem] -translate-y-[0.5rem] bg-orange-700 border-orange-700 text-white text-sm">
               {unreadNotificationCount}
             </div>
           )}
@@ -134,7 +134,7 @@ export function DpNotificationBellComponent({
                     {notification.message}
                   </div>
                   <DropdownMenuShortcut>
-                    {notification.formattedTime}
+                    {notification.formattedTime} ago
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
                 {index < notifications.length - 1 && <DropdownMenuSeparator />}
