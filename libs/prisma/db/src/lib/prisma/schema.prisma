@@ -82,7 +82,7 @@ model UserNotification {
 
 model Channel {
     id          Int           @id @default(autoincrement())
-    name        String
+    name        String        @unique
     description String?
     created_at  DateTime      @default(now())
     UserChannel UserChannel[]
