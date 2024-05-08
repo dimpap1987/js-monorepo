@@ -3,13 +3,13 @@ import { PrismaClient as AuthPrismaClient } from '@db/prisma-auth/client'
 import { PrismaClient } from '@prisma/client'
 
 // Auth Prisma client singleton function
-const authPrismaClientSingleton = () => {
+const prismaClientSingleton = () => {
   return new AuthPrismaClient()
 }
 
 // Initialize the Auth Prisma client
 const authClient: PrismaClient =
-  globalThis.authClient ?? authPrismaClientSingleton()
+  globalThis.authClient ?? prismaClientSingleton()
 
 export { authClient }
 

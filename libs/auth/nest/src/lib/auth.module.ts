@@ -97,8 +97,8 @@ export class AuthModule implements NestModule {
           useValue: config.redirectUiUrl,
         },
         {
-          provide: 'AUTH_CLIENT',
-          useValue: config.authClient,
+          provide: 'DB_CLIENT',
+          useValue: config.dbClient,
         },
       ],
     }
