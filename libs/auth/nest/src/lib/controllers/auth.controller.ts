@@ -30,7 +30,8 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    @Inject('REDIRECT_UI_URL') private readonly redirectUrl: string
+    @Inject('REDIRECT_UI_URL') private readonly redirectUrl: string,
+    @Inject('ON_REGISTER_CALLBACK') private readonly onRegisterCallBack: any
   ) {}
 
   @Get('google/login')
@@ -110,6 +111,7 @@ export class AuthController {
       res
     )
     res.clearCookie('UNREGISTERED-USER')
+    this.onRegisterCallBack?.(user)
     res.status(HttpStatus.CREATED).send()
   }
 

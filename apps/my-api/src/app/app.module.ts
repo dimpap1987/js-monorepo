@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common'
+import { ChannelService } from './services/channel.service'
 
 import { AuthModule } from '@js-monorepo/auth'
-import { prismaClient } from '@js-monorepo/db'
 import { ConfigModule } from '@nestjs/config'
+import { AuthUser } from '@prisma/client'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { NotificationController } from './controllers/notification.controller'
 import { EventsService } from './services/event.service'
+import { PrismaService } from './services/prisma.service'
 
 const ENV = process.env.NODE_ENV
 
@@ -15,23 +17,35 @@ const ENV = process.env.NODE_ENV
     ConfigModule.forRoot({
       envFilePath: ['.env', `.env.${ENV}`, `environments/.env.${ENV}`],
     }),
-    AuthModule.forRoot(prismaClient, {
-      sessionSecret: process.env.SESSION_SECRET,
-      jwtSercret: process.env.JWT_SECRET_KEY,
-      github: {
-        clientId: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callBackUrl: process.env.GITHUB_REDIRECT_URL,
-      },
-      google: {
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callBackUrl: process.env.GOOGLE_REDIRECT_URL,
-      },
-      redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
+    AuthModule.forRootAsync({
+      imports: [AppModule],
+      useFactory: (
+        channelService: ChannelService,
+        prismaClient: PrismaService
+      ) => ({
+        dbClient: prismaClient,
+        sessionSecret: process.env.SESSION_SECRET,
+        jwtSercret: process.env.JWT_SECRET_KEY,
+        github: {
+          clientId: process.env.GITHUB_CLIENT_ID,
+          clientSecret: process.env.GITHUB_CLIENT_SECRET,
+          callBackUrl: process.env.GITHUB_REDIRECT_URL,
+        },
+        google: {
+          clientId: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          callBackUrl: process.env.GOOGLE_REDIRECT_URL,
+        },
+        redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
+        onRegister: async (user: AuthUser) => {
+          await channelService.registerUserToGlobalChannel(user.id)
+        },
+      }),
+      inject: [ChannelService, PrismaService],
     }),
   ],
   controllers: [AppController, NotificationController],
-  providers: [AppService, EventsService],
+  providers: [AppService, EventsService, PrismaService, ChannelService],
+  exports: [ChannelService, PrismaService],
 })
 export class AppModule {}

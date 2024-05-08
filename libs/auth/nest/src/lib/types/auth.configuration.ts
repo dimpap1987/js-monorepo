@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { AuthUser, PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express'
 
 export interface GoogleAuth {
@@ -14,10 +14,12 @@ export interface GithubAuth {
 
 export interface AuthConfiguration {
   sessionSecret: string
+  dbClient: PrismaClient
   jwtSercret: string
   redirectUiUrl?: string
   github?: GithubAuth
   google?: GoogleAuth
+  onRegister?: (user: AuthUser) => Promise<any>
 }
 
 declare module 'express' {

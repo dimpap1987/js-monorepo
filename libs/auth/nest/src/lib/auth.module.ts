@@ -1,14 +1,5 @@
-import {
-  DynamicModule,
-  Inject,
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common'
+import { DynamicModule, Inject, Module } from '@nestjs/common'
 import { APP_FILTER, REQUEST } from '@nestjs/core'
-import { PrismaClient } from '@prisma/client'
-import session from 'express-session'
 import { AuthController } from './controllers/auth.controller'
 import {
   AuthExceptionFilter,
@@ -19,7 +10,6 @@ import {
 } from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
-import { RefererMiddleware } from './middlewares/referer.middleware'
 import { AuthService } from './services/auth.service'
 import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
@@ -67,62 +57,70 @@ import { AuthConfiguration } from './types/auth.configuration'
   ],
   exports: ['jwt', JwtAuthGuard, RolesGuard, AuthService],
 })
-export class AuthModule implements NestModule {
+export class AuthModule {
   constructor(
     @Inject('SESSION_SECRET') private readonly sessionSecret: string
   ) {}
 
-  static forRoot(
-    prisma: PrismaClient,
-    config: AuthConfiguration
-  ): DynamicModule {
+  static forRootAsync(options: {
+    useFactory: (...fn: any) => Promise<AuthConfiguration> | AuthConfiguration
+    inject?: any[]
+    imports?: any[]
+  }): DynamicModule {
     return {
       module: AuthModule,
-      imports: [],
+      imports: options.imports,
       providers: [
         {
-          provide: 'DB_CLIENT',
-          useValue: prisma,
+          provide: 'AUTH_CONFIG',
+          useFactory: options.useFactory,
+          inject: options.inject || [],
         },
         {
           provide: 'SESSION_SECRET',
-          useValue: config.sessionSecret,
+          useFactory: async (config: AuthConfiguration) => config.sessionSecret,
+          inject: ['AUTH_CONFIG'],
         },
         {
           provide: 'JWT_SECRET',
-          useValue: config.jwtSercret,
+          useFactory: async (config: AuthConfiguration) => config.jwtSercret,
+          inject: ['AUTH_CONFIG'],
+        },
+        {
+          provide: 'DB_CLIENT',
+          useFactory: async (config: AuthConfiguration) => config.dbClient,
+          inject: ['AUTH_CONFIG'],
         },
         {
           provide: 'GOOGLE-AUTH',
-          useValue: config.google,
+          useFactory: async (config: AuthConfiguration) => config.google,
+          inject: ['AUTH_CONFIG'],
         },
         {
           provide: 'GITHUB-AUTH',
-          useValue: config.github,
+          useFactory: async (config: AuthConfiguration) => config.github,
+          inject: ['AUTH_CONFIG'],
         },
         {
           provide: 'REDIRECT_UI_URL',
-          useValue: config.redirectUiUrl,
+          useFactory: async (config: AuthConfiguration) => config.redirectUiUrl,
+          inject: ['AUTH_CONFIG'],
+        },
+        {
+          provide: 'ON_REGISTER_CALLBACK',
+          useFactory: async (config: AuthConfiguration) => config.onRegister,
+          inject: ['AUTH_CONFIG'],
         },
       ],
+      exports: [
+        'SESSION_SECRET',
+        'JWT_SECRET',
+        'DB_CLIENT',
+        'ON_REGISTER_CALLBACK',
+        'REDIRECT_UI_URL',
+        'GITHUB-AUTH',
+        'GOOGLE-AUTH',
+      ],
     }
-  }
-
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(
-        session({
-          secret: this.sessionSecret,
-          resave: false,
-          saveUninitialized: false,
-        })
-      )
-      .forRoutes('*')
-      .apply(RefererMiddleware)
-      .forRoutes(
-        { path: '*google/login*', method: RequestMethod.GET },
-        { path: '*github/login*', method: RequestMethod.GET },
-        { path: '*facebook/login*', method: RequestMethod.GET }
-      )
   }
 }
