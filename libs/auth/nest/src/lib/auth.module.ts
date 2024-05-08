@@ -7,6 +7,7 @@ import {
   RequestMethod,
 } from '@nestjs/common'
 import { APP_FILTER, REQUEST } from '@nestjs/core'
+import { PrismaClient } from '@prisma/client'
 import session from 'express-session'
 import { AuthController } from './controllers/auth.controller'
 import {
@@ -71,11 +72,18 @@ export class AuthModule implements NestModule {
     @Inject('SESSION_SECRET') private readonly sessionSecret: string
   ) {}
 
-  static forRoot(config: AuthConfiguration): DynamicModule {
+  static forRoot(
+    prisma: PrismaClient,
+    config: AuthConfiguration
+  ): DynamicModule {
     return {
       module: AuthModule,
       imports: [],
       providers: [
+        {
+          provide: 'DB_CLIENT',
+          useValue: prisma,
+        },
         {
           provide: 'SESSION_SECRET',
           useValue: config.sessionSecret,
@@ -95,10 +103,6 @@ export class AuthModule implements NestModule {
         {
           provide: 'REDIRECT_UI_URL',
           useValue: config.redirectUiUrl,
-        },
-        {
-          provide: 'DB_CLIENT',
-          useValue: config.dbClient,
         },
       ],
     }

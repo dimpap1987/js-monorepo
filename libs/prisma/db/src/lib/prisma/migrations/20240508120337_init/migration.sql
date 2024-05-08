@@ -16,7 +16,7 @@ CREATE TABLE "auth_users" (
 );
 
 -- CreateTable
-CREATE TABLE "unregister_users" (
+CREATE TABLE "unregistered_users" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "token" TEXT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE "unregister_users" (
     "profileImage" TEXT,
     "providerEnum" "ProviderEnum" NOT NULL,
 
-    CONSTRAINT "unregister_users_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "unregistered_users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -44,10 +44,10 @@ CREATE UNIQUE INDEX "auth_users_username_key" ON "auth_users"("username");
 CREATE UNIQUE INDEX "auth_users_email_key" ON "auth_users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "unregister_users_token_key" ON "unregister_users"("token");
+CREATE UNIQUE INDEX "unregistered_users_token_key" ON "unregistered_users"("token");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "unregister_users_email_key" ON "unregister_users"("email");
+CREATE UNIQUE INDEX "unregistered_users_email_key" ON "unregistered_users"("email");
 
 -- AddForeignKey
 ALTER TABLE "providers" ADD CONSTRAINT "providers_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth_users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

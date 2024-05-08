@@ -13,7 +13,6 @@ export interface GithubAuth {
 }
 
 export interface AuthConfiguration {
-  dbClient: PrismaClient
   sessionSecret: string
   jwtSercret: string
   redirectUiUrl?: string
