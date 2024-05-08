@@ -16,7 +16,7 @@ const ENV = process.env.NODE_ENV
       envFilePath: ['.env', `.env.${ENV}`, `environments/.env.${ENV}`],
     }),
     AuthModule.forRoot({
-      authClient: authClient,
+      dbClient: authClient,
       sessionSecret: process.env.SESSION_SECRET,
       jwtSercret: process.env.JWT_SECRET_KEY,
       github: {

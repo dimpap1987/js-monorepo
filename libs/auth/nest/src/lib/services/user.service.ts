@@ -12,9 +12,7 @@ import { AuthException } from '../exceptions/api-exception'
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject('AUTH_CLIENT') private readonly authClient: PrismaClient
-  ) {}
+  constructor(@Inject('DB_CLIENT') private readonly authClient: PrismaClient) {}
 
   async findAuthUserByEmail(email: string): Promise<AuthUserWithProviders> {
     try {

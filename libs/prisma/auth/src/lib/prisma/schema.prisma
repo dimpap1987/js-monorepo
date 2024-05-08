@@ -16,6 +16,8 @@ model AuthUser {
     email     String     @unique
     roles     AuthRole[] @default([USER])
     providers Provider[]
+
+    @@map(name: "auth_users")
 }
 
 model UnRegisteredUser {
@@ -25,6 +27,8 @@ model UnRegisteredUser {
     email        String       @unique
     profileImage String?
     providerEnum ProviderEnum
+
+    @@map(name: "unregistered_users")
 }
 
 model Provider {
@@ -33,6 +37,8 @@ model Provider {
     profileImage String?
     userId       Int
     user         AuthUser     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map(name: "providers")
 }
 
 enum AuthRole {
