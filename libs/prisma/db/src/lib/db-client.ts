@@ -1,19 +1,18 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { PrismaClient as AuthPrismaClient } from '@db/prisma-auth/client'
 import { PrismaClient } from '@prisma/client'
 
 // Auth Prisma client singleton function
 const prismaClientSingleton = () => {
-  return new AuthPrismaClient()
+  return new PrismaClient()
 }
 
 // Initialize the Auth Prisma client
-const authClient: PrismaClient =
-  globalThis.authClient ?? prismaClientSingleton()
+const prismaClient: PrismaClient =
+  globalThis.prismaClient ?? prismaClientSingleton()
 
-export { authClient }
+export { prismaClient }
 
 // Store Prisma clients in global scope in development mode
 if (process.env.NODE_ENV !== 'production') {
-  globalThis.authClient = authClient
+  globalThis.prismaClient = prismaClient
 }

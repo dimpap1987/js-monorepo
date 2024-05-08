@@ -1,0 +1,101 @@
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+    // output   = "../../../../../../node_modules/@db/prisma-auth/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model AuthUser {
+    id                    Int                @id @default(autoincrement())
+    createdAt             DateTime           @default(now())
+    username              String             @unique
+    email                 String             @unique
+    roles                 AuthRole[]         @default([USER])
+    providers             Provider[]
+    userChannels          UserChannel[]
+    sentNotifications     UserNotification[] @relation("sender")
+    receivedNotifications UserNotification[] @relation("receiver")
+
+    @@map(name: "auth_users")
+}
+
+model UnRegisteredUser {
+    id           Int          @id @default(autoincrement())
+    createdAt    DateTime     @default(now())
+    token        String       @unique
+    email        String       @unique
+    profileImage String?
+    providerEnum ProviderEnum
+
+    @@map(name: "unregistered_users")
+}
+
+model Provider {
+    id           Int          @id @default(autoincrement())
+    type         ProviderEnum
+    profileImage String?
+    userId       Int
+    user         AuthUser     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map(name: "providers")
+}
+
+enum AuthRole {
+    USER
+    ADMIN
+}
+
+enum ProviderEnum {
+    GOOGLE
+    GITHUB
+}
+
+model Notification {
+    id               Int                @id @default(autoincrement())
+    message          String
+    created_at       DateTime           @default(now())
+    type             String?
+    is_archived      Boolean            @default(false)
+    additional_data  Json?
+    link             String?
+    userNotification UserNotification[]
+
+    @@map(name: "notifications")
+}
+
+model UserNotification {
+    id              Int          @id @default(autoincrement())
+    user_id         Int
+    notification_id Int
+    user            AuthUser     @relation("receiver", fields: [user_id], references: [id])
+    notification    Notification @relation(fields: [notification_id], references: [id])
+    sender          AuthUser?    @relation("sender", fields: [sender_id], references: [id])
+    sender_id       Int?
+    is_read         Boolean      @default(false)
+
+    @@map(name: "users_notifications")
+}
+
+model Channel {
+    id          Int           @id @default(autoincrement())
+    name        String
+    description String?
+    created_at  DateTime      @default(now())
+    UserChannel UserChannel[]
+
+    @@map(name: "channels")
+}
+
+model UserChannel {
+    id         Int      @id @default(autoincrement())
+    user_id    Int
+    channel_id Int
+    user       AuthUser @relation(fields: [user_id], references: [id])
+    channel    Channel  @relation(fields: [channel_id], references: [id])
+
+    @@map(name: "users_channels")
+}

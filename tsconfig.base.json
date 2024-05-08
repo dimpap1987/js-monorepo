@@ -43,7 +43,6 @@
         "libs/shared/ui/page-progress-bar/src/index.ts"
       ],
       "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
-      "@js-monorepo/prisma-auth": ["libs/prisma/auth/src/index.ts"],
       "@js-monorepo/schemas": ["libs/shared/schemas/src/index.ts"],
       "@js-monorepo/sidebar": ["libs/shared/ui/sidebar/src/index.ts"],
       "@js-monorepo/store": ["libs/shared/store/src/index.ts"],

@@ -23,9 +23,9 @@
     "start:webhook": "cd dist/apps/webhook-server && node main.js",
     "start:my-api": "cd dist/apps/my-api && node main.js",
     "start:docs": "cd dist/apps/docs && npx next start",
-    "db:auth-migrate": "env-cmd --no-override -f libs/prisma/run_auth_migrations/.env npx prisma migrate dev --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
-    "db:auth-create": "env-cmd --no-override -f libs/prisma/run_auth_migrations/.env npx prisma migrate dev --create-only --schema=libs/prisma/auth/src/lib/prisma/schema.prisma",
-    "db:auth-generate": "prisma generate --schema=libs/prisma/auth/src/lib/prisma/schema.prisma"
+    "db:migrate": "env-cmd --no-override -f libs/prisma/run_migrations/.env npx prisma migrate dev --schema=libs/prisma/db/src/lib/prisma/schema.prisma",
+    "db:create": "env-cmd --no-override -f libs/prisma/run_migrations/.env npx prisma migrate dev --create-only --schema=libs/prisma/db/src/lib/prisma/schema.prisma",
+    "db:generate": "prisma generate --schema=libs/prisma/db/src/lib/prisma/schema.prisma"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

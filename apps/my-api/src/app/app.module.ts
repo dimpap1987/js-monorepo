@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 
 import { AuthModule } from '@js-monorepo/auth'
-import { authClient } from '@js-monorepo/db'
+import { prismaClient } from '@js-monorepo/db'
 import { ConfigModule } from '@nestjs/config'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -15,8 +15,7 @@ const ENV = process.env.NODE_ENV
     ConfigModule.forRoot({
       envFilePath: ['.env', `.env.${ENV}`, `environments/.env.${ENV}`],
     }),
-    AuthModule.forRoot({
-      dbClient: authClient,
+    AuthModule.forRoot(prismaClient, {
       sessionSecret: process.env.SESSION_SECRET,
       jwtSercret: process.env.JWT_SECRET_KEY,
       github: {

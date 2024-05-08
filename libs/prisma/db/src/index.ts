@@ -1,1 +1,1 @@
-export { authClient } from './lib/auth-client'
+export { prismaClient } from './lib/db-client'

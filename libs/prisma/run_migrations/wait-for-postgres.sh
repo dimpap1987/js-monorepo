@@ -10,7 +10,7 @@ shift
 shift
 cmd="$@"
   
-until PGPASSWORD=$AUTH_DATABASE_PASSWORD psql -h "$host" -U "$user" -d "$auth" -c '\q'; do
+until PGPASSWORD=$DATABASE_PASSWORD psql -h "$host" -U "$user" -d "$auth" -c '\q'; do
   >&2 echo "Postgres is unavailable - sleeping"
   sleep 1
 done
