@@ -1,5 +1,13 @@
-import { DynamicModule, Inject, Module } from '@nestjs/common'
+import {
+  DynamicModule,
+  Inject,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common'
 import { APP_FILTER, REQUEST } from '@nestjs/core'
+import session from 'express-session'
 import { AuthController } from './controllers/auth.controller'
 import {
   AuthExceptionFilter,
@@ -10,6 +18,7 @@ import {
 } from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
+import { RefererMiddleware } from './middlewares/referer.middleware'
 import { AuthService } from './services/auth.service'
 import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
@@ -57,7 +66,7 @@ import { AuthConfiguration } from './types/auth.configuration'
   ],
   exports: ['jwt', JwtAuthGuard, RolesGuard, AuthService],
 })
-export class AuthModule {
+export class AuthModule implements NestModule {
   constructor(
     @Inject('SESSION_SECRET') private readonly sessionSecret: string
   ) {}
@@ -111,16 +120,40 @@ export class AuthModule {
           useFactory: async (config: AuthConfiguration) => config.onRegister,
           inject: ['AUTH_CONFIG'],
         },
+        {
+          provide: 'ON_LOGIN_CALLBACK',
+          useFactory: async (config: AuthConfiguration) => config.onLogin,
+          inject: ['AUTH_CONFIG'],
+        },
       ],
       exports: [
         'SESSION_SECRET',
         'JWT_SECRET',
         'DB_CLIENT',
         'ON_REGISTER_CALLBACK',
+        'ON_LOGIN_CALLBACK',
         'REDIRECT_UI_URL',
         'GITHUB-AUTH',
         'GOOGLE-AUTH',
       ],
     }
+  }
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        session({
+          secret: this.sessionSecret,
+          resave: false,
+          saveUninitialized: false,
+        })
+      )
+      .forRoutes('*')
+      .apply(RefererMiddleware)
+      .forRoutes(
+        { path: '*google/login*', method: RequestMethod.GET },
+        { path: '*github/login*', method: RequestMethod.GET },
+        { path: '*facebook/login*', method: RequestMethod.GET }
+      )
   }
 }

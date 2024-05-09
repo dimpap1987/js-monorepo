@@ -20,6 +20,7 @@ export interface AuthConfiguration {
   github?: GithubAuth
   google?: GoogleAuth
   onRegister?: (user: AuthUser) => Promise<any>
+  onLogin?: (user: AuthUser) => Promise<any>
 }
 
 declare module 'express' {
