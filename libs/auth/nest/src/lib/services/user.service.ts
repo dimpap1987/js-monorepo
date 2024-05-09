@@ -38,7 +38,7 @@ export class UserService {
     providerDTO: Omit<Provider, 'id' | 'userId'>
   ) {
     try {
-      const user = await this.authClient.$transaction(async (prisma) => {
+      return await this.authClient.$transaction(async (prisma) => {
         if (providerDTO) {
           return prisma.authUser.create({
             data: {
@@ -61,8 +61,6 @@ export class UserService {
           })
         }
       })
-      Logger.log(`User: '${user.username}' created successfully`)
-      return user
     } catch (err: any) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002') {

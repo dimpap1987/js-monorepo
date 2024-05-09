@@ -14,15 +14,6 @@ export class ChannelService {
         where: { name: 'global' },
       })
 
-      const existingUserChannel = await this.prisma.userChannel.findFirst({
-        where: { user_id: userId, channel_id: globalChannel.id },
-      })
-
-      if (existingUserChannel) {
-        // User is already registered to the global channel
-        return
-      }
-
       // Register the user to the global channel
       await this.prisma.userChannel.create({
         data: {
@@ -33,6 +24,28 @@ export class ChannelService {
     } catch (error) {
       console.error('Error registering user to global channel:', error)
       throw new Error('Failed to register user to global channel')
+    }
+  }
+
+  async getChannelsByUsername(username: string) {
+    try {
+      const userChannels = await this.prisma.userChannel.findMany({
+        where: {
+          user: {
+            username: username,
+          },
+        },
+        include: {
+          channel: true,
+        },
+      })
+
+      const channels = userChannels?.map((userChannel) => userChannel.channel)
+
+      return channels
+    } catch (error) {
+      console.error('Error fetching channels:', error)
+      throw error
     }
   }
 }

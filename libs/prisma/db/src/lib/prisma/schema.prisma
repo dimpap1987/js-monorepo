@@ -68,7 +68,6 @@ model Notification {
 }
 
 model UserNotification {
-    id              Int          @id @default(autoincrement())
     user_id         Int
     notification_id Int
     user            AuthUser     @relation("receiver", fields: [user_id], references: [id])
@@ -77,6 +76,7 @@ model UserNotification {
     sender_id       Int?
     is_read         Boolean      @default(false)
 
+    @@id([user_id, notification_id])
     @@map(name: "users_notifications")
 }
 
@@ -91,11 +91,11 @@ model Channel {
 }
 
 model UserChannel {
-    id         Int      @id @default(autoincrement())
     user_id    Int
     channel_id Int
-    user       AuthUser @relation(fields: [user_id], references: [id])
+    user       AuthUser @relation(fields: [user_id], references: [id], onDelete: Cascade)
     channel    Channel  @relation(fields: [channel_id], references: [id])
 
+    @@id([user_id, channel_id])
     @@map(name: "users_channels")
 }

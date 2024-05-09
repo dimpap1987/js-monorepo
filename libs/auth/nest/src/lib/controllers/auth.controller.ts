@@ -31,7 +31,8 @@ export class AuthController {
     private authService: AuthService,
     private userService: UserService,
     @Inject('REDIRECT_UI_URL') private readonly redirectUrl: string,
-    @Inject('ON_REGISTER_CALLBACK') private readonly onRegisterCallBack: any
+    @Inject('ON_REGISTER_CALLBACK') private readonly onRegisterCallBack: any,
+    @Inject('ON_LOGIN_CALLBACK') private readonly onLoginCallBack: any
   ) {}
 
   @Get('google/login')
@@ -150,8 +151,8 @@ export class AuthController {
         },
         res
       )
-      Logger.log(`User: ${user.username} successfully logged in !!!`)
       redirectURI = req.session['redirect-after-login'] ?? `${this.redirectUrl}`
+      this.onLoginCallBack?.(user)
     } catch (e) {
       if (
         e instanceof AuthException &&
