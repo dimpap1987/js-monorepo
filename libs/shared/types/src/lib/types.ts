@@ -1,3 +1,4 @@
+import { IconType } from 'react-icons/lib'
 import { Prisma } from '@prisma/client'
 
 export interface UserJWT {
@@ -30,3 +31,10 @@ export type AuthUserWithProviders = Prisma.AuthUserGetPayload<{
     providers: true
   }
 }>
+
+export type MenuItem = {
+  name: string
+  href: string
+  Icon?: IconType
+  roles: ('ADMIN' | 'USER' | 'PUBLIC')[]
+}

@@ -1,4 +1,4 @@
-import { compose, withError, withPathName } from '@js-monorepo/utils'
+import { compose, withPathName } from '@js-monorepo/utils'
 import { NextResponse } from 'next/server'
 import { withAuth } from './app/middlewares/withAuth'
 
