@@ -18,7 +18,7 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=deps /usr/src/app/package.json ./package.json
 COPY dist/apps/next-app/public ./public
 COPY dist/apps/next-app/.next ./.next
-COPY libs/prisma/auth/src/lib/prisma ./prisma
+COPY libs/prisma/db/src/lib/prisma ./prisma
 RUN chown -R node:node .
 USER node
 EXPOSE 3000
