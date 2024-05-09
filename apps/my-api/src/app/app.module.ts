@@ -6,9 +6,11 @@ import { ConfigModule } from '@nestjs/config'
 import { AuthUser } from '@prisma/client'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { AdminController } from './controllers/admin.controller'
 import { NotificationController } from './controllers/notification.controller'
 import { EventsService } from './services/event.service'
 import { PrismaService } from './services/prisma.service'
+import { UserService } from './services/user.service'
 
 const ENV = process.env.NODE_ENV
 
@@ -48,8 +50,14 @@ const ENV = process.env.NODE_ENV
       inject: [ChannelService, PrismaService],
     }),
   ],
-  controllers: [AppController, NotificationController],
-  providers: [AppService, EventsService, PrismaService, ChannelService],
+  controllers: [AppController, NotificationController, AdminController],
+  providers: [
+    AppService,
+    EventsService,
+    PrismaService,
+    ChannelService,
+    UserService,
+  ],
   exports: [ChannelService, PrismaService],
 })
 export class AppModule {}

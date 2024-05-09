@@ -103,6 +103,7 @@ export class AuthController {
     this.handleLoggedInUser(
       {
         user: {
+          id: user.id,
           username: user.username,
           roles: user.roles,
           createdAt: user.createdAt,
@@ -143,6 +144,7 @@ export class AuthController {
       this.handleLoggedInUser(
         {
           user: {
+            id: user.id,
             username: user.username,
             roles: user.roles,
             createdAt: user.createdAt,

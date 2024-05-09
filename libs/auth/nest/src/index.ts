@@ -1,2 +1,5 @@
 export * from './lib/auth.module'
+export { HasRoles } from './lib/decorators/has-roles.decorator'
 export { JwtAuthGuard } from './lib/guards/jwt-auth.guard'
+export { RolesGuard } from './lib/guards/roles-guard'
+export { RolesEnum } from './lib/types/auth.configuration'

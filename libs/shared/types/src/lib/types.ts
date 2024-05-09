@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 
 export interface UserJWT {
+  id: string | number
   username: string
   createdAt?: string | Date
   lastLoggedIn?: string | null
