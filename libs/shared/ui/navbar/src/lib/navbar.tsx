@@ -1,7 +1,7 @@
 'use client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { MenuItem } from '@js-monorepo/sidebar'
+import { MenuItem, UserJWT } from '@js-monorepo/types'
 import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
 import { GiHamburgerMenu } from 'react-icons/gi'
@@ -16,12 +16,7 @@ export interface DpNextNavbarProps {
   readonly onLogout?: () => void
   readonly onSideBarClick?: () => void
 }
-export type UserNavProps = {
-  username?: string | null
-  isLoggedIn: boolean
-  userProfileImage?: string | null
-  createdAt?: string | null | Date
-}
+export type UserNavProps = Partial<UserJWT> & { isLoggedIn: boolean }
 
 export type UserNavSocial = {
   type: 'google' | 'github' | 'facebook'
@@ -64,13 +59,18 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       key={index}
                       className="hover:text-foreground-hover text-center text-nowrap"
                     >
-                      <DpNextNavLink
-                        className="py-2 px-4"
-                        activeClassName="text-foreground-hover underline-offset-8"
-                        href={item.href}
-                      >
-                        {item.name}
-                      </DpNextNavLink>
+                      {(item?.roles?.includes('PUBLIC') ||
+                        item?.roles?.some((role) =>
+                          user?.roles?.includes(role)
+                        )) && (
+                        <DpNextNavLink
+                          className="py-2 px-4"
+                          activeClassName="text-foreground-hover underline-offset-8"
+                          href={item.href}
+                        >
+                          {item.name}
+                        </DpNextNavLink>
+                      )}
                     </li>
                   ))}
               </ul>
@@ -105,7 +105,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       {user?.isLoggedIn && (
                         <>
                           <UserMetadata
-                            profileImage={user.userProfileImage}
+                            profileImage={user.picture}
                             username={user.username}
                             createdAt={user.createdAt}
                             className="mb-2 border-border border-b"

@@ -1,7 +1,7 @@
 import { SessionProvider } from '@js-monorepo/auth-client'
-import { validateAuthToken } from '@js-monorepo/auth-server'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
+import { getCurrentUser } from '@next-app/actions/session'
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
@@ -24,7 +24,7 @@ export default async function RootLayout(props: {
   readonly children: ReactNode
   readonly auth: ReactNode
 }) {
-  const session = await validateAuthToken(process.env.JWT_SECRET_KEY ?? '')
+  const session = await getCurrentUser()
 
   return (
     <html lang="en" suppressHydrationWarning={true}>

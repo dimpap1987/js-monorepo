@@ -6,8 +6,9 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNotificationBellComponent } from '@js-monorepo/notification-bell'
-import { DpNextSidebar, MenuItem } from '@js-monorepo/sidebar'
+import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
+import { MenuItem } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
 import { PropsWithChildren, useState } from 'react'
 import SVGLogo from './logo-svg'
@@ -16,14 +17,22 @@ const menuItems: MenuItem[] = [
   {
     href: '/',
     name: 'Home',
+    roles: ['PUBLIC'],
   },
-  {
-    href: '/ai-image-generator',
-    name: 'AI Image Generator',
-  },
+  // {
+  //   href: '/ai-image-generator',
+  //   name: 'AI Image Generator',
+  //   roles: ['PUBLIC'],
+  // },
   {
     href: '/about',
     name: 'About',
+    roles: ['PUBLIC'],
+  },
+  {
+    href: '/dashboard',
+    name: 'Dashboard',
+    roles: ['ADMIN'],
   },
 ]
 
@@ -38,9 +47,7 @@ export default function MainTemplate({
       <DpNextNavbar
         user={{
           isLoggedIn: isLoggedIn,
-          username: user?.username,
-          createdAt: user?.createdAt,
-          userProfileImage: user?.picture,
+          ...user,
         }}
         menuItems={menuItems}
         onSideBarClick={() => {
@@ -66,6 +73,9 @@ export default function MainTemplate({
         onClose={() => setOpenSideBar(false)}
         position="right"
         items={menuItems}
+        user={{
+          ...user,
+        }}
       >
         <div className="p-3">
           {!user && (

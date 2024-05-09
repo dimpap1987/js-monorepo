@@ -1,19 +1,14 @@
 'use client'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ModeToggle } from '@js-monorepo/theme-provider'
+import { MenuItem, UserJWT } from '@js-monorepo/types'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode, RefObject, forwardRef, useEffect, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
-import { IconType } from 'react-icons/lib'
 import { useClickAway } from 'react-use'
 
 export type SidebarPositionType = 'right' | 'left'
 
-export type MenuItem = {
-  name: string
-  href: string
-  Icon?: IconType
-}
 export interface DpNextSidebarProps {
   readonly children?: ReactNode
   readonly isOpen: boolean
@@ -21,6 +16,7 @@ export interface DpNextSidebarProps {
   readonly position?: SidebarPositionType
   readonly items: MenuItem[]
   readonly header?: string
+  readonly user?: Partial<UserJWT>
 }
 
 const framerSidebarPanel = (position: SidebarPositionType) => ({
@@ -53,7 +49,7 @@ const framerIcon = {
 
 const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
   (
-    { children, isOpen, onClose, items = [], position = 'left', header },
+    { children, isOpen, onClose, user, items = [], position = 'left', header },
     forwardedRef
   ) => {
     const localRef = useRef<HTMLDivElement | null>(null)
@@ -88,29 +84,35 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
               </button>
             </div>
             <ul>
-              {items?.map(({ name, href, Icon }, idx) => {
+              {items?.map((item, idx) => {
+                const shouldRenderNavLink =
+                  item.roles?.includes('PUBLIC') || // Always render if PUBLIC role is present
+                  item?.roles?.some((role) => user?.roles?.includes(role)) // Render if user has any of the required roles
+
                 return (
-                  <li key={name}>
-                    <DpNextNavLink
-                      className={`flex items-center w-full ${
-                        position === 'right' ? 'flex-row-reverse' : ''
-                      } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-border`}
-                      href={href}
-                      onClick={() => onClose()}
-                    >
-                      <motion.span
-                        {...framerText(idx, position)}
-                        className="text-white"
+                  shouldRenderNavLink && (
+                    <li key={item.name}>
+                      <DpNextNavLink
+                        className={`flex items-center w-full ${
+                          position === 'right' ? 'flex-row-reverse' : ''
+                        } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-border`}
+                        href={item.href}
+                        onClick={() => onClose()}
                       >
-                        {name}
-                      </motion.span>
-                      {Icon && (
-                        <motion.div {...framerIcon}>
-                          <Icon className="text-2xl" />
-                        </motion.div>
-                      )}
-                    </DpNextNavLink>
-                  </li>
+                        <motion.span
+                          {...framerText(idx, position)}
+                          className="text-white"
+                        >
+                          {item.name}
+                        </motion.span>
+                        {item.Icon && (
+                          <motion.div {...framerIcon}>
+                            <item.Icon className="text-2xl" />
+                          </motion.div>
+                        )}
+                      </DpNextNavLink>
+                    </li>
+                  )
                 )
               })}
             </ul>
