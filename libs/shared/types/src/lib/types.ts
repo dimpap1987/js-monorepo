@@ -38,3 +38,12 @@ export type MenuItem = {
   Icon?: IconType
   roles: ('ADMIN' | 'USER' | 'PUBLIC')[]
 }
+
+export type AuthUserFullPayload = Prisma.AuthUserGetPayload<{
+  include: {
+    providers: true
+    receivedNotifications: true
+    sentNotifications: true
+    userChannels: true
+  }
+}>

@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@js-monorepo/dropdown'
+} from '@js-monorepo/components'
 import { cn } from '@js-monorepo/utils'
 import moment from 'moment'
 import { Fragment, useEffect, useState } from 'react'
@@ -103,7 +103,7 @@ export function DpNotificationBellComponent({
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="p-1 bg-background-secondary mt-3 hidden md:block text-white w-[430px]">
+      <DropdownMenuContent className="p-1 bg-background-secondary mt-3 hidden md:block text-white w-[460px] xl:w-[640px]">
         <DropdownMenuLabel>Notifications</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div className="max-h-[320px] overflow-x-hidden overflow-y-auto">
