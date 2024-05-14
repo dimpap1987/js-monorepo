@@ -1,7 +1,11 @@
-import React from 'react'
+import { DashboardUsersTableComponent } from '@js-monorepo/dashboard/users'
 
-function DashboardController() {
-  return <h1 className="text-foreground">DashboardController</h1>
+async function DashboardController() {
+  return (
+    <>
+      <DashboardUsersTableComponent></DashboardUsersTableComponent>
+    </>
+  )
 }
 
 export default DashboardController

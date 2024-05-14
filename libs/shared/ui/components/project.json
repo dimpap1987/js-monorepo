@@ -1,7 +1,7 @@
 {
-  "name": "dropdown",
+  "name": "table",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/shared/ui/dropdown/src",
+  "sourceRoot": "libs/shared/ui/components/src",
   "projectType": "library",
   "tags": [],
   "targets": {}

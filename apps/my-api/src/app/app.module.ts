@@ -8,9 +8,9 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AdminController } from './controllers/admin.controller'
 import { NotificationController } from './controllers/notification.controller'
+import { AdminService } from './services/admin.service'
 import { EventsService } from './services/event.service'
 import { PrismaService } from './services/prisma.service'
-import { UserService } from './services/user.service'
 
 const ENV = process.env.NODE_ENV
 
@@ -56,7 +56,7 @@ const ENV = process.env.NODE_ENV
     EventsService,
     PrismaService,
     ChannelService,
-    UserService,
+    AdminService,
   ],
   exports: [ChannelService, PrismaService],
 })
