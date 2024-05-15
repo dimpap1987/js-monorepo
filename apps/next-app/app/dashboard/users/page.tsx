@@ -1,6 +1,6 @@
 import { DashboardUsersTableComponent } from '@js-monorepo/dashboard/users'
 
-async function DashboardController() {
+async function UsersDashboardController() {
   return (
     <>
       <DashboardUsersTableComponent></DashboardUsersTableComponent>
@@ -8,4 +8,4 @@ async function DashboardController() {
   )
 }
 
-export default DashboardController
+export default UsersDashboardController

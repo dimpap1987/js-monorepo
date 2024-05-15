@@ -13,16 +13,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select'
+import { cn } from '@js-monorepo/utils'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
+  className?: string
 }
 
 export function DataTablePagination<TData>({
   table,
+  className,
 }: DataTablePaginationProps<TData>) {
   return (
-    <div className="flex items-center justify-between px-2">
+    <div className={cn('flex items-center justify-between p-3', className)}>
       <div className="flex-1 text-sm text-muted-foreground">
         {table.getFilteredSelectedRowModel().rows.length} of{' '}
         {table.getFilteredRowModel().rows.length} row(s) selected.

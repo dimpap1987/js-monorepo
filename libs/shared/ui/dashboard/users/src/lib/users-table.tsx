@@ -145,7 +145,7 @@ const DashboardUsersTableComponent = (
     const params = new URLSearchParams(searchParams)
     params.set('pageSize', pagination.pageSize.toString())
     params.set('page', pagination.pageIndex.toString())
-    replace('/dashboard?' + params)
+    replace('?' + params)
   }, [pagination, limit, onPaginationChange, skip])
 
   const pageCount = Math.round(data.totalCount / limit)

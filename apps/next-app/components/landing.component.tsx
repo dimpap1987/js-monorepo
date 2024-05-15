@@ -14,7 +14,7 @@ interface MainProps {
   readonly className?: string
 }
 
-export default function Main({ children, className }: MainProps) {
+export default function LandingComponent({ children, className }: MainProps) {
   const [, setLoaderState] = useLoader()
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
