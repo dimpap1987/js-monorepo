@@ -103,16 +103,3 @@ export const useSession = () => {
   }
   return context
 }
-
-export const getSession = async () => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`,
-    {
-      credentials: 'include',
-    }
-  )
-  if (response.ok) {
-    const session = await response.json()
-    return session
-  }
-}

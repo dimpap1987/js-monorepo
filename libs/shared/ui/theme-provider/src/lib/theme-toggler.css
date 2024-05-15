@@ -36,13 +36,13 @@
   border-radius: 50%;
   left: 10%;
   bottom: 15%;
-  box-shadow: inset 8px -4px 0px 0px #fff000;
+  box-shadow: inset 4px -2px 0px 2px white;
   background: var(--background);
   transition: 0.5s;
 }
 
 input:checked + .slider {
-  background-color: #522ba7;
+  background-color: #1943EC;
 }
 
 input:checked + .slider:before {

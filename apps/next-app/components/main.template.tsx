@@ -1,10 +1,8 @@
 'use client'
 import { authClient, useSession } from '@js-monorepo/auth-client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
-import { DpLoaderProvider } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
-import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNotificationBellComponent } from '@js-monorepo/notification-bell'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
@@ -97,16 +95,7 @@ export default function MainTemplate({
         </div>
       </DpNextSidebar>
 
-      <DpLoaderProvider>
-        <DpNotificationProvider>
-          <main className="p-3 flex-grow container mx-auto min-w-[200px]">
-            {children}
-          </main>
-          <footer className="text-center py-4">
-            <DpVersion></DpVersion>
-          </footer>
-        </DpNotificationProvider>
-      </DpLoaderProvider>
+      {children}
     </>
   )
 }
