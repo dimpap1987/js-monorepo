@@ -11,7 +11,7 @@ import {
   FormItem,
   FormLabel,
   Input,
-} from '@js-monorepo/form'
+} from '@js-monorepo/components'
 import { useNotifications } from '@js-monorepo/notification'
 import { RegisterUserSchema } from '@js-monorepo/schemas'
 import { useRouter } from 'next-nprogress-bar'
