@@ -6,7 +6,8 @@ import {
 } from '@radix-ui/react-icons'
 import { Column } from '@tanstack/react-table'
 
-import { DpButton } from '@js-monorepo/button'
+import { cn } from '@js-monorepo/utils'
+import { Button } from '../button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../dropdown'
-import { cn } from '@js-monorepo/utils'
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -39,8 +39,9 @@ export function DataTableColumnHeader<TData, TValue>({
     <div className={cn('flex items-center space-x-2', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <DpButton
-            size="small"
+          <Button
+            variant="ghost"
+            size="sm"
             className="-ml-3 h-8 data-[state=open]:bg-accent w-full"
           >
             <span>{title}</span>
@@ -51,7 +52,7 @@ export function DataTableColumnHeader<TData, TValue>({
             ) : (
               <CaretSortIcon className="ml-2 h-4 w-4" />
             )}
-          </DpButton>
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-background-primary" align="center">
           <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
