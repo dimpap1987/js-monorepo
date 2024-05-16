@@ -83,6 +83,7 @@ export const columns: ColumnDef<AuthUserFullPayload>[] = [
   },
   {
     accessorKey: 'roles',
+    size: 130,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Roles" />
     ),
@@ -92,6 +93,7 @@ export const columns: ColumnDef<AuthUserFullPayload>[] = [
   },
   {
     accessorKey: 'createdAt',
+    size: 100,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created At" />
     ),
@@ -103,6 +105,7 @@ export const columns: ColumnDef<AuthUserFullPayload>[] = [
   },
   {
     accessorKey: 'provider',
+    size: 100,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Provider" />
     ),
