@@ -9,6 +9,7 @@ import {
 
 import { DataTablePagination } from './data-table-pagination'
 // import { DataTableToolbar } from "./data-table-toolbar"
+import { Dispatch, SetStateAction } from 'react'
 import {
   Table,
   TableBody,
@@ -17,7 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from './table'
-import { Dispatch, SetStateAction } from 'react'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
