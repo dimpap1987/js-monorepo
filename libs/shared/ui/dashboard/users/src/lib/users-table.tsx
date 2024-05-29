@@ -4,8 +4,10 @@ import {
   DataTable,
   DataTableColumnHeader,
   Input,
+  TextareaForm,
   usePagination,
 } from '@js-monorepo/components'
+import { DpDialog, DpDialogContent, DpDialogHeader } from '@js-monorepo/dialog'
 import { AuthUserFullPayload } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/utils'
 import { ColumnDef } from '@tanstack/react-table'
@@ -47,6 +49,8 @@ const findUsers = async (searchParams?: string) => {
 
 const DashboardUsersTableComponent = () => {
   const [data, setData] = useState<UsersReponse>({ users: [], totalCount: 0 })
+  const [selectedUserForAnnouncement, setSelectedUserForAnnouncement] =
+    useState<AuthUserFullPayload | undefined | null>()
 
   const [update, setUpdate] = useState<{
     index?: number
@@ -256,7 +260,10 @@ const DashboardUsersTableComponent = () => {
                   />
                 </div>
               )}
-              <div className="flex justify-center items-center border-2 rounded-lg p-1">
+              <div
+                className="flex justify-center items-center border-2 rounded-lg p-1"
+                onClick={() => setSelectedUserForAnnouncement(row.original)}
+              >
                 <GrAnnounce className="shrink-0 text-2xl cursor-pointer" />
               </div>
             </div>
@@ -264,7 +271,7 @@ const DashboardUsersTableComponent = () => {
         },
       },
     ],
-    [update, replace, searchParams, pagination]
+    [update, replace, searchParams, pagination, selectedUserForAnnouncement]
   )
 
   return (
@@ -276,6 +283,41 @@ const DashboardUsersTableComponent = () => {
         totalCount={pageCount}
         pagination={pagination}
       ></DataTable>
+
+      {selectedUserForAnnouncement && (
+        <DpDialog
+          isOpen={!!selectedUserForAnnouncement}
+          onClose={() => setSelectedUserForAnnouncement(null)}
+          autoClose={true}
+        >
+          <DpDialogHeader>
+            Send notification to ' {selectedUserForAnnouncement.username} '
+          </DpDialogHeader>
+          <DpDialogContent>
+            <TextareaForm
+              submitCallBack={async (callBackData) => {
+                const response = await fetch(
+                  `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`,
+                  {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      channel: selectedUserForAnnouncement.username,
+                      message: callBackData.notification,
+                    }),
+                  }
+                )
+                if (response.ok) {
+                  console.log('OK')
+                }
+              }}
+            ></TextareaForm>
+          </DpDialogContent>
+        </DpDialog>
+      )}
     </>
   )
 }

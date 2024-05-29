@@ -56,6 +56,10 @@ export function withAuth(
 
     const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 
+    const routeExists = routes.some((route) =>
+      nextUrl.pathname.startsWith(route.path)
+    )
+
     // start the middleware logic
     if (isApiAuthRoute || isPublicRoute) {
       return nextMiddleware(request)
@@ -68,7 +72,7 @@ export function withAuth(
       return nextMiddleware(request)
     }
 
-    if (!isLoggedIn && !isPublicRoute) {
+    if (!isLoggedIn && !isPublicRoute && routeExists) {
       return NextResponse.redirect(new URL(`/auth/login`, nextUrl))
     }
 
@@ -76,7 +80,7 @@ export function withAuth(
       .find((route) => nextUrl.pathname.startsWith(route.path))
       ?.roles?.some((role) => session?.user?.roles?.includes(role))
 
-    if (!hasRequiredRole) {
+    if (!hasRequiredRole && routeExists) {
       return NextResponse.redirect(new URL('/', nextUrl))
     }
 
