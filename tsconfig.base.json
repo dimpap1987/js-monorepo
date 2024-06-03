@@ -24,8 +24,8 @@
       "@js-monorepo/auth-server": ["libs/auth/server/src/index.ts"],
       "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
-      "@js-monorepo/dashboard/users": [
-        "libs/shared/ui/dashboard/users/src/index.ts"
+      "@js-monorepo/dashboard-users": [
+        "libs/shared/ui/dashboard-users/src/index.ts"
       ],
       "@js-monorepo/db": ["libs/prisma/db/src/index.ts"],
       "@js-monorepo/dialog": ["libs/shared/ui/dialog/src/index.ts"],

@@ -45,10 +45,10 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     return (
       <header className="z-20">
         <nav
-          className="text-foreground w-full border-b border-border sm:px-8"
+          className="text-foreground border-b border-border sm:px-8"
           ref={ref}
         >
-          <div className="flex justify-between h-14">
+          <div className="flex justify-between navbar-height overflow-hidden">
             <div className="px-5 py-2 flex w-full items-center">
               {logo}
               <ul className="hidden md:flex px-4 font-semibold font-heading items-center space-x-6 ml-[14%]">

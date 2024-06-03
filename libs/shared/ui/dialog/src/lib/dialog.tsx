@@ -1,11 +1,5 @@
 import { cn } from '@js-monorepo/utils'
-import React, {
-  ReactNode,
-  forwardRef,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { GrFormClose } from 'react-icons/gr'
 import DpConfirmationDialog from '../components/confirmation-dialog'
 import DpDialogContent from '../components/content'
@@ -67,18 +61,7 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
       }
     }, [children])
 
-    const [shouldRender, setShouldRender] = useState(isOpen)
-
-    useEffect(() => {
-      if (isOpen) {
-        setShouldRender(true)
-      } else {
-        const timer = setTimeout(() => setShouldRender(false), 300) // 300ms matches the animation duration
-        return () => clearTimeout(timer)
-      }
-    }, [isOpen])
-
-    if (!shouldRender) return null
+    if (!isOpen) return null
 
     return (
       <>
@@ -86,15 +69,23 @@ const DpDialog = forwardRef<HTMLDivElement, DpDialogProps>(
           data-dialog-backdrop="dialog"
           data-dialog-backdrop-close="true"
           className={cn(
-            `absolute inset-0 z-10 top-[50px] min-h-[calc(100vh-50px)] pointer-events-all bg-black bg-opacity-50`,
+            `fixed inset-0 top-navbar-offset z-10 pointer-events-all bg-black bg-opacity-50`,
             overlayClassName
           )}
           onClick={() => autoClose && onClose?.()}
+          tabIndex={0}
         ></div>
         <div
           data-dialog="dialog"
+          aria-modal="true"
+          tabIndex={-1}
           role="dialog"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              onClose?.()
+            }
+          }}
           className={cn(
             `z-30 w-[90%] sm:w-[50%] min-w-[210px] mb-50 fixed top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border border-primary mb-20 max-h-[80%] overflow-y-auto m-auto rounded-2xl bg-slate-100 text-base font-light leading-relaxed antialiased pointer-events-auto transition ease-out duration-200 
             text-black shadow-2xl shadow-cyan-500/50 p-2 ${isOpen ? ' opacity-100 translate-y-0 ' : ' opacity-0 -translate-y-full '} `,

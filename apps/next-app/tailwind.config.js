@@ -81,6 +81,18 @@ module.exports = {
       backgroundColor: ['hover'],
     },
   },
-  // eslint-disable-next-line global-require
-  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
+  plugins: [
+    require('tailwindcss-animate'),
+    require('@tailwindcss/typography'),
+    function ({ addUtilities }) {
+      addUtilities({
+        '.navbar-height': {
+          height: 'var(--navbar-height)',
+        },
+        '.top-navbar-offset': {
+          top: 'var(--navbar-height)',
+        },
+      })
+    },
+  ],
 }

@@ -16,7 +16,7 @@ export default function DpNotificationList({
     notifications.length > 0 && (
       <section
         className={cn(
-          `fixed top-[50px] right-2 p-2 z-40 flex flex-col-reverse gap-2`,
+          `fixed top-navbar-offset right-2 p-2 z-40 flex flex-col-reverse gap-2`,
           overlayClassName
         )}
       >
