@@ -311,7 +311,7 @@ const DashboardUsersTableComponent = () => {
                   }
                 )
                 if (response.ok) {
-                  console.log('OK')
+                  setSelectedUserForAnnouncement(null)
                 }
               }}
             ></TextareaForm>
