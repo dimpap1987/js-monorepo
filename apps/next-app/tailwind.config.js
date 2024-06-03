@@ -74,6 +74,10 @@ module.exports = {
       zIndex: {
         100: '100',
       },
+      boxShadow: {
+        primary:
+          '0 0 40px -2px hsl(var(--primary), 0.1), 0 2px 4px -1px hsl(var(--primary), 0.06)',
+      },
     },
   },
   variants: {

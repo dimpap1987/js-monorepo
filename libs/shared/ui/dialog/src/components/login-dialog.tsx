@@ -27,7 +27,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
         isOpen={isOpen}
         onClose={onClose}
         ref={ref}
-        className="z-40 sm:w-[380px] top-1/4"
+        className="z-40 sm:w-[415px] top-1/4"
       >
         <DpDialogHeader className="justify-center font-semibold ml-9">
           Sign in with
@@ -40,7 +40,8 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'google' && (
                   <button
                     type="button"
-                    className="flex justify-center bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black items-center mr-2 shadow-effect transition-transform duration-300 transform hover:scale-105"
+                    className="flex justify-center bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black items-center
+                     mr-2 shadow-effect transition-transform duration-300 transform hover:scale-105"
                     onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <div className="flex items-center">
@@ -79,7 +80,8 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'github' && (
                   <button
                     type="button"
-                    className="flex justify-center bg-[#24292F] shadow-effect w-full text-white rounded-lg px-5 py-2.5 text-center items-center mr-2 transition-transform duration-300 transform hover:scale-105"
+                    className="flex justify-center bg-[#24292F] shadow-effect w-full text-white rounded-lg px-5 py-2.5 text-center 
+                    items-center mr-2 transition-transform duration-300 transform hover:scale-105"
                     onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <div className="flex items-center">
@@ -107,7 +109,8 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'facebook' && (
                   <button
                     type="button"
-                    className="flex justify-center bg-[#3b5998] w-full shadow-effect text-white rounded-lg px-5 py-2.5 text-center items-center mr-2 transition-transform duration-300 transform hover:scale-105"
+                    className="flex justify-center bg-[#3b5998] w-full shadow-effect text-white rounded-lg px-5 py-2.5 text-center 
+                    items-center mr-2 transition-transform duration-300 transform hover:scale-105"
                     onClick={() => handleSocialLogin(social.onLogin)}
                   >
                     <svg

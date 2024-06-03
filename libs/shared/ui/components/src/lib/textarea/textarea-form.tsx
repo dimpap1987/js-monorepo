@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from '../form'
 import { Textarea } from './textarea'
+import { DpButton } from '@js-monorepo/button'
 
 const FormSchema = z.object({
   notification: z
@@ -42,7 +43,7 @@ export function TextareaForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
           name="notification"
@@ -59,7 +60,9 @@ export function TextareaForm({
             </FormItem>
           )}
         />
-        <Button type="submit">Send</Button>
+        <DpButton type="submit" className="w-full">
+          Send
+        </DpButton>
       </form>
     </Form>
   )
