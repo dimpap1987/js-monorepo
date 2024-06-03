@@ -26,6 +26,8 @@ h4 {
 
 @layer base {
   :root {
+    --navbar-height: 50px; /* Define the height of your navbar */
+    --navbar-offset: calc(var(--navbar-height));
     --border: 240 4% 56%;
 
     --background-primary: 0 0% 95%;
