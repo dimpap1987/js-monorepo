@@ -1,9 +1,13 @@
-import React, { forwardRef } from 'react'
-import { DpDialog, DpDialogFooter } from '../lib/dialog'
-import DpDialogContent from './content'
-import DpDialogHeader from './header'
-import './login-dialog.css'
+import {
+  Dialog,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DpDialogContent,
+} from '@js-monorepo/components'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import React, { forwardRef } from 'react'
+import './login-dialog.css'
 
 export type SocialConfig = {
   type: 'google' | 'github' | 'facebook'
@@ -11,28 +15,33 @@ export type SocialConfig = {
 }
 
 export type DpLoginDialogProps = {
-  readonly isOpen: boolean
   readonly onClose: () => void
   readonly socialConfig: SocialConfig[]
 }
 
-async function handleSocialLogin(func: () => void | Promise<void>) {
-  func()
-}
-
 const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
-  ({ isOpen, onClose, socialConfig }, ref) => {
+  ({ onClose, socialConfig }, ref) => {
     return (
-      <DpDialog
-        isOpen={isOpen}
-        onClose={onClose}
-        ref={ref}
-        className="z-40 sm:w-[415px] top-1/4"
+      <Dialog
+        modal={false}
+        defaultOpen
+        onOpenChange={(open) => {
+          if (!open) {
+            onClose?.()
+          }
+        }}
       >
-        <DpDialogHeader className="justify-center font-semibold ml-9">
-          Sign in with
-        </DpDialogHeader>
-        <DpDialogContent className="p-3 pt-5 w-full">
+        <DpDialogContent
+          onInteractOutside={(e) => {
+            // prevent from closing when clicking outside the dialog
+            e.preventDefault()
+          }}
+        >
+          <DialogHeader className="font-semibold justify-center">
+            <DialogTitle className="text-center font-bold">
+              Sign in with
+            </DialogTitle>
+          </DialogHeader>
           <div className="flex flex-col items-center text-base gap-2 font-medium">
             {socialConfig?.map((social) => (
               <React.Fragment key={social.type}>
@@ -42,7 +51,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                     type="button"
                     className="flex justify-center bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black items-center
                      mr-2 shadow-effect transition-transform duration-300 transform hover:scale-105"
-                    onClick={() => handleSocialLogin(social.onLogin)}
+                    onClick={() => social.onLogin()}
                   >
                     <div className="flex items-center">
                       <svg
@@ -82,7 +91,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                     type="button"
                     className="flex justify-center bg-[#24292F] shadow-effect w-full text-white rounded-lg px-5 py-2.5 text-center 
                     items-center mr-2 transition-transform duration-300 transform hover:scale-105"
-                    onClick={() => handleSocialLogin(social.onLogin)}
+                    onClick={() => social.onLogin()}
                   >
                     <div className="flex items-center">
                       <svg
@@ -111,7 +120,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                     type="button"
                     className="flex justify-center bg-[#3b5998] w-full shadow-effect text-white rounded-lg px-5 py-2.5 text-center 
                     items-center mr-2 transition-transform duration-300 transform hover:scale-105"
-                    onClick={() => handleSocialLogin(social.onLogin)}
+                    onClick={() => social.onLogin()}
                   >
                     <svg
                       className="mr-2 -ml-1 w-4 h-4 shrink-0"
@@ -134,28 +143,28 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
               </React.Fragment>
             ))}
           </div>
+          <DialogFooter>
+            <div className="mt-2 text-gray-600 text-center px-6">
+              <p className="text-xs">
+                By proceeding, you agree to our &nbsp;
+                <DpNextNavLink href="/terms-of-use" className="underline">
+                  Terms of Use
+                </DpNextNavLink>
+                &nbsp; and confirm that you have read our &nbsp;
+                <DpNextNavLink
+                  href="/privacy-cookie-statement"
+                  className="underline"
+                >
+                  Privacy and Cookie Statement.
+                </DpNextNavLink>
+              </p>
+            </div>
+          </DialogFooter>
         </DpDialogContent>
-        <DpDialogFooter>
-          <div className="mt-2 text-gray-600 text-center px-6">
-            <p className="text-xs">
-              By proceeding, you agree to our &nbsp;
-              <DpNextNavLink href="/terms-of-use" className="underline">
-                Terms of Use
-              </DpNextNavLink>
-              &nbsp; and confirm that you have read our &nbsp;
-              <DpNextNavLink
-                href="/privacy-cookie-statement"
-                className="underline"
-              >
-                Privacy and Cookie Statement.
-              </DpNextNavLink>
-            </p>
-          </div>
-        </DpDialogFooter>
-      </DpDialog>
+      </Dialog>
     )
   }
 )
 DpLoginDialog.displayName = 'DpLoginDialog'
 
-export default DpLoginDialog
+export { DpLoginDialog }

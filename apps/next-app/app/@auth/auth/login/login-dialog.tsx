@@ -5,38 +5,46 @@ import { useLoader } from '@js-monorepo/loader'
 import { UserNavSocial } from '@js-monorepo/navbar'
 import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function LoginDialog() {
-  const [isOpen, setIsOpen] = useState(true)
   const router = useRouter()
   const [, setLoaderState] = useLoader()
   const pathname = usePathname()
+  const [hydrated, setHydrated] = useState(false)
 
-  if (pathname !== '/auth/login') return null
+  useEffect(() => {
+    // this is a hacky way in order to disable a hydration error caused by radix
+    setHydrated(true)
+    return () => {
+      setLoaderState({
+        show: false,
+      })
+    }
+  }, [])
+
+  if (pathname !== '/auth/login' || !hydrated) return null
+
+  const triggerLoading = () => {
+    setLoaderState({
+      show: true,
+      message: 'Logging in...',
+      description: 'Sit back and relax.',
+    })
+  }
 
   const socials: UserNavSocial[] = [
     {
       type: 'github',
       onLogin: async () => {
-        setIsOpen(false)
-        setLoaderState({
-          show: true,
-          message: 'Logging in...',
-          description: 'Sit back and relax.',
-        })
+        triggerLoading()
         authClient.login('github')
       },
     },
     {
       type: 'google',
       onLogin: async () => {
-        setIsOpen(false)
-        setLoaderState({
-          show: true,
-          message: 'Logging in...',
-          description: 'Sit back and relax.',
-        })
+        triggerLoading()
         authClient.login('google')
       },
     },
@@ -44,7 +52,6 @@ function LoginDialog() {
   return (
     <DpLoginDialog
       socialConfig={socials}
-      isOpen={isOpen}
       onClose={() => {
         router.back()
       }}

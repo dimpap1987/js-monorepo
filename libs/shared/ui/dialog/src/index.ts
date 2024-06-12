@@ -1,1 +1,2 @@
-export * from './lib/dialog'
+export * from './components/donation-dialog'
+export * from './components/login-dialog'

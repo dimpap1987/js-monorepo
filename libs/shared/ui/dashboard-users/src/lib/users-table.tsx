@@ -3,11 +3,15 @@
 import {
   DataTable,
   DataTableColumnHeader,
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DpDialogContent,
   Input,
   TextareaForm,
   usePagination,
 } from '@js-monorepo/components'
-import { DpDialog, DpDialogContent, DpDialogHeader } from '@js-monorepo/dialog'
 import { AuthUserFullPayload } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/utils'
 import { ColumnDef } from '@tanstack/react-table'
@@ -49,8 +53,6 @@ const findUsers = async (searchParams?: string) => {
 
 const DashboardUsersTableComponent = () => {
   const [data, setData] = useState<UsersReponse>({ users: [], totalCount: 0 })
-  const [selectedUserForAnnouncement, setSelectedUserForAnnouncement] =
-    useState<AuthUserFullPayload | undefined | null>()
 
   const [update, setUpdate] = useState<{
     index?: number
@@ -260,18 +262,47 @@ const DashboardUsersTableComponent = () => {
                   />
                 </div>
               )}
-              <div
-                className="flex justify-center items-center border-2 rounded-lg p-1"
-                onClick={() => setSelectedUserForAnnouncement(row.original)}
-              >
-                <GrAnnounce className="shrink-0 text-2xl cursor-pointer" />
-              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div className="flex justify-center items-center border-2 rounded-lg p-1">
+                    <GrAnnounce className="shrink-0 text-2xl cursor-pointer" />
+                  </div>
+                </DialogTrigger>
+                <DpDialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      Send notification to ' {row.original?.username} '
+                    </DialogTitle>
+                  </DialogHeader>
+                  <TextareaForm
+                    submitCallBack={async (callBackData) => {
+                      const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`,
+                        {
+                          method: 'POST',
+                          credentials: 'include',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            channel: row.original?.username,
+                            message: callBackData.notification,
+                          }),
+                        }
+                      )
+                      if (response.ok) {
+                        console.log('Announcement sent')
+                      }
+                    }}
+                  ></TextareaForm>
+                </DpDialogContent>
+              </Dialog>
             </div>
           )
         },
       },
     ],
-    [update, replace, searchParams, pagination, selectedUserForAnnouncement]
+    [update, replace, searchParams, pagination]
   )
 
   return (
@@ -283,41 +314,6 @@ const DashboardUsersTableComponent = () => {
         totalCount={pageCount}
         pagination={pagination}
       ></DataTable>
-
-      {selectedUserForAnnouncement && (
-        <DpDialog
-          isOpen={!!selectedUserForAnnouncement}
-          onClose={() => setSelectedUserForAnnouncement(null)}
-          autoClose={true}
-        >
-          <DpDialogHeader>
-            Send notification to ' {selectedUserForAnnouncement.username} '
-          </DpDialogHeader>
-          <DpDialogContent>
-            <TextareaForm
-              submitCallBack={async (callBackData) => {
-                const response = await fetch(
-                  `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`,
-                  {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      channel: selectedUserForAnnouncement.username,
-                      message: callBackData.notification,
-                    }),
-                  }
-                )
-                if (response.ok) {
-                  setSelectedUserForAnnouncement(null)
-                }
-              }}
-            ></TextareaForm>
-          </DpDialogContent>
-        </DpDialog>
-      )}
     </>
   )
 }
