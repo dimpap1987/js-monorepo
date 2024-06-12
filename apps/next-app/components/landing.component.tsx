@@ -1,13 +1,12 @@
 'use client'
 import { DpButton } from '@js-monorepo/button'
-import { DpConfirmationDialog } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
 // import { MapComponent, Marker, Popup } from '@js-monorepo/map'
+import { DonationDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { ReactNode, useState } from 'react'
-import { DpCheckoutDialog } from '@js-monorepo/payment'
-import { checkoutSessionClient } from '@js-monorepo/utils'
 import { useUserStore } from '@js-monorepo/store'
+import { checkoutSessionClient } from '@js-monorepo/utils'
+import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
 interface MainProps {
   readonly children?: ReactNode
@@ -18,7 +17,6 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [, setLoaderState] = useLoader()
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
-  const [isOpenDialog, setOpenDialog] = useState(false)
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
   const { data: user } = useUserStore()
 
@@ -102,57 +100,32 @@ export default function LandingComponent({ children, className }: MainProps) {
         >
           Disable when Clicked
         </DpButton>
-        <DpButton
-          onClick={() => {
-            setOpenDialog((prev) => !prev)
-          }}
-        >
-          Confirmation dialog
-        </DpButton>
       </div>
-
-      <DpConfirmationDialog
-        isOpen={isOpenDialog}
-        onClose={() => setOpenDialog(false)}
-        onCancel={() => setOpenDialog(false)}
-        onConfirm={async () => {
-          setOpenDialog(false)
-          // await loadForTwoSecond()
-          // addNotification({
-          //   message: 'Successfully submitted !!!',
-          //   type: 'success',
-          //   duration: 4000,
-          // })
-        }}
-      ></DpConfirmationDialog>
 
       {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
         <div className="mt-2">
-          <DpButton
-            variant="secondary"
-            onClick={() => setOpenCheckoutDialog(true)}
-            loading={isOpenCheckoutDialog}
-            className="w-full"
-          >
-            Donate 5 &euro;
-          </DpButton>
-
-          <DpCheckoutDialog
+          <DonationDialogComponent
             stripePublishableKey={
               process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
             }
-            isOpen={isOpenCheckoutDialog}
-            onClose={() => setOpenCheckoutDialog(false)}
             checkOutPromise={() =>
               checkoutSessionClient({
                 username: user.username as string,
                 url: '/api/checkout_sessions',
                 customSubmitMessage: 'Thank you for your support',
                 isDonate: true,
-                price: 500,
+                price: 600,
               })
             }
-          />
+          >
+            <DpButton
+              variant="secondary"
+              loading={isOpenCheckoutDialog}
+              className="w-full"
+            >
+              Donate 6 &euro;
+            </DpButton>
+          </DonationDialogComponent>
         </div>
       )}
 

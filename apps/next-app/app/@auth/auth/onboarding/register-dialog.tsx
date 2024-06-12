@@ -1,94 +1,35 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { authClient, useSession } from '@js-monorepo/auth-client'
-import { DpButton } from '@js-monorepo/button'
-import { DpDialog, DpDialogContent, DpDialogHeader } from '@js-monorepo/dialog'
+import { useSession } from '@js-monorepo/auth-client'
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  Input,
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DpDialogContent,
 } from '@js-monorepo/components'
 import { useNotifications } from '@js-monorepo/notification'
-import { RegisterUserSchema } from '@js-monorepo/schemas'
 import { useRouter } from 'next-nprogress-bar'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { BsCheck2Circle } from 'react-icons/bs'
-import { FaRegTimesCircle } from 'react-icons/fa'
-import { FaAt } from 'react-icons/fa6'
-import { HiLockClosed } from 'react-icons/hi'
-import { IoMdInformationCircle } from 'react-icons/io'
-import { RegisterDialogErrorComponentType, RegisterDialogType } from './types'
-import {
-  handleValidation,
-  handleValidationErrros,
-  initialRegisterValidations,
-} from './utils'
-
-const RegisterDialogErrorComponent = ({
-  validations,
-}: {
-  validations: RegisterDialogErrorComponentType[]
-}) => {
-  return (
-    validations && (
-      <div className="p-3 rounded-md text-sm">
-        {validations?.map((validation) => (
-          <div key={validation.type} className="flex items-center gap-2 py-1">
-            {/* Render IoMdInformationCircle when status is 'untouched' */}
-            {validation.status === 'untouched' && (
-              <IoMdInformationCircle className="text-xl shrink-0" />
-            )}
-
-            {/* Render BsCheck2Circle when status is 'valid' */}
-            {validation.status === 'valid' && (
-              <BsCheck2Circle className="text-green-600 text-xl shrink-0" />
-            )}
-
-            {/* Render FaRegTimesCircle when status is 'invalid' */}
-            {validation.status === 'invalid' && (
-              <FaRegTimesCircle className="text-red-600 text-xl shrink-0" />
-            )}
-
-            <p className="font-semibold">{validation.message}</p>
-          </div>
-        ))}
-      </div>
-    )
-  )
-}
+import { RegisterForm } from './register-form'
+import { RegisterDialogType } from './types'
 
 export function RegisterDialog({
   formInput,
   userProfileImage,
 }: RegisterDialogType) {
   //hooks
-  const [isOpen, setIsOpen] = useState(true)
-  const [validations, setValidations] = useState(initialRegisterValidations)
   const pathname = usePathname()
-  const { replace, push } = useRouter()
-  const { user, refreshSession } = useSession()
+  const { push } = useRouter()
+  const { user } = useSession()
   const [addNotification] = useNotifications()
-  const form = useForm({
-    resolver: zodResolver(RegisterUserSchema),
-    mode: 'all',
-    defaultValues: {
-      email: formInput?.email,
-      username: '',
-    },
-  })
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    form.watch(() => {
-      setTimeout(() => handleValidation(form, setValidations))
-    })
-  }, [form])
+    // this is a hacky way in order to disable a hydration error caused by radix
+    setHydrated(true)
+  }, [])
 
   useEffect(() => {
     if (user?.username) {
@@ -99,112 +40,42 @@ export function RegisterDialog({
     }
   }, [user?.username, addNotification])
 
-  if (pathname !== '/auth/onboarding') return null
-
-  const onSubmit = async (formData: any, e?: React.BaseSyntheticEvent) => {
-    e?.preventDefault()
-    form.clearErrors()
-    const response = await authClient.registerUser({
-      username: formData.username,
-    })
-    if (response.ok) {
-      refreshSession()
-      replace('/')
-    } else {
-      if (response.errors) {
-        handleValidationErrros(response.errors, setValidations)
-      }
-    }
-  }
+  if (pathname !== '/auth/onboarding' || !hydrated) return null
 
   return (
-    <DpDialog
-      className="top-[20%] sm:w-[386px]"
-      isOpen={isOpen}
-      onClose={() => {
-        setIsOpen(false)
-        push('/')
+    <Dialog
+      modal={false}
+      defaultOpen
+      onOpenChange={(open) => {
+        if (!open) {
+          push('/')
+        }
       }}
-      autoClose={false}
     >
-      <DpDialogHeader className="font-semibold justify-center ml-9">
-        Sign Up
-      </DpDialogHeader>
-      <DpDialogContent>
-        {userProfileImage && (
-          <div className="p-2 flex justify-center">
-            <Image
-              className="rounded-2xl"
-              width={80}
-              height={80}
-              alt="user profile"
-              src={userProfileImage}
-            ></Image>
-          </div>
-        )}
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(
-              onSubmit,
-              (errors, e?: React.BaseSyntheticEvent) => {
-                e?.preventDefault()
-                handleValidationErrros(errors, setValidations)
-              }
-            )}
-          >
-            {/* email */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl className="relative flex items-center">
-                    <HiLockClosed className="absolute left-2 text-foreground" />
-                    <Input
-                      {...field}
-                      readOnly
-                      className="pl-7 ring ring-primary text-center"
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            {/* username */}
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl className="relative flex items-center">
-                    <FaAt className="absolute left-2 text-foreground" />
-                    <Input
-                      placeholder="Type your username"
-                      className="pl-7 text-center"
-                      autoFocus
-                      {...field}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <div className="mt-7">
-              <DpButton
-                disabled={!form.formState.isValid}
-                loading={form.formState.isSubmitting}
-                className="w-full"
-              >
-                Sign Up
-              </DpButton>
+      <DpDialogContent
+        onInteractOutside={(e) => {
+          // prevent from closing when clicking outside the dialog
+          e.preventDefault()
+        }}
+      >
+        <DialogHeader className="font-semibold justify-center">
+          <DialogTitle className="text-center font-bold">Sign Up</DialogTitle>
+        </DialogHeader>
+        <section>
+          {userProfileImage && (
+            <div className="p-2 flex justify-center">
+              <Image
+                className="rounded-2xl"
+                width={80}
+                height={80}
+                alt="user profile"
+                src={userProfileImage}
+              ></Image>
             </div>
-          </form>
-        </Form>
-
-        <RegisterDialogErrorComponent
-          validations={validations}
-        ></RegisterDialogErrorComponent>
+          )}
+          <RegisterForm formInput={formInput}></RegisterForm>
+        </section>
       </DpDialogContent>
-    </DpDialog>
+    </Dialog>
   )
 }
