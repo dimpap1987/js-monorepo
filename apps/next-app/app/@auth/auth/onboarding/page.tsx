@@ -1,7 +1,12 @@
 import { findUnregisteredUser } from '@js-monorepo/auth-server'
-import { RegisterDialog } from './register-dialog'
-import { redirect } from 'next/navigation'
+import { Metadata } from 'next'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { RegisterDialog } from './register-dialog'
+
+export const metadata: Metadata = {
+  title: 'Onboarding 😎',
+}
 
 export default async function OnBoardingPage() {
   const headers = new Headers()
@@ -16,6 +21,7 @@ export default async function OnBoardingPage() {
   if (!unRegisteredUser?.email) {
     redirect('/')
   }
+
   return (
     <RegisterDialog
       formInput={{

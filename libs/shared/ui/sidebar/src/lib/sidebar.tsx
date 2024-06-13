@@ -65,7 +65,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
         {isOpen && (
           <motion.div
             {...framerSidebarPanel(position)}
-            className={`fixed top-0 bottom-0 z-20 focus:z-50 dark ${
+            className={`fixed top-0 bottom-0 z-30 focus:z-50 dark ${
               position === 'left' ? 'left-0' : 'right-0'
             } w-full h-screen max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
             ref={localRef}

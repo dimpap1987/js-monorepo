@@ -1,21 +1,18 @@
 'use client'
 import { authClient } from '@js-monorepo/auth-client'
-import { DpLoginDialog } from '@js-monorepo/dialog'
+import { DpLoginDialogComponent } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
 import { UserNavSocial } from '@js-monorepo/navbar'
 import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 function LoginDialog() {
   const router = useRouter()
   const [, setLoaderState] = useLoader()
   const pathname = usePathname()
-  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    // this is a hacky way in order to disable a hydration error caused by radix
-    setHydrated(true)
     return () => {
       setLoaderState({
         show: false,
@@ -23,7 +20,7 @@ function LoginDialog() {
     }
   }, [])
 
-  if (pathname !== '/auth/login' || !hydrated) return null
+  if (pathname !== '/auth/login') return null
 
   const triggerLoading = () => {
     setLoaderState({
@@ -50,12 +47,12 @@ function LoginDialog() {
     },
   ]
   return (
-    <DpLoginDialog
+    <DpLoginDialogComponent
       socialConfig={socials}
       onClose={() => {
         router.back()
       }}
-    ></DpLoginDialog>
+    ></DpLoginDialogComponent>
   )
 }
 
