@@ -110,18 +110,47 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 const DpDialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogContent
-    className={cn(
-      'rounded-3xl max-h-[80svh] overflow-y-scroll sm:rounded-3xl bg-slate-100 text-base font-light text-black shadow-2xl shadow-primary',
-      className
-    )}
-    ref={ref}
-    {...props}
-  >
-    {children}
-  </DialogContent>
-))
+>(({ className, children, ...props }, ref) => {
+  React.useEffect(() => {
+    setTimeout(() => {
+      document.body.style.pointerEvents = ''
+    }, 200)
+  }, [])
+  return (
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          `fixed left-[50%] top-[50%] z-30 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] border 
+          bg-background p-4 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out 
+          data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 
+          data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] 
+          data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-3xl max-h-[80svh] 
+          overflow-y-auto sm:rounded-3xl`,
+          className
+        )}
+        {...props}
+      >
+        <div
+          className="p-5 overflow-hidden grid gap-4 bg-slate-100 text-base font-light
+         text-black shadow-2xl shadow-primary rounded-3xl"
+        >
+          {children}
+        </div>
+        <DialogPrimitive.Close
+          className="absolute right-2 top-2 rounded-sm opacity-70 
+        ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 
+        focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent
+         data-[state=open]:text-foreground"
+        >
+          <Cross2Icon className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+})
 
 DpDialogContent.displayName = 'DpDialogContent'
 

@@ -19,11 +19,11 @@ export type DpLoginDialogProps = {
   readonly socialConfig: SocialConfig[]
 }
 
-const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
+const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
   ({ onClose, socialConfig }, ref) => {
     return (
       <Dialog
-        modal={false}
+        modal={true}
         defaultOpen
         onOpenChange={(open) => {
           if (!open) {
@@ -31,12 +31,7 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
           }
         }}
       >
-        <DpDialogContent
-          onInteractOutside={(e) => {
-            // prevent from closing when clicking outside the dialog
-            e.preventDefault()
-          }}
-        >
+        <DpDialogContent>
           <DialogHeader className="font-semibold justify-center">
             <DialogTitle className="text-center font-bold">
               Sign in with
@@ -165,6 +160,6 @@ const DpLoginDialog = forwardRef<HTMLDivElement, DpLoginDialogProps>(
     )
   }
 )
-DpLoginDialog.displayName = 'DpLoginDialog'
+DpLoginDialogComponent.displayName = 'DpLoginDialogComponent'
 
-export { DpLoginDialog }
+export { DpLoginDialogComponent }
