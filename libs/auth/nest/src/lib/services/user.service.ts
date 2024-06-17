@@ -67,7 +67,8 @@ export class UserService {
           Logger.warn(`Username: '${authUserDTO.username}' already exists`)
           throw new AuthException(
             HttpStatus.BAD_REQUEST,
-            'Username already exists'
+            'Username already exists',
+            'USERNAME_EXISTS'
           )
         }
       }
@@ -75,7 +76,11 @@ export class UserService {
         err,
         `There was an error when creating a user with username: ${authUserDTO.username}`
       )
-      throw new AuthException(HttpStatus.BAD_REQUEST, 'CREATE_USER_EXCEPTION')
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'Something went wrong while creating user',
+        'CREATE_USER_EXCEPTION'
+      )
     }
   }
 
@@ -107,11 +112,12 @@ export class UserService {
         err,
         `There was an error with user: ${unRegisteredUser.email}`
       )
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'Something went wrong while creating unregistered user',
+        'CREATE_UNREGISTERED_USER_EXCEPTION'
+      )
     }
-    throw new AuthException(
-      HttpStatus.BAD_REQUEST,
-      'CREATE_UNREGISTERED_USER_EXCEPTION'
-    )
   }
 
   async findUnRegisteredUserByToken(token: string): Promise<UnRegisteredUser> {
@@ -122,7 +128,11 @@ export class UserService {
         })
       return unregisteredUser
     } catch (e) {
-      throw new AuthException(HttpStatus.BAD_REQUEST, 'INVALID_TOKEN_EXCEPTION')
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'Invalid token!',
+        'INVALID_TOKEN_EXCEPTION'
+      )
     }
   }
 }

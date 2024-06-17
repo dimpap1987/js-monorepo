@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
+import { VerifyCallback } from 'jsonwebtoken'
 import { Octokit } from 'octokit'
 import { Strategy } from 'passport-github'
 import { GithubAuth } from '../types/auth.configuration'
-import { VerifyCallback } from 'jsonwebtoken'
 
 @Injectable()
 export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
@@ -42,7 +42,7 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
     const octokit = new Octokit({
       auth: token,
     })
-    return octokit.request('GET /user/public_emails', {
+    return octokit.request('GET /user/emails', {
       headers: {
         'X-GitHub-Api-Version': '2022-11-28',
       },
