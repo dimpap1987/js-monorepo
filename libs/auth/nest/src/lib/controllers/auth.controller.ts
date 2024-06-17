@@ -112,7 +112,6 @@ export class AuthController {
       },
       res
     )
-    res.clearCookie('UNREGISTERED-USER')
     this.onRegisterCallBack?.(user)
     res.status(HttpStatus.CREATED).send()
   }
@@ -138,6 +137,10 @@ export class AuthController {
     const email = req.user?.email
     let redirectURI = this.redirectUrl
 
+    if (!email) {
+      Logger.warn(`Undefined email for provider: ${provider}`)
+      return res.redirect(`${redirectURI}/auth/login?error=empty-email-github`)
+    }
     try {
       const user = await this.userService.findAuthUserByEmail(email)
       // Handle Logged in user
@@ -161,15 +164,20 @@ export class AuthController {
         e.errorCode === 'NOT_FOUND_USER_EXCEPTION'
       ) {
         //Handle Unregistered User
-        const unRegisteredUser = await this.userService.createUnRegisteredUser({
-          email: email,
-          providerEnum: provider,
-          profileImage: req.user?.picture,
-        })
-        res.cookie('UNREGISTERED-USER', unRegisteredUser?.token, {
-          httpOnly: true,
-        })
-        redirectURI = `${this.redirectUrl}/auth/onboarding`
+        try {
+          const unRegisteredUser =
+            await this.userService.createUnRegisteredUser({
+              email: email,
+              providerEnum: provider,
+              profileImage: req.user?.picture,
+            })
+          res.cookie('UNREGISTERED-USER', unRegisteredUser?.token, {
+            httpOnly: true,
+          })
+          redirectURI = `${this.redirectUrl}/auth/onboarding`
+        } catch (e2) {
+          redirectURI = `${this.redirectUrl}/auth/login?error=user-creation`
+        }
         Logger.log(
           `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}'`
         )
