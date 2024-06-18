@@ -1,5 +1,3 @@
-import React from 'react'
-
 function TermsOfUsePage() {
   return (
     <div className="mt-4">

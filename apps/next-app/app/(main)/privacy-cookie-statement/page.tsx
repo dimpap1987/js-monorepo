@@ -1,5 +1,3 @@
-import React from 'react'
-
 function PrivacyCookieStatementPage() {
   return (
     <div className="mt-4">
