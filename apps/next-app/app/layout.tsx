@@ -1,13 +1,8 @@
-import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
 import MainTemplate from '../components/main.template'
 import './global.css'
-
-export const metadata: Metadata = {
-  title: 'Next-14 App ',
-}
 
 const poppins = Poppins({
   subsets: ['latin'],

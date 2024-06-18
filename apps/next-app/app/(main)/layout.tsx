@@ -1,11 +1,7 @@
 import { DpVersion } from '@js-monorepo/version'
-import { ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 
-export default async function RootLayout({
-  children,
-}: {
-  readonly children: ReactNode
-}) {
+export default async function RootLayout({ children }: PropsWithChildren) {
   return (
     <>
       <main className="p-3 flex-grow container mx-auto min-w-[200px]">

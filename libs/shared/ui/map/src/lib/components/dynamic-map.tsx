@@ -1,6 +1,6 @@
 import { DpLoadingSpinner } from '@js-monorepo/loader'
 import dynamic from 'next/dynamic'
-import React from 'react'
+import { memo } from 'react'
 
 const DynamicMap = dynamic(() => import('./map-leaflet'), {
   loading: () => (
@@ -11,6 +11,6 @@ const DynamicMap = dynamic(() => import('./map-leaflet'), {
   ssr: false,
 })
 
-const MemoizedDynamicMap = React.memo(DynamicMap)
+const MemoizedDynamicMap = memo(DynamicMap)
 
 export default MemoizedDynamicMap
