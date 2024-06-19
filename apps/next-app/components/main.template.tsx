@@ -28,6 +28,11 @@ const menuItems: MenuItem[] = [
     roles: ['PUBLIC'],
   },
   {
+    href: '/feedback',
+    name: 'Feedback',
+    roles: ['PUBLIC'],
+  },
+  {
     href: '/dashboard',
     name: 'Dashboard',
     roles: ['ADMIN'],

@@ -23,6 +23,10 @@ export const routes = [
     path: '/dashboard',
     roles: ['ADMIN'],
   },
+  {
+    path: '/feedback',
+    roles: ['PUBLIC'],
+  },
 ]
 
 export const authRoutes = ['/auth/login', '/auth/register', '/auth/onboarding']
