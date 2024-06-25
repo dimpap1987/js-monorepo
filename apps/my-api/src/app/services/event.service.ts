@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common'
-import { Observable, fromEvent, merge } from 'rxjs'
 import { EventEmitter } from 'events'
+import { Observable, fromEvent, merge } from 'rxjs'
 
 @Injectable()
 export class EventsService {
   private readonly emitter = new EventEmitter()
 
   subscribe(channel: string | string[]): Observable<any> {
+    if (!channel) return
+
     if (Array.isArray(channel)) {
       // If multiple channels are provided, create an observable for each channel
       const observables = channel?.map((chan) => fromEvent(this.emitter, chan))

@@ -1,8 +1,8 @@
 import { JwtAuthGuard } from '@js-monorepo/auth'
 import { JwtPayload } from '@js-monorepo/types'
 import { Controller, Inject, Post, Req, Sse, UseGuards } from '@nestjs/common'
-import { EventsService } from '../services/event.service'
 import { ChannelService } from '../services/channel.service'
+import { EventsService } from '../services/event.service'
 
 @Controller('notifications')
 export class NotificationController {
@@ -16,10 +16,10 @@ export class NotificationController {
   @UseGuards(JwtAuthGuard)
   async events() {
     // get user channels from DB
-    const channels = await this.channelService.getChannelsByUsername(
-      this.jwt.user.username
+    const channels = await this.channelService.getChannelsByUserId(
+      this.jwt.user.id
     )
-    const channelNames = channels.map((channel) => channel.name)
+    const channelNames = channels?.map((channel) => channel.name)
     //subscribe to these channels
     return this.eventsService.subscribe([
       this.jwt.user.username,
