@@ -41,7 +41,7 @@ const ENV = process.env.NODE_ENV
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUser) => {
           Logger.log(`User: '${user.username}' created successfully 😍`)
-          channelService.registerUserToGlobalChannel(user.id)
+          channelService.assignUserToChannels(user.id, 'global')
         },
         onLogin: async (user: AuthUser) => {
           Logger.log(`User: '${user.username}' has successfully logged in 😁`)

@@ -176,6 +176,7 @@ export class AuthController {
           })
           redirectURI = `${this.redirectUrl}/auth/onboarding`
         } catch (e2) {
+          Logger.error(e, `Error when creating unregistered user`)
           redirectURI = `${this.redirectUrl}/auth/login?error=user-creation`
         }
         Logger.log(

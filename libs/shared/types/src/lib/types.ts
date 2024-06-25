@@ -2,7 +2,7 @@ import { IconType } from 'react-icons/lib'
 import { Prisma } from '@prisma/client'
 
 export interface UserJWT {
-  id: string | number
+  id: number
   username: string
   createdAt?: string | Date
   lastLoggedIn?: string | null
