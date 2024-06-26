@@ -102,7 +102,7 @@ export default function LandingComponent({ children, className }: MainProps) {
         </DpButton>
       </div>
 
-      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user.isLoggedIn && (
         <div className="mt-2">
           <DonationDialogComponent
             stripePublishableKey={

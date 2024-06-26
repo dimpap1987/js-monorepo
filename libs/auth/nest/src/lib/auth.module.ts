@@ -9,13 +9,7 @@ import {
 import { APP_FILTER, REQUEST } from '@nestjs/core'
 import session from 'express-session'
 import { AuthController } from './controllers/auth.controller'
-import {
-  AuthExceptionFilter,
-  BadRequestExceptionFilter,
-  HttpExceptionFilter,
-  PrismaClientExceptionFilter,
-  ZodExceptionFilter,
-} from './exceptions/filter'
+import { AuthExceptionFilter } from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
 import { RefererMiddleware } from './middlewares/referer.middleware'
@@ -37,31 +31,15 @@ import { AuthConfiguration } from './types/auth.configuration'
     JwtAuthGuard,
     RolesGuard,
     {
-      provide: APP_FILTER,
-      useClass: BadRequestExceptionFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: ZodExceptionFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: PrismaClientExceptionFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: AuthExceptionFilter,
-    },
-    {
       provide: 'jwt',
       useFactory: async (authService: AuthService, req: any): Promise<any> => {
         return authService.decode(req?.cookies.accessToken)
       },
       inject: [AuthService, REQUEST],
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AuthExceptionFilter,
     },
   ],
   exports: ['jwt', JwtAuthGuard, RolesGuard, AuthService],
