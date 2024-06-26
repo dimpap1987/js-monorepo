@@ -1,4 +1,5 @@
 import { HasRoles, RolesEnum, RolesGuard } from '@js-monorepo/auth'
+import { AuthUserFullPayload } from '@js-monorepo/types'
 import {
   Body,
   Controller,
@@ -13,7 +14,6 @@ import {
 } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
 import { AdminService } from '../services/admin.service'
-import { AuthUserFullPayload } from '@js-monorepo/types'
 import { EventsService } from '../services/event.service'
 
 @Controller('admin')

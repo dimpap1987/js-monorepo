@@ -3,11 +3,19 @@ import { ChannelService } from './services/channel.service'
 
 import { AuthModule } from '@js-monorepo/auth'
 import { ConfigModule } from '@nestjs/config'
+import { APP_FILTER } from '@nestjs/core'
 import { AuthUser } from '@prisma/client'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AdminController } from './controllers/admin.controller'
 import { NotificationController } from './controllers/notification.controller'
+import {
+  ApiExceptionFilter,
+  BadRequestExceptionFilter,
+  GlobalExceptionFilter,
+  PrismaClientExceptionFilter,
+  ZodExceptionFilter,
+} from './exceptions/filter'
 import { AdminService } from './services/admin.service'
 import { EventsService } from './services/event.service'
 import { PrismaService } from './services/prisma.service'
@@ -57,6 +65,26 @@ const ENV = process.env.NODE_ENV
     PrismaService,
     ChannelService,
     AdminService,
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: BadRequestExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ZodExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: PrismaClientExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ApiExceptionFilter,
+    },
   ],
   exports: [ChannelService, PrismaService],
 })

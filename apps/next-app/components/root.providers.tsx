@@ -23,7 +23,7 @@ export default async function RootProviders({
       <DpNextPageProgressBar>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
