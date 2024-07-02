@@ -1,6 +1,7 @@
 'use client'
 
 import { UserJWT } from '@js-monorepo/types'
+import { HttpClientProxy } from '@js-monorepo/utils'
 import React, {
   createContext,
   useCallback,
@@ -25,15 +26,15 @@ const fetchSession = async (
   errorCallback: (error?: any) => void
 ) => {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`,
-      {
-        credentials: 'include',
-      }
-    )
+    const response = await HttpClientProxy.builder<{
+      user: UserJWT
+    }>(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`)
+      .get()
+      .withCredentials()
+      .execute()
+
     if (response.ok) {
-      const reponse = await response.json()
-      successCallback(reponse.user)
+      successCallback(response.data?.user)
     } else {
       errorCallback()
     }

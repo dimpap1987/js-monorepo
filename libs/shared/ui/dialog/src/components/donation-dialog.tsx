@@ -2,6 +2,7 @@
 
 import { Dialog, DialogTrigger, DpDialogContent } from '@js-monorepo/components'
 import { useNotifications } from '@js-monorepo/notification'
+import { ClientResponseType } from '@js-monorepo/types'
 import {
   EmbeddedCheckout,
   EmbeddedCheckoutProvider,
@@ -11,7 +12,7 @@ import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 
 interface DonationDialogComponentProps {
   stripePublishableKey: string
-  checkOutPromise: () => Promise<Response>
+  checkOutPromise: () => Promise<ClientResponseType<any>>
 }
 
 async function initStripe(stripePublishableKey: string) {
@@ -40,7 +41,7 @@ function DonationDialogComponent({
         if (!res.ok) {
           throw new Error('Failed to fetch client secret')
         }
-        return res.json()
+        return res.data
       })
       .then((data) => {
         setResponse({ ...data })

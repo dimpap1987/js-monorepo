@@ -1,8 +1,5 @@
-import {
-  CreateCheckoutSessionRequestBody,
-  createCheckoutSession,
-  stripe,
-} from '@js-monorepo/utils'
+import { CreateCheckoutSessionRequestBody } from '@js-monorepo/types'
+import { createCheckoutSession, stripe } from '@js-monorepo/utils'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
