@@ -15,6 +15,7 @@ async function request<T>(
   url: string,
   options?: RequestInit
 ): Promise<ClientResponseType<T>> {
+  const errorMessage = 'Something went wrong, please try again later...'
   try {
     const response = await fetch(url, options)
     const contentType = response.headers.get('Content-Type')
@@ -23,6 +24,7 @@ async function request<T>(
       // SUCCESS case
       const finalResponse: SuccessResponse<T> = {
         ok: true,
+        httpStatusCode: response.status,
       }
 
       if (contentType?.includes('application/json')) {
@@ -39,21 +41,24 @@ async function request<T>(
       const errorData = await response.json()
       return {
         ok: false,
-        message: errorData.message ?? this.errorMessage,
+        httpStatusCode: response.status,
+        message: errorData.message ?? errorMessage,
         errors: errorData.errors || [],
       }
     }
 
-    console.error('Error with u')
+    console.error('Unhandled Error')
     return {
       ok: false,
-      message: this.errorMessage,
+      httpStatusCode: response.status,
+      message: errorMessage,
     }
   } catch (error) {
     console.error('Error catch:', error)
     return {
       ok: false,
-      message: this.errorMessage,
+      httpStatusCode: 503,
+      message: errorMessage,
     }
   }
 }
@@ -81,8 +86,9 @@ class HttpClientBuilder<T> {
       ...this.options.headers,
       ...headers,
     }
-    if (!this.options.headers['Content-Type']) {
-      this.options.headers['Content-Type'] = 'application/json'
+    if (!(this.options.headers as Record<string, string>)['Content-Type']) {
+      ;(this.options.headers as Record<string, string>)['Content-Type'] =
+        'application/json'
     }
     return this
   }
