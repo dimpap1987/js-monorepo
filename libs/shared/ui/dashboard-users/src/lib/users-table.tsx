@@ -13,7 +13,7 @@ import {
   usePagination,
 } from '@js-monorepo/components'
 import { AuthUserFullPayload } from '@js-monorepo/types'
-import { constructURIQueryString } from '@js-monorepo/utils'
+import { HttpClientProxy, constructURIQueryString } from '@js-monorepo/utils'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'
@@ -35,20 +35,19 @@ declare module '@tanstack/table-core' {
 }
 
 const findUsers = async (searchParams?: string) => {
-  const response = await fetch(
-    `http://localhost:3333/api/admin/users${searchParams}`,
-    {
-      credentials: 'include',
-      cache: 'no-store',
-    }
+  const response = await HttpClientProxy.builder<UsersReponse>(
+    `http://localhost:3333/api/admin/users${searchParams}`
   )
+    .get()
+    .withCredentials()
+    .execute()
 
-  if (!response.ok)
-    return {
-      users: [],
-      totalCount: 0,
-    }
-  return response.json() as Promise<UsersReponse>
+  if (response.ok) return response.data as UsersReponse
+
+  return {
+    users: [],
+    totalCount: 0,
+  }
 }
 
 const DashboardUsersTableComponent = () => {
@@ -211,21 +210,15 @@ const DashboardUsersTableComponent = () => {
                       title="Submit"
                       className="shrink-0 text-2xl cursor-pointer transform hover:scale-125 transition duration-300 border rounded-lg"
                       onClick={async () => {
-                        const response = await fetch(
-                          `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users/${row.original.id}`,
-                          {
-                            method: 'PUT',
-                            credentials: 'include',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              ...row.updatedUser,
-                            }),
-                          }
+                        const response = await HttpClientProxy.builder(
+                          `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users/${row.original.id}`
                         )
+                          .put()
+                          .body({ ...row.updatedUser })
+                          .withCredentials()
+                          .execute()
+
                         if (response.ok) {
-                          await response.json()
                           const params = new URLSearchParams(searchParams)
                           params.set('updatedAt', new Date().toLocaleString())
                           replace('?' + params)
@@ -276,20 +269,17 @@ const DashboardUsersTableComponent = () => {
                   </DialogHeader>
                   <TextareaForm
                     submitCallBack={async (callBackData) => {
-                      const response = await fetch(
-                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`,
-                        {
-                          method: 'POST',
-                          credentials: 'include',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            channel: row.original?.username,
-                            message: callBackData.notification,
-                          }),
-                        }
+                      const response = await HttpClientProxy.builder(
+                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`
                       )
+                        .post()
+                        .body({
+                          channel: row.original?.username,
+                          message: callBackData.notification,
+                        })
+                        .withCredentials()
+                        .execute()
+
                       if (response.ok) {
                         console.log('Announcement sent')
                       }

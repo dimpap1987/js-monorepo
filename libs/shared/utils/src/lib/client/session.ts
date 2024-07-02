@@ -1,3 +1,5 @@
+import { HttpClientProxy } from '../utils'
+
 export async function checkoutSessionClient({
   username,
   url,
@@ -11,16 +13,13 @@ export async function checkoutSessionClient({
   isDonate: boolean
   customSubmitMessage: string
 }) {
-  return fetch(url, {
-    body: JSON.stringify({
+  return HttpClientProxy.builder(url)
+    .body({
       username,
       price,
       isDonate,
       customSubmitMessage,
-    }),
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+    })
+    .post()
+    .execute()
 }

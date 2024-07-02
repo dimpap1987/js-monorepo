@@ -1,4 +1,5 @@
 import { ClientResponseType } from '@js-monorepo/types'
+import { HttpClientProxy } from '@js-monorepo/utils'
 
 export class AuthClient {
   private readonly BASE_URL: string
@@ -8,17 +9,15 @@ export class AuthClient {
   }
 
   async logout() {
-    try {
-      const response = await fetch(`${this.BASE_URL}/api/auth/logout`, {
-        method: 'GET',
-        credentials: 'include',
-      })
+    const response = await HttpClientProxy.builder(
+      `${this.BASE_URL}/api/auth/logout`
+    )
+      .get()
+      .withCredentials()
+      .execute()
 
-      if (response.ok) {
-        window.location.reload()
-      }
-    } catch (error) {
-      console.error('Error during logout:', error)
+    if (response.ok) {
+      window.location.reload()
     }
   }
 
@@ -28,35 +27,15 @@ export class AuthClient {
 
   async registerUser(payload: {
     username: string
-  }): Promise<ClientResponseType> {
-    try {
-      const response = await fetch(`${this.BASE_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      })
+  }): Promise<ClientResponseType<any>> {
+    const response = await HttpClientProxy.builder(
+      `${this.BASE_URL}/api/auth/register`
+    )
+      .body(payload)
+      .withCredentials()
+      .post()
+      .execute()
 
-      if (response.ok) {
-        return {
-          ok: true,
-        }
-      }
-
-      const errorData = await response.json()
-      return {
-        ok: false,
-        message: errorData.message,
-        errors: errorData.errors,
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      return {
-        ok: false,
-        message: 'Something went wrong, try again later...',
-      }
-    }
+    return response
   }
 }

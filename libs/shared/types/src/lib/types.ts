@@ -1,5 +1,5 @@
-import { IconType } from 'react-icons/lib'
 import { Prisma } from '@prisma/client'
+import { IconType } from 'react-icons/lib'
 
 export interface UserJWT {
   id: number
@@ -15,16 +15,19 @@ export interface JwtPayload {
   user: UserJWT
 }
 
-export type ClientResponseType =
-  | {
-      ok: true
-      data?: any
-    }
-  | {
-      ok: false
-      message?: string
-      errors?: string[]
-    }
+export type SuccessResponse<T> = {
+  ok: true
+  data?: T
+  message?: string
+}
+
+export type ErrorResponse = {
+  ok: false
+  message?: string
+  errors?: string[]
+}
+
+export type ClientResponseType<T> = SuccessResponse<T> | ErrorResponse
 
 export type AuthUserWithProviders = Prisma.AuthUserGetPayload<{
   include: {
@@ -47,3 +50,12 @@ export type AuthUserFullPayload = Prisma.AuthUserGetPayload<{
     userChannels: true
   }
 }>
+
+export interface CreateCheckoutSessionRequestBody {
+  username: string
+  price: number
+  paymentName?: string
+  paymentDescription?: string
+  customSubmitMessage?: string
+  isDonate?: boolean
+}
