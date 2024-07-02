@@ -74,9 +74,13 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
   })
 
   useEffect(() => {
-    form.watch(() => {
+    const formSubscription = form.watch(() => {
       setTimeout(() => handleValidation(form, setValidations))
     })
+
+    return () => {
+      formSubscription.unsubscribe()
+    }
   }, [form])
 
   const onSubmit = async (formData: any, e?: React.BaseSyntheticEvent) => {
@@ -91,6 +95,7 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
     } else {
       if (response.errors) {
         handleValidationErrros(response.errors, setValidations)
+        form.setError('username', {})
       }
     }
   }
@@ -146,7 +151,11 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
           />
           <div className="mt-7">
             <DpButton
-              disabled={!form.formState.isValid}
+              disabled={
+                !form.formState.isValid ||
+                form.formState.isSubmitting ||
+                form.formState.isSubmitSuccessful
+              }
               loading={form.formState.isSubmitting}
               className="w-full"
             >

@@ -27,6 +27,7 @@ function CardList({ className }: { className: string }) {
         <CardFooter>
           <DpButton
             className="w-full"
+            size="large"
             onClick={() =>
               window.open(
                 'https://github.com/dimpap1987/js-monorepo/issues/new/choose',
@@ -53,6 +54,7 @@ function CardList({ className }: { className: string }) {
         </CardContent>
         <CardFooter>
           <DpButton
+            size="large"
             className="w-full"
             onClick={() =>
               window.open(

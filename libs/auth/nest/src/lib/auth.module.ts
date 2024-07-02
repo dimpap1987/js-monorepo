@@ -104,16 +104,6 @@ export class AuthModule implements NestModule {
           inject: ['AUTH_CONFIG'],
         },
       ],
-      exports: [
-        'SESSION_SECRET',
-        'JWT_SECRET',
-        'DB_CLIENT',
-        'ON_REGISTER_CALLBACK',
-        'ON_LOGIN_CALLBACK',
-        'REDIRECT_UI_URL',
-        'GITHUB-AUTH',
-        'GOOGLE-AUTH',
-      ],
     }
   }
 
