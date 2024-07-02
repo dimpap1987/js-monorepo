@@ -100,7 +100,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
 
                     <UserOptionsDropdown
                       IconComponent={FaCircleUser}
-                      className="w-60 lg:w-80 fixed right-0  mt-4"
+                      className="w-80 fixed right-0  mt-4"
                     >
                       {user?.isLoggedIn && (
                         <>

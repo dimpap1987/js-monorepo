@@ -2,9 +2,9 @@
 import { DpButton } from '@js-monorepo/button'
 import { useLoader } from '@js-monorepo/loader'
 // import { MapComponent, Marker, Popup } from '@js-monorepo/map'
+import { useSession } from '@js-monorepo/auth-client'
 import { DonationDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { useUserStore } from '@js-monorepo/store'
 import { checkoutSessionClient } from '@js-monorepo/utils'
 import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
@@ -18,7 +18,7 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
-  const { data: user } = useUserStore()
+  const { user } = useSession()
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -102,7 +102,7 @@ export default function LandingComponent({ children, className }: MainProps) {
         </DpButton>
       </div>
 
-      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user.isLoggedIn && (
+      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
         <div className="mt-2">
           <DonationDialogComponent
             stripePublishableKey={

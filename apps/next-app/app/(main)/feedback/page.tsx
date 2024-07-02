@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 function FeedBack() {
   return (
-    <section className="flex justify-center pt-5 md:pt-10 mt-10">
+    <section className="flex justify-center pt-5 md:pt-10 mt-2 lg:mt-10">
       <div className="space-y-7">
         <div>
           <h1 className="text-center p-2">How can we make the App better?</h1>

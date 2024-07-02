@@ -3,7 +3,7 @@ import { ClientResponseType } from '@js-monorepo/types'
 export class AuthClient {
   private readonly BASE_URL: string
 
-  constructor(private baseUrl: string) {
+  constructor(private readonly baseUrl: string) {
     this.BASE_URL = baseUrl
   }
 
@@ -13,10 +13,9 @@ export class AuthClient {
         method: 'GET',
         credentials: 'include',
       })
+
       if (response.ok) {
         window.location.reload()
-      } else {
-        console.error('Logout failed')
       }
     } catch (error) {
       console.error('Error during logout:', error)
@@ -40,17 +39,17 @@ export class AuthClient {
         credentials: 'include',
       })
 
-      if (!response.ok) {
-        const responseData = await response.json()
-        return {
-          ok: false,
-          message: responseData.message,
-          errors: responseData.errors,
-        }
-      } else {
+      if (response.ok) {
         return {
           ok: true,
         }
+      }
+
+      const errorData = await response.json()
+      return {
+        ok: false,
+        message: errorData.message,
+        errors: errorData.errors,
       }
     } catch (error) {
       console.error('Error:', error)

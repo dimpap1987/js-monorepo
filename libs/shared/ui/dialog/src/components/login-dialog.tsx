@@ -37,7 +37,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
               Sign in with
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col items-center text-base gap-2 font-medium">
+          <div className="flex flex-col items-center text-base gap-4 font-medium p-2">
             {socialConfig?.map((social) => (
               <React.Fragment key={social.type}>
                 {/* GOOGLE */}
