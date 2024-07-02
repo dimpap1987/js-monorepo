@@ -19,12 +19,14 @@ export type SuccessResponse<T> = {
   ok: true
   data?: T
   message?: string
+  httpStatusCode: number
 }
 
 export type ErrorResponse = {
   ok: false
   message?: string
   errors?: string[]
+  httpStatusCode: number
 }
 
 export type ClientResponseType<T> = SuccessResponse<T> | ErrorResponse
