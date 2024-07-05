@@ -17,7 +17,6 @@ import { AuthService } from './services/auth.service'
 import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
-import { JwtStrategy } from './strategies/jwt.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
 
 @Module({
@@ -25,7 +24,6 @@ import { AuthConfiguration } from './types/auth.configuration'
   providers: [
     GoogleStrategy,
     GithubOauthStrategy,
-    JwtStrategy,
     AuthService,
     UserService,
     JwtAuthGuard,
