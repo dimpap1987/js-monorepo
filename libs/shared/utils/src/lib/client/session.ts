@@ -20,6 +20,7 @@ export async function checkoutSessionClient({
       isDonate,
       customSubmitMessage,
     })
+    .withCsrf()
     .post()
     .execute()
 }

@@ -33,6 +33,7 @@ export class AuthClient {
     )
       .body(payload)
       .withCredentials()
+      .withCsrf()
       .post()
       .execute()
 
