@@ -12,12 +12,22 @@ import { AuthController } from './controllers/auth.controller'
 import { AuthExceptionFilter } from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
+import { CsrfGeneratorMiddleware } from './middlewares/csrf-generator.middleware'
 import { RefererMiddleware } from './middlewares/referer.middleware'
 import { AuthService } from './services/auth.service'
 import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
+import csurf = require('csurf')
+
+export const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+  },
+})
 
 @Module({
   controllers: [AuthController],
@@ -115,11 +125,17 @@ export class AuthModule implements NestModule {
         })
       )
       .forRoutes('*')
-      .apply(RefererMiddleware)
+      .apply(RefererMiddleware, CsrfGeneratorMiddleware)
       .forRoutes(
         { path: '*google/login*', method: RequestMethod.GET },
         { path: '*github/login*', method: RequestMethod.GET },
         { path: '*facebook/login*', method: RequestMethod.GET }
+      )
+      .apply(CsrfGeneratorMiddleware)
+      .forRoutes(
+        { path: '*', method: RequestMethod.POST },
+        { path: '*', method: RequestMethod.PUT },
+        { path: '*', method: RequestMethod.DELETE }
       )
   }
 }

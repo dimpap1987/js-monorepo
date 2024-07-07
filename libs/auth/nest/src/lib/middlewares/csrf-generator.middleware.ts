@@ -1,12 +1,16 @@
 import { Injectable, NestMiddleware } from '@nestjs/common'
+import { csrfProtection } from '../auth.module'
 
 @Injectable()
 export class CsrfGeneratorMiddleware implements NestMiddleware {
   use(req, res, next) {
-    res.cookie('XSRF-TOKEN', req.csrfToken(), {
-      httpOnly: true, // Set the cookie as HTTPOnly
+    csrfProtection(req, res, (err) => {
+      if (err) {
+        return next(err)
+      }
+      res.cookie('XSRF-TOKEN', req.csrfToken())
+      res.locals._csrf = req.csrfToken()
+      next()
     })
-    res.locals._csrf = req.csrfToken()
-    next()
   }
 }

@@ -67,11 +67,11 @@ export class AuthController {
 
   @Get('logout')
   @HttpCode(200)
-  async logOut(@Res() res: Response) {
-    res.clearCookie('accessToken')
-    res.clearCookie('refreshToken')
-    res.clearCookie('_csrf')
-    res.clearCookie('XSRF-TOKEN')
+  async logOut(@Req() req: Request, @Res() res: Response) {
+    const cookies = Object.keys(req.cookies)
+    for (const cookie of cookies) {
+      res.clearCookie(cookie)
+    }
     res.send({})
   }
 

@@ -11,6 +11,22 @@ export function calculateThirtyMinutesFromNow() {
   return Math.floor(thirtyMinutesLater / 1000)
 }
 
+export function getCookie(name: string) {
+  const cookies = document.cookie.split(';')
+
+  // Loop through each cookie
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim()
+    const [key, value] = cookie.split('=')
+
+    if (key === name && value) {
+      return value
+    }
+  }
+
+  return null
+}
+
 async function request<T>(
   url: string,
   options?: RequestInit
@@ -74,6 +90,17 @@ class HttpClientBuilder<T> {
 
   constructor(url: string) {
     this.url = url
+  }
+
+  withCsrf(csrfHeader = 'XSRF-TOKEN'): HttpClientBuilder<T> {
+    const csrfValue = getCookie(csrfHeader)
+    if (csrfValue) {
+      this.options.headers = {
+        ...this.options.headers,
+        [csrfHeader?.toUpperCase()]: csrfValue,
+      }
+    }
+    return this
   }
 
   body(data: any): HttpClientBuilder<T> {

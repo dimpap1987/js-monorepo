@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export function withError(
+export function withCrf(
   nextMiddleware: (
     request: NextRequest
   ) => Promise<NextResponse<unknown>> | NextResponse<unknown>
 ): (
   request: NextRequest
 ) => Promise<NextResponse<unknown>> | NextResponse<unknown> {
-  return async function middleWithError(
+  return async function middleWithCrf(
     request: NextRequest
   ): Promise<NextResponse<unknown>> {
-    const errorCode = request.nextUrl.searchParams.get('error')
-    console.log(errorCode)
+    const csrfToken = request.cookies.get('XSRF-TOKEN')?.value
+
+    if (csrfToken) {
+      request.headers.set('X-XSRF-TOKEN', csrfToken)
+    }
     return nextMiddleware(request)
   }
 }

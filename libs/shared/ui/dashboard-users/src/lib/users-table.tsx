@@ -215,6 +215,7 @@ const DashboardUsersTableComponent = () => {
                         )
                           .put()
                           .body({ ...row.updatedUser })
+                          .withCsrf()
                           .withCredentials()
                           .execute()
 
@@ -277,6 +278,7 @@ const DashboardUsersTableComponent = () => {
                           channel: row.original?.username,
                           message: callBackData.notification,
                         })
+                        .withCsrf()
                         .withCredentials()
                         .execute()
 
