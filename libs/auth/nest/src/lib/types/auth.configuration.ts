@@ -14,6 +14,7 @@ export interface GithubAuth {
 
 export interface AuthConfiguration {
   sessionSecret: string
+  csrfEnabled?: boolean
   dbClient: PrismaClient
   jwtSercret: string
   redirectUiUrl?: string

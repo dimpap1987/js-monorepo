@@ -36,6 +36,7 @@ const ENV = process.env.NODE_ENV
         dbClient: prismaClient,
         sessionSecret: process.env.SESSION_SECRET,
         jwtSercret: process.env.JWT_SECRET_KEY,
+        csrfEnabled: true,
         github: {
           clientId: process.env.GITHUB_CLIENT_ID,
           clientSecret: process.env.GITHUB_CLIENT_SECRET,
