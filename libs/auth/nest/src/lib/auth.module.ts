@@ -13,7 +13,6 @@ import { AuthExceptionFilter } from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
 import { CsrfGeneratorMiddleware } from './middlewares/csrf-generator.middleware'
-import { RefererMiddleware } from './middlewares/referer.middleware'
 import { AuthService } from './services/auth.service'
 import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
@@ -54,7 +53,8 @@ export const csrfProtection = csurf({
 })
 export class AuthModule implements NestModule {
   constructor(
-    @Inject('SESSION_SECRET') private readonly sessionSecret: string
+    @Inject('SESSION_SECRET') private readonly sessionSecret: string,
+    @Inject('CSRF_ENABLED') private readonly csrfEnabled: boolean
   ) {}
 
   static forRootAsync(options: {
@@ -111,6 +111,12 @@ export class AuthModule implements NestModule {
           useFactory: async (config: AuthConfiguration) => config.onLogin,
           inject: ['AUTH_CONFIG'],
         },
+        {
+          provide: 'CSRF_ENABLED',
+          useFactory: async (config: AuthConfiguration) =>
+            config.csrfEnabled ?? false,
+          inject: ['AUTH_CONFIG'],
+        },
       ],
     }
   }
@@ -125,17 +131,24 @@ export class AuthModule implements NestModule {
         })
       )
       .forRoutes('*')
-      .apply(RefererMiddleware, CsrfGeneratorMiddleware)
-      .forRoutes(
-        { path: '*google/login*', method: RequestMethod.GET },
-        { path: '*github/login*', method: RequestMethod.GET },
-        { path: '*facebook/login*', method: RequestMethod.GET }
-      )
-      .apply(CsrfGeneratorMiddleware)
-      .forRoutes(
-        { path: '*', method: RequestMethod.POST },
-        { path: '*', method: RequestMethod.PUT },
-        { path: '*', method: RequestMethod.DELETE }
-      )
+    // .apply(RefererMiddleware)
+    // .forRoutes(
+    //   { path: '*google/login*', method: RequestMethod.GET },
+    //   { path: '*github/login*', method: RequestMethod.GET },
+    //   { path: '*facebook/login*', method: RequestMethod.GET }
+    // )
+
+    if (this.csrfEnabled) {
+      consumer
+        .apply(CsrfGeneratorMiddleware)
+        .forRoutes(
+          { path: '*google/login*', method: RequestMethod.GET },
+          { path: '*github/login*', method: RequestMethod.GET },
+          { path: '*facebook/login*', method: RequestMethod.GET },
+          { path: '*', method: RequestMethod.POST },
+          { path: '*', method: RequestMethod.PUT },
+          { path: '*', method: RequestMethod.DELETE }
+        )
+    }
   }
 }
