@@ -84,6 +84,14 @@ export class AuthController {
   ) {
     const token = req.cookies['UNREGISTERED-USER']
 
+    if (!token) {
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'Invalid token!',
+        'INVALID_TOKEN_EXCEPTION'
+      )
+    }
+
     // Find unregistered user by token
     const unregisteredUser =
       await this.userService.findUnRegisteredUserByToken(token)
@@ -124,8 +132,27 @@ export class AuthController {
 
   private handleLoggedInUser(payload: JwtPayload, res: Response) {
     const tokens = this.authService.createJwtTokens(payload)
-    res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true })
-    res.cookie('accessToken', tokens.accessToken, { httpOnly: true })
+    // REFRESH TOKEN
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.AUTH_COOKIE_DOMAIN_PROD
+          : 'localhost',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
+    // ACCESS TOKEN
+    res.cookie('accessToken', tokens.accessToken, {
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.AUTH_COOKIE_DOMAIN_PROD
+          : 'localhost',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
+    // REMOVE UNREGISTERED USER
     res.clearCookie('UNREGISTERED-USER')
   }
 

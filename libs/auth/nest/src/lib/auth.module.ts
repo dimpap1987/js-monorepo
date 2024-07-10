@@ -25,6 +25,11 @@ export const csrfProtection = csurf({
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     path: '/',
+    domain:
+      process.env.NODE_ENV === 'production'
+        ? process.env.AUTH_COOKIE_DOMAIN_PROD
+        : 'localhost',
+    sameSite: 'strict',
   },
 })
 
