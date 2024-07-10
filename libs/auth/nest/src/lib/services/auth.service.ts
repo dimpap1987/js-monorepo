@@ -20,7 +20,7 @@ export class AuthService {
   }
 
   createAccessToken(payload: any) {
-    return sign(payload, 300 * 60, this.jwtSecret) // 60 minutes
+    return sign(payload, 300 * 10, this.jwtSecret) // 10 minutes
   }
 
   createRefreshToken(payload: JwtPayload) {
