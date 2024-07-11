@@ -20,6 +20,7 @@ import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
 import csurf = require('csurf')
 import { RefreshTokenService } from './services/refreshToken.service'
+import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
 
 export const csrfProtection = csurf({
   cookie: {
@@ -44,6 +45,7 @@ export const csrfProtection = csurf({
     JwtAuthGuard,
     RolesGuard,
     RefreshTokenService,
+    TokenRotationMiddleware,
     {
       provide: 'jwt',
       useFactory: async (authService: AuthService, req: any): Promise<any> => {
@@ -56,7 +58,13 @@ export const csrfProtection = csurf({
       useClass: AuthExceptionFilter,
     },
   ],
-  exports: ['jwt', JwtAuthGuard, RolesGuard, AuthService],
+  exports: [
+    'jwt',
+    JwtAuthGuard,
+    RolesGuard,
+    AuthService,
+    TokenRotationMiddleware,
+  ],
 })
 export class AuthModule implements NestModule {
   constructor(
@@ -138,12 +146,20 @@ export class AuthModule implements NestModule {
         })
       )
       .forRoutes('*')
-    // .apply(RefererMiddleware)
-    // .forRoutes(
-    //   { path: '*google/login*', method: RequestMethod.GET },
-    //   { path: '*github/login*', method: RequestMethod.GET },
-    //   { path: '*facebook/login*', method: RequestMethod.GET }
-    // )
+
+      .apply(TokenRotationMiddleware)
+      .exclude(
+        '/',
+        'auth/google/login',
+        'auth/github/login',
+        'auth/facebook/login',
+        'auth/google/redirect',
+        'auth/github/redirect',
+        'auth/logout',
+        'auth/register',
+        'auth/unregistered-user'
+      )
+      .forRoutes('*')
 
     if (this.csrfEnabled) {
       consumer

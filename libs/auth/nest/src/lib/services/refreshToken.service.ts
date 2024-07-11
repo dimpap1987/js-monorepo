@@ -1,3 +1,4 @@
+import { RefreshTokenPayload } from '@js-monorepo/types'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
 
@@ -6,20 +7,18 @@ export class RefreshTokenService {
   constructor(@Inject('DB_CLIENT') private readonly dbClient: PrismaClient) {}
 
   async createRefreshToken(
-    newToken: string,
-    userId: number,
+    payload: RefreshTokenPayload,
     client = this.dbClient
   ) {
     try {
-      Logger.debug(`Creating refresh token for user: ${userId}`)
+      Logger.debug(`Creating refresh token for user: ${payload.user_id}`)
       return await client.refreshToken.create({
         data: {
-          user_id: userId,
-          token: newToken,
+          ...payload,
         },
       })
     } catch (e) {
-      Logger.error(`Error Creating refresh token for user: ${userId}`)
+      Logger.error(`Error Creating refresh token for user: ${payload.user_id}`)
       return null
     }
   }

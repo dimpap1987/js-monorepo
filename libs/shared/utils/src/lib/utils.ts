@@ -1,4 +1,5 @@
 import { ClientResponseType, SuccessResponse } from '@js-monorepo/types'
+import { Request } from 'express'
 
 export function calculateThirtyMinutesFromNow() {
   // Get the current time in milliseconds
@@ -149,4 +150,26 @@ class HttpClientBuilder<T> {
 
 export const HttpClientProxy = {
   builder: <T>(url: string) => new HttpClientBuilder<T>(url),
+}
+
+export function getIPAddress(req: Request): string | undefined {
+  if (!req) return undefined
+  // Check for forwarded IP addresses (e.g., behind a proxy)
+  const xForwardedFor = req.headers['x-forwarded-for']
+  if (xForwardedFor) {
+    const ips = Array.isArray(xForwardedFor) ? xForwardedFor[0] : xForwardedFor
+    return ips
+  }
+
+  const xRealIp = req.headers['x-real-ip']
+  if (xRealIp) {
+    return Array.isArray(xRealIp) ? xRealIp[0] : xRealIp
+  }
+
+  return req.ip || undefined
+}
+
+export function getBrowserInfo(req: Request): string | undefined {
+  if (!req) return undefined
+  return req.headers['user-agent'] || undefined
 }

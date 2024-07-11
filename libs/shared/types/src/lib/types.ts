@@ -37,6 +37,27 @@ export type AuthUserWithProviders = Prisma.AuthUserGetPayload<{
   }
 }>
 
+export type RefreshTokenPayload = Partial<
+  Omit<
+    Prisma.RefreshTokenGetPayload<{
+      include: {
+        user: false
+      }
+    }>,
+    'token' | 'user_id'
+  >
+> &
+  Required<
+    Pick<
+      Prisma.RefreshTokenGetPayload<{
+        include: {
+          user: false
+        }
+      }>,
+      'token' | 'user_id'
+    >
+  >
+
 export type MenuItem = {
   name: string
   href: string

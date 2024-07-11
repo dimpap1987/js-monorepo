@@ -7,6 +7,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common'
+import { Response } from 'express'
 import { AuthException } from '../exceptions/api-exception'
 import { RefreshTokenService } from './refreshToken.service'
 import { UserService } from './user.service'
@@ -61,7 +62,8 @@ export class AuthService {
 
   async handleTokenRotation(
     accessToken: string,
-    refreshToken: string
+    refreshToken: string,
+    userMetadata?: { ipAddress?: string; browserInfo?: string }
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       verify(accessToken, this.jwtSecret)
@@ -73,8 +75,7 @@ export class AuthService {
       // access token is invalid so create new one  - refresh token as well
       if (e1 instanceof JwtError) {
         try {
-          verify(refreshToken, this.jwtSecret)
-          const payload = this.decode(refreshToken) as JwtPayload
+          const payload = verify(refreshToken, this.jwtSecret) as JwtPayload
 
           const retrievedRefreshToken =
             await this.refreshTokenService.findRefreshToken(refreshToken)
@@ -101,10 +102,12 @@ export class AuthService {
           )
 
           // save the new refresh token in the DB
-          this.refreshTokenService.createRefreshToken(
-            rotatedTokens.refreshToken,
-            payload.user.id
-          )
+          this.refreshTokenService.createRefreshToken({
+            user_id: payload.user.id,
+            token: rotatedTokens.refreshToken,
+            user_agent: userMetadata?.browserInfo,
+            ip_address: userMetadata?.ipAddress,
+          })
 
           return rotatedTokens
         } catch (e2) {
@@ -128,13 +131,18 @@ export class AuthService {
     }
   }
 
-  async persistRefreshToken(refreshToken: string) {
+  async persistRefreshToken(
+    refreshToken: string,
+    userMetada?: { ipAddress?: string; userAgent?: string }
+  ) {
     try {
       const payload = this.decode(refreshToken) as JwtPayload
-      await this.refreshTokenService.createRefreshToken(
-        refreshToken,
-        payload.user.id
-      )
+      await this.refreshTokenService.createRefreshToken({
+        token: refreshToken,
+        user_id: payload.user.id,
+        user_agent: userMetada?.userAgent,
+        ip_address: userMetada?.ipAddress,
+      })
     } catch (e) {
       Logger.error('Error in persisting the refresh Token')
     }
@@ -142,5 +150,29 @@ export class AuthService {
 
   async revokeRefreshToken(refreshToken: string) {
     this.refreshTokenService.revokeRefreshTokensOfUserByToken(refreshToken)
+  }
+
+  setAccessTokenCookie(res: Response, accessToken: string) {
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.AUTH_COOKIE_DOMAIN_PROD
+          : 'localhost',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
+  }
+
+  setRefreshTokenCookie(res: Response, refreshToken: string) {
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.AUTH_COOKIE_DOMAIN_PROD
+          : 'localhost',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
   }
 }
