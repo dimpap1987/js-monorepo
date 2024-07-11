@@ -1,31 +1,39 @@
-import { RefreshTokenPayload } from '@js-monorepo/types'
+import { PrismaTransactionType, RefreshTokenPayload } from '@js-monorepo/types'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class RefreshTokenService {
+  private readonly logger = new Logger(RefreshTokenService.name)
+
   constructor(@Inject('DB_CLIENT') private readonly dbClient: PrismaClient) {}
 
-  async createRefreshToken(
+  async storeRefreshTokenInDb(
     payload: RefreshTokenPayload,
-    client = this.dbClient
+    client: PrismaClient | PrismaTransactionType = this.dbClient
   ) {
     try {
-      Logger.debug(`Creating refresh token for user: ${payload.user_id}`)
+      this.logger.debug(`Creating refresh token for user: ${payload.user_id}`)
       return await client.refreshToken.create({
         data: {
           ...payload,
         },
       })
     } catch (e) {
-      Logger.error(`Error Creating refresh token for user: ${payload.user_id}`)
+      this.logger.error(
+        `Error Creating refresh token for user: ${payload.user_id}`,
+        e
+      )
       return null
     }
   }
 
-  async revokeRefreshTokenOfUser(tokenId: number, client = this.dbClient) {
+  async revokeRefreshTokenById(
+    tokenId: number,
+    client: PrismaClient | PrismaTransactionType = this.dbClient
+  ) {
     try {
-      Logger.debug(`Revoking refresh token with id: ${tokenId}`)
+      this.logger.debug(`Revoking refresh token with id: ${tokenId}`)
       await client.refreshToken.update({
         where: {
           id: tokenId,
@@ -35,13 +43,16 @@ export class RefreshTokenService {
         },
       })
     } catch (e) {
-      Logger.error(`Error Revoking refresh token with id: ${tokenId}`)
+      this.logger.error(`Error Revoking refresh token with id: ${tokenId}`, e)
     }
   }
 
-  async revokeRefreshTokensOfUser(userId: number, client = this.dbClient) {
+  async revokeRefreshTokensOByUserId(
+    userId: number,
+    client: PrismaClient | PrismaTransactionType = this.dbClient
+  ) {
     try {
-      Logger.debug(`Revoking refresh tokens of user with id: ${userId}`)
+      this.logger.debug(`Revoking refresh tokens of user with id: ${userId}`)
       await client.refreshToken.updateMany({
         where: {
           user_id: userId,
@@ -51,16 +62,18 @@ export class RefreshTokenService {
         },
       })
     } catch (e) {
-      Logger.error(`Error Revoking refresh tokens of user with id: ${userId}`)
+      this.logger.error(
+        `Error Revoking refresh tokens of user with id: ${userId}`
+      )
     }
   }
 
-  async revokeRefreshTokensOfUserByToken(
+  async revokeRefreshTokenByToken(
     token: string,
-    client = this.dbClient
+    client: PrismaClient | PrismaTransactionType = this.dbClient
   ) {
     try {
-      Logger.debug(`Revoking refresh token`)
+      this.logger.debug(`Revoking refresh token`)
       await client.refreshToken.update({
         where: {
           token: token,
@@ -70,18 +83,21 @@ export class RefreshTokenService {
         },
       })
     } catch (e) {
-      Logger.error('Revoking refresh token`', e)
+      this.logger.error('Revoking refresh token`', e)
     }
   }
 
-  async findRefreshToken(token: string, client = this.dbClient) {
+  async findRefreshToken(
+    token: string,
+    client: PrismaClient | PrismaTransactionType = this.dbClient
+  ) {
     try {
-      Logger.debug(`Retrieving refresh token`)
+      this.logger.debug(`Retrieving refresh token`)
       return await client.refreshToken.findUniqueOrThrow({
         where: { token: token },
       })
     } catch (e) {
-      Logger.error(`Error Retrieving refresh token: ${token}`)
+      this.logger.error(`Error Retrieving refresh token: ${token}`, e)
     }
     return null
   }

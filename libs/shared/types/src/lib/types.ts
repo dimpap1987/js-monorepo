@@ -1,4 +1,5 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
+import { DefaultArgs } from '@prisma/client/runtime/library'
 import { IconType } from 'react-icons/lib'
 
 export interface UserJWT {
@@ -82,3 +83,8 @@ export interface CreateCheckoutSessionRequestBody {
   customSubmitMessage?: string
   isDonate?: boolean
 }
+
+export type PrismaTransactionType = Omit<
+  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+>

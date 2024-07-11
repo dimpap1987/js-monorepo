@@ -5,12 +5,14 @@ import { getBrowserInfo, getIPAddress } from '@js-monorepo/utils'
 
 @Injectable()
 export class TokenRotationMiddleware implements NestMiddleware {
+  private readonly logger = new Logger(TokenRotationMiddleware.name)
+
   constructor(private authService: AuthService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
       const { accessToken, refreshToken } = req.cookies
-      Logger.debug(`TokenRotationMiddleware: path = '${req.baseUrl}'`)
+      this.logger.debug(`path = '${req.baseUrl}'`)
 
       if (accessToken && refreshToken) {
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
@@ -20,13 +22,13 @@ export class TokenRotationMiddleware implements NestMiddleware {
             { browserInfo: getBrowserInfo(req), ipAddress: getIPAddress(req) }
           )
 
-        this.authService.setRefreshTokenCookie(res, newRefreshToken)
-        this.authService.setAccessTokenCookie(res, newAccessToken)
         req.cookies.accessToken = newAccessToken
         req.cookies.refreshToken = newRefreshToken
+        this.authService.setRefreshTokenCookie(res, newRefreshToken)
+        this.authService.setAccessTokenCookie(res, newAccessToken)
       }
     } catch (error) {
-      Logger.error(`Token rotation error in path: ${req.baseUrl}`)
+      this.logger.error(`Error in path: ${req.baseUrl}`, error)
     }
     next()
   }

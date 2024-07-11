@@ -21,6 +21,7 @@ import { AuthConfiguration } from './types/auth.configuration'
 import csurf = require('csurf')
 import { RefreshTokenService } from './services/refreshToken.service'
 import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
+import { TokensService } from './services/tokens.service'
 
 export const csrfProtection = csurf({
   cookie: {
@@ -46,12 +47,16 @@ export const csrfProtection = csurf({
     RolesGuard,
     RefreshTokenService,
     TokenRotationMiddleware,
+    TokensService,
     {
       provide: 'jwt',
-      useFactory: async (authService: AuthService, req: any): Promise<any> => {
-        return authService.decode(req?.cookies.accessToken)
+      useFactory: async (
+        tokenService: TokensService,
+        req: any
+      ): Promise<any> => {
+        return tokenService.decode(req?.cookies.accessToken)
       },
-      inject: [AuthService, REQUEST],
+      inject: [TokensService, REQUEST],
     },
     {
       provide: APP_FILTER,
@@ -64,6 +69,7 @@ export const csrfProtection = csurf({
     RolesGuard,
     AuthService,
     TokenRotationMiddleware,
+    TokensService,
   ],
 })
 export class AuthModule implements NestModule {
@@ -92,8 +98,15 @@ export class AuthModule implements NestModule {
           inject: ['AUTH_CONFIG'],
         },
         {
-          provide: 'JWT_SECRET',
-          useFactory: async (config: AuthConfiguration) => config.jwtSercret,
+          provide: 'ACCESS_TOKEN_SECRET',
+          useFactory: async (config: AuthConfiguration) =>
+            config.accessTokenSecret,
+          inject: ['AUTH_CONFIG'],
+        },
+        {
+          provide: 'REFRESH_TOKEN_SECRET',
+          useFactory: async (config: AuthConfiguration) =>
+            config.refreshTokenSecret,
           inject: ['AUTH_CONFIG'],
         },
         {

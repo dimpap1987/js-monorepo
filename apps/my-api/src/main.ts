@@ -5,7 +5,12 @@ import helmet from 'helmet'
 import { AppModule } from './app/app.module'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    logger:
+      process.env.NODE_ENV === 'production'
+        ? ['log', 'error', 'warn']
+        : ['log', 'debug', 'error', 'warn'],
+  })
   const port = process.env.PORT || 3333
   const globalPrefix = 'api'
 
