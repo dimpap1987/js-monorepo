@@ -30,7 +30,7 @@ export function verify(token: string, secret: string) {
   }
 }
 
-export function sign(payload: any, expiry: number, secret: string) {
+export function sign(payload: any, expiry: number | string, secret: string) {
   try {
     return jsonSign(payload, secret, {
       expiresIn: expiry,

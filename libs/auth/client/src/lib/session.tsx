@@ -75,7 +75,7 @@ export const SessionProvider = ({
     if (!isLoggedIn) return
     refreshSession()
 
-    const intervalId = setInterval(refreshSession, 60000 * 60) // 1 hour
+    const intervalId = setInterval(refreshSession, 60000 * 4) // 4 minutes
 
     return () => {
       clearInterval(intervalId)

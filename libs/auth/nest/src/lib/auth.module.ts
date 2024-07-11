@@ -19,6 +19,7 @@ import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
 import csurf = require('csurf')
+import { RefreshTokenService } from './services/refreshToken.service'
 
 export const csrfProtection = csurf({
   cookie: {
@@ -42,6 +43,7 @@ export const csrfProtection = csurf({
     UserService,
     JwtAuthGuard,
     RolesGuard,
+    RefreshTokenService,
     {
       provide: 'jwt',
       useFactory: async (authService: AuthService, req: any): Promise<any> => {

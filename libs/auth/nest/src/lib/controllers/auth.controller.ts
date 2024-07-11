@@ -60,14 +60,21 @@ export class AuthController {
   }
 
   @Get('session')
-  getUserMetadata(@Req() req: Request) {
-    const accessToken = req.cookies.accessToken
-    return this.authService.handleSessionRequest(accessToken)
+  async getUserMetadata(@Req() req: Request, @Res() res: Response) {
+    const { accessToken, refreshToken } = req.cookies
+    const tokens = await this.authService.handleTokenRotation(
+      accessToken,
+      refreshToken
+    )
+    this.setRefreshTokenCookie(res, tokens.refreshToken)
+    this.setAccessTokenCookie(res, tokens.accessToken)
+    res.json(this.authService.handleSessionRequest(tokens.accessToken))
   }
 
   @Get('logout')
   @HttpCode(200)
   async logOut(@Req() req: Request, @Res() res: Response) {
+    this.authService.revokeRefreshToken(req.cookies.refreshToken)
     const cookies = Object.keys(req.cookies)
     for (const cookie of cookies) {
       res.clearCookie(cookie)
@@ -132,26 +139,11 @@ export class AuthController {
 
   private handleLoggedInUser(payload: JwtPayload, res: Response) {
     const tokens = this.authService.createJwtTokens(payload)
+    this.authService.persistRefreshToken(tokens.refreshToken)
     // REFRESH TOKEN
-    res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      domain:
-        process.env.NODE_ENV === 'production'
-          ? process.env.AUTH_COOKIE_DOMAIN_PROD
-          : 'localhost',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    })
+    this.setRefreshTokenCookie(res, tokens.refreshToken)
     // ACCESS TOKEN
-    res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      domain:
-        process.env.NODE_ENV === 'production'
-          ? process.env.AUTH_COOKIE_DOMAIN_PROD
-          : 'localhost',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    })
+    this.setAccessTokenCookie(res, tokens.accessToken)
     // REMOVE UNREGISTERED USER
     res.clearCookie('UNREGISTERED-USER')
   }
@@ -213,5 +205,29 @@ export class AuthController {
     } finally {
       res.redirect(redirectURI)
     }
+  }
+
+  private setAccessTokenCookie(res: Response, accessToken: string) {
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.AUTH_COOKIE_DOMAIN_PROD
+          : 'localhost',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
+  }
+
+  private setRefreshTokenCookie(res: Response, refreshToken: string) {
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.AUTH_COOKIE_DOMAIN_PROD
+          : 'localhost',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
   }
 }
