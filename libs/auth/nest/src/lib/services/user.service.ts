@@ -12,11 +12,11 @@ import { AuthException } from '../exceptions/api-exception'
 
 @Injectable()
 export class UserService {
-  constructor(@Inject('DB_CLIENT') private readonly authClient: PrismaClient) {}
+  constructor(@Inject('DB_CLIENT') private readonly dbClient: PrismaClient) {}
 
   async findAuthUserByEmail(email: string): Promise<AuthUserWithProviders> {
     try {
-      const user = await this.authClient.authUser.findUniqueOrThrow({
+      const user = await this.dbClient.authUser.findUniqueOrThrow({
         where: { email: email },
         include: {
           providers: true,
@@ -33,12 +33,31 @@ export class UserService {
     }
   }
 
+  async findAuthUserById(id: number): Promise<AuthUserWithProviders> {
+    try {
+      const user = await this.dbClient.authUser.findUniqueOrThrow({
+        where: { id: id },
+        include: {
+          providers: true,
+        },
+      })
+      return user
+    } catch (e) {
+      Logger.warn(`User not found with id: '${id}'`)
+      throw new AuthException(
+        HttpStatus.NOT_FOUND,
+        `User doens't not exist with id: '${id}'`,
+        'NOT_FOUND_USER_EXCEPTION'
+      )
+    }
+  }
+
   async createAuthUser(
     authUserDTO: Omit<AuthUser, 'id' | 'createdAt' | 'roles'>,
     providerDTO: Omit<Provider, 'id' | 'userId'>
   ) {
     try {
-      return await this.authClient.$transaction(async (prisma) => {
+      return await this.dbClient.$transaction(async (prisma) => {
         if (providerDTO) {
           return prisma.authUser.create({
             data: {
@@ -88,7 +107,7 @@ export class UserService {
     unRegisteredUser: Omit<UnRegisteredUser, 'id' | 'createdAt' | 'token'>
   ): Promise<UnRegisteredUser> {
     try {
-      const user = await this.authClient.unRegisteredUser.upsert({
+      const user = await this.dbClient.unRegisteredUser.upsert({
         where: { email: unRegisteredUser.email },
         update: {
           createdAt: new Date(),
@@ -123,7 +142,7 @@ export class UserService {
   async findUnRegisteredUserByToken(token: string): Promise<UnRegisteredUser> {
     try {
       const unregisteredUser =
-        await this.authClient.unRegisteredUser.findUniqueOrThrow({
+        await this.dbClient.unRegisteredUser.findUniqueOrThrow({
           where: { token: token },
         })
       return unregisteredUser
