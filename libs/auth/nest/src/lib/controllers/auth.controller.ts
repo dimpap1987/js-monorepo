@@ -3,6 +3,7 @@ import {
   RegisterUserSchemaType,
 } from '@js-monorepo/schemas'
 import { JwtPayload } from '@js-monorepo/types'
+import { getBrowserInfo, getIPAddress } from '@js-monorepo/utils'
 import {
   Body,
   Controller,
@@ -24,12 +25,16 @@ import { AuthGoogle } from '../guards/google.guard'
 import { ZodPipe } from '../pipes/zod.pipe'
 import { AuthService } from '../services/auth.service'
 import { UserService } from '../services/user.service'
+import { TokensService } from '../services/tokens.service'
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name)
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private readonly tokensService: TokensService,
     @Inject('REDIRECT_UI_URL') private readonly redirectUrl: string,
     @Inject('ON_REGISTER_CALLBACK') private readonly onRegisterCallBack: any,
     @Inject('ON_LOGIN_CALLBACK') private readonly onLoginCallBack: any
@@ -49,26 +54,29 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGoogle)
-  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+  async googleAuthRedirect(
+    @Req() req: Request & { user: { email: string; picture: string } },
+    @Res() res: Response
+  ) {
     return this.handleSocialRedirect(req, res, ProviderEnum.GOOGLE)
   }
 
   @Get('github/redirect')
   @UseGuards(AuthGithub)
-  async githubAuthCallback(@Req() req: Request, @Res() res: Response) {
+  async githubAuthCallback(
+    @Req() req: Request & { user: { email: string; picture: string } },
+    @Res() res: Response
+  ) {
     return this.handleSocialRedirect(req, res, ProviderEnum.GITHUB)
   }
 
   @Get('session')
-  async getUserMetadata(@Req() req: Request, @Res() res: Response) {
-    const { accessToken, refreshToken } = req.cookies
-    const tokens = await this.authService.handleTokenRotation(
-      accessToken,
-      refreshToken
-    )
-    this.setRefreshTokenCookie(res, tokens.refreshToken)
-    this.setAccessTokenCookie(res, tokens.accessToken)
-    res.json(this.authService.handleSessionRequest(tokens.accessToken))
+  getUserMetadata(@Req() req: Request) {
+    const { accessToken } = req.cookies
+    const { user } = this.tokensService.verifyAcessToken(accessToken)
+    return {
+      user: user,
+    }
   }
 
   @Get('logout')
@@ -125,7 +133,8 @@ export class AuthController {
           picture: unregisteredUser.profileImage,
         },
       },
-      res
+      res,
+      req
     )
     this.onRegisterCallBack?.(user)
     res.status(HttpStatus.CREATED).send()
@@ -137,19 +146,22 @@ export class AuthController {
     return this.userService.findUnRegisteredUserByToken(token)
   }
 
-  private handleLoggedInUser(payload: JwtPayload, res: Response) {
-    const tokens = this.authService.createJwtTokens(payload)
-    this.authService.persistRefreshToken(tokens.refreshToken)
+  private handleLoggedInUser(payload: JwtPayload, res: Response, req: Request) {
+    const tokens = this.tokensService.createJwtTokens(payload)
+    this.authService.persistRefreshToken(tokens.refreshToken, {
+      userAgent: getBrowserInfo(req),
+      ipAddress: getIPAddress(req),
+    })
     // REFRESH TOKEN
-    this.setRefreshTokenCookie(res, tokens.refreshToken)
+    this.authService.setRefreshTokenCookie(res, tokens.refreshToken)
     // ACCESS TOKEN
-    this.setAccessTokenCookie(res, tokens.accessToken)
+    this.authService.setAccessTokenCookie(res, tokens.accessToken)
     // REMOVE UNREGISTERED USER
     res.clearCookie('UNREGISTERED-USER')
   }
 
   private async handleSocialRedirect(
-    req: any,
+    req: Request & { user: { email: string; picture: string } },
     res: Response,
     provider: ProviderEnum
   ) {
@@ -157,8 +169,8 @@ export class AuthController {
     let redirectURI = this.redirectUrl
 
     if (!email) {
-      Logger.warn(`Undefined email for provider: ${provider}`)
-      return res.redirect(`${redirectURI}/auth/login?error=empty-email-github`)
+      this.logger.warn(`Empty email for provider: ${provider}`)
+      return res.redirect(`${redirectURI}/auth/login?error=empty-email`)
     }
     try {
       const user = await this.userService.findAuthUserByEmail(email)
@@ -173,7 +185,8 @@ export class AuthController {
             picture: user.providers[0]?.profileImage,
           },
         },
-        res
+        res,
+        req
       )
       redirectURI = req.session['redirect-after-login'] ?? `${this.redirectUrl}`
       this.onLoginCallBack?.(user)
@@ -195,39 +208,15 @@ export class AuthController {
           })
           redirectURI = `${this.redirectUrl}/auth/onboarding`
         } catch (e2) {
-          Logger.error(e, `Error when creating unregistered user`)
+          this.logger.error(`Error when creating unregistered user`, e2)
           redirectURI = `${this.redirectUrl}/auth/login?error=user-creation`
         }
-        Logger.log(
+        this.logger.log(
           `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}'`
         )
       }
     } finally {
       res.redirect(redirectURI)
     }
-  }
-
-  private setAccessTokenCookie(res: Response, accessToken: string) {
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      domain:
-        process.env.NODE_ENV === 'production'
-          ? process.env.AUTH_COOKIE_DOMAIN_PROD
-          : 'localhost',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    })
-  }
-
-  private setRefreshTokenCookie(res: Response, refreshToken: string) {
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      domain:
-        process.env.NODE_ENV === 'production'
-          ? process.env.AUTH_COOKIE_DOMAIN_PROD
-          : 'localhost',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    })
   }
 }

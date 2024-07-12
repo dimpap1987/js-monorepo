@@ -3,8 +3,10 @@ import { AuthException } from './api-exception'
 
 @Catch(AuthException)
 export class AuthExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(AuthExceptionFilter.name)
+
   catch(exception: AuthException, host: ArgumentsHost) {
-    Logger.error(
+    this.logger.error(
       `Exception of type: 'AuthExceptionFilter' - message: '${
         exception.message
       }' - statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`
@@ -12,6 +14,9 @@ export class AuthExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()
     const request = ctx.getRequest()
+
+    response.clearCookie('accessToken')
+    response.clearCookie('refreshToken')
 
     return response.status(exception.getStatus()).json({
       createdBy: 'AuthExceptionFilter',
