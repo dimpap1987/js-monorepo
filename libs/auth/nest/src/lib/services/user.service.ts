@@ -1,4 +1,7 @@
-import { AuthUserWithProviders } from '@js-monorepo/types'
+import {
+  AuthUserWithProviders,
+  PrismaTransactionType,
+} from '@js-monorepo/types'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import {
   AuthUser,
@@ -12,6 +15,8 @@ import { AuthException } from '../exceptions/api-exception'
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name)
+
   constructor(@Inject('DB_CLIENT') private readonly dbClient: PrismaClient) {}
 
   async findAuthUserByEmail(email: string): Promise<AuthUserWithProviders> {
@@ -24,7 +29,7 @@ export class UserService {
       })
       return user
     } catch (e) {
-      Logger.warn(`User not found with email: '${email}'`)
+      this.logger.warn(`User not found with email: '${email}'`)
       throw new AuthException(
         HttpStatus.NOT_FOUND,
         `User doens't not exist with email: '${email}'`,
@@ -33,9 +38,12 @@ export class UserService {
     }
   }
 
-  async findAuthUserById(id: number): Promise<AuthUserWithProviders> {
+  async findAuthUserById(
+    id: number,
+    tr: PrismaClient | PrismaTransactionType = this.dbClient
+  ): Promise<AuthUserWithProviders> {
     try {
-      const user = await this.dbClient.authUser.findUniqueOrThrow({
+      const user = await tr.authUser.findUniqueOrThrow({
         where: { id: id },
         include: {
           providers: true,
@@ -43,7 +51,7 @@ export class UserService {
       })
       return user
     } catch (e) {
-      Logger.warn(`User not found with id: '${id}'`)
+      this.logger.warn(`User not found with id: '${id}'`)
       throw new AuthException(
         HttpStatus.NOT_FOUND,
         `User doens't not exist with id: '${id}'`,
@@ -83,7 +91,7 @@ export class UserService {
     } catch (err: any) {
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2002') {
-          Logger.warn(`Username: '${authUserDTO.username}' already exists`)
+          this.logger.warn(`Username: '${authUserDTO.username}' already exists`)
           throw new AuthException(
             HttpStatus.BAD_REQUEST,
             'Username already exists',
@@ -91,9 +99,9 @@ export class UserService {
           )
         }
       }
-      Logger.error(
-        err,
-        `There was an error when creating a user with username: ${authUserDTO.username}`
+      this.logger.error(
+        `There was an error when creating a user with username: ${authUserDTO.username}`,
+        err
       )
       throw new AuthException(
         HttpStatus.BAD_REQUEST,
@@ -122,14 +130,14 @@ export class UserService {
           profileImage: unRegisteredUser.profileImage,
         },
       })
-      Logger.log(
+      this.logger.log(
         `Unregistered User: '${unRegisteredUser.email}' created successfully`
       )
       return user
     } catch (err) {
-      Logger.error(
-        err,
-        `There was an error with user: ${unRegisteredUser.email}`
+      this.logger.error(
+        `There was an error with user: ${unRegisteredUser.email}`,
+        err
       )
       throw new AuthException(
         HttpStatus.BAD_REQUEST,
@@ -141,12 +149,17 @@ export class UserService {
 
   async findUnRegisteredUserByToken(token: string): Promise<UnRegisteredUser> {
     try {
+      this.logger.debug(`Find Unregistered user with token: ${token}`)
       const unregisteredUser =
         await this.dbClient.unRegisteredUser.findUniqueOrThrow({
           where: { token: token },
         })
       return unregisteredUser
     } catch (e) {
+      this.logger.error(
+        `Error in finding Unregistered user with token: ${token}`,
+        e
+      )
       throw new AuthException(
         HttpStatus.BAD_REQUEST,
         'Invalid token!',

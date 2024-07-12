@@ -16,7 +16,8 @@ export interface AuthConfiguration {
   sessionSecret: string
   csrfEnabled?: boolean
   dbClient: PrismaClient
-  jwtSercret: string
+  accessTokenSecret: string
+  refreshTokenSecret: string
   redirectUiUrl?: string
   github?: GithubAuth
   google?: GoogleAuth

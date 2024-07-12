@@ -20,6 +20,8 @@ import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
 import csurf = require('csurf')
 import { RefreshTokenService } from './services/refreshToken.service'
+import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
+import { TokensService } from './services/tokens.service'
 
 export const csrfProtection = csurf({
   cookie: {
@@ -44,19 +46,31 @@ export const csrfProtection = csurf({
     JwtAuthGuard,
     RolesGuard,
     RefreshTokenService,
+    TokenRotationMiddleware,
+    TokensService,
     {
       provide: 'jwt',
-      useFactory: async (authService: AuthService, req: any): Promise<any> => {
-        return authService.decode(req?.cookies.accessToken)
+      useFactory: async (
+        tokenService: TokensService,
+        req: any
+      ): Promise<any> => {
+        return tokenService.decode(req?.cookies.accessToken)
       },
-      inject: [AuthService, REQUEST],
+      inject: [TokensService, REQUEST],
     },
     {
       provide: APP_FILTER,
       useClass: AuthExceptionFilter,
     },
   ],
-  exports: ['jwt', JwtAuthGuard, RolesGuard, AuthService],
+  exports: [
+    'jwt',
+    JwtAuthGuard,
+    RolesGuard,
+    AuthService,
+    TokenRotationMiddleware,
+    TokensService,
+  ],
 })
 export class AuthModule implements NestModule {
   constructor(
@@ -84,8 +98,15 @@ export class AuthModule implements NestModule {
           inject: ['AUTH_CONFIG'],
         },
         {
-          provide: 'JWT_SECRET',
-          useFactory: async (config: AuthConfiguration) => config.jwtSercret,
+          provide: 'ACCESS_TOKEN_SECRET',
+          useFactory: async (config: AuthConfiguration) =>
+            config.accessTokenSecret,
+          inject: ['AUTH_CONFIG'],
+        },
+        {
+          provide: 'REFRESH_TOKEN_SECRET',
+          useFactory: async (config: AuthConfiguration) =>
+            config.refreshTokenSecret,
           inject: ['AUTH_CONFIG'],
         },
         {
@@ -138,12 +159,20 @@ export class AuthModule implements NestModule {
         })
       )
       .forRoutes('*')
-    // .apply(RefererMiddleware)
-    // .forRoutes(
-    //   { path: '*google/login*', method: RequestMethod.GET },
-    //   { path: '*github/login*', method: RequestMethod.GET },
-    //   { path: '*facebook/login*', method: RequestMethod.GET }
-    // )
+
+      .apply(TokenRotationMiddleware)
+      .exclude(
+        '/',
+        'auth/google/login',
+        'auth/github/login',
+        'auth/facebook/login',
+        'auth/google/redirect',
+        'auth/github/redirect',
+        'auth/logout',
+        'auth/register',
+        'auth/unregistered-user'
+      )
+      .forRoutes('*')
 
     if (this.csrfEnabled) {
       consumer
