@@ -1,4 +1,7 @@
-import { AuthUserWithProviders } from '@js-monorepo/types'
+import {
+  AuthUserWithProviders,
+  PrismaTransactionType,
+} from '@js-monorepo/types'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import {
   AuthUser,
@@ -35,9 +38,12 @@ export class UserService {
     }
   }
 
-  async findAuthUserById(id: number): Promise<AuthUserWithProviders> {
+  async findAuthUserById(
+    id: number,
+    tr: PrismaClient | PrismaTransactionType = this.dbClient
+  ): Promise<AuthUserWithProviders> {
     try {
-      const user = await this.dbClient.authUser.findUniqueOrThrow({
+      const user = await tr.authUser.findUniqueOrThrow({
         where: { id: id },
         include: {
           providers: true,

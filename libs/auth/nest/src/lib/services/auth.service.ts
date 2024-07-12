@@ -57,7 +57,13 @@ export class AuthService {
           userRefreshToken.id
         )
         const rotatedTokens = this.tokensService.createJwtTokens({
-          user: user,
+          user: {
+            id: user.id,
+            username: user.username,
+            roles: user.roles,
+            createdAt: user.createdAt,
+            picture: user.providers[0]?.profileImage,
+          },
         })
 
         this.dbClient.$transaction(async (tr) => {

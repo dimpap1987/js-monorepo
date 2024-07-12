@@ -169,8 +169,8 @@ export class AuthController {
     let redirectURI = this.redirectUrl
 
     if (!email) {
-      this.logger.warn(`Undefined email for provider: ${provider}`)
-      return res.redirect(`${redirectURI}/auth/login?error=empty-email-github`)
+      this.logger.warn(`Empty email for provider: ${provider}`)
+      return res.redirect(`${redirectURI}/auth/login?error=empty-email`)
     }
     try {
       const user = await this.userService.findAuthUserByEmail(email)

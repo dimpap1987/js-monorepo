@@ -15,6 +15,9 @@ export class AuthExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse()
     const request = ctx.getRequest()
 
+    response.clearCookie('accessToken')
+    response.clearCookie('refreshToken')
+
     return response.status(exception.getStatus()).json({
       createdBy: 'AuthExceptionFilter',
       errorCode: exception.errorCode,
