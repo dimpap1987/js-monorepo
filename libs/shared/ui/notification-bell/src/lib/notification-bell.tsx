@@ -1,5 +1,6 @@
 'use client'
 
+import { useSession } from '@js-monorepo/auth-client'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +33,7 @@ export function DpNotificationBellComponent({
   notificationList?: NotificationType[]
   className?: string
 }) {
+  const { isLoggedIn } = useSession()
   const [notifications, setNotifications] =
     useState<NotificationType[]>(notificationList)
   const unreadNotificationCount = notifications?.filter(
@@ -40,6 +42,8 @@ export function DpNotificationBellComponent({
   const isRinging = unreadNotificationCount > 0
 
   useEffect(() => {
+    if (!isLoggedIn) return
+
     const eventSource = new EventSource(
       process.env.NEXT_PUBLIC_NOTIFICATION_CONTROLLER ?? '',
       { withCredentials: true }
@@ -63,9 +67,9 @@ export function DpNotificationBellComponent({
       })
     }
     return () => {
-      eventSource.close()
+      eventSource?.close()
     }
-  }, [])
+  }, [isLoggedIn])
 
   useEffect(() => {
     if (!(notifications?.length > 0)) return

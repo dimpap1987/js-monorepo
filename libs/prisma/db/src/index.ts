@@ -1,1 +1,2 @@
-export { prismaClient } from './lib/db-client'
+export { PrismaService } from './lib/db-client'
+export { PrismaModule } from './lib/prisma.module'

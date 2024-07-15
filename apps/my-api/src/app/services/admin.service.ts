@@ -1,7 +1,7 @@
+import { PrismaService } from '@js-monorepo/db'
+import { AuthUserFullPayload } from '@js-monorepo/types'
 import { Injectable } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
-import { PrismaService } from './prisma.service'
-import { AuthUserFullPayload } from '@js-monorepo/types'
 
 @Injectable()
 export class AdminService {

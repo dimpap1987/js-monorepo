@@ -1,5 +1,5 @@
+import { PrismaService } from '@js-monorepo/db'
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from './prisma.service'
 
 @Injectable()
 export class NotificationService {

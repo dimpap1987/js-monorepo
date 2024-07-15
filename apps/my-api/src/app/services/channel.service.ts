@@ -1,6 +1,6 @@
+import { PrismaService } from '@js-monorepo/db'
 import { Injectable, Logger } from '@nestjs/common'
 import { ApiException } from '../exceptions/api-exception'
-import { PrismaService } from './prisma.service'
 
 @Injectable()
 export class ChannelService {

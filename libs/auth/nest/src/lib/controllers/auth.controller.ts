@@ -26,6 +26,7 @@ import { ZodPipe } from '../pipes/zod.pipe'
 import { AuthService } from '../services/auth.service'
 import { UserService } from '../services/user.service'
 import { TokensService } from '../services/tokens.service'
+import { AuthConfiguration } from '../types/auth.configuration'
 
 @Controller('auth')
 export class AuthController {
@@ -35,9 +36,7 @@ export class AuthController {
     private authService: AuthService,
     private userService: UserService,
     private readonly tokensService: TokensService,
-    @Inject('REDIRECT_UI_URL') private readonly redirectUrl: string,
-    @Inject('ON_REGISTER_CALLBACK') private readonly onRegisterCallBack: any,
-    @Inject('ON_LOGIN_CALLBACK') private readonly onLoginCallBack: any
+    @Inject('AUTH_OPTIONS') private readonly options: AuthConfiguration
   ) {}
 
   @Get('google/login')
@@ -136,7 +135,7 @@ export class AuthController {
       res,
       req
     )
-    this.onRegisterCallBack?.(user)
+    this.options.onRegister?.(user)
     res.status(HttpStatus.CREATED).send()
   }
 
@@ -166,7 +165,7 @@ export class AuthController {
     provider: ProviderEnum
   ) {
     const email = req.user?.email
-    let redirectURI = this.redirectUrl
+    let redirectURI = this.options.redirectUiUrl
 
     if (!email) {
       this.logger.warn(`Empty email for provider: ${provider}`)
@@ -188,8 +187,9 @@ export class AuthController {
         res,
         req
       )
-      redirectURI = req.session['redirect-after-login'] ?? `${this.redirectUrl}`
-      this.onLoginCallBack?.(user)
+      redirectURI =
+        req.session['redirect-after-login'] ?? `${this.options.redirectUiUrl}`
+      this.options.onLogin?.(user)
     } catch (e) {
       if (
         e instanceof AuthException &&
@@ -206,17 +206,17 @@ export class AuthController {
           res.cookie('UNREGISTERED-USER', unRegisteredUser?.token, {
             httpOnly: true,
           })
-          redirectURI = `${this.redirectUrl}/auth/onboarding`
+          redirectURI = `${this.options.redirectUiUrl}/auth/onboarding`
         } catch (e2) {
           this.logger.error(`Error when creating unregistered user`, e2)
-          redirectURI = `${this.redirectUrl}/auth/login?error=user-creation`
+          redirectURI = `${this.options.redirectUiUrl}/auth/login?error=user-creation`
         }
         this.logger.log(
           `UnRegistered User: '${email}' is being redirecting to: '${redirectURI}'`
         )
       }
     } finally {
-      res.redirect(redirectURI)
+      res.redirect(redirectURI as string)
     }
   }
 }

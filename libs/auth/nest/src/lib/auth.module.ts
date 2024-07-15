@@ -1,3 +1,4 @@
+import { PrismaService } from '@js-monorepo/db'
 import {
   DynamicModule,
   Inject,
@@ -13,15 +14,15 @@ import { AuthExceptionFilter } from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
 import { CsrfGeneratorMiddleware } from './middlewares/csrf-generator.middleware'
+import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
 import { AuthService } from './services/auth.service'
+import { RefreshTokenService } from './services/refreshToken.service'
+import { TokensService } from './services/tokens.service'
 import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
 import csurf = require('csurf')
-import { RefreshTokenService } from './services/refreshToken.service'
-import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
-import { TokensService } from './services/tokens.service'
 
 export const csrfProtection = csurf({
   cookie: {
@@ -74,8 +75,7 @@ export const csrfProtection = csurf({
 })
 export class AuthModule implements NestModule {
   constructor(
-    @Inject('SESSION_SECRET') private readonly sessionSecret: string,
-    @Inject('CSRF_ENABLED') private readonly csrfEnabled: boolean
+    @Inject('AUTH_CONFIG') private readonly config: AuthConfiguration
   ) {}
 
   static forRootAsync(options: {
@@ -84,6 +84,7 @@ export class AuthModule implements NestModule {
     imports?: any[]
   }): DynamicModule {
     return {
+      global: true,
       module: AuthModule,
       imports: options.imports,
       providers: [
@@ -92,57 +93,24 @@ export class AuthModule implements NestModule {
           useFactory: options.useFactory,
           inject: options.inject || [],
         },
-        {
-          provide: 'SESSION_SECRET',
-          useFactory: async (config: AuthConfiguration) => config.sessionSecret,
-          inject: ['AUTH_CONFIG'],
-        },
-        {
-          provide: 'ACCESS_TOKEN_SECRET',
-          useFactory: async (config: AuthConfiguration) =>
-            config.accessTokenSecret,
-          inject: ['AUTH_CONFIG'],
-        },
-        {
-          provide: 'REFRESH_TOKEN_SECRET',
-          useFactory: async (config: AuthConfiguration) =>
-            config.refreshTokenSecret,
-          inject: ['AUTH_CONFIG'],
-        },
+        // TODO inject it from client
         {
           provide: 'DB_CLIENT',
-          useFactory: async (config: AuthConfiguration) => config.dbClient,
-          inject: ['AUTH_CONFIG'],
+          useExisting: PrismaService,
         },
         {
-          provide: 'GOOGLE-AUTH',
-          useFactory: async (config: AuthConfiguration) => config.google,
-          inject: ['AUTH_CONFIG'],
-        },
-        {
-          provide: 'GITHUB-AUTH',
-          useFactory: async (config: AuthConfiguration) => config.github,
-          inject: ['AUTH_CONFIG'],
-        },
-        {
-          provide: 'REDIRECT_UI_URL',
-          useFactory: async (config: AuthConfiguration) => config.redirectUiUrl,
-          inject: ['AUTH_CONFIG'],
-        },
-        {
-          provide: 'ON_REGISTER_CALLBACK',
-          useFactory: async (config: AuthConfiguration) => config.onRegister,
-          inject: ['AUTH_CONFIG'],
-        },
-        {
-          provide: 'ON_LOGIN_CALLBACK',
-          useFactory: async (config: AuthConfiguration) => config.onLogin,
-          inject: ['AUTH_CONFIG'],
-        },
-        {
-          provide: 'CSRF_ENABLED',
-          useFactory: async (config: AuthConfiguration) =>
-            config.csrfEnabled ?? false,
+          provide: 'AUTH_OPTIONS',
+          useFactory: async (config: AuthConfiguration) => ({
+            sessionSecret: config.sessionSecret,
+            accessTokenSecret: config.accessTokenSecret,
+            refreshTokenSecret: config.refreshTokenSecret,
+            google: config.google,
+            github: config.github,
+            redirectUiUrl: config.redirectUiUrl,
+            onRegister: config.onRegister,
+            onLogin: config.onLogin,
+            csrfEnabled: config.csrfEnabled ?? false,
+          }),
           inject: ['AUTH_CONFIG'],
         },
       ],
@@ -153,7 +121,7 @@ export class AuthModule implements NestModule {
     consumer
       .apply(
         session({
-          secret: this.sessionSecret,
+          secret: this.config.sessionSecret,
           resave: false,
           saveUninitialized: false,
         })
@@ -174,7 +142,7 @@ export class AuthModule implements NestModule {
       )
       .forRoutes('*')
 
-    if (this.csrfEnabled) {
+    if (this.config.csrfEnabled) {
       consumer
         .apply(CsrfGeneratorMiddleware)
         .forRoutes(
