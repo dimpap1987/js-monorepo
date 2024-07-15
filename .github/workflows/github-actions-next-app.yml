@@ -30,8 +30,8 @@ jobs:
         name: Checkout [Pull Request]
         if: ${{ github.event_name == 'pull_request' }}
         with:
-          # By default, PRs will be checked-out based on the Merge Commit, but we want the actual branch HEAD.
-          ref: ${{ github.event.pull_request.head.sha }}
+          # Use the head ref instead of the SHA
+          ref: ${{ github.head_ref }}
           # We need to fetch all branches and commits so that Nx affected has a base to compare against.
           fetch-depth: 0
 
@@ -42,8 +42,11 @@ jobs:
           # We need to fetch all branches and commits so that Nx affected has a base to compare against.
           fetch-depth: 0
 
-      - name: Setup Remote Tracking
-        run: git fetch origin +refs/heads/*:refs/remotes/origin/*
+      - name: Fetch main branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      # - name: Setup Remote Tracking
+      #   run: git fetch origin +refs/heads/*:refs/remotes/origin/*
 
       - name: Use Node.js 20
         uses: actions/setup-node@v3

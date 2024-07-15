@@ -1,4 +1,4 @@
-import { AuthUser, PrismaClient } from '@prisma/client'
+import { AuthUser } from '@prisma/client'
 import { Request, Response } from 'express'
 
 export interface GoogleAuth {
@@ -15,7 +15,6 @@ export interface GithubAuth {
 export interface AuthConfiguration {
   sessionSecret: string
   csrfEnabled?: boolean
-  dbClient: PrismaClient
   accessTokenSecret: string
   refreshTokenSecret: string
   redirectUiUrl?: string

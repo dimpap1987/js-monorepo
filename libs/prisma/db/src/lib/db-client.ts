@@ -1,18 +1,24 @@
-/* eslint-disable import/no-extraneous-dependencies */
+import {
+  INestApplication,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
 
-// Auth Prisma client singleton function
-const prismaClientSingleton = () => {
-  return new PrismaClient()
-}
+@Injectable()
+export class PrismaService extends PrismaClient implements OnModuleInit {
+  private readonly logger = new Logger(PrismaService.name)
 
-// Initialize the Auth Prisma client
-const prismaClient: PrismaClient =
-  globalThis.prismaClient ?? prismaClientSingleton()
+  async onModuleInit() {
+    await this.$connect()
+    this.logger.log('Connected to database')
+  }
 
-export { prismaClient }
-
-// Store Prisma clients in global scope in development mode
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.prismaClient = prismaClient
+  async enableShutdownHooks(app: INestApplication) {
+    this.$on('beforeExit' as never, async () => {
+      this.logger.log('Wait for application closing...')
+      await app.close()
+    })
+  }
 }

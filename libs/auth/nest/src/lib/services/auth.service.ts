@@ -40,7 +40,7 @@ export class AuthService {
 
         if (!retrievedRefreshToken || retrievedRefreshToken?.revoked) {
           this.logger.warn(
-            `Token: '${retrievedRefreshToken}' for user has been revoked!`
+            `Refresh Token: '${retrievedRefreshToken?.id}' for user has been revoked!`
           )
           this.refreshTokenService.revokeRefreshTokensOByUserId(
             userRefreshToken.id

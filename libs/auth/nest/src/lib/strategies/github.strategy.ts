@@ -3,15 +3,17 @@ import { PassportStrategy } from '@nestjs/passport'
 import { VerifyCallback } from 'jsonwebtoken'
 import { Octokit } from 'octokit'
 import { Strategy } from 'passport-github'
-import { GithubAuth } from '../types/auth.configuration'
+import { AuthConfiguration } from '../types/auth.configuration'
 
 @Injectable()
 export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
-  constructor(@Inject('GITHUB-AUTH') private readonly config: GithubAuth) {
+  constructor(
+    @Inject('AUTH_OPTIONS') private readonly options: AuthConfiguration
+  ) {
     super({
-      clientID: config.clientId,
-      clientSecret: config.clientSecret,
-      callbackURL: config.callBackUrl,
+      clientID: options.github?.clientId,
+      clientSecret: options.github?.clientSecret,
+      callbackURL: options.github?.callBackUrl,
       scope: ['read:project', 'user:email', 'read:user'],
     })
   }
