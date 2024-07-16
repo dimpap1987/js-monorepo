@@ -1,6 +1,6 @@
 {
   "name": "@js-monorepo/source",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "license": "MIT",
   "scripts": {
     "lint": "nx affected:lint --all",
@@ -156,7 +156,7 @@
     "eslint": "8.57.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-airbnb-typescript": "^18.0.0",
     "eslint-config-next": "14.2.3",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-cypress": "^2.13.4",
