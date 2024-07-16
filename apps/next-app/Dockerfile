@@ -4,8 +4,7 @@ FROM node:21-alpine3.18 as deps
 RUN apk add --no-cache libc6-compat python3 make g++ alpine-sdk && rm -rf /var/cache/apk/*
 WORKDIR /usr/src/app
 COPY .npmrc dist/apps/next-app/package*.json ./
-COPY node_modules/.prisma ./node_modules/.prisma
-RUN npm install --omit=dev
+RUN npm ci
 
 # Production image, copy all the files and run next
 FROM node:21-alpine3.18 as runner
@@ -18,7 +17,6 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY --from=deps /usr/src/app/package.json ./package.json
 COPY dist/apps/next-app/public ./public
 COPY dist/apps/next-app/.next ./.next
-COPY libs/prisma/db/src/lib/prisma ./prisma
 RUN chown -R node:node .
 USER node
 EXPOSE 3000
