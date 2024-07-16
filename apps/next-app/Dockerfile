@@ -4,7 +4,8 @@ FROM node:21-alpine3.18 as deps
 RUN apk add --no-cache libc6-compat python3 make g++ alpine-sdk && rm -rf /var/cache/apk/*
 WORKDIR /usr/src/app
 COPY .npmrc dist/apps/next-app/package*.json ./
-RUN npm install
+COPY ./node_modules ./node_modules
+# RUN npm install
 
 # Production image, copy all the files and run next
 FROM node:21-alpine3.18 as runner
