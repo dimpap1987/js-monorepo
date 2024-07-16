@@ -1,12 +1,3 @@
-# Install dependencies only when needed
-FROM node:21-alpine3.18 as deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat python3 make g++ alpine-sdk && rm -rf /var/cache/apk/*
-WORKDIR /usr/src/app
-COPY .npmrc dist/apps/next-app/package*.json ./
-COPY ./node_modules ./node_modules
-# RUN npm install
-
 # Production image, copy all the files and run next
 FROM node:21-alpine3.18 as runner
 RUN apk add --no-cache dumb-init
@@ -14,13 +5,11 @@ ENV NODE_ENV=production
 ENV PORT=3000
 
 WORKDIR /usr/src/app
-COPY --from=deps /usr/src/app/node_modules ./node_modules
-COPY --from=deps /usr/src/app/package.json ./package.json
+# Copy the node_modules folder from the GitHub Actions workflow
+COPY ./node_modules ./node_modules
 COPY dist/apps/next-app/public ./public
 COPY dist/apps/next-app/.next ./.next
 RUN chown -R node:node .
 USER node
 EXPOSE 3000
 ENV NEXT_TELEMETRY_DISABLED=1
-
-CMD ["dumb-init", "node_modules/.bin/next", "start"]
