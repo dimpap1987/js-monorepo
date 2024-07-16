@@ -11,3 +11,5 @@ Dockerfile
 .git
 node_modules
 .next
+!.next/static
+!.next/standalone
