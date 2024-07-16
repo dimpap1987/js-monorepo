@@ -30,14 +30,23 @@
         "plugin:prettier/recommended"
       ],
       "rules": {
-        "prettier/prettier": ["error", { "endOfLine": "auto" }],
+        "prettier/prettier": [
+          "error",
+          {
+            "endOfLine": "auto"
+          }
+        ],
         "import/no-extraneous-dependencies": [
           "error",
-          { "devDependencies": true }
+          {
+            "devDependencies": true
+          }
         ],
         "react/jsx-no-useless-fragment": "off",
         "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-explicit-any": "off"
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-extra-semi": "error",
+        "no-extra-semi": "off"
       },
       "parserOptions": {
         "project": ["tsconfig.*?.json"]
@@ -54,8 +63,12 @@
       "rules": {
         "import/no-extraneous-dependencies": [
           "error",
-          { "devDependencies": true }
-        ]
+          {
+            "devDependencies": true
+          }
+        ],
+        "@typescript-eslint/no-extra-semi": "error",
+        "no-extra-semi": "off"
       }
     }
   ]
