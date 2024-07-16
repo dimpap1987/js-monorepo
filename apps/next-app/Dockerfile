@@ -4,13 +4,13 @@ FROM node:21-alpine3.18 as deps
 RUN apk add --no-cache libc6-compat python3 make g++ alpine-sdk && rm -rf /var/cache/apk/*
 WORKDIR /usr/src/app
 COPY .npmrc dist/apps/next-app/package*.json ./
-RUN npm ci
+RUN npm install
 
 # Production image, copy all the files and run next
 FROM node:21-alpine3.18 as runner
 RUN apk add --no-cache dumb-init
-ENV NODE_ENV production
-ENV PORT 3000
+ENV NODE_ENV=production
+ENV PORT=3000
 
 WORKDIR /usr/src/app
 COPY --from=deps /usr/src/app/node_modules ./node_modules
@@ -20,6 +20,6 @@ COPY dist/apps/next-app/.next ./.next
 RUN chown -R node:node .
 USER node
 EXPOSE 3000
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 CMD ["dumb-init", "node_modules/.bin/next", "start"]
