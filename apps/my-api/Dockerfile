@@ -22,4 +22,4 @@ USER nestjs
 
 EXPOSE 3333
 
-CMD [ "node", "main.js" ]
+CMD [ "tail", "-f" ]
