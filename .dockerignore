@@ -3,7 +3,6 @@ node_modules/
 
 # Exclude node_modules/prisma
 !node_modules/.prisma
-!node_modules/@prisma
 
 # Nx cache
 .cache/

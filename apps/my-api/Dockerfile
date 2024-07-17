@@ -13,7 +13,7 @@ COPY --chown=nestjs:nodejs dist/apps/my-api/package*.json ./
 
 RUN npm install --omit=dev --ignore-scripts
 
-COPY --chown=nestjs:nodejs node_modules/@prisma node_modules/@prisma
+COPY --chown=nestjs:nodejs node_modules/.prisma ./node_modules/.prisma
 
 COPY --chown=nestjs:nodejs dist/apps/my-api ./
 
