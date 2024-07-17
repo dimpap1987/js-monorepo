@@ -1,10 +1,12 @@
-name: Test - Next-app
+name: integration - CI/CD
 
 on:
   push:
-    paths:
-      - 'apps/next-app/**'
-      - 'package.json'
+    branches:
+      - integration
+  pull_request:
+    branches:
+      - integration
 
 jobs:
   main:
@@ -12,16 +14,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        name: Checkout [Default Branch]
+        name: Checkout [Integration Branch]]
         with:
           # We need to fetch all branches and commits so that Nx affected has a base to compare against.
           fetch-depth: 0
 
-      - name: Fetch main branch
+      - name: Fetch integration branch
         run: git fetch origin ${{ github.base_ref }}
-
-      # - name: Setup Remote Tracking
-      #   run: git fetch origin +refs/heads/*:refs/remotes/origin/*
 
       - name: Use Node.js 20
         uses: actions/setup-node@v3
@@ -41,10 +40,10 @@ jobs:
       - run: npm install
 
       - name: Lint check
-        run: npx nx affected:lint --base=origin/main --head=${{ github.sha }}
+        run: npx nx affected:lint --base=origin/integration --head=${{ github.sha }}
 
       - name: Run Tests
-        run: npx nx affected:test --base=origin/main --head=${{ github.sha }}
+        run: npx nx affected:test --base=origin/integration --head=${{ github.sha }}
         
       - name: Generate Prisma Client
         env:
@@ -68,21 +67,11 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Login to Docker Hub
-        if: github.ref == 'refs/heads/main'
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build Docker image using Buildx and Push to Docker Hub
-        if: github.ref == 'refs/heads/main'
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
           -t dimpap/next-app:${{ steps.extract_version.outputs.version }} \
           -t dimpap/next-app:latest \
           -f apps/next-app/Dockerfile . --push
-
-
-      # - name: Apply Migrations to Production Database
-      #   env:
-      #     DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
-      #     DIRECT_URL: ${{ secrets.TEST_DIRECT_URL }}
-      #   run: |
-      #     npx prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema.prisma

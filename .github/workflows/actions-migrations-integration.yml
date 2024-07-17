@@ -1,0 +1,47 @@
+name: integration - CI/CD
+
+on:
+  push:
+    branches:
+      - integration
+  pull_request:
+    branches:
+      - integration
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout [Integration Branch]]
+        with:
+          # We need to fetch all branches and commits so that Nx affected has a base to compare against.
+          fetch-depth: 0
+
+      - name: Fetch integration branch
+        run: git fetch origin ${{ github.base_ref }}
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+ 
+      - name: Use the package manager cache if available
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - uses: nrwl/nx-set-shas@v3
+      - run: npm install
+
+      - name: Apply Migrations to Integration Database
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.TEST_DIRECT_URL }}
+        run: |
+          npx prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema.prisma
