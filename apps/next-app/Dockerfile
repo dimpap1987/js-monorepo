@@ -15,6 +15,9 @@ RUN addgroup --system nextjs && \
 
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV NEXT_TELEMETRY_DISABLED=1
+
+USER nextjs
 
 WORKDIR /usr/src/app
 
@@ -23,12 +26,6 @@ COPY --from=deps /usr/src/app/package.json ./package.json
 COPY dist/apps/next-app/public ./public
 COPY dist/apps/next-app/.next ./.next
 
-RUN chown -R nextjs:nextjs .
-
-USER nextjs
-
 EXPOSE 3000
-
-ENV NEXT_TELEMETRY_DISABLED=1
 
 CMD ["dumb-init", "node_modules/.bin/next", "start"]
