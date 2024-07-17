@@ -1,12 +1,16 @@
-name: integration - CI/CD
+name: integration - migrations - CI/CD
 
 on:
   push:
     branches:
       - integration
+    paths:
+      - 'libs/prisma/db/src/lib/prisma/migrations/**'
   pull_request:
     branches:
       - integration
+    paths:
+      - 'libs/prisma/db/src/lib/prisma/migrations/**'
 
 jobs:
   main:
