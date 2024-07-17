@@ -6,19 +6,19 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
 ENV PORT=3333
 
-COPY dist/apps/my-api/package*.json ./
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
+COPY --chown=nestjs:nodejs dist/apps/my-api/package*.json ./
 
 RUN npm install --omit=dev --ignore-scripts
 
-RUN addgroup --system nestjs && \
-    adduser --system -G nestjs nestjs
 
-# Switch to the nestjs user
+COPY --chown=nestjs:nodejs node_modules/.prisma node_modules/.prisma
+
+COPY --chown=nestjs:nodejs dist/apps/my-api ./
+
 USER nestjs
-
-COPY node_modules/.prisma node_modules/.prisma
-
-COPY dist/apps/my-api ./
 
 EXPOSE 3333
 
