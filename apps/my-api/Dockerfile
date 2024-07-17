@@ -11,5 +11,7 @@ COPY package*.json ./
 
 COPY dist/apps/my-api ./
 
+EXPOSE 3333
+
 CMD [ "node", "main.js" ]
 

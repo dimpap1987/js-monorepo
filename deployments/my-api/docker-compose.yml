@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  my-api:
+    image: dimpap/my-api:latest
+    container_name: my-api-container
+    ports:
+      - '3333:3333'
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - my-api
+
+networks:
+  my-api:
+    name: postgres_network
