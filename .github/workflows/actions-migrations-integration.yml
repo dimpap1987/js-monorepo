@@ -1,4 +1,4 @@
-name: integration - migrations - CI/CD
+name: integration - MIGRATIONS
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: integration - API - CI/CD
+name: integration - API
 
 on:
   push:
