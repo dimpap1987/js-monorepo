@@ -1,4 +1,4 @@
-name: integration - front - CI/CD
+name: integration - UI
 
 on:
   push:
