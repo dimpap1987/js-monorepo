@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { DefaultArgs } from '@prisma/client/runtime/library'
-import { IconType } from 'react-icons/lib'
 
 export interface UserJWT {
   id: number
@@ -62,7 +61,7 @@ export type RefreshTokenPayload = Partial<
 export type MenuItem = {
   name: string
   href: string
-  Icon?: IconType
+  Icon?: unknown
   roles: ('ADMIN' | 'USER' | 'PUBLIC')[]
 }
 
