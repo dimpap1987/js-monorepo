@@ -1,4 +1,4 @@
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 import Notification, { DpNotificationProps } from './notification'
 import styles from './notification.module.css'
 

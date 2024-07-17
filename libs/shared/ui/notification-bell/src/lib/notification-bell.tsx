@@ -10,7 +10,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@js-monorepo/components'
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 import moment from 'moment'
 import { Fragment, useEffect, useState } from 'react'
 import { GoDotFill } from 'react-icons/go'

@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select'
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>

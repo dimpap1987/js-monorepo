@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
-import { calculateThirtyMinutesFromNow } from '../../utils'
 import { CreateCheckoutSessionRequestBody } from '@js-monorepo/types'
+import { calculateThirtyMinutesFromNow } from '../utils'
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-10-16',

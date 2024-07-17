@@ -5,9 +5,9 @@ import { useLoader } from '@js-monorepo/loader'
 import { useSession } from '@js-monorepo/auth-client'
 import { DonationDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { checkoutSessionClient } from '@js-monorepo/utils'
 import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
+import { checkoutSessionClient } from '@js-monorepo/ui/util'
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
