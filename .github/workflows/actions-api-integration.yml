@@ -68,10 +68,13 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build Docker image using Buildx and Push to Docker Hub
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.TEST_DIRECT_URL }}
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
           -t dimpap/my-api:${{ steps.extract_version.outputs.version }} \
           -t dimpap/my-api:latest \
-          --build-arg DATABASE_URL=${{ secrets.TEST_DATABASE_URL }} \
-          --build-arg DIRECT_URL=${{ secrets.TEST_DIRECT_URL }} \
+          --build-arg DATABASE_URL=$DATABASE_URL \
+          --build-arg DIRECT_URL=$DIRECT_URL \
           -f apps/my-api/Dockerfile . --push
