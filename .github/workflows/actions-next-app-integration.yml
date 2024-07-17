@@ -54,7 +54,9 @@ jobs:
 
       - name: Build Next.js
         env:
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_INTEGRATION }}
+          NEXT_PUBLIC_AUTH_URL: ${{ secrets.NEXT_PUBLIC_AUTH_URL_INTEGRATION }}
+          NEXT_PUBLIC_NOTIFICATION_CONTROLLER: ${{ secrets.NEXT_PUBLIC_NOTIFICATION_CONTROLLER_INTEGRATION }}
         run:  npm run build:next
 
       - name: Extract version from package.json

@@ -55,6 +55,7 @@
       "@js-monorepo/ui/util": ["libs/shared/ui/utils/src/index.ts"],
       "@js-monorepo/utils": ["libs/shared/utils/src/index.ts"],
       "@js-monorepo/version": ["libs/shared/ui/version/src/index.ts"],
+      "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
       "@next-app/*": ["./apps/next-app/*"]
     }
   },
