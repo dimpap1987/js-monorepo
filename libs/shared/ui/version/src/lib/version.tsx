@@ -1,5 +1,5 @@
 import pkg from '@js-monorepo/package.json'
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 import { forwardRef } from 'react'
 
 export interface DpVersionProps {

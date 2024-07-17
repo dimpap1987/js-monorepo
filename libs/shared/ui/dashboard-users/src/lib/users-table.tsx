@@ -13,7 +13,8 @@ import {
   usePagination,
 } from '@js-monorepo/components'
 import { AuthUserFullPayload } from '@js-monorepo/types'
-import { HttpClientProxy, constructURIQueryString } from '@js-monorepo/utils'
+import { constructURIQueryString } from '@js-monorepo/ui/util'
+import { HttpClientProxy } from '@js-monorepo/utils'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'

@@ -115,6 +115,7 @@ class HttpClientBuilder<T> {
       ...headers,
     }
     if (!(this.options.headers as Record<string, string>)['Content-Type']) {
+      // eslint-disable-next-line @typescript-eslint/no-extra-semi
       ;(this.options.headers as Record<string, string>)['Content-Type'] =
         'application/json'
     }

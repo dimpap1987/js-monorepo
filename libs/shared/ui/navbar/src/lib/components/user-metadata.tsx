@@ -1,4 +1,4 @@
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 import Image from 'next/image'
 import { FaAt } from 'react-icons/fa'
 

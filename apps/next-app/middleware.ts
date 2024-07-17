@@ -1,6 +1,6 @@
-import { compose, withPathName } from '@js-monorepo/utils'
 import { NextResponse } from 'next/server'
 import { withAuth } from './app/middlewares/withAuth'
+import { compose, withPathName } from '@js-monorepo/nest-utils'
 
 const composedMiddlewares = compose(withPathName, withAuth)
 
