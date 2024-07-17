@@ -14,7 +14,7 @@ RUN addgroup --system nextjs && \
     adduser --system -G nextjs nextjs
 
 ENV NODE_ENV=production
-ENV PORT=000
+ENV PORT=3000
 
 WORKDIR /usr/src/app
 

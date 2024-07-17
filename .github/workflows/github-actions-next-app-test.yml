@@ -80,9 +80,9 @@ jobs:
           -f apps/next-app/Dockerfile . --push
 
 
-      - name: Apply Migrations to Production Database
-        env:
-          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.TEST_DIRECT_URL }}
-        run: |
-          npx prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema.prisma
+      # - name: Apply Migrations to Production Database
+      #   env:
+      #     DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      #     DIRECT_URL: ${{ secrets.TEST_DIRECT_URL }}
+      #   run: |
+      #     npx prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema.prisma
