@@ -61,7 +61,7 @@ export type RefreshTokenPayload = Partial<
 export type MenuItem = {
   name: string
   href: string
-  Icon?: unknown
+  Icon?: any
   roles: ('ADMIN' | 'USER' | 'PUBLIC')[]
 }
 

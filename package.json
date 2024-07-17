@@ -26,7 +26,7 @@
     "db:migrate": "env-cmd --no-override -f libs/prisma/run_migrations/.env npx prisma migrate dev --schema=libs/prisma/db/src/lib/prisma/schema.prisma",
     "db:deploy": "env-cmd --no-override -f libs/prisma/run_migrations/.env npx prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema.prisma",
     "db:create": "env-cmd --no-override -f libs/prisma/run_migrations/.env npx prisma migrate dev --create-only --schema=libs/prisma/db/src/lib/prisma/schema.prisma",
-    "db:generate": "prisma generate --schema=libs/prisma/db/src/lib/prisma/schema.prisma"
+    "db:generate": "env-cmd --no-override -f libs/prisma/run_migrations/.env prisma generate --schema=libs/prisma/db/src/lib/prisma/schema.prisma"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
