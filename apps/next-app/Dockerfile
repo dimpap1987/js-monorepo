@@ -10,22 +10,22 @@ RUN npm install --omit=dev --ignore-scripts
 FROM node:21-alpine3.18 as runner
 RUN apk add --no-cache dumb-init
 
-RUN addgroup --system nextjs && \
-    adduser --system -G nextjs nextjs
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
 
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV NEXT_TELEMETRY_DISABLED=1
 
-USER nextjs
-
 WORKDIR /usr/src/app
 
-COPY --from=deps /usr/src/app/node_modules ./node_modules
-COPY --from=deps /usr/src/app/package.json ./package.json
-COPY dist/apps/next-app/public ./public
-COPY dist/apps/next-app/.next ./.next
+COPY --from=deps --chown=nextjs:nodejs /usr/src/app/node_modules ./node_modules
+COPY --from=deps --chown=nextjs:nodejs /usr/src/app/package.json ./package.json
+COPY --chown=nextjs:nodejs dist/apps/next-app/public ./public
+COPY --chown=nextjs:nodejs dist/apps/next-app/.next ./.next
 
+USER nextjs
 EXPOSE 3000
+
 
 CMD ["dumb-init", "node_modules/.bin/next", "start"]
