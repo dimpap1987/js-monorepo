@@ -72,4 +72,6 @@ jobs:
           docker buildx build --platform linux/amd64,linux/arm64 \
           -t dimpap/my-api:${{ steps.extract_version.outputs.version }} \
           -t dimpap/my-api:latest \
+          --build-arg DATABASE_URL=${{ secrets.TEST_DATABASE_URL }} \
+          --build-arg DIRECT_URL=${{ secrets.TEST_DIRECT_URL }} \
           -f apps/my-api/Dockerfile . --push
