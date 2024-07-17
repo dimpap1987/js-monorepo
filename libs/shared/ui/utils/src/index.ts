@@ -1,4 +1,3 @@
-import { HttpClientProxy } from '@js-monorepo/utils'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(
@@ -30,29 +29,4 @@ export function constructURIQueryString(
 
   // Join the encoded key-value pairs with '&' to construct the query string
   return paramStrings.length > 0 ? `?${paramStrings.join('&')}` : ''
-}
-
-export async function checkoutSessionClient({
-  username,
-  url,
-  price,
-  isDonate,
-  customSubmitMessage,
-}: {
-  username: string
-  url: string
-  price: number
-  isDonate: boolean
-  customSubmitMessage: string
-}) {
-  return HttpClientProxy.builder(url)
-    .body({
-      username,
-      price,
-      isDonate,
-      customSubmitMessage,
-    })
-    .withCsrf()
-    .post()
-    .execute()
 }
