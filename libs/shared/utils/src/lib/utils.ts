@@ -115,7 +115,7 @@ class HttpClientBuilder<T> {
       ...headers,
     }
     if (!(this.options.headers as Record<string, string>)['Content-Type']) {
-      ;(this.options.headers as Record<string, string>)['Content-Type'] =
+      (this.options.headers as Record<string, string>)['Content-Type'] =
         'application/json'
     }
     return this
