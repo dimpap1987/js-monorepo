@@ -1,4 +1,4 @@
-import { AuthUser } from '@prisma/client'
+import { AuthUserDto } from '@js-monorepo/types'
 import { Request, Response } from 'express'
 
 export interface GoogleAuth {
@@ -20,8 +20,8 @@ export interface AuthConfiguration {
   redirectUiUrl?: string
   github?: GithubAuth
   google?: GoogleAuth
-  onRegister?: (user: AuthUser) => Promise<any>
-  onLogin?: (user: AuthUser) => Promise<any>
+  onRegister?: (user: AuthUserDto) => Promise<any>
+  onLogin?: (user: AuthUserDto) => Promise<any>
 }
 
 declare module 'express' {

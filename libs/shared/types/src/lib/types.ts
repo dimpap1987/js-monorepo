@@ -8,7 +8,7 @@ export interface UserJWT {
   lastLoggedIn?: string | null
   picture?: string | null
   provider?: string | null
-  roles?: string[]
+  roles?: AuthRoles[]
 }
 
 export interface JwtPayload {
@@ -87,3 +87,65 @@ export type PrismaTransactionType = Omit<
   PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
   '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
 >
+
+export type ProviderName = 'github' | 'google'
+
+export type AuthRoles = 'ADMIN' | 'USER'
+
+export type ProviderDto = {
+  id: number
+  profileImage: string | null
+  type: ProviderName
+}
+
+export type AuthUserWithProvidersDto = {
+  id: number
+  username: string
+  roles: AuthRoles[]
+  createdAt: string | Date
+  providers: ProviderDto[]
+}
+
+export type AuthUserCreateDto = {
+  email: string
+  username: string
+}
+
+export type AuthUserDto = {
+  id: number
+  username: string
+  roles: AuthRoles[]
+  createdAt: string | Date
+}
+
+export type ProvidersDto = {
+  type: ProviderName
+  profileImage: string | null
+}
+
+export type UnRegisteredUserCreateDto = {
+  email: string
+  provider: ProviderName
+  profileImage: string
+}
+
+export type UnRegisteredUserDto = {
+  id: number
+  token: string
+  email: string
+  provider: ProviderName
+  profileImage: string | null
+  createdAt: Date
+}
+
+export type RefreshTokenCreateDto = {
+  user_id: number
+  token: string
+  ip_address?: string | null
+  user_agent?: string | null
+}
+
+export type RefreshTokenDto = {
+  id: number
+  revoked: boolean
+}

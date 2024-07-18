@@ -27,7 +27,6 @@ export class ChannelService {
         error,
         `Error assigning user to channels for user with id: '${userId}'`
       )
-      throw new ApiException()
     }
   }
 

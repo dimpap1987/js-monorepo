@@ -29,6 +29,7 @@ const ENV = process.env.NODE_ENV
     }),
     PrismaModule,
     AuthModule.forRootAsync({
+      imports: [AppModule],
       useFactory: async (channelService: ChannelService) => {
         return {
           sessionSecret: process.env.SESSION_SECRET,
@@ -48,7 +49,11 @@ const ENV = process.env.NODE_ENV
           redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
           onRegister: async (user: AuthUser) => {
             Logger.log(`User: '${user.username}' created successfully 😍`)
-            channelService.assignUserToChannels(user.id, 'global')
+            try {
+              channelService.assignUserToChannels(user.id, 'global')
+            } catch (e) {
+              Logger.error(e)
+            }
           },
           onLogin: async (user: AuthUser) => {
             Logger.log(`User: '${user.username}' has successfully logged in 😁`)
@@ -84,5 +89,6 @@ const ENV = process.env.NODE_ENV
       useClass: ApiExceptionFilter,
     },
   ],
+  exports: [ChannelService],
 })
 export class AppModule {}

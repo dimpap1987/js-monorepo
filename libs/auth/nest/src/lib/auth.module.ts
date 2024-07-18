@@ -15,14 +15,17 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
 import { CsrfGeneratorMiddleware } from './middlewares/csrf-generator.middleware'
 import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
-import { AuthService } from './services/auth.service'
-import { RefreshTokenService } from './services/refreshToken.service'
+import { AuthServiceImpl } from './services/implementations/auth.service'
+import { RefreshTokenServiceImpl } from './services/implementations/refreshToken.service'
+import { UnregisteredServiceImpl } from './services/implementations/unregistered-user.service'
 import { TokensService } from './services/tokens.service'
-import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
 import csurf = require('csurf')
+import { AuthRepositoryPrismaImpl } from './repositories/implementations/prisma/auth.repository'
+import { RefreshTokenRepositoryPrismaImpl } from './repositories/implementations/prisma/refreshToken.repository'
+import { UnRegisteredUserRepositoryPrismaImpl } from './repositories/implementations/prisma/unregistered.repository'
 
 export const csrfProtection = csurf({
   cookie: {
@@ -42,13 +45,34 @@ export const csrfProtection = csurf({
   providers: [
     GoogleStrategy,
     GithubOauthStrategy,
-    AuthService,
-    UserService,
+    TokensService,
+    {
+      provide: 'AUTH_REPOSITORY',
+      useClass: AuthRepositoryPrismaImpl,
+    },
+    {
+      provide: 'REFRESH_TOKEN_REPOSITORY',
+      useClass: RefreshTokenRepositoryPrismaImpl,
+    },
+    {
+      provide: 'UNREGISTERED_USER_REPOSITORY',
+      useClass: UnRegisteredUserRepositoryPrismaImpl,
+    },
+    {
+      provide: 'AUTH_SERVICE',
+      useClass: AuthServiceImpl,
+    },
+    {
+      provide: 'REFRESH_TOKEN_SERVICE',
+      useClass: RefreshTokenServiceImpl,
+    },
+    {
+      provide: 'UNREGISTERED_USER_SERVICE',
+      useClass: UnregisteredServiceImpl,
+    },
     JwtAuthGuard,
     RolesGuard,
-    RefreshTokenService,
     TokenRotationMiddleware,
-    TokensService,
     {
       provide: 'jwt',
       useFactory: async (
@@ -68,7 +92,6 @@ export const csrfProtection = csurf({
     'jwt',
     JwtAuthGuard,
     RolesGuard,
-    AuthService,
     TokenRotationMiddleware,
     TokensService,
   ],

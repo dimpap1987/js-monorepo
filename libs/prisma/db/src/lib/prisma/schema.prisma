@@ -31,7 +31,7 @@ model UnRegisteredUser {
     token        String       @unique
     email        String       @unique
     profileImage String?
-    providerEnum ProviderEnum
+    provider     ProviderEnum
 
     @@map(name: "unregistered_users")
 }
@@ -66,8 +66,8 @@ enum AuthRole {
 }
 
 enum ProviderEnum {
-    GOOGLE
-    GITHUB
+    google
+    github
 }
 
 model Notification {

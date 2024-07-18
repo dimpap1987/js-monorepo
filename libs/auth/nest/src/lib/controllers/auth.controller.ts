@@ -1,8 +1,9 @@
+import { logger } from '@js-monorepo/logger'
 import {
   RegisterUserSchema,
   RegisterUserSchemaType,
 } from '@js-monorepo/schemas'
-import { JwtPayload } from '@js-monorepo/types'
+import { JwtPayload, ProviderName } from '@js-monorepo/types'
 import { getBrowserInfo, getIPAddress } from '@js-monorepo/utils'
 import {
   Body,
@@ -17,14 +18,15 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { ProviderEnum } from '@prisma/client'
 import { Request, Response } from 'express'
 import { AuthException } from '../exceptions/api-exception'
 import { AuthGithub } from '../guards/github.guard'
 import { AuthGoogle } from '../guards/google.guard'
 import { ZodPipe } from '../pipes/zod.pipe'
-import { AuthService } from '../services/auth.service'
-import { UserService } from '../services/user.service'
+
+import { AuthService } from '../services/interfaces/auth.service'
+import { RefreshTokenService } from '../services/interfaces/refreshToken.service'
+import { UnregisteredService } from '../services/interfaces/unregistered-user.service'
 import { TokensService } from '../services/tokens.service'
 import { AuthConfiguration } from '../types/auth.configuration'
 
@@ -33,10 +35,13 @@ export class AuthController {
   private readonly logger = new Logger(AuthController.name)
 
   constructor(
-    private authService: AuthService,
-    private userService: UserService,
-    private readonly tokensService: TokensService,
-    @Inject('AUTH_OPTIONS') private readonly options: AuthConfiguration
+    @Inject('AUTH_OPTIONS') private readonly options: AuthConfiguration,
+    @Inject('AUTH_SERVICE') private authService: AuthService,
+    @Inject('REFRESH_TOKEN_SERVICE')
+    private refreshTokenService: RefreshTokenService,
+    @Inject('UNREGISTERED_USER_SERVICE')
+    private unRegisteredUserService: UnregisteredService,
+    private readonly tokensService: TokensService
   ) {}
 
   @Get('google/login')
@@ -57,7 +62,7 @@ export class AuthController {
     @Req() req: Request & { user: { email: string; picture: string } },
     @Res() res: Response
   ) {
-    return this.handleSocialRedirect(req, res, ProviderEnum.GOOGLE)
+    return this.handleSocialRedirect(req, res, 'google')
   }
 
   @Get('github/redirect')
@@ -66,7 +71,7 @@ export class AuthController {
     @Req() req: Request & { user: { email: string; picture: string } },
     @Res() res: Response
   ) {
-    return this.handleSocialRedirect(req, res, ProviderEnum.GITHUB)
+    return this.handleSocialRedirect(req, res, 'github')
   }
 
   @Get('session')
@@ -81,7 +86,7 @@ export class AuthController {
   @Get('logout')
   @HttpCode(200)
   async logOut(@Req() req: Request, @Res() res: Response) {
-    this.authService.revokeRefreshToken(req.cookies.refreshToken)
+    this.refreshTokenService.revokeRefreshTokenByToken(req.cookies.refreshToken)
     const cookies = Object.keys(req.cookies)
     for (const cookie of cookies) {
       res.clearCookie(cookie)
@@ -108,16 +113,16 @@ export class AuthController {
 
     // Find unregistered user by token
     const unregisteredUser =
-      await this.userService.findUnRegisteredUserByToken(token)
+      await this.unRegisteredUserService.findUnRegisteredUserByToken(token)
 
     // create new user
-    const user = await this.userService.createAuthUser(
+    const user = await this.authService.createAuthUser(
       {
         email: unregisteredUser.email,
         username: username,
       },
       {
-        type: unregisteredUser.providerEnum,
+        type: unregisteredUser.provider,
         profileImage: unregisteredUser.profileImage,
       }
     )
@@ -135,26 +140,34 @@ export class AuthController {
       res,
       req
     )
-    this.options.onRegister?.(user)
+
+    try {
+      this.options.onRegister?.(user)
+    } catch (e) {
+      this.logger.error('Register callback error', e)
+    }
+
     res.status(HttpStatus.CREATED).send()
   }
 
   @Get('unregistered-user')
   getUnRegisteredUser(@Req() req: Request) {
     const token = req.cookies['UNREGISTERED-USER']
-    return this.userService.findUnRegisteredUserByToken(token)
+    return this.unRegisteredUserService.findUnRegisteredUserByToken(token)
   }
 
   private handleLoggedInUser(payload: JwtPayload, res: Response, req: Request) {
     const tokens = this.tokensService.createJwtTokens(payload)
-    this.authService.persistRefreshToken(tokens.refreshToken, {
-      userAgent: getBrowserInfo(req),
-      ipAddress: getIPAddress(req),
+    this.refreshTokenService.storeRefreshToken({
+      token: tokens.refreshToken,
+      user_agent: getBrowserInfo(req),
+      ip_address: getIPAddress(req),
+      user_id: payload.user.id,
     })
     // REFRESH TOKEN
-    this.authService.setRefreshTokenCookie(res, tokens.refreshToken)
+    this.setRefreshTokenCookie(res, tokens.refreshToken)
     // ACCESS TOKEN
-    this.authService.setAccessTokenCookie(res, tokens.accessToken)
+    this.setAccessTokenCookie(res, tokens.accessToken)
     // REMOVE UNREGISTERED USER
     res.clearCookie('UNREGISTERED-USER')
   }
@@ -162,7 +175,7 @@ export class AuthController {
   private async handleSocialRedirect(
     req: Request & { user: { email: string; picture: string } },
     res: Response,
-    provider: ProviderEnum
+    provider: ProviderName
   ) {
     const email = req.user?.email
     let redirectURI = this.options.redirectUiUrl
@@ -172,8 +185,8 @@ export class AuthController {
       return res.redirect(`${redirectURI}/auth/login?error=empty-email`)
     }
     try {
-      const user = await this.userService.findAuthUserByEmail(email)
-      // Handle Logged in user
+      const user = await this.authService.findAuthUserByEmail(email)
+
       this.handleLoggedInUser(
         {
           user: {
@@ -189,7 +202,11 @@ export class AuthController {
       )
       redirectURI =
         req.session['redirect-after-login'] ?? `${this.options.redirectUiUrl}`
-      this.options.onLogin?.(user)
+      try {
+        this.options.onLogin?.(user)
+      } catch (e) {
+        this.logger.error('Signin call back error', e)
+      }
     } catch (e) {
       if (
         e instanceof AuthException &&
@@ -198,9 +215,9 @@ export class AuthController {
         //Handle Unregistered User
         try {
           const unRegisteredUser =
-            await this.userService.createUnRegisteredUser({
+            await this.unRegisteredUserService.createUnRegisteredUser({
               email: email,
-              providerEnum: provider,
+              provider: provider,
               profileImage: req.user?.picture,
             })
           res.cookie('UNREGISTERED-USER', unRegisteredUser?.token, {
@@ -218,5 +235,29 @@ export class AuthController {
     } finally {
       res.redirect(redirectURI as string)
     }
+  }
+
+  setAccessTokenCookie(res: Response, accessToken: string) {
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.AUTH_COOKIE_DOMAIN_PROD
+          : 'localhost',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
+  }
+
+  setRefreshTokenCookie(res: Response, refreshToken: string) {
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.AUTH_COOKIE_DOMAIN_PROD
+          : 'localhost',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    })
   }
 }
