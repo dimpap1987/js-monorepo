@@ -1,4 +1,9 @@
-export const routes = [
+import { AuthRoles } from '@js-monorepo/types'
+
+export const routes: {
+  path: string
+  roles: (AuthRoles | 'PUBLIC')[]
+}[] = [
   {
     path: '/about',
     roles: ['PUBLIC'],
