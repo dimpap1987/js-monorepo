@@ -7,7 +7,7 @@ export interface RefreshTokenService {
 
   revokeRefreshTokenById(tokenId: number): Promise<void>
 
-  revokeRefreshTokensOByUserId(userId: number): Promise<void>
+  revokeRefreshTokensByUserId(userId: number): Promise<void>
 
   revokeRefreshTokenByToken(token: string): Promise<void>
 

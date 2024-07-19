@@ -30,7 +30,7 @@ export class RefreshTokenRepositoryPrismaImpl
     })
   }
 
-  async revokeRefreshTokensOByUserId(userId: number): Promise<void> {
+  async revokeRefreshTokensByUserId(userId: number): Promise<void> {
     await this.dbClient.refreshToken.updateMany({
       where: {
         user_id: userId,

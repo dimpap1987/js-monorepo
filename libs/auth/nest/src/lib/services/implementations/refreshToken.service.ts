@@ -28,10 +28,10 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
     }
   }
 
-  async revokeRefreshTokensOByUserId(userId: number): Promise<void> {
+  async revokeRefreshTokensByUserId(userId: number): Promise<void> {
     try {
       this.logger.debug(`Revoking refresh tokens of user with id: ${userId}`)
-      await this.refreshTokenRepository.revokeRefreshTokenById(userId)
+      await this.refreshTokenRepository.revokeRefreshTokensByUserId(userId)
     } catch (e) {
       this.logger.error(
         `Error Revoking refresh tokens of user with id: ${userId}`
@@ -96,7 +96,7 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
           this.logger.warn(
             `Refresh Token: '${retrievedRefreshToken?.id}' for user has been revoked!`
           )
-          await this.revokeRefreshTokensOByUserId(userRefreshToken.id)
+          await this.revokeRefreshTokensByUserId(userRefreshToken.id)
           throw new AuthException(
             HttpStatus.UNAUTHORIZED,
             `Refresh Token has been revoked'`,
