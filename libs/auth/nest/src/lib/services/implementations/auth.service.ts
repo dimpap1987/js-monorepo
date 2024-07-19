@@ -6,6 +6,10 @@ import {
 } from '@js-monorepo/types'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
+import {
+  CONSTRAINT_CODE,
+  ConstraintViolationException,
+} from '../../exceptions/contraint-violation'
 import { AuthRepository } from '../../repositories/auth.repository'
 import { AuthService } from '../interfaces/auth.service'
 
@@ -49,12 +53,9 @@ export class AuthServiceImpl implements AuthService {
   ): Promise<AuthUserDto> {
     try {
       return await this.authRepository.createAuthUser(authUserDTO, providerDTO)
-    } catch (err: any) {
-      // TODO if error instance of CONTAINT violation.
-      // TODO create custom exception to handle it
-      if (err) {
-        // TODO handler contraint username
-        if (err.code === 'P2002') {
+    } catch (err) {
+      if (err instanceof ConstraintViolationException) {
+        if (err.code === CONSTRAINT_CODE.USERNAME_EXISTS) {
           this.logger.warn(`Username: '${authUserDTO.username}' already exists`)
           throw new AuthException(
             HttpStatus.BAD_REQUEST,

@@ -1,5 +1,5 @@
 import { RefreshTokenCreateDto, RefreshTokenDto } from '@js-monorepo/types'
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { PrismaClient } from '@prisma/client'
 import { RefreshTokenRepository } from '../../refreshToken.repository'
 
@@ -7,8 +7,6 @@ import { RefreshTokenRepository } from '../../refreshToken.repository'
 export class RefreshTokenRepositoryPrismaImpl
   implements RefreshTokenRepository
 {
-  private readonly logger = new Logger(RefreshTokenRepositoryPrismaImpl.name)
-
   constructor(@Inject('DB_CLIENT') private readonly dbClient: PrismaClient) {}
 
   async storeRefreshToken(

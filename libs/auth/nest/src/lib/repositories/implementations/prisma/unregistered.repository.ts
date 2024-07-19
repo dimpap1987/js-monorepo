@@ -2,7 +2,7 @@ import {
   UnRegisteredUserCreateDto,
   UnRegisteredUserDto,
 } from '@js-monorepo/types'
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { PrismaClient, ProviderEnum } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 import { UnregisteredRepository } from '../../unregistered.repository'
@@ -11,10 +11,6 @@ import { UnregisteredRepository } from '../../unregistered.repository'
 export class UnRegisteredUserRepositoryPrismaImpl
   implements UnregisteredRepository
 {
-  private readonly logger = new Logger(
-    UnRegisteredUserRepositoryPrismaImpl.name
-  )
-
   constructor(@Inject('DB_CLIENT') private readonly dbClient: PrismaClient) {}
 
   async createUnRegisteredUser(

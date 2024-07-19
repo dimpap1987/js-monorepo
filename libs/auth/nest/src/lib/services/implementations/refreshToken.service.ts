@@ -119,9 +119,7 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
         })
 
         //TODO the below in a trasaction scope
-        // Invalidate the previous refresh token in the database
         await this.revokeRefreshTokenById(retrievedRefreshToken.id)
-        // save the new refresh token in the DB
         await this.storeRefreshToken({
           user_id: user.id,
           token: rotatedTokens.refreshToken,
