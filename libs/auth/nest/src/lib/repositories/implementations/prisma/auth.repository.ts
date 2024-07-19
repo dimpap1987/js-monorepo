@@ -8,7 +8,7 @@ import {
 import { Injectable } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import {
-  CONSTRAINT_CODE,
+  ConstraintCode,
   ConstraintViolationException,
 } from '../../../exceptions/contraint-violation'
 import { AuthRepository } from '../../auth.repository'
@@ -40,7 +40,7 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
     providerDTO: ProvidersDto
   ): Promise<AuthUserDto> {
     try {
-      return await this.dbClient.authUser.create({
+      const user = await this.dbClient.authUser.create({
         data: {
           email: authUserDTO.email,
           username: authUserDTO.username,
@@ -52,12 +52,11 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
           },
         },
       })
+      return user
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
-          throw new ConstraintViolationException(
-            CONSTRAINT_CODE.USERNAME_EXISTS
-          )
+          throw new ConstraintViolationException(ConstraintCode.USERNAME_EXISTS)
         }
       }
       throw e

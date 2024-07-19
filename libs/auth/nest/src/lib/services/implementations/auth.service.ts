@@ -7,7 +7,7 @@ import {
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
 import {
-  CONSTRAINT_CODE,
+  ConstraintCode,
   ConstraintViolationException,
 } from '../../exceptions/contraint-violation'
 import { AuthRepository } from '../../repositories/auth.repository'
@@ -55,7 +55,7 @@ export class AuthServiceImpl implements AuthService {
       return await this.authRepository.createAuthUser(authUserDTO, providerDTO)
     } catch (err) {
       if (err instanceof ConstraintViolationException) {
-        if (err.code === CONSTRAINT_CODE.USERNAME_EXISTS) {
+        if (err.code === ConstraintCode.USERNAME_EXISTS) {
           this.logger.warn(`Username: '${authUserDTO.username}' already exists`)
           throw new AuthException(
             HttpStatus.BAD_REQUEST,

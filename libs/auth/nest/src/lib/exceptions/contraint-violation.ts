@@ -1,12 +1,12 @@
 export class ConstraintViolationException extends Error {
-  code?: CONSTRAINT_CODE
+  code?: ConstraintCode
 
-  constructor(code?: CONSTRAINT_CODE) {
+  constructor(code?: ConstraintCode) {
     super()
     this.code = code
   }
 }
 
-export enum CONSTRAINT_CODE {
+export enum ConstraintCode {
   USERNAME_EXISTS,
 }

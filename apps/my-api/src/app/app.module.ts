@@ -13,6 +13,7 @@ import { AdminProviderModule } from './modules/admin.module'
 import { ChannelProviderModule } from './modules/channel.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { EventsService } from './services/event.service'
+import { NotificationProviderModule } from './modules/notifications.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -22,6 +23,7 @@ const ENV = process.env.NODE_ENV
     FilterProviderModule,
     ChannelProviderModule,
     AdminProviderModule,
+    NotificationProviderModule,
     ConfigModule.forRoot({
       envFilePath: ['.env', `.env.${ENV}`, `environments/.env.${ENV}`],
     }),
