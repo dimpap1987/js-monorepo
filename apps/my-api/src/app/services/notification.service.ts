@@ -1,38 +1,35 @@
-import { PrismaService } from '@js-monorepo/db'
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import { NotificationRepository } from '../repositories/interfaces/notification.repository'
 
 @Injectable()
 export class NotificationService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(NotificationService.name)
+
+  constructor(
+    @Inject('NOTIFICATION_REPOSITORY')
+    private notificationRepository: NotificationRepository
+  ) {}
 
   async createNotification(
     message: string,
     type: string | null,
     additionalData: Record<string, any> | null,
     link: string | null,
-    userId: number,
+    receiverId: number,
     senderId: number
   ) {
     try {
-      const notification = await this.prisma.notification.create({
-        data: {
-          message,
-          type,
-          additional_data: additionalData,
-          link,
-          userNotification: {
-            create: {
-              user: { connect: { id: userId } },
-              sender: senderId ? { connect: { id: senderId } } : undefined,
-            },
-          },
-        },
-        include: { userNotification: true }, // Include the userNotification relation in the response
+      this.logger.debug(`Creating new notification - Sender is : '${senderId}'`)
+      await this.notificationRepository.createNotification({
+        message,
+        receiverId,
+        senderId,
+        link,
+        type,
+        additionalData,
       })
-
-      return notification
     } catch (error) {
-      console.error('Error creating notification:', error)
+      this.logger.error('Error creating notification:', error)
       throw new Error('Failed to create notification')
     }
   }

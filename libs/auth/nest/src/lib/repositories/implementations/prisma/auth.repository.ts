@@ -1,11 +1,11 @@
+import { PrismaService } from '@js-monorepo/db'
 import {
   AuthUserCreateDto,
   AuthUserDto,
   AuthUserWithProvidersDto,
   ProvidersDto,
 } from '@js-monorepo/types'
-import { Inject, Injectable } from '@nestjs/common'
-import { PrismaClient } from '@prisma/client'
+import { Injectable } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import {
   CONSTRAINT_CODE,
@@ -15,7 +15,7 @@ import { AuthRepository } from '../../auth.repository'
 
 @Injectable()
 export class AuthRepositoryPrismaImpl implements AuthRepository {
-  constructor(@Inject('DB_CLIENT') private readonly dbClient: PrismaClient) {}
+  constructor(private readonly dbClient: PrismaService) {}
 
   async findAuthUserByEmail(email: string): Promise<AuthUserWithProvidersDto> {
     return this.dbClient.authUser.findUniqueOrThrow({

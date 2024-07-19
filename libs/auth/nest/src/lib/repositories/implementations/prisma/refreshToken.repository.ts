@@ -1,13 +1,13 @@
+import { PrismaService } from '@js-monorepo/db'
 import { RefreshTokenCreateDto, RefreshTokenDto } from '@js-monorepo/types'
-import { Inject, Injectable } from '@nestjs/common'
-import { PrismaClient } from '@prisma/client'
+import { Injectable } from '@nestjs/common'
 import { RefreshTokenRepository } from '../../refreshToken.repository'
 
 @Injectable()
 export class RefreshTokenRepositoryPrismaImpl
   implements RefreshTokenRepository
 {
-  constructor(@Inject('DB_CLIENT') private readonly dbClient: PrismaClient) {}
+  constructor(private readonly dbClient: PrismaService) {}
 
   async storeRefreshToken(
     payload: RefreshTokenCreateDto
@@ -33,7 +33,7 @@ export class RefreshTokenRepositoryPrismaImpl
   async revokeRefreshTokensByUserId(userId: number): Promise<void> {
     await this.dbClient.refreshToken.updateMany({
       where: {
-        user_id: userId,
+        userId: userId,
       },
       data: {
         revoked: true,

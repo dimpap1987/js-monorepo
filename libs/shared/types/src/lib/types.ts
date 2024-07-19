@@ -1,14 +1,11 @@
-import { Prisma, PrismaClient } from '@prisma/client'
-import { DefaultArgs } from '@prisma/client/runtime/library'
-
 export interface UserJWT {
   id: number
   username: string
-  createdAt?: string | Date
+  createdAt: Date
   lastLoggedIn?: string | null
   picture?: string | null
   provider?: string | null
-  roles?: AuthRoles[]
+  roles: AuthRoles[]
 }
 
 export interface JwtPayload {
@@ -31,48 +28,12 @@ export type ErrorResponse = {
 
 export type ClientResponseType<T> = SuccessResponse<T> | ErrorResponse
 
-export type AuthUserWithProviders = Prisma.AuthUserGetPayload<{
-  include: {
-    providers: true
-  }
-}>
-
-export type RefreshTokenPayload = Partial<
-  Omit<
-    Prisma.RefreshTokenGetPayload<{
-      include: {
-        user: false
-      }
-    }>,
-    'token' | 'user_id'
-  >
-> &
-  Required<
-    Pick<
-      Prisma.RefreshTokenGetPayload<{
-        include: {
-          user: false
-        }
-      }>,
-      'token' | 'user_id'
-    >
-  >
-
 export type MenuItem = {
   name: string
   href: string
   Icon?: any
   roles: ('ADMIN' | 'USER' | 'PUBLIC')[]
 }
-
-export type AuthUserFullPayload = Prisma.AuthUserGetPayload<{
-  include: {
-    providers: true
-    receivedNotifications: true
-    sentNotifications: true
-    userChannels: true
-  }
-}>
 
 export interface CreateCheckoutSessionRequestBody {
   username: string
@@ -83,11 +44,6 @@ export interface CreateCheckoutSessionRequestBody {
   isDonate?: boolean
 }
 
-export type PrismaTransactionType = Omit<
-  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
->
-
 export type ProviderName = 'github' | 'google'
 
 export type AuthRoles = 'ADMIN' | 'USER'
@@ -96,13 +52,10 @@ export type ProviderDto = {
   id: number
   profileImage: string | null
   type: ProviderName
+  userId: number
 }
 
-export type AuthUserWithProvidersDto = {
-  id: number
-  username: string
-  roles: AuthRoles[]
-  createdAt: string | Date
+export type AuthUserWithProvidersDto = AuthUserDto & {
   providers: ProviderDto[]
 }
 
@@ -113,9 +66,10 @@ export type AuthUserCreateDto = {
 
 export type AuthUserDto = {
   id: number
+  email?: string
   username: string
   roles: AuthRoles[]
-  createdAt: string | Date
+  createdAt: Date
 }
 
 export type ProvidersDto = {
@@ -139,13 +93,57 @@ export type UnRegisteredUserDto = {
 }
 
 export type RefreshTokenCreateDto = {
-  user_id: number
+  userId: number
   token: string
-  ip_address?: string | null
-  user_agent?: string | null
+  ipAddress?: string | null
+  userAgent?: string | null
 }
 
 export type RefreshTokenDto = {
   id: number
   revoked: boolean
+}
+
+export type Pageable = {
+  page: number
+  pageSize: number
+}
+
+export type AuthUserUpdateDto =
+  | { username: string; roles?: AuthRoles[] }
+  | { username?: string; roles: AuthRoles[] }
+
+export type ChannelDto = {
+  id: number
+  name: string
+  description: string | null
+  createdAt: Date
+}
+
+export type NotificationCreateDto = {
+  receiverId: number
+  senderId: number
+  message: string
+  link?: string
+  type?: string
+  additionalData?: Record<string, any> | null
+}
+
+export type UserChannelDto = {
+  userId: number
+  channelId: number
+}
+
+export type NotificationDto = {
+  receiverId: number
+  notificationId: number
+  senderId: number
+  isRead: boolean
+}
+
+export type AuthUserFullDto = AuthUserDto & {
+  providers: ProviderDto[]
+  userChannels: UserChannelDto[]
+  sentNotifications: NotificationDto[]
+  receivedNotifications: NotificationDto[]
 }

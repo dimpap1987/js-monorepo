@@ -1,53 +1,39 @@
-import { PrismaService } from '@js-monorepo/db'
-import { Injectable, Logger } from '@nestjs/common'
-import { ApiException } from '../exceptions/api-exception'
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import { ChannelRepository } from '../repositories/interfaces/channel.repository'
 
 @Injectable()
 export class ChannelService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(ChannelService.name)
+
+  constructor(
+    @Inject('CHANNEL_REPOSITORY')
+    private channelRepository: ChannelRepository
+  ) {}
 
   async assignUserToChannels(userId: number, ...channelNames: string[]) {
     try {
-      for (const channelName of channelNames) {
-        // Find the channel by name
-        const channel = await this.prisma.channel.findUniqueOrThrow({
-          where: { name: channelName },
-        })
-
-        // Register the user to the channel
-        await this.prisma.userChannel.create({
-          data: {
-            user: { connect: { id: userId } },
-            channel: { connect: { id: channel.id } },
-          },
-        })
-      }
+      this.logger.debug(
+        `Assign user: '${userId}' in channels: '${channelNames.join(', ')}'`
+      )
+      await this.channelRepository.assignUserToChannels(userId, ...channelNames)
     } catch (error) {
-      Logger.error(
-        error,
-        `Error assigning user to channels for user with id: '${userId}'`
+      this.logger.error(
+        `Error assigning user to channels for user with id: '${userId}'`,
+        error
       )
     }
   }
 
   async getChannelsByUserId(userId: number) {
+    this.logger.debug(`Fetching channels for user with id: '${userId}'`)
     try {
-      const userChannels = await this.prisma.userChannel.findMany({
-        where: {
-          user_id: userId,
-        },
-        include: {
-          channel: true,
-        },
-      })
-
-      return userChannels?.map((userChannel) => userChannel.channel)
+      return await this.channelRepository.getChannelsByUserId(userId)
     } catch (error) {
-      Logger.error(
+      this.logger.error(
         error,
         `Error fetching channels for user with id: '${userId}'`
       )
-      throw new ApiException()
     }
+    return []
   }
 }

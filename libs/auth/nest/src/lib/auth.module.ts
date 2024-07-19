@@ -1,4 +1,3 @@
-import { PrismaService } from '@js-monorepo/db'
 import {
   DynamicModule,
   Inject,
@@ -15,17 +14,14 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
 import { CsrfGeneratorMiddleware } from './middlewares/csrf-generator.middleware'
 import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
-import { AuthServiceImpl } from './services/implementations/auth.service'
-import { RefreshTokenServiceImpl } from './services/implementations/refreshToken.service'
-import { UnregisteredServiceImpl } from './services/implementations/unregistered-user.service'
+import { AuthProviderModule } from './modules/auth.provider.modules'
+import { RefreshTokenProviderModule } from './modules/refreshToken.provider.module'
+import { UnRegisteredUserProviderModule } from './modules/unregisteredUser.provider.module'
 import { TokensService } from './services/tokens.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
 import csurf = require('csurf')
-import { AuthRepositoryPrismaImpl } from './repositories/implementations/prisma/auth.repository'
-import { RefreshTokenRepositoryPrismaImpl } from './repositories/implementations/prisma/refreshToken.repository'
-import { UnRegisteredUserRepositoryPrismaImpl } from './repositories/implementations/prisma/unregistered.repository'
 
 export const csrfProtection = csurf({
   cookie: {
@@ -41,35 +37,16 @@ export const csrfProtection = csurf({
 })
 
 @Module({
+  imports: [
+    AuthProviderModule,
+    RefreshTokenProviderModule,
+    UnRegisteredUserProviderModule,
+  ],
   controllers: [AuthController],
   providers: [
     GoogleStrategy,
     GithubOauthStrategy,
     TokensService,
-    {
-      provide: 'AUTH_REPOSITORY',
-      useClass: AuthRepositoryPrismaImpl,
-    },
-    {
-      provide: 'REFRESH_TOKEN_REPOSITORY',
-      useClass: RefreshTokenRepositoryPrismaImpl,
-    },
-    {
-      provide: 'UNREGISTERED_USER_REPOSITORY',
-      useClass: UnRegisteredUserRepositoryPrismaImpl,
-    },
-    {
-      provide: 'AUTH_SERVICE',
-      useClass: AuthServiceImpl,
-    },
-    {
-      provide: 'REFRESH_TOKEN_SERVICE',
-      useClass: RefreshTokenServiceImpl,
-    },
-    {
-      provide: 'UNREGISTERED_USER_SERVICE',
-      useClass: UnregisteredServiceImpl,
-    },
     JwtAuthGuard,
     RolesGuard,
     TokenRotationMiddleware,
@@ -115,11 +92,6 @@ export class AuthModule implements NestModule {
           provide: 'AUTH_CONFIG',
           useFactory: options.useFactory,
           inject: options.inject || [],
-        },
-        // TODO inject it from client
-        {
-          provide: 'DB_CLIENT',
-          useExisting: PrismaService,
         },
         {
           provide: 'AUTH_OPTIONS',

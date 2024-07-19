@@ -1,4 +1,3 @@
-import { logger } from '@js-monorepo/logger'
 import {
   RegisterUserSchema,
   RegisterUserSchemaType,
@@ -160,9 +159,9 @@ export class AuthController {
     const tokens = this.tokensService.createJwtTokens(payload)
     this.refreshTokenService.storeRefreshToken({
       token: tokens.refreshToken,
-      user_agent: getBrowserInfo(req),
-      ip_address: getIPAddress(req),
-      user_id: payload.user.id,
+      userAgent: getBrowserInfo(req),
+      ipAddress: getIPAddress(req),
+      userId: payload.user.id,
     })
     // REFRESH TOKEN
     this.setRefreshTokenCookie(res, tokens.refreshToken)

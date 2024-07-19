@@ -1,5 +1,5 @@
 import { HasRoles, RolesEnum, RolesGuard } from '@js-monorepo/auth'
-import { AuthUserFullPayload } from '@js-monorepo/types'
+import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
 import {
   Body,
   Controller,
@@ -30,7 +30,7 @@ export class AdminController {
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
   ): Promise<{
-    users: AuthUserFullPayload[]
+    users: AuthUserFullDto[]
     totalCount: number
   }> {
     return this.adminService.getUsers(page, pageSize)
@@ -40,7 +40,7 @@ export class AdminController {
   async updateUser(
     @Param('id', ParseIntPipe) userId: number,
     @Body() updateUser: Omit<AuthUser, 'id' | 'email' | 'createdAt'>
-  ): Promise<AuthUser> {
+  ): Promise<AuthUserDto> {
     return this.adminService.updateUser(userId, updateUser)
   }
 

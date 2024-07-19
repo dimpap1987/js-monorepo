@@ -1,4 +1,4 @@
-import { RefreshTokenDto, RefreshTokenPayload } from '@js-monorepo/types'
+import { RefreshTokenCreateDto, RefreshTokenDto } from '@js-monorepo/types'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { JwtPayload } from 'jsonwebtoken'
 import { AuthException } from '../../exceptions/api-exception'
@@ -59,14 +59,14 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
   }
 
   async storeRefreshToken(
-    payload: RefreshTokenPayload
+    payload: RefreshTokenCreateDto
   ): Promise<RefreshTokenDto | null> {
     try {
-      this.logger.debug(`Creating refresh token for user: ${payload.user_id}`)
+      this.logger.debug(`Creating refresh token for user: ${payload.userId}`)
       return await this.refreshTokenRepository.storeRefreshToken(payload)
     } catch (e) {
       this.logger.error(
-        `Error Creating refresh token for user: ${payload.user_id}`,
+        `Error Creating refresh token for user: ${payload.userId}`,
         e
       )
       return null
@@ -121,10 +121,10 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
         //TODO the below in a trasaction scope
         await this.revokeRefreshTokenById(retrievedRefreshToken.id)
         await this.storeRefreshToken({
-          user_id: user.id,
+          userId: user.id,
           token: rotatedTokens.refreshToken,
-          user_agent: userMetadata?.browserInfo,
-          ip_address: userMetadata?.ipAddress,
+          userAgent: userMetadata?.browserInfo,
+          ipAddress: userMetadata?.ipAddress,
         })
 
         return rotatedTokens
