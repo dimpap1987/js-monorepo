@@ -2,6 +2,7 @@
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import { MenuItem, UserJWT } from '@js-monorepo/types'
+import { AuthRole } from '@prisma/client'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode, RefObject, forwardRef, useEffect, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
@@ -87,7 +88,9 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
               {items?.map((item, idx) => {
                 const shouldRenderNavLink =
                   item.roles?.includes('PUBLIC') || // Always render if PUBLIC role is present
-                  item?.roles?.some((role) => user?.roles?.includes(role)) // Render if user has any of the required roles
+                  item.roles?.some((role) =>
+                    user?.roles?.includes(role as AuthRole)
+                  ) // Render if user has any of the required roles
 
                 return (
                   shouldRenderNavLink && (
