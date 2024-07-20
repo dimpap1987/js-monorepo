@@ -2,15 +2,17 @@ import { ClientResponseType } from '@js-monorepo/types'
 import { HttpClientProxy } from '@js-monorepo/utils'
 
 export class AuthClient {
-  private readonly BASE_URL: string
-
-  constructor(private readonly baseUrl: string) {
-    this.BASE_URL = baseUrl
+  constructor(
+    private readonly publicUrl: string,
+    private readonly innerUrl: string
+  ) {
+    this.publicUrl = publicUrl
+    this.innerUrl = innerUrl
   }
 
   async logout() {
     const response = await HttpClientProxy.builder(
-      `${this.BASE_URL}/api/auth/logout`
+      `${this.innerUrl}/api/auth/logout`
     )
       .get()
       .withCredentials()
@@ -22,14 +24,14 @@ export class AuthClient {
   }
 
   login(provider: 'google' | 'github') {
-    window.location.href = `${this.BASE_URL}/api/auth/${provider}/login`
+    window.location.href = `${this.publicUrl}/api/auth/${provider}/login`
   }
 
   async registerUser(payload: {
     username: string
   }): Promise<ClientResponseType<any>> {
     const response = await HttpClientProxy.builder(
-      `${this.BASE_URL}/api/auth/register`
+      `${this.innerUrl}/api/auth/register`
     )
       .body(payload)
       .withCredentials()

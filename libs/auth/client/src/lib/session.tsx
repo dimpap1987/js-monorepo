@@ -28,7 +28,7 @@ const fetchSession = async (
   try {
     const response = await HttpClientProxy.builder<{
       user: UserJWT
-    }>(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`)
+    }>(`${process.env.NEXT_PUBLIC_AUTH_URL_INNER}/api/auth/session`)
       .get()
       .withCredentials()
       .execute()

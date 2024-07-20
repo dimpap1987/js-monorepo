@@ -37,7 +37,7 @@ declare module '@tanstack/table-core' {
 
 const findUsers = async (searchParams?: string) => {
   const response = await HttpClientProxy.builder<UsersReponse>(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users${searchParams}`
+    `${process.env.NEXT_PUBLIC_AUTH_URL_INNER}/api/admin/users${searchParams}`
   )
     .get()
     .withCredentials()
@@ -212,7 +212,7 @@ const DashboardUsersTableSuspense = () => {
                       className="shrink-0 text-2xl cursor-pointer transform hover:scale-125 transition duration-300 border rounded-lg"
                       onClick={async () => {
                         const response = await HttpClientProxy.builder(
-                          `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users/${row.original.id}`
+                          `${process.env.NEXT_PUBLIC_AUTH_URL_INNER}/api/admin/users/${row.original.id}`
                         )
                           .put()
                           .body({ ...row.updatedUser })
@@ -272,7 +272,7 @@ const DashboardUsersTableSuspense = () => {
                   <TextareaForm
                     submitCallBack={async (callBackData) => {
                       const response = await HttpClientProxy.builder(
-                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`
+                        `${process.env.NEXT_PUBLIC_AUTH_URL_INNER}/api/admin/notification/emit`
                       )
                         .post()
                         .body({
