@@ -12,7 +12,7 @@ import {
   TextareaForm,
   usePagination,
 } from '@js-monorepo/components'
-import { AuthUserFullPayload } from '@js-monorepo/types'
+import { AuthUserFullDto } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
 import { HttpClientProxy } from '@js-monorepo/utils'
 import { ColumnDef } from '@tanstack/react-table'
@@ -25,7 +25,7 @@ import { GrAnnounce } from 'react-icons/gr'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
 interface UsersReponse {
-  users: AuthUserFullPayload[] | []
+  users: AuthUserFullDto[] | []
   totalCount: number
 }
 
@@ -37,7 +37,7 @@ declare module '@tanstack/table-core' {
 
 const findUsers = async (searchParams?: string) => {
   const response = await HttpClientProxy.builder<UsersReponse>(
-    `http://localhost:3333/api/admin/users${searchParams}`
+    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users${searchParams}`
   )
     .get()
     .withCredentials()
@@ -57,7 +57,7 @@ const DashboardUsersTableComponent = () => {
   const [update, setUpdate] = useState<{
     index?: number
     inProgress: boolean
-    user?: AuthUserFullPayload
+    user?: AuthUserFullDto
   }>()
 
   const searchParams = useSearchParams()
@@ -90,7 +90,7 @@ const DashboardUsersTableComponent = () => {
 
   const pageCount = Math.round(data.totalCount / limit)
 
-  const memoizedColumns: ColumnDef<AuthUserFullPayload>[] = useMemo(
+  const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
     () => [
       {
         accessorKey: 'profileImage',

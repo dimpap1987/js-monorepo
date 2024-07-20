@@ -20,7 +20,7 @@ export class NotificationController {
       this.jwt.user.id
     )
     const channelNames = channels?.map((channel) => channel.name)
-    //subscribe to these channels
+
     return this.eventsService.subscribe([
       this.jwt.user.username,
       ...channelNames,

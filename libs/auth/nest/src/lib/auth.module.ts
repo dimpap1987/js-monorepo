@@ -1,4 +1,3 @@
-import { PrismaService } from '@js-monorepo/db'
 import {
   DynamicModule,
   Inject,
@@ -15,10 +14,10 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
 import { CsrfGeneratorMiddleware } from './middlewares/csrf-generator.middleware'
 import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
-import { AuthService } from './services/auth.service'
-import { RefreshTokenService } from './services/refreshToken.service'
+import { AuthProviderModule } from './modules/auth.provider.modules'
+import { RefreshTokenProviderModule } from './modules/refreshToken.provider.module'
+import { UnRegisteredUserProviderModule } from './modules/unregisteredUser.provider.module'
 import { TokensService } from './services/tokens.service'
-import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
@@ -38,17 +37,19 @@ export const csrfProtection = csurf({
 })
 
 @Module({
+  imports: [
+    AuthProviderModule,
+    RefreshTokenProviderModule,
+    UnRegisteredUserProviderModule,
+  ],
   controllers: [AuthController],
   providers: [
     GoogleStrategy,
     GithubOauthStrategy,
-    AuthService,
-    UserService,
+    TokensService,
     JwtAuthGuard,
     RolesGuard,
-    RefreshTokenService,
     TokenRotationMiddleware,
-    TokensService,
     {
       provide: 'jwt',
       useFactory: async (
@@ -68,7 +69,6 @@ export const csrfProtection = csurf({
     'jwt',
     JwtAuthGuard,
     RolesGuard,
-    AuthService,
     TokenRotationMiddleware,
     TokensService,
   ],
@@ -92,11 +92,6 @@ export class AuthModule implements NestModule {
           provide: 'AUTH_CONFIG',
           useFactory: options.useFactory,
           inject: options.inject || [],
-        },
-        // TODO inject it from client
-        {
-          provide: 'DB_CLIENT',
-          useExisting: PrismaService,
         },
         {
           provide: 'AUTH_OPTIONS',

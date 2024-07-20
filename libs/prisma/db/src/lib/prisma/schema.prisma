@@ -31,7 +31,7 @@ model UnRegisteredUser {
     token        String       @unique
     email        String       @unique
     profileImage String?
-    providerEnum ProviderEnum
+    provider     ProviderEnum
 
     @@map(name: "unregistered_users")
 }
@@ -47,15 +47,15 @@ model Provider {
 }
 
 model RefreshToken {
-    id         Int      @id @default(autoincrement())
-    user_id    Int
-    user       AuthUser @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    token      String   @unique
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-    revoked    Boolean  @default(false)
-    ip_address String?
-    user_agent String?
+    id        Int      @id @default(autoincrement())
+    userId    Int      @map("user_id")
+    user      AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+    token     String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    revoked   Boolean  @default(false)
+    ipAddress String?  @map("ip_address")
+    userAgent String?  @map("user_agent")
 
     @@map(name: "refresh_tokens")
 }
@@ -66,17 +66,17 @@ enum AuthRole {
 }
 
 enum ProviderEnum {
-    GOOGLE
-    GITHUB
+    google
+    github
 }
 
 model Notification {
     id               Int                @id @default(autoincrement())
     message          String
-    created_at       DateTime           @default(now())
+    createdAt        DateTime           @default(now()) @map("createdAt")
     type             String?
-    is_archived      Boolean            @default(false)
-    additional_data  Json?
+    isArchived       Boolean            @default(false) @map("is_archived")
+    additionalData   Json?              @map("additional_data")
     link             String?
     userNotification UserNotification[]
 
@@ -84,15 +84,15 @@ model Notification {
 }
 
 model UserNotification {
-    user_id         Int
-    notification_id Int
-    user            AuthUser     @relation("receiver", fields: [user_id], references: [id])
-    notification    Notification @relation(fields: [notification_id], references: [id])
-    sender          AuthUser?    @relation("sender", fields: [sender_id], references: [id])
-    sender_id       Int?
-    is_read         Boolean      @default(false)
+    receiverId     Int          @map("receiver_id")
+    notificationId Int          @map("notification_id")
+    user           AuthUser     @relation("receiver", fields: [receiverId], references: [id])
+    notification   Notification @relation(fields: [notificationId], references: [id])
+    sender         AuthUser?    @relation("sender", fields: [senderId], references: [id])
+    senderId       Int?         @map("sender_id")
+    isRead         Boolean      @default(false) @map("is_read")
 
-    @@id([user_id, notification_id])
+    @@id([receiverId, notificationId])
     @@map(name: "users_notifications")
 }
 
@@ -100,18 +100,18 @@ model Channel {
     id          Int           @id @default(autoincrement())
     name        String        @unique
     description String?
-    created_at  DateTime      @default(now())
+    createdAt   DateTime      @default(now()) @map("created_at")
     UserChannel UserChannel[]
 
     @@map(name: "channels")
 }
 
 model UserChannel {
-    user_id    Int
-    channel_id Int
-    user       AuthUser @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    channel    Channel  @relation(fields: [channel_id], references: [id])
+    userId    Int      @map("user_id")
+    channelId Int      @map("channel_id")
+    user      AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+    channel   Channel  @relation(fields: [channelId], references: [id])
 
-    @@id([user_id, channel_id])
+    @@id([userId, channelId])
     @@map(name: "users_channels")
 }
