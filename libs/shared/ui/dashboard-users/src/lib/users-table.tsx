@@ -20,7 +20,7 @@ import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { GrAnnounce } from 'react-icons/gr'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
@@ -51,7 +51,7 @@ const findUsers = async (searchParams?: string) => {
   }
 }
 
-const DashboardUsersTableComponent = () => {
+const DashboardUsersTableSuspense = () => {
   const [data, setData] = useState<UsersReponse>({ users: [], totalCount: 0 })
 
   const [update, setUpdate] = useState<{
@@ -311,4 +311,11 @@ const DashboardUsersTableComponent = () => {
   )
 }
 
-export { DashboardUsersTableComponent }
+function DashboardUsersTable() {
+  return (
+    <Suspense>
+      <DashboardUsersTableSuspense></DashboardUsersTableSuspense>
+    </Suspense>
+  )
+}
+export { DashboardUsersTable }

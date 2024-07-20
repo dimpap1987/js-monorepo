@@ -15,18 +15,19 @@ export type SocialConfig = {
 }
 
 export type DpLoginDialogProps = {
+  readonly open: boolean
   readonly onClose: () => void
   readonly socialConfig: SocialConfig[]
 }
 
 const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
-  ({ onClose, socialConfig }, ref) => {
+  ({ open, onClose, socialConfig }, ref) => {
     return (
       <Dialog
+        open={open}
         modal={true}
-        defaultOpen
-        onOpenChange={(open) => {
-          if (!open) {
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
             onClose?.()
           }
         }}

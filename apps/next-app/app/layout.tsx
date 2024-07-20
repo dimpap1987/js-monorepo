@@ -1,4 +1,4 @@
-import dynamic from 'next/dynamic'
+import RootProviders from '@next-app/components/root.providers'
 import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
 import MainTemplate from '../components/main.template'
@@ -12,16 +12,6 @@ const poppins = Poppins({
   adjustFontFallback: false,
 })
 
-// Having an issue with hydration error when added Shadcn Dialog. This is a workaround
-// https://stackoverflow.com/questions/75094010/nextjs-13-hydration-failed-because-the-initial-ui-does-not-match-what-was-render
-const DynamicContextProvider = dynamic(
-  () =>
-    import('@next-app/components/root.providers').then((mod) => mod.default),
-  {
-    ssr: false,
-  }
-)
-
 export default async function RootLayout(props: {
   readonly children: ReactNode
   readonly auth: ReactNode
@@ -31,12 +21,12 @@ export default async function RootLayout(props: {
       <body
         className={`${poppins.className} flex flex-col min-h-100svh bg-background-primary overflow-x-hidden`}
       >
-        <DynamicContextProvider>
+        <RootProviders>
           <MainTemplate>
             {props.auth}
             {props.children}
           </MainTemplate>
-        </DynamicContextProvider>
+        </RootProviders>
       </body>
     </html>
   )
