@@ -55,7 +55,7 @@ CREATE TABLE "refresh_tokens" (
 CREATE TABLE "notifications" (
     "id" SERIAL NOT NULL,
     "message" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "type" TEXT,
     "is_archived" BOOLEAN NOT NULL DEFAULT false,
     "additional_data" JSONB,
@@ -66,12 +66,12 @@ CREATE TABLE "notifications" (
 
 -- CreateTable
 CREATE TABLE "users_notifications" (
-    "user_id" INTEGER NOT NULL,
+    "receiver_id" INTEGER NOT NULL,
     "notification_id" INTEGER NOT NULL,
     "sender_id" INTEGER,
     "is_read" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "users_notifications_pkey" PRIMARY KEY ("user_id","notification_id")
+    CONSTRAINT "users_notifications_pkey" PRIMARY KEY ("receiver_id","notification_id")
 );
 
 -- CreateTable
@@ -117,7 +117,7 @@ ALTER TABLE "providers" ADD CONSTRAINT "providers_userId_fkey" FOREIGN KEY ("use
 ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth_users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "users_notifications" ADD CONSTRAINT "users_notifications_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "users_notifications" ADD CONSTRAINT "users_notifications_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "auth_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "users_notifications" ADD CONSTRAINT "users_notifications_notification_id_fkey" FOREIGN KEY ("notification_id") REFERENCES "notifications"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
