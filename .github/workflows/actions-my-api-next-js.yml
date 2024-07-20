@@ -66,7 +66,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: dist/apps/
+          path: |
+            dist/apps/my-api/
+            dist/apps/next-app/
           retention-days: 1
 
   build-and-push-docker:
