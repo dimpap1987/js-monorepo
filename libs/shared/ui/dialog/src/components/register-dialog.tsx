@@ -8,15 +8,18 @@ import {
 import { useRouter } from 'next-nprogress-bar'
 import { PropsWithChildren } from 'react'
 
-function RegisterDialogComponent({ children }: Readonly<PropsWithChildren>) {
+function RegisterDialogComponent({
+  children,
+  open,
+}: Readonly<PropsWithChildren & { open: boolean }>) {
   const { push } = useRouter()
 
   return (
     <Dialog
+      open={open}
       modal={true}
-      defaultOpen
-      onOpenChange={(open) => {
-        if (!open) {
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
           push('/')
         }
       }}

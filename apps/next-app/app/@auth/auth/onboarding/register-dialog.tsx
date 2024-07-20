@@ -5,7 +5,7 @@ import { RegisterDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { RegisterForm } from './register-form'
 import { RegisterDialogType } from './types'
 
@@ -17,6 +17,11 @@ export function RegisterDialog({
   const pathname = usePathname()
   const { user } = useSession()
   const [addNotification] = useNotifications()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (user?.username) {
@@ -27,10 +32,10 @@ export function RegisterDialog({
     }
   }, [user?.username])
 
-  if (pathname !== '/auth/onboarding') return null
+  if (pathname !== '/auth/onboarding' || !mounted) return null
 
   return (
-    <RegisterDialogComponent>
+    <RegisterDialogComponent open={mounted}>
       {userProfileImage && (
         <div className="p-2 flex justify-center">
           <Image

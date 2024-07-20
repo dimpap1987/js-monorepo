@@ -4,9 +4,9 @@ import { FormErrorMessage, Input } from '@js-monorepo/components'
 import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 
-export function AiGeneratorImage({
+function AiGeneratorImageSuspense({
   generateMethod,
 }: {
   generateMethod: (prompt: string) => Promise<
@@ -121,5 +121,24 @@ export function AiGeneratorImage({
         </section>
       )}
     </div>
+  )
+}
+
+export function AiGeneratorImage(props: {
+  generateMethod: (prompt: string) => Promise<
+    | {
+        success: true
+        data: string[]
+      }
+    | {
+        success: false
+        message: string
+      }
+  >
+}) {
+  return (
+    <Suspense>
+      <AiGeneratorImageSuspense {...props} />
+    </Suspense>
   )
 }
