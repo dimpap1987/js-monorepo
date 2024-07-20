@@ -66,9 +66,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: |
-            dist/apps/my-api/
-            dist/apps/next-app/
+          path: dist
           retention-days: 1
 
   build-and-push-docker:
@@ -86,7 +84,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
-          path: .
+          path: dist
           
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
