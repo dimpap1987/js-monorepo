@@ -14,7 +14,7 @@ export async function getCurrentSession() {
       })
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_AUTH_URL_INNER}/api/auth/session`,
+      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`,
       {
         method: 'GET',
         headers: headers,
@@ -34,7 +34,7 @@ export async function getCurrentSession() {
 export async function findUnregisteredUser(headers?: Headers) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_AUTH_URL_INNER}/api/auth/unregistered-user`,
+      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/unregistered-user`,
       {
         method: 'GET',
         headers: headers,
