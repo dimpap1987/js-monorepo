@@ -1,64 +1,52 @@
-import { PrismaService } from '@js-monorepo/db'
-import { AuthUserFullPayload } from '@js-monorepo/types'
-import { Injectable } from '@nestjs/common'
+import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
+import { AdminRepository } from '../repositories/interfaces/admin.repository'
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(AdminService.name)
+
+  constructor(
+    @Inject('ADMIN_REPOSITORY')
+    private adminRepository: AdminRepository
+  ) {}
 
   async getUsers(
     page?: number,
     pageSize?: number
   ): Promise<{
-    users: AuthUserFullPayload[]
+    users: AuthUserFullDto[]
     totalCount: number
   }> {
-    // Fetch total count of users
-    if (!page && !pageSize) {
-      // If page or pageSize is not provided, fetch all users without pagination
-      const allUsers = await this.prisma.authUser.findMany({
-        include: {
-          providers: true,
-          receivedNotifications: true,
-          sentNotifications: true,
-          userChannels: true,
-        },
+    this.logger.debug(
+      `Fetching user: page: '${page}' - pageSize: '${pageSize}'`
+    )
+    try {
+      return await this.adminRepository.getUsers({
+        page,
+        pageSize,
       })
-      return {
-        users: allUsers,
-        totalCount: allUsers?.length,
-      }
+    } catch (e) {
+      this.logger.error(
+        `Error fetching user: page: '${page}' - pageSize: '${pageSize}'`
+      )
     }
-
-    const totalCount = await this.prisma.authUser.count()
-    // Fetch users with pagination using Prisma
-    const users = await this.prisma.authUser.findMany({
-      take: pageSize,
-      skip: page * pageSize,
-      include: {
-        providers: true,
-        receivedNotifications: true,
-        sentNotifications: true,
-        userChannels: true,
-      },
-    })
     return {
-      users: users,
-      totalCount: totalCount,
+      users: [],
+      totalCount: 0,
     }
   }
 
   async updateUser(
     userId: number,
     updateUser: Omit<AuthUser, 'id' | 'email' | 'createdAt'>
-  ): Promise<AuthUser> {
-    return this.prisma.authUser.update({
-      where: { id: userId },
-      data: {
-        username: updateUser.username,
-        roles: updateUser.roles,
-      },
-    })
+  ): Promise<AuthUserDto> {
+    this.logger.debug(`Updating User with id: '${userId}'`)
+    try {
+      return await this.adminRepository.updateUser(userId, updateUser)
+    } catch (e) {
+      this.logger.error(`Error Updating User with id: '${userId}'`)
+    }
   }
 }
