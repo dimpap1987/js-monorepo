@@ -19,11 +19,11 @@ COPY --chown=nestjs:nodejs dist/apps/my-api/package*.json ./
 
 RUN npm install --omit=dev --ignore-scripts
 
-# COPY --chown=nestjs:nodejs node_modules/.prisma ./node_modules/.prisma
-
 COPY --chown=nestjs:nodejs dist/apps/my-api ./
 COPY --chown=nestjs:nodejs libs/prisma/db/src/lib/prisma ./prisma
+
 RUN npx prisma generate --schema=./prisma/schema.prisma
+RUN chown -R nestjs:nodejs /usr/src/app/node_modules/.prisma
 
 USER nestjs
 

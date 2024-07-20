@@ -8,7 +8,7 @@ on:
       - 'libs/prisma/db/src/lib/prisma/migrations/**'
 
 jobs:
-  main:
+  run-migration:
     runs-on: ubuntu-latest
 
     steps:
