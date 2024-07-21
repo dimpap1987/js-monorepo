@@ -13,7 +13,6 @@ export interface GithubAuth {
 }
 
 export interface AuthConfiguration {
-  sessionSecret: string
   csrfEnabled?: boolean
   accessTokenSecret: string
   refreshTokenSecret: string

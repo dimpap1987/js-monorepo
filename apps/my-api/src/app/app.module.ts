@@ -32,7 +32,6 @@ const ENV = process.env.NODE_ENV
       inject: [ChannelService],
       useFactory: async (channelService: ChannelService) => {
         return {
-          sessionSecret: process.env.SESSION_SECRET,
           accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
           refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
           csrfEnabled: true,

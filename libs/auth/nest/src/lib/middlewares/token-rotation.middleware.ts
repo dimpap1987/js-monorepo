@@ -2,6 +2,7 @@ import { getBrowserInfo, getIPAddress } from '@js-monorepo/utils'
 import { Inject, Injectable, Logger, NestMiddleware } from '@nestjs/common'
 import { NextFunction, Request, Response } from 'express'
 import { RefreshTokenService } from '../services/interfaces/refreshToken.service'
+import { authCookiesOptions } from '../utils'
 
 @Injectable()
 export class TokenRotationMiddleware implements NestMiddleware {
@@ -36,28 +37,11 @@ export class TokenRotationMiddleware implements NestMiddleware {
     next()
   }
 
-  // TODO create a utils class
   setAccessTokenCookie(res: Response, accessToken: string) {
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      domain:
-        process.env.NODE_ENV === 'production'
-          ? process.env.AUTH_COOKIE_DOMAIN_PROD
-          : 'localhost',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    })
+    res.cookie('accessToken', accessToken, authCookiesOptions)
   }
 
   setRefreshTokenCookie(res: Response, refreshToken: string) {
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      domain:
-        process.env.NODE_ENV === 'production'
-          ? process.env.AUTH_COOKIE_DOMAIN_PROD
-          : 'localhost',
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
-    })
+    res.cookie('refreshToken', refreshToken, authCookiesOptions)
   }
 }
