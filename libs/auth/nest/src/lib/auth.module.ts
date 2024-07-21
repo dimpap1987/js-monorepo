@@ -7,7 +7,6 @@ import {
   RequestMethod,
 } from '@nestjs/common'
 import { APP_FILTER, REQUEST } from '@nestjs/core'
-import session from 'express-session'
 import { AuthController } from './controllers/auth.controller'
 import { AuthExceptionFilter } from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
@@ -21,19 +20,11 @@ import { TokensService } from './services/tokens.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
+import { authCookiesOptions } from './utils'
 import csurf = require('csurf')
 
 export const csrfProtection = csurf({
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    domain:
-      process.env.NODE_ENV === 'production'
-        ? process.env.AUTH_COOKIE_DOMAIN_PROD
-        : 'localhost',
-    sameSite: 'strict',
-  },
+  cookie: authCookiesOptions,
 })
 
 @Module({
@@ -96,7 +87,6 @@ export class AuthModule implements NestModule {
         {
           provide: 'AUTH_OPTIONS',
           useFactory: async (config: AuthConfiguration) => ({
-            sessionSecret: config.sessionSecret,
             accessTokenSecret: config.accessTokenSecret,
             refreshTokenSecret: config.refreshTokenSecret,
             google: config.google,
@@ -114,15 +104,6 @@ export class AuthModule implements NestModule {
 
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(
-        session({
-          secret: this.config.sessionSecret,
-          resave: false,
-          saveUninitialized: false,
-        })
-      )
-      .forRoutes('*')
-
       .apply(TokenRotationMiddleware)
       .exclude(
         '/',
