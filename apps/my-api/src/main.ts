@@ -8,7 +8,6 @@ import { AppModule } from './app/app.module'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
-console.log(process.env.GOOGLE_REDIRECT_URL)
 const logLevelsArray: LogLevel[] = process.env.LOGGER_LEVELS
   ? process.env.LOGGER_LEVELS.split(',').map(
       (level) => level.trim() as LogLevel
