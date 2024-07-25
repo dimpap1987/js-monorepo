@@ -8,12 +8,13 @@ import { AuthUser } from '@prisma/client'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AdminController } from './controllers/admin.controller'
+import { ExceptionController } from './controllers/exception.controller'
 import { NotificationController } from './controllers/notification.controller'
 import { AdminProviderModule } from './modules/admin.module'
 import { ChannelProviderModule } from './modules/channel.module'
 import { FilterProviderModule } from './modules/filter.modules'
-import { EventsService } from './services/event.service'
 import { NotificationProviderModule } from './modules/notifications.module'
+import { EventsService } from './services/event.service'
 
 const ENV = process.env.NODE_ENV
 
@@ -57,7 +58,12 @@ const ENV = process.env.NODE_ENV
       },
     }),
   ],
-  controllers: [AppController, NotificationController, AdminController],
+  controllers: [
+    AppController,
+    NotificationController,
+    AdminController,
+    ExceptionController,
+  ],
   providers: [AppService, EventsService],
 })
 export class AppModule {}

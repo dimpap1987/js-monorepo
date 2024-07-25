@@ -174,3 +174,13 @@ export function getBrowserInfo(req: Request): string | undefined {
   if (!req) return undefined
   return req.headers['user-agent'] || undefined
 }
+
+export function isObjectDefinedOrEmpty(obj: object) {
+  if (!obj) return true
+
+  if (typeof obj !== 'object') {
+    throw new TypeError('Input must be an object')
+  }
+
+  return Object.keys(obj)?.length === 0
+}
