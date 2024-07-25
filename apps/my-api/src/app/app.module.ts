@@ -33,9 +33,16 @@ const ENV = process.env.NODE_ENV
       inject: [ChannelService],
       useFactory: async (channelService: ChannelService) => {
         return {
+          csrf: {
+            enabled: true,
+            middlewareExclusions: ['exceptions'],
+          },
+          tokenRoation: {
+            enabled: true,
+            middlewareExclusions: ['exceptions'],
+          },
           accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
           refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
-          csrfEnabled: true,
           github: {
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
