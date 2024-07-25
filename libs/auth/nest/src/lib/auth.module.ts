@@ -89,12 +89,13 @@ export class AuthModule implements NestModule {
           useFactory: async (config: AuthConfiguration) => ({
             accessTokenSecret: config.accessTokenSecret,
             refreshTokenSecret: config.refreshTokenSecret,
+            tokenRotation: config.tokenRoation,
+            crf: config.csrf,
             google: config.google,
             github: config.github,
             redirectUiUrl: config.redirectUiUrl,
             onRegister: config.onRegister,
             onLogin: config.onLogin,
-            csrfEnabled: config.csrfEnabled ?? false,
           }),
           inject: ['AUTH_CONFIG'],
         },
@@ -103,24 +104,27 @@ export class AuthModule implements NestModule {
   }
 
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(TokenRotationMiddleware)
-      .exclude(
-        '/',
-        'auth/google/login',
-        'auth/github/login',
-        'auth/facebook/login',
-        'auth/google/redirect',
-        'auth/github/redirect',
-        'auth/logout',
-        'auth/register',
-        'auth/unregistered-user'
-      )
-      .forRoutes('*')
+    if (this.config.tokenRoation?.enabled) {
+      consumer
+        .apply(TokenRotationMiddleware)
+        .exclude(
+          'auth/google/login',
+          'auth/github/login',
+          'auth/facebook/login',
+          'auth/google/redirect',
+          'auth/github/redirect',
+          'auth/logout',
+          'auth/register',
+          'auth/unregistered-user',
+          ...(this.config.tokenRoation?.middlewareExclusions || [])
+        )
+        .forRoutes('*')
+    }
 
-    if (this.config.csrfEnabled) {
+    if (this.config.csrf?.enabled) {
       consumer
         .apply(CsrfGeneratorMiddleware)
+        .exclude(...(this.config.csrf?.middlewareExclusions || []))
         .forRoutes(
           { path: '*google/login*', method: RequestMethod.GET },
           { path: '*github/login*', method: RequestMethod.GET },

@@ -1,4 +1,5 @@
 import { AuthUserDto } from '@js-monorepo/types'
+import { RouteInfo } from '@nestjs/common/interfaces'
 import { Request, Response } from 'express'
 
 export interface GoogleAuth {
@@ -13,7 +14,14 @@ export interface GithubAuth {
 }
 
 export interface AuthConfiguration {
-  csrfEnabled?: boolean
+  csrf?: {
+    enabled: boolean
+    middlewareExclusions?: (string | RouteInfo)[]
+  }
+  tokenRoation?: {
+    enabled: boolean
+    middlewareExclusions?: (string | RouteInfo)[]
+  }
   accessTokenSecret: string
   refreshTokenSecret: string
   redirectUiUrl?: string
