@@ -16,6 +16,7 @@ import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware
 import { AuthProviderModule } from './modules/auth.provider.modules'
 import { RefreshTokenProviderModule } from './modules/refreshToken.provider.module'
 import { UnRegisteredUserProviderModule } from './modules/unregisteredUser.provider.module'
+import { RefreshTokenService } from './services/interfaces/refreshToken.service'
 import { TokensService } from './services/tokens.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
@@ -35,12 +36,9 @@ export const csrfProtection = csurf({
   ],
   controllers: [AuthController],
   providers: [
-    GoogleStrategy,
-    GithubOauthStrategy,
     TokensService,
     JwtAuthGuard,
     RolesGuard,
-    TokenRotationMiddleware,
     {
       provide: 'jwt',
       useFactory: async (
@@ -56,13 +54,7 @@ export const csrfProtection = csurf({
       useClass: AuthExceptionFilter,
     },
   ],
-  exports: [
-    'jwt',
-    JwtAuthGuard,
-    RolesGuard,
-    TokenRotationMiddleware,
-    TokensService,
-  ],
+  exports: ['jwt', JwtAuthGuard, RolesGuard, TokensService],
 })
 export class AuthModule implements NestModule {
   constructor(
@@ -98,6 +90,35 @@ export class AuthModule implements NestModule {
             onLogin: config.onLogin,
           }),
           inject: ['AUTH_CONFIG'],
+        },
+        {
+          provide: GoogleStrategy,
+          useFactory: (config: AuthConfiguration) => {
+            if (config.google) return new GoogleStrategy(config)
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
+        },
+        {
+          provide: GithubOauthStrategy,
+          useFactory: (config: AuthConfiguration) => {
+            if (config.github) new GithubOauthStrategy(config)
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
+        },
+        {
+          provide: TokenRotationMiddleware,
+          useFactory: (
+            config: AuthConfiguration,
+            refreshTokenService: RefreshTokenService
+          ) => {
+            if (config.tokenRoation?.enabled) {
+              return new TokenRotationMiddleware(refreshTokenService)
+            }
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
         },
       ],
     }
