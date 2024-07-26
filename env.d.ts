@@ -21,7 +21,7 @@ declare global {
       AUTH_COOKIES_DOMAIN: string
       AUTH_COOKIES_SECURE: string
 
-      LOGGER_LEVELS: string
+      LOGGER_LEVEL: string
     }
   }
 }
