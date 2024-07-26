@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common'
 
-// const LOGGER = new Logger('Retry')
+const logger = new Logger('Retry')
 
 export function Retry(retries: number, timeout = 2000) {
   return function (
@@ -9,7 +9,6 @@ export function Retry(retries: number, timeout = 2000) {
     descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value
-    const logger = new Logger(`${target.constructor.name}-Retry`);
     let originalError: unknown = null
 
     descriptor.value = async function (...args: any[]) {
@@ -21,9 +20,11 @@ export function Retry(retries: number, timeout = 2000) {
           const methodName = propertyKey
           const className = target.constructor.name
           if (i == 0) {
-            logger.error(`Retry - ${className} - ${methodName}`)
+            logger.error(`[${className}] [Retry] - ${methodName}`)
           } else {
-            logger.error(`Retry - Attempt ${i} - ${className} - ${methodName}`)
+            logger.error(
+              `[${className}] [Retry] - Attempt ${i} - ${methodName}`
+            )
           }
           if (i < retries) {
             // dont wait on the last retry

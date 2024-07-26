@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common'
 
 const logger = new Logger('Catch')
 
-export function Catch<T>(input?: T, errorDesciption?: string) {
+export function Catch<T>(outputWhenError?: T, errorDesciption?: string) {
   return function (
     target: any,
     propertyKey: string,
@@ -17,11 +17,15 @@ export function Catch<T>(input?: T, errorDesciption?: string) {
         const methodName = propertyKey
         const className = target.constructor.name
         const errorMessage = errorDesciption
-          ? `Catch [${className}] - ${methodName}() - errorDesciption`
-          : `Catch [${className}] - ${methodName}()`
+          ? `[${className}] [Catch]- ${methodName}() - ${errorDesciption}`
+          : `[${className}] [Catch] - ${methodName}()`
 
         logger.error(errorMessage, error)
-        return input
+        if (outputWhenError === undefined) {
+          return
+        } else {
+          return outputWhenError
+        }
       }
     }
 
