@@ -88,7 +88,7 @@ const DashboardUsersTableSuspense = () => {
     replace('?' + params)
   }, [pagination, limit, onPaginationChange, skip])
 
-  const pageCount = Math.round(data.totalCount / limit)
+  const pageCount = Math.round(data?.totalCount / limit)
 
   const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
     () => [
@@ -302,7 +302,7 @@ const DashboardUsersTableSuspense = () => {
     <>
       <DataTable
         columns={memoizedColumns}
-        data={data.users}
+        data={data?.users}
         onPaginationChange={onPaginationChange}
         totalCount={pageCount}
         pagination={pagination}
