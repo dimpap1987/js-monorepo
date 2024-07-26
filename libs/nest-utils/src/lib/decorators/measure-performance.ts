@@ -2,30 +2,31 @@ import { Logger } from '@nestjs/common'
 
 const logger = new Logger('MeasurePerformance')
 
-export function MeasurePerformance(
-  target: any,
-  propertyKey: string,
-  descriptor: PropertyDescriptor
-) {
-  const originalMethod = descriptor.value
+export function MeasurePerformance() {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    const originalMethod = descriptor.value
 
-  descriptor.value = function (...args: any[]) {
-    const start = performance.now()
-    const result = originalMethod.apply(this, args)
-    const end = performance.now()
+    descriptor.value = function (...args: any[]) {
+      const start = performance.now()
+      const result = originalMethod.apply(this, args)
+      const end = performance.now()
 
-    const methodName = propertyKey
-    const className = target.constructor.name
+      const methodName = propertyKey
+      const className = target.constructor.name
 
-    const seconds = convertMillisToSeconds(end - start)
-    logger.debug(
-      `${className} - ${methodName} - execution time: '${seconds} seconds'`
-    )
+      const seconds = convertMillisToSeconds(end - start)
+      logger.debug(
+        `[${className}] - ${methodName}() - execution time: '${seconds} seconds'`
+      )
 
-    return result
+      return result
+    }
+    return descriptor
   }
-
-  return descriptor
 }
 
 function convertMillisToSeconds(milliseconds: number) {
