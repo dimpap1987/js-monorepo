@@ -29,7 +29,7 @@ export class NotificationService {
         additionalData,
       })
     } catch (error) {
-      this.logger.error('Error creating notification:', error)
+      this.logger.error('Error creating notification:', error.stack)
       throw new Error('Failed to create notification')
     }
   }

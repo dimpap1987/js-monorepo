@@ -1,3 +1,4 @@
+import { isPromise } from '@js-monorepo/utils'
 import { Logger } from '@nestjs/common'
 
 const logger = new Logger('Retry')
@@ -14,22 +15,23 @@ export function Retry(retries: number, timeout = 2000) {
     descriptor.value = async function (...args: any[]) {
       for (let i = 0; i <= retries; i++) {
         try {
-          return await originalMethod.apply(this, args)
-        } catch (error) {
+          const result = originalMethod.apply(this, args)
+          return isPromise(result) ? await result : result
+        } catch (error: any) {
           originalError = error
           const methodName = propertyKey
           const className = target.constructor.name
           if (i == 0) {
-            logger.error(`[${className}] [Retry] - ${methodName}`)
+            logger.error(`[${className}] - ${methodName}`, error.stack)
           } else {
             logger.error(
-              `[${className}] [Retry] - Attempt ${i} - ${methodName}`
+              `[${className}] - Attempt ${i} - ${methodName}`,
+              error.stack
             )
           }
           if (i < retries) {
-            // dont wait on the last retry
-            await new Promise((resolve) => setTimeout(resolve, timeout))
-            timeout *= 2
+            const currentTimeout = timeout * Math.pow(2, i) // Exponential backoff
+            await new Promise((resolve) => setTimeout(resolve, currentTimeout))
           }
         }
       }

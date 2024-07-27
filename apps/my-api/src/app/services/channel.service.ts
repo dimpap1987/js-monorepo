@@ -19,7 +19,7 @@ export class ChannelService {
     } catch (error) {
       this.logger.error(
         `Error assigning user to channels for user with id: '${userId}'`,
-        error
+        error.stack
       )
     }
   }
@@ -30,8 +30,8 @@ export class ChannelService {
       return await this.channelRepository.getChannelsByUserId(userId)
     } catch (error) {
       this.logger.error(
-        error,
-        `Error fetching channels for user with id: '${userId}'`
+        `Error fetching channels for user with id: '${userId}'`,
+        error.stack
       )
     }
     return []

@@ -30,8 +30,8 @@ export class TokenRotationMiddleware implements NestMiddleware {
         this.setRefreshTokenCookie(res, newRefreshToken)
         this.setAccessTokenCookie(res, newAccessToken)
       }
-    } catch (error) {
-      this.logger.error(`Error in path: ${req.baseUrl}`, error)
+    } catch (error: any) {
+      this.logger.error(`Error in path: ${req.baseUrl}`, error.stack)
     }
     next()
   }
