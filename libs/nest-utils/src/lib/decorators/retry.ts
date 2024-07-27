@@ -31,8 +31,8 @@ export function Retry(retries: number, timeout = 2000) {
             )
           }
           if (i < retries) {
-            // eslint-disable-next-line @typescript-eslint/no-loop-func
             const currentTimeout = timeout * Math.pow(2, i) // Exponential backoff
+            // eslint-disable-next-line @typescript-eslint/no-loop-func
             await new Promise((resolve) => setTimeout(resolve, currentTimeout))
           }
         }
