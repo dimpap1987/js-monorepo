@@ -36,7 +36,7 @@ export class LoggerService implements LS {
         }),
         new winston.transports.File({
           filename: `info-${getCurrentDateFormatted()}.log`,
-          level: 'info',
+          level: logLevel,
           format: combine(
             timestamp({ format: greeceTimezone }),
             prettyPrint({
