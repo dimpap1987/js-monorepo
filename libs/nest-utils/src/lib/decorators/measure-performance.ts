@@ -1,3 +1,4 @@
+import { isPromise } from '@js-monorepo/utils'
 import { Logger } from '@nestjs/common'
 
 const logger = new Logger('MeasurePerformance')
@@ -10,15 +11,18 @@ export function MeasurePerformance() {
   ) {
     const originalMethod = descriptor.value
 
-    descriptor.value = function (...args: any[]) {
+    descriptor.value = async function (...args: any[]) {
       const start = performance.now()
-      const result = originalMethod.apply(this, args)
+      const response = originalMethod.apply(this, args)
+
+      const result = isPromise(response) ? await response : response
+
       const end = performance.now()
 
       const methodName = propertyKey
       const className = target.constructor.name
 
-      const seconds = convertMillisToSeconds(end - start)
+      const seconds = parseFloat(((end - start) / 1000).toFixed(4))
       logger.debug(
         `[${className}] - ${methodName}() - execution time: '${seconds} seconds'`
       )
@@ -27,8 +31,4 @@ export function MeasurePerformance() {
     }
     return descriptor
   }
-}
-
-function convertMillisToSeconds(milliseconds: number) {
-  return parseFloat((milliseconds / 1000).toFixed(4))
 }

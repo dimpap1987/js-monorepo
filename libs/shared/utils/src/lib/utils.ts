@@ -16,7 +16,7 @@ export function getCookie(name: string) {
   const cookies = document.cookie.split(';')
 
   // Loop through each cookie
-  for (let i = 0; i < cookies.length; i++) {
+  for (let i = 0; i < cookies?.length; i++) {
     const cookie = cookies[i].trim()
     const [key, value] = cookie.split('=')
 
@@ -191,4 +191,10 @@ export function getCurrentDateFormatted() {
   const month = String(date.getMonth() + 1).padStart(2, '0') // Months are zero-based
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+export function isPromise(pro: any) {
+  return (
+    pro != null && (pro instanceof Promise || typeof pro.then === 'function')
+  )
 }

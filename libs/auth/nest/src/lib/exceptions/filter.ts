@@ -12,7 +12,8 @@ export class AuthExceptionFilter implements ExceptionFilter {
     this.logger.error(
       `Exception of type: 'AuthExceptionFilter' - message: '${
         exception.message
-      }' - url: '${request.url}' statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`
+      }' - url: '${request.url}' statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`,
+      exception.stack
     )
 
     response.clearCookie('accessToken')

@@ -13,7 +13,7 @@ export default function DpNotificationList({
 }: DpNotificationListProps) {
   return (
     notifications &&
-    notifications.length > 0 && (
+    notifications?.length > 0 && (
       <section
         className={cn(
           `fixed top-navbar-offset right-2 p-2 z-40 flex flex-col-reverse gap-2`,

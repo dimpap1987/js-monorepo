@@ -29,10 +29,10 @@ export class UnregisteredServiceImpl implements UnregisteredService {
         `Unregistered User: '${newUnRegisteredUser.email}' created successfully`
       )
       return newUnRegisteredUser
-    } catch (err) {
+    } catch (err: any) {
       this.logger.error(
         `There was an error with user: ${unRegisteredUser.email}`,
-        err
+        err.stack
       )
       throw new AuthException(
         HttpStatus.BAD_REQUEST,
@@ -50,10 +50,10 @@ export class UnregisteredServiceImpl implements UnregisteredService {
       return await this.unRegisteredRepository.findUnRegisteredUserByToken(
         token
       )
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(
         `Error in finding Unregistered user with token: ${token}`,
-        e
+        e.stack
       )
       throw new AuthException(
         HttpStatus.BAD_REQUEST,

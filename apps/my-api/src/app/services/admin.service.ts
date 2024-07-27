@@ -29,7 +29,8 @@ export class AdminService {
       })
     } catch (e) {
       this.logger.error(
-        `Error fetching user: page: '${page}' - pageSize: '${pageSize}'`
+        `Error fetching user: page: '${page}' - pageSize: '${pageSize}'`,
+        e.stack
       )
     }
     return {
@@ -46,7 +47,7 @@ export class AdminService {
     try {
       return await this.adminRepository.updateUser(userId, updateUser)
     } catch (e) {
-      this.logger.error(`Error Updating User with id: '${userId}'`)
+      this.logger.error(`Error Updating User with id: '${userId}'`, e.stack)
     }
   }
 }

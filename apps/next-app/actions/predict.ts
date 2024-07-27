@@ -42,8 +42,8 @@ export async function predict(prompt: string): Promise<ReplicateResponse> {
       success: true,
       data: output as string[],
     }
-  } catch (e) {
-    logger.error(e, 'Error while generating AI image')
+  } catch (e: any) {
+    logger.error(e, 'Error while generating AI image', e.stack)
     return {
       success: false,
       message: 'Something went wrong, while generating AI image...',

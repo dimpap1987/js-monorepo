@@ -141,7 +141,7 @@ export function DpNotificationBellComponent({
                     {notification.formattedTime} ago
                   </DropdownMenuShortcut>
                 </DropdownMenuItem>
-                {index < notifications.length - 1 && <DropdownMenuSeparator />}
+                {index < notifications?.length - 1 && <DropdownMenuSeparator />}
               </Fragment>
             ))
           ) : (

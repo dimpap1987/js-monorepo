@@ -23,8 +23,11 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
     try {
       this.logger.debug(`Revoking refresh token with id: ${tokenId}`)
       await this.refreshTokenRepository.revokeRefreshTokenById(tokenId)
-    } catch (e) {
-      this.logger.error(`Error Revoking refresh token with id: ${tokenId}`, e)
+    } catch (e: any) {
+      this.logger.error(
+        `Error Revoking refresh token with id: ${tokenId}`,
+        e.stack
+      )
     }
   }
 
@@ -32,9 +35,10 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
     try {
       this.logger.debug(`Revoking refresh tokens of user with id: ${userId}`)
       await this.refreshTokenRepository.revokeRefreshTokensByUserId(userId)
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(
-        `Error Revoking refresh tokens of user with id: ${userId}`
+        `Error Revoking refresh tokens of user with id: ${userId}`,
+        e.stack
       )
     }
   }
@@ -43,8 +47,8 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
     try {
       this.logger.debug(`Revoking refresh token`)
       await this.refreshTokenRepository.revokeRefreshTokenByToken(token)
-    } catch (e) {
-      this.logger.error('Revoking refresh token`', e)
+    } catch (e: any) {
+      this.logger.error('Revoking refresh token`', e.stack)
     }
   }
 
@@ -52,8 +56,8 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
     try {
       this.logger.debug(`Retrieving refresh token`)
       return await this.refreshTokenRepository.findRefreshToken(token)
-    } catch (e) {
-      this.logger.error(`Error Retrieving refresh token: ${token}`, e)
+    } catch (e: any) {
+      this.logger.error(`Error Retrieving refresh token: ${token}`, e.stack)
     }
     return null
   }
@@ -64,10 +68,10 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
     try {
       this.logger.debug(`Creating refresh token for user: ${payload.userId}`)
       return await this.refreshTokenRepository.storeRefreshToken(payload)
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error(
         `Error Creating refresh token for user: ${payload.userId}`,
-        e
+        e.stack
       )
       return null
     }
@@ -128,13 +132,13 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
         })
 
         return rotatedTokens
-      } catch (e2) {
+      } catch (e2: any) {
         if (e2 instanceof AuthException) {
           throw e2
         } else {
           this.logger.error(
             `Error when handling refresh token rotation for refreshToken: '${refreshToken}'`,
-            e2
+            e2.stack
           )
         }
       }

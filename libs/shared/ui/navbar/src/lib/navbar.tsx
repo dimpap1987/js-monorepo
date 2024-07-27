@@ -54,7 +54,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               {logo}
               <ul className="hidden md:flex px-4 font-semibold font-heading items-center space-x-6 ml-[14%]">
                 {menuItems &&
-                  menuItems.length > 0 &&
+                  menuItems?.length > 0 &&
                   menuItems.map((item, index) => (
                     <li
                       key={index}
