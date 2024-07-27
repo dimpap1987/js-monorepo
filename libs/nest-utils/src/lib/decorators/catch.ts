@@ -14,6 +14,7 @@ export function Catch(outputWhenError?: any, errorDesciption?: string) {
     descriptor.value = async function (...args: any[]) {
       try {
         const result = originalMethod.apply(this, args)
+        // eslint-disable-next-line @typescript-eslint/return-await
         return isPromise(result) ? await result : result
       } catch (error: any) {
         const methodName = propertyKey
