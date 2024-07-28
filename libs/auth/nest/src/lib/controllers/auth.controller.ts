@@ -144,7 +144,7 @@ export class AuthController {
     try {
       this.options.onRegister?.(user)
     } catch (e) {
-      this.logger.error('Register callback error', e)
+      this.logger.error('Register callback error', e.stack)
     }
 
     res.status(HttpStatus.CREATED).send()
@@ -205,7 +205,7 @@ export class AuthController {
       try {
         this.options.onLogin?.(user)
       } catch (e) {
-        this.logger.error('Signin call back error', e)
+        this.logger.error('Signin call back error', e.stack)
       }
     } catch (e) {
       if (
@@ -225,7 +225,7 @@ export class AuthController {
           })
           redirectURI = `${this.options.redirectUiUrl}/auth/onboarding`
         } catch (e2) {
-          this.logger.error(`Error when creating unregistered user`, e2)
+          this.logger.error(`Error when creating unregistered user`, e2.stack)
           redirectURI = `${this.options.redirectUiUrl}/auth/login?error=user-creation`
         }
         this.logger.log(

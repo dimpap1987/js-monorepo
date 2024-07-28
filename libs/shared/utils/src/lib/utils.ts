@@ -16,7 +16,7 @@ export function getCookie(name: string) {
   const cookies = document.cookie.split(';')
 
   // Loop through each cookie
-  for (let i = 0; i < cookies.length; i++) {
+  for (let i = 0; i < cookies?.length; i++) {
     const cookie = cookies[i].trim()
     const [key, value] = cookie.split('=')
 
@@ -173,4 +173,38 @@ export function getIPAddress(req: Request): string | undefined {
 export function getBrowserInfo(req: Request): string | undefined {
   if (!req) return undefined
   return req.headers['user-agent'] || undefined
+}
+
+export function isObjectDefinedOrEmpty(obj: object) {
+  if (!obj) return true
+
+  if (typeof obj !== 'object') {
+    throw new TypeError('Input must be an object')
+  }
+
+  return Object.keys(obj)?.length === 0
+}
+
+export function getCurrentDateFormatted() {
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are zero-based
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+export function isPromise(pro: any) {
+  return (
+    pro != null && (pro instanceof Promise || typeof pro.then === 'function')
+  )
+}
+
+export function getColorizedText(
+  text: number | string,
+  ansiC0de = '\x1b[33m'
+): string {
+  // ANSI escape codes for colorization
+  const reset = '\x1b[0m'
+
+  return `${ansiC0de}${text}${reset}`
 }

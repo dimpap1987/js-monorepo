@@ -1,19 +1,21 @@
-import { Logger, Module } from '@nestjs/common'
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ChannelService } from './services/channel.service'
 
 import { AuthModule } from '@js-monorepo/auth'
 import { PrismaModule } from '@js-monorepo/db'
 import { ConfigModule } from '@nestjs/config'
 import { AuthUser } from '@prisma/client'
+import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AdminController } from './controllers/admin.controller'
+import { ExceptionController } from './controllers/exception.controller'
 import { NotificationController } from './controllers/notification.controller'
 import { AdminProviderModule } from './modules/admin.module'
 import { ChannelProviderModule } from './modules/channel.module'
 import { FilterProviderModule } from './modules/filter.modules'
-import { EventsService } from './services/event.service'
 import { NotificationProviderModule } from './modules/notifications.module'
+import { EventsService } from './services/event.service'
 
 const ENV = process.env.NODE_ENV
 
@@ -32,9 +34,16 @@ const ENV = process.env.NODE_ENV
       inject: [ChannelService],
       useFactory: async (channelService: ChannelService) => {
         return {
+          csrf: {
+            enabled: true,
+            middlewareExclusions: ['exceptions'],
+          },
+          tokenRoation: {
+            enabled: true,
+            middlewareExclusions: ['exceptions'],
+          },
           accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
           refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
-          csrfEnabled: true,
           github: {
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -57,7 +66,16 @@ const ENV = process.env.NODE_ENV
       },
     }),
   ],
-  controllers: [AppController, NotificationController, AdminController],
-  providers: [AppService, EventsService],
+  controllers: [
+    AppController,
+    NotificationController,
+    AdminController,
+    ExceptionController,
+  ],
+  providers: [AppService, EventsService, LoggerMiddleware],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*')
+  }
+}

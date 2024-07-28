@@ -28,5 +28,5 @@ export function constructURIQueryString(
   })
 
   // Join the encoded key-value pairs with '&' to construct the query string
-  return paramStrings.length > 0 ? `?${paramStrings.join('&')}` : ''
+  return paramStrings?.length > 0 ? `?${paramStrings.join('&')}` : ''
 }

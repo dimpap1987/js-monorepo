@@ -70,7 +70,7 @@ export default function BannerSVG() {
         bubbleConfig.minRadius
       const fill =
         bubbleConfig.colors[
-          Math.floor(Math.random() * bubbleConfig.colors.length)
+          Math.floor(Math.random() * bubbleConfig.colors?.length)
         ]
       const delay =
         Math.random() * (bubbleConfig.maxDelay - bubbleConfig.minDelay) +

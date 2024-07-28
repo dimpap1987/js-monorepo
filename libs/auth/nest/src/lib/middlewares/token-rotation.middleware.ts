@@ -16,8 +16,6 @@ export class TokenRotationMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     try {
       const { accessToken, refreshToken } = req.cookies
-      // this.logger.debug(`path = '${req.baseUrl}'`)
-
       if (accessToken && refreshToken) {
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
           await this.refreshTokenService.handleTokenRotation(
@@ -31,8 +29,8 @@ export class TokenRotationMiddleware implements NestMiddleware {
         this.setRefreshTokenCookie(res, newRefreshToken)
         this.setAccessTokenCookie(res, newAccessToken)
       }
-    } catch (error) {
-      this.logger.error(`Error in path: ${req.baseUrl}`, error)
+    } catch (error: any) {
+      this.logger.error(`Error in path: ${req.baseUrl}`, error.stack)
     }
     next()
   }

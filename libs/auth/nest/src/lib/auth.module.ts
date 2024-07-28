@@ -16,6 +16,7 @@ import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware
 import { AuthProviderModule } from './modules/auth.provider.modules'
 import { RefreshTokenProviderModule } from './modules/refreshToken.provider.module'
 import { UnRegisteredUserProviderModule } from './modules/unregisteredUser.provider.module'
+import { RefreshTokenService } from './services/interfaces/refreshToken.service'
 import { TokensService } from './services/tokens.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
@@ -35,12 +36,9 @@ export const csrfProtection = csurf({
   ],
   controllers: [AuthController],
   providers: [
-    GoogleStrategy,
-    GithubOauthStrategy,
     TokensService,
     JwtAuthGuard,
     RolesGuard,
-    TokenRotationMiddleware,
     {
       provide: 'jwt',
       useFactory: async (
@@ -56,13 +54,7 @@ export const csrfProtection = csurf({
       useClass: AuthExceptionFilter,
     },
   ],
-  exports: [
-    'jwt',
-    JwtAuthGuard,
-    RolesGuard,
-    TokenRotationMiddleware,
-    TokensService,
-  ],
+  exports: ['jwt', JwtAuthGuard, RolesGuard, TokensService],
 })
 export class AuthModule implements NestModule {
   constructor(
@@ -89,38 +81,71 @@ export class AuthModule implements NestModule {
           useFactory: async (config: AuthConfiguration) => ({
             accessTokenSecret: config.accessTokenSecret,
             refreshTokenSecret: config.refreshTokenSecret,
+            tokenRotation: config.tokenRoation,
+            crf: config.csrf,
             google: config.google,
             github: config.github,
             redirectUiUrl: config.redirectUiUrl,
             onRegister: config.onRegister,
             onLogin: config.onLogin,
-            csrfEnabled: config.csrfEnabled ?? false,
           }),
           inject: ['AUTH_CONFIG'],
+        },
+        {
+          provide: GoogleStrategy,
+          useFactory: (config: AuthConfiguration) => {
+            if (config.google) return new GoogleStrategy(config)
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
+        },
+        {
+          provide: GithubOauthStrategy,
+          useFactory: (config: AuthConfiguration) => {
+            if (config.github) new GithubOauthStrategy(config)
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
+        },
+        {
+          provide: TokenRotationMiddleware,
+          useFactory: (
+            config: AuthConfiguration,
+            refreshTokenService: RefreshTokenService
+          ) => {
+            if (config.tokenRoation?.enabled) {
+              return new TokenRotationMiddleware(refreshTokenService)
+            }
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
         },
       ],
     }
   }
 
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(TokenRotationMiddleware)
-      .exclude(
-        '/',
-        'auth/google/login',
-        'auth/github/login',
-        'auth/facebook/login',
-        'auth/google/redirect',
-        'auth/github/redirect',
-        'auth/logout',
-        'auth/register',
-        'auth/unregistered-user'
-      )
-      .forRoutes('*')
+    if (this.config.tokenRoation?.enabled) {
+      consumer
+        .apply(TokenRotationMiddleware)
+        .exclude(
+          'auth/google/login',
+          'auth/github/login',
+          'auth/facebook/login',
+          'auth/google/redirect',
+          'auth/github/redirect',
+          'auth/logout',
+          'auth/register',
+          'auth/unregistered-user',
+          ...(this.config.tokenRoation?.middlewareExclusions || [])
+        )
+        .forRoutes('*')
+    }
 
-    if (this.config.csrfEnabled) {
+    if (this.config.csrf?.enabled) {
       consumer
         .apply(CsrfGeneratorMiddleware)
+        .exclude(...(this.config.csrf?.middlewareExclusions || []))
         .forRoutes(
           { path: '*google/login*', method: RequestMethod.GET },
           { path: '*github/login*', method: RequestMethod.GET },

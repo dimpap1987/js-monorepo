@@ -1,4 +1,5 @@
-import { Logger, LogLevel, ValidationPipe } from '@nestjs/common'
+import { LoggerService } from '@js-monorepo/nest-utils'
+import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
@@ -8,17 +9,13 @@ import { AppModule } from './app/app.module'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
-console.log(process.env.GOOGLE_REDIRECT_URL)
-const logLevelsArray: LogLevel[] = process.env.LOGGER_LEVELS
-  ? process.env.LOGGER_LEVELS.split(',').map(
-      (level) => level.trim() as LogLevel
-    )
-  : ['log', 'debug', 'error', 'warn']
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: logLevelsArray,
+    bufferLogs: true,
   })
+
+  app.useLogger(new LoggerService(process.env.LOGGER_LEVEL))
+
   const port = process.env.PORT || 3333
   const globalPrefix = 'api'
 

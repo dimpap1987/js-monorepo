@@ -53,7 +53,7 @@ export class AuthServiceImpl implements AuthService {
   ): Promise<AuthUserDto> {
     try {
       return await this.authRepository.createAuthUser(authUserDTO, providerDTO)
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof ConstraintViolationException) {
         if (err.code === ConstraintCode.USERNAME_EXISTS) {
           this.logger.warn(`Username: '${authUserDTO.username}' already exists`)
@@ -66,7 +66,7 @@ export class AuthServiceImpl implements AuthService {
       }
       this.logger.error(
         `There was an error when creating a user with username: ${authUserDTO.username}`,
-        err
+        err.stack
       )
       throw new AuthException(
         HttpStatus.BAD_REQUEST,

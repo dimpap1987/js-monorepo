@@ -33,7 +33,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         retryCount++
         this.logger.error(
           `Error connecting to database (attempt ${retryCount}/${this.maxRetries})`,
-          error
+          error.stack
         )
 
         if (retryCount < this.maxRetries) {

@@ -1,22 +1,29 @@
-// import { JwtTokenService } from '@mymonorepo/jwt-utils'
-// import { Injectable, Logger, NestMiddleware } from '@nestjs/common'
+import { JwtPayload } from '@js-monorepo/types'
+import { getIPAddress } from '@js-monorepo/utils'
+import { Inject, Injectable, Logger, NestMiddleware } from '@nestjs/common'
+import { NextFunction, Request, Response } from 'express'
 
-// @Injectable()
-// export class LoggerMiddleware implements NestMiddleware {
-//   constructor(private jwtService: JwtTokenService) {}
+@Injectable()
+export class LoggerMiddleware implements NestMiddleware {
+  logger = new Logger('HTTP')
 
-//   use(req, res, next) {
-//     const { ip, method, path: url } = req
-//     const email = this.jwtService.extractPayload(req.cookies['accessToken'])?.user?.email
-//     const userAgent = req.get('user-agent') || ''
+  constructor(@Inject('jwt') private readonly jwt: JwtPayload) {}
 
-//     res.on('close', () => {
-//       const { statusCode } = res
-//       const contentLength = res.get('content-length')
-//       const emailLog = `${email ? `- email: ${email}` : ''}`
+  use(req: Request, res: Response, next: NextFunction): void {
+    const { method, originalUrl: url } = req
 
-//       Logger.log(`${method} ${url} ${statusCode} ${contentLength} - ${userAgent} ${ip} ${emailLog}`)
-//     })
-//     next()
-//   }
-// }
+    const ip = getIPAddress(req)
+    const id = this.jwt?.user?.id
+
+    const userAgent = req.get('user-agent') || 'NONE'
+
+    res.on('close', () => {
+      const { statusCode } = res
+      const userId = id ? id : 'ANONYMOUS'
+      this.logger.log(
+        `[${method} - ${statusCode} - ${url}] - [USER = ${userId}] - [IP = ${ip}] - [USER_AGENT = ${userAgent}]`
+      )
+    })
+    next()
+  }
+}
