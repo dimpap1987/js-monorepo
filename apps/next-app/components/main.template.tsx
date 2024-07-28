@@ -65,7 +65,7 @@ export default function MainTemplate({
         </DpLogo>
         <NavbarItems>
           {isLoggedIn && (
-            <DpNotificationBellComponent></DpNotificationBellComponent>
+            <DpNotificationBellComponent className="hidden sm:block"></DpNotificationBellComponent>
           )}
           <ModeToggle></ModeToggle>
         </NavbarItems>
