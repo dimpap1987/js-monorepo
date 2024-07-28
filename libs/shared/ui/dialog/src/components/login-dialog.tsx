@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Dialog,
   DialogFooter,
@@ -6,7 +8,7 @@ import {
   DpDialogContent,
 } from '@js-monorepo/components'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useState } from 'react'
 import './login-dialog.css'
 
 export type SocialConfig = {
@@ -22,13 +24,16 @@ export type DpLoginDialogProps = {
 
 const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
   ({ open, onClose, socialConfig }, ref) => {
+    const [hasOpen, sethasOpen] = useState(open)
+
     return (
       <Dialog
-        open={open}
+        open={hasOpen}
         modal={true}
         onOpenChange={(isOpen) => {
           if (!isOpen) {
             onClose?.()
+            sethasOpen(false)
           }
         }}
       >
@@ -47,7 +52,10 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                     type="button"
                     className="flex justify-center bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black items-center
                      mr-2 shadow-effect transition-transform duration-300 transform hover:scale-105"
-                    onClick={() => social.onLogin()}
+                    onClick={() => {
+                      social.onLogin()
+                      sethasOpen(false)
+                    }}
                   >
                     <div className="flex items-center">
                       <svg
@@ -87,7 +95,10 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                     type="button"
                     className="flex justify-center bg-[#24292F] shadow-effect w-full text-white rounded-lg px-5 py-2.5 text-center 
                     items-center mr-2 transition-transform duration-300 transform hover:scale-105"
-                    onClick={() => social.onLogin()}
+                    onClick={() => {
+                      social.onLogin()
+                      sethasOpen(false)
+                    }}
                   >
                     <div className="flex items-center">
                       <svg
@@ -116,7 +127,10 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                     type="button"
                     className="flex justify-center bg-[#3b5998] w-full shadow-effect text-white rounded-lg px-5 py-2.5 text-center 
                     items-center mr-2 transition-transform duration-300 transform hover:scale-105"
-                    onClick={() => social.onLogin()}
+                    onClick={() => {
+                      social.onLogin()
+                      sethasOpen(false)
+                    }}
                   >
                     <svg
                       className="mr-2 -ml-1 w-4 h-4 shrink-0"
