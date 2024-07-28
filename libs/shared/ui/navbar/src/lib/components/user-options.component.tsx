@@ -21,8 +21,8 @@ const UserOptionsDropdown = forwardRef(
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const [isVisible, setIsVisible] = useState(false) // State to show/hide div
-    const dropdownRef = useRef(null)
-    const iconRef = useRef<HTMLElement | null>(null)
+    const dropdownRef = useRef<HTMLDivElement | null>(null)
+    const iconRef = useRef<HTMLDivElement | null>(null)
 
     useClickAway(dropdownRef, (event) => {
       const target = event.target as Node

@@ -1,4 +1,4 @@
-import { getColorizedText, getCurrentDateFormatted } from '@js-monorepo/utils'
+import { getCurrentDateFormatted } from '@js-monorepo/utils'
 import { Inject, LoggerService as LS } from '@nestjs/common'
 import {
   utilities as nestWinstonModuleUtilities,
@@ -89,7 +89,7 @@ export class LoggerService implements LS {
   }
 
   private toPrettyJson(message: any, fields?: any) {
-    let log: Record<string, any> = {}
+    const log: Record<string, any> = {}
 
     if (typeof message === 'string') {
       log['message'] = this.stripAnsiCodes(message)
