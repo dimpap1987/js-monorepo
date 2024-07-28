@@ -1,3 +1,4 @@
+import { AuthJWT } from '@js-monorepo/auth'
 import { JwtPayload } from '@js-monorepo/types'
 import { getIPAddress } from '@js-monorepo/utils'
 import { Inject, Injectable, Logger, NestMiddleware } from '@nestjs/common'
@@ -7,7 +8,7 @@ import { NextFunction, Request, Response } from 'express'
 export class LoggerMiddleware implements NestMiddleware {
   logger = new Logger('HTTP')
 
-  constructor(@Inject('jwt') private readonly jwt: JwtPayload) {}
+  constructor(@Inject(AuthJWT) private readonly jwt: JwtPayload) {}
 
   use(req: Request, res: Response, next: NextFunction): void {
     const { method, originalUrl: url } = req

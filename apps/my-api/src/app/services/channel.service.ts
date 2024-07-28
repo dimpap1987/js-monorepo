@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { ChannelRepo } from '../types'
 import { ChannelRepository } from '../repositories/interfaces/channel.repository'
 
 @Injectable()
@@ -6,7 +7,7 @@ export class ChannelService {
   private readonly logger = new Logger(ChannelService.name)
 
   constructor(
-    @Inject('CHANNEL_REPOSITORY')
+    @Inject(ChannelRepo)
     private channelRepository: ChannelRepository
   ) {}
 

@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { NotificationRepo } from '../types'
 import { NotificationRepository } from '../repositories/interfaces/notification.repository'
 
 @Injectable()
@@ -6,7 +7,7 @@ export class NotificationService {
   private readonly logger = new Logger(NotificationService.name)
 
   constructor(
-    @Inject('NOTIFICATION_REPOSITORY')
+    @Inject(NotificationRepo)
     private notificationRepository: NotificationRepository
   ) {}
 
