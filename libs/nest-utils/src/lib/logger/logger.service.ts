@@ -82,7 +82,7 @@ export class LoggerService implements LS {
   private stripAnsiCodes(input: string): string {
     // Define the regex pattern to match ANSI color codes
     const ansiRegex =
-      /[\x1b\x9b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
+      /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
 
     // Use the replace method to remove ANSI codes
     return input.replace(ansiRegex, '')
