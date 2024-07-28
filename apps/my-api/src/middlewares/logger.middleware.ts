@@ -20,9 +20,8 @@ export class LoggerMiddleware implements NestMiddleware {
     res.on('close', () => {
       const { statusCode } = res
       const userId = id ? id : 'ANONYMOUS'
-
       this.logger.log(
-        `[METHOD = ${method}] - [USER = ${userId}] - [IP = ${ip}] - [URL = ${url}] - [STATUS_CODE = ${statusCode}] - [USER_AGENT = ${userAgent}]`
+        `[${method} - ${statusCode} - ${url}] - [USER = ${userId}] - [IP = ${ip}] - [USER_AGENT = ${userAgent}]`
       )
     })
     next()
