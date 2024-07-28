@@ -1,10 +1,11 @@
-import { Logger, Module } from '@nestjs/common'
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ChannelService } from './services/channel.service'
 
 import { AuthModule } from '@js-monorepo/auth'
 import { PrismaModule } from '@js-monorepo/db'
 import { ConfigModule } from '@nestjs/config'
 import { AuthUser } from '@prisma/client'
+import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AdminController } from './controllers/admin.controller'
@@ -71,6 +72,10 @@ const ENV = process.env.NODE_ENV
     AdminController,
     ExceptionController,
   ],
-  providers: [AppService, EventsService],
+  providers: [AppService, EventsService, LoggerMiddleware],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*')
+  }
+}
