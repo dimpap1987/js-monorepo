@@ -1,4 +1,4 @@
-import { getCurrentDateFormatted } from '@js-monorepo/utils'
+import { getColorizedText, getCurrentDateFormatted } from '@js-monorepo/utils'
 import { Inject, LoggerService as LS } from '@nestjs/common'
 import {
   utilities as nestWinstonModuleUtilities,
@@ -23,6 +23,7 @@ export class LoggerService implements LS {
       format: combine(timestamp(), json()),
       transports: [
         new winston.transports.Console({
+          handleExceptions: true,
           format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.ms(),
@@ -40,7 +41,7 @@ export class LoggerService implements LS {
           format: combine(
             timestamp({ format: greeceTimezone }),
             prettyPrint({
-              depth: 1,
+              depth: 10,
             })
           ),
         }),
@@ -50,7 +51,7 @@ export class LoggerService implements LS {
           format: combine(
             timestamp({ format: greeceTimezone }),
             prettyPrint({
-              depth: 1,
+              depth: 10,
             })
           ),
         }),
@@ -63,40 +64,52 @@ export class LoggerService implements LS {
   }
 
   error(message: any, stack: any, context: string) {
-    this.logger.error(message, stack, context)
+    this.logger.error('❌ ' + message, this.toPrettyJson(stack), context)
   }
 
   warn(message: any, context?: any) {
-    this.logger.warn(message, context)
+    this.logger.log('[WARNING]⚠️  ' + message, context)
   }
 
   debug(message: any, context?: any) {
-    this.logger.debug?.(message, context)
+    this.logger.debug?.('🐞 ' + message, context)
   }
 
   verbose(message: any, context?: any) {
-    this.logger.verbose?.(message, context)
+    throw new Error('NOT EXISTING')
   }
 
-  // private toPrettyJson(message: any, fields?: any) {
-  //   let log: Record<string, any> = {}
+  private stripAnsiCodes(input: string): string {
+    // Define the regex pattern to match ANSI color codes
+    const ansiRegex =
+      /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
 
-  //   if (typeof message === 'string') {
-  //     log['message'] = message
-  //   } else if (typeof message === 'object') {
-  //     for (const [key, value] of Object.entries(message)) {
-  //       log[key] = value
-  //     }
-  //   }
-  //   if (fields) {
-  //     if (typeof fields === 'object') {
-  //       for (const [key, value] of Object.entries(fields)) {
-  //         log[key] = value
-  //       }
-  //     } else if (typeof fields === 'string') {
-  //       log['context'] = fields
-  //     }
-  //   }
-  //   return log
-  // }
+    // Use the replace method to remove ANSI codes
+    return input.replace(ansiRegex, '')
+  }
+
+  private toPrettyJson(message: any, fields?: any) {
+    let log: Record<string, any> = {}
+
+    if (typeof message === 'string') {
+      log['message'] = this.stripAnsiCodes(message)
+    } else if (typeof message === 'object') {
+      for (const [key, value] of Object.entries(message)) {
+        log[key] =
+          typeof value === 'string' ? this.stripAnsiCodes(value) : value
+      }
+    }
+    if (fields) {
+      if (typeof fields === 'object') {
+        for (const [key, value] of Object.entries(fields)) {
+          log[key] =
+            typeof value === 'string' ? this.stripAnsiCodes(value) : value
+        }
+      } else if (typeof fields === 'string') {
+        log['context'] =
+          typeof fields === 'string' ? this.stripAnsiCodes(fields) : fields
+      }
+    }
+    return log
+  }
 }

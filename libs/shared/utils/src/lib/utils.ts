@@ -198,3 +198,13 @@ export function isPromise(pro: any) {
     pro != null && (pro instanceof Promise || typeof pro.then === 'function')
   )
 }
+
+export function getColorizedText(
+  text: number | string,
+  ansiC0de = '\x1b[33m'
+): string {
+  // ANSI escape codes for colorization
+  const reset = '\x1b[0m'
+
+  return `${ansiC0de}${text}${reset}`
+}
