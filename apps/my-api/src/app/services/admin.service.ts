@@ -1,6 +1,7 @@
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
+import { AdminRepo } from '../types'
 import { AdminRepository } from '../repositories/interfaces/admin.repository'
 
 @Injectable()
@@ -8,7 +9,7 @@ export class AdminService {
   private readonly logger = new Logger(AdminService.name)
 
   constructor(
-    @Inject('ADMIN_REPOSITORY')
+    @Inject(AdminRepo)
     private adminRepository: AdminRepository
   ) {}
 

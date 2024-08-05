@@ -28,6 +28,8 @@ export const csrfProtection = csurf({
   cookie: authCookiesOptions,
 })
 
+export const AuthJWT = Symbol()
+
 @Module({
   imports: [
     AuthProviderModule,
@@ -40,7 +42,7 @@ export const csrfProtection = csurf({
     JwtAuthGuard,
     RolesGuard,
     {
-      provide: 'jwt',
+      provide: AuthJWT,
       useFactory: async (
         tokenService: TokensService,
         req: any
@@ -54,7 +56,7 @@ export const csrfProtection = csurf({
       useClass: AuthExceptionFilter,
     },
   ],
-  exports: ['jwt', JwtAuthGuard, RolesGuard, TokensService],
+  exports: [AuthJWT, JwtAuthGuard, RolesGuard, TokensService],
 })
 export class AuthModule implements NestModule {
   constructor(

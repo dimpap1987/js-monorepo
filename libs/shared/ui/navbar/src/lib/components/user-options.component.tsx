@@ -39,7 +39,7 @@ const UserOptionsDropdown = forwardRef(
 
     return (
       <div
-        className="relative"
+        className={cn('flex items-center', className)}
         ref={ref}
         aria-label="dropdown options"
         tabIndex={0}
@@ -62,10 +62,7 @@ const UserOptionsDropdown = forwardRef(
                 transition: { duration: 0.4 },
               }}
               ref={dropdownRef}
-              className={cn(
-                `absolute mt-3 p-1 border border-gray-500 rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`,
-                className
-              )}
+              className="w-80 fixed right-0 mt-3 p-1 border border-gray-500 rounded-xl text-foreground z-30 shadow-2xl bg-background-primary text-foreground"
             >
               {children}
             </motion.div>
