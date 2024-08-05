@@ -20,7 +20,9 @@ export class ApiExceptionFilter implements ExceptionFilter {
     Logger.error(
       `Exception of type: 'ApiException' - message: '${
         exception.message
-      }' - statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`
+      }' - statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`,
+      exception.stack,
+      ApiException.name
     )
 
     const ctx = host.switchToHttp()
@@ -51,16 +53,22 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message = exception.message
       Logger.error(
         `Generic Exception - 'HttpException' - message: '${exception.message}'`,
-        exception
+        exception.stack,
+        GlobalExceptionFilter.name
       )
     } else if (exception instanceof Error) {
       message = exception.message
       Logger.error(
         `Generic Exception - 'Error' - message: '${exception.message}'`,
-        exception
+        exception.stack,
+        GlobalExceptionFilter.name
       )
     } else {
-      Logger.error(`Generic Exception - unkown error happened`, exception)
+      Logger.error(
+        `Generic Exception - unkown error happened`,
+        exception,
+        GlobalExceptionFilter.name
+      )
     }
 
     return response.status(status).json({
@@ -68,7 +76,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       path: request.url,
       errors: [
         {
-          message: message?.trim().length ? message : INTERNAL_ERROR,
+          message: message?.trim()?.length ? message : INTERNAL_ERROR,
         },
       ],
     })
@@ -82,7 +90,9 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     host: ArgumentsHost
   ) {
     Logger.error(
-      `Exception of type: 'PrismaClientKnownRequestError' - message: '${exception.message}' - code: '${exception.code}'`
+      `Exception of type: 'PrismaClientKnownRequestError' - message: '${exception.message}' - code: '${exception.code}'`,
+      exception.stack,
+      PrismaClientExceptionFilter.name
     )
 
     const ctx = host.switchToHttp()
@@ -104,7 +114,9 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
     Logger.error(
       `Exception of type: 'BadRequestException' - message: '${
         errorMessage ? errorMessage : exception.message
-      }'`
+      }'`,
+      exception.stack,
+      BadRequestExceptionFilter.name
     )
 
     const ctx = host.switchToHttp()
@@ -127,7 +139,9 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
 export class ZodExceptionFilter<T extends ZodError> implements ExceptionFilter {
   catch(exception: T, host: ArgumentsHost) {
     Logger.error(
-      `Exception of type: 'ZodError' - message: '${exception.message}'`
+      `Exception of type: 'ZodError' - message: '${exception.message}'`,
+      exception.name,
+      ZodExceptionFilter.name
     )
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()

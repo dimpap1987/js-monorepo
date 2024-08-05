@@ -1,4 +1,4 @@
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 import { forwardRef } from 'react'
 import { BiLogOutCircle } from 'react-icons/bi'
 import { DpButton } from './button'

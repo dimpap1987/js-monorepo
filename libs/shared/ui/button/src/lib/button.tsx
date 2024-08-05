@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { buttonVariants, type VariantProps } from './button-variants'
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,

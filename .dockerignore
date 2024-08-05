@@ -1,7 +1,7 @@
 # Node modules
 node_modules/
 
-# Include node_modules/prisma
+# Exclude node_modules/prisma
 !node_modules/.prisma
 
 # Nx cache
@@ -38,3 +38,4 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+logs/

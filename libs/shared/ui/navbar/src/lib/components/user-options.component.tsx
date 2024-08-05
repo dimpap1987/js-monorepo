@@ -1,4 +1,4 @@
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 import { AnimatePresence, motion } from 'framer-motion' // Assuming you're using framer-motion
 import React, {
   ForwardedRef,
@@ -21,12 +21,12 @@ const UserOptionsDropdown = forwardRef(
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const [isVisible, setIsVisible] = useState(false) // State to show/hide div
-    const dropdownRef = useRef(null)
-    const iconRef = useRef(null)
+    const dropdownRef = useRef<HTMLDivElement | null>(null)
+    const iconRef = useRef<HTMLDivElement | null>(null)
 
     useClickAway(dropdownRef, (event) => {
       const target = event.target as Node
-      const icon = iconRef.current! as Node
+      const icon = iconRef?.current
       if (icon?.contains(target)) return
       setIsVisible(false)
     })
@@ -39,7 +39,7 @@ const UserOptionsDropdown = forwardRef(
 
     return (
       <div
-        className="relative"
+        className={cn('flex items-center', className)}
         ref={ref}
         aria-label="dropdown options"
         tabIndex={0}
@@ -62,10 +62,7 @@ const UserOptionsDropdown = forwardRef(
                 transition: { duration: 0.4 },
               }}
               ref={dropdownRef}
-              className={cn(
-                `absolute mt-3 p-1 border border-gray-500 rounded-xl text-foreground z-30 hidden md:block shadow-2xl bg-background-primary text-foreground`,
-                className
-              )}
+              className="w-80 fixed right-0 mt-3 p-1 border border-gray-500 rounded-xl text-foreground z-30 shadow-2xl bg-background-primary text-foreground"
             >
               {children}
             </motion.div>

@@ -12,7 +12,7 @@ const glob = require('glob')
 })()
 
 function transformDocsToJson(...paths) {
-  const pathString = paths.length > 1 ? `{${paths.join(',')}}` : paths[0]
+  const pathString = paths?.length > 1 ? `{${paths.join(',')}}` : paths[0]
   try {
     const readmeFilesToRead = glob.sync(pathString)
     return readmeFilesToRead
@@ -20,7 +20,7 @@ function transformDocsToJson(...paths) {
         try {
           const data = fs.readFileSync(readmeFile, 'utf-8')
           const parts = readmeFile.split('\\')
-          const secondToLastPart = parts[parts.length - 2]
+          const secondToLastPart = parts[parts?.length - 2]
           return {
             path: readmeFile.substring(0, readmeFile.lastIndexOf('\\')),
             data: data,

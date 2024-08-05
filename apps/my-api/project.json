@@ -14,6 +14,7 @@
         "compiler": "tsc",
         "outputPath": "dist/apps/my-api",
         "main": "apps/my-api/src/main.ts",
+        "generatePackageJson": true,
         "tsConfig": "apps/my-api/tsconfig.app.json",
         "assets": [],
         "isolatedConfig": true,

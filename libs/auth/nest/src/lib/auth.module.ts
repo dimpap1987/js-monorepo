@@ -1,4 +1,3 @@
-import { PrismaService } from '@js-monorepo/db'
 import {
   DynamicModule,
   Inject,
@@ -8,49 +7,42 @@ import {
   RequestMethod,
 } from '@nestjs/common'
 import { APP_FILTER, REQUEST } from '@nestjs/core'
-import session from 'express-session'
 import { AuthController } from './controllers/auth.controller'
 import { AuthExceptionFilter } from './exceptions/filter'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { RolesGuard } from './guards/roles-guard'
 import { CsrfGeneratorMiddleware } from './middlewares/csrf-generator.middleware'
 import { TokenRotationMiddleware } from './middlewares/token-rotation.middleware'
-import { AuthService } from './services/auth.service'
-import { RefreshTokenService } from './services/refreshToken.service'
+import { AuthProviderModule } from './modules/auth.provider.modules'
+import { RefreshTokenProviderModule } from './modules/refreshToken.provider.module'
+import { UnRegisteredUserProviderModule } from './modules/unregisteredUser.provider.module'
+import { RefreshTokenService } from './services/interfaces/refreshToken.service'
 import { TokensService } from './services/tokens.service'
-import { UserService } from './services/user.service'
 import { GithubOauthStrategy } from './strategies/github.strategy'
 import { GoogleStrategy } from './strategies/google.strategy'
 import { AuthConfiguration } from './types/auth.configuration'
+import { authCookiesOptions } from './utils'
 import csurf = require('csurf')
 
 export const csrfProtection = csurf({
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    domain:
-      process.env.NODE_ENV === 'production'
-        ? process.env.AUTH_COOKIE_DOMAIN_PROD
-        : 'localhost',
-    sameSite: 'strict',
-  },
+  cookie: authCookiesOptions,
 })
 
+export const AuthJWT = Symbol()
+
 @Module({
+  imports: [
+    AuthProviderModule,
+    RefreshTokenProviderModule,
+    UnRegisteredUserProviderModule,
+  ],
   controllers: [AuthController],
   providers: [
-    GoogleStrategy,
-    GithubOauthStrategy,
-    AuthService,
-    UserService,
+    TokensService,
     JwtAuthGuard,
     RolesGuard,
-    RefreshTokenService,
-    TokenRotationMiddleware,
-    TokensService,
     {
-      provide: 'jwt',
+      provide: AuthJWT,
       useFactory: async (
         tokenService: TokensService,
         req: any
@@ -64,14 +56,7 @@ export const csrfProtection = csurf({
       useClass: AuthExceptionFilter,
     },
   ],
-  exports: [
-    'jwt',
-    JwtAuthGuard,
-    RolesGuard,
-    AuthService,
-    TokenRotationMiddleware,
-    TokensService,
-  ],
+  exports: [AuthJWT, JwtAuthGuard, RolesGuard, TokensService],
 })
 export class AuthModule implements NestModule {
   constructor(
@@ -93,58 +78,76 @@ export class AuthModule implements NestModule {
           useFactory: options.useFactory,
           inject: options.inject || [],
         },
-        // TODO inject it from client
-        {
-          provide: 'DB_CLIENT',
-          useExisting: PrismaService,
-        },
         {
           provide: 'AUTH_OPTIONS',
           useFactory: async (config: AuthConfiguration) => ({
-            sessionSecret: config.sessionSecret,
             accessTokenSecret: config.accessTokenSecret,
             refreshTokenSecret: config.refreshTokenSecret,
+            tokenRotation: config.tokenRoation,
+            crf: config.csrf,
             google: config.google,
             github: config.github,
             redirectUiUrl: config.redirectUiUrl,
             onRegister: config.onRegister,
             onLogin: config.onLogin,
-            csrfEnabled: config.csrfEnabled ?? false,
           }),
           inject: ['AUTH_CONFIG'],
+        },
+        {
+          provide: GoogleStrategy,
+          useFactory: (config: AuthConfiguration) => {
+            if (config.google) return new GoogleStrategy(config)
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
+        },
+        {
+          provide: GithubOauthStrategy,
+          useFactory: (config: AuthConfiguration) => {
+            if (config.github) new GithubOauthStrategy(config)
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
+        },
+        {
+          provide: TokenRotationMiddleware,
+          useFactory: (
+            config: AuthConfiguration,
+            refreshTokenService: RefreshTokenService
+          ) => {
+            if (config.tokenRoation?.enabled) {
+              return new TokenRotationMiddleware(refreshTokenService)
+            }
+            return null
+          },
+          inject: ['AUTH_OPTIONS'],
         },
       ],
     }
   }
 
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(
-        session({
-          secret: this.config.sessionSecret,
-          resave: false,
-          saveUninitialized: false,
-        })
-      )
-      .forRoutes('*')
+    if (this.config.tokenRoation?.enabled) {
+      consumer
+        .apply(TokenRotationMiddleware)
+        .exclude(
+          'auth/google/login',
+          'auth/github/login',
+          'auth/facebook/login',
+          'auth/google/redirect',
+          'auth/github/redirect',
+          'auth/logout',
+          'auth/register',
+          'auth/unregistered-user',
+          ...(this.config.tokenRoation?.middlewareExclusions || [])
+        )
+        .forRoutes('*')
+    }
 
-      .apply(TokenRotationMiddleware)
-      .exclude(
-        '/',
-        'auth/google/login',
-        'auth/github/login',
-        'auth/facebook/login',
-        'auth/google/redirect',
-        'auth/github/redirect',
-        'auth/logout',
-        'auth/register',
-        'auth/unregistered-user'
-      )
-      .forRoutes('*')
-
-    if (this.config.csrfEnabled) {
+    if (this.config.csrf?.enabled) {
       consumer
         .apply(CsrfGeneratorMiddleware)
+        .exclude(...(this.config.csrf?.middlewareExclusions || []))
         .forRoutes(
           { path: '*google/login*', method: RequestMethod.GET },
           { path: '*github/login*', method: RequestMethod.GET },

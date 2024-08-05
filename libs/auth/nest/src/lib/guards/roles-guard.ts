@@ -1,8 +1,8 @@
 import { JwtPayload } from '@js-monorepo/types'
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { TokensService } from '../services/tokens.service'
 import { RolesEnum } from '../types/auth.configuration'
+import { TokensService } from '../services/tokens.service'
 
 @Injectable()
 export class RolesGuard implements CanActivate {

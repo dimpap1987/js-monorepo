@@ -1,4 +1,5 @@
-import { AuthUser } from '@prisma/client'
+import { AuthUserDto } from '@js-monorepo/types'
+import { RouteInfo } from '@nestjs/common/interfaces'
 import { Request, Response } from 'express'
 
 export interface GoogleAuth {
@@ -13,15 +14,21 @@ export interface GithubAuth {
 }
 
 export interface AuthConfiguration {
-  sessionSecret: string
-  csrfEnabled?: boolean
+  csrf?: {
+    enabled: boolean
+    middlewareExclusions?: (string | RouteInfo)[]
+  }
+  tokenRoation?: {
+    enabled: boolean
+    middlewareExclusions?: (string | RouteInfo)[]
+  }
   accessTokenSecret: string
   refreshTokenSecret: string
   redirectUiUrl?: string
   github?: GithubAuth
   google?: GoogleAuth
-  onRegister?: (user: AuthUser) => Promise<any>
-  onLogin?: (user: AuthUser) => Promise<any>
+  onRegister?: (user: AuthUserDto) => Promise<any>
+  onLogin?: (user: AuthUserDto) => Promise<any>
 }
 
 declare module 'express' {

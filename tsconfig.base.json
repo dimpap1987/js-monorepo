@@ -24,18 +24,21 @@
       "@js-monorepo/auth-server": ["libs/auth/server/src/index.ts"],
       "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
+      "@js-monorepo/next-client": ["libs/next/client/src/index.ts"],
       "@js-monorepo/components": ["libs/shared/ui/components/src/index.ts"],
       "@js-monorepo/dashboard-users": [
         "libs/shared/ui/dashboard-users/src/index.ts"
       ],
       "@js-monorepo/db": ["libs/prisma/db/src/index.ts"],
       "@js-monorepo/dialog": ["libs/shared/ui/dialog/src/index.ts"],
+      "@js-monorepo/error": ["libs/shared/ui/error/src/index.ts"],
       "@js-monorepo/loader": ["libs/shared/ui/loader/src/index.ts"],
       "@js-monorepo/logger": ["libs/shared/logger/src/index.ts"],
       "@js-monorepo/map": ["libs/shared/ui/map/src/index.ts"],
       "@js-monorepo/markdown": ["libs/shared/ui/markdown/src/index.ts"],
       "@js-monorepo/nav-link": ["libs/shared/ui/nav-link/src/index.ts"],
       "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
+      "@js-monorepo/nest-utils": ["libs/nest-utils/src/index.ts"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
       "@js-monorepo/notification-bell": [
         "libs/shared/ui/notification-bell/src/index.ts"
@@ -44,6 +47,7 @@
       "@js-monorepo/page-progress-bar": [
         "libs/shared/ui/page-progress-bar/src/index.ts"
       ],
+      "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
       "@js-monorepo/schemas": ["libs/shared/schemas/src/index.ts"],
       "@js-monorepo/sidebar": ["libs/shared/ui/sidebar/src/index.ts"],
       "@js-monorepo/store": ["libs/shared/store/src/index.ts"],

@@ -1,4 +1,4 @@
-import { JwtAuthGuard } from '@js-monorepo/auth'
+import { AuthJWT, JwtAuthGuard } from '@js-monorepo/auth'
 import { JwtPayload } from '@js-monorepo/types'
 import { Controller, Inject, Post, Req, Sse, UseGuards } from '@nestjs/common'
 import { ChannelService } from '../services/channel.service'
@@ -9,7 +9,7 @@ export class NotificationController {
   constructor(
     private eventsService: EventsService,
     private channelService: ChannelService,
-    @Inject('jwt') private readonly jwt: JwtPayload
+    @Inject(AuthJWT) private readonly jwt: JwtPayload
   ) {}
 
   @Sse('subscribe')
@@ -20,7 +20,7 @@ export class NotificationController {
       this.jwt.user.id
     )
     const channelNames = channels?.map((channel) => channel.name)
-    //subscribe to these channels
+
     return this.eventsService.subscribe([
       this.jwt.user.username,
       ...channelNames,

@@ -1,4 +1,4 @@
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 import * as React from 'react'
 
 const Table = React.forwardRef<

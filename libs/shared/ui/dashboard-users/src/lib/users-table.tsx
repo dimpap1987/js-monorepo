@@ -12,19 +12,20 @@ import {
   TextareaForm,
   usePagination,
 } from '@js-monorepo/components'
-import { AuthUserFullPayload } from '@js-monorepo/types'
-import { HttpClientProxy, constructURIQueryString } from '@js-monorepo/utils'
+import { AuthUserFullDto } from '@js-monorepo/types'
+import { constructURIQueryString } from '@js-monorepo/ui/util'
+import { HttpClientProxy } from '@js-monorepo/utils'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { GrAnnounce } from 'react-icons/gr'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
 interface UsersReponse {
-  users: AuthUserFullPayload[] | []
+  users: AuthUserFullDto[] | []
   totalCount: number
 }
 
@@ -36,7 +37,7 @@ declare module '@tanstack/table-core' {
 
 const findUsers = async (searchParams?: string) => {
   const response = await HttpClientProxy.builder<UsersReponse>(
-    `http://localhost:3333/api/admin/users${searchParams}`
+    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users${searchParams}`
   )
     .get()
     .withCredentials()
@@ -50,13 +51,13 @@ const findUsers = async (searchParams?: string) => {
   }
 }
 
-const DashboardUsersTableComponent = () => {
+const DashboardUsersTableSuspense = () => {
   const [data, setData] = useState<UsersReponse>({ users: [], totalCount: 0 })
 
   const [update, setUpdate] = useState<{
     index?: number
     inProgress: boolean
-    user?: AuthUserFullPayload
+    user?: AuthUserFullDto
   }>()
 
   const searchParams = useSearchParams()
@@ -87,9 +88,9 @@ const DashboardUsersTableComponent = () => {
     replace('?' + params)
   }, [pagination, limit, onPaginationChange, skip])
 
-  const pageCount = Math.round(data.totalCount / limit)
+  const pageCount = Math.round(data?.totalCount / limit)
 
-  const memoizedColumns: ColumnDef<AuthUserFullPayload>[] = useMemo(
+  const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
     () => [
       {
         accessorKey: 'profileImage',
@@ -301,7 +302,7 @@ const DashboardUsersTableComponent = () => {
     <>
       <DataTable
         columns={memoizedColumns}
-        data={data.users}
+        data={data?.users}
         onPaginationChange={onPaginationChange}
         totalCount={pageCount}
         pagination={pagination}
@@ -310,4 +311,11 @@ const DashboardUsersTableComponent = () => {
   )
 }
 
-export { DashboardUsersTableComponent }
+function DashboardUsersTable() {
+  return (
+    <Suspense>
+      <DashboardUsersTableSuspense></DashboardUsersTableSuspense>
+    </Suspense>
+  )
+}
+export { DashboardUsersTable }

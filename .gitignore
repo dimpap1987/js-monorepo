@@ -46,3 +46,6 @@ Thumbs.db
 
 apps/docs/public/README.json
 .nx/
+*.log
+*audit.json
+logs/

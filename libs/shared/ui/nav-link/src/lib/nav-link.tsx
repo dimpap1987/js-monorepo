@@ -1,5 +1,5 @@
 'use client'
-import { cn } from '@js-monorepo/utils'
+import { cn } from '@js-monorepo/ui/util'
 import { useRouter } from 'next-nprogress-bar'
 import { usePathname } from 'next/navigation'
 import React, { ForwardedRef, forwardRef } from 'react'

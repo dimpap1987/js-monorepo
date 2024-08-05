@@ -5,7 +5,7 @@ import { useLoader } from '@js-monorepo/loader'
 import { useSession } from '@js-monorepo/auth-client'
 import { DonationDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { checkoutSessionClient } from '@js-monorepo/utils'
+import { checkoutSessionClient } from '@js-monorepo/payment'
 import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
 interface MainProps {
