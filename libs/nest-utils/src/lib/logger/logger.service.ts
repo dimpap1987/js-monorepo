@@ -19,7 +19,7 @@ export class LoggerService implements LS {
 
   constructor(@Inject('LOG_LEVEL') private logLevel = 'info') {
     this.logger = WinstonModule.createLogger({
-      levels: winston.config.syslog.levels,
+      levels: winston.config.npm.levels,
       level: logLevel,
       format: combine(timestamp({ format: serverTimezone }), json()),
       transports: [
@@ -78,7 +78,7 @@ export class LoggerService implements LS {
   }
 
   warn(message: any, context?: any) {
-    this.logger.log('[WARNING]⚠️  ' + message, context)
+    this.logger.warn('⚠️  ' + message, context)
   }
 
   debug(message: any, context?: any) {

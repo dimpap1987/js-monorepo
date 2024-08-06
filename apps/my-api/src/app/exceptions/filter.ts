@@ -18,7 +18,7 @@ const INTERNAL_ERROR = 'Internal server error'
 export class ApiExceptionFilter implements ExceptionFilter {
   catch(exception: ApiException, host: ArgumentsHost) {
     Logger.error(
-      `Exception of type: 'ApiException' - message: '${
+      `'${
         exception.message
       }' - statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`,
       exception.stack,
@@ -52,20 +52,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       status = exception.getStatus()
       message = exception.message
       Logger.error(
-        `Generic Exception - 'HttpException' - message: '${exception.message}'`,
+        `'HttpException' - path: '${request.url}' - message: '${exception.message}'`,
         exception.stack,
         GlobalExceptionFilter.name
       )
     } else if (exception instanceof Error) {
       message = exception.message
       Logger.error(
-        `Generic Exception - 'Error' - message: '${exception.message}'`,
+        `'Error' - path: '${request.url}' - message: '${exception.message}'`,
         exception.stack,
         GlobalExceptionFilter.name
       )
     } else {
       Logger.error(
-        `Generic Exception - unkown error happened`,
+        `Unkown error happened - path: '${request.url}'`,
         exception,
         GlobalExceptionFilter.name
       )
@@ -76,7 +76,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       path: request.url,
       errors: [
         {
-          message: message?.trim()?.length ? message : INTERNAL_ERROR,
+          INTERNAL_ERROR,
         },
       ],
     })
