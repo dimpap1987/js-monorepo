@@ -3,6 +3,7 @@ import { Inject, Injectable, Logger, NestMiddleware } from '@nestjs/common'
 import { NextFunction, Request, Response } from 'express'
 import { RefreshTokenService } from '../services/interfaces/refreshToken.service'
 import { authCookiesOptions } from '../utils'
+import { AuthException } from '../exceptions/api-exception'
 
 @Injectable()
 export class TokenRotationMiddleware implements NestMiddleware {
@@ -30,7 +31,9 @@ export class TokenRotationMiddleware implements NestMiddleware {
         this.setAccessTokenCookie(res, newAccessToken)
       }
     } catch (error: any) {
-      this.logger.error(`Error in path: ${req.baseUrl}`, error.stack)
+      if (!(error instanceof AuthException)) {
+        this.logger.error(`Error in path: ${req.baseUrl}`, error.stack)
+      }
     }
     next()
   }

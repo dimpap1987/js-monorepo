@@ -9,11 +9,10 @@ export class AuthExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()
     const request = ctx.getRequest()
-    this.logger.error(
-      `Exception of type: 'AuthExceptionFilter' - message: '${
+    this.logger.warn(
+      `'${
         exception.message
-      }' - url: '${request.url}' statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`,
-      exception.stack
+      }' - url: '${request.url}' statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`
     )
 
     response.clearCookie('accessToken')
