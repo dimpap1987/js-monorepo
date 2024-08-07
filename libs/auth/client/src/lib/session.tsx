@@ -23,7 +23,7 @@ const SessionContext = createContext<{
 
 const fetchSession = async (
   successCallback: (user: any) => void,
-  errorCallback: (error?: any) => void
+  errorCallback?: (error?: any) => void
 ) => {
   try {
     const response = await HttpClientProxy.builder<{
@@ -36,11 +36,11 @@ const fetchSession = async (
     if (response.ok) {
       successCallback(response.data?.user)
     } else {
-      errorCallback()
+      errorCallback?.()
     }
   } catch (error) {
     console.error('Error fetching session:', error)
-    errorCallback(error)
+    errorCallback?.(error)
   }
 }
 
@@ -80,6 +80,14 @@ export const SessionProvider = ({
       clearInterval(intervalId)
     }
   }, [isLoggedIn, refreshSession])
+
+  useEffect(() => {
+    if (isLoggedIn) return
+    fetchSession((userResponse) => {
+      setIsLoggedIn(!!userResponse)
+      setUser(userResponse)
+    })
+  }, [])
 
   const contextValue = useMemo(() => {
     return {

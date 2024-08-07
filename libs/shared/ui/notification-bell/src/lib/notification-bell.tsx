@@ -76,11 +76,6 @@ export function DpNotificationBellComponent({
       })
     }
 
-    es.onerror = (error) => {
-      console.error('EventSource failed:', error)
-      es.close()
-    }
-
     return () => {
       es?.close()
     }
