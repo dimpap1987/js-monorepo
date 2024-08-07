@@ -1,7 +1,7 @@
 'use server'
 
-import { decodeAuthToken } from '@js-monorepo/auth-server'
+import { validateAuthToken } from '@js-monorepo/auth-server'
 
 export async function getCurrentUser() {
-  return decodeAuthToken()
+  return validateAuthToken(process.env.ACCESS_TOKEN_SECRET ?? '')
 }

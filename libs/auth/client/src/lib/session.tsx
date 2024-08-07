@@ -73,7 +73,6 @@ export const SessionProvider = ({
 
   useEffect(() => {
     if (!isLoggedIn) return
-    refreshSession()
 
     const intervalId = setInterval(refreshSession, 60000 * 4) // 4 minutes
 
