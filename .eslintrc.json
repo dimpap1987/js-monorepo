@@ -52,7 +52,9 @@
         "no-control-regex": 0
       },
       "parserOptions": {
-        "project": ["tsconfig.*?.json"]
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": "./tsconfig.base.json"
       }
     },
     {
