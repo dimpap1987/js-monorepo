@@ -23,7 +23,7 @@
       "@js-monorepo/auth/next/*": ["libs/auth/next/src/lib/*"],
       "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
-      "@js-monorepo/next-client": ["libs/next/client/src/index.ts"],
+      "@js-monorepo/next/*": ["libs/next/src/lib/*"],
       "@js-monorepo/components/*": ["libs/shared/ui/components/src/lib/*"],
       "@js-monorepo/dashboard-users": [
         "libs/shared/ui/dashboard-users/src/index.ts"
