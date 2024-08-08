@@ -72,22 +72,23 @@ export const SessionProvider = ({
   }, [])
 
   useEffect(() => {
-    if (!isLoggedIn) return
-
-    const intervalId = setInterval(refreshSession, 60000 * 4) // 4 minutes
-
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [isLoggedIn, refreshSession])
-
-  useEffect(() => {
-    if (isLoggedIn) return
     fetchSession((userResponse) => {
       setIsLoggedIn(!!userResponse)
       setUser(userResponse)
     })
   }, [])
+
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const intervalId = setInterval(() => {
+      refreshSession() // Refresh session if logged in
+    }, 60000 * 4) // 4 minutes
+
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [refreshSession, isLoggedIn])
 
   const contextValue = useMemo(() => {
     return {
