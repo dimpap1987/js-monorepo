@@ -1,5 +1,5 @@
 'use client'
-import { authClient } from '@js-monorepo/auth-client'
+import { authClient } from '@js-monorepo/auth/next/client'
 import { DpLoginDialogComponent } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
 import { UserNavSocial } from '@js-monorepo/navbar'

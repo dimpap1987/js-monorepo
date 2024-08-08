@@ -1,4 +1,4 @@
-import { isPromise } from '@js-monorepo/utils'
+import { isPromise } from '@js-monorepo/utils/common'
 import { Logger } from '@nestjs/common'
 
 const logger = new Logger('Catch')

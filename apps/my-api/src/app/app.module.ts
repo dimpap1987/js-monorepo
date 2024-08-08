@@ -1,7 +1,7 @@
 import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { ChannelService } from './services/channel.service'
 
-import { AuthModule } from '@js-monorepo/auth'
+import { AuthModule } from '@js-monorepo/auth/nest'
 import { PrismaModule } from '@js-monorepo/db'
 import { ConfigModule } from '@nestjs/config'
 import { AuthUser } from '@prisma/client'

@@ -1,6 +1,6 @@
-import { AuthJWT } from '@js-monorepo/auth'
+import { getIPAddress } from '@js-monorepo/utils/http'
+import { AuthJWT } from '@js-monorepo/auth/nest'
 import { JwtPayload } from '@js-monorepo/types'
-import { getIPAddress } from '@js-monorepo/utils'
 import { Inject, Injectable, Logger, NestMiddleware } from '@nestjs/common'
 import { NextFunction, Request, Response } from 'express'
 

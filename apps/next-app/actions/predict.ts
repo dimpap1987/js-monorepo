@@ -1,6 +1,5 @@
 'use server'
 
-import { logger } from '@js-monorepo/logger'
 import Replicate from 'replicate'
 
 const replicate = new Replicate({
@@ -43,7 +42,7 @@ export async function predict(prompt: string): Promise<ReplicateResponse> {
       data: output as string[],
     }
   } catch (e: any) {
-    logger.error(e, 'Error while generating AI image', e.stack)
+    console.error(e, 'Error while generating AI image', e.stack)
     return {
       success: false,
       message: 'Something went wrong, while generating AI image...',

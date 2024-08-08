@@ -3,7 +3,7 @@ import {
   RegisterUserSchemaType,
 } from '@js-monorepo/schemas'
 import { JwtPayload, ProviderName } from '@js-monorepo/types'
-import { getBrowserInfo, getIPAddress } from '@js-monorepo/utils'
+import { getBrowserInfo, getIPAddress } from '@js-monorepo/utils/http'
 import {
   Body,
   Controller,

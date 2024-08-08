@@ -1,5 +1,5 @@
 import { JwtPayload } from '@js-monorepo/types'
-import { decode, sign, verify } from '@js-monorepo/utils'
+import { decode, sign, verify } from '@js-monorepo/utils/jwt'
 import { HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { AuthException } from '../exceptions/api-exception'
 import { AuthConfiguration } from '../types/auth.configuration'
