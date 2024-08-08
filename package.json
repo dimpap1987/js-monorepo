@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "nx affected:lint --all",
+    "lint:all": "npx nx run-many --all --target=lint",
     "format": "npx prettier --write .",
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
