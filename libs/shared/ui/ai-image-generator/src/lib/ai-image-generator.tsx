@@ -1,6 +1,6 @@
 'use client'
 import { DpButton } from '@js-monorepo/button'
-import { FormErrorMessage, Input } from '@js-monorepo/components'
+import { FormErrorMessage, Input } from '@js-monorepo/components/form'
 import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'

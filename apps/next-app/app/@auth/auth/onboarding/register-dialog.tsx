@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth-client'
+import { useSession } from '@js-monorepo/auth/next/client'
 import { RegisterDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'

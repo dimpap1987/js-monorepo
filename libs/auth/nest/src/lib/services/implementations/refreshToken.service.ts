@@ -137,7 +137,7 @@ export class RefreshTokenServiceImpl implements RefreshTokenService {
           throw e2
         } else {
           this.logger.error(
-            `Error when handling refresh token rotation for refreshToken: '${refreshToken}'`,
+            `Unexpected Error when handling refresh token rotation for refreshToken: '${refreshToken}'`,
             e2.stack
           )
         }

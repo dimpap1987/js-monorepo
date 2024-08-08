@@ -40,7 +40,7 @@ jobs:
       - run: npm install
 
       - name: Lint check
-        run: npx nx affected:lint --base=origin/integration --head=${{ github.sha }}
+        run: npm run lint:all
 
       - name: Run Tests
         run: npx nx affected:test --base=origin/integration --head=${{ github.sha }}

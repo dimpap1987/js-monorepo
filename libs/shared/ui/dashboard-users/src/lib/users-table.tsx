@@ -1,20 +1,25 @@
 'use client'
 
 import {
-  DataTable,
-  DataTableColumnHeader,
   Dialog,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
   DpDialogContent,
-  Input,
-  TextareaForm,
+} from '@js-monorepo/components/dialog'
+
+import {
+  DataTable,
+  DataTableColumnHeader,
   usePagination,
-} from '@js-monorepo/components'
+} from '@js-monorepo/components/table'
+
+import { Input } from '@js-monorepo/components/form'
+import { TextareaForm } from '@js-monorepo/components/textarea'
+
 import { AuthUserFullDto } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
-import { HttpClientProxy } from '@js-monorepo/utils'
+import { HttpClientProxy } from '@js-monorepo/utils/http'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'

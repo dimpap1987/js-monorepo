@@ -1,7 +1,7 @@
 'use client'
 
 import { UserJWT } from '@js-monorepo/types'
-import { HttpClientProxy } from '@js-monorepo/utils'
+import { HttpClientProxy } from '@js-monorepo/utils/http'
 import React, {
   createContext,
   useCallback,
@@ -23,7 +23,7 @@ const SessionContext = createContext<{
 
 const fetchSession = async (
   successCallback: (user: any) => void,
-  errorCallback: (error?: any) => void
+  errorCallback?: (error?: any) => void
 ) => {
   try {
     const response = await HttpClientProxy.builder<{
@@ -36,11 +36,11 @@ const fetchSession = async (
     if (response.ok) {
       successCallback(response.data?.user)
     } else {
-      errorCallback()
+      errorCallback?.()
     }
   } catch (error) {
     console.error('Error fetching session:', error)
-    errorCallback(error)
+    errorCallback?.(error)
   }
 }
 
@@ -72,15 +72,23 @@ export const SessionProvider = ({
   }, [])
 
   useEffect(() => {
-    if (!isLoggedIn) return
-    refreshSession()
+    fetchSession((userResponse) => {
+      setIsLoggedIn(!!userResponse)
+      setUser(userResponse)
+    })
+  }, [])
 
-    const intervalId = setInterval(refreshSession, 60000 * 4) // 4 minutes
+  useEffect(() => {
+    if (!isLoggedIn) return
+
+    const intervalId = setInterval(() => {
+      refreshSession() // Refresh session if logged in
+    }, 60000 * 4) // 4 minutes
 
     return () => {
       clearInterval(intervalId)
     }
-  }, [isLoggedIn, refreshSession])
+  }, [refreshSession, isLoggedIn])
 
   const contextValue = useMemo(() => {
     return {

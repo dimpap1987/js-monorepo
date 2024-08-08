@@ -1,8 +1,6 @@
 import { CreateCheckoutSessionRequestBody } from '@js-monorepo/types'
-import {
-  calculateThirtyMinutesFromNow,
-  HttpClientProxy,
-} from '@js-monorepo/utils'
+import { HttpClientProxy } from '@js-monorepo/utils/http'
+import { calculateThirtyMinutesFromNow } from '@js-monorepo/utils/common'
 import Stripe from 'stripe'
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {

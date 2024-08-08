@@ -1,5 +1,5 @@
 import { ClientResponseType } from '@js-monorepo/types'
-import { HttpClientProxy } from '@js-monorepo/utils'
+import { HttpClientProxy } from '@js-monorepo/utils/http'
 
 export class AuthClient {
   constructor(private readonly authUrl: string) {
@@ -38,3 +38,9 @@ export class AuthClient {
     return response
   }
 }
+
+const authClient = new AuthClient(process.env.NEXT_PUBLIC_AUTH_URL ?? '')
+
+export { authClient }
+
+export * from './session'

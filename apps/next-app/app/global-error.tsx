@@ -3,7 +3,7 @@
 import { DpButton } from '@js-monorepo/button'
 import { ErrorComponent } from '@js-monorepo/error'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
-import { isObjectDefinedOrEmpty } from '@js-monorepo/utils'
+import { isObjectDefinedOrEmpty } from '@js-monorepo/utils/common'
 import { submitErrors } from '@next-app/actions/submit-error'
 import { Poppins } from 'next/font/google'
 import { useEffect } from 'react'

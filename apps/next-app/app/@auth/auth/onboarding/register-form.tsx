@@ -1,7 +1,7 @@
 'use react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { authClient, useSession } from '@js-monorepo/auth-client'
+import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import {
   Form,
@@ -10,7 +10,7 @@ import {
   FormItem,
   FormLabel,
   Input,
-} from '@js-monorepo/components'
+} from '@js-monorepo/components/form'
 import { RegisterUserSchema } from '@js-monorepo/schemas'
 import { useRouter } from 'next-nprogress-bar'
 import { useEffect, useState } from 'react'

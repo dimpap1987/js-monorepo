@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth-client'
+import { useSession } from '@js-monorepo/auth/next/client'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@js-monorepo/components'
+} from '@js-monorepo/components/dropdown'
 import { cn } from '@js-monorepo/ui/util'
 import moment from 'moment'
 import { Fragment, useEffect, useState } from 'react'
@@ -22,7 +22,7 @@ type NotificationType = {
   id: number
   message: string
   isRead: boolean
-  time: any
+  time: string | Date
   formattedTime: string
 }
 
@@ -34,6 +34,8 @@ export function DpNotificationBellComponent({
   className?: string
 }) {
   const { isLoggedIn } = useSession()
+  const [eventSource, setEventSource] = useState<EventSource | null>(null)
+
   const [notifications, setNotifications] =
     useState<NotificationType[]>(notificationList)
   const unreadNotificationCount = notifications?.filter(
@@ -42,13 +44,20 @@ export function DpNotificationBellComponent({
   const isRinging = unreadNotificationCount > 0
 
   useEffect(() => {
-    if (!isLoggedIn) return
+    if (!isLoggedIn) {
+      // Close the EventSource if the user is not logged in
+      eventSource?.close()
+      return
+    }
 
-    const eventSource = new EventSource(
+    const es = new EventSource(
       process.env.NEXT_PUBLIC_NOTIFICATION_CONTROLLER ?? '',
       { withCredentials: true }
     )
-    eventSource.onmessage = (event) => {
+
+    setEventSource(es)
+
+    es.onmessage = (event) => {
       const data = JSON.parse(event.data)
       const timeDifference = moment().diff(moment(data.time))
       const formattedDifference = moment.duration(timeDifference).humanize()
@@ -66,8 +75,9 @@ export function DpNotificationBellComponent({
         ]
       })
     }
+
     return () => {
-      eventSource?.close()
+      es?.close()
     }
   }, [isLoggedIn])
 

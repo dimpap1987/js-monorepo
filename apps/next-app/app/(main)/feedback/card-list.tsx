@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@js-monorepo/components'
+} from '@js-monorepo/components/card'
 
 function CardList({ className }: { className: string }) {
   return (
