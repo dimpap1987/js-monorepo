@@ -1,4 +1,4 @@
-import { HasRoles, RolesEnum, RolesGuard } from '@js-monorepo/auth'
+import { HasRoles, RolesEnum, RolesGuard } from '@js-monorepo/auth/nest'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
 import {
   Body,

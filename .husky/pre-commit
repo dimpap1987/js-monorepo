@@ -4,8 +4,8 @@
 echo "Precommit Triggered..."
 
 # Run Prettier to format files
-echo "Run Prettier to format files"
-npx prettier --write .
+# echo "Run Prettier to format files"
+# npx prettier --write .
 
 echo "Run Lint to all files"
 npm run lint:all

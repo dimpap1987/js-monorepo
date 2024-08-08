@@ -1,4 +1,4 @@
-import { SessionProvider } from '@js-monorepo/auth-client'
+import { SessionProvider } from '@js-monorepo/auth/next/client'
 import { DpLoaderProvider } from '@js-monorepo/loader'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'

@@ -1,4 +1,4 @@
-import { AuthJWT, JwtAuthGuard } from '@js-monorepo/auth'
+import { AuthJWT, JwtAuthGuard } from '@js-monorepo/auth/nest'
 import { JwtPayload } from '@js-monorepo/types'
 import { Controller, Inject, Post, Req, Sse, UseGuards } from '@nestjs/common'
 import { ChannelService } from '../services/channel.service'

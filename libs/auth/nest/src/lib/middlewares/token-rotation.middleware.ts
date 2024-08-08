@@ -1,4 +1,4 @@
-import { getBrowserInfo, getIPAddress } from '@js-monorepo/utils'
+import { getBrowserInfo, getIPAddress } from '@js-monorepo/utils/http'
 import { Inject, Injectable, Logger, NestMiddleware } from '@nestjs/common'
 import { NextFunction, Request, Response } from 'express'
 import { RefreshTokenService } from '../services/interfaces/refreshToken.service'

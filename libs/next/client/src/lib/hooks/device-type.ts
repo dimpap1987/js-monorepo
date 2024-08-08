@@ -1,4 +1,4 @@
-import { getDeviceType } from '@js-monorepo/utils'
+import { getDeviceType } from '@js-monorepo/utils/common'
 import { useEffect, useState } from 'react'
 
 export function useDeviceType() {

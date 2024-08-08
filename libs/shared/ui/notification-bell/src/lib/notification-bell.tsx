@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth-client'
+import { useSession } from '@js-monorepo/auth/next/client'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from '@js-monorepo/components'
+} from '@js-monorepo/components/dropdown'
 import { cn } from '@js-monorepo/ui/util'
 import moment from 'moment'
 import { Fragment, useEffect, useState } from 'react'

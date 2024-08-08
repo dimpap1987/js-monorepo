@@ -1,7 +1,7 @@
 'use client'
 
 import { UserJWT } from '@js-monorepo/types'
-import { HttpClientProxy } from '@js-monorepo/utils'
+import { HttpClientProxy } from '@js-monorepo/utils/http'
 import React, {
   createContext,
   useCallback,
