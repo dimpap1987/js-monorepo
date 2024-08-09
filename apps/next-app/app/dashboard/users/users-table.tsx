@@ -271,7 +271,7 @@ const DashboardUsersTableSuspense = () => {
                 <DpDialogContent>
                   <DialogHeader>
                     <DialogTitle>
-                      Send notification to ' {row.original?.username} '
+                      Send notification to &apos;{row.original?.username}&apos;
                     </DialogTitle>
                   </DialogHeader>
                   <TextareaForm
