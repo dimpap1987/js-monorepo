@@ -1,4 +1,4 @@
-import { DashboardUsersTable } from '@js-monorepo/dashboard-users'
+import { DashboardUsersTable } from './users-table'
 
 async function UsersDashboardController() {
   return (
