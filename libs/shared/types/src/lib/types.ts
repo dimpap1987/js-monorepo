@@ -2,9 +2,9 @@ export interface UserJWT {
   id: number
   username: string
   createdAt: Date
-  lastLoggedIn?: string | null
-  picture?: string | null
-  provider?: string | null
+  lastLoggedIn?: string
+  picture?: string
+  provider?: string
   roles: AuthRoles[]
 }
 
@@ -50,7 +50,7 @@ export type AuthRoles = 'ADMIN' | 'USER'
 
 export type ProviderDto = {
   id: number
-  profileImage: string | null
+  profileImage?: string
   type: ProviderName
   userId: number
 }
@@ -74,7 +74,7 @@ export type AuthUserDto = {
 
 export type ProvidersDto = {
   type: ProviderName
-  profileImage: string | null
+  profileImage?: string
 }
 
 export type UnRegisteredUserCreateDto = {
@@ -88,15 +88,15 @@ export type UnRegisteredUserDto = {
   token: string
   email: string
   provider: ProviderName
-  profileImage: string | null
+  profileImage?: string
   createdAt: Date
 }
 
 export type RefreshTokenCreateDto = {
   userId: number
   token: string
-  ipAddress?: string | null
-  userAgent?: string | null
+  ipAddress?: string
+  userAgent?: string
 }
 
 export type RefreshTokenDto = {
@@ -116,7 +116,7 @@ export type AuthUserUpdateDto =
 export type ChannelDto = {
   id: number
   name: string
-  description: string | null
+  description?: string
   createdAt: Date
 }
 
@@ -126,7 +126,7 @@ export type NotificationCreateDto = {
   message: string
   link?: string
   type?: string
-  additionalData?: Record<string, any> | null
+  additionalData?: Record<string, any>
 }
 
 export type UserChannelDto = {

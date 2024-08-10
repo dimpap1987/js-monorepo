@@ -14,6 +14,19 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+  webpack: (
+    config,
+    { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
+  ) => {
+    const newConfig = {
+      ...config,
+      optimization: {
+        ...config.optimization,
+        usedExports: !dev, // Enable tree-shaking only in production
+      },
+    }
+    return newConfig
+  },
   swcMinify: true,
   images: {
     remotePatterns: [

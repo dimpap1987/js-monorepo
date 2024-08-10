@@ -109,15 +109,18 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 const DpDialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    hasPortal?: boolean
+  }
+>(({ className, children, hasPortal = true, ...props }, ref) => {
   React.useEffect(() => {
     setTimeout(() => {
       document.body.style.pointerEvents = ''
     }, 200)
   }, [])
-  return (
-    <DialogPortal>
+
+  const content = (
+    <>
       <DialogOverlay />
       <DialogPrimitive.Content
         ref={ref}
@@ -148,8 +151,10 @@ const DpDialogContent = React.forwardRef<
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
-    </DialogPortal>
+    </>
   )
+
+  return hasPortal ? <DialogPortal>{content}</DialogPortal> : <>{content}</>
 })
 
 DpDialogContent.displayName = 'DpDialogContent'
