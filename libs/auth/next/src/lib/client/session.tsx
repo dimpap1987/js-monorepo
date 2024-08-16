@@ -1,7 +1,7 @@
 'use client'
 
 import { UserJWT } from '@js-monorepo/types'
-import { HttpClientProxy } from '@js-monorepo/utils/http'
+import { HttpClientBuilder, HttpClientProxy } from '@js-monorepo/utils/http'
 import React, {
   createContext,
   useCallback,
@@ -23,15 +23,17 @@ const SessionContext = createContext<{
 
 const fetchSession = async (
   successCallback: (user: any) => void,
-  errorCallback?: (error?: any) => void
+  errorCallback?: (error?: any) => void,
+  clientBuilder: HttpClientBuilder = new HttpClientProxy().builder()
 ) => {
   try {
-    const response = await HttpClientProxy.builder<{
-      user: UserJWT
-    }>(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`)
+    const response = await clientBuilder
+      .url(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`)
       .get()
       .withCredentials()
-      .execute()
+      .execute<{
+        user: UserJWT
+      }>()
 
     if (response.ok) {
       successCallback(response.data?.user)
@@ -47,12 +49,14 @@ const fetchSession = async (
 export const SessionProvider = ({
   children,
   value,
+  clientBuilder,
 }: {
   readonly children?: React.ReactNode
   readonly value: {
     user: UserJWT | null | undefined
     isLoggedIn: boolean
   }
+  clientBuilder?: HttpClientBuilder
 }) => {
   const [user, setUser] = useState(value.user)
   const [isLoggedIn, setIsLoggedIn] = useState(value.isLoggedIn)
@@ -67,9 +71,10 @@ export const SessionProvider = ({
         setUser(null)
         setIsLoggedIn(false)
         window.location.reload()
-      }
+      },
+      clientBuilder
     )
-  }, [])
+  }, [clientBuilder])
 
   useEffect(() => {
     fetchSession((userResponse) => {

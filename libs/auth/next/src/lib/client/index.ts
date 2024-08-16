@@ -1,15 +1,16 @@
 import { ClientResponseType } from '@js-monorepo/types'
-import { HttpClientProxy } from '@js-monorepo/utils/http'
+import { HttpClientBuilder, HttpClientProxy } from '@js-monorepo/utils/http'
 
 export class AuthClient {
   constructor(private readonly authUrl: string) {
     this.authUrl = authUrl
   }
 
-  async logout() {
-    const response = await HttpClientProxy.builder(
-      `${this.authUrl}/api/auth/logout`
-    )
+  async logout(
+    fetchBuilder: HttpClientBuilder = new HttpClientProxy().builder()
+  ) {
+    const response = await fetchBuilder
+      .url(`${this.authUrl}/api/auth/logout`)
       .get()
       .withCredentials()
       .execute()
@@ -23,12 +24,14 @@ export class AuthClient {
     window.location.href = `${this.authUrl}/api/auth/${provider}/login`
   }
 
-  async registerUser(payload: {
-    username: string
-  }): Promise<ClientResponseType<any>> {
-    const response = await HttpClientProxy.builder(
-      `${this.authUrl}/api/auth/register`
-    )
+  async registerUser(
+    payload: {
+      username: string
+    },
+    fetchBuilder: HttpClientBuilder = new HttpClientProxy().builder()
+  ): Promise<ClientResponseType<any>> {
+    const response = await fetchBuilder
+      .url(`${this.authUrl}/api/auth/register`)
       .body(payload)
       .withCredentials()
       .withCsrf()

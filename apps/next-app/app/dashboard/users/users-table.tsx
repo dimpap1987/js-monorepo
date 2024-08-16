@@ -19,7 +19,7 @@ import { TextareaForm } from '@js-monorepo/components/textarea'
 
 import { AuthUserFullDto } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
-import { HttpClientProxy } from '@js-monorepo/utils/http'
+import { API } from '@next-app/api-proxy'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'
@@ -41,7 +41,7 @@ declare module '@tanstack/table-core' {
 }
 
 const findUsers = async (searchParams?: string) => {
-  const response = await HttpClientProxy.builder<UsersReponse>(
+  const response = await API.url(
     `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users${searchParams}`
   )
     .get()
@@ -216,7 +216,7 @@ const DashboardUsersTableSuspense = () => {
                       title="Submit"
                       className="shrink-0 text-2xl cursor-pointer transform hover:scale-125 transition duration-300 border rounded-lg"
                       onClick={async () => {
-                        const response = await HttpClientProxy.builder(
+                        const response = await API.url(
                           `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users/${row.original.id}`
                         )
                           .put()
@@ -276,7 +276,7 @@ const DashboardUsersTableSuspense = () => {
                   </DialogHeader>
                   <TextareaForm
                     submitCallBack={async (callBackData) => {
-                      const response = await HttpClientProxy.builder(
+                      const response = await API.url(
                         `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`
                       )
                         .post()

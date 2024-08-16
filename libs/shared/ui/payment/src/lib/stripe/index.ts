@@ -1,6 +1,6 @@
 import { CreateCheckoutSessionRequestBody } from '@js-monorepo/types'
-import { HttpClientProxy } from '@js-monorepo/utils/http'
 import { calculateThirtyMinutesFromNow } from '@js-monorepo/utils/common'
+import { HttpClientBuilder, HttpClientProxy } from '@js-monorepo/utils/http'
 import Stripe from 'stripe'
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -92,20 +92,25 @@ export async function createCheckoutSession(
   return str.checkout.sessions.create(sessionPayload)
 }
 
-export async function checkoutSessionClient({
-  username,
-  url,
-  price,
-  isDonate,
-  customSubmitMessage,
-}: {
-  username: string
-  url: string
-  price: number
-  isDonate: boolean
-  customSubmitMessage: string
-}) {
-  return HttpClientProxy.builder(url)
+export async function checkoutSessionClient(
+  {
+    username,
+    url,
+    price,
+    isDonate,
+    customSubmitMessage,
+  }: {
+    username: string
+    url: string
+    price: number
+    isDonate: boolean
+    customSubmitMessage: string
+    fetchBuilder?: HttpClientBuilder
+  },
+  fetchBuilder: HttpClientBuilder = new HttpClientProxy().builder()
+) {
+  return fetchBuilder
+    .url(url)
     .body({
       username,
       price,
