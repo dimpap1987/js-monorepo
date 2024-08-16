@@ -1,6 +1,10 @@
 import { ClientResponseType, SuccessResponse } from '@js-monorepo/types'
 import { Request } from 'express'
 
+export type Middleware = (
+  next: (url: string, options: RequestInit) => Promise<Response>
+) => (url: string, options: RequestInit) => Promise<Response>
+
 export function getCookie(name: string) {
   const cookies = document.cookie.split(';')
 
@@ -17,17 +21,62 @@ export function getCookie(name: string) {
   return null
 }
 
-async function request<T>(
-  url: string,
-  options?: RequestInit
-): Promise<ClientResponseType<T>> {
-  const errorMessage = 'Something went wrong, please try again later...'
-  try {
-    const response = await fetch(url, options)
+export class HttpClientBuilder {
+  private fullUrl = ''
+
+  private middlewares: Middleware[] = []
+
+  private options: RequestInit = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+
+  use(middleware: Middleware): HttpClientBuilder {
+    this.middlewares.push(middleware)
+    return this
+  }
+
+  private async runMiddleware(
+    url: string,
+    options: RequestInit
+  ): Promise<Response> {
+    const finalMiddleware = this.middlewares.reduce(
+      (next, middleware) => middleware(next),
+      this.fetch.bind(this)
+    )
+
+    return finalMiddleware(url, options)
+  }
+
+  private async fetch(url: string, options: RequestInit): Promise<Response> {
+    const errorMessage = 'Something went wrong, please try again later...'
+    try {
+      return await fetch(url, options)
+    } catch (error) {
+      console.error('Fetch Error catch:', error)
+      throw new Error(errorMessage)
+    }
+  }
+
+  async execute<T>(): Promise<ClientResponseType<T>> {
+    if (!this.fullUrl) {
+      throw new Error('URL must be set before executing a request.')
+    }
+
+    const response = await this.runMiddleware(this.fullUrl, {
+      ...this.options,
+    })
+    return this.handleResponse<T>(response)
+  }
+
+  private async handleResponse<T>(
+    response: Response
+  ): Promise<ClientResponseType<T>> {
+    const errorMessage = 'Something went wrong, please try again later...'
     const contentType = response.headers.get('Content-Type')
 
     if (response.ok) {
-      // SUCCESS case
       const finalResponse: SuccessResponse<T> = {
         ok: true,
         httpStatusCode: response.status,
@@ -40,8 +89,6 @@ async function request<T>(
 
       return finalResponse
     }
-
-    // ERROR case
 
     if (contentType?.includes('application/json')) {
       const errorData = await response.json()
@@ -59,30 +106,14 @@ async function request<T>(
       httpStatusCode: response.status,
       message: errorMessage,
     }
-  } catch (error) {
-    console.error('Error catch:', error)
-    return {
-      ok: false,
-      httpStatusCode: 503,
-      message: errorMessage,
-    }
-  }
-}
-
-class HttpClientBuilder<T> {
-  private url: string
-
-  private options: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
   }
 
-  constructor(url: string) {
-    this.url = url
+  withCredentials(): HttpClientBuilder {
+    this.options.credentials = 'include'
+    return this
   }
 
-  withCsrf(csrfHeader = 'XSRF-TOKEN'): HttpClientBuilder<T> {
+  withCsrf(csrfHeader = 'XSRF-TOKEN'): HttpClientBuilder {
     const csrfValue = getCookie(csrfHeader)
     if (csrfValue) {
       this.options.headers = {
@@ -93,12 +124,12 @@ class HttpClientBuilder<T> {
     return this
   }
 
-  body(data: any): HttpClientBuilder<T> {
+  body(data: any): HttpClientBuilder {
     this.options.body = JSON.stringify(data)
     return this
   }
 
-  withHeaders(headers: HeadersInit): HttpClientBuilder<T> {
+  withHeaders(headers: HeadersInit): HttpClientBuilder {
     this.options.headers = {
       ...this.options.headers,
       ...headers,
@@ -111,35 +142,44 @@ class HttpClientBuilder<T> {
     return this
   }
 
-  withCredentials(): HttpClientBuilder<T> {
-    this.options.credentials = 'include'
+  url(url: string): HttpClientBuilder {
+    this.fullUrl = url // Set the full URL
     return this
   }
 
-  get(): HttpClientBuilder<T> {
+  get(): HttpClientBuilder {
     this.options.method = 'GET'
     return this
   }
 
-  post(): HttpClientBuilder<T> {
+  post(): HttpClientBuilder {
     this.options.method = 'POST'
     return this
   }
 
-  put(): HttpClientBuilder<T> {
+  put(): HttpClientBuilder {
     this.options.method = 'PUT'
     return this
   }
-
-  async execute(): Promise<ClientResponseType<T>> {
-    return request<T>(this.url, {
-      ...this.options,
-    })
-  }
 }
 
-export const HttpClientProxy = {
-  builder: <T>(url: string) => new HttpClientBuilder<T>(url),
+export class HttpClientProxy {
+  private middlewares: Middleware[] = []
+
+  builder() {
+    const builder = new HttpClientBuilder()
+
+    // Add the shared middleware to the builder
+    this.middlewares.forEach((middleware) => {
+      builder.use(middleware)
+    })
+
+    return builder
+  }
+
+  use(middleware: Middleware) {
+    this.middlewares.push(middleware)
+  }
 }
 
 export function getIPAddress(req: Request): string | undefined {
