@@ -1,8 +1,14 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
+export class PrismaService
+  extends PrismaClient<
+    Prisma.PrismaClientOptions,
+    'query' | 'info' | 'warn' | 'error'
+  >
+  implements OnModuleInit
+{
   private readonly logger = new Logger(PrismaService.name)
 
   private readonly maxRetries = 10
@@ -14,6 +20,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       datasourceUrl: process.env.DATABASE_URL,
       errorFormat: 'pretty',
       log: [
+        { level: 'query', emit: 'event' },
         { level: 'warn', emit: 'event' },
         { level: 'info', emit: 'event' },
         { level: 'error', emit: 'event' },
@@ -22,6 +29,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   async onModuleInit() {
+    await this.handleDatabaseConnection()
+    this.handleEvents()
+  }
+
+  private async handleDatabaseConnection() {
     let retryCount = 0
 
     while (retryCount < this.maxRetries) {
@@ -50,5 +62,24 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       'Maximum number of retries reached. Unable to connect to the database.'
     )
     throw new Error('Failed to connect to the database')
+  }
+
+  private handleEvents() {
+    const showSql = process.env.SHOW_SQL === 'true'
+
+    if (showSql) {
+      this.$on('query', (e: Prisma.QueryEvent) => {
+        this.logger.log(
+          `Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration} ms`
+        )
+      })
+      this.$on('info', (e: Prisma.LogEvent) => {
+        this.logger.log(`Message: ${e.message}`)
+      })
+    }
+
+    this.$on('error', (e: Prisma.LogEvent) => {
+      this.logger.error(`Error Message: ${e.message}`)
+    })
   }
 }
