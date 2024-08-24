@@ -19,7 +19,9 @@ export default async function RootLayout(props: {
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body
-        className={`${poppins.className} flex flex-col min-h-100svh bg-background-primary overflow-x-hidden`}
+        className={`${poppins.className} 
+        grid grid-rows-[auto_1fr] min-h-100svh
+        bg-background-primary overflow-x-hidden`}
       >
         <RootProviders>
           <MainTemplate>
