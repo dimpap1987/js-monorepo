@@ -47,29 +47,31 @@ export default function MainTemplate({
 
   return (
     <>
-      <DpNextNavbar
-        user={{
-          isLoggedIn: isLoggedIn,
-          ...user,
-        }}
-        menuItems={menuItems}
-        onSideBarClick={() => {
-          setOpenSideBar((prev) => !prev)
-        }}
-        onLogout={async () => {
-          authClient.logout()
-        }}
-      >
-        <DpLogo>
-          <SVGLogo></SVGLogo>
-        </DpLogo>
-        <NavbarItems>
-          {isLoggedIn && (
-            <DpNotificationBellComponent className="hidden sm:block"></DpNotificationBellComponent>
-          )}
-          <ModeToggle></ModeToggle>
-        </NavbarItems>
-      </DpNextNavbar>
+      <header>
+        <DpNextNavbar
+          user={{
+            isLoggedIn: isLoggedIn,
+            ...user,
+          }}
+          menuItems={menuItems}
+          onSideBarClick={() => {
+            setOpenSideBar((prev) => !prev)
+          }}
+          onLogout={async () => {
+            authClient.logout()
+          }}
+        >
+          <DpLogo>
+            <SVGLogo></SVGLogo>
+          </DpLogo>
+          <NavbarItems>
+            {isLoggedIn && (
+              <DpNotificationBellComponent className="hidden sm:block"></DpNotificationBellComponent>
+            )}
+            <ModeToggle></ModeToggle>
+          </NavbarItems>
+        </DpNextNavbar>
+      </header>
 
       <DpNextSidebar
         isOpen={openSideBar}
