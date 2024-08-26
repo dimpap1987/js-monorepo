@@ -21,7 +21,7 @@ RUN npm install --omit=dev --ignore-scripts
 COPY --chown=nestjs:nodejs dist/apps/my-api ./
 COPY --chown=nestjs:nodejs libs/prisma/db/src/lib/prisma ./prisma
 
-RUN npx prisma generate --schema=./prisma/schema.prisma
+RUN npx prisma generate --schema=./prisma/schema
 # Ensure permissions are set for .prisma directory
 RUN chown -R nestjs:nodejs ./node_modules/.prisma
 

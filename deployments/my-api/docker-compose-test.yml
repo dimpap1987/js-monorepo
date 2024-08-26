@@ -14,7 +14,7 @@ services:
     networks:
       - my-api
     command: >
-      sh -c "npx prisma generate --schema=./prisma/schema.prisma && node main.js"
+      sh -c "npx prisma generate --schema=./prisma/schema && node main.js"
 
 networks:
   my-api:

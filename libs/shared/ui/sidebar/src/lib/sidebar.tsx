@@ -74,7 +74,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
             tabIndex={-1}
           >
             <div className="flex items-center justify-between p-5 border-b-2 border-border">
-              <ModeToggle className="text-right absolute left-0.5"></ModeToggle>
+              <ModeToggle></ModeToggle>
               <span>{header}</span>
               <button
                 onClick={() => onClose()}
