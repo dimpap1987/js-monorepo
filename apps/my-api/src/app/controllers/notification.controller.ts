@@ -17,12 +17,12 @@ export class NotificationController {
   async events() {
     // get user channels from DB
     const channels = await this.channelService.getChannelsByUserId(
-      this.jwt.user.id
+      this.jwt?.user?.id
     )
     const channelNames = channels?.map((channel) => channel.name)
 
     return this.eventsService.subscribe([
-      this.jwt.user.username,
+      this.jwt?.user?.username,
       ...channelNames,
     ])
   }

@@ -1,0 +1,59 @@
+model AuthUser {
+    id                    Int                @id @default(autoincrement())
+    createdAt             DateTime           @default(now())
+    username              String             @unique
+    email                 String             @unique
+    roles                 AuthRole[]         @default([USER])
+    providers             Provider[]
+    userChannels          UserChannel[]
+    sentNotifications     UserNotification[] @relation("sender")
+    receivedNotifications UserNotification[] @relation("receiver")
+    refreshTokens         RefreshToken[]
+
+    @@map(name: "auth_users")
+}
+
+model UnRegisteredUser {
+    id           Int          @id @default(autoincrement())
+    createdAt    DateTime     @default(now())
+    token        String       @unique
+    email        String       @unique
+    profileImage String?
+    provider     ProviderEnum
+
+    @@map(name: "unregistered_users")
+}
+
+model Provider {
+    id           Int          @id @default(autoincrement())
+    type         ProviderEnum
+    profileImage String?
+    userId       Int
+    user         AuthUser     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map(name: "providers")
+}
+
+model RefreshToken {
+    id        Int      @id @default(autoincrement())
+    userId    Int      @map("user_id")
+    user      AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+    token     String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    revoked   Boolean  @default(false)
+    ipAddress String?  @map("ip_address")
+    userAgent String?  @map("user_agent")
+
+    @@map(name: "refresh_tokens")
+}
+
+enum AuthRole {
+    USER
+    ADMIN
+}
+
+enum ProviderEnum {
+    google
+    github
+}
