@@ -19,7 +19,7 @@
       "@js-monorepo/ai-image-generator": [
         "libs/shared/ui/ai-image-generator/src/index.ts"
       ],
-      "@js-monorepo/auth/nest": ["libs/auth/nest/src/index.ts"],
+      "@js-monorepo/auth/nest/*": ["libs/auth/nest/src/*"],
       "@js-monorepo/auth/next/*": ["libs/auth/next/src/lib/*"],
       "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],

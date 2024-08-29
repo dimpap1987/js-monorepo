@@ -1,8 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
 import { RegisterDialogComponent } from '@js-monorepo/dialog'
-import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -15,22 +13,11 @@ export function RegisterDialog({
 }: RegisterDialogType) {
   //hooks
   const pathname = usePathname()
-  const { user } = useSession()
-  const [addNotification] = useNotifications()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  useEffect(() => {
-    if (user?.username) {
-      addNotification({
-        message: `Welcome aboard, ${user.username}! 🚀`,
-        duration: 5000,
-      })
-    }
-  }, [user?.username])
 
   if (pathname !== '/auth/onboarding' || !mounted) return null
 

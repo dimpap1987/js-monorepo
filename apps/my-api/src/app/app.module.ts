@@ -1,10 +1,16 @@
-import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
-import { ChannelService } from './services/channel.service'
+import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
-import { AuthModule } from '@js-monorepo/auth/nest'
+import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
+import {
+  AuthSessionMiddleware,
+  AuthSessionModule,
+} from '@js-monorepo/auth/nest/session'
 import { PrismaModule } from '@js-monorepo/db'
 import { ConfigModule } from '@nestjs/config'
-import { AuthUser } from '@prisma/client'
+import RedisStore from 'connect-redis'
+import session from 'express-session'
+import passport from 'passport'
+import { RedisClientType } from 'redis'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -15,12 +21,33 @@ import { AdminProviderModule } from './modules/admin.module'
 import { ChannelProviderModule } from './modules/channel.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { NotificationProviderModule } from './modules/notifications.module'
+import { REDIS, RedisModule } from './modules/redis.module'
 import { EventsService } from './services/event.service'
 
 const ENV = process.env.NODE_ENV
 
 @Module({
   imports: [
+    RedisModule,
+    AuthSessionModule.forRootAsync({
+      useFactory: () => ({
+        google: {
+          clientId: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          callBackUrl: process.env.GOOGLE_REDIRECT_URL,
+        },
+        github: {
+          clientId: process.env.GITHUB_CLIENT_ID,
+          clientSecret: process.env.GITHUB_CLIENT_SECRET,
+          callBackUrl: process.env.GITHUB_REDIRECT_URL,
+        },
+        csrf: {
+          enabled: true,
+          middlewareExclusions: ['exceptions'],
+        },
+        redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
+      }),
+    }),
     PrismaModule,
     FilterProviderModule,
     ChannelProviderModule,
@@ -28,42 +55,6 @@ const ENV = process.env.NODE_ENV
     NotificationProviderModule,
     ConfigModule.forRoot({
       envFilePath: ['.env', `.env.${ENV}`, `environments/.env.${ENV}`],
-    }),
-    AuthModule.forRootAsync({
-      imports: [ChannelProviderModule],
-      inject: [ChannelService],
-      useFactory: async (channelService: ChannelService) => {
-        return {
-          csrf: {
-            enabled: true,
-            middlewareExclusions: ['exceptions'],
-          },
-          tokenRoation: {
-            enabled: true,
-            middlewareExclusions: ['exceptions'],
-          },
-          accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
-          refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
-          github: {
-            clientId: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
-            callBackUrl: process.env.GITHUB_REDIRECT_URL,
-          },
-          google: {
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callBackUrl: process.env.GOOGLE_REDIRECT_URL,
-          },
-          redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
-          onRegister: async (user: AuthUser) => {
-            Logger.log(`User: '${user.username}' created successfully 😍`)
-            channelService.assignUserToChannels(user.id, 'global')
-          },
-          onLogin: async (user: AuthUser) => {
-            Logger.log(`User: '${user.username}' has successfully logged in 😁`)
-          },
-        }
-      },
     }),
   ],
   controllers: [
@@ -75,7 +66,32 @@ const ENV = process.env.NODE_ENV
   providers: [AppService, EventsService, LoggerMiddleware],
 })
 export class AppModule implements NestModule {
+  constructor(@Inject(REDIS) private readonly redis: RedisClientType) {}
+
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*')
+    consumer
+      .apply(
+        session({
+          store: new RedisStore({
+            client: this.redis,
+            prefix: 'myapp:sessions:',
+          }),
+          saveUninitialized: false,
+          secret: process.env['SESSION_SECRET'],
+          resave: false,
+          name: 'JSESSIONID',
+          cookie: {
+            ...authCookiesOptions,
+            maxAge: 1000 * 60, // 1 hour
+          },
+        }),
+        passport.initialize(),
+        passport.session()
+      )
+      .forRoutes('*')
+      .apply(LoggerMiddleware) // Apply LoggerMiddleware
+      .forRoutes('*')
+      .apply(AuthSessionMiddleware)
+      .forRoutes('*')
   }
 }
