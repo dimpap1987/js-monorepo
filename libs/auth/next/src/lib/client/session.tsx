@@ -88,7 +88,7 @@ export const SessionProvider = ({
 
     const intervalId = setInterval(() => {
       refreshSession() // Refresh session if logged in
-    }, 60000 * 4) // 4 minutes
+    }, 60000 * 30) // 30 minutes
 
     return () => {
       clearInterval(intervalId)
