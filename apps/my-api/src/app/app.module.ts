@@ -82,7 +82,7 @@ export class AppModule implements NestModule {
           name: 'JSESSIONID',
           cookie: {
             ...authCookiesOptions,
-            maxAge: 1000 * 60, // 1 hour
+            maxAge: 1000 * 60 * 60 * 24, // 1 day
           },
         }),
         passport.initialize(),
