@@ -148,6 +148,13 @@ export class AuthJWTController {
   @Get('unregistered-user')
   getUnRegisteredUser(@Req() req: Request) {
     const token = req.cookies['UNREGISTERED-USER']
+    if (!token) {
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'Invalid token!',
+        'INVALID_TOKEN_EXCEPTION'
+      )
+    }
     return this.unRegisteredUserService.findUnRegisteredUserByToken(token)
   }
 
@@ -204,7 +211,7 @@ export class AuthJWTController {
             profileImage: req.user?.profileImage,
           })
         res.cookie('UNREGISTERED-USER', unRegisteredUser?.token, {
-          httpOnly: true,
+          httpOnly: false,
         })
         redirectURI = `${this.options.redirectUiUrl}/auth/onboarding`
       } catch (e2: any) {

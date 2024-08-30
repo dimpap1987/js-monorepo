@@ -32,7 +32,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     return response.status(exception.getStatus()).json({
       createdBy: 'ApiExceptionFilter',
       errorCode: exception.errorCode,
-      path: request.url,
+      path: request.originalUrl,
       message: exception.message,
     })
   }

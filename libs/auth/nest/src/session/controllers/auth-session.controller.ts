@@ -89,8 +89,8 @@ export class AuthSessionController {
     if (!token) {
       throw new AuthException(
         HttpStatus.BAD_REQUEST,
-        'Invalid token!',
-        'INVALID_TOKEN_EXCEPTION'
+        'Invalid unregistered user token!',
+        'INVALID_UNREGISTERED-USER_EXCEPTION'
       )
     }
 
@@ -134,6 +134,13 @@ export class AuthSessionController {
   @Get('unregistered-user')
   getUnRegisteredUser(@Req() req: Request) {
     const token = req.cookies['UNREGISTERED-USER']
+    if (!token) {
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'Invalid unregistered user token!',
+        'INVALID_UNREGISTERED-USER_EXCEPTION'
+      )
+    }
     return this.unRegisteredUserService.findUnRegisteredUserByToken(token)
   }
 

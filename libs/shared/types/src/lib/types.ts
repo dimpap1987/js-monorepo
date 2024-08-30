@@ -3,7 +3,7 @@ export interface UserJWT {
   username: string
   createdAt: Date
   lastLoggedIn?: string
-  profileImage?: string
+  profileImage?: string | null
   provider?: string
   roles: AuthRoles[]
 }
@@ -13,7 +13,7 @@ export interface SessionUserType {
   username: string
   createdAt: Date
   lastLoggedIn?: string
-  profileImage?: string
+  profileImage?: string | null
   provider?: string
   roles: AuthRoles[]
 }
@@ -88,13 +88,13 @@ export type AuthUserDto = {
 
 export type ProvidersDto = {
   type: ProviderName
-  profileImage?: string
+  profileImage?: string | null
 }
 
 export type UnRegisteredUserCreateDto = {
   email: string
   provider: ProviderName
-  profileImage?: string
+  profileImage?: string | null
 }
 
 export type UnRegisteredUserDto = {
