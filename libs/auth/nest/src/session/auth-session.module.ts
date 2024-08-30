@@ -19,8 +19,8 @@ import { SessionConfiguration } from '../common/types/auth.configuration'
 import { AuthSessionController } from './controllers/auth-session.controller'
 import { LoggedInGuard } from './guards/login.guard'
 import { RolesGuard } from './guards/roles-guard'
-import { SessionSerializer } from './providers/session-serializer'
 import { AuthSessionMiddleware } from './middlewares/auth-session.middleware'
+import { SessionSerializer } from './providers/session-serializer'
 
 @Module({
   imports: [

@@ -32,7 +32,7 @@ export class AuthGoogle extends AuthGuard('google') {
 
     if (user?.unRegisteredUser) {
       res.cookie('UNREGISTERED-USER', user.unRegisteredUser.token, {
-        httpOnly: true,
+        httpOnly: false,
       })
       return false
     } else {

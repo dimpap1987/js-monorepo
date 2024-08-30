@@ -12,13 +12,13 @@ export class AuthExceptionFilter implements ExceptionFilter {
     this.logger.warn(
       `'${
         exception.message
-      }' - url: '${request.url}' statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`
+      }' - url: '${request.originalUrl}' statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`
     )
 
     return response.status(exception.getStatus()).json({
       createdBy: 'AuthExceptionFilter',
       errorCode: exception.errorCode,
-      path: request.url,
+      path: request.originalUrl,
       errors: [{ message: exception.message }],
     })
   }
