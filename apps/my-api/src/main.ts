@@ -1,4 +1,4 @@
-import { LoggerService } from '@js-monorepo/nest-utils'
+import { LoggerService } from '@js-monorepo/nest/logger'
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import cookieParser from 'cookie-parser'
