@@ -6,6 +6,7 @@ import {
   AuthSessionModule,
 } from '@js-monorepo/auth/nest/session'
 import { PrismaModule } from '@js-monorepo/db'
+import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import { ConfigModule } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
@@ -21,14 +22,15 @@ import { AdminProviderModule } from './modules/admin.module'
 import { ChannelProviderModule } from './modules/channel.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { NotificationProviderModule } from './modules/notifications.module'
-import { REDIS, RedisModule } from './modules/redis.module'
 import { EventsService } from './services/event.service'
 
 const ENV = process.env.NODE_ENV
 
 @Module({
   imports: [
-    RedisModule,
+    RedisModule.register({
+      url: process.env['REDIS_URL'],
+    }),
     AuthSessionModule.forRootAsync({
       useFactory: () => ({
         google: {
