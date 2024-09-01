@@ -38,6 +38,7 @@ export class AuthGithub extends AuthGuard('github') {
       })
       return false
     } else {
+      res.clearCookie('UNREGISTERED-USER')
       return true
     }
   }

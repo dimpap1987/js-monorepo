@@ -36,6 +36,7 @@ export class AuthGoogle extends AuthGuard('google') {
       })
       return false
     } else {
+      res.clearCookie('UNREGISTERED-USER')
       return true
     }
   }

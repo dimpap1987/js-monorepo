@@ -1,4 +1,4 @@
-import { ZodPipe } from '@js-monorepo/nest-utils'
+import { ZodPipe } from '@js-monorepo/nest/pipes'
 import {
   RegisterUserSchema,
   RegisterUserSchemaType,

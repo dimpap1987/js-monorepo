@@ -1,4 +1,3 @@
-import { ZodPipe } from '@js-monorepo/nest-utils'
 import {
   RegisterUserSchema,
   RegisterUserSchemaType,
@@ -21,6 +20,7 @@ import { Request, Response } from 'express'
 import { AuthGithub } from '../guards/github.guard'
 import { AuthGoogle } from '../guards/google.guard'
 
+import { ZodPipe } from '@js-monorepo/nest/pipes'
 import { AuthException } from '../../common/exceptions/api-exception'
 import { AuthService } from '../../common/services/interfaces/auth.service'
 import { UnregisteredService } from '../../common/services/interfaces/unregistered-user.service'
