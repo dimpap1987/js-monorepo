@@ -1,7 +1,6 @@
 import { ExecutionContext, Logger } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { Request, Response } from 'express'
-import { authCookiesOptions } from '../../common/utils'
 
 export class AuthGithub extends AuthGuard('github') {
   private readonly logger = new Logger(AuthGithub.name)
