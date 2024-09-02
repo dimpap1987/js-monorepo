@@ -1,7 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
+import { RolesEnum } from '../../common/types'
 import { LoggedInGuard } from './login.guard'
-import { RolesEnum } from '../../common/types/auth.configuration'
 
 @Injectable()
 export class RolesGuard extends LoggedInGuard {

@@ -1,6 +1,6 @@
 import { AuthUserDto } from '@js-monorepo/types'
 import { RouteInfo } from '@nestjs/common/interfaces'
-import { GithubAuth, GoogleAuth } from '../../common/types/auth.configuration'
+import { GithubAuth, GoogleAuth } from '../../common/types'
 
 export interface AuthConfiguration {
   csrf?: {

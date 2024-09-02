@@ -1,6 +1,5 @@
 import { AuthUserDto, SessionUserType } from '@js-monorepo/types'
 import { RouteInfo } from '@nestjs/common/interfaces'
-import session from 'express-session'
 
 export interface GoogleAuth {
   clientId: string
@@ -53,7 +52,7 @@ declare module 'express-serve-static-core' {
   interface Request {
     user?: {
       user?: any
-      unRegisteredUser: any
+      unRegisteredUser?: any
     }
   }
 }
@@ -62,3 +61,10 @@ export enum RolesEnum {
   ADMIN = 'ADMIN',
   USER = 'USER',
 }
+
+export const AuthConfig = Symbol('AUTH_CONFIG')
+export const AuthOpts = Symbol('AUTH_OPTIONS')
+export const ServiceAuth = Symbol('AUTH_SERVICE')
+export const RepoAuth = Symbol('AUTH_REPOSITORY')
+export const ServiceUnRegisteredUser = Symbol('UNREGISTERED_USER_SERVICE')
+export const RepoUnRegisteredUser = Symbol('UNREGISTERED_USER_REPOSITORY')

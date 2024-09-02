@@ -20,7 +20,12 @@ import { Request, Response } from 'express'
 import { AuthException } from '../../common/exceptions/api-exception'
 import { AuthService } from '../../common/services/interfaces/auth.service'
 import { UnregisteredService } from '../../common/services/interfaces/unregistered-user.service'
-import { SessionConfiguration } from '../../common/types/auth.configuration'
+import {
+  AuthOpts,
+  ServiceAuth,
+  ServiceUnRegisteredUser,
+  SessionConfiguration,
+} from '../../common/types'
 import { AuthGithub } from '../guards/github.guard'
 import { AuthGoogle } from '../guards/google.guard'
 
@@ -29,9 +34,9 @@ export class AuthSessionController {
   private readonly logger = new Logger(AuthSessionController.name)
 
   constructor(
-    @Inject('AUTH_OPTIONS') private readonly options: SessionConfiguration,
-    @Inject('AUTH_SERVICE') private authService: AuthService,
-    @Inject('UNREGISTERED_USER_SERVICE')
+    @Inject(AuthOpts) private readonly options: SessionConfiguration,
+    @Inject(ServiceAuth) private authService: AuthService,
+    @Inject(ServiceUnRegisteredUser)
     private unRegisteredUserService: UnregisteredService
   ) {}
 

@@ -11,6 +11,7 @@ import {
   ConstraintViolationException,
 } from '../../exceptions/contraint-violation'
 import { AuthRepository } from '../../repositories/auth.repository'
+import { RepoAuth } from '../../types'
 import { AuthService } from '../interfaces/auth.service'
 
 @Injectable()
@@ -18,7 +19,7 @@ export class AuthServiceImpl implements AuthService {
   private readonly logger = new Logger(AuthServiceImpl.name)
 
   constructor(
-    @Inject('AUTH_REPOSITORY') private readonly authRepository: AuthRepository
+    @Inject(RepoAuth) private readonly authRepository: AuthRepository
   ) {}
 
   async findAuthUserByEmail(
