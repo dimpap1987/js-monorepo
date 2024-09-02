@@ -76,7 +76,7 @@ export class AppModule implements NestModule {
         session({
           store: new RedisStore({
             client: this.redis,
-            prefix: 'myapp:sessions:',
+            prefix: `${process.env['REDIS_NAMESPACE']}:sessions:`,
           }),
           saveUninitialized: false,
           secret: process.env['SESSION_SECRET'],
