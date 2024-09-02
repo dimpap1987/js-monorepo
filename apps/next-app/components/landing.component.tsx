@@ -3,11 +3,13 @@ import { DpButton } from '@js-monorepo/button'
 import { useLoader } from '@js-monorepo/loader'
 // import { MapComponent, Marker, Popup } from '@js-monorepo/map'
 import { useSession } from '@js-monorepo/auth/next/client'
+import { Marquee, MarqueeRef } from '@js-monorepo/components/marquee'
 import { DonationDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import { checkoutSessionClient } from '@js-monorepo/payment'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useRef, useState } from 'react'
 import BannerSVG from './banner-svg'
+
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
@@ -18,7 +20,17 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
+  const marqueeRef = useRef<MarqueeRef>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
   const { user } = useSession()
+
+  const handleStart = () => {
+    marqueeRef.current?.start()
+  }
+
+  const handleStop = () => {
+    marqueeRef.current?.stop()
+  }
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -35,6 +47,13 @@ export default function LandingComponent({ children, className }: MainProps) {
   }
   return (
     <section className={className}>
+      <div>
+        <Marquee ref={marqueeRef} onPlayingStateChange={setIsPlaying}>
+          <span>Hello 😇</span>
+          <span>Hi 😒</span>
+          <span>Bonjur 😡</span>
+        </Marquee>
+      </div>
       {children}
       <div className="relative min-h-[200px] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
         <BannerSVG />
@@ -129,6 +148,14 @@ export default function LandingComponent({ children, className }: MainProps) {
         </div>
       )}
 
+      <div className="flex gap-2 flex-wrap py-2">
+        <DpButton className="flex-1" onClick={handleStart} disabled={isPlaying}>
+          Start Marquee
+        </DpButton>
+        <DpButton className="flex-1" onClick={handleStop} disabled={!isPlaying}>
+          Stop Marquee
+        </DpButton>
+      </div>
       {/* Map component */}
       {/* <div className="mt-2 h-[300px]">
         <MapComponent
