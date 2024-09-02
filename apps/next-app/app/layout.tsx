@@ -27,7 +27,7 @@ export default async function RootLayout(props: {
     <html lang="en" suppressHydrationWarning={true}>
       <body
         className={`${poppins.className} 
-        grid grid-rows-[auto_1fr] min-h-100svh
+        flex flex-col min-h-100svh
         bg-background-primary overflow-x-hidden`}
       >
         <DynamicRootProvicers>
