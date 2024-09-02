@@ -1,5 +1,5 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
-import { RolesEnum } from '@js-monorepo/auth/nest/common/types/auth.configuration'
+import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { RolesGuard } from '@js-monorepo/auth/nest/session'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
 import {

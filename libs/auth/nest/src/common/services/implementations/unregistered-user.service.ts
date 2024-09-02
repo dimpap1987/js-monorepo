@@ -5,6 +5,7 @@ import {
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
 import { UnregisteredRepository } from '../../repositories/unregistered.repository'
+import { RepoUnRegisteredUser } from '../../types'
 import { UnregisteredService } from '../interfaces/unregistered-user.service'
 
 @Injectable()
@@ -12,7 +13,7 @@ export class UnregisteredServiceImpl implements UnregisteredService {
   private readonly logger = new Logger(UnregisteredServiceImpl.name)
 
   constructor(
-    @Inject('UNREGISTERED_USER_REPOSITORY')
+    @Inject(RepoUnRegisteredUser)
     private readonly unRegisteredRepository: UnregisteredRepository
   ) {}
 

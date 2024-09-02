@@ -15,7 +15,13 @@ import { AuthService } from '../common/services/interfaces/auth.service'
 import { UnregisteredService } from '../common/services/interfaces/unregistered-user.service'
 import { GithubOauthStrategy } from '../common/strategies/github.strategy'
 import { GoogleStrategy } from '../common/strategies/google.strategy'
-import { SessionConfiguration } from '../common/types/auth.configuration'
+import {
+  AuthConfig,
+  AuthOpts,
+  ServiceAuth,
+  ServiceUnRegisteredUser,
+  SessionConfiguration,
+} from '../common/types'
 import { AuthSessionController } from './controllers/auth-session.controller'
 import { LoggedInGuard } from './guards/login.guard'
 import { RolesGuard } from './guards/roles-guard'
@@ -46,9 +52,9 @@ import { SessionSerializer } from './providers/session-serializer'
 })
 export class AuthSessionModule implements NestModule {
   constructor(
-    @Inject('AUTH_CONFIG') private readonly config: SessionConfiguration,
-    @Inject('AUTH_SERVICE') private authService: AuthService,
-    @Inject('UNREGISTERED_USER_SERVICE')
+    @Inject(AuthConfig) private readonly config: SessionConfiguration,
+    @Inject(ServiceAuth) private authService: AuthService,
+    @Inject(ServiceUnRegisteredUser)
     private unRegisteredUserService: UnregisteredService
   ) {}
 
@@ -65,12 +71,12 @@ export class AuthSessionModule implements NestModule {
       imports: options.imports,
       providers: [
         {
-          provide: 'AUTH_CONFIG',
+          provide: AuthConfig,
           useFactory: options.useFactory,
           inject: options.inject || [],
         },
         {
-          provide: 'AUTH_OPTIONS',
+          provide: AuthOpts,
           useFactory: async (config: SessionConfiguration) => ({
             google: config.google,
             github: config.github,
@@ -79,7 +85,7 @@ export class AuthSessionModule implements NestModule {
             onRegister: config.onRegister,
             onLogin: config.onLogin,
           }),
-          inject: ['AUTH_CONFIG'],
+          inject: [AuthConfig],
         },
         {
           provide: GoogleStrategy,
@@ -96,7 +102,7 @@ export class AuthSessionModule implements NestModule {
               )
             return null
           },
-          inject: ['AUTH_OPTIONS', 'AUTH_SERVICE', 'UNREGISTERED_USER_SERVICE'],
+          inject: [AuthOpts, ServiceAuth, ServiceUnRegisteredUser],
         },
         {
           provide: GithubOauthStrategy,
@@ -113,7 +119,7 @@ export class AuthSessionModule implements NestModule {
               )
             return null
           },
-          inject: ['AUTH_OPTIONS', 'AUTH_SERVICE', 'UNREGISTERED_USER_SERVICE'],
+          inject: [AuthOpts, ServiceAuth, ServiceUnRegisteredUser],
         },
       ],
     }

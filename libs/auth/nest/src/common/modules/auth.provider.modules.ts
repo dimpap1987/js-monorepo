@@ -1,16 +1,15 @@
 import { Global, Module, Provider } from '@nestjs/common'
 import { AuthRepositoryPrismaImpl } from '../repositories/implementations/prisma/auth.repository'
 import { AuthServiceImpl } from '../services/implementations/auth.service'
-
-// const AuthService = Symbol('AuthService')
+import { RepoAuth, ServiceAuth } from '../types'
 
 const providers: Provider[] = [
   {
-    provide: 'AUTH_REPOSITORY',
+    provide: RepoAuth,
     useClass: AuthRepositoryPrismaImpl,
   },
   {
-    provide: 'AUTH_SERVICE',
+    provide: ServiceAuth,
     useClass: AuthServiceImpl,
   },
 ]

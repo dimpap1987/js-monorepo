@@ -3,15 +3,21 @@ import { PassportStrategy } from '@nestjs/passport'
 import { Strategy, VerifyCallback } from 'passport-google-oauth20'
 import { AuthService } from '../services/interfaces/auth.service'
 import { UnregisteredService } from '../services/interfaces/unregistered-user.service'
-import { SessionConfiguration } from '../types/auth.configuration'
+import {
+  AuthOpts,
+  ServiceAuth,
+  ServiceUnRegisteredUser,
+  SessionConfiguration,
+} from '../types'
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   private readonly logger = new Logger(GoogleStrategy.name)
+
   constructor(
-    @Inject('AUTH_OPTIONS') private readonly options: SessionConfiguration,
-    @Inject('AUTH_SERVICE') private authService: AuthService,
-    @Inject('UNREGISTERED_USER_SERVICE')
+    @Inject(AuthOpts) private readonly options: SessionConfiguration,
+    @Inject(ServiceAuth) private authService: AuthService,
+    @Inject(ServiceUnRegisteredUser)
     private unRegisteredUserService: UnregisteredService
   ) {
     super({

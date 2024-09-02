@@ -1,11 +1,12 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { SessionUserType } from '@js-monorepo/types'
+import { Inject, Injectable } from '@nestjs/common'
 import { PassportSerializer } from '@nestjs/passport'
 import { AuthService } from '../../common/services/interfaces/auth.service'
-import { SessionUserType } from '@js-monorepo/types'
+import { ServiceAuth } from '../../common/types'
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  constructor(@Inject('AUTH_SERVICE') private authService: AuthService) {
+  constructor(@Inject(ServiceAuth) private authService: AuthService) {
     super()
   }
 
