@@ -1,6 +1,5 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +9,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@js-monorepo/components/dropdown'
+import { useEventSourceContext } from '@js-monorepo/next/providers'
 import { cn } from '@js-monorepo/ui/util'
 import moment from 'moment'
 import { Fragment, useEffect, useState } from 'react'
@@ -19,7 +19,7 @@ import { MdNotificationsActive } from 'react-icons/md'
 import './bell.css'
 
 type NotificationType = {
-  id: number
+  id: string
   message: string
   isRead: boolean
   time: string | Date
@@ -33,9 +33,6 @@ export function DpNotificationBellComponent({
   notificationList?: NotificationType[]
   className?: string
 }) {
-  const { isLoggedIn } = useSession()
-  const [eventSource, setEventSource] = useState<EventSource | null>(null)
-
   const [notifications, setNotifications] =
     useState<NotificationType[]>(notificationList)
   const unreadNotificationCount = notifications?.filter(
@@ -43,43 +40,25 @@ export function DpNotificationBellComponent({
   )?.length
   const isRinging = unreadNotificationCount > 0
 
+  const { event } = useEventSourceContext<{ message: string }>('notification')
+
   useEffect(() => {
-    if (!isLoggedIn) {
-      // Close the EventSource if the user is not logged in
-      eventSource?.close()
-      return
-    }
-
-    const es = new EventSource(
-      process.env.NEXT_PUBLIC_NOTIFICATION_CONTROLLER ?? '',
-      { withCredentials: true }
-    )
-
-    setEventSource(es)
-
-    es.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      const timeDifference = moment().diff(moment(data.time))
+    if (event) {
+      const timeDifference = moment().diff(moment(event.time))
       const formattedDifference = moment.duration(timeDifference).humanize()
 
-      setNotifications((prev) => {
-        return [
-          {
-            id: data.id,
-            isRead: false,
-            time: data.time,
-            formattedTime: formattedDifference,
-            message: data.message,
-          },
-          ...prev,
-        ]
-      })
+      setNotifications((prev) => [
+        {
+          id: event.id,
+          isRead: false,
+          time: event.time,
+          formattedTime: formattedDifference,
+          message: event.data?.message,
+        },
+        ...prev,
+      ])
     }
-
-    return () => {
-      es?.close()
-    }
-  }, [isLoggedIn])
+  }, [event])
 
   useEffect(() => {
     if (!(notifications?.length > 0)) return
@@ -131,8 +110,8 @@ export function DpNotificationBellComponent({
               <Fragment key={notification.id}>
                 <DropdownMenuItem
                   className={`cursor-pointer p-2 focus:text-white ${notification.isRead ? 'opacity-35' : 'bg-background-secondary-lighter'}`}
-                  onSelect={(event) => {
-                    event.preventDefault()
+                  onSelect={(e) => {
+                    e.preventDefault()
                     const notIndex = notifications.findIndex(
                       (item) => item.id === notification.id
                     )

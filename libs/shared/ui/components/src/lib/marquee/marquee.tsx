@@ -1,98 +1,80 @@
-import {
-  AnimationDefinition,
-  motion,
-  useAnimationControls,
-} from 'framer-motion'
+import { cn } from '@js-monorepo/ui/util'
+import { motion } from 'framer-motion'
 import React, {
+  ForwardedRef,
   forwardRef,
   ReactNode,
   useEffect,
-  useImperativeHandle,
   useRef,
-  useState,
 } from 'react'
 
 interface MarqueeProps {
   children?: ReactNode
+  className?: string
   duration?: number // Duration for the animation
-  direction?: 'left' | 'right' // Direction of the marquee
   repeat?: number // Number of loops before stopping
-  onPlayingStateChange?: (isPlaying: boolean) => void
+  onAnimationComplete?: () => void // Callback to clear announcements
 }
 
-export interface MarqueeRef {
-  start: () => void
-  stop: () => void
-}
-
-// Use forwardRef to allow parent components to access start stop and isPlaying
 const Marquee = forwardRef(
   (
     {
       children,
       duration = 15,
       repeat = undefined,
-      onPlayingStateChange,
+      onAnimationComplete,
+      className,
     }: MarqueeProps,
-    ref
+    ref: ForwardedRef<HTMLDivElement>
   ) => {
-    const containerRef = useRef<HTMLDivElement>(null)
-    const controls = useAnimationControls()
-    const [controlConfig, setControlConfig] =
-      useState<AnimationDefinition | null>(null)
-    const [isPlaying, setIsPlaying] = useState(false)
+    const animationStatusRef = useRef(new Map<number, boolean>()) // Ref to track animation completion
 
     useEffect(() => {
-      if (containerRef.current) {
-        setControlConfig({
-          x: [
-            containerRef.current.offsetWidth,
-            -containerRef.current.offsetWidth,
-          ],
-          transition: {
-            duration,
-            ease: 'linear',
-            repeat,
-            repeatType: repeat ? 'loop' : undefined,
-          },
-        })
-      }
-    }, [duration, repeat])
+      // Initialize the animation status map when children change
+      animationStatusRef.current?.clear() // Clear previous status
+      React.Children.forEach(children, (child, index) => {
+        animationStatusRef.current?.set(index, false) // Set initial status to false
+      })
+    }, [children])
 
-    // Expose start and stop functions to parent components
-    useImperativeHandle(ref, () => ({
-      start: () => controlConfig && controls?.start(controlConfig),
-      stop: () => controls?.stop(),
-    }))
+    const checkAllAnimationsCompleted = () => {
+      // check if all animations are completed
+      const allCompleted = Array.from(
+        animationStatusRef.current.values()
+      ).every((status) => status)
+
+      if (allCompleted) {
+        onAnimationComplete?.()
+      }
+    }
 
     return (
       <div
-        ref={containerRef}
-        style={{
-          overflow: 'hidden',
-          whiteSpace: 'nowrap',
-          position: 'relative',
-        }}
+        ref={ref}
+        className={cn('overflow-hidden whitespace-nowrap py-1', className)}
       >
-        <motion.div
-          className={`flex gap-40 ${isPlaying ? 'opacity-1' : 'opacity-0'} py-1`}
-          animate={controls}
-          onAnimationStart={() => {
-            setIsPlaying(true)
-            onPlayingStateChange?.(true)
-          }}
-          onAnimationComplete={() => {
-            setIsPlaying(false)
-            onPlayingStateChange?.(false)
-          }}
-          style={{
-            display: 'inline-flex',
-          }}
-        >
-          {React.Children?.map(children, (child) => (
-            <div style={{ padding: '0 20px' }}>{child}</div>
+        <div className={`flex gap-40 min-h-6 relative items-center`}>
+          {React.Children.map(children, (child, index) => (
+            <motion.div
+              key={index}
+              className="px-4 absolute"
+              initial={{ x: `100vw` }}
+              animate={{ x: `-500px` }}
+              transition={{
+                duration,
+                ease: 'linear',
+                delay: index * 0.5,
+                onComplete: () => {
+                  // Mark this animation as completed
+                  animationStatusRef.current.set(index, true)
+                  setTimeout(checkAllAnimationsCompleted, 400) // Small delay to ensure state updates
+                },
+              }}
+            >
+              {child}
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     )
   }

@@ -283,12 +283,15 @@ const DashboardUsersTableSuspense = () => {
                   <TextareaForm
                     submitCallBack={async (callBackData) => {
                       const response = await API.url(
-                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`
+                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/events/emit`
                       )
                         .post()
                         .body({
                           channel: row.original?.username,
-                          message: callBackData.notification,
+                          type: 'notification',
+                          data: {
+                            message: callBackData.notification,
+                          },
                         })
                         .withCsrf()
                         .withCredentials()
