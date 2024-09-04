@@ -1,5 +1,6 @@
 import { SessionProvider } from '@js-monorepo/auth/next/client'
 import { DpLoaderProvider } from '@js-monorepo/loader'
+import { EventSourceProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
@@ -20,18 +21,20 @@ export default async function RootProviders({
         isLoggedIn: !!session?.user,
       }}
     >
-      <DpNextPageProgressBar>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <DpLoaderProvider>
-            <DpNotificationProvider>{children}</DpNotificationProvider>
-          </DpLoaderProvider>
-        </ThemeProvider>
-      </DpNextPageProgressBar>
+      <EventSourceProvider>
+        <DpNextPageProgressBar>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <DpLoaderProvider>
+              <DpNotificationProvider>{children}</DpNotificationProvider>
+            </DpLoaderProvider>
+          </ThemeProvider>
+        </DpNextPageProgressBar>
+      </EventSourceProvider>
     </SessionProvider>
   )
 }

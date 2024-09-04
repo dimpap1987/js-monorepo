@@ -93,7 +93,7 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
     })
     if (response.ok) {
       addNotification({
-        message: `Welcome,  ${formData.username}! 🚀`,
+        message: `Welcome,    ${formData.username} 👋`,
         duration: 5000,
       })
       refreshSession()

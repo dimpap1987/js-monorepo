@@ -149,3 +149,13 @@ export type AuthUserFullDto = AuthUserDto & {
   sentNotifications: NotificationDto[]
   receivedNotifications: NotificationDto[]
 }
+
+export type EventsReponseType = 'notification' | 'announcement'
+
+export interface EventsReponse<T = any> {
+  id: string
+  data: T
+  time: Date
+  channel: string
+  type: EventsReponseType
+}

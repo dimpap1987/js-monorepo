@@ -152,6 +152,11 @@ export class AuthSessionController {
   private async handleSocialRedirect(req: Request, res: Response) {
     if (req.user?.user) {
       // If the user is logged in
+      try {
+        this.options.onLogin?.(req.user.user)
+      } catch (e: any) {
+        this.logger.error('Login callback error', e.stack)
+      }
       res.redirect(this.options.redirectUiUrl as string)
     } else if (req.user?.unRegisteredUser) {
       // If the user is not logged in but has the UNREGISTERED-USER cookie

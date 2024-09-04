@@ -30,3 +30,12 @@ export const registerUserSchemaConfig = new RegisterUserSchemaConfig()
 export const RegisterUserSchema = registerUserSchemaConfig.getSchema()
 
 export type RegisterUserSchemaType = z.infer<typeof RegisterUserSchema>
+
+//EventSchema
+export const EventSchema = z.object({
+  channel: z.string(),
+  data: z.any(),
+  type: z.enum(['announcement', 'notification']),
+})
+
+export type EventSchemaType = z.infer<typeof EventSchema>
