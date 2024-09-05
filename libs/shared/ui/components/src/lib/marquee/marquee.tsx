@@ -59,11 +59,11 @@ const Marquee = forwardRef(
               key={index}
               className="px-4 absolute"
               initial={{ x: `100vw` }}
-              animate={{ x: `-500px` }}
+              animate={{ x: `-300px` }}
               transition={{
                 duration,
                 ease: 'linear',
-                delay: index * 0.5,
+                delay: index * 1.5,
                 onComplete: () => {
                   // Mark this animation as completed
                   animationStatusRef.current.set(index, true)

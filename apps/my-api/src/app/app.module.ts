@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { GLOBAL_CHANNEL } from './constants'
 import { AdminController } from './controllers/admin.controller'
 import { EventsController } from './controllers/events.controller'
 import { ExceptionController } from './controllers/exception.controller'
@@ -54,31 +55,29 @@ const ENV = process.env.NODE_ENV
         },
         csrf: {
           enabled: true,
-          middlewareExclusions: ['exceptions'],
+          middlewareExclusions: ['exceptions', 'events'],
         },
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onLogin: async (user: AuthUserDto) => {
-          eventsService.emit('global', {
+          eventsService.emit(GLOBAL_CHANNEL, {
             id: uuidv4(),
             data: {
-              announcements: [`${user.username} is online`],
+              announcements: [`'${user.username}' is online`],
             },
             time: new Date(),
             type: 'announcement',
-            channel: 'global',
           })
         },
         onRegister: async (user: AuthUserDto) => {
-          await channelService.assignUserToChannels(user.id, 'global')
+          await channelService.assignUserToChannels(user.id, GLOBAL_CHANNEL)
 
-          eventsService.emit('global', {
+          eventsService.emit(GLOBAL_CHANNEL, {
             id: uuidv4(),
             data: {
-              announcements: [`${user.username} has joined 🚀`],
+              announcements: [`'${user.username}' has just joined!`],
             },
             time: new Date(),
             type: 'announcement',
-            channel: 'global',
           })
         },
       }),

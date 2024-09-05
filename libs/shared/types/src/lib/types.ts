@@ -156,6 +156,5 @@ export interface EventsReponse<T = any> {
   id: string
   data: T
   time: Date
-  channel: string
   type: EventsReponseType
 }
