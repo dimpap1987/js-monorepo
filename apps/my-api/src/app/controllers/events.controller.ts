@@ -37,14 +37,12 @@ export class EventsController {
     @Body(new ZodPipe(EventSchema))
     { channel, data, type }: EventSchemaType
   ) {
-    const payload: EventsReponse<any> = {
+    this.eventsService.emit(channel, {
       id: uuidv4(),
       data,
       time: new Date(),
-      channel,
       type,
-    }
-    this.eventsService.emit(channel, payload)
+    })
 
     return { ok: true }
   }

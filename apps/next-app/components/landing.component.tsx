@@ -52,7 +52,10 @@ export default function LandingComponent({ children, className }: MainProps) {
     <section className={cn('overflow-hidden', className)}>
       <Marquee duration={15} onAnimationComplete={() => setAnnouncements([])}>
         {announcements.map((message, index) => (
-          <span className="text-sm" key={index}>
+          <span
+            className="dark:text-lime-300 font-semibold tracking-wider font-mono select-none"
+            key={index}
+          >
             {message}
           </span>
         ))}
