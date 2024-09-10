@@ -71,7 +71,6 @@ export class AuthSessionController {
   @HttpCode(200)
   async logOut(@Req() req: Request, @Res() res: Response) {
     req.logOut(() => {})
-    req.session.cookie.maxAge = 0
     res.send({ message: 'Logged out successfully' })
   }
 
