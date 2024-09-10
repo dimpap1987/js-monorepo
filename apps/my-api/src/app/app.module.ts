@@ -8,7 +8,7 @@ import {
 import { PrismaModule } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import { AuthUserDto } from '@js-monorepo/types'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
 import passport from 'passport'
@@ -33,8 +33,19 @@ const ENV = process.env.NODE_ENV
 
 @Module({
   imports: [
-    RedisModule.register({
-      url: process.env['REDIS_URL'],
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [
+        `apps/my-api/.env.${ENV}`,
+        'apps/my-api/.env',
+        `.env.${ENV}`,
+        `.env`,
+      ],
+    }),
+    RedisModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        url: configService.get('REDIS_URL'),
+      }),
     }),
     AuthSessionModule.forRootAsync({
       imports: [AppModule, ChannelProviderModule],
@@ -87,9 +98,6 @@ const ENV = process.env.NODE_ENV
     ChannelProviderModule,
     AdminProviderModule,
     NotificationProviderModule,
-    ConfigModule.forRoot({
-      envFilePath: ['.env', `.env.${ENV}`, `environments/.env.${ENV}`],
-    }),
   ],
   controllers: [
     AppController,

@@ -1,6 +1,7 @@
 import { REDIS } from '@js-monorepo/nest/redis'
 import { SessionUserType } from '@js-monorepo/types'
 import { Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { PassportSerializer } from '@nestjs/passport'
 import { RedisClientType } from 'redis'
 import { AuthService } from '../../common/services/interfaces/auth.service'
@@ -10,7 +11,8 @@ import { ServiceAuth } from '../../common/types'
 export class SessionSerializer extends PassportSerializer {
   constructor(
     @Inject(ServiceAuth) private authService: AuthService,
-    @Inject(REDIS) private readonly redis: RedisClientType
+    @Inject(REDIS) private readonly redis: RedisClientType,
+    private readonly configService: ConfigService
   ) {
     super()
   }
@@ -20,7 +22,8 @@ export class SessionSerializer extends PassportSerializer {
   }
 
   async deserializeUser(userId: string, done: CallableFunction) {
-    const cacheKey = `${process.env['REDIS_NAMESPACE']}:users-session:${userId}`
+    const REDIS_NAMESPACE = this.configService.get('REDIS_NAMESPACE')
+    const cacheKey = `${REDIS_NAMESPACE}:users-session:${userId}`
     const cachedUser = await this.redis.get(cacheKey)
 
     if (cachedUser) {
