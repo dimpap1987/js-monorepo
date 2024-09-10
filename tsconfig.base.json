@@ -23,7 +23,6 @@
       "@js-monorepo/auth/next/*": ["libs/auth/next/src/lib/*"],
       "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
-      "@js-monorepo/next/*": ["libs/next/src/lib/*"],
       "@js-monorepo/components/*": ["libs/shared/ui/components/src/lib/*"],
       "@js-monorepo/db": ["libs/prisma/db/src/index.ts"],
       "@js-monorepo/dialog": ["libs/shared/ui/dialog/src/index.ts"],
@@ -34,6 +33,7 @@
       "@js-monorepo/nav-link": ["libs/shared/ui/nav-link/src/index.ts"],
       "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
       "@js-monorepo/nest/*": ["libs/nest-utils/src/lib/*"],
+      "@js-monorepo/next/*": ["libs/next/src/lib/*"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
       "@js-monorepo/notification-bell": [
         "libs/shared/ui/notification-bell/src/index.ts"
