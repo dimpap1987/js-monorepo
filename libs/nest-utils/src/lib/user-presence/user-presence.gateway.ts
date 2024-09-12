@@ -10,6 +10,8 @@ import { Socket } from 'socket.io'
 import { UserPresenceService } from './user-presence.service'
 import { WsGuard } from './ws.guard'
 
+export const ONLINE_USERS_ROOM = 'online_users_room'
+
 @WebSocketGateway(4444, {
   pingInterval: 30000,
   pingTimeout: 5000,
@@ -35,6 +37,8 @@ export class UserPresenceGateway
       } else {
         this.userPresenceService.addOnlineUser(userId, client.id)
         this.logger.debug(`User: ${userId} connected through websocket`)
+        client.join(ONLINE_USERS_ROOM)
+        // broadcast to channel 'event-users-online'
       }
     } catch (e: any) {
       this.logger.error('Error while handling websocket connection', e.stack)
