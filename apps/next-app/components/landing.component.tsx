@@ -24,18 +24,12 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
   const { user, isLoggedIn } = useSession()
   const [announcements, setAnnouncements] = useState<string[] | []>([])
-  const { subscribe } = useWebSocket()
+  const [subscribe] = useWebSocket()
 
   useEffect(() => {
-    // let subscription = null
-    // if (isLoggedIn) {
-    //   subscription = subscribe('presence', 'test', (response) => {
-    //     setAnnouncements([response])
-    //   })
-    // }
-    // return () => {
-    //   subscription?.terminate()
-    // }
+    if (isLoggedIn) {
+      subscribe('presence')
+    }
   }, [isLoggedIn])
 
   async function loadForTwoSecond() {
