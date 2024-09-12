@@ -2,13 +2,19 @@
 
 import { createContext, useContext, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import { v4 as uuidv4 } from 'uuid'
 
-type WebSocketContextType = {
-  subscribe: (
+type Subscription = {
+  (
     namespace: string,
     event: string,
     callback: (data: any) => void
-  ) => { terminate: () => void }
+  ): { terminate: () => void }
+  (namespace: string): { terminate: () => void }
+}
+
+type WebSocketContextType = {
+  subscribe: Subscription
 }
 
 const WebSocketContext = createContext<WebSocketContextType>(
@@ -20,7 +26,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const socketRefs = useRef<Map<string, Socket>>(new Map())
   const pingIntervals = useRef<Map<string, NodeJS.Timer>>(new Map())
-  const listeners = useRef<Map<string, Array<(data: any) => void>>>(new Map())
+  const listeners = useRef<Map<string, (data: any) => void>>(new Map())
 
   useEffect(() => {
     // Cleanup all sockets and intervals on unmount
@@ -32,44 +38,48 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [])
 
-  const unsubscribe = (
-    namespace: string,
-    event: string,
-    callback: (data: any) => void
-  ) => {
-    const callbacks = listeners.current.get(event)
-    if (callbacks) {
-      listeners.current.set(
-        event,
-        callbacks.filter((cb) => cb !== callback)
-      )
+  const unsubscribe = (listenerId: string) => {
+    // Check if the listenerId exists before deleting
+    if (!listeners.current.has(listenerId)) {
+      console.warn(`Listener ID ${listenerId} does not exist.`)
+      return
     }
 
+    listeners.current.delete(listenerId)
+
+    const namespace = listenerId.split('-')[0]
+
+    const remainingListeners = Array.from(listeners.current.keys()).filter(
+      (key) => key.startsWith(namespace)
+    )
+
     // Disconnect the socket if there are no more listeners
-    if (callbacks?.length === 0) {
+    if (remainingListeners.length === 0) {
       const socket = socketRefs.current.get(namespace)
       if (socket) {
+        console.debug(`Disconnecting socket for namespace: ${namespace}`)
         socket.disconnect()
         socketRefs.current.delete(namespace)
         const interval = pingIntervals.current.get(namespace)
         if (interval) {
           clearInterval(interval)
           pingIntervals.current.delete(namespace)
+          console.debug(`Cleared ping interval for namespace: ${namespace}`)
         }
       }
     }
   }
 
-  const subscribe = (
+  const subscribe: Subscription = (
     namespace: string,
-    event: string,
-    callback: (data: any) => void
+    event?: string,
+    callback?: (data: any) => void
   ) => {
-    if (!listeners.current.has(event)) {
-      listeners.current.set(event, [])
-    }
-    listeners.current.get(event)?.push(callback)
+    const listenerKey = `${namespace}-${event}-${uuidv4()}`
 
+    if (event && callback) {
+      listeners.current.set(listenerKey, callback)
+    }
     // Create a socket connection for the specified namespace if it doesn't exist
     if (!socketRefs.current.has(namespace)) {
       const socket = io(
@@ -90,27 +100,25 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log(`Disconnected from namespace: ${namespace}`)
       })
 
-      // Register event listeners
-      const handleEvent = (data: any) => {
-        const callbacks = listeners.current.get(event)
-        if (callbacks) {
-          callbacks.forEach((cb) => cb(data))
-        }
+      if (event) {
+        socket.on(event, (data) => {
+          listeners.current.get(listenerKey)?.(data)
+        })
       }
 
-      socket.on(event, handleEvent)
-
       // Set up ping interval
-      const pingInterval = setInterval(() => {
-        socket.emit('ping')
-      }, 5000)
-      pingIntervals.current.set(namespace, pingInterval)
+      if (namespace === 'presence') {
+        const pingInterval = setInterval(() => {
+          socket.emit('ping')
+        }, 5000)
+        pingIntervals.current.set(namespace, pingInterval)
+      }
     }
 
     // Return an object with a terminate method
     return {
       terminate: () => {
-        unsubscribe(namespace, event, callback)
+        unsubscribe(listenerKey)
       },
     }
   }
@@ -128,5 +136,5 @@ export const useWebSocket = () => {
   if (!context) {
     throw new Error('useWebSocket must be used within a WebSocketProvider')
   }
-  return context
+  return [context.subscribe]
 }
