@@ -11,6 +11,7 @@ import { checkoutSessionClient } from '@js-monorepo/payment'
 import { cn } from '@js-monorepo/ui/util'
 import { ReactNode, useEffect, useState } from 'react'
 import BannerSVG from './banner-svg'
+import { WebSocketComponent } from './websocket-client'
 
 interface MainProps {
   readonly children?: ReactNode
@@ -60,6 +61,7 @@ export default function LandingComponent({ children, className }: MainProps) {
           </span>
         ))}
       </Marquee>
+      <WebSocketComponent></WebSocketComponent>
       {children}
       <div className="relative min-h-[200px] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
         <BannerSVG />
