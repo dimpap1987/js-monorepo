@@ -3,12 +3,13 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
+import { useWebSocket } from '@js-monorepo/next/providers'
 import { DpNotificationBellComponent } from '@js-monorepo/notification-bell'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import { MenuItem } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import SVGLogo from './logo-svg'
 
 const menuItems: MenuItem[] = [
@@ -44,6 +45,15 @@ export default function MainTemplate({
 }: Readonly<PropsWithChildren>) {
   const { user, isLoggedIn } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
+  const socket = useWebSocket('presence')
+
+  socket?.on('connect', () => socket.ping())
+
+  useEffect(() => {
+    return () => {
+      socket?.disconnect()
+    }
+  }, [])
 
   return (
     <>

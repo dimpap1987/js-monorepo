@@ -5,13 +5,11 @@ import { useLoader } from '@js-monorepo/loader'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Marquee } from '@js-monorepo/components/marquee'
 import { DonationDialogComponent } from '@js-monorepo/dialog'
-import { useWebSocket } from '@js-monorepo/next/providers'
 import { useNotifications } from '@js-monorepo/notification'
 import { checkoutSessionClient } from '@js-monorepo/payment'
 import { cn } from '@js-monorepo/ui/util'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
-
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
@@ -22,15 +20,8 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
-  const { user, isLoggedIn } = useSession()
+  const { user } = useSession()
   const [announcements, setAnnouncements] = useState<string[] | []>([])
-  const [subscribe] = useWebSocket()
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      subscribe('presence')
-    }
-  }, [isLoggedIn])
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -58,7 +49,6 @@ export default function LandingComponent({ children, className }: MainProps) {
           </span>
         ))}
       </Marquee>
-      {/* <WebSocketComponent></WebSocketComponent> */}
       {children}
       <div className="relative min-h-[200px] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
         <BannerSVG />
