@@ -11,18 +11,20 @@ export class RedisEventEmitter implements EventEmitterInterface {
     private eventEmitter: EventEmitter2
   ) {}
 
-  async emit(eventName: string, payload: Record<any, any>): Promise<void> {
+  async emit(
+    eventName: string,
+    payload: PublishableEventInterface
+  ): Promise<void> {
     this.eventEmitter.emit(eventName, payload)
-
     if (this.isPublishableEvent(payload)) {
       await this.redisPubClient.publish(
-        payload.publishableEventName,
+        payload.eventName,
         JSON.stringify(payload)
       )
     }
   }
 
   private isPublishableEvent(event: any): event is PublishableEventInterface {
-    return event.publishableEventName !== undefined
+    return event.eventName !== undefined
   }
 }

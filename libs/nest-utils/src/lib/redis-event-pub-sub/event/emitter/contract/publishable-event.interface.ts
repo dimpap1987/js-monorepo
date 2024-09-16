@@ -1,3 +1,3 @@
 export interface PublishableEventInterface {
-  readonly publishableEventName: string
+  readonly eventName: string
 }

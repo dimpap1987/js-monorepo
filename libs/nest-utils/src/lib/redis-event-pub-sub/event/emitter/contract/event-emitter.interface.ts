@@ -1,3 +1,9 @@
 export interface EventEmitterInterface {
-  emit(eventName: string, data: any): void
+  emit(
+    eventName: string,
+    paylod: {
+      eventName: string
+      data: any
+    }
+  ): void
 }
