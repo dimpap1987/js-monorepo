@@ -50,13 +50,24 @@ export default function MainTemplate({
     isLoggedIn
   )
 
-  socket?.on('connect', () => socket.ping())
-
   useEffect(() => {
-    return () => {
-      socket?.disconnect()
+    if (socket) {
+      socket.on('connect', () => {
+        socket.ping()
+        // check if he is admin. add isAdmin property
+        socket.emit('fetch-online-users', {})
+
+        socket.on('events-online-users', (data) => {
+          console.log(data)
+        })
+      })
+
+      // Cleanup function to remove the listeners when the component unmounts
+      return () => {
+        socket?.disconnect()
+      }
     }
-  }, [])
+  }, [socket])
 
   return (
     <>

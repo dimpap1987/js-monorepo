@@ -4,10 +4,13 @@ import * as cookie from 'cookie'
 import * as cookieParser from 'cookie-parser'
 import { Socket } from 'socket.io'
 import { REDIS } from '../redis'
+import { UserCacheType } from './types'
 
 @Injectable()
 export class UserPresenceService {
   private readonly ONLINE_KEY = `${process.env['REDIS_NAMESPACE']}:online-users`
+
+  logger = new Logger(UserPresenceService.name)
 
   constructor(@Inject(REDIS) private readonly redisClient: RedisClientType) {}
 
@@ -48,6 +51,23 @@ export class UserPresenceService {
     } catch (e: any) {
       Logger.error('Error while getting user from websocket', e)
       return undefined
+    }
+  }
+
+  async getAllOnlineUsers(): Promise<Omit<UserCacheType, 'socketId'>[]> {
+    try {
+      const keys = await this.redisClient.keys(`${this.ONLINE_KEY}:*`)
+      const userInfos = await Promise.all(
+        keys.map(async (key) => {
+          const userInfo = await this.redisClient.get(key)
+          return userInfo ? JSON.parse(userInfo) : null
+        })
+      )
+
+      return userInfos.filter(Boolean).map(({ userId }) => ({ userId }))
+    } catch (e: any) {
+      this.logger.error('Error while getting all online users', e.stach)
+      return []
     }
   }
 }

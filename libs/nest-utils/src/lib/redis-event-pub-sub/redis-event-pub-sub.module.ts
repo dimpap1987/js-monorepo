@@ -82,13 +82,12 @@ export class RedisEventPubSubModule extends ConfigurableModuleClass {
             )
             await client.connect()
             for (const eventPublishableName of eventsPublishableNames) {
-              await client.subscribe(eventPublishableName, (message) => {
+              await client.subscribe(eventPublishableName, (response) => {
                 const normalizedMessage = JSON.parse(
-                  message
+                  response
                 ) as PublishableEventInterface
 
-                const { publishableEventName, ...newMessage } =
-                  normalizedMessage
+                const { eventName, ...newMessage } = normalizedMessage
 
                 eventEmitter.emit(eventPublishableName, newMessage)
               })

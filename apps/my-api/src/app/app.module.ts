@@ -54,14 +54,13 @@ const ENV = process.env.NODE_ENV
       isGlobal: true,
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        url: configService.get('REDIS_URL'),
+        url: configService.get('REDIS_URL') ?? '',
       }),
       inject: [ConfigService],
     }),
     EventEmitterModule.forRoot({
       global: true,
     }),
-    // RedisEventPubSubModule.registerEvents(['events:new-message']),
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
       imports: [AppModule, ChannelProviderModule],
