@@ -45,7 +45,10 @@ export default function MainTemplate({
 }: Readonly<PropsWithChildren>) {
   const { user, isLoggedIn } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
-  const socket = useWebSocket('presence')
+  const socket = useWebSocket(
+    process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
+    isLoggedIn
+  )
 
   socket?.on('connect', () => socket.ping())
 
