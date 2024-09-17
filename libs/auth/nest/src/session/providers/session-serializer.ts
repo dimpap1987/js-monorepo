@@ -1,19 +1,13 @@
-import { REDIS } from '@js-monorepo/nest/redis'
 import { SessionUserType } from '@js-monorepo/types'
-import { Inject, Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { Injectable, Logger } from '@nestjs/common'
 import { PassportSerializer } from '@nestjs/passport'
-import { RedisClientType } from 'redis'
-import { AuthService } from '../../common/services/interfaces/auth.service'
-import { ServiceAuth } from '../../common/types'
+import { AuthSessionUserCache } from './auth-session-cache.service'
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  constructor(
-    @Inject(ServiceAuth) private authService: AuthService,
-    @Inject(REDIS) private readonly redis: RedisClientType,
-    private readonly configService: ConfigService
-  ) {
+  logger = new Logger(SessionSerializer.name)
+
+  constructor(private readonly authSessionUserCache: AuthSessionUserCache) {
     super()
   }
 
@@ -22,32 +16,21 @@ export class SessionSerializer extends PassportSerializer {
   }
 
   async deserializeUser(userId: string, done: CallableFunction) {
-    const REDIS_NAMESPACE = this.configService.get('REDIS_NAMESPACE')
-    const cacheKey = `${REDIS_NAMESPACE}:users-session:${userId}`
-    const cachedUser = await this.redis.get(cacheKey)
+    let user
+    user = await this.authSessionUserCache.findAuthCacheUserById(Number(userId))
 
-    if (cachedUser) {
-      // If user found in cache, parse and return it
-      done(null, JSON.parse(cachedUser))
+    if (user) {
+      done(null, { user })
     } else {
-      // If not found in cache, fetch from the database
-      const user = await this.authService.findAuthUserById(Number(userId))
+      user = await this.authSessionUserCache.saveAuthUserInCache(
+        {
+          id: Number(userId),
+        },
+        60 * 10
+      )
+
       if (user) {
-        const userData = {
-          user: {
-            id: user.id,
-            username: user.username,
-            roles: user.roles,
-            createdAt: user.createdAt,
-            profileImage: user.providers[0]?.profileImage,
-          },
-        }
-
-        await this.redis.set(cacheKey, JSON.stringify(userData), {
-          EX: 60, // Set expiration time to seconds
-        })
-
-        done(null, userData)
+        done(null, { user })
       } else {
         done(null, null)
       }

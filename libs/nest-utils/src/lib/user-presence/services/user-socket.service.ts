@@ -3,23 +3,22 @@ import { RedisClientType } from '@redis/client'
 import * as cookie from 'cookie'
 import * as cookieParser from 'cookie-parser'
 import { Socket } from 'socket.io'
-import { REDIS } from '../redis'
-import { UserCacheType } from './types'
+import { REDIS } from '../../redis'
+import { ONLINE_KEY } from '../constants'
+import { UserCacheType } from '../types'
 
 @Injectable()
-export class UserPresenceService {
-  private readonly ONLINE_KEY = `${process.env['REDIS_NAMESPACE']}:online-users`
-
-  logger = new Logger(UserPresenceService.name)
+export class UserSocketService {
+  logger = new Logger(UserSocketService.name)
 
   constructor(@Inject(REDIS) private readonly redisClient: RedisClientType) {}
 
-  async addOnlineUser(
+  async addSocketUser(
     userId: number | string,
     socketId: string
   ): Promise<void> {
     await this.redisClient.set(
-      `${this.ONLINE_KEY}:${socketId}`,
+      `${ONLINE_KEY}:${socketId}`,
       JSON.stringify({
         userId: userId,
         socket: socketId,
@@ -28,8 +27,8 @@ export class UserPresenceService {
     )
   }
 
-  async removeOnlineUser(socketId: number | string): Promise<void> {
-    await this.redisClient.del(`${this.ONLINE_KEY}:${socketId}`)
+  async removeSocketUser(socketId: number | string): Promise<void> {
+    await this.redisClient.del(`${ONLINE_KEY}:${socketId}`)
   }
 
   async getUserIdFromSocket(socket: Socket) {
@@ -54,17 +53,17 @@ export class UserPresenceService {
     }
   }
 
-  async getAllOnlineUsers(): Promise<Omit<UserCacheType, 'socketId'>[]> {
+  async getSocketUsers(): Promise<Omit<UserCacheType, 'socketId'>[]> {
     try {
-      const keys = await this.redisClient.keys(`${this.ONLINE_KEY}:*`)
+      const keys = await this.redisClient.keys(`${ONLINE_KEY}:*`)
       const userInfos = await Promise.all(
-        keys.map(async (key) => {
+        keys?.map(async (key) => {
           const userInfo = await this.redisClient.get(key)
           return userInfo ? JSON.parse(userInfo) : null
         })
       )
 
-      return userInfos.filter(Boolean).map(({ userId }) => ({ userId }))
+      return userInfos?.filter(Boolean).map(({ userId }) => ({ userId }))
     } catch (e: any) {
       this.logger.error('Error while getting all online users', e.stach)
       return []

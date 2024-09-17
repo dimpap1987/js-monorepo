@@ -4,9 +4,10 @@ import {
   OnlineUsersEvent,
   RedisEventPubSubModule,
 } from '../redis-event-pub-sub'
+import { OnlineUsersService } from './services/online-users.service'
+import { UserSocketService } from './services/user-socket.service'
 import { UserPresenceGateway } from './user-presence.gateway'
 import { UserPresenceScheduler } from './user-presence.scheduler'
-import { UserPresenceService } from './user-presence.service'
 import { WsGuard } from './ws.guard'
 
 @Module({
@@ -16,15 +17,11 @@ import { WsGuard } from './ws.guard'
   ],
   providers: [
     UserPresenceGateway,
-    UserPresenceService,
+    UserSocketService,
     WsGuard,
     UserPresenceScheduler,
+    OnlineUsersService,
   ],
-  exports: [
-    UserPresenceGateway,
-    UserPresenceService,
-    WsGuard,
-    UserPresenceScheduler,
-  ],
+  exports: [UserSocketService, WsGuard, OnlineUsersService],
 })
 export class UserPresenceModule {}

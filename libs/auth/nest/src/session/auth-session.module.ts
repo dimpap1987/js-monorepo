@@ -26,6 +26,7 @@ import { AuthSessionController } from './controllers/auth-session.controller'
 import { LoggedInGuard } from './guards/login.guard'
 import { RolesGuard } from './guards/roles-guard'
 import { AuthSessionMiddleware } from './middlewares/auth-session.middleware'
+import { AuthSessionUserCache } from './providers/auth-session-cache.service'
 import { SessionSerializer } from './providers/session-serializer'
 
 @Module({
@@ -42,12 +43,14 @@ import { SessionSerializer } from './providers/session-serializer'
     LoggedInGuard,
     SessionSerializer,
     AuthSessionMiddleware,
+    AuthSessionUserCache,
   ],
   exports: [
     RolesGuard,
     LoggedInGuard,
     SessionSerializer,
     AuthSessionMiddleware,
+    AuthSessionUserCache,
   ],
 })
 export class AuthSessionModule implements NestModule {
