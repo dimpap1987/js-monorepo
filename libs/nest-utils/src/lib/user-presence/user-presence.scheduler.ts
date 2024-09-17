@@ -5,14 +5,14 @@ import {
   EventEmitterInterface,
   OnlineUsersEvent,
 } from '../redis-event-pub-sub'
-import { UserPresenceService } from './user-presence.service'
+import { OnlineUsersService } from './services/online-users.service'
 
 @Injectable()
 export class UserPresenceScheduler {
   logger = new Logger(UserPresenceScheduler.name)
 
   constructor(
-    private userPresenceService: UserPresenceService,
+    private onlineUsersService: OnlineUsersService,
     @Inject(EVENT_EMITTER_TOKEN)
     private readonly eventEmitter: EventEmitterInterface
   ) {}
@@ -20,7 +20,7 @@ export class UserPresenceScheduler {
   @Cron(CronExpression.EVERY_10_SECONDS)
   async emitOnlineUsers() {
     try {
-      const onlineUsers = await this.userPresenceService.getAllOnlineUsers()
+      const onlineUsers = await this.onlineUsersService.loadOnlineUsers()
       this.eventEmitter.emit(
         OnlineUsersEvent.name,
         new OnlineUsersEvent(onlineUsers)

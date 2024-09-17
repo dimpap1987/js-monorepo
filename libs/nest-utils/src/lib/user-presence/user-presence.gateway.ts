@@ -7,14 +7,14 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets'
-import { from, map, Observable } from 'rxjs'
 import { Namespace, Socket } from 'socket.io'
 import {
   EVENT_SUBSCRIBER_TOKEN,
   EventSubscriberInterface,
   OnlineUsersEvent,
 } from '../redis-event-pub-sub'
-import { UserPresenceService } from './user-presence.service'
+import { OnlineUsersService } from './services/online-users.service'
+import { UserSocketService } from './services/user-socket.service'
 import { WsGuard } from './ws.guard'
 
 export const ONLINE_USERS_ROOM = 'online_users_room'
@@ -42,19 +42,21 @@ export class UserPresenceGateway
   namespace?: Namespace
 
   constructor(
-    private userPresenceService: UserPresenceService,
+    private userSocketService: UserSocketService,
     @Inject(EVENT_SUBSCRIBER_TOKEN)
-    private eventSubscriber: EventSubscriberInterface
+    private eventSubscriber: EventSubscriberInterface,
+    private onlineUsersService: OnlineUsersService
   ) {}
 
   async handleConnection(socket: Socket) {
     try {
-      const userId = await this.userPresenceService.getUserIdFromSocket(socket)
+      const userId = await this.userSocketService.getUserIdFromSocket(socket)
 
       if (!userId) {
         socket.disconnect()
       } else {
-        this.userPresenceService.addOnlineUser(userId, socket.id)
+        await this.userSocketService.addSocketUser(userId, socket.id)
+        this.onlineUsersService.loadOnlineUsers()
         this.logger.debug(`User: ${userId} connected through websocket`)
       }
     } catch (e: any) {
@@ -63,46 +65,24 @@ export class UserPresenceGateway
   }
 
   async handleDisconnect(client: Socket) {
-    this.userPresenceService.removeOnlineUser(client.id)
+    await this.userSocketService.removeSocketUser(client.id)
+    this.onlineUsersService.loadOnlineUsers()
   }
 
   @UseGuards(WsGuard)
   @SubscribeMessage('ping')
   async handlePing(@ConnectedSocket() client: Socket): Promise<void> {
-    const userId = await this.userPresenceService.getUserIdFromSocket(client)
-    this.userPresenceService.addOnlineUser(userId, client.id)
+    const userId = await this.userSocketService.getUserIdFromSocket(client)
+    this.userSocketService.addSocketUser(userId, client.id)
   }
 
   @UseGuards(WsGuard)
   @SubscribeMessage(WebsocketEventSubscribeList.FETCH_ONLINE_USERS)
   async streamMessagesData(@ConnectedSocket() client: any) {
-    const stream$ = this.createWebsocketStreamFromEventFactory(
+    return this.eventSubscriber.createWebsocketStream(
       client,
-      this.eventSubscriber,
-      OnlineUsersEvent.eventName
+      OnlineUsersEvent.eventName,
+      WebsocketEventSubscribeList.EVENTS_ONLINE_USERS
     )
-
-    const event = WebsocketEventSubscribeList.EVENTS_ONLINE_USERS
-    return from(stream$).pipe(map((data) => ({ event, data })))
-  }
-
-  private createWebsocketStreamFromEventFactory(
-    client: any,
-    eventSubscriber: EventSubscriberInterface,
-    eventName: string
-  ): Observable<any> {
-    return new Observable((observer) => {
-      const dynamicListener = (
-        data: OnlineUsersEvent<{ userId: number }>['data']
-      ) => {
-        observer.next(data)
-      }
-
-      eventSubscriber.on(eventName, dynamicListener)
-
-      client.on('disconnect', () => {
-        eventSubscriber.off(eventName, dynamicListener)
-      })
-    })
   }
 }
