@@ -3,8 +3,6 @@ declare global {
     interface ProcessEnv extends Dict<string> {
       NODE_ENV: 'development' | 'production' | 'test'
 
-      ACCESS_TOKEN_SECRET: string
-      REFRESH_TOKEN_SECRET: string
       CORS_ORIGIN_DOMAINS: string
 
       GITHUB_CLIENT_ID: string
