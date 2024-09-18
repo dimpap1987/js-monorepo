@@ -1,4 +1,5 @@
 'use client'
+import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
@@ -54,6 +55,7 @@ export default function MainTemplate({
     if (socket) {
       socket.on('connect', () => {
         socket.ping()
+        socket.emit('subscribe:announcements', {})
       })
       return () => {
         socket?.disconnect()
@@ -88,6 +90,8 @@ export default function MainTemplate({
           </NavbarItems>
         </DpNextNavbar>
       </header>
+
+      <AnnouncementsComponent className="p-2"></AnnouncementsComponent>
 
       <DpNextSidebar
         isOpen={openSideBar}
