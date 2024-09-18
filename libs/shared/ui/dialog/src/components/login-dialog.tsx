@@ -37,7 +37,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
           }
         }}
       >
-        <DpDialogContent hasPortal={false}>
+        <DpDialogContent>
           <DialogHeader className="font-semibold justify-center">
             <DialogTitle className="text-center font-bold">
               Sign in with

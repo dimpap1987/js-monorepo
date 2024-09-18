@@ -17,13 +17,17 @@ import {
 import { Input } from '@js-monorepo/components/form'
 import { TextareaForm } from '@js-monorepo/components/textarea'
 
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '@js-monorepo/components/avatar'
 import { AuthUserFullDto } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
 import { API } from '@next-app/api-proxy'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'
-import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { GrAnnounce } from 'react-icons/gr'
@@ -106,15 +110,17 @@ const DashboardUsersTableSuspense = () => {
         cell: ({ row }) => {
           return (
             <div className="h-12 flex justify-center items-center">
-              {row.original.providers[0]?.profileImage && (
-                <Image
-                  src={row.original.providers[0]?.profileImage}
-                  width={25}
-                  height={25}
-                  alt="Picture of the user"
-                  className="rounded-full mb-1 mx-auto object-contain"
-                />
-              )}
+              <Avatar>
+                {row.original.providers[0]?.profileImage && (
+                  <AvatarImage
+                    src={row.original.providers[0]?.profileImage}
+                    alt={`${row.original.username} picture`}
+                  ></AvatarImage>
+                )}
+                <AvatarFallback>
+                  {row.original.username?.slice(0, 2)?.toUpperCase() || 'A'}
+                </AvatarFallback>
+              </Avatar>
             </div>
           )
         },
@@ -277,12 +283,15 @@ const DashboardUsersTableSuspense = () => {
                   <TextareaForm
                     submitCallBack={async (callBackData) => {
                       const response = await API.url(
-                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/notification/emit`
+                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/events/emit`
                       )
                         .post()
                         .body({
                           channel: row.original?.username,
-                          message: callBackData.notification,
+                          type: 'notification',
+                          data: {
+                            message: callBackData.notification,
+                          },
                         })
                         .withCsrf()
                         .withCredentials()

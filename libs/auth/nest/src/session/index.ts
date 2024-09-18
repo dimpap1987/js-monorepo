@@ -1,0 +1,6 @@
+export * from './auth-session.module'
+export { SessionUser } from './decorators/session.decorator'
+export { LoggedInGuard } from './guards/login.guard'
+export { RolesGuard } from './guards/roles-guard'
+export { AuthSessionMiddleware } from './middlewares/auth-session.middleware'
+export { AuthSessionUserCache } from './providers/auth-session-cache.service'

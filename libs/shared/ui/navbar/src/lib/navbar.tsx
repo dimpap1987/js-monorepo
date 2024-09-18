@@ -53,7 +53,7 @@ function NavUserOptions({
     user?.isLoggedIn && (
       <UserOptionsDropdown IconComponent={FaCircleUser} className={className}>
         <UserMetadata
-          profileImage={user.picture}
+          profileImage={user.profileImage}
           username={user.username}
           createdAt={user.createdAt}
           className="mb-2 border-border border-b"

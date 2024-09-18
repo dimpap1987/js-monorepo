@@ -8,7 +8,6 @@ model AuthUser {
     userChannels          UserChannel[]
     sentNotifications     UserNotification[] @relation("sender")
     receivedNotifications UserNotification[] @relation("receiver")
-    refreshTokens         RefreshToken[]
 
     @@map(name: "auth_users")
 }
@@ -32,20 +31,6 @@ model Provider {
     user         AuthUser     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@map(name: "providers")
-}
-
-model RefreshToken {
-    id        Int      @id @default(autoincrement())
-    userId    Int      @map("user_id")
-    user      AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
-    token     String   @unique
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    revoked   Boolean  @default(false)
-    ipAddress String?  @map("ip_address")
-    userAgent String?  @map("user_agent")
-
-    @@map(name: "refresh_tokens")
 }
 
 enum AuthRole {

@@ -64,6 +64,9 @@ export class HttpClientBuilder {
       throw new Error('URL must be set before executing a request.')
     }
 
+    if (this.options.method === 'GET') {
+      delete this.options.body
+    }
     const response = await this.runMiddleware(this.fullUrl, {
       ...this.options,
     })

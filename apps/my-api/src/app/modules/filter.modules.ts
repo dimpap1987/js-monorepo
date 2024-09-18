@@ -1,3 +1,4 @@
+import { AuthExceptionFilter } from '@js-monorepo/auth/nest/common/exceptions/filter'
 import { Global, Module, Provider } from '@nestjs/common'
 import { APP_FILTER } from '@nestjs/core'
 import {
@@ -28,6 +29,10 @@ const providers: Provider[] = [
   {
     provide: APP_FILTER,
     useClass: ApiExceptionFilter,
+  },
+  {
+    provide: APP_FILTER,
+    useClass: AuthExceptionFilter,
   },
 ]
 
