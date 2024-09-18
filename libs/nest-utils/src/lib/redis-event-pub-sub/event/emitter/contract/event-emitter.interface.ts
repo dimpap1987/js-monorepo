@@ -1,9 +1,5 @@
+import { PublishableDataInterface } from './publishable-event.interface'
+
 export interface EventEmitterInterface {
-  emit(
-    eventName: string,
-    paylod: {
-      eventName: string
-      data: any
-    }
-  ): void
+  emit(eventName: string, paylod: PublishableDataInterface): void
 }

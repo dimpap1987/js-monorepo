@@ -9,7 +9,6 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@js-monorepo/components/dropdown'
-import { useEventSourceContext } from '@js-monorepo/next/providers'
 import { cn } from '@js-monorepo/ui/util'
 import moment from 'moment'
 import { Fragment, useEffect, useState } from 'react'
@@ -40,25 +39,24 @@ export function DpNotificationBellComponent({
   )?.length
   const isRinging = unreadNotificationCount > 0
 
-  const { event } = useEventSourceContext<{ message: string }>('notification')
+  //TODO websocket notifications
+  // useEffect(() => {
+  //   if (event) {
+  //     const timeDifference = moment().diff(moment(event.time))
+  //     const formattedDifference = moment.duration(timeDifference).humanize()
 
-  useEffect(() => {
-    if (event) {
-      const timeDifference = moment().diff(moment(event.time))
-      const formattedDifference = moment.duration(timeDifference).humanize()
-
-      setNotifications((prev) => [
-        {
-          id: event.id,
-          isRead: false,
-          time: event.time,
-          formattedTime: formattedDifference,
-          message: event.data?.message,
-        },
-        ...prev,
-      ])
-    }
-  }, [event])
+  //     setNotifications((prev) => [
+  //       {
+  //         id: event.id,
+  //         isRead: false,
+  //         time: event.time,
+  //         formattedTime: formattedDifference,
+  //         message: event.data?.message,
+  //       },
+  //       ...prev,
+  //     ])
+  //   }
+  // }, [event])
 
   useEffect(() => {
     if (!(notifications?.length > 0)) return

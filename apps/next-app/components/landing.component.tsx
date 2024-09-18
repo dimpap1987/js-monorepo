@@ -5,10 +5,11 @@ import { useLoader } from '@js-monorepo/loader'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Marquee } from '@js-monorepo/components/marquee'
 import { DonationDialogComponent } from '@js-monorepo/dialog'
+import { useWebSocket } from '@js-monorepo/next/providers'
 import { useNotifications } from '@js-monorepo/notification'
 import { checkoutSessionClient } from '@js-monorepo/payment'
 import { cn } from '@js-monorepo/ui/util'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import BannerSVG from './banner-svg'
 interface MainProps {
   readonly children?: ReactNode
@@ -20,8 +21,24 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
-  const { user } = useSession()
+  const { user, isLoggedIn } = useSession()
   const [announcements, setAnnouncements] = useState<string[] | []>([])
+
+  const socket = useWebSocket(
+    process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
+    isLoggedIn
+  )
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit('subscribe:announcements', {})
+      socket.on('event:announcements', (message: { data: string[] }) => {
+        if (message?.data) {
+          setAnnouncements((prev) => [...prev, ...message.data])
+        }
+      })
+    }
+  }, [socket])
 
   async function loadForTwoSecond() {
     setLoaderState({

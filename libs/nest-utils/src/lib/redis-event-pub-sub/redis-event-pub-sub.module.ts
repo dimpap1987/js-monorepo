@@ -1,7 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { RedisClientType, createClient } from 'redis'
-import { PublishableEventInterface } from './event/emitter/contract/publishable-event.interface'
 import {
   EVENT_EMITTER_TOKEN,
   RedisEventEmitter,
@@ -13,6 +12,7 @@ import {
   MODULE_OPTIONS_TOKEN,
   RedisEventPubSubModuleOptions,
 } from './redis-event-pub-sub.module-definition'
+import { PubSubService } from './pub-sub.service'
 
 export const REDIS_PUB_CLIENT = 'REDIS_PUB_CLIENT'
 export const REDIS_SUB_CLIENT = 'REDIS_SUB_CLIENT'
@@ -21,6 +21,7 @@ export const REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS =
 
 @Module({
   providers: [
+    PubSubService,
     {
       provide: REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS,
       useFactory: (options: RedisEventPubSubModuleOptions) => options,
@@ -61,6 +62,7 @@ export const REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS =
     EVENT_EMITTER_TOKEN,
     EVENT_SUBSCRIBER_TOKEN,
     REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS,
+    PubSubService,
   ],
 })
 export class RedisEventPubSubModule extends ConfigurableModuleClass {
@@ -83,13 +85,7 @@ export class RedisEventPubSubModule extends ConfigurableModuleClass {
             await client.connect()
             for (const eventPublishableName of eventsPublishableNames) {
               await client.subscribe(eventPublishableName, (response) => {
-                const normalizedMessage = JSON.parse(
-                  response
-                ) as PublishableEventInterface
-
-                const { eventName, ...newMessage } = normalizedMessage
-
-                eventEmitter.emit(eventPublishableName, newMessage)
+                eventEmitter.emit(eventPublishableName, JSON.parse(response))
               })
             }
             return client

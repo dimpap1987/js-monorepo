@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
-import { REDIS } from '../../redis/redis'
 import { ONLINE_KEY_LIST } from '../constants'
 import { UserCacheType } from '../types'
 import { UserSocketService } from './user-socket.service'
+import { REDIS } from '@js-monorepo/nest/redis'
 
 @Injectable()
 export class OnlineUsersService {
