@@ -39,6 +39,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const socket = io(url, {
         withCredentials: true,
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: 10,
         transports: ['websocket'],
       }) as PingableSocket
 
