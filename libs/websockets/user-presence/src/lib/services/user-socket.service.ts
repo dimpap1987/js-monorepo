@@ -3,9 +3,9 @@ import { RedisClientType } from '@redis/client'
 import * as cookie from 'cookie'
 import * as cookieParser from 'cookie-parser'
 import { Socket } from 'socket.io'
-import { REDIS } from '../../redis'
 import { ONLINE_KEY } from '../constants'
 import { UserCacheType } from '../types'
+import { REDIS } from '@js-monorepo/nest/redis'
 
 @Injectable()
 export class UserSocketService {

@@ -8,8 +8,8 @@ import {
 import { PrismaModule } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import { RedisEventPubSubModule } from '@js-monorepo/nest/redis-event-pub-sub'
-import { UserPresenceModule } from '@js-monorepo/nest/user-presence'
 import { AuthUserDto } from '@js-monorepo/types'
+import { UserPresenceModule } from '@js-monorepo/user-presence'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import RedisStore from 'connect-redis'
@@ -135,9 +135,7 @@ export class AppModule implements NestModule {
             client: this.redis,
             prefix: `${process.env['REDIS_NAMESPACE']}:sessions:`,
           }),
-          genid: function (req) {
-            return uuidv4()
-          },
+          genid: () => uuidv4(),
           saveUninitialized: false,
           secret: process.env['SESSION_SECRET'],
           resave: false,

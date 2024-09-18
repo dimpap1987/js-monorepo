@@ -15,7 +15,23 @@ export class AuthSessionUserCache {
     @Inject(REDIS) private readonly redis: RedisClientType
   ) {}
 
-  async findAuthCacheUserById(id: number | string) {
+  async findOrSaveCacheUserById(
+    id: number,
+    ttl = 60
+  ): Promise<SessionUserType | undefined> {
+    try {
+      const userCache = await this.findAuthCacheUserById(id)
+
+      if (userCache) return userCache
+
+      return (await this.saveAuthUserInCache({ id }, ttl)) as SessionUserType
+    } catch (e: any) {
+      this.logger.error('Error while retriving or saving cache user', e.stack)
+      return undefined
+    }
+  }
+
+  async findAuthCacheUserById(id: number) {
     const cacheUser = await this.redis.get(`${USER_SESSION_KEY}:${id}`)
     return cacheUser ? JSON.parse(cacheUser) : undefined
   }

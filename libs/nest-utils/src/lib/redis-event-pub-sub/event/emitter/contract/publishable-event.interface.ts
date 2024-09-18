@@ -1,3 +1,4 @@
-export interface PublishableEventInterface {
-  readonly eventName: string
+export interface PublishableDataInterface {
+  readonly data: any
+  readonly publish?: boolean
 }

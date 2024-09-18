@@ -16,24 +16,14 @@ export class SessionSerializer extends PassportSerializer {
   }
 
   async deserializeUser(userId: string, done: CallableFunction) {
-    let user
-    user = await this.authSessionUserCache.findAuthCacheUserById(Number(userId))
+    const user = await this.authSessionUserCache.findOrSaveCacheUserById(
+      Number(userId)
+    )
 
     if (user) {
       done(null, { user })
     } else {
-      user = await this.authSessionUserCache.saveAuthUserInCache(
-        {
-          id: Number(userId),
-        },
-        60 * 10
-      )
-
-      if (user) {
-        done(null, { user })
-      } else {
-        done(null, null)
-      }
+      done(null, null)
     }
   }
 }

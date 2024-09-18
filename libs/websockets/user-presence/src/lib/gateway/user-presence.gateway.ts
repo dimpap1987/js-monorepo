@@ -1,4 +1,5 @@
-import { Inject, Logger, UseGuards } from '@nestjs/common'
+import { AuthSessionUserCache } from '@js-monorepo/auth/nest/session'
+import { Logger, UseGuards } from '@nestjs/common'
 import {
   ConnectedSocket,
   OnGatewayConnection,
@@ -8,21 +9,13 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets'
 import { Namespace, Socket } from 'socket.io'
-import {
-  EVENT_SUBSCRIBER_TOKEN,
-  EventSubscriberInterface,
-  OnlineUsersEvent,
-} from '../redis-event-pub-sub'
-import { OnlineUsersService } from './services/online-users.service'
-import { UserSocketService } from './services/user-socket.service'
-import { WsGuard } from './ws.guard'
+
+import { BrokerEvents, WebSocketEvents } from '../constants'
+import { WsGuard } from '../guards/ws.guard'
+import { UserSocketService } from '../services/user-socket.service'
+import { PubSubService } from '@js-monorepo/nest/redis-event-pub-sub'
 
 export const ONLINE_USERS_ROOM = 'online_users_room'
-
-export enum WebsocketEventSubscribeList {
-  FETCH_ONLINE_USERS = 'fetch-online-users',
-  EVENTS_ONLINE_USERS = 'events-online-users',
-}
 
 @WebSocketGateway(4444, {
   pingInterval: 30000,
@@ -42,10 +35,9 @@ export class UserPresenceGateway
   namespace?: Namespace
 
   constructor(
-    private userSocketService: UserSocketService,
-    @Inject(EVENT_SUBSCRIBER_TOKEN)
-    private eventSubscriber: EventSubscriberInterface,
-    private onlineUsersService: OnlineUsersService
+    private readonly userSocketService: UserSocketService,
+    private readonly pubSubService: PubSubService,
+    private readonly authSessionUserCache: AuthSessionUserCache
   ) {}
 
   async handleConnection(socket: Socket) {
@@ -56,7 +48,16 @@ export class UserPresenceGateway
         socket.disconnect()
       } else {
         await this.userSocketService.addSocketUser(userId, socket.id)
-        this.onlineUsersService.loadOnlineUsers()
+
+        const cachedUser =
+          await this.authSessionUserCache.findOrSaveCacheUserById(
+            Number(userId)
+          )
+
+        this.pubSubService.emit(BrokerEvents.announcements, {
+          data: [`${cachedUser?.username}  is online`],
+        })
+
         this.logger.debug(`User: ${userId} connected through websocket`)
       }
     } catch (e: any) {
@@ -65,8 +66,7 @@ export class UserPresenceGateway
   }
 
   async handleDisconnect(client: Socket) {
-    await this.userSocketService.removeSocketUser(client.id)
-    this.onlineUsersService.loadOnlineUsers()
+    this.userSocketService.removeSocketUser(client.id)
   }
 
   @UseGuards(WsGuard)
@@ -77,12 +77,12 @@ export class UserPresenceGateway
   }
 
   @UseGuards(WsGuard)
-  @SubscribeMessage(WebsocketEventSubscribeList.FETCH_ONLINE_USERS)
-  async streamMessagesData(@ConnectedSocket() client: any) {
-    return this.eventSubscriber.createWebsocketStream(
+  @SubscribeMessage(WebSocketEvents.announcements.subscribe)
+  async streamAnnouncements(@ConnectedSocket() client: any) {
+    return this.pubSubService.createWebsocketStream(
       client,
-      OnlineUsersEvent.eventName,
-      WebsocketEventSubscribeList.EVENTS_ONLINE_USERS
+      BrokerEvents.announcements,
+      WebSocketEvents.announcements.emit
     )
   }
 }
