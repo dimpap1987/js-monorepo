@@ -1,14 +1,16 @@
 'use client'
+import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
+import { useWebSocket } from '@js-monorepo/next/providers'
 import { DpNotificationBellComponent } from '@js-monorepo/notification-bell'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import { MenuItem } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import SVGLogo from './logo-svg'
 
 const menuItems: MenuItem[] = [
@@ -44,6 +46,22 @@ export default function MainTemplate({
 }: Readonly<PropsWithChildren>) {
   const { user, isLoggedIn } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
+  const socket = useWebSocket(
+    process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
+    isLoggedIn
+  )
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('connect', () => {
+        socket.ping()
+        socket.emit('subscribe:announcements', {})
+      })
+      return () => {
+        socket?.disconnect()
+      }
+    }
+  }, [socket])
 
   return (
     <>
@@ -72,6 +90,8 @@ export default function MainTemplate({
           </NavbarItems>
         </DpNextNavbar>
       </header>
+
+      <AnnouncementsComponent className="p-2"></AnnouncementsComponent>
 
       <DpNextSidebar
         isOpen={openSideBar}

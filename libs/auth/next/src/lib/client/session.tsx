@@ -1,7 +1,11 @@
 'use client'
 
 import { UserJWT } from '@js-monorepo/types'
-import { HttpClientBuilder, HttpClientProxy } from '@js-monorepo/utils/http'
+import {
+  getCookie,
+  HttpClientBuilder,
+  HttpClientProxy,
+} from '@js-monorepo/utils/http'
 import React, {
   createContext,
   useCallback,
@@ -77,6 +81,7 @@ export const SessionProvider = ({
   }, [clientBuilder])
 
   useEffect(() => {
+    if (isLoggedIn || getCookie('UNREGISTERED-USER')) return
     fetchSession((userResponse) => {
       setIsLoggedIn(!!userResponse)
       setUser(userResponse)
@@ -88,7 +93,7 @@ export const SessionProvider = ({
 
     const intervalId = setInterval(() => {
       refreshSession() // Refresh session if logged in
-    }, 60000 * 4) // 4 minutes
+    }, 60000 * 30) // 30 minutes
 
     return () => {
       clearInterval(intervalId)

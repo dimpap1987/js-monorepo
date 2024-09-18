@@ -6,6 +6,7 @@ import { useSession } from '@js-monorepo/auth/next/client'
 import { DonationDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import { checkoutSessionClient } from '@js-monorepo/payment'
+import { cn } from '@js-monorepo/ui/util'
 import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
 interface MainProps {
@@ -33,8 +34,9 @@ export default function LandingComponent({ children, className }: MainProps) {
       }, 4000)
     })
   }
+
   return (
-    <section className={className}>
+    <section className={cn('overflow-hidden', className)}>
       {children}
       <div className="relative min-h-[200px] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
         <BannerSVG />

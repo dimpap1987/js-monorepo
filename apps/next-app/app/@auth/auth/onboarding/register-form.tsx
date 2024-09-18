@@ -11,6 +11,7 @@ import {
   FormLabel,
   Input,
 } from '@js-monorepo/components/form'
+import { useNotifications } from '@js-monorepo/notification'
 import { RegisterUserSchema } from '@js-monorepo/schemas'
 import { useRouter } from 'next-nprogress-bar'
 import { useEffect, useState } from 'react'
@@ -62,6 +63,7 @@ const RegisterDialogErrorComponent = ({
 
 const RegisterForm = ({ formInput }: RegisterDialogType) => {
   const [validations, setValidations] = useState(initialRegisterValidations)
+  const [addNotification] = useNotifications()
   const { refreshSession } = useSession()
   const { replace } = useRouter()
   const form = useForm({
@@ -90,6 +92,10 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
       username: formData.username,
     })
     if (response.ok) {
+      addNotification({
+        message: `Welcome,    ${formData.username} 👋`,
+        duration: 5000,
+      })
       refreshSession()
       replace('/')
     } else {

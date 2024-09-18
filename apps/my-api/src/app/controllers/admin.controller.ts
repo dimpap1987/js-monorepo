@@ -1,4 +1,6 @@
-import { HasRoles, RolesEnum, RolesGuard } from '@js-monorepo/auth/nest'
+import { HasRoles } from '@js-monorepo/auth/nest/common'
+import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
+import { RolesGuard } from '@js-monorepo/auth/nest/session'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
 import {
   Body,
@@ -6,24 +8,18 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Post,
   Put,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
 import { AdminService } from '../services/admin.service'
-import { EventsService } from '../services/event.service'
 
 @Controller('admin')
 @UseGuards(RolesGuard)
 @HasRoles(RolesEnum.ADMIN)
 export class AdminController {
-  constructor(
-    private readonly adminService: AdminService,
-    private eventsService: EventsService
-  ) {}
+  constructor(private readonly adminService: AdminService) {}
 
   @Get('users')
   async getUsers(
@@ -42,16 +38,5 @@ export class AdminController {
     @Body() updateUser: Omit<AuthUser, 'id' | 'email' | 'createdAt'>
   ): Promise<AuthUserDto> {
     return this.adminService.updateUser(userId, updateUser)
-  }
-
-  @Post('notification/emit')
-  async emit(@Req() req: any) {
-    const { channel, message } = req.body
-    this.eventsService.emit(channel, {
-      id: Math.random() * 1000,
-      message: message,
-      time: new Date(),
-    })
-    return { ok: true }
   }
 }

@@ -3,13 +3,27 @@ export interface UserJWT {
   username: string
   createdAt: Date
   lastLoggedIn?: string
-  picture?: string
+  profileImage?: string | null
+  provider?: string
+  roles: AuthRoles[]
+}
+
+export interface SessionUserType {
+  id: number
+  username: string
+  createdAt: Date
+  lastLoggedIn?: string
+  profileImage?: string | null
   provider?: string
   roles: AuthRoles[]
 }
 
 export interface JwtPayload {
   user: UserJWT
+}
+
+export interface SessionPayload {
+  user: SessionUserType
 }
 
 export type SuccessResponse<T> = {
@@ -50,7 +64,7 @@ export type AuthRoles = 'ADMIN' | 'USER'
 
 export type ProviderDto = {
   id: number
-  profileImage?: string
+  profileImage?: string | null
   type: ProviderName
   userId: number
 }
@@ -74,13 +88,13 @@ export type AuthUserDto = {
 
 export type ProvidersDto = {
   type: ProviderName
-  profileImage?: string
+  profileImage?: string | null
 }
 
 export type UnRegisteredUserCreateDto = {
   email: string
   provider: ProviderName
-  profileImage: string
+  profileImage?: string | null
 }
 
 export type UnRegisteredUserDto = {
@@ -88,20 +102,8 @@ export type UnRegisteredUserDto = {
   token: string
   email: string
   provider: ProviderName
-  profileImage?: string
+  profileImage?: string | null
   createdAt: Date
-}
-
-export type RefreshTokenCreateDto = {
-  userId: number
-  token: string
-  ipAddress?: string
-  userAgent?: string
-}
-
-export type RefreshTokenDto = {
-  id: number
-  revoked: boolean
 }
 
 export type Pageable = {
@@ -146,4 +148,13 @@ export type AuthUserFullDto = AuthUserDto & {
   userChannels: UserChannelDto[]
   sentNotifications: NotificationDto[]
   receivedNotifications: NotificationDto[]
+}
+
+export type EventsReponseType = 'notification' | 'announcement'
+
+export interface EventsReponse<T = any> {
+  id: string
+  data: T
+  time: Date
+  type: EventsReponseType
 }
