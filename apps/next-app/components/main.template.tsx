@@ -58,7 +58,7 @@ export default function MainTemplate({
         socket.emit('fetch-online-users', {})
 
         socket.on('events-online-users', (data) => {
-          console.log(data)
+          // console.log(data)
         })
       })
 
