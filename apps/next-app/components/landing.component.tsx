@@ -3,13 +3,11 @@ import { DpButton } from '@js-monorepo/button'
 import { useLoader } from '@js-monorepo/loader'
 // import { MapComponent, Marker, Popup } from '@js-monorepo/map'
 import { useSession } from '@js-monorepo/auth/next/client'
-import { Marquee } from '@js-monorepo/components/marquee'
 import { DonationDialogComponent } from '@js-monorepo/dialog'
-import { useWebSocket } from '@js-monorepo/next/providers'
 import { useNotifications } from '@js-monorepo/notification'
 import { checkoutSessionClient } from '@js-monorepo/payment'
 import { cn } from '@js-monorepo/ui/util'
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
 interface MainProps {
   readonly children?: ReactNode
@@ -21,24 +19,7 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
   const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
-  const { user, isLoggedIn } = useSession()
-  const [announcements, setAnnouncements] = useState<string[] | []>([])
-
-  const socket = useWebSocket(
-    process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
-    isLoggedIn
-  )
-
-  useEffect(() => {
-    if (socket) {
-      socket.emit('subscribe:announcements', {})
-      socket.on('event:announcements', (message: { data: string[] }) => {
-        if (message?.data) {
-          setAnnouncements((prev) => [...prev, ...message.data])
-        }
-      })
-    }
-  }, [socket])
+  const { user } = useSession()
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -56,16 +37,6 @@ export default function LandingComponent({ children, className }: MainProps) {
 
   return (
     <section className={cn('overflow-hidden', className)}>
-      <Marquee duration={15} onAnimationComplete={() => setAnnouncements([])}>
-        {announcements.map((message, index) => (
-          <span
-            className="dark:text-lime-300 font-semibold tracking-wider font-mono select-none"
-            key={index}
-          >
-            {message}
-          </span>
-        ))}
-      </Marquee>
       {children}
       <div className="relative min-h-[200px] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
         <BannerSVG />
