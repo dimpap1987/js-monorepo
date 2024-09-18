@@ -52,14 +52,13 @@ export default function MainTemplate({
   )
 
   useEffect(() => {
-    if (socket) {
-      socket.on('connect', () => {
-        socket.ping()
-        socket.emit('subscribe:announcements', {})
-      })
-      return () => {
-        socket?.disconnect()
-      }
+    socket?.on('connect', () => {
+      socket.ping()
+      socket.emit('subscribe:announcements', {})
+    })
+
+    return () => {
+      socket?.disconnect()
     }
   }, [socket])
 

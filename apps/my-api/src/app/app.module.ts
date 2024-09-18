@@ -22,7 +22,6 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { GLOBAL_CHANNEL } from './constants'
 import { AdminController } from './controllers/admin.controller'
-import { EventsController } from './controllers/events.controller'
 import { ExceptionController } from './controllers/exception.controller'
 import { NotificationController } from './controllers/notification.controller'
 import { AdminProviderModule } from './modules/admin.module'
@@ -30,7 +29,6 @@ import { ChannelProviderModule } from './modules/channel.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { NotificationProviderModule } from './modules/notifications.module'
 import { ChannelService } from './services/channel.service'
-import { EventsService } from './services/event.service'
 const ENV = process.env.NODE_ENV
 
 @Module({
@@ -64,11 +62,8 @@ const ENV = process.env.NODE_ENV
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
       imports: [AppModule, ChannelProviderModule],
-      inject: [EventsService, ChannelService],
-      useFactory: async (
-        eventsService: EventsService,
-        channelService: ChannelService
-      ) => ({
+      inject: [ChannelService],
+      useFactory: async (channelService: ChannelService) => ({
         google: {
           clientId: process.env.GOOGLE_CLIENT_ID,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -84,27 +79,8 @@ const ENV = process.env.NODE_ENV
           middlewareExclusions: ['exceptions', 'events'],
         },
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
-        onLogin: async (user: AuthUserDto) => {
-          eventsService.emit(GLOBAL_CHANNEL, {
-            id: uuidv4(),
-            data: {
-              announcements: [`'${user.username}' is online`],
-            },
-            time: new Date(),
-            type: 'announcement',
-          })
-        },
         onRegister: async (user: AuthUserDto) => {
           await channelService.assignUserToChannels(user.id, GLOBAL_CHANNEL)
-
-          eventsService.emit(GLOBAL_CHANNEL, {
-            id: uuidv4(),
-            data: {
-              announcements: [`'${user.username}' has just joined!`],
-            },
-            time: new Date(),
-            type: 'announcement',
-          })
         },
       }),
     }),
@@ -116,13 +92,11 @@ const ENV = process.env.NODE_ENV
   ],
   controllers: [
     AppController,
-    EventsController,
     NotificationController,
     AdminController,
     ExceptionController,
   ],
-  providers: [AppService, EventsService, LoggerMiddleware],
-  exports: [EventsService],
+  providers: [AppService, LoggerMiddleware],
 })
 export class AppModule implements NestModule {
   constructor(@Inject(REDIS) private readonly redis: RedisClientType) {}
