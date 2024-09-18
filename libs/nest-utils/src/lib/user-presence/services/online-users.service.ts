@@ -15,7 +15,8 @@ export class OnlineUsersService {
   ) {}
 
   private async createOnlineUsersList(
-    onlineUsers: Omit<UserCacheType, 'socketId'>[]
+    onlineUsers: Omit<UserCacheType, 'socketId'>[],
+    ttl = 10
   ): Promise<void> {
     // Clear existing sorted set
     if (!onlineUsers?.length) return
@@ -27,6 +28,7 @@ export class OnlineUsersService {
 
     await this.redisClient.del(ONLINE_KEY_LIST)
     await this.redisClient.zAdd(ONLINE_KEY_LIST, members)
+    this.redisClient.expire(ONLINE_KEY_LIST, ttl)
   }
 
   async getOnlineUserIds(
