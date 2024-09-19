@@ -35,12 +35,7 @@ const ENV = process.env.NODE_ENV
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [
-        `apps/my-api/.env.${ENV}`,
-        'apps/my-api/.env',
-        `.env.${ENV}`,
-        `.env`,
-      ],
+      envFilePath: [`.env.${ENV}`, `.env`],
     }),
     RedisModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({

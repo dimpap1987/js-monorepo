@@ -46,7 +46,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: redis-full
+    container_name: redis_prod
     restart: unless-stopped
     volumes:
       - redis-data:/data
@@ -54,7 +54,7 @@ services:
       - my-api
 
   redis-commander:
-    container_name: redis-commander-full
+    container_name: redis-commander_prod
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     restart: unless-stopped
