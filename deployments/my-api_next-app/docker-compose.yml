@@ -2,23 +2,27 @@ version: '3.8'
 
 services:
   my-api:
-    image: dimpap/my-api:latest
-    container_name: my-api-container
+    image: dimpap/my-api:1.0.100
+    container_name: my-api_prod
     ports:
       - '3333:3333'
+      - '4444:4444'
     env_file:
       - .env
     restart: unless-stopped
     volumes:
-      - ./logs:/usr/src/app/logs
+      - logs-data:/usr/src/app/logs
     networks:
       - my-api
     command: >
-      sh -c "npx prisma generate --schema=./prisma/schema && node main.js"
+      sh -c "npx prisma migrate deploy --schema=./prisma/schema && node main.js"
+    depends_on:
+      - redis
+      - postgres
 
   next-app:
-    image: dimpap/next-app:latest
-    container_name: next-app-container
+    image: dimpap/next-app:1.0.100
+    container_name: next-app_prod
     ports:
       - '3000:3000'
     env_file:
@@ -29,7 +33,7 @@ services:
 
   postgres:
     image: postgres:16.1-alpine3.19
-    container_name: postgres_container
+    container_name: postgres_container_prod
     environment:
       POSTGRES_DB: ${DATABASE_DB}
       POSTGRES_USER: ${DATABASE_USER}
@@ -42,7 +46,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: redis-container
+    container_name: redis-full
     restart: unless-stopped
     volumes:
       - redis-data:/data
@@ -50,7 +54,7 @@ services:
       - my-api
 
   redis-commander:
-    container_name: redis-commander
+    container_name: redis-commander-full
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     restart: unless-stopped
@@ -60,7 +64,13 @@ services:
       - '8081:8081'
     networks:
       - my-api
+    depends_on:
+      - redis
+
+volumes:
+  dumpnew:
+  redis-data:
+  logs-data:
 
 networks:
   my-api:
-    name: dev_network

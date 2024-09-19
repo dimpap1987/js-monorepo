@@ -14,9 +14,15 @@ ENV PORT=3333
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nestjs -u 1001
 
+# Create a logs directory and assign permissions
+RUN mkdir -p /usr/src/app/logs && \
+    chown -R nestjs:nodejs /usr/src/app/logs
+
 COPY --chown=nestjs:nodejs dist/apps/my-api/package*.json ./
 
 RUN npm install --omit=dev --ignore-scripts
+
+RUN chown -R nestjs:nodejs ./node_modules
 
 COPY --chown=nestjs:nodejs dist/apps/my-api ./
 COPY --chown=nestjs:nodejs libs/prisma/db/src/lib/prisma ./prisma
@@ -28,5 +34,6 @@ RUN chown -R nestjs:nodejs ./node_modules/.prisma
 USER nestjs
 
 EXPOSE 3333
+EXPOSE 4444
 
 CMD [ "node", "main.js" ]
