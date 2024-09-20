@@ -1,4 +1,3 @@
-import { AuthSessionUserCache } from '@js-monorepo/auth/nest/session'
 import { Logger, UseGuards } from '@nestjs/common'
 import {
   ConnectedSocket,
@@ -10,10 +9,10 @@ import {
 } from '@nestjs/websockets'
 import { Namespace, Socket } from 'socket.io'
 
+import { PubSubService } from '@js-monorepo/nest/redis-event-pub-sub'
 import { BrokerEvents, WebSocketEvents } from '../constants'
 import { WsGuard } from '../guards/ws.guard'
 import { UserSocketService } from '../services/user-socket.service'
-import { PubSubService } from '@js-monorepo/nest/redis-event-pub-sub'
 
 export const ONLINE_USERS_ROOM = 'online_users_room'
 
@@ -36,8 +35,7 @@ export class UserPresenceGateway
 
   constructor(
     private readonly userSocketService: UserSocketService,
-    private readonly pubSubService: PubSubService,
-    private readonly authSessionUserCache: AuthSessionUserCache
+    private readonly pubSubService: PubSubService
   ) {}
 
   async handleConnection(socket: Socket) {
@@ -48,16 +46,6 @@ export class UserPresenceGateway
         socket.disconnect()
       } else {
         await this.userSocketService.addSocketUser(userId, socket.id)
-
-        const cachedUser =
-          await this.authSessionUserCache.findOrSaveCacheUserById(
-            Number(userId)
-          )
-
-        this.pubSubService.emit(BrokerEvents.announcements, {
-          data: [`${cachedUser?.username}  is online`],
-        })
-
         this.logger.debug(`User: ${userId} connected through websocket`)
       }
     } catch (e: any) {

@@ -7,9 +7,12 @@ import {
 } from '@js-monorepo/auth/nest/session'
 import { PrismaModule } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
-import { RedisEventPubSubModule } from '@js-monorepo/nest/redis-event-pub-sub'
+import {
+  PubSubService,
+  RedisEventPubSubModule,
+} from '@js-monorepo/nest/redis-event-pub-sub'
 import { AuthUserDto } from '@js-monorepo/types'
-import { UserPresenceModule } from '@js-monorepo/user-presence'
+import { BrokerEvents, UserPresenceModule } from '@js-monorepo/user-presence'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import RedisStore from 'connect-redis'
@@ -57,8 +60,11 @@ const ENV = process.env.NODE_ENV
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
       imports: [AppModule, ChannelProviderModule],
-      inject: [ChannelService],
-      useFactory: async (channelService: ChannelService) => ({
+      inject: [ChannelService, PubSubService],
+      useFactory: async (
+        channelService: ChannelService,
+        pubSubService: PubSubService
+      ) => ({
         google: {
           clientId: process.env.GOOGLE_CLIENT_ID,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -76,6 +82,14 @@ const ENV = process.env.NODE_ENV
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUserDto) => {
           await channelService.assignUserToChannels(user.id, GLOBAL_CHANNEL)
+          pubSubService.emit(BrokerEvents.announcements, {
+            data: [`'${user.username}' has joined 🚀`],
+          })
+        },
+        onLogin: async (user) => {
+          pubSubService.emit(BrokerEvents.announcements, {
+            data: [`'${user.username}' is online 😎`],
+          })
         },
       }),
     }),
