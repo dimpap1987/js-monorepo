@@ -5,7 +5,7 @@ import { BrokerEvents } from './constants'
 import { OnlineUsersService } from './services/online-users.service'
 import { UserSocketService } from './services/user-socket.service'
 import { UserPresenceGateway } from './gateway/user-presence.gateway'
-import { WsGuard } from './guards/ws.guard'
+import { WsLoginGuard } from './guards/ws-login.guard'
 import { UserPresenceScheduler } from './schedulers/user-presence.scheduler'
 
 @Module({
@@ -19,10 +19,10 @@ import { UserPresenceScheduler } from './schedulers/user-presence.scheduler'
   providers: [
     UserPresenceGateway,
     UserSocketService,
-    WsGuard,
+    WsLoginGuard,
     UserPresenceScheduler,
     OnlineUsersService,
   ],
-  exports: [UserSocketService, WsGuard, OnlineUsersService],
+  exports: [UserSocketService, WsLoginGuard, OnlineUsersService],
 })
 export class UserPresenceModule {}

@@ -31,7 +31,9 @@ export class AuthSessionUserCache {
     }
   }
 
-  async findAuthCacheUserById(id: number) {
+  async findAuthCacheUserById(
+    id: number
+  ): Promise<SessionUserType | undefined> {
     const cacheUser = await this.redis.get(`${USER_SESSION_KEY}:${id}`)
     return cacheUser ? JSON.parse(cacheUser) : undefined
   }

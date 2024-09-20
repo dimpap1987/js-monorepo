@@ -11,11 +11,12 @@ import { Namespace, Socket } from 'socket.io'
 
 import { PubSubService } from '@js-monorepo/nest/redis-event-pub-sub'
 import { BrokerEvents, WebSocketEvents } from '../constants'
-import { WsGuard } from '../guards/ws.guard'
+import { WsLoginGuard } from '../guards/ws-login.guard'
 import { UserSocketService } from '../services/user-socket.service'
 
 export const ONLINE_USERS_ROOM = 'online_users_room'
 
+@UseGuards(WsLoginGuard)
 @WebSocketGateway(4444, {
   pingInterval: 30000,
   pingTimeout: 5000,
@@ -57,14 +58,14 @@ export class UserPresenceGateway
     this.userSocketService.removeSocketUser(client.id)
   }
 
-  @UseGuards(WsGuard)
   @SubscribeMessage('ping')
   async handlePing(@ConnectedSocket() client: Socket): Promise<void> {
     const userId = await this.userSocketService.getUserIdFromSocket(client)
-    this.userSocketService.addSocketUser(userId, client.id)
+    if (userId) {
+      this.userSocketService.addSocketUser(userId, client.id)
+    }
   }
 
-  @UseGuards(WsGuard)
   @SubscribeMessage(WebSocketEvents.announcements.subscribe)
   async streamAnnouncements(@ConnectedSocket() client: any) {
     return this.pubSubService.createWebsocketStream(
@@ -73,4 +74,8 @@ export class UserPresenceGateway
       WebSocketEvents.announcements.emit
     )
   }
+
+  //TODO get online users
+  // @UseGuards(WsRolesGuard)
+  // @HasRoles(RolesEnum.ADMIN)
 }

@@ -46,7 +46,7 @@ export class UserSocketService {
 
       if (!sessionData) return undefined
 
-      return JSON.parse(sessionData)?.passport?.user
+      return JSON.parse(sessionData)?.passport?.user as number
     } catch (e: any) {
       Logger.error('Error while getting user from websocket', e)
       return undefined
