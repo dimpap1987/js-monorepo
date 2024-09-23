@@ -4,7 +4,7 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
-import { useWebSocket } from '@js-monorepo/next/providers'
+import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { DpNotificationBellComponent } from '@js-monorepo/notification-bell'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
@@ -41,15 +41,16 @@ const menuItems: MenuItem[] = [
   },
 ]
 
+export const websocketOptions: WebSocketOptionsType = {
+  url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
+}
+
 export default function MainTemplate({
   children,
 }: Readonly<PropsWithChildren>) {
   const { user, isLoggedIn } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
-  const socket = useWebSocket(
-    process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
-    isLoggedIn
-  )
+  const socket = useWebSocket(websocketOptions, isLoggedIn)
 
   useEffect(() => {
     socket?.on('connect', () => {

@@ -17,9 +17,10 @@ import { UserSocketService } from '../services/user-socket.service'
 export const ONLINE_USERS_ROOM = 'online_users_room'
 
 @UseGuards(WsLoginGuard)
-@WebSocketGateway(4444, {
+@WebSocketGateway({
   pingInterval: 30000,
   pingTimeout: 5000,
+  path: '/ws',
   namespace: 'presence',
   cors: {
     origin: '*',
