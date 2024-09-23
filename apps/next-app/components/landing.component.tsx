@@ -113,7 +113,7 @@ export default function LandingComponent({ children, className }: MainProps) {
             checkOutPromise={() =>
               checkoutSessionClient({
                 username: user.username as string,
-                url: '/api/checkout_sessions',
+                url: '/next-api/checkout_sessions',
                 customSubmitMessage: 'Thank you for your support',
                 isDonate: true,
                 price: 600,
