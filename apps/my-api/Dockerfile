@@ -34,6 +34,5 @@ RUN chown -R nestjs:nodejs ./node_modules/.prisma
 USER nestjs
 
 EXPOSE 3333
-EXPOSE 4444
 
 CMD [ "node", "main.js" ]

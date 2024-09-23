@@ -13,14 +13,11 @@ export async function getCurrentSession() {
         headers.append('Cookie', `${cookie.name}=${cookie.value}`)
       })
 
-    const response = await fetch(
-      `${process.env.DOCKER_API_URL}/api/auth/session`,
-      {
-        method: 'GET',
-        headers: headers,
-        cache: 'no-store',
-      }
-    )
+    const response = await fetch(`${process.env.API_URL}/api/auth/session`, {
+      method: 'GET',
+      headers: headers,
+      cache: 'no-store',
+    })
     if (response.ok) {
       const session = await response.json()
       return session
@@ -34,7 +31,7 @@ export async function getCurrentSession() {
 export async function findUnregisteredUser(headers?: Headers) {
   try {
     const response = await fetch(
-      `${process.env.DOCKER_API_URL}/api/auth/unregistered-user`,
+      `${process.env.API_URL}/api/auth/unregistered-user`,
       {
         method: 'GET',
         headers: headers,
