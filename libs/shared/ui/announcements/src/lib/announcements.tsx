@@ -2,17 +2,18 @@
 
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Marquee } from '@js-monorepo/components/marquee'
-import { useWebSocket } from '@js-monorepo/next/providers'
+import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { useEffect, useState } from 'react'
+
+const websocketOptions: WebSocketOptionsType = {
+  url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
+}
 
 export function AnnouncementsComponent({ className }: { className?: string }) {
   const { isLoggedIn } = useSession()
   const [announcements, setAnnouncements] = useState<string[] | []>([])
 
-  const socket = useWebSocket(
-    process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL']!,
-    isLoggedIn
-  )
+  const socket = useWebSocket(websocketOptions, isLoggedIn)
 
   useEffect(() => {
     if (socket?.active) {

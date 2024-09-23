@@ -5,8 +5,13 @@ import { io, Socket } from 'socket.io-client'
 
 type PingableSocket = Socket & { ping: () => void }
 
+export type WebSocketOptionsType = {
+  url: string
+  path?: string
+}
+
 type WebSocketContextType = {
-  connectSocket: (url?: string) => PingableSocket | undefined
+  connectSocket: (opts: WebSocketOptionsType) => PingableSocket | undefined
   unsubscribe: (url: string) => void
 }
 
@@ -30,14 +35,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [])
 
-  const connectSocket = (url?: string) => {
-    if (!url) return undefined
+  const connectSocket = (opts: WebSocketOptionsType) => {
+    if (!opts?.url) return undefined
     try {
-      if (socketRefs.current.has(url)) {
-        return socketRefs.current.get(url) as PingableSocket
+      if (socketRefs.current.has(opts.url)) {
+        return socketRefs.current.get(opts.url) as PingableSocket
       }
 
-      const socket = io(url, {
+      const socket = io(opts.url, {
+        path: opts.path ? opts.path : '/ws',
         withCredentials: true,
         reconnection: true,
         reconnectionDelay: 1000,
@@ -45,26 +51,26 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         transports: ['websocket'],
       }) as PingableSocket
 
-      socketRefs.current.set(url, socket)
+      socketRefs.current.set(opts.url, socket)
 
       socket.on('connect', () => {
-        console.log(`Connected to url: ${url}`)
+        console.log(`Connected to url: ${opts.url}`)
         socket.ping = () => {
-          clearInterval(pingIntervalsRefs.current.get(url))
+          clearInterval(pingIntervalsRefs.current.get(opts.url))
           const interval = setInterval(() => {
             if (socket.active) {
               socket.emit('ping')
             }
           }, 5000)
 
-          pingIntervalsRefs.current.set(url, interval)
+          pingIntervalsRefs.current.set(opts.url, interval)
         }
       })
 
       socket.on('disconnect', () => {
-        console.log(`Disconnected from url: ${url}`)
-        socketRefs.current.delete(url)
-        clearInterval(pingIntervalsRefs.current.get(url))
+        console.log(`Disconnected from url: ${opts.url}`)
+        socketRefs.current.delete(opts.url)
+        clearInterval(pingIntervalsRefs.current.get(opts.url))
       })
       return socket
     } catch (e) {
@@ -94,7 +100,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 
 // Create a custom hook to use the WebSocket context
 export const useWebSocket = (
-  url: string,
+  opts: WebSocketOptionsType,
   shouldConnect: boolean
 ): PingableSocket => {
   const context = useContext(WebSocketContext) as WebSocketContextType
@@ -106,13 +112,13 @@ export const useWebSocket = (
 
   useEffect(() => {
     if (shouldConnect) {
-      const newSocket = context.connectSocket(url) as PingableSocket
+      const newSocket = context.connectSocket(opts) as PingableSocket
       setSocket(newSocket)
     } else {
-      context.unsubscribe(url)
+      context.unsubscribe(opts.url)
       setSocket(undefined)
     }
-  }, [url, shouldConnect])
+  }, [opts.url, shouldConnect])
 
   return socket as PingableSocket
 }
