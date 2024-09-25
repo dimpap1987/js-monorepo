@@ -1,5 +1,6 @@
-import { ExecutionContext, Injectable } from '@nestjs/common'
+import { ExecutionContext, HttpStatus, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
+import { AuthException } from '../../common/exceptions/api-exception'
 import { RolesEnum } from '../../common/types'
 import { LoggedInGuard } from './login.guard'
 
@@ -17,9 +18,14 @@ export class RolesGuard extends LoggedInGuard {
     if (!requiredRoles) return true
 
     const req = context.switchToHttp().getRequest()
-    return (
+
+    if (
       super.canActivate(context) &&
       requiredRoles.some((role) => req.user?.user?.roles?.includes(role))
-    )
+    ) {
+      return true
+    }
+
+    throw new AuthException(HttpStatus.FORBIDDEN, `Invalid privileges`)
   }
 }

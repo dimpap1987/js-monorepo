@@ -77,7 +77,7 @@ const ENV = process.env.NODE_ENV
         },
         csrf: {
           enabled: true,
-          middlewareExclusions: ['exceptions', 'events'],
+          middlewareExclusions: ['exceptions', 'admin/(.*)'],
         },
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUserDto) => {
