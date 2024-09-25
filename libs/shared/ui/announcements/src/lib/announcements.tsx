@@ -9,15 +9,23 @@ const websocketOptions: WebSocketOptionsType = {
   url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
 }
 
-export function AnnouncementsComponent({ className }: { className?: string }) {
+export function AnnouncementsComponent({
+  className,
+  opts = websocketOptions,
+  eventName = 'event:announcements',
+}: {
+  className?: string
+  opts?: WebSocketOptionsType
+  eventName?: string
+}) {
   const { isLoggedIn } = useSession()
   const [announcements, setAnnouncements] = useState<string[] | []>([])
 
-  const socket = useWebSocket(websocketOptions, isLoggedIn)
+  const socket = useWebSocket(opts, isLoggedIn)
 
   useEffect(() => {
     if (socket?.active) {
-      socket.on('event:announcements', (message: { data: string[] }) => {
+      socket.on(eventName, (message: { data: string[] }) => {
         if (message?.data) {
           setAnnouncements((prev) => [...prev, ...message.data])
         }

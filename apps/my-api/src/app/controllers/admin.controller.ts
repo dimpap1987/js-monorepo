@@ -1,6 +1,7 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { RolesGuard } from '@js-monorepo/auth/nest/session'
+import { PubSubService } from '@js-monorepo/nest/redis-event-pub-sub'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
 import {
   Body,
@@ -8,6 +9,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Post,
   Put,
   Query,
   UseGuards,
@@ -19,7 +21,10 @@ import { AdminService } from '../services/admin.service'
 @UseGuards(RolesGuard)
 @HasRoles(RolesEnum.ADMIN)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly pubSubService: PubSubService
+  ) {}
 
   @Get('users')
   async getUsers(
@@ -38,5 +43,14 @@ export class AdminController {
     @Body() updateUser: Omit<AuthUser, 'id' | 'email' | 'createdAt'>
   ): Promise<AuthUserDto> {
     return this.adminService.updateUser(userId, updateUser)
+  }
+
+  @Post('event')
+  async makeAnnouncement(
+    @Body() { event, data }: { event: string; data: any }
+  ): Promise<void> {
+    this.pubSubService.emit(event, {
+      data: data,
+    })
   }
 }
