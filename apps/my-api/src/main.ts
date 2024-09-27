@@ -1,4 +1,5 @@
 import { LoggerService } from '@js-monorepo/nest/logger'
+import { RedisIoAdapter } from '@js-monorepo/user-presence'
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import cookieParser from 'cookie-parser'
@@ -12,6 +13,7 @@ expand(config()) // add functionality for .env to use interpolation and more
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
+    forceCloseConnections: true,
   })
 
   app.useLogger(new LoggerService(process.env.LOGGER_LEVEL))
@@ -33,7 +35,11 @@ async function bootstrap() {
   )
 
   app.useGlobalPipes(new ValidationPipe())
-  app.enableShutdownHooks()
+
+  const redisIoAdapter = new RedisIoAdapter(app)
+  await redisIoAdapter.connectToRedis()
+
+  app.useWebSocketAdapter(redisIoAdapter)
   await app.listen(port)
 
   Logger.log(

@@ -1,9 +1,8 @@
+import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
+import { REDIS } from '@js-monorepo/nest/redis'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
-import { ONLINE_KEY_LIST } from '../constants'
-import { UserCacheType } from '../types'
-import { UserSocketService } from './user-socket.service'
-import { REDIS } from '@js-monorepo/nest/redis'
+import { ONLINE_KEY_LIST } from '../constants/constants'
 
 @Injectable()
 export class OnlineUsersService {
@@ -11,55 +10,60 @@ export class OnlineUsersService {
 
   constructor(
     @Inject(REDIS) private readonly redisClient: RedisClientType,
-    private readonly userSocketService: UserSocketService
+    private readonly authSessionUserCacheService: AuthSessionUserCacheService
   ) {}
 
-  private async createOnlineUsersList(
-    onlineUsers: Omit<UserCacheType, 'socketId'>[],
-    ttl = 10
-  ): Promise<void> {
-    // Clear existing sorted set
-    if (!onlineUsers?.length) return
-
-    const members = onlineUsers.map(({ userId }) => ({
-      score: Date.now(),
-      value: `${userId}`,
-    }))
-
-    await this.redisClient.del(ONLINE_KEY_LIST)
-    await this.redisClient.zAdd(ONLINE_KEY_LIST, members)
-    this.redisClient.expire(ONLINE_KEY_LIST, ttl)
-  }
-
-  async getOnlineUserIds(
-    page = 1,
-    limit = 100
-  ): Promise<Omit<UserCacheType, 'socketId'>[]> {
+  async getOnlineUsersList(page = 1, limit = 100) {
     try {
       const start = (page - 1) * limit
       const end = start + limit - 1
 
-      const userIds = await this.redisClient.zRange(ONLINE_KEY_LIST, start, end)
-
-      if (!userIds || userIds.length <= 0) return []
-
-      return userIds.map((member) => ({
-        userId: Number(member),
-      }))
+      const onlineUsers = await this.redisClient.zRange(
+        ONLINE_KEY_LIST,
+        start,
+        end
+      )
+      return onlineUsers.map((u) => JSON.parse(u))
     } catch (e: any) {
       this.logger.error('Error while getting all online users', e.stack)
       return []
     }
   }
 
-  async loadOnlineUsers() {
-    try {
-      const onlineUsers = await this.userSocketService.getSocketUsers()
-      await this.createOnlineUsersList(onlineUsers)
-      return await this.getOnlineUserIds()
-    } catch (e: any) {
-      this.logger.error('Error while loading online users', e.stack)
-    }
-    return []
+  async addUser(userId: number | string): Promise<any> {
+    const user = await this.authSessionUserCacheService.findOrSaveCacheUserById(
+      Number(userId)
+    )
+    if (!user) return
+
+    // Add the user to the sorted set with a score (timestamp)
+    return this.redisClient.zAdd(ONLINE_KEY_LIST, {
+      score: Date.now(),
+      value: JSON.stringify({
+        id: user.id,
+        username: user.username,
+        roles: user.roles,
+      }),
+    })
+  }
+
+  async removeUser(userId: number | string): Promise<any> {
+    const user = await this.authSessionUserCacheService.findOrSaveCacheUserById(
+      Number(userId)
+    )
+    if (!user) return
+
+    return this.redisClient.zRem(
+      ONLINE_KEY_LIST,
+      JSON.stringify({
+        id: user.id,
+        username: user.username,
+        roles: user.roles,
+      })
+    )
+  }
+
+  async clearUsers() {
+    return this.redisClient.del(ONLINE_KEY_LIST)
   }
 }

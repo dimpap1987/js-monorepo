@@ -1,13 +1,13 @@
 import { SessionUserType } from '@js-monorepo/types'
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { PassportSerializer } from '@nestjs/passport'
-import { AuthSessionUserCache } from './auth-session-cache.service'
+import { AuthSessionUserCacheService } from './auth-session-cache.service'
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  logger = new Logger(SessionSerializer.name)
-
-  constructor(private readonly authSessionUserCache: AuthSessionUserCache) {
+  constructor(
+    private readonly authSessionUserCacheService: AuthSessionUserCacheService
+  ) {
     super()
   }
 
@@ -16,7 +16,7 @@ export class SessionSerializer extends PassportSerializer {
   }
 
   async deserializeUser(userId: string, done: CallableFunction) {
-    const user = await this.authSessionUserCache.findOrSaveCacheUserById(
+    const user = await this.authSessionUserCacheService.findOrSaveCacheUserById(
       Number(userId)
     )
 

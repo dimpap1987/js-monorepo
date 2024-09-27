@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common'
+import { DynamicModule, Logger, Module } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { RedisClientType, createClient } from 'redis'
 import {
@@ -7,17 +7,19 @@ import {
 } from './event/emitter/redis.event-emitter'
 import { EventEmitter2EventSubscriber } from './event/subscriber/event-emitter-2.event-subscriber'
 import { EVENT_SUBSCRIBER_TOKEN } from './event/subscriber/event-subscriber.interface'
+import { PubSubService } from './pub-sub.service'
 import {
   ConfigurableModuleClass,
   MODULE_OPTIONS_TOKEN,
   RedisEventPubSubModuleOptions,
 } from './redis-event-pub-sub.module-definition'
-import { PubSubService } from './pub-sub.service'
 
 export const REDIS_PUB_CLIENT = 'REDIS_PUB_CLIENT'
 export const REDIS_SUB_CLIENT = 'REDIS_SUB_CLIENT'
 export const REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS =
   'REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS'
+
+const logger = new Logger('RedisEventPubSubModule')
 
 @Module({
   providers: [
@@ -79,8 +81,8 @@ export class RedisEventPubSubModule extends ConfigurableModuleClass {
             const client = createClient({
               url: options.url,
             })
-            client.on('error', (err) =>
-              console.error('Redis Client Error', err)
+            client.on('error', (err: any) =>
+              logger.error('Redis Client Error', err)
             )
             await client.connect()
             for (const eventPublishableName of eventsPublishableNames) {

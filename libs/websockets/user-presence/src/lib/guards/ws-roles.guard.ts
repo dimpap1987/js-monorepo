@@ -1,15 +1,13 @@
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
-import { AuthSessionUserCache } from '@js-monorepo/auth/nest/session'
+import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { UserSocketService } from '../services/user-socket.service'
 
 @Injectable()
 export class WsRolesGuard {
   constructor(
     private reflector: Reflector,
-    private readonly userSocketService: UserSocketService,
-    private readonly authSessionUserCache: AuthSessionUserCache
+    private readonly authSessionUserCacheService: AuthSessionUserCacheService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -19,14 +17,11 @@ export class WsRolesGuard {
     )
     if (!requiredRoles) return false
 
-    const userId = await this.userSocketService.getUserIdFromSocket(
-      context.switchToWs().getClient()
-    )
-
+    const userId = context.switchToWs().getClient().user.id
     if (!userId) return false
 
     const sessionUser =
-      await this.authSessionUserCache.findOrSaveCacheUserById(userId)
+      await this.authSessionUserCacheService.findOrSaveCacheUserById(userId)
     return requiredRoles.some((role) => sessionUser?.roles?.includes(role))
   }
 }
