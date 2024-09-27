@@ -54,7 +54,6 @@ export default function MainTemplate({
 
   useEffect(() => {
     socket?.on('connect', () => {
-      socket.ping()
       socket.emit('subscribe:announcements', {})
     })
 

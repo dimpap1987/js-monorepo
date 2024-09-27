@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common'
+import csurf from 'csurf'
 import { authCookiesOptions } from '../utils'
-import csurf = require('csurf')
 
 export const csrfProtection = csurf({
   cookie: authCookiesOptions,
@@ -8,7 +8,7 @@ export const csrfProtection = csurf({
 
 @Injectable()
 export class CsrfGeneratorMiddleware implements NestMiddleware {
-  use(req, res, next) {
+  use(req: any, res: any, next: any) {
     csrfProtection(req, res, (err) => {
       if (err) {
         return next(err)

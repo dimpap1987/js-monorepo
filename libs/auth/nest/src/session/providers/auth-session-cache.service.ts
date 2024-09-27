@@ -7,8 +7,8 @@ import { ServiceAuth } from '../../common/types'
 import { USER_SESSION_KEY } from '../constants'
 
 @Injectable()
-export class AuthSessionUserCache {
-  logger = new Logger(AuthSessionUserCache.name)
+export class AuthSessionUserCacheService {
+  private logger = new Logger(AuthSessionUserCacheService.name)
 
   constructor(
     @Inject(ServiceAuth) private authService: AuthService,

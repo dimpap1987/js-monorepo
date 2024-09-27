@@ -1,28 +1,30 @@
-import { RedisEventPubSubModule } from '@js-monorepo/nest/redis-event-pub-sub'
 import { Module } from '@nestjs/common'
-import { ScheduleModule } from '@nestjs/schedule'
-import { BrokerEvents } from './constants'
-import { OnlineUsersService } from './services/online-users.service'
-import { UserSocketService } from './services/user-socket.service'
+import { RedisIoAdapter } from './adapters/redis-adapter'
 import { UserPresenceGateway } from './gateway/user-presence.gateway'
 import { WsLoginGuard } from './guards/ws-login.guard'
-import { UserPresenceScheduler } from './schedulers/user-presence.scheduler'
+import { WsRolesGuard } from './guards/ws-roles.guard'
+import { OnlineUsersService } from './services/online-users.service'
+import { UserPresenceWebsocketService } from './services/user-presence.service'
+import { UserSocketService } from './services/user-socket.service'
 
 @Module({
-  imports: [
-    ScheduleModule.forRoot(),
-    RedisEventPubSubModule.registerEvents([
-      BrokerEvents.onlineUsers,
-      BrokerEvents.announcements,
-    ]),
-  ],
   providers: [
     UserPresenceGateway,
     UserSocketService,
     WsLoginGuard,
-    UserPresenceScheduler,
     OnlineUsersService,
+    RedisIoAdapter,
+    WsRolesGuard,
+    UserPresenceWebsocketService,
   ],
-  exports: [UserSocketService, WsLoginGuard, OnlineUsersService],
+  exports: [
+    UserPresenceGateway,
+    UserSocketService,
+    WsLoginGuard,
+    OnlineUsersService,
+    RedisIoAdapter,
+    WsRolesGuard,
+    UserPresenceWebsocketService,
+  ],
 })
 export class UserPresenceModule {}

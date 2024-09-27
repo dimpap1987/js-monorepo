@@ -7,14 +7,13 @@ import {
 } from '@js-monorepo/auth/nest/session'
 import { PrismaModule } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
-import {
-  PubSubService,
-  RedisEventPubSubModule,
-} from '@js-monorepo/nest/redis-event-pub-sub'
 import { AuthUserDto } from '@js-monorepo/types'
-import { BrokerEvents, UserPresenceModule } from '@js-monorepo/user-presence'
+import {
+  BrokerEvents,
+  UserPresenceModule,
+  UserPresenceWebsocketService,
+} from '@js-monorepo/user-presence'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { EventEmitterModule } from '@nestjs/event-emitter'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
 import passport from 'passport'
@@ -46,24 +45,13 @@ const ENV = process.env.NODE_ENV
       }),
       isGlobal: true,
     }),
-    RedisEventPubSubModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        url: configService.get('REDIS_URL') ?? '',
-      }),
-      inject: [ConfigService],
-    }),
-    EventEmitterModule.forRoot({
-      global: true,
-    }),
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
-      imports: [AppModule, ChannelProviderModule],
-      inject: [ChannelService, PubSubService],
+      imports: [UserPresenceModule],
+      inject: [ChannelService, UserPresenceWebsocketService],
       useFactory: async (
         channelService: ChannelService,
-        pubSubService: PubSubService
+        userPresenceWebsocketService: UserPresenceWebsocketService
       ) => ({
         google: {
           clientId: process.env.GOOGLE_CLIENT_ID,
@@ -82,14 +70,14 @@ const ENV = process.env.NODE_ENV
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUserDto) => {
           await channelService.assignUserToChannels(user.id, GLOBAL_CHANNEL)
-          pubSubService.emit(BrokerEvents.announcements, {
-            data: [`'${user.username}' has joined 🚀`],
-          })
+          userPresenceWebsocketService.broadcast(BrokerEvents.announcements, [
+            `'${user.username}' has joined 🚀`,
+          ])
         },
         onLogin: async (user) => {
-          pubSubService.emit(BrokerEvents.announcements, {
-            data: [`'${user.username}' is online 😎`],
-          })
+          userPresenceWebsocketService.broadcast(BrokerEvents.announcements, [
+            `'${user.username}' is online 😎`,
+          ])
         },
       }),
     }),

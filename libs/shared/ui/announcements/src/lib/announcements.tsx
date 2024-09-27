@@ -12,7 +12,7 @@ const websocketOptions: WebSocketOptionsType = {
 export function AnnouncementsComponent({
   className,
   opts = websocketOptions,
-  eventName = 'event:announcements',
+  eventName = 'events:announcements',
 }: {
   className?: string
   opts?: WebSocketOptionsType
@@ -25,11 +25,16 @@ export function AnnouncementsComponent({
 
   useEffect(() => {
     if (socket?.active) {
-      socket.on(eventName, (message: { data: string[] }) => {
-        if (message?.data) {
-          setAnnouncements((prev) => [...prev, ...message.data])
+      socket.on(eventName, (messages: string[]) => {
+        console.log(messages)
+
+        if (messages) {
+          setAnnouncements((prev) => [...prev, ...messages])
         }
       })
+    }
+    return () => {
+      socket?.off(eventName)
     }
   }, [socket])
 

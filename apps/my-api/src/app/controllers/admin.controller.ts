@@ -1,8 +1,8 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { RolesGuard } from '@js-monorepo/auth/nest/session'
-import { PubSubService } from '@js-monorepo/nest/redis-event-pub-sub'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
+import { OnlineUsersService } from '@js-monorepo/user-presence'
 import {
   Body,
   Controller,
@@ -23,7 +23,7 @@ import { AdminService } from '../services/admin.service'
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
-    private readonly pubSubService: PubSubService
+    private readonly οnlineUsersService: OnlineUsersService
   ) {}
 
   @Get('users')
@@ -37,6 +37,14 @@ export class AdminController {
     return this.adminService.getUsers(page, pageSize)
   }
 
+  @Get('online-users')
+  async getOnlineUsers(
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
+  ) {
+    return this.οnlineUsersService.getOnlineUsersList(page, pageSize)
+  }
+
   @Put('users/:id')
   async updateUser(
     @Param('id', ParseIntPipe) userId: number,
@@ -45,12 +53,8 @@ export class AdminController {
     return this.adminService.updateUser(userId, updateUser)
   }
 
-  @Post('event')
-  async makeAnnouncement(
-    @Body() { event, data }: { event: string; data: any }
-  ): Promise<void> {
-    this.pubSubService.emit(event, {
-      data: data,
-    })
-  }
+  // @Post('event')
+  // async makeAnnouncement(
+  //   @Body() { event, data }: { event: string; data: any }
+  // ): Promise<void> {}
 }

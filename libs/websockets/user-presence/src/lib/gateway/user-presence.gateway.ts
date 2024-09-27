@@ -9,74 +9,98 @@ import {
 } from '@nestjs/websockets'
 import { Namespace, Socket } from 'socket.io'
 
-import { PubSubService } from '@js-monorepo/nest/redis-event-pub-sub'
-import { BrokerEvents, WebSocketEvents } from '../constants'
-import { WsLoginGuard } from '../guards/ws-login.guard'
+import { HasRoles } from '@js-monorepo/auth/nest/common'
+import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
+import { WsRolesGuard } from '../guards/ws-roles.guard'
+import { OnlineUsersService } from '../services/online-users.service'
 import { UserSocketService } from '../services/user-socket.service'
-
 export const ONLINE_USERS_ROOM = 'online_users_room'
 
-@UseGuards(WsLoginGuard)
 @WebSocketGateway({
   pingInterval: 30000,
   pingTimeout: 5000,
   path: '/ws',
   namespace: 'presence',
   cors: {
-    origin: '*',
+    origin: process.env['CORS_ORIGIN_DOMAINS'],
   },
   transports: ['websocket'],
 })
 export class UserPresenceGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-  logger = new Logger(UserPresenceGateway.name)
+  private logger = new Logger(UserPresenceGateway.name)
 
   @WebSocketServer()
-  namespace?: Namespace
+  namespace!: Namespace
 
   constructor(
     private readonly userSocketService: UserSocketService,
-    private readonly pubSubService: PubSubService
-  ) {}
+    private readonly onlineUsersService: OnlineUsersService
+  ) {
+    setInterval(async () => {
+      if (this.namespace?.sockets) {
+        const promises = Array.from(this.namespace.sockets).map(([_, socket]) =>
+          this.saveUserSocketAndOnlineList(socket)
+        )
+        await Promise.all(promises)
+      }
+    }, 240000) //every 4 minutes
+  }
 
   async handleConnection(socket: Socket) {
     try {
-      const userId = await this.userSocketService.getUserIdFromSocket(socket)
-
-      if (!userId) {
-        socket.disconnect()
-      } else {
-        await this.userSocketService.addSocketUser(userId, socket.id)
-        this.logger.debug(`User: ${userId} connected through websocket`)
-      }
+      await this.saveUserSocketAndOnlineList(socket)
+      this.logger.debug(`User: ${socket.user?.id} connected through websocket`)
+      this.emitOnlineUsersToAdmins()
     } catch (e: any) {
       this.logger.error('Error while handling websocket connection', e.stack)
     }
   }
 
-  async handleDisconnect(client: Socket) {
-    this.userSocketService.removeSocketUser(client.id)
-  }
-
-  @SubscribeMessage('ping')
-  async handlePing(@ConnectedSocket() client: Socket): Promise<void> {
-    const userId = await this.userSocketService.getUserIdFromSocket(client)
+  async handleDisconnect(socket: Socket) {
+    const userId = socket.user?.id
+    this.logger.debug(`User: ${userId} disconnected through websocket`)
+    await this.userSocketService.removeSocketUserBySocketId(socket.id)
     if (userId) {
-      this.userSocketService.addSocketUser(userId, client.id)
+      await this.onlineUsersService.removeUser(userId)
     }
+    this.emitOnlineUsersToAdmins()
   }
 
-  @SubscribeMessage(WebSocketEvents.announcements.subscribe)
-  async streamAnnouncements(@ConnectedSocket() client: any) {
-    return this.pubSubService.createWebsocketStream(
-      client,
-      BrokerEvents.announcements,
-      WebSocketEvents.announcements.emit
+  @UseGuards(WsRolesGuard)
+  @HasRoles(RolesEnum.ADMIN)
+  @SubscribeMessage('emit:join-admin-room')
+  async streamOnlineUsers(@ConnectedSocket() client: Socket) {
+    await client.join('admin-room')
+    this.emitOnlineUsersToAdmins()
+  }
+
+  private async saveUserSocketAndOnlineList(socket: Socket) {
+    if (!socket?.user?.id) {
+      socket.disconnect()
+      return
+    }
+
+    const socketPromise = this.userSocketService.addSocketUser(
+      {
+        userId: socket.user.id,
+        socketId: socket.id,
+        pid: process.pid,
+      },
+      60 * 5
     )
+    const onlineUsersPromise = this.onlineUsersService.addUser(socket.user.id)
+
+    await Promise.all([socketPromise, onlineUsersPromise])
   }
 
-  //TODO get online users
-  // @UseGuards(WsRolesGuard)
-  // @HasRoles(RolesEnum.ADMIN)
+  async emitOnlineUsersToAdmins() {
+    this.namespace
+      .to('admin-room')
+      .emit(
+        'event:online-users',
+        await this.onlineUsersService.getOnlineUsersList()
+      )
+  }
 }
