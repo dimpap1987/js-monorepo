@@ -70,10 +70,20 @@ export class UserPresenceGateway
 
   @UseGuards(WsRolesGuard)
   @HasRoles(RolesEnum.ADMIN)
-  @SubscribeMessage('emit:join-admin-room')
-  async streamOnlineUsers(@ConnectedSocket() client: Socket) {
-    await client.join('admin-room')
-    this.emitOnlineUsersToAdmins()
+  @SubscribeMessage('subscribe:online-users')
+  async getOnlineUsers(@ConnectedSocket() client: Socket) {
+    client.emit(
+      'event:online-users',
+      await this.onlineUsersService.getOnlineUsersList()
+    )
+  }
+
+  @UseGuards(WsRolesGuard)
+  @HasRoles(RolesEnum.ADMIN)
+  @SubscribeMessage('subscribe:join-admin-room')
+  async joinAdminGroup(@ConnectedSocket() client: Socket) {
+    client.join('admin-room')
+    client.emit('message', 'You have successfully joined the admin room')
   }
 
   private async saveUserSocketAndOnlineList(socket: Socket) {

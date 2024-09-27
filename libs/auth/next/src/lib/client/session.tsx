@@ -18,10 +18,12 @@ import React, {
 const SessionContext = createContext<{
   user: UserJWT | null | undefined
   isLoggedIn: boolean
+  isAdmin: boolean
   refreshSession: () => void
 }>({
   user: null,
   isLoggedIn: false,
+  isAdmin: false,
   refreshSession: () => {},
 })
 
@@ -63,17 +65,14 @@ export const SessionProvider = ({
   clientBuilder?: HttpClientBuilder
 }) => {
   const [user, setUser] = useState(value.user)
-  const [isLoggedIn, setIsLoggedIn] = useState(value.isLoggedIn)
 
   const refreshSession = useCallback(() => {
     fetchSession(
       (userResponse) => {
-        setIsLoggedIn(!!userResponse)
         setUser(userResponse)
       },
       () => {
         setUser(null)
-        setIsLoggedIn(false)
         window.location.reload()
       },
       clientBuilder
@@ -81,15 +80,14 @@ export const SessionProvider = ({
   }, [clientBuilder])
 
   useEffect(() => {
-    if (isLoggedIn || getCookie('UNREGISTERED-USER')) return
+    if (!!user || getCookie('UNREGISTERED-USER')) return
     fetchSession((userResponse) => {
-      setIsLoggedIn(!!userResponse)
       setUser(userResponse)
     })
   }, [])
 
   useEffect(() => {
-    if (!isLoggedIn) return
+    if (!user) return
 
     const intervalId = setInterval(() => {
       refreshSession() // Refresh session if logged in
@@ -98,15 +96,16 @@ export const SessionProvider = ({
     return () => {
       clearInterval(intervalId)
     }
-  }, [refreshSession, isLoggedIn])
+  }, [refreshSession, user])
 
   const contextValue = useMemo(() => {
     return {
       user,
-      isLoggedIn,
+      isLoggedIn: !!user,
       refreshSession,
+      isAdmin: user?.roles?.includes('ADMIN') ?? false,
     }
-  }, [user, isLoggedIn, refreshSession])
+  }, [user, refreshSession])
 
   return (
     <SessionContext.Provider value={contextValue}>
