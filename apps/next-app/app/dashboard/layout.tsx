@@ -9,28 +9,32 @@ export const metadata = {
 
 export default async function DashboardLayout({ children }: PropsWithChildren) {
   return (
-    <main className="h-[87svh] grid grid-cols-5 gap-0 bg-background-primary text-foreground">
+    <main className="h-[87svh] grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-0 bg-background-primary text-foreground">
       <div
-        className="col-start-1 col-end-2 row-start-1 row-end-6 border-r border-border
+        className="min-w-max col-start-1 col-end-2 row-start-1 row-end-6 border-r border-border
                       flex flex-col justify-between gap-2"
       >
         <div className="space-y-2 text-center">
           <DpNextNavLink
-            className="p-2 w-full transition-colors duration-300 flex gap-2 items-center justify-center 
-            hover:underline border border-border rounded-md"
+            className="p-2 transition-colors duration-300 grid grid-cols-[20px_auto] sm:grid-cols-[50px_auto] gap-2 items-center 
+               hover:underline border border-border rounded-md"
             href={`/dashboard/users`}
             activeClassName="underline"
           >
-            <HiMiniUsers className="shrink-0" />
+            <div className="flex justify-end">
+              <HiMiniUsers className="shrink-0" />
+            </div>
             <span>Manage Users</span>
           </DpNextNavLink>
           <DpNextNavLink
-            className="p-2 w-full transition-colors duration-300 flex gap-2 items-center justify-center 
-            hover:underline border border-border rounded-md"
+            className="p-2 transition-colors duration-300 grid grid-cols-[20px_auto] sm:grid-cols-[50px_auto] gap-2 items-center 
+               hover:underline border border-border rounded-md"
             href={`/dashboard/online-users`}
             activeClassName="underline"
           >
-            <HiMiniUsers className="shrink-0" />
+            <div className="flex justify-end">
+              <HiMiniUsers className="shrink-0" />
+            </div>
             <span>Online Users</span>
           </DpNextNavLink>
         </div>

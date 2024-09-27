@@ -48,13 +48,16 @@ export const websocketOptions: WebSocketOptionsType = {
 export default function MainTemplate({
   children,
 }: Readonly<PropsWithChildren>) {
-  const { user, isLoggedIn } = useSession()
+  const { user, isLoggedIn, isAdmin } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const socket = useWebSocket(websocketOptions, isLoggedIn)
 
   useEffect(() => {
     socket?.on('connect', () => {
       socket.emit('subscribe:announcements', {})
+      if (isAdmin) {
+        socket?.emit('subscribe:join-admin-room', {})
+      }
     })
 
     return () => {
