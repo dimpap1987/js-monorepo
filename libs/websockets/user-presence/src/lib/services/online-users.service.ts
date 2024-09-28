@@ -23,7 +23,19 @@ export class OnlineUsersService {
         start,
         end
       )
-      return onlineUsers.map((u) => JSON.parse(u))
+      const userPromises = onlineUsers.map(async (userId) => {
+        const userCache =
+          await this.authSessionUserCacheService.findOrSaveCacheUserById(
+            Number(userId)
+          )
+        return {
+          id: userCache?.id,
+          username: userCache?.username,
+          roles: userCache?.roles,
+        }
+      })
+
+      return await Promise.all(userPromises)
     } catch (e: any) {
       this.logger.error('Error while getting all online users', e.stack)
       return []
@@ -31,36 +43,19 @@ export class OnlineUsersService {
   }
 
   async addUser(userId: number | string): Promise<any> {
-    const user = await this.authSessionUserCacheService.findOrSaveCacheUserById(
-      Number(userId)
-    )
-    if (!user) return
+    if (userId === undefined || userId === null) return
 
     // Add the user to the sorted set with a score (timestamp)
     return this.redisClient.zAdd(ONLINE_KEY_LIST, {
       score: Date.now(),
-      value: JSON.stringify({
-        id: user.id,
-        username: user.username,
-        roles: user.roles,
-      }),
+      value: `${userId}`,
     })
   }
 
   async removeUser(userId: number | string): Promise<any> {
-    const user = await this.authSessionUserCacheService.findOrSaveCacheUserById(
-      Number(userId)
-    )
-    if (!user) return
+    if (userId === undefined || userId === null) return
 
-    return this.redisClient.zRem(
-      ONLINE_KEY_LIST,
-      JSON.stringify({
-        id: user.id,
-        username: user.username,
-        roles: user.roles,
-      })
-    )
+    return this.redisClient.zRem(ONLINE_KEY_LIST, `${userId}`)
   }
 
   async clearUsers() {

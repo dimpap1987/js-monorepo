@@ -55,10 +55,10 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="space-y-1">
+    <div className="overflow-auto rounded-t-md rounded-b-md border">
       {/* <DataTableToolbar table={table} /> */}
       {/* <div className=""> */}
-      <Table className="table-fixed divide-y divide-gray-200">
+      <Table className="table-fixed divide-y divide-gray-200 flex-1 overscroll-none">
         <TableHeader className="bg-gray-50">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -108,7 +108,7 @@ export function DataTable<TData, TValue>({
       {/* </div> */}
       <DataTablePagination
         table={table}
-        className="rounded-md border bg-white text-sm text-gray-900"
+        className="bg-white text-sm text-gray-900"
       />
     </div>
   )
