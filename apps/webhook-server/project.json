@@ -16,7 +16,6 @@
         "main": "apps/webhook-server/src/main.ts",
         "tsConfig": "apps/webhook-server/tsconfig.app.json",
         "assets": [],
-        "isolatedConfig": true,
         "webpackConfig": "apps/webhook-server/webpack.config.js"
       },
       "configurations": {
