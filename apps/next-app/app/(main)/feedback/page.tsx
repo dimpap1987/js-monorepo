@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 function FeedBack() {
   return (
-    <section className="flex justify-center pt-5 md:pt-10 mt-2 lg:mt-10">
+    <section className="flex justify-center mt-2">
       <div className="space-y-7">
         <div>
           <h1 className="text-center p-2">How can we make the App better?</h1>
@@ -16,7 +16,7 @@ function FeedBack() {
             needs to our team.
           </h4>
         </div>
-        <CardList className="flex justify-center gap-10 p-3 flex-wrap"></CardList>
+        <CardList className="width-[90%] mx-auto max-w-[400px] flex justify-center gap-10 p-3 flex-wrap"></CardList>
       </div>
     </section>
   )
