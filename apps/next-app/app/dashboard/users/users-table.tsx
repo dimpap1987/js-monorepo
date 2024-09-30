@@ -62,6 +62,7 @@ const findUsers = async (searchParams?: string) => {
 
 const DashboardUsersTableSuspense = () => {
   const [data, setData] = useState<UsersReponse>({ users: [], totalCount: 0 })
+  const [loading, setLoading] = useState(true)
 
   const [update, setUpdate] = useState<{
     index?: number
@@ -85,8 +86,10 @@ const DashboardUsersTableSuspense = () => {
     //Avoid being called twice because of the below useEffect setting the pagination
     if (!searchParams.get('page') || !searchParams.get('pageSize')) return
     const searchQuery = constructURIQueryString(pagination)
+    setLoading(true)
     findUsers(searchQuery).then((response) => {
       setData(response)
+      setLoading(false)
     })
   }, [searchParams])
 
@@ -320,6 +323,7 @@ const DashboardUsersTableSuspense = () => {
         onPaginationChange={onPaginationChange}
         totalCount={pageCount}
         pagination={pagination}
+        loading={loading}
       ></DataTable>
     </>
   )
