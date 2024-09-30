@@ -46,7 +46,7 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
         </div>
         <DpVersion className="hidden sm:block text-sm text-center"></DpVersion>
       </div>
-      <div className="p-3 col-span-3 sm:col-span-4 lg:col-span-5 xl:col-span-7">
+      <div className="px-3 col-span-3 sm:col-span-4 lg:col-span-5 xl:col-span-7">
         {children}
       </div>
     </main>

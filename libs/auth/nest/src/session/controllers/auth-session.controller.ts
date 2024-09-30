@@ -68,10 +68,14 @@ export class AuthSessionController {
   }
 
   @Get('logout')
-  @HttpCode(200)
+  @HttpCode(204)
   async logOut(@Req() req: Request, @Res() res: Response) {
-    req.logOut(() => {})
-    res.send({ message: 'Logged out successfully' })
+    req.logOut((error) => {
+      if (error) {
+        this.logger.error('There was an error in logout', error.stack)
+      }
+    })
+    res.send()
   }
 
   @Get('session')
