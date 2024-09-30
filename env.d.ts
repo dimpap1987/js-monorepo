@@ -18,6 +18,13 @@ declare global {
       AUTH_LOGIN_REDIRECT: string
       AUTH_COOKIES_DOMAIN: string
       AUTH_COOKIES_SECURE: string
+      AUTH_COOKIES_SAME_SITE:
+        | boolean
+        | 'lax'
+        | 'strict'
+        | 'none'
+        | undefined
+        | ''
 
       LOGGER_LEVEL: string
     }
