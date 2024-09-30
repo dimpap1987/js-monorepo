@@ -23,7 +23,8 @@ export class OnlineUsersService {
         start,
         end
       )
-      const userPromises = onlineUsers.map(async (userId) => {
+      const userPromises = onlineUsers.map(async (value) => {
+        const [userId, socketId] = value.split(':')
         const userCache =
           await this.authSessionUserCacheService.findOrSaveCacheUserById(
             Number(userId)
@@ -31,6 +32,7 @@ export class OnlineUsersService {
         return {
           id: userCache?.id,
           username: userCache?.username,
+          socketId: socketId,
           roles: userCache?.roles,
         }
       })
@@ -42,20 +44,20 @@ export class OnlineUsersService {
     }
   }
 
-  async addUser(userId: number | string): Promise<any> {
-    if (userId === undefined || userId === null) return
+  async addUser(value: string): Promise<any> {
+    if (value === undefined || value === null) return
 
     // Add the user to the sorted set with a score (timestamp)
     return this.redisClient.zAdd(ONLINE_KEY_LIST, {
       score: Date.now(),
-      value: `${userId}`,
+      value: value,
     })
   }
 
-  async removeUser(userId: number | string): Promise<any> {
-    if (userId === undefined || userId === null) return
+  async removeUser(value: string): Promise<any> {
+    if (value === undefined || value === null) return
 
-    return this.redisClient.zRem(ONLINE_KEY_LIST, `${userId}`)
+    return this.redisClient.zRem(ONLINE_KEY_LIST, `${value}`)
   }
 
   async clearUsers() {

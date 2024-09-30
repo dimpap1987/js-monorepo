@@ -8,6 +8,7 @@ import { FaCircle } from 'react-icons/fa6'
 export type OnlineUsersType = {
   id: number
   username: string
+  socketId: string
   roles: []
 }
 export const websocketOptions: WebSocketOptionsType = {
@@ -36,6 +37,14 @@ export default function OnlineUsersTableComponent() {
 
       <div className="w-full overflow-auto shadow bg-white rounded-b-lg">
         <table className="w-full p-2">
+          <thead>
+            <tr className="border-b text-sm border-blue-100 text-gray-800 font-semibold">
+              <th className="p-3 pl-4 px-3 text-left"> {/* Empty Header */}</th>
+              <th className="p-3 px-3 text-left">Username</th>
+              <th className="p-3 px-3 text-left">Socket ID</th>
+              <th className="p-3 px-3 text-left">Actions</th>
+            </tr>
+          </thead>
           <tbody>
             {onlineUsers?.map((user) => (
               <tr
@@ -51,6 +60,13 @@ export default function OnlineUsersTableComponent() {
                     {user.username}
                   </div>
                 </td>
+
+                <td className="p-3 px-3 whitespace-no-wrap">
+                  <div className="leading-5 text-gray-500 font-medium">
+                    {user.socketId}
+                  </div>
+                </td>
+                <td></td>
               </tr>
             ))}
           </tbody>

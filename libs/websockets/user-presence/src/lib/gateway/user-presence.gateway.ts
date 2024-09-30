@@ -63,7 +63,7 @@ export class UserPresenceGateway
     this.logger.debug(`User: ${userId} disconnected through websocket`)
     await this.userSocketService.removeSocketUserBySocketId(socket.id)
     if (userId) {
-      await this.onlineUsersService.removeUser(userId)
+      await this.onlineUsersService.removeUser(`${userId}:${socket.id}`)
     }
     this.emitOnlineUsersToAdmins()
   }
@@ -100,7 +100,9 @@ export class UserPresenceGateway
       },
       60 * 5
     )
-    const onlineUsersPromise = this.onlineUsersService.addUser(socket.user.id)
+    const onlineUsersPromise = this.onlineUsersService.addUser(
+      `${socket.user.id}:${socket.id}`
+    )
 
     await Promise.all([socketPromise, onlineUsersPromise])
   }
