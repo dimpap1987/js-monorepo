@@ -1,25 +1,14 @@
-export interface UserJWT {
-  id: number
-  username: string
-  createdAt: Date
-  lastLoggedIn?: string
-  profileImage?: string | null
-  provider?: string
-  roles: string[]
-}
-
 export interface SessionUserType {
   id: number
   username: string
-  createdAt: Date
+  createdAt?: Date
   lastLoggedIn?: string
-  profileImage?: string | null
-  provider?: string
+  profile: {
+    id?: number
+    image?: string | null
+    provider: string
+  }
   roles: string[]
-}
-
-export interface JwtPayload {
-  user: UserJWT
 }
 
 export interface SessionPayload {
@@ -127,7 +116,6 @@ export type NotificationDto = {
 }
 
 export type AuthUserFullDto = AuthUserDto & {
-  userProfiles?: UserProfileDto[]
   userChannels?: UserChannelDto[]
   sentNotifications?: NotificationDto[]
   receivedNotifications?: NotificationDto[]
@@ -162,7 +150,14 @@ export interface AuthUserDto {
   createdAt: Date
   username: string
   email: string
-  userProfiles: UserProfileDto[]
+  userProfiles: {
+    id: number
+    providerId: number
+    provider: {
+      name: string
+    }
+    profileImage?: string | null
+  }[]
   userRole: {
     role: {
       name: string
@@ -173,12 +168,4 @@ export interface AuthUserDto {
 export interface AuthUserCreateDto {
   username: string
   email: string
-}
-
-export interface UserProfileDto {
-  id: number
-  createdAt: Date
-  userId: number
-  providerId: number
-  profileImage?: string
 }

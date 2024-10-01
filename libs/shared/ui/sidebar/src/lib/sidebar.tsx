@@ -1,7 +1,7 @@
 'use client'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { ModeToggle } from '@js-monorepo/theme-provider'
-import { AuthRoles, MenuItem, UserJWT } from '@js-monorepo/types'
+import { AuthRoles, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode, RefObject, forwardRef, useEffect, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
@@ -16,7 +16,7 @@ export interface DpNextSidebarProps {
   readonly position?: SidebarPositionType
   readonly items: MenuItem[]
   readonly header?: string
-  readonly user?: Partial<UserJWT>
+  readonly user?: Partial<SessionUserType>
 }
 
 const framerSidebarPanel = (position: SidebarPositionType) => ({

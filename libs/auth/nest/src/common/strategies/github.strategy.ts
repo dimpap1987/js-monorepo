@@ -50,6 +50,10 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
           roles: user.userRole?.map((userRole) => userRole.role.name),
           createdAt: user.createdAt,
           profileImage: user.userProfiles?.[0]?.profileImage,
+          profile: {
+            image: user.userProfiles?.[0]?.profileImage,
+            provider: user.userProfiles?.[0]?.provider.name,
+          },
         },
       })
     } else {

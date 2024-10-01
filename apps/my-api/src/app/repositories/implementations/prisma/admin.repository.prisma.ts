@@ -20,7 +20,18 @@ export class AdminRepositoryPrisma implements AdminRepository {
           createdAt: true,
           username: true,
           email: true,
-          userProfiles: true,
+          userProfiles: {
+            select: {
+              id: true,
+              providerId: true,
+              profileImage: true,
+              provider: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
           userRole: {
             select: {
               role: {
@@ -48,7 +59,18 @@ export class AdminRepositoryPrisma implements AdminRepository {
         createdAt: true,
         username: true,
         email: true,
-        userProfiles: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
         userRole: {
           select: {
             role: {

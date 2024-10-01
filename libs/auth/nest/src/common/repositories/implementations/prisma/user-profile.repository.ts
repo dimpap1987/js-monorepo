@@ -37,22 +37,24 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
   async createUserProfile(
     userProfileCreateDto: UserProfileCreateDto
   ): Promise<UserProfileDto> {
-    try {
-      return await this.dbClient.userProfile.create({
+    return this.dbClient.userProfile
+      .create({
         data: {
           userId: userProfileCreateDto.userId,
           providerId: userProfileCreateDto.providerId,
           profileImage: userProfileCreateDto.profileImage,
         },
       })
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          throw new ConstraintViolationException(ConstraintCode.PROFILE_EXISTS) // Change this as needed
+      .catch((e) => {
+        if (e instanceof PrismaClientKnownRequestError) {
+          if (e.code === 'P2002') {
+            throw new ConstraintViolationException(
+              ConstraintCode.PROFILE_EXISTS
+            )
+          }
         }
-      }
-      throw e
-    }
+        throw e
+      })
   }
 
   async updateUserProfile(

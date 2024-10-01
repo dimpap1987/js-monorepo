@@ -1,7 +1,7 @@
 'use client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { AuthRoles, MenuItem, UserJWT } from '@js-monorepo/types'
+import { AuthRoles, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
@@ -52,7 +52,7 @@ function NavUserOptions({
     user?.isLoggedIn && (
       <UserOptionsDropdown IconComponent={FaCircleUser} className={className}>
         <UserMetadata
-          profileImage={user.profileImage}
+          profileImage={user.profile?.image}
           username={user.username}
           createdAt={user.createdAt}
           className="mb-2 border-border border-b"
@@ -85,7 +85,7 @@ export interface DpNextNavbarProps {
   readonly onLogout?: () => void
   readonly onSideBarClick?: () => void
 }
-export type UserNavProps = Partial<UserJWT> & { isLoggedIn: boolean }
+export type UserNavProps = Partial<SessionUserType> & { isLoggedIn: boolean }
 
 export type UserNavSocial = {
   type: 'google' | 'github' | 'facebook'

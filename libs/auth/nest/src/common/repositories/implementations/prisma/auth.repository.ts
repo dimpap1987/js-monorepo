@@ -24,7 +24,18 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
         createdAt: true,
         username: true,
         email: true,
-        userProfiles: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
         userRole: {
           select: {
             role: {
@@ -46,7 +57,18 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
         createdAt: true,
         username: true,
         email: true,
-        userProfiles: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
         userRole: {
           select: {
             role: {
@@ -64,8 +86,8 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
     authUserDTO: AuthUserCreateDto,
     providerDTO: ProvidersDto
   ): Promise<AuthUserDto> {
-    try {
-      return await this.dbClient.authUser.create({
+    return this.dbClient.authUser
+      .create({
         data: {
           email: authUserDTO.email,
           username: authUserDTO.username,
@@ -86,7 +108,18 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
           createdAt: true,
           username: true,
           email: true,
-          userProfiles: true,
+          userProfiles: {
+            select: {
+              id: true,
+              providerId: true,
+              profileImage: true,
+              provider: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
           userRole: {
             select: {
               role: {
@@ -98,13 +131,15 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
           },
         },
       })
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          throw new ConstraintViolationException(ConstraintCode.USERNAME_EXISTS)
+      .catch((e) => {
+        if (e instanceof PrismaClientKnownRequestError) {
+          if (e.code === 'P2002') {
+            throw new ConstraintViolationException(
+              ConstraintCode.USERNAME_EXISTS
+            )
+          }
         }
-      }
-      throw e
-    }
+        throw e // Re-throw any other errors
+      })
   }
 }

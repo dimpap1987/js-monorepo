@@ -1,8 +1,7 @@
-import { JwtPayload } from '@js-monorepo/types'
 import { decode, sign, verify } from '@js-monorepo/utils/jwt'
 import { HttpStatus, Inject, Injectable } from '@nestjs/common'
-import { AuthConfiguration } from '../types/auth.configuration'
 import { AuthException } from '../../common/exceptions/api-exception'
+import { AuthConfiguration } from '../types/auth.configuration'
 
 @Injectable()
 export class TokensService {
@@ -10,7 +9,7 @@ export class TokensService {
     @Inject('AUTH_OPTIONS') private readonly options: AuthConfiguration
   ) {}
 
-  createJwtTokens(payload: JwtPayload) {
+  createJwtTokens(payload: any) {
     try {
       const accessToken = this.createAccessToken(payload)
       const refreshToken = this.createRefreshToken(payload)
@@ -31,13 +30,13 @@ export class TokensService {
     return sign(payload, '5min', this.options.accessTokenSecret) // 5 minutes
   }
 
-  createRefreshToken(payload: JwtPayload) {
+  createRefreshToken(payload: any) {
     return sign(payload, '6h', this.options.refreshTokenSecret) // 6 hours
   }
 
   verifyAcessToken(token: any) {
     try {
-      return verify(token, this.options.accessTokenSecret) as JwtPayload
+      return verify(token, this.options.accessTokenSecret)
     } catch (e) {
       throw new AuthException(
         HttpStatus.UNAUTHORIZED,
@@ -49,7 +48,7 @@ export class TokensService {
 
   verifyRefreshToken(token: any) {
     try {
-      return verify(token, this.options.refreshTokenSecret) as JwtPayload
+      return verify(token, this.options.refreshTokenSecret)
     } catch (e) {
       throw new AuthException(
         HttpStatus.UNAUTHORIZED,
@@ -60,6 +59,6 @@ export class TokensService {
   }
 
   decode(token: any) {
-    return decode(token) as JwtPayload
+    return decode(token) as any
   }
 }
