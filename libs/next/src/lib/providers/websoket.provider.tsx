@@ -84,7 +84,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     if (socket) {
       socket.disconnect() // Disconnect the socket
       socketRefs.current.delete(url) // Remove from the map
-      clearInterval(pingIntervalsRefs.current.get(url))
+      if (pingIntervalsRefs.current.get(url)) {
+        clearInterval(pingIntervalsRefs.current.get(url))
+      }
       console.log(`Unsubscribed from url: ${url}`)
     } else {
       console.warn(`No socket found for url: ${url}`)
@@ -101,7 +103,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 // Create a custom hook to use the WebSocket context
 export const useWebSocket = (
   opts: WebSocketOptionsType,
-  shouldConnect: boolean
+  connect: boolean
 ): PingableSocket => {
   const context = useContext(WebSocketContext) as WebSocketContextType
   const [socket, setSocket] = useState<PingableSocket | undefined>(undefined)
@@ -111,14 +113,17 @@ export const useWebSocket = (
   }
 
   useEffect(() => {
-    if (shouldConnect) {
+    if (connect) {
       const newSocket = context.connectSocket(opts) as PingableSocket
       setSocket(newSocket)
     } else {
       context.unsubscribe(opts.url)
       setSocket(undefined)
     }
-  }, [opts.url, shouldConnect])
+    return () => {
+      socket?.disconnect()
+    }
+  }, [opts.url, connect])
 
   return socket as PingableSocket
 }

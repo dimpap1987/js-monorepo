@@ -76,7 +76,8 @@ h4 {
 
 /* custom scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 15px;
+  height: 15px;
 }
 
 ::-webkit-scrollbar-track {

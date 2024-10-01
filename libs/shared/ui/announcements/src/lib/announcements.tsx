@@ -26,8 +26,6 @@ export function AnnouncementsComponent({
   useEffect(() => {
     if (socket?.active) {
       socket.on(eventName, (messages: string[]) => {
-        console.log(messages)
-
         if (messages) {
           setAnnouncements((prev) => [...prev, ...messages])
         }
