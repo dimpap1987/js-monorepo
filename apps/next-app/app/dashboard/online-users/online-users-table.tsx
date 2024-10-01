@@ -12,6 +12,7 @@ export type OnlineUsersType = {
   socketId: string
   roles: []
 }
+
 export const websocketOptions: WebSocketOptionsType = {
   url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
 }
@@ -41,31 +42,42 @@ export default function OnlineUsersTableComponent() {
     }
   }, [socket])
 
+  // Group users by username
+  const groupedUsers = onlineUsers?.reduce(
+    (acc, user) => {
+      if (!acc[user.username]) {
+        acc[user.username] = []
+      }
+      acc[user.username].push(user.socketId)
+      return acc
+    },
+    {} as Record<string, string[]>
+  )
+
   return (
-    <div className="flex flex-col p-1">
-      <div className="bg-white p-2 text-sm text-center text-gray-500 font-bold px-5 py-2 shadow border-b border-gray-300 rounded-t-lg">
+    <div className="flex flex-col p-2 bg-white border-b rounded-lg shadow overflow-hidden text-sm">
+      <div className="text-center text-gray-500 font-bold py-1 shadow rounded-lg border-gray-300">
         Online Users
       </div>
 
-      <div className="w-full overflow-auto shadow bg-white rounded-b-lg">
-        <table className="w-full p-2 whitespace-nowrap">
+      <div className="overflow-auto whitespace-nowrap">
+        <table className="w-full">
           {!loading && (
             <thead>
-              <tr className="border-b text-sm border-blue-100 text-gray-800 font-semibold">
+              <tr className="border-b border-blue-100 text-gray-800 font-semibold">
                 <th className="p-3 pl-4 px-3 text-left"></th>
                 <th className="p-3 px-3 text-left">Username</th>
-                <th className="p-3 px-3 text-left">Socket ID</th>
-                <th className="p-3 px-3 text-left">Actions</th>
+                <th className="p-3 px-3 text-left">Devices</th>
+                {/* <th className="p-3 px-3 text-left">Actions</th> */}
               </tr>
             </thead>
           )}
           <tbody>
             {loading
-              ? // Render skeletons if loading
-                Array.from({ length: 5 }).map((_, index) => (
+              ? Array.from({ length: 5 }).map((_, index) => (
                   <tr
                     key={`skeleton-${index}`}
-                    className="relative border-t text-sm border-blue-100 cursor-default"
+                    className="relative border-t border-blue-100 cursor-default"
                   >
                     <td className="p-3 pl-4 px-3">
                       <Skeleton className="h-3 rounded-full" />
@@ -76,15 +88,15 @@ export default function OnlineUsersTableComponent() {
                     <td className="p-3 px-3">
                       <Skeleton className="h-3" />
                     </td>
-                    <td className="p-3 px-3">
+                    {/* <td className="p-3 px-3">
                       <Skeleton className="h-3" />
-                    </td>
+                    </td> */}
                   </tr>
                 ))
-              : onlineUsers?.map((user) => (
+              : Object.entries(groupedUsers).map(([username, socketIds]) => (
                   <tr
-                    key={user.socketId}
-                    className="relative border-t text-sm border-blue-100 cursor-default"
+                    key={username}
+                    className="relative border-t border-blue-100 cursor-default"
                   >
                     <td className="p-3 pl-4 px-3">
                       <FaCircle className="text-green-500 animate-pulse" />
@@ -92,16 +104,20 @@ export default function OnlineUsersTableComponent() {
 
                     <td className="p-3 px-3">
                       <div className="leading-5 text-gray-500 font-medium">
-                        {user.username}
+                        {username}
                       </div>
                     </td>
 
                     <td className="p-3 px-3">
-                      <div className="leading-5 text-gray-500 font-medium">
-                        {user.socketId}
-                      </div>
+                      <ul className="list-disc pl-5">
+                        {socketIds.map((socketId) => (
+                          <li key={socketId} className="text-gray-500">
+                            {socketId}
+                          </li>
+                        ))}
+                      </ul>
                     </td>
-                    <td className="p-3 px-3"></td>
+                    {/* <td className="p-3 px-3"></td> */}
                   </tr>
                 ))}
           </tbody>
