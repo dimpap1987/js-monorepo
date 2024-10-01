@@ -1,28 +1,35 @@
--- CreateEnum
-CREATE TYPE "AuthRole" AS ENUM ('USER', 'ADMIN');
-
--- CreateEnum
-CREATE TYPE "ProviderEnum" AS ENUM ('google', 'github');
-
 -- CreateTable
 CREATE TABLE "auth_users" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "roles" "AuthRole"[] DEFAULT ARRAY['USER']::"AuthRole"[],
 
     CONSTRAINT "auth_users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_profiles" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
+    "userId" INTEGER NOT NULL,
+    "providerId" INTEGER NOT NULL,
+    "profileImage" TEXT,
+
+    CONSTRAINT "user_profiles_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "unregistered_users" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
     "token" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "profileImage" TEXT,
-    "provider" "ProviderEnum" NOT NULL,
+    "providerId" INTEGER NOT NULL,
 
     CONSTRAINT "unregistered_users_pkey" PRIMARY KEY ("id")
 );
@@ -30,11 +37,27 @@ CREATE TABLE "unregistered_users" (
 -- CreateTable
 CREATE TABLE "providers" (
     "id" SERIAL NOT NULL,
-    "type" "ProviderEnum" NOT NULL,
-    "profileImage" TEXT,
-    "userId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
 
     CONSTRAINT "providers_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "roles" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+
+    CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_role" (
+    "userId" INTEGER NOT NULL,
+    "roleId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3),
+
+    CONSTRAINT "user_role_pkey" PRIMARY KEY ("userId","roleId")
 );
 
 -- CreateTable
@@ -85,16 +108,46 @@ CREATE UNIQUE INDEX "auth_users_username_key" ON "auth_users"("username");
 CREATE UNIQUE INDEX "auth_users_email_key" ON "auth_users"("email");
 
 -- CreateIndex
+CREATE INDEX "auth_users_email_idx" ON "auth_users"("email");
+
+-- CreateIndex
+CREATE INDEX "auth_users_username_idx" ON "auth_users"("username");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "unregistered_users_token_key" ON "unregistered_users"("token");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "unregistered_users_email_key" ON "unregistered_users"("email");
 
 -- CreateIndex
+CREATE INDEX "unregistered_users_email_idx" ON "unregistered_users"("email");
+
+-- CreateIndex
+CREATE INDEX "unregistered_users_token_idx" ON "unregistered_users"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "providers_name_key" ON "providers"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "roles_name_key" ON "roles"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "channels_name_key" ON "channels"("name");
 
 -- AddForeignKey
-ALTER TABLE "providers" ADD CONSTRAINT "providers_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth_users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "user_profiles" ADD CONSTRAINT "user_profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth_users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_profiles" ADD CONSTRAINT "user_profiles_providerId_fkey" FOREIGN KEY ("providerId") REFERENCES "providers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "unregistered_users" ADD CONSTRAINT "unregistered_users_providerId_fkey" FOREIGN KEY ("providerId") REFERENCES "providers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_role" ADD CONSTRAINT "user_role_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth_users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_role" ADD CONSTRAINT "user_role_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "roles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "users_notifications" ADD CONSTRAINT "users_notifications_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "auth_users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,14 +1,13 @@
 import {
   AuthUserCreateDto,
   AuthUserDto,
-  AuthUserWithProvidersDto,
   ProvidersDto,
 } from '@js-monorepo/types'
 
 export interface AuthService {
-  findAuthUserByEmail(email: string): Promise<AuthUserWithProvidersDto | null>
+  findAuthUserByEmail(email: string): Promise<AuthUserDto | null>
 
-  findAuthUserById(id: number): Promise<AuthUserWithProvidersDto | null>
+  findAuthUserById(id: number): Promise<AuthUserDto | null>
 
   createAuthUser(
     authUserDTO: AuthUserCreateDto,

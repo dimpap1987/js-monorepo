@@ -1,4 +1,3 @@
-import { AuthRoles } from '@js-monorepo/types'
 import { getCurrentUser } from '@next-app/actions/session'
 import { NextRequest, NextResponse } from 'next/server'
 import { apiAuthPrefix, authRoutes, routes } from './routes'
@@ -50,7 +49,7 @@ export function withAuth(
 
     const hasRequiredRole = routes
       .find((route) => nextUrl.pathname.startsWith(route.path))
-      ?.roles?.some((role) => session?.user?.roles?.includes(role as AuthRoles))
+      ?.roles?.some((role) => session?.user?.roles?.includes(role))
 
     if (!hasRequiredRole && routeExists) {
       return NextResponse.redirect(new URL('/', nextUrl))

@@ -112,16 +112,16 @@ const DashboardUsersTableSuspense = () => {
         ),
         cell: ({ row }) => {
           return (
-            <div className="h-12 flex justify-center items-center">
-              <Avatar>
-                {row.original.providers[0]?.profileImage && (
+            <div className="flex justify-center items-center">
+              <Avatar className='h-10 w-10"'>
+                {row.original?.userProfiles?.[0].profileImage && (
                   <AvatarImage
-                    src={row.original.providers[0]?.profileImage}
+                    src={row.original?.userProfiles?.[0].profileImage}
                     alt={`${row.original.username} picture`}
                   ></AvatarImage>
                 )}
                 <AvatarFallback>
-                  {row.original.username?.slice(0, 2)?.toUpperCase() || 'A'}
+                  {row.original.username?.slice(0, 3)?.toUpperCase() || 'A'}
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -184,7 +184,9 @@ const DashboardUsersTableSuspense = () => {
           <DataTableColumnHeader column={column} title="Roles" />
         ),
         cell: ({ row }) => (
-          <div className="text-center">{row.getValue('roles')}</div>
+          <div className="text-center">
+            {row.original?.userRole?.map((r) => r.role.name).join(', ')}
+          </div>
         ),
       },
       {
@@ -199,16 +201,18 @@ const DashboardUsersTableSuspense = () => {
           </div>
         ),
       },
-      {
-        accessorKey: 'provider',
-        size: 100,
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Provider" />
-        ),
-        cell: ({ row }) => (
-          <div className="text-center">{row.original.providers[0]?.type}</div>
-        ),
-      },
+      // {
+      //   accessorKey: 'provider',
+      //   size: 100,
+      //   header: ({ column }) => (
+      //     <DataTableColumnHeader column={column} title="Provider" />
+      //   ),
+      //   cell: ({ row }) => (
+      //     <div className="text-center">
+      //       {row.original?.userProfiles?.[0].providerId}
+      //     </div>
+      //   ),
+      // },
       {
         id: 'actions',
         size: 100,

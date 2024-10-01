@@ -1,7 +1,6 @@
 import {
   AuthUserCreateDto,
   AuthUserDto,
-  AuthUserWithProvidersDto,
   ProvidersDto,
 } from '@js-monorepo/types'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
@@ -22,9 +21,7 @@ export class AuthServiceImpl implements AuthService {
     @Inject(RepoAuth) private readonly authRepository: AuthRepository
   ) {}
 
-  async findAuthUserByEmail(
-    email: string
-  ): Promise<AuthUserWithProvidersDto | null> {
+  async findAuthUserByEmail(email: string): Promise<AuthUserDto | null> {
     try {
       this.logger.debug(`Search user with email: '${email}'`)
       return await this.authRepository.findAuthUserByEmail(email)
@@ -34,7 +31,7 @@ export class AuthServiceImpl implements AuthService {
     }
   }
 
-  async findAuthUserById(id: number): Promise<AuthUserWithProvidersDto | null> {
+  async findAuthUserById(id: number): Promise<AuthUserDto | null> {
     try {
       return await this.authRepository.findAuthUserById(id)
     } catch (e) {

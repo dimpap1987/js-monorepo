@@ -57,9 +57,9 @@ export class AuthSessionUserCacheService {
         userCache = {
           id: userDb.id,
           username: userDb?.username,
-          roles: userDb?.roles,
+          roles: userDb.userRole?.map((userRole) => userRole.role.name),
           createdAt: userDb?.createdAt,
-          profileImage: userDb.providers[0]?.profileImage,
+          profileImage: userDb.userProfiles?.[0]?.profileImage,
         } satisfies SessionUserType
       }
 

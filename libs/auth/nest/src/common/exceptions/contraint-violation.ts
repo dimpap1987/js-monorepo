@@ -9,4 +9,5 @@ export class ConstraintViolationException extends Error {
 
 export enum ConstraintCode {
   USERNAME_EXISTS,
+  PROFILE_EXISTS,
 }

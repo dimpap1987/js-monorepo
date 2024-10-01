@@ -47,9 +47,9 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
         user: {
           id: user.id,
           username: user.username,
-          roles: user.roles,
+          roles: user.userRole?.map((userRole) => userRole.role.name),
           createdAt: user.createdAt,
-          profileImage: user.providers[0]?.profileImage,
+          profileImage: user.userProfiles?.[0]?.profileImage,
         },
       })
     } else {
@@ -58,7 +58,7 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
         const unRegisteredUser =
           await this.unRegisteredUserService.createUnRegisteredUser({
             email: email,
-            provider: 'google',
+            provider: 'GITHUB',
             profileImage: profile.photos[0].value,
           })
 

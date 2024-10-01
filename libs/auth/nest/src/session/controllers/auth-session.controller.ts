@@ -113,7 +113,7 @@ export class AuthSessionController {
         username: username,
       },
       {
-        type: unregisteredUser.provider,
+        id: unregisteredUser.providerId,
         profileImage: unregisteredUser.profileImage,
       }
     )

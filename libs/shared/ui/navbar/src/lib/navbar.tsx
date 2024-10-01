@@ -1,9 +1,8 @@
 'use client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { MenuItem, UserJWT } from '@js-monorepo/types'
+import { AuthRoles, MenuItem, UserJWT } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import { AuthRole } from '@prisma/client'
 import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
 import { GiHamburgerMenu } from 'react-icons/gi'
@@ -129,7 +128,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 >
                   {(item?.roles?.includes('PUBLIC') ||
                     item?.roles?.some((role) =>
-                      user?.roles?.includes(role as AuthRole)
+                      user?.roles?.includes(role as AuthRoles)
                     )) && (
                     <DpNextNavLink
                       className="p-2"
