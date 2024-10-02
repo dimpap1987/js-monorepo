@@ -11,6 +11,7 @@ import { PassportModule } from '@nestjs/passport'
 import { CsrfGeneratorMiddleware } from '../common/middlewares/csrf-generator.middleware'
 import { AuthProviderModule } from '../common/modules/auth.provider.modules'
 import { UnRegisteredUserProviderModule } from '../common/modules/unregisteredUser.provider.module'
+import { UserProfileProviderModule } from '../common/modules/user-profile.provider.modules'
 import { AuthService } from '../common/services/interfaces/auth.service'
 import { UnregisteredService } from '../common/services/interfaces/unregistered-user.service'
 import { GithubOauthStrategy } from '../common/strategies/github.strategy'
@@ -36,6 +37,7 @@ import { SessionSerializer } from './providers/session-serializer'
     }),
     AuthProviderModule,
     UnRegisteredUserProviderModule,
+    UserProfileProviderModule,
   ],
   controllers: [AuthSessionController],
   providers: [

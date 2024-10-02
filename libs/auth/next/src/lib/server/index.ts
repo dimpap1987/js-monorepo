@@ -1,7 +1,6 @@
 'use server'
 
-import { JwtPayload } from '@js-monorepo/types'
-import { JWTPayload, decodeJwt, jwtVerify } from 'jose'
+import { decodeJwt, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 
 export async function getCurrentSession() {
@@ -48,22 +47,17 @@ export async function findUnregisteredUser(headers?: Headers) {
   }
 }
 
-export async function validateAuthToken(
-  secret: string
-): Promise<(JWTPayload & JwtPayload) | null> {
+export async function validateAuthToken(secret: string): Promise<any> {
   const token = cookies().get('accessToken')?.value
   if (!token || token === '') return null
   try {
-    return (await jwtVerify(token, new TextEncoder().encode(secret)))
-      .payload as JWTPayload & JwtPayload
+    return (await jwtVerify(token, new TextEncoder().encode(secret))).payload
   } catch (e) {
     return null
   }
 }
 
-export async function decodeAuthToken(): Promise<
-  (JWTPayload & JwtPayload) | null
-> {
+export async function decodeAuthToken(): Promise<any> {
   try {
     const accessToken = cookies().get('accessToken')?.value
     if (!accessToken || accessToken === '') return null
@@ -72,7 +66,7 @@ export async function decodeAuthToken(): Promise<
 
     if (!payload) return null
 
-    return payload as JWTPayload & JwtPayload
+    return payload
   } catch (e) {
     return null
   }

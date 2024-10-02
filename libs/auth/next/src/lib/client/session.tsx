@@ -1,6 +1,6 @@
 'use client'
 
-import { UserJWT } from '@js-monorepo/types'
+import { SessionUserType } from '@js-monorepo/types'
 import {
   getCookie,
   HttpClientBuilder,
@@ -16,7 +16,7 @@ import React, {
 } from 'react'
 
 const SessionContext = createContext<{
-  user: UserJWT | null | undefined
+  user: SessionUserType | null | undefined
   isLoggedIn: boolean
   isAdmin: boolean
   refreshSession: () => void
@@ -38,7 +38,7 @@ const fetchSession = async (
       .get()
       .withCredentials()
       .execute<{
-        user: UserJWT
+        user: SessionUserType
       }>()
 
     if (response.ok) {
@@ -59,7 +59,7 @@ export const SessionProvider = ({
 }: {
   readonly children?: React.ReactNode
   readonly value: {
-    user: UserJWT | null | undefined
+    user: SessionUserType | null | undefined
     isLoggedIn: boolean
   }
   clientBuilder?: HttpClientBuilder

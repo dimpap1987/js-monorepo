@@ -58,7 +58,7 @@ export class AuthJWTController {
     @Req() req: Request & { user: { email: string; profileImage: string } },
     @Res() res: Response
   ) {
-    return this.handleSocialRedirect(req, res, 'google')
+    return this.handleSocialRedirect(req, res, 'GOOGLE')
   }
 
   @Get('github/redirect')
@@ -67,7 +67,7 @@ export class AuthJWTController {
     @Req() req: Request & { user: { email: string; profileImage: string } },
     @Res() res: Response
   ) {
-    return this.handleSocialRedirect(req, res, 'github')
+    return this.handleSocialRedirect(req, res, 'GITHUB')
   }
 
   @Get('session')
@@ -117,7 +117,7 @@ export class AuthJWTController {
         username: username,
       },
       {
-        type: unregisteredUser.provider,
+        id: unregisteredUser.providerId,
         profileImage: unregisteredUser.profileImage,
       }
     )
@@ -127,7 +127,7 @@ export class AuthJWTController {
         user: {
           id: user.id,
           username: user.username,
-          roles: user.roles,
+          roles: user.userRole?.map((userRole) => userRole.role.name),
           createdAt: user.createdAt,
           profileImage: unregisteredUser.profileImage,
         },
@@ -189,9 +189,9 @@ export class AuthJWTController {
           user: {
             id: user.id,
             username: user.username,
-            roles: user.roles,
+            roles: user.userRole?.map((userRole) => userRole.role.name),
             createdAt: user.createdAt,
-            profileImage: user.providers[0]?.profileImage,
+            profileImage: user.userProfiles[0]?.profileImage,
           },
         },
         res,

@@ -1,8 +1,6 @@
-import { AuthRoles } from '@js-monorepo/types'
-
 export const routes: {
   path: string
-  roles: (AuthRoles | 'PUBLIC')[]
+  roles: (string | 'PUBLIC')[]
 }[] = [
   {
     path: '/about',
