@@ -65,7 +65,7 @@ const ENV = process.env.NODE_ENV
         },
         csrf: {
           enabled: true,
-          middlewareExclusions: ['exceptions', 'admin/(.*)'],
+          middlewareExclusions: ['exceptions', 'admin/(.*)', 'health'],
         },
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUserDto) => {
@@ -118,6 +118,7 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware) // Apply LoggerMiddleware
       .forRoutes('*')
       .apply(AuthSessionMiddleware)
+      .exclude('health')
       .forRoutes('*')
   }
 }
