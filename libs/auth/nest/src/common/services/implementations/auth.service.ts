@@ -2,6 +2,7 @@ import {
   AuthUserCreateDto,
   AuthUserDto,
   ProvidersDto,
+  SessionUserType,
 } from '@js-monorepo/types'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
@@ -66,6 +67,19 @@ export class AuthServiceImpl implements AuthService {
         'Something went wrong while creating user',
         'CREATE_USER_EXCEPTION'
       )
+    }
+  }
+
+  createSessionUser(authUser: AuthUserDto): SessionUserType {
+    return {
+      id: authUser?.id,
+      username: authUser?.username,
+      roles: authUser?.userRole?.map((userRole) => userRole.role.name),
+      createdAt: authUser?.createdAt,
+      profile: {
+        image: authUser?.userProfiles?.[0]?.profileImage,
+        provider: authUser?.userProfiles?.[0]?.provider.name,
+      },
     }
   }
 }

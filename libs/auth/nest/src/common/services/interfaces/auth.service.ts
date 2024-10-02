@@ -2,7 +2,9 @@ import {
   AuthUserCreateDto,
   AuthUserDto,
   ProvidersDto,
+  SessionUserType,
 } from '@js-monorepo/types'
+import { AuthUser } from '@prisma/client'
 
 export interface AuthService {
   findAuthUserByEmail(email: string): Promise<AuthUserDto | null>
@@ -13,4 +15,6 @@ export interface AuthService {
     authUserDTO: AuthUserCreateDto,
     providerDTO: ProvidersDto
   ): Promise<AuthUserDto>
+
+  createSessionUser(authUser: Partial<AuthUser>): SessionUserType
 }

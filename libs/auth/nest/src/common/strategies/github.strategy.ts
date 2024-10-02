@@ -43,18 +43,9 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
 
     if (user) {
       // If the user exists in the database
+      const sessionUser = this.authService.createSessionUser(user)
       done(null, {
-        user: {
-          id: user.id,
-          username: user.username,
-          roles: user.userRole?.map((userRole) => userRole.role.name),
-          createdAt: user.createdAt,
-          profileImage: user.userProfiles?.[0]?.profileImage,
-          profile: {
-            image: user.userProfiles?.[0]?.profileImage,
-            provider: user.userProfiles?.[0]?.provider.name,
-          },
-        },
+        user: sessionUser,
       })
     } else {
       // If the user doesn't exist in the database
