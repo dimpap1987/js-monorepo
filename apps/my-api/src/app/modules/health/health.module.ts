@@ -6,7 +6,7 @@ import { HealthController } from './health.controller'
 @Module({
   imports: [
     TerminusModule.forRoot({
-      errorLogStyle: 'pretty',
+      errorLogStyle: 'json',
       gracefulShutdownTimeoutMs: 1000,
     }),
   ],
