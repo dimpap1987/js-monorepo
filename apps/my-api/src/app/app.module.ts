@@ -20,8 +20,6 @@ import passport from 'passport'
 import { RedisClientType } from 'redis'
 import { v4 as uuidv4 } from 'uuid'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
 import { GLOBAL_CHANNEL } from './constants'
 import { AdminController } from './controllers/admin.controller'
 import { ExceptionController } from './controllers/exception.controller'
@@ -29,6 +27,7 @@ import { NotificationController } from './controllers/notification.controller'
 import { AdminProviderModule } from './modules/admin.module'
 import { ChannelProviderModule } from './modules/channel.module'
 import { FilterProviderModule } from './modules/filter.modules'
+import { HealthModule } from './modules/health/health.module'
 import { NotificationProviderModule } from './modules/notifications.module'
 import { ChannelService } from './services/channel.service'
 const ENV = process.env.NODE_ENV
@@ -39,6 +38,7 @@ const ENV = process.env.NODE_ENV
       isGlobal: true,
       envFilePath: [`.env.${ENV}`, `.env`],
     }),
+    HealthModule,
     RedisModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         url: configService.get('REDIS_URL'),
@@ -87,13 +87,8 @@ const ENV = process.env.NODE_ENV
     AdminProviderModule,
     NotificationProviderModule,
   ],
-  controllers: [
-    AppController,
-    NotificationController,
-    AdminController,
-    ExceptionController,
-  ],
-  providers: [AppService, LoggerMiddleware],
+  controllers: [NotificationController, AdminController, ExceptionController],
+  providers: [LoggerMiddleware],
 })
 export class AppModule implements NestModule {
   constructor(@Inject(REDIS) private readonly redis: RedisClientType) {}

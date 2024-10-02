@@ -25,6 +25,11 @@ services:
       - logs-data:/usr/src/app/logs
     networks:
       - my-api
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3333/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
     command: >
       sh -c "npx prisma migrate deploy --schema=./prisma/schema && node main.js"
     depends_on:
@@ -48,6 +53,15 @@ services:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     networks:
       - my-api
     volumes:
@@ -57,6 +71,11 @@ services:
     image: redis:latest
     container_name: redis_prod
     restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
+      interval: 1s
+      timeout: 3s
+      retries: 5
     volumes:
       - redis-data:/data
     networks:
