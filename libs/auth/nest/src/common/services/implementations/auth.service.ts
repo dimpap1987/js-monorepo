@@ -1,8 +1,8 @@
 import {
   AuthUserCreateDto,
   AuthUserDto,
-  AuthUserWithProvidersDto,
   ProvidersDto,
+  SessionUserType,
 } from '@js-monorepo/types'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
@@ -22,9 +22,7 @@ export class AuthServiceImpl implements AuthService {
     @Inject(RepoAuth) private readonly authRepository: AuthRepository
   ) {}
 
-  async findAuthUserByEmail(
-    email: string
-  ): Promise<AuthUserWithProvidersDto | null> {
+  async findAuthUserByEmail(email: string): Promise<AuthUserDto | null> {
     try {
       this.logger.debug(`Search user with email: '${email}'`)
       return await this.authRepository.findAuthUserByEmail(email)
@@ -34,7 +32,7 @@ export class AuthServiceImpl implements AuthService {
     }
   }
 
-  async findAuthUserById(id: number): Promise<AuthUserWithProvidersDto | null> {
+  async findAuthUserById(id: number): Promise<AuthUserDto | null> {
     try {
       return await this.authRepository.findAuthUserById(id)
     } catch (e) {
@@ -69,6 +67,19 @@ export class AuthServiceImpl implements AuthService {
         'Something went wrong while creating user',
         'CREATE_USER_EXCEPTION'
       )
+    }
+  }
+
+  createSessionUser(authUser: AuthUserDto): SessionUserType {
+    return {
+      id: authUser?.id,
+      username: authUser?.username,
+      roles: authUser?.userRole?.map((userRole) => userRole.role.name),
+      createdAt: authUser?.createdAt,
+      profile: {
+        image: authUser?.userProfiles?.[0]?.profileImage,
+        provider: authUser?.userProfiles?.[0]?.provider.name,
+      },
     }
   }
 }

@@ -2,7 +2,6 @@ import { PrismaService } from '@js-monorepo/db'
 import {
   AuthUserCreateDto,
   AuthUserDto,
-  AuthUserWithProvidersDto,
   ProvidersDto,
 } from '@js-monorepo/types'
 import { Injectable } from '@nestjs/common'
@@ -17,20 +16,68 @@ import { AuthRepository } from '../../auth.repository'
 export class AuthRepositoryPrismaImpl implements AuthRepository {
   constructor(private readonly dbClient: PrismaService) {}
 
-  async findAuthUserByEmail(email: string): Promise<AuthUserWithProvidersDto> {
+  async findAuthUserByEmail(email: string): Promise<AuthUserDto> {
     return this.dbClient.authUser.findUniqueOrThrow({
       where: { email: email },
-      include: {
-        providers: true,
+      select: {
+        id: true,
+        createdAt: true,
+        username: true,
+        email: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        userRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     })
   }
 
-  async findAuthUserById(id: number): Promise<AuthUserWithProvidersDto> {
+  async findAuthUserById(id: number): Promise<AuthUserDto> {
     return this.dbClient.authUser.findUniqueOrThrow({
       where: { id: id },
-      include: {
-        providers: true,
+      select: {
+        id: true,
+        createdAt: true,
+        username: true,
+        email: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        userRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     })
   }
@@ -39,27 +86,60 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
     authUserDTO: AuthUserCreateDto,
     providerDTO: ProvidersDto
   ): Promise<AuthUserDto> {
-    try {
-      const user = await this.dbClient.authUser.create({
+    return this.dbClient.authUser
+      .create({
         data: {
           email: authUserDTO.email,
           username: authUserDTO.username,
-          providers: {
+          userProfiles: {
             create: {
-              type: providerDTO.type,
+              providerId: providerDTO.id,
               profileImage: providerDTO.profileImage,
+            },
+          },
+          userRole: {
+            create: {
+              roleId: 2,
+            },
+          },
+        },
+        select: {
+          id: true,
+          createdAt: true,
+          username: true,
+          email: true,
+          userProfiles: {
+            select: {
+              id: true,
+              providerId: true,
+              profileImage: true,
+              provider: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          userRole: {
+            select: {
+              role: {
+                select: {
+                  name: true,
+                },
+              },
             },
           },
         },
       })
-      return user
-    } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-          throw new ConstraintViolationException(ConstraintCode.USERNAME_EXISTS)
+      .catch((e) => {
+        if (e instanceof PrismaClientKnownRequestError) {
+          if (e.code === 'P2002') {
+            throw new ConstraintViolationException(
+              ConstraintCode.USERNAME_EXISTS
+            )
+          }
         }
-      }
-      throw e
-    }
+        throw e // Re-throw any other errors
+      })
   }
 }

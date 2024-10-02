@@ -1,25 +1,14 @@
-export interface UserJWT {
-  id: number
-  username: string
-  createdAt: Date
-  lastLoggedIn?: string
-  profileImage?: string | null
-  provider?: string
-  roles: AuthRoles[]
-}
-
 export interface SessionUserType {
   id: number
   username: string
-  createdAt: Date
+  createdAt?: Date
   lastLoggedIn?: string
-  profileImage?: string | null
-  provider?: string
-  roles: AuthRoles[]
-}
-
-export interface JwtPayload {
-  user: UserJWT
+  profile: {
+    id?: number
+    image?: string | null
+    provider: string
+  }
+  roles: string[]
 }
 
 export interface SessionPayload {
@@ -58,7 +47,7 @@ export interface CreateCheckoutSessionRequestBody {
   isDonate?: boolean
 }
 
-export type ProviderName = 'github' | 'google'
+export type ProviderName = 'GITHUB' | 'GOOGLE'
 
 export type AuthRoles = 'ADMIN' | 'USER'
 
@@ -69,25 +58,8 @@ export type ProviderDto = {
   userId: number
 }
 
-export type AuthUserWithProvidersDto = AuthUserDto & {
-  providers: ProviderDto[]
-}
-
-export type AuthUserCreateDto = {
-  email: string
-  username: string
-}
-
-export type AuthUserDto = {
-  id: number
-  email?: string
-  username: string
-  roles: AuthRoles[]
-  createdAt: Date
-}
-
 export type ProvidersDto = {
-  type: ProviderName
+  id: number
   profileImage?: string | null
 }
 
@@ -101,7 +73,7 @@ export type UnRegisteredUserDto = {
   id: number
   token: string
   email: string
-  provider: ProviderName
+  providerId: number
   profileImage?: string | null
   createdAt: Date
 }
@@ -144,10 +116,9 @@ export type NotificationDto = {
 }
 
 export type AuthUserFullDto = AuthUserDto & {
-  providers: ProviderDto[]
-  userChannels: UserChannelDto[]
-  sentNotifications: NotificationDto[]
-  receivedNotifications: NotificationDto[]
+  userChannels?: UserChannelDto[]
+  sentNotifications?: NotificationDto[]
+  receivedNotifications?: NotificationDto[]
 }
 
 export type EventsReponseType = 'notification' | 'announcement'
@@ -157,4 +128,44 @@ export interface EventsReponse<T = any> {
   data: T
   time: Date
   type: EventsReponseType
+}
+
+export interface UserProfileDto {
+  id: number
+  createdAt: Date
+  updatedAt: Date
+  userId: number
+  providerId: number
+  profileImage?: string | null
+}
+
+export interface UserProfileCreateDto {
+  userId: number
+  providerId: number
+  profileImage?: string | null
+}
+
+export interface AuthUserDto {
+  id: number
+  createdAt: Date
+  username: string
+  email: string
+  userProfiles: {
+    id: number
+    providerId: number
+    provider: {
+      name: string
+    }
+    profileImage?: string | null
+  }[]
+  userRole: {
+    role: {
+      name: string
+    }
+  }[]
+}
+
+export interface AuthUserCreateDto {
+  username: string
+  email: string
 }

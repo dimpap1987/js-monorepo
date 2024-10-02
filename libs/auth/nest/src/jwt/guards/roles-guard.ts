@@ -1,8 +1,7 @@
-import { JwtPayload } from '@js-monorepo/types'
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
+import { RolesEnum } from '../../common/types'
 import { TokensService } from '../services/tokens.service'
-import { RolesEnum } from '../../common/types/auth.configuration'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -19,10 +18,8 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles) return true
 
     const accessToken = context.switchToHttp().getRequest().cookies.accessToken
-    const payload = this.tokenService.verifyAcessToken(
-      accessToken
-    ) as JwtPayload
+    const payload = this.tokenService.verifyAcessToken(accessToken) as any
 
-    return requiredRoles.some((role) => payload.user?.roles?.includes(role))
+    return requiredRoles.some((role) => payload?.user?.roles?.includes(role))
   }
 }

@@ -1,8 +1,7 @@
 'use client'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { ModeToggle } from '@js-monorepo/theme-provider'
-import { MenuItem, UserJWT } from '@js-monorepo/types'
-import { AuthRole } from '@prisma/client'
+import { AuthRoles, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode, RefObject, forwardRef, useEffect, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
@@ -17,7 +16,7 @@ export interface DpNextSidebarProps {
   readonly position?: SidebarPositionType
   readonly items: MenuItem[]
   readonly header?: string
-  readonly user?: Partial<UserJWT>
+  readonly user?: Partial<SessionUserType>
 }
 
 const framerSidebarPanel = (position: SidebarPositionType) => ({
@@ -89,7 +88,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
                 const shouldRenderNavLink =
                   item.roles?.includes('PUBLIC') || // Always render if PUBLIC role is present
                   item.roles?.some((role) =>
-                    user?.roles?.includes(role as AuthRole)
+                    user?.roles?.includes(role as AuthRoles)
                   ) // Render if user has any of the required roles
 
                 return (

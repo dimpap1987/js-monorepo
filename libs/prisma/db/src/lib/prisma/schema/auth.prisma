@@ -1,44 +1,76 @@
 model AuthUser {
     id                    Int                @id @default(autoincrement())
     createdAt             DateTime           @default(now())
+    updatedAt             DateTime           @updatedAt
     username              String             @unique
     email                 String             @unique
-    roles                 AuthRole[]         @default([USER])
-    providers             Provider[]
     userChannels          UserChannel[]
+    userProfiles          UserProfile[]
     sentNotifications     UserNotification[] @relation("sender")
     receivedNotifications UserNotification[] @relation("receiver")
+    userRole              UserRole[]
 
+    @@index([email])
+    @@index([username])
     @@map(name: "auth_users")
 }
 
-model UnRegisteredUser {
-    id           Int          @id @default(autoincrement())
-    createdAt    DateTime     @default(now())
-    token        String       @unique
-    email        String       @unique
+model UserProfile {
+    id           Int      @id @default(autoincrement())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    userId       Int
+    providerId   Int
     profileImage String?
-    provider     ProviderEnum
 
+    authUser AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+    provider Provider @relation(fields: [providerId], references: [id])
+
+    @@map(name: "user_profiles")
+}
+
+model UnRegisteredUser {
+    id           Int      @id @default(autoincrement())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    token        String   @unique
+    email        String   @unique
+    profileImage String?
+    providerId   Int
+
+    provider Provider @relation(fields: [providerId], references: [id])
+
+    @@index([email])
+    @@index([token])
     @@map(name: "unregistered_users")
 }
 
 model Provider {
-    id           Int          @id @default(autoincrement())
-    type         ProviderEnum
-    profileImage String?
-    userId       Int
-    user         AuthUser     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id               Int                @id @default(autoincrement())
+    name             String             @unique
+    userProfiles     UserProfile[]
+    unRegisteredUser UnRegisteredUser[]
 
     @@map(name: "providers")
 }
 
-enum AuthRole {
-    USER
-    ADMIN
+model Role {
+    id       Int        @id @default(autoincrement())
+    name     String     @unique
+    userRole UserRole[]
+
+    @@map(name: "roles")
 }
 
-enum ProviderEnum {
-    google
-    github
+model UserRole {
+    userId    Int
+    roleId    Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    authUser AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+    role     Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+    @@id([userId, roleId]) // Composite primary key
+    @@map(name: "user_role")
 }

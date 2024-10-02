@@ -37,17 +37,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const { name, emails, photos, id } = profile
     const email = emails[0].value
     const user = await this.authService.findAuthUserByEmail(email)
-
     if (user) {
       // If the user exists in the database
+      const sessionUser = this.authService.createSessionUser(user)
       done(null, {
-        user: {
-          id: user.id,
-          username: user.username,
-          roles: user.roles,
-          createdAt: user.createdAt,
-          profileImage: user.providers[0]?.profileImage,
-        },
+        user: sessionUser,
       })
     } else {
       // If the user doesn't exist in the database
@@ -55,7 +49,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         const unRegisteredUser =
           await this.unRegisteredUserService.createUnRegisteredUser({
             email: email,
-            provider: 'google',
+            provider: 'GOOGLE',
             profileImage: photos[0].value,
           })
 
