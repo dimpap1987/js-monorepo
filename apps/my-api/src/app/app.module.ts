@@ -5,7 +5,7 @@ import {
   AuthSessionMiddleware,
   AuthSessionModule,
 } from '@js-monorepo/auth/nest/session'
-import { PrismaModule } from '@js-monorepo/db'
+import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import { AuthUserDto } from '@js-monorepo/types'
 import {
@@ -13,9 +13,12 @@ import {
   UserPresenceModule,
   UserPresenceWebsocketService,
 } from '@js-monorepo/user-presence'
+import { ClsPluginTransactional } from '@nestjs-cls/transactional'
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
+import { ClsModule } from 'nestjs-cls'
 import passport from 'passport'
 import { RedisClientType } from 'redis'
 import { v4 as uuidv4 } from 'uuid'
@@ -30,8 +33,8 @@ import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { NotificationProviderModule } from './modules/notifications.module'
 import { ChannelService } from './services/channel.service'
-const ENV = process.env.NODE_ENV
 
+const ENV = process.env.NODE_ENV
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -86,6 +89,20 @@ const ENV = process.env.NODE_ENV
     ChannelProviderModule,
     AdminProviderModule,
     NotificationProviderModule,
+    ClsModule.forRoot({
+      global: true,
+      middleware: {
+        mount: true,
+      },
+      plugins: [
+        new ClsPluginTransactional({
+          imports: [PrismaModule],
+          adapter: new TransactionalAdapterPrisma({
+            prismaInjectionToken: PrismaService,
+          }),
+        }),
+      ],
+    }),
   ],
   controllers: [NotificationController, AdminController, ExceptionController],
   providers: [LoggerMiddleware],

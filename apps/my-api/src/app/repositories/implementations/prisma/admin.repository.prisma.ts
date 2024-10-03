@@ -1,11 +1,14 @@
-import { PrismaService } from '@js-monorepo/db'
 import { AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
+import { TransactionHost } from '@nestjs-cls/transactional'
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { AdminRepository } from '../../interfaces/admin.repository'
 
 @Injectable()
 export class AdminRepositoryPrisma implements AdminRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
+  ) {}
 
   async getUsers(
     pageable: Pageable
@@ -14,7 +17,7 @@ export class AdminRepositoryPrisma implements AdminRepository {
 
     if (!page && !pageSize) {
       // If page or pageSize is not provided, fetch all users without pagination
-      const allUsers = await this.prisma.authUser.findMany({
+      const allUsers = await this.txHost.tx.authUser.findMany({
         select: {
           id: true,
           createdAt: true,
@@ -49,9 +52,9 @@ export class AdminRepositoryPrisma implements AdminRepository {
       }
     }
 
-    const totalCount = await this.prisma.authUser.count()
-    // Fetch users with pagination using Prisma
-    const users = await this.prisma.authUser.findMany({
+    const totalCount = await this.txHost.tx.authUser.count()
+    // Fetch users with pagination using txHost.tx
+    const users = await this.txHost.tx.authUser.findMany({
       take: pageSize,
       skip: page * pageSize,
       select: {
@@ -92,7 +95,7 @@ export class AdminRepositoryPrisma implements AdminRepository {
     userId: number,
     updateUser: AuthUserUpdateDto
   ): Promise<any> {
-    return this.prisma.authUser.update({
+    return this.txHost.tx.authUser.update({
       where: { id: userId },
       data: {
         username: updateUser.username,

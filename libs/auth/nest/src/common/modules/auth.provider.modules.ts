@@ -3,6 +3,7 @@ import { AuthRepositoryPrismaImpl } from '../repositories/implementations/prisma
 import { AuthServiceImpl } from '../services/implementations/auth.service'
 import { RolesServiceImpl } from '../services/implementations/role.service'
 import { RepoAuth, ServiceAuth, ServiceRole } from '../types'
+import { RolesRepository } from '../repositories/implementations/prisma/role.repository'
 
 const providers: Provider[] = [
   {
@@ -17,6 +18,7 @@ const providers: Provider[] = [
     provide: ServiceRole,
     useClass: RolesServiceImpl,
   },
+  RolesRepository,
 ]
 
 @Global()

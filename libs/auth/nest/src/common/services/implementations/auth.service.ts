@@ -6,6 +6,7 @@ import {
   ProvidersDto,
   SessionUserType,
 } from '@js-monorepo/types'
+import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
 import {
@@ -46,6 +47,7 @@ export class AuthServiceImpl implements AuthService {
     }
   }
 
+  @Transactional()
   async createAuthUser(
     authUserDTO: AuthUserCreateDto,
     providerDTO: ProvidersDto,

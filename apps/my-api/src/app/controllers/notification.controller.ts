@@ -9,8 +9,7 @@ export class NotificationController {
   @Sse('subscribe')
   async events(@SessionUser() user) {
     // get user channels from DB
-    const channels = await this.channelService.getChannelsByUserId(user?.id)
-    const channelNames = channels?.map((channel) => channel.name)
+    // const channels = await this.channelService.getChannelsByUserId(user?.id)
   }
 
   @Post('emit')

@@ -18,17 +18,10 @@ import {
 } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthException } from '../../common/exceptions/api-exception'
-import { AuthService } from '../../common/services/interfaces/auth.service'
-import { UnregisteredService } from '../../common/services/interfaces/unregistered-user.service'
-import {
-  AuthOpts,
-  ServiceAuth,
-  ServiceUnRegisteredUser,
-  SessionConfiguration,
-} from '../../common/types'
+import { AuthOpts, SessionConfiguration } from '../../common/types'
 import { AuthGithub } from '../guards/github.guard'
 import { AuthGoogle } from '../guards/google.guard'
-import { AuthRole } from '@js-monorepo/types'
+import { SessionService } from '../services/session.service'
 
 @Controller('auth')
 export class AuthSessionController {
@@ -36,9 +29,7 @@ export class AuthSessionController {
 
   constructor(
     @Inject(AuthOpts) private readonly options: SessionConfiguration,
-    @Inject(ServiceAuth) private authService: AuthService,
-    @Inject(ServiceUnRegisteredUser)
-    private unRegisteredUserService: UnregisteredService
+    private readonly sessionService: SessionService
   ) {}
 
   @Get('google/login')
@@ -103,21 +94,8 @@ export class AuthSessionController {
       )
     }
 
-    // Find unregistered user by token
-    const unregisteredUser =
-      await this.unRegisteredUserService.findUnRegisteredUserByToken(token)
-
     // create new user
-    const user = await this.authService.createAuthUser(
-      {
-        email: unregisteredUser.email,
-        username: username,
-      },
-      {
-        id: unregisteredUser.providerId,
-        profileImage: unregisteredUser.profileImage,
-      }
-    )
+    const user = await this.sessionService.handleRegister(token, username)
 
     try {
       this.options.onRegister?.(user)
@@ -150,7 +128,7 @@ export class AuthSessionController {
         'INVALID_UNREGISTERED-USER_EXCEPTION'
       )
     }
-    return this.unRegisteredUserService.findUnRegisteredUserByToken(token)
+    return this.sessionService.findUnRegisteredUserByToken(token)
   }
 
   private async handleSocialRedirect(req: Request, res: Response) {

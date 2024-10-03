@@ -1,9 +1,10 @@
-import { PrismaService } from '@js-monorepo/db'
 import {
   ProviderName,
   UnRegisteredUserCreateDto,
   UnRegisteredUserDto,
 } from '@js-monorepo/types'
+import { TransactionHost } from '@nestjs-cls/transactional'
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { v4 as uuidv4 } from 'uuid'
 import { UnregisteredRepository } from '../../unregistered.repository'
@@ -12,16 +13,18 @@ import { UnregisteredRepository } from '../../unregistered.repository'
 export class UnRegisteredUserRepositoryPrismaImpl
   implements UnregisteredRepository
 {
-  constructor(private readonly dbClient: PrismaService) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
+  ) {}
 
   async createUnRegisteredUser(
     unRegisteredUser: UnRegisteredUserCreateDto
   ): Promise<UnRegisteredUserDto> {
-    const provider = await this.dbClient.provider.findUniqueOrThrow({
+    const provider = await this.txHost.tx.provider.findUniqueOrThrow({
       where: { name: unRegisteredUser.provider as ProviderName },
     })
 
-    return this.dbClient.unRegisteredUser.upsert({
+    return this.txHost.tx.unRegisteredUser.upsert({
       where: { email: unRegisteredUser.email },
       update: {
         createdAt: new Date(),
@@ -41,7 +44,7 @@ export class UnRegisteredUserRepositoryPrismaImpl
   async findUnRegisteredUserByToken(
     token: string
   ): Promise<UnRegisteredUserDto> {
-    return this.dbClient.unRegisteredUser.findUniqueOrThrow({
+    return this.txHost.tx.unRegisteredUser.findUniqueOrThrow({
       where: { token: token },
       include: {
         provider: true,
