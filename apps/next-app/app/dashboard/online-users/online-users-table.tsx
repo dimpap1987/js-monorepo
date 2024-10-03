@@ -1,6 +1,7 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
+import { Badge } from '@js-monorepo/components/badge'
 import { Skeleton } from '@js-monorepo/components/skeleton'
 import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { useEffect, useState } from 'react'
@@ -42,16 +43,15 @@ export default function OnlineUsersTableComponent() {
     }
   }, [socket])
 
-  // Group users by username
   const groupedUsers = onlineUsers?.reduce(
     (acc, user) => {
       if (!acc[user.username]) {
-        acc[user.username] = []
+        acc[user.username] = 0
       }
-      acc[user.username].push(user.socketId)
+      acc[user.username]++
       return acc
     },
-    {} as Record<string, string[]>
+    {} as Record<string, number>
   )
 
   return (
@@ -67,8 +67,7 @@ export default function OnlineUsersTableComponent() {
               <tr className="border-b border-blue-100 text-gray-800 font-semibold">
                 <th className="p-3 pl-4 px-3 text-left"></th>
                 <th className="p-3 px-3 text-left">Username</th>
-                <th className="p-3 px-3 text-left">Devices</th>
-                {/* <th className="p-3 px-3 text-left">Actions</th> */}
+                <th className="p-3 px-3 text-center">Devices</th>
               </tr>
             </thead>
           )}
@@ -93,7 +92,7 @@ export default function OnlineUsersTableComponent() {
                     </td> */}
                   </tr>
                 ))
-              : Object.entries(groupedUsers).map(([username, socketIds]) => (
+              : Object.entries(groupedUsers).map(([username, count]) => (
                   <tr
                     key={username}
                     className="relative border-t border-blue-100 cursor-default"
@@ -104,18 +103,13 @@ export default function OnlineUsersTableComponent() {
 
                     <td className="p-3 px-3">
                       <div className="leading-5 text-gray-500 font-medium">
-                        {username}
+                        <span>{username}</span>
                       </div>
                     </td>
-
                     <td className="p-3 px-3">
-                      <ul className="list-disc pl-5">
-                        {socketIds.map((socketId) => (
-                          <li key={socketId} className="text-gray-500">
-                            {socketId}
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="leading-5 text-gray-500 font-medium text-center">
+                        <Badge className="">{count}</Badge>
+                      </div>
                     </td>
                     {/* <td className="p-3 px-3"></td> */}
                   </tr>
