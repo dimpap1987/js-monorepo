@@ -3,6 +3,7 @@ import {
   utilities as nestWinstonModuleUtilities,
   WinstonModule,
 } from 'nest-winston'
+import { ClsService } from 'nestjs-cls'
 import * as winston from 'winston'
 import 'winston-daily-rotate-file'
 
@@ -17,7 +18,10 @@ const serverTimezone = () => {
 export class LoggerService implements LS {
   private logger: LS
 
-  constructor(@Inject('LOG_LEVEL') private logLevel = 'info') {
+  constructor(
+    private readonly cls: ClsService,
+    @Inject('LOG_LEVEL') private logLevel = 'info'
+  ) {
     this.logger = WinstonModule.createLogger({
       levels: winston.config.npm.levels,
       level: logLevel,
@@ -53,7 +57,7 @@ export class LoggerService implements LS {
         }),
         new winston.transports.DailyRotateFile({
           filename: `logs/info-%DATE%.log`,
-          level: logLevel,
+          level: 'info',
           format: combine(
             prettyPrint({
               depth: 10,
@@ -70,19 +74,23 @@ export class LoggerService implements LS {
   }
 
   log(message: any, context?: any) {
-    this.logger.log(message, context)
+    this.logger.log(message + this.sessionMessage(), context)
   }
 
   error(message: any, stack: any, context: string) {
-    this.logger.error('❌ ' + message, this.toPrettyJson(stack), context)
+    this.logger.error(
+      '❌ ' + message + this.sessionMessage(),
+      this.toPrettyJson(stack),
+      context
+    )
   }
 
   warn(message: any, context?: any) {
-    this.logger.warn('⚠️  ' + message, context)
+    this.logger.warn('⚠️  ' + message + this.sessionMessage(), context)
   }
 
   debug(message: any, context?: any) {
-    this.logger.debug?.('🐞 ' + message, context)
+    this.logger.debug?.('🐞 ' + message + this.sessionMessage(), context)
   }
 
   verbose(message: any, context?: any) {
@@ -121,5 +129,10 @@ export class LoggerService implements LS {
       }
     }
     return log
+  }
+
+  private sessionMessage() {
+    const sessionId = this.cls.get('session-id')
+    return sessionId ? `- [SESSION_ID=${sessionId}]` : ''
   }
 }

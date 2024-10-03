@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
 import { expand } from 'dotenv-expand'
 import helmet from 'helmet'
+import { ClsService } from 'nestjs-cls'
 import { AppModule } from './app/app.module'
 
 expand(config()) // add functionality for .env to use interpolation and more
@@ -16,7 +17,9 @@ async function bootstrap() {
     forceCloseConnections: true,
   })
 
-  app.useLogger(new LoggerService(process.env.LOGGER_LEVEL))
+  app.useLogger(
+    new LoggerService(app.get(ClsService), process.env.LOGGER_LEVEL)
+  )
 
   const port = process.env.PORT || 3333
   const globalPrefix = 'api'
@@ -34,7 +37,15 @@ async function bootstrap() {
     })
   )
 
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(
+    new ValidationPipe({
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+      whitelist: true,
+      transform: true,
+      stopAtFirstError: true,
+    })
+  )
 
   const redisIoAdapter = new RedisIoAdapter(app)
   await redisIoAdapter.connectToRedis()

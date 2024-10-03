@@ -93,6 +93,11 @@ const ENV = process.env.NODE_ENV
       global: true,
       middleware: {
         mount: true,
+        setup: (cls, req) => {
+          if (req.cookies['JSESSIONID']) {
+            cls.set('session-id', req.cookies['JSESSIONID'])
+          }
+        },
       },
       plugins: [
         new ClsPluginTransactional({

@@ -10,15 +10,13 @@ export class LoggerMiddleware implements NestMiddleware {
     const { method, originalUrl: url } = req
 
     const ip = getIPAddress(req)
-    const user = req.user?.user
 
     const userAgent = req.get('user-agent') || 'NONE'
 
     res.on('close', () => {
       const { statusCode } = res
-      const username = user?.username ? user?.username : 'ANONYMOUS'
       this.logger.log(
-        `[${method} - ${statusCode} - ${url}] - [USER = ${username}] - [IP = ${ip}] - [USER_AGENT = ${userAgent}]`
+        `[${method} - ${statusCode} - ${url}] - [IP = ${ip}] - [USER_AGENT = ${userAgent}]`
       )
     })
     next()
