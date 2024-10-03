@@ -28,6 +28,7 @@ import {
 } from '../../common/types'
 import { AuthGithub } from '../guards/github.guard'
 import { AuthGoogle } from '../guards/google.guard'
+import { AuthRole } from '@js-monorepo/types'
 
 @Controller('auth')
 export class AuthSessionController {
