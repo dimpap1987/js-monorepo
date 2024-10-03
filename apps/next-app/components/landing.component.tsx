@@ -2,10 +2,7 @@
 import { DpButton } from '@js-monorepo/button'
 import { useLoader } from '@js-monorepo/loader'
 // import { MapComponent, Marker, Popup } from '@js-monorepo/map'
-import { useSession } from '@js-monorepo/auth/next/client'
-import { DonationDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { checkoutSessionClient } from '@js-monorepo/payment'
 import { cn } from '@js-monorepo/ui/util'
 import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
@@ -18,8 +15,8 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [, setLoaderState] = useLoader()
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
-  const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
-  const { user } = useSession()
+  // const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
+  // const { user } = useSession()
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -104,7 +101,7 @@ export default function LandingComponent({ children, className }: MainProps) {
         </DpButton>
       </div>
 
-      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
+      {/* {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
         <div className="mt-2">
           <DonationDialogComponent
             stripePublishableKey={
@@ -129,7 +126,7 @@ export default function LandingComponent({ children, className }: MainProps) {
             </DpButton>
           </DonationDialogComponent>
         </div>
-      )}
+      )} */}
 
       {/* Map component */}
       {/* <div className="mt-2 h-[300px]">
