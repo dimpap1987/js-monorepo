@@ -29,6 +29,7 @@ import { RolesGuard } from './guards/roles-guard'
 import { AuthSessionMiddleware } from './middlewares/auth-session.middleware'
 import { AuthSessionUserCacheService } from './providers/auth-session-cache.service'
 import { SessionSerializer } from './providers/session-serializer'
+import { SessionService } from './services/session.service'
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { SessionSerializer } from './providers/session-serializer'
   providers: [
     RolesGuard,
     LoggedInGuard,
+    SessionService,
     SessionSerializer,
     AuthSessionMiddleware,
     AuthSessionUserCacheService,

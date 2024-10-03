@@ -1,9 +1,10 @@
-import { PrismaService } from '@js-monorepo/db'
 import {
   AuthUserCreateDto,
   AuthUserDto,
   ProvidersDto,
 } from '@js-monorepo/types'
+import { TransactionHost } from '@nestjs-cls/transactional'
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import {
@@ -14,17 +15,19 @@ import { AuthRepository } from '../../auth.repository'
 
 @Injectable()
 export class AuthRepositoryPrismaImpl implements AuthRepository {
-  constructor(private readonly dbClient: PrismaService) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
+  ) {}
 
   async findAuthUserByEmail(email: string): Promise<AuthUserDto> {
-    return this.dbClient.authUser.findUniqueOrThrow({
+    return this.txHost.tx.authUser.findUniqueOrThrow({
       where: { email: email },
       select: this.authUserSelectStatement(),
     })
   }
 
   async findAuthUserById(id: number): Promise<AuthUserDto> {
-    return this.dbClient.authUser.findUniqueOrThrow({
+    return this.txHost.tx.authUser.findUniqueOrThrow({
       where: { id: id },
       select: this.authUserSelectStatement(),
     })
@@ -35,7 +38,7 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
     providerDTO: ProvidersDto,
     roleIds: number[]
   ): Promise<AuthUserDto> {
-    return this.dbClient.authUser
+    return this.txHost.tx.authUser
       .create({
         data: {
           email: authUserDTO.email,

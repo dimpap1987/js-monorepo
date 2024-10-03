@@ -1,9 +1,10 @@
-import { PrismaService } from '@js-monorepo/db'
 import {
   ProviderName,
   UserProfileCreateDto,
   UserProfileDto,
 } from '@js-monorepo/types'
+import { TransactionHost } from '@nestjs-cls/transactional'
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import {
@@ -14,10 +15,12 @@ import { UserProfileRepository } from '../../user-profile.repository'
 
 @Injectable()
 export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
-  constructor(private readonly dbClient: PrismaService) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
+  ) {}
 
   async findUserProfileById(id: number): Promise<UserProfileDto> {
-    return this.dbClient.userProfile.findUniqueOrThrow({
+    return this.txHost.tx.userProfile.findUniqueOrThrow({
       where: { id },
       include: {
         provider: true,
@@ -26,7 +29,7 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
   }
 
   async findUserProfilesByUserId(userId: number): Promise<UserProfileDto[]> {
-    return this.dbClient.userProfile.findMany({
+    return this.txHost.tx.userProfile.findMany({
       where: { userId },
       include: {
         provider: true,
@@ -37,7 +40,7 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
   async createUserProfile(
     userProfileCreateDto: UserProfileCreateDto
   ): Promise<UserProfileDto> {
-    return this.dbClient.userProfile
+    return this.txHost.tx.userProfile
       .create({
         data: {
           userId: userProfileCreateDto.userId,
@@ -61,7 +64,7 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
     id: number,
     userProfileUpdateDto: Partial<UserProfileCreateDto>
   ): Promise<UserProfileDto> {
-    return this.dbClient.userProfile.update({
+    return this.txHost.tx.userProfile.update({
       where: { id },
       data: userProfileUpdateDto,
     })
@@ -71,7 +74,7 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
     userId: number,
     providerName: ProviderName
   ): Promise<UserProfileDto[]> {
-    return this.dbClient.userProfile.findMany({
+    return this.txHost.tx.userProfile.findMany({
       where: {
         userId,
         provider: {

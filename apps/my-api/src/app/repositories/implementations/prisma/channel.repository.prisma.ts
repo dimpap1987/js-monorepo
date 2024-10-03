@@ -1,24 +1,27 @@
-import { PrismaService } from '@js-monorepo/db'
 import { ChannelDto } from '@js-monorepo/types'
+import { TransactionHost } from '@nestjs-cls/transactional'
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { ChannelRepository } from '../../interfaces/channel.repository'
 
 @Injectable()
 export class ChannelRepositoryPrisma implements ChannelRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
+  ) {}
 
   async assignUserToChannels(
     userId: number,
     ...channelNames: string[]
-  ): Promise<void> {
+  ): Promise<any> {
     for (const channelName of channelNames) {
       // Find the channel by name
-      const channel = await this.prisma.channel.findUniqueOrThrow({
+      const channel = await this.txHost.tx.channel.findUniqueOrThrow({
         where: { name: channelName },
       })
 
       // Register the user to the channel
-      await this.prisma.userChannel.create({
+      await this.txHost.tx.userChannel.create({
         data: {
           user: { connect: { id: userId } },
           channel: { connect: { id: channel.id } },
@@ -27,15 +30,23 @@ export class ChannelRepositoryPrisma implements ChannelRepository {
     }
   }
 
-  async getChannelsByUserId(userId: number): Promise<ChannelDto[]> {
-    const userChannels = await this.prisma.userChannel.findMany({
+  async getChannelsByUserId(
+    userId: number
+  ): Promise<{ channel: ChannelDto }[]> {
+    return this.txHost.tx.userChannel.findMany({
       where: {
         userId: userId,
       },
-      include: {
-        channel: true,
+      select: {
+        channel: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            createdAt: true,
+          },
+        },
       },
     })
-    return userChannels?.map((userChannel) => userChannel.channel)
   }
 }
