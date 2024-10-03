@@ -6,7 +6,7 @@ export interface SessionUserType {
   profile: {
     id?: number
     image?: string | null
-    provider: string
+    provider?: string
   }
   roles: string[]
 }
@@ -35,7 +35,7 @@ export type MenuItem = {
   name: string
   href: string
   Icon?: any
-  roles: (AuthRoles | 'PUBLIC')[]
+  roles: (AuthRole | 'PUBLIC')[]
 }
 
 export interface CreateCheckoutSessionRequestBody {
@@ -47,9 +47,10 @@ export interface CreateCheckoutSessionRequestBody {
   isDonate?: boolean
 }
 
-export type ProviderName = 'GITHUB' | 'GOOGLE'
+export const PROVIDERS_ARRAY = ['GITHUB', 'GOOGLE', 'FACEBOOK'] as const
+export type ProviderName = (typeof PROVIDERS_ARRAY)[number]
 
-export type AuthRoles = 'ADMIN' | 'USER'
+export type AuthRole = 'ADMIN' | 'USER'
 
 export type ProviderDto = {
   id: number
@@ -84,8 +85,8 @@ export type Pageable = {
 }
 
 export type AuthUserUpdateDto =
-  | { username: string; roles?: AuthRoles[] }
-  | { username?: string; roles: AuthRoles[] }
+  | { username: string; roles?: AuthRole[] }
+  | { username?: string; roles: AuthRole[] }
 
 export type ChannelDto = {
   id: number
@@ -153,7 +154,7 @@ export interface AuthUserDto {
   userProfiles: {
     id: number
     providerId: number
-    provider: {
+    provider?: {
       name: string
     }
     profileImage?: string | null
@@ -168,4 +169,9 @@ export interface AuthUserDto {
 export interface AuthUserCreateDto {
   username: string
   email: string
+}
+
+export type AuthRoleDTO = {
+  id: number
+  name: string
 }

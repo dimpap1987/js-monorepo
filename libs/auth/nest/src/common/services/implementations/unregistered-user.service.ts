@@ -7,6 +7,7 @@ import { AuthException } from '../../exceptions/api-exception'
 import { UnregisteredRepository } from '../../repositories/unregistered.repository'
 import { RepoUnRegisteredUser } from '../../types'
 import { UnregisteredService } from '../interfaces/unregistered-user.service'
+import { CreateUnregisteredUserSchema } from '@js-monorepo/schemas'
 
 @Injectable()
 export class UnregisteredServiceImpl implements UnregisteredService {
@@ -20,6 +21,7 @@ export class UnregisteredServiceImpl implements UnregisteredService {
   async createUnRegisteredUser(
     unRegisteredUser: UnRegisteredUserCreateDto
   ): Promise<UnRegisteredUserDto> {
+    CreateUnregisteredUserSchema.parse(unRegisteredUser)
     try {
       const newUnRegisteredUser =
         await this.unRegisteredRepository.createUnRegisteredUser(

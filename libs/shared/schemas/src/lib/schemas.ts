@@ -1,3 +1,4 @@
+import { PROVIDERS_ARRAY } from '@js-monorepo/types'
 import * as z from 'zod'
 
 class RegisterUserSchemaConfig {
@@ -31,11 +32,17 @@ export const RegisterUserSchema = registerUserSchemaConfig.getSchema()
 
 export type RegisterUserSchemaType = z.infer<typeof RegisterUserSchema>
 
-//EventSchema
-export const EventSchema = z.object({
-  channel: z.string(),
-  data: z.any(),
-  type: z.enum(['announcement', 'notification']),
+export const CreateUnregisteredUserSchema = z.object({
+  email: z.string().email({ message: 'Invalid email address.' }),
+  provider: z
+    .enum(PROVIDERS_ARRAY, {
+      description: 'Provider must be one of: GITHUB, GOOGLE, FACEBOOK.',
+    })
+    .nullable()
+    .optional(),
+  profileImage: z
+    .string()
+    .url({ message: 'Profile image must be a valid URL.' })
+    .nullable()
+    .optional(),
 })
-
-export type EventSchemaType = z.infer<typeof EventSchema>

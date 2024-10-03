@@ -11,6 +11,7 @@ export interface AuthRepository {
 
   createAuthUser(
     authUserDTO: AuthUserCreateDto,
-    providerDTO: ProvidersDto
+    providerDTO: ProvidersDto,
+    roleIds: number[]
   ): Promise<AuthUserDto>
 }

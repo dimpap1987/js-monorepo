@@ -2,7 +2,7 @@ import {
   RegisterUserSchema,
   RegisterUserSchemaType,
 } from '@js-monorepo/schemas'
-import { JwtPayload, ProviderName } from '@js-monorepo/types'
+import { ProviderName } from '@js-monorepo/types'
 import {
   Body,
   Controller,
@@ -73,7 +73,7 @@ export class AuthJWTController {
   @Get('session')
   getUserMetadata(@Req() req: Request) {
     const { accessToken } = req.cookies
-    const { user } = this.tokensService.verifyAcessToken(accessToken)
+    const { user } = this.tokensService.verifyAcessToken(accessToken) as any
     return {
       user: user,
     }
@@ -158,7 +158,7 @@ export class AuthJWTController {
     return this.unRegisteredUserService.findUnRegisteredUserByToken(token)
   }
 
-  private handleLoggedInUser(payload: JwtPayload, res: Response, req: Request) {
+  private handleLoggedInUser(payload: any, res: Response, req: Request) {
     const tokens = this.tokensService.createJwtTokens(payload)
     // REFRESH TOKEN
     this.setRefreshTokenCookie(res, tokens.refreshToken)

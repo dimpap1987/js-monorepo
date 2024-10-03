@@ -19,72 +19,21 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
   async findAuthUserByEmail(email: string): Promise<AuthUserDto> {
     return this.dbClient.authUser.findUniqueOrThrow({
       where: { email: email },
-      select: {
-        id: true,
-        createdAt: true,
-        username: true,
-        email: true,
-        userProfiles: {
-          select: {
-            id: true,
-            providerId: true,
-            profileImage: true,
-            provider: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-        userRole: {
-          select: {
-            role: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
+      select: this.authUserSelectStatement(),
     })
   }
 
   async findAuthUserById(id: number): Promise<AuthUserDto> {
     return this.dbClient.authUser.findUniqueOrThrow({
       where: { id: id },
-      select: {
-        id: true,
-        createdAt: true,
-        username: true,
-        email: true,
-        userProfiles: {
-          select: {
-            id: true,
-            providerId: true,
-            profileImage: true,
-            provider: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-        userRole: {
-          select: {
-            role: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
+      select: this.authUserSelectStatement(),
     })
   }
 
   async createAuthUser(
     authUserDTO: AuthUserCreateDto,
-    providerDTO: ProvidersDto
+    providerDTO: ProvidersDto,
+    roleIds: number[]
   ): Promise<AuthUserDto> {
     return this.dbClient.authUser
       .create({
@@ -98,38 +47,16 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
             },
           },
           userRole: {
-            create: {
-              roleId: 2,
-            },
-          },
-        },
-        select: {
-          id: true,
-          createdAt: true,
-          username: true,
-          email: true,
-          userProfiles: {
-            select: {
-              id: true,
-              providerId: true,
-              profileImage: true,
-              provider: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-          userRole: {
-            select: {
+            create: roleIds.map((roleId) => ({
               role: {
-                select: {
-                  name: true,
+                connect: {
+                  id: roleId,
                 },
               },
-            },
+            })),
           },
         },
+        select: this.authUserSelectStatement(),
       })
       .catch((e) => {
         if (e instanceof PrismaClientKnownRequestError) {
@@ -141,5 +68,35 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
         }
         throw e // Re-throw any other errors
       })
+  }
+
+  private authUserSelectStatement() {
+    return {
+      id: true,
+      createdAt: true,
+      username: true,
+      email: true,
+      userProfiles: {
+        select: {
+          id: true,
+          providerId: true,
+          profileImage: true,
+          provider: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+      userRole: {
+        select: {
+          role: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    }
   }
 }

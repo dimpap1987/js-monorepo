@@ -1,4 +1,5 @@
 import {
+  AuthRole,
   AuthUserCreateDto,
   AuthUserDto,
   ProvidersDto,
@@ -13,7 +14,8 @@ export interface AuthService {
 
   createAuthUser(
     authUserDTO: AuthUserCreateDto,
-    providerDTO: ProvidersDto
+    providerDTO: ProvidersDto,
+    roles?: AuthRole[]
   ): Promise<AuthUserDto>
 
   createSessionUser(authUser: Partial<AuthUser>): SessionUserType

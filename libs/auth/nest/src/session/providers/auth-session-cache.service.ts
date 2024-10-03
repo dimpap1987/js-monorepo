@@ -62,7 +62,7 @@ export class AuthSessionUserCacheService {
           profile: {
             id: userDb.userProfiles?.[0]?.id,
             image: userDb.userProfiles?.[0]?.profileImage,
-            provider: userDb.userProfiles?.[0]?.provider.name,
+            provider: userDb.userProfiles?.[0]?.provider?.name,
           },
         } satisfies SessionUserType
       }

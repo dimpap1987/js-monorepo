@@ -1,7 +1,7 @@
 'use client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { AuthRoles, MenuItem, SessionUserType } from '@js-monorepo/types'
+import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
@@ -128,7 +128,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 >
                   {(item?.roles?.includes('PUBLIC') ||
                     item?.roles?.some((role) =>
-                      user?.roles?.includes(role as AuthRoles)
+                      user?.roles?.includes(role as AuthRole)
                     )) && (
                     <DpNextNavLink
                       className="p-2"
