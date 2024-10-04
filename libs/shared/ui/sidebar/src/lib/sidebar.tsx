@@ -31,7 +31,7 @@ const framerText = (delay: number, position: SidebarPositionType) => {
     initial: { opacity: 0, x: position === 'left' ? -50 : 50 },
     animate: { opacity: 1, x: 0 },
     transition: {
-      delay: 0.5 + delay / 10,
+      delay: 0.2 + delay / 10,
     },
   }
 }
@@ -67,7 +67,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
             {...framerSidebarPanel(position)}
             className={`fixed top-0 bottom-0 z-30 focus:z-50 dark ${
               position === 'left' ? 'left-0' : 'right-0'
-            } w-full h-screen max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
+            } w-full h-[100svh] max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
             ref={localRef}
             aria-label="Sidebar"
             tabIndex={-1}

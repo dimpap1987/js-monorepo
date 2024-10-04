@@ -14,8 +14,7 @@ function CardList({ className }: { className: string }) {
     <div className={className}>
       <Card
         className="bg-slate-100 text-base font-light
-         text-black shadow-md shadow-primary p-3 
-         flex flex-col justify-between"
+         text-black p-3 flex flex-col justify-between"
       >
         <CardHeader>
           <CardTitle>🐛 Report a bug</CardTitle>
@@ -42,8 +41,7 @@ function CardList({ className }: { className: string }) {
 
       <Card
         className="bg-slate-100 text-base font-light
-         text-black shadow-md shadow-primary p-3 
-         flex flex-col justify-between"
+         text-black p-3 flex flex-col justify-between"
       >
         <CardHeader>
           <CardTitle>💡 Feature request</CardTitle>
