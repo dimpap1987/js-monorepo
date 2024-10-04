@@ -18,7 +18,7 @@ const INTERNAL_ERROR = 'Internal server error'
 export class ApiExceptionFilter implements ExceptionFilter {
   catch(exception: ApiException, host: ArgumentsHost) {
     Logger.error(
-      `Exception of type: 'ApiException' - message: '${
+      `'${
         exception.message
       }' - statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`,
       exception.stack,
@@ -32,7 +32,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     return response.status(exception.getStatus()).json({
       createdBy: 'ApiExceptionFilter',
       errorCode: exception.errorCode,
-      path: request.url,
+      path: request.originalUrl,
       message: exception.message,
     })
   }
@@ -52,20 +52,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       status = exception.getStatus()
       message = exception.message
       Logger.error(
-        `Generic Exception - 'HttpException' - message: '${exception.message}'`,
+        `'HttpException' - path: '${request.originalUrl}' - message: '${exception.message}'`,
         exception.stack,
         GlobalExceptionFilter.name
       )
     } else if (exception instanceof Error) {
       message = exception.message
       Logger.error(
-        `Generic Exception - 'Error' - message: '${exception.message}'`,
+        `'Error' - path: '${request.originalUrl}' - message: '${exception.message}'`,
         exception.stack,
         GlobalExceptionFilter.name
       )
     } else {
       Logger.error(
-        `Generic Exception - unkown error happened`,
+        `Unkown error happened - path: '${request.originalUrl}'`,
         exception,
         GlobalExceptionFilter.name
       )
@@ -73,10 +73,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     return response.status(status).json({
       createdBy: 'GlobalExceptionFilter',
-      path: request.url,
+      path: request.originalUrl,
       errors: [
         {
-          message: message?.trim()?.length ? message : INTERNAL_ERROR,
+          INTERNAL_ERROR,
         },
       ],
     })
@@ -101,7 +101,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 
     return response.status(400).json({
       createdBy: 'PrismaClientKnownRequestError',
-      path: request.url,
+      path: request.originalUrl,
       errors: [{ message: exception.message }],
     })
   }
@@ -125,7 +125,7 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
 
     return response.status(400).json({
       createdBy: 'BadRequestExceptionFilter',
-      path: request.url,
+      path: request.originalUrl,
       errors: [
         {
           message: errorMessage ?? 'Something went wrong',
@@ -149,7 +149,7 @@ export class ZodExceptionFilter<T extends ZodError> implements ExceptionFilter {
 
     return response.status(400).json({
       createdBy: 'ZodExceptionFilter',
-      path: request.url,
+      path: request.originalUrl,
       errors: exception.issues ?? [{ message: 'Something went wrong' }],
     })
   }

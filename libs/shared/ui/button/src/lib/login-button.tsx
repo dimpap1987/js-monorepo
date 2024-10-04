@@ -1,11 +1,9 @@
 import { cn } from '@js-monorepo/ui/util'
-import { DpButton } from './button'
 import { forwardRef } from 'react'
 import { BiLogInCircle } from 'react-icons/bi'
-import { twMerge } from 'tailwind-merge'
+import { ButtonProps, DpButton } from './button'
 
-interface DpLoginButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DpLoginButtonProps extends ButtonProps {
   className?: string
 }
 

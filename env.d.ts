@@ -3,8 +3,6 @@ declare global {
     interface ProcessEnv extends Dict<string> {
       NODE_ENV: 'development' | 'production' | 'test'
 
-      ACCESS_TOKEN_SECRET: string
-      REFRESH_TOKEN_SECRET: string
       CORS_ORIGIN_DOMAINS: string
 
       GITHUB_CLIENT_ID: string
@@ -20,6 +18,13 @@ declare global {
       AUTH_LOGIN_REDIRECT: string
       AUTH_COOKIES_DOMAIN: string
       AUTH_COOKIES_SECURE: string
+      AUTH_COOKIES_SAME_SITE:
+        | boolean
+        | 'lax'
+        | 'strict'
+        | 'none'
+        | undefined
+        | ''
 
       LOGGER_LEVEL: string
     }

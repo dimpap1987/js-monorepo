@@ -7,9 +7,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { DataTablePagination } from './data-table-pagination'
-// import { DataTableToolbar } from "./data-table-toolbar"
 import { Dispatch, SetStateAction } from 'react'
+import { Skeleton } from '../skeleton'
+import { DataTablePagination } from './data-table-pagination'
 import {
   Table,
   TableBody,
@@ -33,6 +33,7 @@ interface DataTableProps<TData, TValue> {
       pageIndex: number
     }>
   >
+  loading?: boolean // Add loading prop
 }
 
 export function DataTable<TData, TValue>({
@@ -41,6 +42,7 @@ export function DataTable<TData, TValue>({
   totalCount,
   onPaginationChange,
   pagination,
+  loading = false, // Default to false if not provided
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data: data,
@@ -55,10 +57,8 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="space-y-1">
-      {/* <DataTableToolbar table={table} /> */}
-      {/* <div className=""> */}
-      <Table className="table-fixed divide-y divide-gray-200">
+    <div className="overflow-auto rounded-t-lg rounded-b-lg border">
+      <Table className="table-fixed divide-y divide-gray-200 flex-1 overscroll-none">
         <TableHeader className="bg-gray-50">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -83,7 +83,21 @@ export function DataTable<TData, TValue>({
           ))}
         </TableHeader>
         <TableBody className="bg-white divide-y divide-gray-200">
-          {table.getRowModel().rows?.length ? (
+          {loading ? (
+            // Render skeletons if loading
+            Array.from({ length: 5 }).map((_, rowIndex) => (
+              <TableRow key={`skeleton-${rowIndex}`}>
+                {columns.map((__, colIndex) => (
+                  <TableCell
+                    key={`skeleton-cell-${rowIndex}-${colIndex}`}
+                    className="text-sm text-gray-900"
+                  >
+                    <Skeleton className="h-4" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
@@ -105,11 +119,12 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      {/* </div> */}
-      <DataTablePagination
-        table={table}
-        className="rounded-md border bg-white text-sm text-gray-900"
-      />
+      {!loading && (
+        <DataTablePagination
+          table={table}
+          className="bg-white text-sm text-gray-900"
+        />
+      )}
     </div>
   )
 }

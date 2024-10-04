@@ -5,7 +5,12 @@
     "next/core-web-vitals",
     "../../.eslintrc.json"
   ],
-  "ignorePatterns": ["!**/*", ".next/**/*", "jest.config.ts", "tailwind.config.js"],
+  "ignorePatterns": [
+    "!**/*",
+    ".next/**/*",
+    "jest.config.ts",
+    "tailwind.config.js"
+  ],
   "overrides": [
     {
       "files": ["*.*"],

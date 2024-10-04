@@ -7,15 +7,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@js-monorepo/components'
+} from '@js-monorepo/components/card'
 
 function CardList({ className }: { className: string }) {
   return (
     <div className={className}>
       <Card
         className="bg-slate-100 text-base font-light
-         text-black shadow-md shadow-primary w-[360px] p-3 
-         flex flex-col justify-between"
+         text-black p-3 flex flex-col justify-between"
       >
         <CardHeader>
           <CardTitle>🐛 Report a bug</CardTitle>
@@ -42,8 +41,7 @@ function CardList({ className }: { className: string }) {
 
       <Card
         className="bg-slate-100 text-base font-light
-         text-black shadow-md shadow-primary w-[360px] p-3 
-         flex flex-col justify-between"
+         text-black p-3 flex flex-col justify-between"
       >
         <CardHeader>
           <CardTitle>💡 Feature request</CardTitle>

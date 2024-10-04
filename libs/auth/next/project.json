@@ -1,0 +1,8 @@
+{
+  "name": "next-auth",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/auth/next/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {}
+}

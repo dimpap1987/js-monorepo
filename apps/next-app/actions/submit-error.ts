@@ -16,7 +16,7 @@ export async function submitErrors(error: any) {
       headers.append('Cookie', `${cookie.name}=${cookie.value}`)
     })
 
-  const response = await fetch(`${process.env.DOCKER_API_URL}/api/exceptions`, {
+  const response = await fetch(`${process.env.API_URL}/api/exceptions`, {
     method: 'POST',
     headers: headers,
     body: JSON.stringify(error),

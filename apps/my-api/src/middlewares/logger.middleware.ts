@@ -1,29 +1,30 @@
-import { AuthJWT } from '@js-monorepo/auth'
-import { JwtPayload } from '@js-monorepo/types'
-import { getIPAddress } from '@js-monorepo/utils'
-import { Inject, Injectable, Logger, NestMiddleware } from '@nestjs/common'
+import { getIPAddress } from '@js-monorepo/utils/http'
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common'
 import { NextFunction, Request, Response } from 'express'
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  logger = new Logger('HTTP')
-
-  constructor(@Inject(AuthJWT) private readonly jwt: JwtPayload) {}
+  private httpLogger = new Logger('HTTP')
+  private nextLogger = new Logger('NEXT') // Requests that coming from Next js server
 
   use(req: Request, res: Response, next: NextFunction): void {
     const { method, originalUrl: url } = req
 
     const ip = getIPAddress(req)
-    const id = this.jwt?.user?.id
 
     const userAgent = req.get('user-agent') || 'NONE'
 
     res.on('close', () => {
       const { statusCode } = res
-      const userId = id ? id : 'ANONYMOUS'
-      this.logger.log(
-        `[${method} - ${statusCode} - ${url}] - [USER = ${userId}] - [IP = ${ip}] - [USER_AGENT = ${userAgent}]`
-      )
+      if (userAgent?.includes('Next.js Middleware') || userAgent === 'node') {
+        this.nextLogger.debug(
+          `[${method} - ${statusCode} - ${url}] - [IP=${ip}] - [USER_AGENT=${userAgent}]`
+        )
+      } else {
+        this.httpLogger.log(
+          `[${method} - ${statusCode} - ${url}] - [IP=${ip}] - [USER_AGENT=${userAgent}]`
+        )
+      }
     })
     next()
   }

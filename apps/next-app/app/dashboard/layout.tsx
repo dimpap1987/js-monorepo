@@ -2,6 +2,7 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpVersion } from '@js-monorepo/version'
 import { PropsWithChildren } from 'react'
 import { HiMiniUsers } from 'react-icons/hi2'
+import { RiUserSettingsFill } from 'react-icons/ri'
 
 export const metadata = {
   title: 'Admin Dashboard',
@@ -9,22 +10,43 @@ export const metadata = {
 
 export default async function DashboardLayout({ children }: PropsWithChildren) {
   return (
-    <main className="flex flex-grow min-w-[200px] bg-background-primary text-foreground">
-      <div className="max-w-max sticky top-0 h-[92.5svh] p-3 flex flex-col border-r border-border">
-        <div className="flex-grow">
+    <main
+      className="grid grid-cols-[max-content_1fr] gap-2
+                 h-[87svh] bg-background-primary text-foreground"
+    >
+      <div
+        className="min-w-max flex flex-col justify-between gap-2 
+                  p-2 border-t border-r border-border rounded-md"
+      >
+        <div className="space-y-2">
           <DpNextNavLink
-            className="p-2 mt-2 w-full text-center transition-colors duration-300 flex gap-2 items-center justify-center 
-            hover:underline border border-border rounded-md min-w-max"
+            className="p-2 transition-colors duration-300 grid grid-cols-1 place-items-center
+                       sm:grid-cols-[50px_auto] gap-2 items-center 
+                       border border-border rounded-md hover:bg-accent"
             href={`/dashboard/users`}
-            activeClassName="underline"
+            activeClassName="bg-accent"
           >
-            <HiMiniUsers className="shrink-0" />
-            <span>Manage Users</span>
+            <div className="flex justify-end">
+              <RiUserSettingsFill className="shrink-0" />
+            </div>
+            <div className="hidden sm:block">Manage Users</div>
+          </DpNextNavLink>
+          <DpNextNavLink
+            className="p-2 transition-colors duration-300 grid grid-cols-1 place-items-center
+                       sm:grid-cols-[50px_auto] gap-2 items-center 
+                       border border-border rounded-md hover:bg-accent"
+            href={`/dashboard/online-users`}
+            activeClassName="bg-accent"
+          >
+            <div className="flex justify-end">
+              <HiMiniUsers className="shrink-0" />
+            </div>
+            <div className="hidden sm:block">Online Users</div>
           </DpNextNavLink>
         </div>
-        <DpVersion className="text-sm text-center"></DpVersion>
+        <DpVersion className="hidden sm:block text-sm text-center"></DpVersion>
       </div>
-      <div className="flex-1 p-4">{children}</div>
+      <div className="px-3 overflow-hidden">{children}</div>
     </main>
   )
 }

@@ -1,6 +1,10 @@
 'use client'
 
-import { Dialog, DialogTrigger, DpDialogContent } from '@js-monorepo/components'
+import {
+  Dialog,
+  DialogTrigger,
+  DpDialogContent,
+} from '@js-monorepo/components/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import { ClientResponseType } from '@js-monorepo/types'
 import {

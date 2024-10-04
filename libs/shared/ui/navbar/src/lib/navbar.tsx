@@ -1,9 +1,8 @@
 'use client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { MenuItem, UserJWT } from '@js-monorepo/types'
+import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import { AuthRole } from '@prisma/client'
 import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
 import { GiHamburgerMenu } from 'react-icons/gi'
@@ -53,7 +52,7 @@ function NavUserOptions({
     user?.isLoggedIn && (
       <UserOptionsDropdown IconComponent={FaCircleUser} className={className}>
         <UserMetadata
-          profileImage={user.picture}
+          profileImage={user.profile?.image}
           username={user.username}
           createdAt={user.createdAt}
           className="mb-2 border-border border-b"
@@ -86,7 +85,7 @@ export interface DpNextNavbarProps {
   readonly onLogout?: () => void
   readonly onSideBarClick?: () => void
 }
-export type UserNavProps = Partial<UserJWT> & { isLoggedIn: boolean }
+export type UserNavProps = Partial<SessionUserType> & { isLoggedIn: boolean }
 
 export type UserNavSocial = {
   type: 'google' | 'github' | 'facebook'
@@ -113,63 +112,61 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     }, [children])
 
     return (
-      <header className="z-20">
-        <nav
-          className="text-foreground border-b border-border navbar-height overflow-hidden flex items-center"
-          ref={ref}
-        >
-          <div className="px-5 flex gap-2 justify-between w-full items-center">
-            {logo}
-            <ul className="hidden sm:flex font-semibold font-heading items-center space-x-1">
-              {menuItems &&
-                menuItems?.length > 0 &&
-                menuItems.map((item, index) => (
-                  <li
-                    key={index}
-                    className="hover:text-foreground-hover text-center text-nowrap"
-                  >
-                    {(item?.roles?.includes('PUBLIC') ||
-                      item?.roles?.some((role) =>
-                        user?.roles?.includes(role as AuthRole)
-                      )) && (
-                      <DpNextNavLink
-                        className="p-2"
-                        activeClassName="text-foreground-hover underline-offset-8"
-                        href={item.href}
-                      >
-                        {item.name}
-                      </DpNextNavLink>
-                    )}
-                  </li>
-                ))}
-            </ul>
+      <nav
+        className="text-foreground border-b border-border navbar-height overflow-hidden flex items-center"
+        ref={ref}
+      >
+        <div className="px-5 flex gap-2 justify-between w-full items-center">
+          {logo}
+          <ul className="hidden sm:flex font-semibold font-heading items-center space-x-1">
+            {menuItems &&
+              menuItems?.length > 0 &&
+              menuItems.map((item, index) => (
+                <li
+                  key={index}
+                  className="hover:text-foreground-hover text-center text-nowrap"
+                >
+                  {(item?.roles?.includes('PUBLIC') ||
+                    item?.roles?.some((role) =>
+                      user?.roles?.includes(role as AuthRole)
+                    )) && (
+                    <DpNextNavLink
+                      className="p-2"
+                      activeClassName="text-foreground-hover underline-offset-8"
+                      href={item.href}
+                    >
+                      {item.name}
+                    </DpNextNavLink>
+                  )}
+                </li>
+              ))}
+          </ul>
 
-            <div className="flex items-center gap-4 justify-end text-center">
-              <section className="hidden sm:flex justify-center items-center gap-3">
-                {navbarItems}
-              </section>
+          <div className="flex items-center gap-4 justify-end text-center">
+            <section className="hidden sm:flex justify-center items-center gap-3">
+              {navbarItems}
+            </section>
 
-              {/* login button */}
-              {!user?.isLoggedIn && (
-                <DpNextNavLink className="hidden sm:flex" href="/auth/login">
-                  <DpLoginButton className="rounded-full"></DpLoginButton>
-                </DpNextNavLink>
-              )}
+            {/* login button */}
+            {!user?.isLoggedIn && (
+              <DpNextNavLink className="hidden sm:flex" href="/auth/login">
+                <DpLoginButton className="rounded-full"></DpLoginButton>
+              </DpNextNavLink>
+            )}
 
-              <NavUserOptions
-                className="hidden sm:block"
-                user={user}
-                onLogout={onLogout}
-              ></NavUserOptions>
+            <NavUserOptions
+              className="hidden sm:block"
+              user={user}
+              onLogout={onLogout}
+            ></NavUserOptions>
 
-              <SideBarIcon
-                onSideBarClick={onSideBarClick}
-                className="block sm:hidden"
-              ></SideBarIcon>
-            </div>
+            <SideBarIcon
+              onSideBarClick={onSideBarClick}
+              className="block sm:hidden"
+            ></SideBarIcon>
           </div>
-        </nav>
-      </header>
+        </div>
+      </nav>
     )
   }
 )

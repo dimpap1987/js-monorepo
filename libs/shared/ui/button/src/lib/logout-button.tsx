@@ -1,9 +1,8 @@
 import { cn } from '@js-monorepo/ui/util'
 import { forwardRef } from 'react'
 import { BiLogOutCircle } from 'react-icons/bi'
-import { DpButton } from './button'
-export interface DpLogoutButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+import { ButtonProps, DpButton } from './button'
+export interface DpLogoutButtonProps extends ButtonProps {
   readonly className: string
 }
 

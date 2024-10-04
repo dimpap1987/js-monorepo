@@ -1,14 +1,17 @@
 'use client'
-import { authClient, useSession } from '@js-monorepo/auth-client'
+import { AnnouncementsComponent } from '@js-monorepo/announcements'
+import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
+import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { DpNotificationBellComponent } from '@js-monorepo/notification-bell'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import { MenuItem } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
-import { PropsWithChildren, useState } from 'react'
+import { useRouter } from 'next-nprogress-bar'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import SVGLogo from './logo-svg'
 
 const menuItems: MenuItem[] = [
@@ -39,37 +42,60 @@ const menuItems: MenuItem[] = [
   },
 ]
 
+export const websocketOptions: WebSocketOptionsType = {
+  url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
+}
+
 export default function MainTemplate({
   children,
 }: Readonly<PropsWithChildren>) {
-  const { user, isLoggedIn } = useSession()
+  const { user, isLoggedIn, isAdmin } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
+  const socket = useWebSocket(websocketOptions, isLoggedIn)
+  const router = useRouter()
+
+  useEffect(() => {
+    socket?.on('connect', () => {
+      socket.emit('subscribe:announcements', {})
+      if (isAdmin) {
+        socket?.emit('subscribe:join-admin-room', {})
+      }
+    })
+
+    return () => {
+      socket?.disconnect()
+    }
+  }, [socket])
 
   return (
     <>
-      <DpNextNavbar
-        user={{
-          isLoggedIn: isLoggedIn,
-          ...user,
-        }}
-        menuItems={menuItems}
-        onSideBarClick={() => {
-          setOpenSideBar((prev) => !prev)
-        }}
-        onLogout={async () => {
-          authClient.logout()
-        }}
-      >
-        <DpLogo>
-          <SVGLogo></SVGLogo>
-        </DpLogo>
-        <NavbarItems>
-          {isLoggedIn && (
-            <DpNotificationBellComponent className="hidden sm:block"></DpNotificationBellComponent>
-          )}
-          <ModeToggle></ModeToggle>
-        </NavbarItems>
-      </DpNextNavbar>
+      <header>
+        <DpNextNavbar
+          user={{
+            isLoggedIn: isLoggedIn,
+            ...user,
+          }}
+          menuItems={menuItems}
+          onSideBarClick={() => {
+            setOpenSideBar((prev) => !prev)
+          }}
+          onLogout={async () => {
+            authClient.logout()
+          }}
+        >
+          <DpLogo onClick={() => router.push('/')}>
+            <SVGLogo></SVGLogo>
+          </DpLogo>
+          <NavbarItems>
+            {isLoggedIn && (
+              <DpNotificationBellComponent className="hidden sm:block"></DpNotificationBellComponent>
+            )}
+            <ModeToggle></ModeToggle>
+          </NavbarItems>
+        </DpNextNavbar>
+      </header>
+
+      <AnnouncementsComponent className="p-2"></AnnouncementsComponent>
 
       <DpNextSidebar
         isOpen={openSideBar}
@@ -83,12 +109,13 @@ export default function MainTemplate({
         <div className="p-3">
           {!user && (
             <DpNextNavLink href="/auth/login">
-              <DpLoginButton></DpLoginButton>
+              <DpLoginButton size="large"></DpLoginButton>
             </DpNextNavLink>
           )}
           {!!user && (
             <DpLogoutButton
               className="p-3 justify-center text-white"
+              size="large"
               onClick={async () => {
                 authClient.logout()
               }}

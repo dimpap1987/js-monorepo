@@ -1,15 +1,18 @@
-export interface UserJWT {
+export interface SessionUserType {
   id: number
   username: string
-  createdAt: Date
-  lastLoggedIn?: string | null
-  picture?: string | null
-  provider?: string | null
-  roles: AuthRoles[]
+  createdAt?: Date
+  lastLoggedIn?: string
+  profile: {
+    id?: number
+    image?: string | null
+    provider?: string
+  }
+  roles: string[]
 }
 
-export interface JwtPayload {
-  user: UserJWT
+export interface SessionPayload {
+  user: SessionUserType
 }
 
 export type SuccessResponse<T> = {
@@ -32,7 +35,7 @@ export type MenuItem = {
   name: string
   href: string
   Icon?: any
-  roles: (AuthRoles | 'PUBLIC')[]
+  roles: (AuthRole | 'PUBLIC')[]
 }
 
 export interface CreateCheckoutSessionRequestBody {
@@ -44,64 +47,36 @@ export interface CreateCheckoutSessionRequestBody {
   isDonate?: boolean
 }
 
-export type ProviderName = 'github' | 'google'
+export const PROVIDERS_ARRAY = ['GITHUB', 'GOOGLE', 'FACEBOOK'] as const
+export type ProviderName = (typeof PROVIDERS_ARRAY)[number]
 
-export type AuthRoles = 'ADMIN' | 'USER'
+export type AuthRole = 'ADMIN' | 'USER'
 
 export type ProviderDto = {
   id: number
-  profileImage: string | null
+  profileImage?: string | null
   type: ProviderName
   userId: number
 }
 
-export type AuthUserWithProvidersDto = AuthUserDto & {
-  providers: ProviderDto[]
-}
-
-export type AuthUserCreateDto = {
-  email: string
-  username: string
-}
-
-export type AuthUserDto = {
-  id: number
-  email?: string
-  username: string
-  roles: AuthRoles[]
-  createdAt: Date
-}
-
 export type ProvidersDto = {
-  type: ProviderName
-  profileImage: string | null
+  id: number
+  profileImage?: string | null
 }
 
 export type UnRegisteredUserCreateDto = {
   email: string
   provider: ProviderName
-  profileImage: string
+  profileImage?: string | null
 }
 
 export type UnRegisteredUserDto = {
   id: number
   token: string
   email: string
-  provider: ProviderName
-  profileImage: string | null
+  providerId: number
+  profileImage?: string | null
   createdAt: Date
-}
-
-export type RefreshTokenCreateDto = {
-  userId: number
-  token: string
-  ipAddress?: string | null
-  userAgent?: string | null
-}
-
-export type RefreshTokenDto = {
-  id: number
-  revoked: boolean
 }
 
 export type Pageable = {
@@ -110,13 +85,13 @@ export type Pageable = {
 }
 
 export type AuthUserUpdateDto =
-  | { username: string; roles?: AuthRoles[] }
-  | { username?: string; roles: AuthRoles[] }
+  | { username: string; roles?: AuthRole[] }
+  | { username?: string; roles: AuthRole[] }
 
 export type ChannelDto = {
   id: number
   name: string
-  description: string | null
+  description?: string
   createdAt: Date
 }
 
@@ -126,7 +101,7 @@ export type NotificationCreateDto = {
   message: string
   link?: string
   type?: string
-  additionalData?: Record<string, any> | null
+  additionalData?: Record<string, any>
 }
 
 export type UserChannelDto = {
@@ -142,8 +117,61 @@ export type NotificationDto = {
 }
 
 export type AuthUserFullDto = AuthUserDto & {
-  providers: ProviderDto[]
-  userChannels: UserChannelDto[]
-  sentNotifications: NotificationDto[]
-  receivedNotifications: NotificationDto[]
+  userChannels?: UserChannelDto[]
+  sentNotifications?: NotificationDto[]
+  receivedNotifications?: NotificationDto[]
+}
+
+export type EventsReponseType = 'notification' | 'announcement'
+
+export interface EventsReponse<T = any> {
+  id: string
+  data: T
+  time: Date
+  type: EventsReponseType
+}
+
+export interface UserProfileDto {
+  id: number
+  createdAt: Date
+  updatedAt: Date
+  userId: number
+  providerId: number
+  profileImage?: string | null
+}
+
+export interface UserProfileCreateDto {
+  userId: number
+  providerId: number
+  profileImage?: string | null
+}
+
+export interface AuthUserDto {
+  id: number
+  createdAt: Date
+  username: string
+  email: string
+  userProfiles: {
+    id: number
+    providerId: number
+    provider?: {
+      name: string
+    }
+    profileImage?: string | null
+  }[]
+  userRole: {
+    role: {
+      name: string
+    }
+  }[]
+}
+
+export interface AuthUserCreateDto {
+  username: string
+  email: string
+}
+
+export type AuthRoleDTO = {
+  id: number
+  name: string
 }

@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { NotificationRepo } from '../types'
 import { NotificationRepository } from '../repositories/interfaces/notification.repository'
+import { NotificationRepo } from '../types'
 
 @Injectable()
 export class NotificationService {
@@ -19,19 +19,14 @@ export class NotificationService {
     receiverId: number,
     senderId: number
   ) {
-    try {
-      this.logger.debug(`Creating new notification - Sender is : '${senderId}'`)
-      await this.notificationRepository.createNotification({
-        message,
-        receiverId,
-        senderId,
-        link,
-        type,
-        additionalData,
-      })
-    } catch (error) {
-      this.logger.error('Error creating notification:', error.stack)
-      throw new Error('Failed to create notification')
-    }
+    this.logger.debug(`Creating new notification - Sender is : '${senderId}'`)
+    return this.notificationRepository.createNotification({
+      message,
+      receiverId,
+      senderId,
+      link,
+      type,
+      additionalData,
+    })
   }
 }

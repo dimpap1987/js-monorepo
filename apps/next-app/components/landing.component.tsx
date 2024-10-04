@@ -2,10 +2,8 @@
 import { DpButton } from '@js-monorepo/button'
 import { useLoader } from '@js-monorepo/loader'
 // import { MapComponent, Marker, Popup } from '@js-monorepo/map'
-import { useSession } from '@js-monorepo/auth-client'
-import { DonationDialogComponent } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { checkoutSessionClient } from '@js-monorepo/payment'
+import { cn } from '@js-monorepo/ui/util'
 import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
 interface MainProps {
@@ -17,8 +15,8 @@ export default function LandingComponent({ children, className }: MainProps) {
   const [, setLoaderState] = useLoader()
   const [addNotification] = useNotifications()
   const [loading, setLoading] = useState(false)
-  const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
-  const { user } = useSession()
+  // const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
+  // const { user } = useSession()
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -33,8 +31,9 @@ export default function LandingComponent({ children, className }: MainProps) {
       }, 4000)
     })
   }
+
   return (
-    <section className={className}>
+    <section className={cn('overflow-hidden', className)}>
       {children}
       <div className="relative min-h-[200px] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
         <BannerSVG />
@@ -102,7 +101,7 @@ export default function LandingComponent({ children, className }: MainProps) {
         </DpButton>
       </div>
 
-      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
+      {/* {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
         <div className="mt-2">
           <DonationDialogComponent
             stripePublishableKey={
@@ -111,7 +110,7 @@ export default function LandingComponent({ children, className }: MainProps) {
             checkOutPromise={() =>
               checkoutSessionClient({
                 username: user.username as string,
-                url: '/api/checkout_sessions',
+                url: '/next-api/checkout_sessions',
                 customSubmitMessage: 'Thank you for your support',
                 isDonate: true,
                 price: 600,
@@ -127,7 +126,7 @@ export default function LandingComponent({ children, className }: MainProps) {
             </DpButton>
           </DonationDialogComponent>
         </div>
-      )}
+      )} */}
 
       {/* Map component */}
       {/* <div className="mt-2 h-[300px]">

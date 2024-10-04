@@ -1,6 +1,7 @@
+import { Transactional } from '@nestjs-cls/transactional'
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { ChannelRepo } from '../types'
 import { ChannelRepository } from '../repositories/interfaces/channel.repository'
+import { ChannelRepo } from '../types'
 
 @Injectable()
 export class ChannelService {
@@ -11,6 +12,7 @@ export class ChannelService {
     private channelRepository: ChannelRepository
   ) {}
 
+  @Transactional()
   async assignUserToChannels(userId: number, ...channelNames: string[]) {
     try {
       this.logger.debug(

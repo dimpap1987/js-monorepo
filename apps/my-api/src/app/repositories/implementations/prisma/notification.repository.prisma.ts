@@ -1,17 +1,22 @@
-import { PrismaService } from '@js-monorepo/db'
 import { NotificationCreateDto } from '@js-monorepo/types'
+import { TransactionHost } from '@nestjs-cls/transactional'
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { NotificationRepository } from '../../interfaces/notification.repository'
 
 @Injectable()
 export class NotificationRepositoryPrisma implements NotificationRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
+  ) {}
 
-  async createNotification(payload: NotificationCreateDto): Promise<void> {
+  async createNotification(
+    payload: NotificationCreateDto
+  ): Promise<{ id: number }> {
     const { message, type, link, additionalData, senderId, receiverId } =
       payload
 
-    await this.prisma.notification.create({
+    return this.txHost.tx.notification.create({
       data: {
         message,
         type,
@@ -23,6 +28,9 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
             sender: senderId ? { connect: { id: senderId } } : undefined,
           },
         },
+      },
+      select: {
+        id: true,
       },
     })
   }

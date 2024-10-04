@@ -1,4 +1,3 @@
-import { AuthRoles } from '@js-monorepo/types'
 import { getCurrentUser } from '@next-app/actions/session'
 import { NextRequest, NextResponse } from 'next/server'
 import { apiAuthPrefix, authRoutes, routes } from './routes'
@@ -13,8 +12,6 @@ export function withAuth(
   return async function middleAuth(
     request: NextRequest
   ): Promise<NextResponse<unknown>> {
-    const session = await getCurrentUser()
-    const isLoggedIn = !!session?.user
     const { nextUrl } = request
 
     // initialize flags
@@ -37,6 +34,9 @@ export function withAuth(
       return nextMiddleware(request)
     }
 
+    const session = await getCurrentUser()
+    const isLoggedIn = !!session?.user
+
     if (isAuthRoute) {
       if (isLoggedIn) {
         return NextResponse.redirect(new URL('/', nextUrl))
@@ -50,7 +50,7 @@ export function withAuth(
 
     const hasRequiredRole = routes
       .find((route) => nextUrl.pathname.startsWith(route.path))
-      ?.roles?.some((role) => session?.user?.roles?.includes(role as AuthRoles))
+      ?.roles?.some((role) => session?.user?.roles?.includes(role))
 
     if (!hasRequiredRole && routeExists) {
       return NextResponse.redirect(new URL('/', nextUrl))

@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
   DpDialogContent,
-} from '@js-monorepo/components'
+} from '@js-monorepo/components/dialog'
 import { useRouter } from 'next-nprogress-bar'
 import { PropsWithChildren } from 'react'
 

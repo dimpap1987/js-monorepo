@@ -1,4 +1,4 @@
-import { findUnregisteredUser } from '@js-monorepo/auth-server'
+import { findUnregisteredUser } from '@js-monorepo/auth/next/server'
 import { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
