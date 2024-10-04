@@ -16,7 +16,7 @@ function FeedBack() {
             needs to our team.
           </h4>
         </div>
-        <CardList className="width-[90%] mx-auto max-w-[400px] flex justify-center gap-10 p-3 flex-wrap"></CardList>
+        <CardList className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]"></CardList>
       </div>
     </section>
   )

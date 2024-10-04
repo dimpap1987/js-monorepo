@@ -56,10 +56,10 @@ const UserOptionsDropdown = forwardRef(
           {isVisible && (
             <motion.div
               {...{
-                initial: { opacity: 0, y: 0 },
-                animate: { opacity: 1, y: 0 },
-                exit: { opacity: 0, y: 0, zIndex: -1 },
-                transition: { duration: 0.4 },
+                initial: { opacity: 0 },
+                animate: { opacity: 1 },
+                exit: { opacity: 0 },
+                transition: { duration: 0.2 },
               }}
               ref={dropdownRef}
               className="w-80 fixed right-0 mt-3 p-1 border border-gray-500 rounded-xl text-foreground z-30 shadow-2xl bg-background-primary text-foreground"

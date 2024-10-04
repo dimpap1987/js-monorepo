@@ -15,7 +15,6 @@ export async function getCurrentSession() {
     const response = await fetch(`${process.env.API_URL}/api/auth/session`, {
       method: 'GET',
       headers: headers,
-      cache: 'no-store',
     })
     if (response.ok) {
       const session = await response.json()
@@ -34,7 +33,6 @@ export async function findUnregisteredUser(headers?: Headers) {
       {
         method: 'GET',
         headers: headers,
-        cache: 'no-store',
       }
     )
     if (response.ok) {
