@@ -137,7 +137,7 @@ const DpDialogContent = React.forwardRef<
       >
         <div
           className="p-5 overflow-hidden grid gap-4 bg-slate-100 text-base font-light
-         text-black shadow-2xl shadow-primary rounded-3xl"
+         text-black shadow-2xl rounded-3xl"
         >
           {children}
         </div>

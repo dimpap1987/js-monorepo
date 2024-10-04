@@ -10,6 +10,7 @@ import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import { MenuItem } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
+import { useRouter } from 'next-nprogress-bar'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import SVGLogo from './logo-svg'
 
@@ -51,6 +52,7 @@ export default function MainTemplate({
   const { user, isLoggedIn, isAdmin } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const socket = useWebSocket(websocketOptions, isLoggedIn)
+  const router = useRouter()
 
   useEffect(() => {
     socket?.on('connect', () => {
@@ -81,7 +83,7 @@ export default function MainTemplate({
             authClient.logout()
           }}
         >
-          <DpLogo>
+          <DpLogo onClick={() => router.push('/')}>
             <SVGLogo></SVGLogo>
           </DpLogo>
           <NavbarItems>
