@@ -4,7 +4,8 @@ import { NextFunction, Request, Response } from 'express'
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  logger = new Logger('HTTP')
+  private httpLogger = new Logger('HTTP')
+  private nextLogger = new Logger('NEXT') // Requests that coming from Next js server
 
   use(req: Request, res: Response, next: NextFunction): void {
     const { method, originalUrl: url } = req
@@ -15,9 +16,15 @@ export class LoggerMiddleware implements NestMiddleware {
 
     res.on('close', () => {
       const { statusCode } = res
-      this.logger.log(
-        `[${method} - ${statusCode} - ${url}] - [IP = ${ip}] - [USER_AGENT = ${userAgent}]`
-      )
+      if (userAgent?.includes('Next.js Middleware') || userAgent === 'node') {
+        this.nextLogger.debug(
+          `[${method} - ${statusCode} - ${url}] - [IP=${ip}] - [USER_AGENT=${userAgent}]`
+        )
+      } else {
+        this.httpLogger.log(
+          `[${method} - ${statusCode} - ${url}] - [IP=${ip}] - [USER_AGENT=${userAgent}]`
+        )
+      }
     })
     next()
   }

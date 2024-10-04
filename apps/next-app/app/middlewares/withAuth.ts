@@ -12,8 +12,6 @@ export function withAuth(
   return async function middleAuth(
     request: NextRequest
   ): Promise<NextResponse<unknown>> {
-    const session = await getCurrentUser()
-    const isLoggedIn = !!session?.user
     const { nextUrl } = request
 
     // initialize flags
@@ -35,6 +33,9 @@ export function withAuth(
     if (isApiAuthRoute || isPublicRoute) {
       return nextMiddleware(request)
     }
+
+    const session = await getCurrentUser()
+    const isLoggedIn = !!session?.user
 
     if (isAuthRoute) {
       if (isLoggedIn) {

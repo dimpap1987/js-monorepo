@@ -9,7 +9,6 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Post,
   Put,
   Query,
   UseGuards,
@@ -52,9 +51,4 @@ export class AdminController {
   ): Promise<AuthUserDto> {
     return this.adminService.updateUser(userId, updateUser)
   }
-
-  // @Post('event')
-  // async makeAnnouncement(
-  //   @Body() { event, data }: { event: string; data: any }
-  // ): Promise<void> {}
 }
