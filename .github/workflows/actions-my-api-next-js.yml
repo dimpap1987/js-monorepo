@@ -42,8 +42,9 @@ jobs:
       - name: Lint check
         run: npm run lint:all
 
-      - name: Run Tests
-        run: npx nx affected:test --base=origin/integration --head=${{ github.sha }}
+      - name: Run Affected Tests
+        run: |
+          npx nx affected:test --base=origin/main --head=${{ github.sha }} --watch=false
 
       - name: Generate Prisma Client
         env:
@@ -70,7 +71,7 @@ jobs:
           retention-days: 1
 
   build-and-push-docker:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     needs: test-and-build
 
