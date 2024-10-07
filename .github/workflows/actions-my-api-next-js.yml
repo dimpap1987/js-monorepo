@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Branch
         with:
           # We need to fetch all branches and commits so that Nx affected has a base to compare against.
@@ -64,7 +64,7 @@ jobs:
         run: npm run build:next
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: dist
@@ -76,13 +76,13 @@ jobs:
     needs: test-and-build
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Branch
         with:
           fetch-depth: 0
 
       - name: Download Build Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v
         with:
           name: build-artifacts
           path: dist

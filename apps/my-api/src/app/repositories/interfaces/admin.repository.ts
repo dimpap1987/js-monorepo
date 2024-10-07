@@ -1,4 +1,5 @@
 import {
+  AuthRoleDTO,
   AuthUserDto,
   AuthUserFullDto,
   AuthUserUpdateDto,
@@ -10,6 +11,8 @@ export interface AdminRepository {
     users: AuthUserFullDto[]
     totalCount: number
   }>
+
+  getRoles(): Promise<AuthRoleDTO[]>
 
   updateUser(
     userId: number,

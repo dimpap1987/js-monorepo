@@ -36,6 +36,11 @@ export class AdminController {
     return this.adminService.getUsers(page, pageSize)
   }
 
+  @Get('roles')
+  async getRoles() {
+    return this.adminService.getRoles()
+  }
+
   @Get('online-users')
   async getOnlineUsers(
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
