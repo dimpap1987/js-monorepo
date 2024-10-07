@@ -66,7 +66,7 @@ function LoginDialog() {
           if (pathnameRef.current === LOGIN_PATH_NAME) {
             router.back()
           }
-        }, 250)
+        }, 450)
       }}
     ></DpLoginDialogComponent>
   )

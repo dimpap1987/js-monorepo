@@ -41,7 +41,7 @@ interface UsersReponse {
 
 declare module '@tanstack/table-core' {
   interface Row<TData> {
-    updatedUser: AuthUserUpdateDto
+    updatedUser: AuthUserUpdateDto | undefined
   }
 }
 

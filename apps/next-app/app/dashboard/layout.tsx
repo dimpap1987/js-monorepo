@@ -22,7 +22,7 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
           <DpNextNavLink
             className="p-2 transition-colors duration-300 grid grid-cols-1 place-items-center
                        sm:grid-cols-[50px_auto] gap-2 items-center 
-                       border border-border rounded-md hover:bg-accent"
+                       border border-border rounded-md hover:ring-2"
             href={`/dashboard/users`}
             activeClassName="bg-accent"
           >
@@ -34,7 +34,7 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
           <DpNextNavLink
             className="p-2 transition-colors duration-300 grid grid-cols-1 place-items-center
                        sm:grid-cols-[50px_auto] gap-2 items-center 
-                       border border-border rounded-md hover:bg-accent"
+                       border border-border rounded-md hover:ring-2"
             href={`/dashboard/online-users`}
             activeClassName="bg-accent"
           >

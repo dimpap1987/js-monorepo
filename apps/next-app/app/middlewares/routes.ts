@@ -35,3 +35,12 @@ export const routes: {
 export const authRoutes = ['/auth/login', '/auth/register', '/auth/onboarding']
 
 export const apiAuthPrefix = '/api/auth'
+
+export function isPublicRoute(pathname: string) {
+  return (
+    pathname === '/' ||
+    routes
+      .filter((route) => route.roles?.includes('PUBLIC'))
+      .some((route) => pathname.startsWith(route.path))
+  )
+}
