@@ -13,7 +13,7 @@ class RegisterUserSchemaConfig {
   public readonly MAX_ERROR_REGEX = `Username must not contain special characters`
 
   /* eslint-disable */
-  getSchema() {
+  createSchema() {
     return z.object({
       username: z
         .string()
@@ -24,11 +24,38 @@ class RegisterUserSchemaConfig {
         }),
     })
   }
+
+  updateSchema() {
+    return z
+      .object({
+        username: z
+          .string()
+          .min(this.MIN_VALUE, { message: this.MIN_ERROR_MESSAGE })
+          .max(this.MAX_VALUE, { message: this.MAX_ERROR_MESSAGE })
+          .regex(/^[^\s!@#$%^&*()_+|~=`{}\[\]:";'<>?,.\/\\]+$/, {
+            message: this.MAX_ERROR_REGEX,
+          })
+          .optional(),
+        roles: z.array(ObjectIdSchema).optional(),
+      })
+      .refine(
+        (data) => data.username || (data.roles && data.roles.length > 0),
+        {
+          message: "At least one of 'username' or 'roles' must be provided.",
+        }
+      )
+  }
 }
+
+const ObjectIdSchema = z.object({
+  id: z.number(),
+})
 
 export const registerUserSchemaConfig = new RegisterUserSchemaConfig()
 
-export const RegisterUserSchema = registerUserSchemaConfig.getSchema()
+export const RegisterUserSchema = registerUserSchemaConfig.createSchema()
+
+export const UserUpdateUserSchema = registerUserSchemaConfig.updateSchema()
 
 export type RegisterUserSchemaType = z.infer<typeof RegisterUserSchema>
 

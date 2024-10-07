@@ -85,8 +85,8 @@ export type Pageable = {
 }
 
 export type AuthUserUpdateDto =
-  | { username: string; roles?: AuthRole[] }
-  | { username?: string; roles: AuthRole[] }
+  | { username: string; roles?: { id: number }[] }
+  | { username?: string; roles: { id: number }[] }
 
 export type ChannelDto = {
   id: number

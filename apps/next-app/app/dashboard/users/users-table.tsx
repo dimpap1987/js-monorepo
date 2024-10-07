@@ -14,7 +14,6 @@ import {
   usePagination,
 } from '@js-monorepo/components/table'
 
-import { Input } from '@js-monorepo/components/form'
 import { TextareaForm } from '@js-monorepo/components/textarea'
 
 import {
@@ -22,7 +21,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from '@js-monorepo/components/avatar'
-import { AuthUserFullDto } from '@js-monorepo/types'
+import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
 import { API } from '@next-app/api-proxy'
 import { ColumnDef } from '@tanstack/react-table'
@@ -33,6 +32,8 @@ import { Suspense, useEffect, useMemo, useState } from 'react'
 import { GrAnnounce } from 'react-icons/gr'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
+import RolesTableInput from './roles-input'
+import { UsernameTableInput } from './username-input'
 interface UsersReponse {
   users: AuthUserFullDto[] | []
   totalCount: number
@@ -40,7 +41,7 @@ interface UsersReponse {
 
 declare module '@tanstack/table-core' {
   interface Row<TData> {
-    updatedUser: any
+    updatedUser: AuthUserUpdateDto
   }
 }
 
@@ -144,27 +145,10 @@ const DashboardUsersTableSuspense = () => {
           <DataTableColumnHeader column={column} title="Username" />
         ),
         cell: ({ row }) => {
-          const initialValue = row.getValue('username') as string
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          const [value, setValue] = useState(initialValue)
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          useEffect(() => {
-            setValue(initialValue)
-          }, [initialValue])
-
           return update?.index === row.index ? (
-            <Input
-              className="py-1 px-4"
-              value={value}
-              onChange={(e) => {
-                setValue(e.target.value)
-                row.updatedUser = {
-                  username: e.target.value,
-                }
-              }}
-            />
+            <UsernameTableInput row={row} />
           ) : (
-            <div className="text-center">{value}</div>
+            <div className="text-center">{row.original.username}</div>
           )
         },
       },
@@ -179,15 +163,19 @@ const DashboardUsersTableSuspense = () => {
       },
       {
         accessorKey: 'roles',
-        size: 130,
+        size: 140,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Roles" />
         ),
-        cell: ({ row }) => (
-          <div className="text-center">
-            {row.original?.userRole?.map((r) => r.role.name).join(', ')}
-          </div>
-        ),
+        cell: ({ row }) => {
+          return update?.index === row.index ? (
+            <RolesTableInput row={row} />
+          ) : (
+            <div className="text-center">
+              {row.original?.userRole?.map((r) => r.role.name).join(', ')}
+            </div>
+          )
+        },
       },
       {
         accessorKey: 'createdAt',
