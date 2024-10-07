@@ -16,7 +16,7 @@ export class AuthClient {
       .execute()
 
     if (response.ok) {
-      window.location.reload()
+      window.location.replace('/')
     }
   }
 

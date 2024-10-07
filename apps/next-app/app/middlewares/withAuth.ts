@@ -1,6 +1,6 @@
 import { getCurrentUser } from '@next-app/actions/session'
 import { NextRequest, NextResponse } from 'next/server'
-import { apiAuthPrefix, authRoutes, routes } from './routes'
+import { apiAuthPrefix, authRoutes, isPublicRoute, routes } from './routes'
 
 export function withAuth(
   nextMiddleware: (
@@ -17,11 +17,7 @@ export function withAuth(
     // initialize flags
     const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
 
-    const isPublicRoute =
-      nextUrl.pathname === '/' ||
-      routes
-        .filter((route) => route.roles?.includes('PUBLIC'))
-        .some((route) => nextUrl.pathname.startsWith(route.path))
+    const isPublic = isPublicRoute(nextUrl.pathname)
 
     const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 
@@ -30,7 +26,7 @@ export function withAuth(
     )
 
     // start the middleware logic
-    if (isApiAuthRoute || isPublicRoute) {
+    if (isApiAuthRoute || isPublic) {
       return nextMiddleware(request)
     }
 
