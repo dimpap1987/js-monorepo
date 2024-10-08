@@ -15,8 +15,8 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
                  h-[87svh] bg-background-primary text-foreground"
     >
       <div
-        className="min-w-max flex flex-col justify-between gap-2 
-                  p-2 border-t border-r border-border rounded-md"
+        className="min-w-max flex flex-col justify-between
+                  p-2 border-r border-border rounded-md"
       >
         <div className="space-y-2">
           <DpNextNavLink
@@ -46,7 +46,7 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
         </div>
         <DpVersion className="hidden sm:block text-sm text-center"></DpVersion>
       </div>
-      <div className="px-3 overflow-hidden">{children}</div>
+      <div className="px-2 container mx-auto overflow-hidden">{children}</div>
     </main>
   )
 }
