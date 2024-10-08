@@ -1,32 +1,56 @@
-# Install dependencies only when needed
-FROM node:21-alpine3.18 AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat python3 make g++ alpine-sdk && rm -rf /var/cache/apk/*
+# Install dependencies and build the source code
+FROM node:lts-alpine AS builder
+RUN apk add --no-cache libc6-compat
 WORKDIR /usr/src/app
-COPY .npmrc apps/next-app/next.config.js dist/apps/next-app/package*.json ./
-RUN npm install --omit=dev --ignore-scripts
 
-# Production image, copy all the files and run next
-FROM node:21-alpine3.18 AS runner
-RUN apk add --no-cache dumb-init
+# Declare build arguments
+ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_AUTH_URL
+ARG NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
+# Set environment variables from build arguments
+ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+ENV NEXT_PUBLIC_AUTH_URL=${NEXT_PUBLIC_AUTH_URL}
+ENV NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL=${NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL}
 
+ENV NEXT_TELEMETRY_DISABLED=1
+# Copy package files and install dependencies
+COPY package*.json .npmrc ./
+RUN npm ci
+
+# Copy the rest of the application code
+COPY . .
+
+# Build the Next.js application
+RUN npm run build:next
+
+# Production image
+FROM node:lts-alpine AS runner
+WORKDIR /usr/src/app
+
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Set production environment
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV NEXT_TELEMETRY_DISABLED=1
 
-WORKDIR /usr/src/app
+# Copy necessary files from builder stage
+COPY --chown=nextjs:nodejs --from=builder /usr/src/app/dist/apps/next-app/package*.json /usr/src/app/.npmrc ./
 
-COPY --from=deps --chown=nextjs:nodejs /usr/src/app/node_modules ./node_modules
-COPY --from=deps --chown=nextjs:nodejs /usr/src/app/package.json ./package.json
-COPY --from=deps --chown=nextjs:nodejs /usr/src/app/next.config.js ./next.config.js
-COPY --chown=nextjs:nodejs dist/apps/next-app/public ./public
-COPY --chown=nextjs:nodejs dist/apps/next-app/.next ./.next
+# Install production dependencies
+RUN npm install --omit=dev --ignore-scripts
 
+# Copy the built application
+COPY --chown=nextjs:nodejs --from=builder /usr/src/app/dist/apps/next-app/ ./
+
+# Use the non-root user
 USER nextjs
+
+# Expose the application port
 EXPOSE 3000
 
-
-CMD ["dumb-init", "node_modules/.bin/next", "start"]
+# Start the application
+CMD ["npm", "start"]

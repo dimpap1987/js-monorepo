@@ -56,6 +56,8 @@ services:
   postgres:
     image: postgres:16.1-alpine3.19
     container_name: postgres_container_prod
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DATABASE_DB}
       POSTGRES_USER: ${DATABASE_USER}
@@ -78,6 +80,8 @@ services:
   redis:
     image: redis:latest
     container_name: redis_prod
+    env_file:
+      - .env
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
