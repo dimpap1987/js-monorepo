@@ -34,7 +34,7 @@ export default function OnlineUsersTableComponent() {
     socket?.emit('subscribe:online-users', {})
 
     socket?.on('event:online-users', async (users) => {
-      await wait(600)
+      await wait(300)
       setOnlineUsers(users)
       setLoading(false)
     })

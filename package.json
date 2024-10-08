@@ -16,7 +16,7 @@
     "dev:my-api": "nx run my-api:serve:development --watch=true",
     "dev:docs": "nx serve docs",
     "dev:webhook": "nx serve webhook-server",
-    "build:next": "nx build next-app --prod",
+    "build:next": "nx build next-app --prod --verbose",
     "build:my-api": "nx build my-api --prod",
     "build:webhook": "nx build webhook-server --prod",
     "build:docs": "npm run generate:docs && nx build docs --prod",

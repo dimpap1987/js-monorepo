@@ -63,17 +63,6 @@ jobs:
           NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL: ${{ secrets.NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL_PROD}}
         run: npm run build:next
 
-      - name: Find .next file 
-        run: find . | grep "\.next"
-
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: dist
-          retention-days: 1
-
   build-and-push-docker:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
@@ -84,12 +73,6 @@ jobs:
         name: Checkout Branch
         with:
           fetch-depth: 0
-
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: dist
           
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -107,7 +90,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
           DIRECT_URL: ${{ secrets.DIRECT_URL_PROD }}
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 \
+          docker buildx build --platform linux/amd64 \
           -t dimpap/my-api:${{ steps.extract_version.outputs.version }} \
           -t dimpap/my-api:latest \
           --build-arg DATABASE_URL=$DATABASE_URL \
@@ -116,7 +99,10 @@ jobs:
     
       - name: Build Docker Next-app image and Push to Docker Hub
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 \
+          docker buildx build --platform linux/amd64 \
           -t dimpap/next-app:${{ steps.extract_version.outputs.version }} \
           -t dimpap/next-app:latest \
+          --build-arg NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }} \
+          --build-arg NEXT_PUBLIC_AUTH_URL=${{ secrets.NEXT_PUBLIC_AUTH_URL_PROD }} \
+          --build-arg NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL=${{ secrets.NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL_PROD }} \
           -f apps/next-app/Dockerfile . --push
