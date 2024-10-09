@@ -33,7 +33,7 @@ function RegisterDialogComponent({
         <DialogHeader className="font-semibold justify-center">
           <DialogTitle className="text-center font-bold">Sign Up</DialogTitle>
         </DialogHeader>
-        <section>{children}</section>
+        <section className="overflow-x-hidden">{children}</section>
       </DpDialogContent>
     </Dialog>
   )
