@@ -12,7 +12,7 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
   return (
     <main
       className="grid grid-cols-[max-content_1fr] gap-2
-                 h-[87svh] bg-background-primary text-foreground"
+                 h-[87svh] bg-bg-primary text-foreground"
     >
       <div
         className="min-w-max flex flex-col justify-between

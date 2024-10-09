@@ -96,7 +96,7 @@ export function DpNotificationBellComponent({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className={cn(
-          'p-1 bg-background-secondary mt-3 text-white w-[460px] xl:w-[640px]',
+          'p-1 bg-bg-secondary mt-3 text-white w-[460px] xl:w-[640px]',
           className
         )}
       >
@@ -107,7 +107,7 @@ export function DpNotificationBellComponent({
             notifications.map((notification, index) => (
               <Fragment key={notification.id}>
                 <DropdownMenuItem
-                  className={`cursor-pointer p-2 focus:text-white ${notification.isRead ? 'opacity-35' : 'bg-background-secondary-lighter'}`}
+                  className={`cursor-pointer p-2 focus:text-white ${notification.isRead ? 'opacity-35' : 'bg-bg-secondary-lighter'}`}
                   onSelect={(e) => {
                     e.preventDefault()
                     const notIndex = notifications.findIndex(

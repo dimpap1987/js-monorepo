@@ -28,7 +28,7 @@ export default async function RootLayout(props: {
       <body
         className={`${poppins.className} 
         flex flex-col min-h-100svh min-w-[200px]
-        bg-background-primary overflow-x-hidden`}
+        bg-bg-primary overflow-x-hidden`}
       >
         <DynamicRootProvicers>
           <MainTemplate>

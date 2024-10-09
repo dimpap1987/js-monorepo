@@ -13,7 +13,7 @@ function UsernameTableInput<T>({ row }: { row: Row<T> }) {
 
   return (
     <Input
-      className="py-1 px-4 bg-background-primary text-foreground text-center"
+      className="py-1 px-4 bg-bg-primary text-foreground text-center"
       value={value}
       onChange={(e) => {
         setValue(e.target.value)
