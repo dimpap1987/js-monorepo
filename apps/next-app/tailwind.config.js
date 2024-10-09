@@ -14,38 +14,47 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        'bg-primary': 'hsl(var(--background-primary))',
-        'bg-secondary': 'hsl(var(--background-secondary))',
-        'bg-secondary-lighter': 'hsl(var(--background-secondary-lighter))',
         foreground: 'hsl(var(--foreground))',
-        'foreground-hover': 'hsl(var(--foreground-hover))',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
+          bg: 'hsl(var(--primary-bg))',
           foreground: 'hsl(var(--primary-foreground))',
+          'foreground-hover': 'hsl(var(--primary-foreground-hover))',
           hover: 'hsl(var(--primary-hover))',
           border: 'hsl(var(--primary-border))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
+          bg: 'hsl(var(--secondary-bg))',
+          'bg-lighter': 'hsl(var(--secondary-lighter-bg))',
           foreground: 'hsl(var(--secondary-foreground))',
+          'foreground-hover': 'hsl(var(--secondary-foreground-hover))',
           hover: 'hsl(var(--secondary-hover))',
           border: 'hsl(var(--secondary-border))',
         },
         accent: {
           DEFAULT: 'hsl(var(--accent))',
+          bg: 'hsl(var(--bg-accent))',
           foreground: 'hsl(var(--accent-foreground))',
+          'foreground-hover': 'hsl(var(--accent-foreground-hover))',
           hover: 'hsl(var(--accent-hover))',
           border: 'hsl(var(--accent-border))',
         },
         danger: {
           DEFAULT: 'hsl(var(--danger))',
+          bg: 'hsl(var(--bg-danger))',
           foreground: 'hsl(var(--danger-foreground))',
+          'foreground-hover': 'hsl(var(--danger-hover))',
           hover: 'hsl(var(--danger-hover))',
+          border: 'hsl(var(--danger-border))',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
+          bg: 'hsl(var(--bg-destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+          'foreground-hover': 'hsl(var(--destructive-hover))',
           hover: 'hsl(var(--destructive-hover))',
+          border: 'hsl(var(--destructive-border))',
         },
       },
       minHeight: {

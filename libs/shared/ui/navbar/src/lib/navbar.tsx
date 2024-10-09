@@ -28,7 +28,7 @@ function SideBarIcon({
       >
         <button
           onClick={onSideBarClick}
-          className="p-2 border-2 border-border rounded-xl"
+          className="p-2 border-2 border-primary-border rounded-xl"
           aria-label="toggle sidebar"
           tabIndex={0}
         >
@@ -55,7 +55,7 @@ function NavUserOptions({
           profileImage={user.profile?.image}
           username={user.username}
           createdAt={user.createdAt}
-          className="mb-2 border-border border-b"
+          className="mb-2 border-primary-border border-b"
         ></UserMetadata>
 
         <DpNextNavLink
@@ -113,7 +113,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
 
     return (
       <nav
-        className="text-foreground border-b border-border navbar-height overflow-hidden flex items-center"
+        className="text-foreground border-b border-primary-border navbar-height overflow-hidden flex items-center"
         ref={ref}
       >
         <div className="px-5 flex gap-2 justify-between w-full items-center">
@@ -124,7 +124,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               menuItems.map((item, index) => (
                 <li
                   key={index}
-                  className="hover:text-foreground-hover text-center text-nowrap"
+                  className="hover:text-primary-foreground-hover text-center text-nowrap"
                 >
                   {(item?.roles?.includes('PUBLIC') ||
                     item?.roles?.some((role) =>
@@ -132,7 +132,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                     )) && (
                     <DpNextNavLink
                       className="p-2"
-                      activeClassName="text-foreground-hover underline-offset-8"
+                      activeClassName="underline-offset-8"
                       href={item.href}
                     >
                       {item.name}
