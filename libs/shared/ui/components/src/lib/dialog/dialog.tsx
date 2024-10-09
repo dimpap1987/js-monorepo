@@ -20,7 +20,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-10 bg-black/50 top-navbar-offset data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'fixed inset-0 drop-shadow-2xl z-10 bg-black/70 top-navbar-offset data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className
     )}
     {...props}
@@ -125,29 +125,29 @@ const DpDialogContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          `fixed left-[50%] top-[50%] z-30 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] border 
+          `fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-30 w-[90%] max-w-lg  border 
           bg-background p-4 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out 
           data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 
           data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] 
-          data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-3xl max-h-[80svh] 
+          data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-3xl max-h-[95svh] 
           overflow-y-auto sm:rounded-3xl`,
           className
         )}
         {...props}
       >
         <div
-          className="p-5 overflow-hidden grid gap-4 bg-slate-100 text-base font-light
-         text-black shadow-2xl rounded-3xl"
+          className="p-5 grid gap-4 bg-slate-100 text-base font-light
+         text-black shadow-2xl rounded-[50px]"
         >
           {children}
         </div>
         <DialogPrimitive.Close
-          className="absolute right-2 top-2 rounded-sm opacity-70 
-        ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 
-        focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent
+          className="absolute p-[4px] right-[9px] top-[10px] rounded-full bg-red-500
+        ring-offset-background transition-all focus:outline-none focus:ring-2  hover:ring-2 ring-white
+        disabled:pointer-events-none data-[state=open]:bg-accent
          data-[state=open]:text-foreground"
         >
-          <Cross2Icon className="h-4 w-4" />
+          <Cross2Icon className="h-3 w-3 stroke-white" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
