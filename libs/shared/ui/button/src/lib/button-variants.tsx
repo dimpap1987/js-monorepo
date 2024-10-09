@@ -11,7 +11,7 @@ export const buttonVariants = {
       danger:
         'bg-danger border-danger-border text-danger-foreground hover:bg-danger-hover focus:bg-danger-hover',
       outline:
-        'border border-input bg-background-primary hover:bg-background-primary-hover text-foreground',
+        'border border-input bg-bg-primary hover:bg-bg-primary-hover text-foreground',
     },
     size: {
       default: 'h-9 px-4 py-2', // Your default size styles

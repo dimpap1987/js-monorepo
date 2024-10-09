@@ -69,12 +69,12 @@ export function MultiSelectDropdown({
           asChild
           className="w-full border-2 border-border rounded-lg text-foreground
          px-6 py-1 text-base hover:border-primary cursor-pointer shadow-sm transition-colors
-         focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-background-primary text-foreground"
+         focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-bg-primary text-foreground"
         >
           <div className="overflow-auto text-nowrap text-center">{label}</div>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="border rounded shadow-md bg-background-primary text-foreground">
+        <DropdownMenuContent className="border rounded shadow-md bg-bg-primary text-foreground">
           {options.map((option, index) => (
             <Fragment key={option.id}>
               <DropdownMenuCheckboxItem

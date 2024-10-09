@@ -45,7 +45,7 @@ export default function GlobalError({
       >
         <body
           className={`${poppins.className} flex justify-center container mx-auto items-center min-h-100svh 
-                    bg-background-primary text-white overflow-x-hidden`}
+                    bg-bg-primary text-white overflow-x-hidden`}
         >
           <ErrorComponent type="global" className="container">
             <div className="flex flex-wrap gap-5 mt-5">
