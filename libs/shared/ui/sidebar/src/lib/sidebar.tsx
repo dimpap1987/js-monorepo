@@ -26,12 +26,12 @@ const framerSidebarPanel = (position: SidebarPositionType) => ({
   transition: { duration: 0.3 },
 })
 
-const framerText = (delay: number, position: SidebarPositionType) => {
+const framerText = (position: SidebarPositionType, delay?: number) => {
   return {
     initial: { opacity: 0, x: position === 'left' ? -50 : 50 },
     animate: { opacity: 1, x: 0 },
     transition: {
-      delay: 0.2 + delay / 10,
+      delay: 0.2,
     },
   }
 }
@@ -67,17 +67,17 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
             {...framerSidebarPanel(position)}
             className={`fixed top-0 bottom-0 z-30 focus:z-50 dark ${
               position === 'left' ? 'left-0' : 'right-0'
-            } w-full h-[100svh] max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
+            } w-full h-[100svh] max-w-xs border-r-2 border-primary-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
             ref={localRef}
             aria-label="Sidebar"
             tabIndex={-1}
           >
-            <div className="flex items-center justify-between p-5 border-b-2 border-border">
+            <div className="flex items-center justify-between p-5 border-b-2 border-primary-border">
               <ModeToggle></ModeToggle>
               <span>{header}</span>
               <button
                 onClick={() => onClose()}
-                className="p-3 border-2 border-border rounded-xl hover:bg-zinc-800"
+                className="p-3 border-2 border-primary-border rounded-xl hover:bg-zinc-800"
                 aria-label="close sidebar"
               >
                 <AiOutlineRollback className="text-white" />
@@ -97,12 +97,12 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
                       <DpNextNavLink
                         className={`flex items-center w-full ${
                           position === 'right' ? 'flex-row-reverse' : ''
-                        } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-border`}
+                        } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-primary-border`}
                         href={item.href}
                         onClick={() => onClose()}
                       >
                         <motion.span
-                          {...framerText(idx, position)}
+                          {...framerText(position)}
                           className="text-white"
                         >
                           {item.name}

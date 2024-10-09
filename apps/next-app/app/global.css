@@ -29,48 +29,45 @@ h4 {
     scrollbar-gutter: stable;
     --navbar-height: 50px; /* Define the height of your navbar */
     --navbar-offset: calc(var(--navbar-height));
-    --border: 240 4% 56%;
-
-    --background-primary: 0 0% 95%;
     --foreground: 0 0% 0%;
-    --foreground-hover: 0 0% 35%;
-    --background-secondary: 219 33% 21%;
-    --background-secondary-lighter: 219 33% 40%;
 
-    /* Turquoise */
-    --primary: 174 72% 56%;
-    --primary-foreground: 0 0% 1%;
-    --primary-hover: 174 65% 41%;
-    --primary-border: 176 73% 36%;
+    --primary: 265 76% 54%;
+    --primary-foreground: 0 0% 90%;
+    --primary-foreground-hover: 0 0% 35%;
+    --primary-hover: 265 76% 35%;
+    --primary-bg: 0 0% 95%;
+    --primary-border: 240 4% 56%;
 
-    /* Gold */
-    --secondary: 49 100% 67%;
-    --secondary-foreground: 0 0% 1%;
-    --secondary-hover: 49 81% 51%;
-    --secondary-border: 47 72% 51%;
+    --secondary: 26 114% 57%;
+    --secondary-foreground: 0 0% 90%;
+    --secondary-hover: 26 114% 37%;
+    --secondary-border: 26 114% 77%;
+    --secondary-bg: 219 33% 21%;
+    --secondary-lighter: 219 33% 40%;
 
-    /* Blue */
-    --accent: 224 76% 54%;
-    --accent-foreground: 0 0% 1%;
-    --accent-hover: 224 76% 41%;
-    --accent-border: 224 76% 52%;
+    --accent: 229 87% 54%;
+    --accent-foreground: 0 0% 90%;
+    --accent-hover: 229 87% 34%;
+    --accent-foreground-hover: 0 0% 35%;
+    --accent-border: 229 87% 74%;
 
-    /* Pink */
-    --danger: 351 100% 86%;
-    --danger-foreground: 0 0% 1%;
-    --danger-hover: 351 72% 75%;
-    --danger-border: 258 49% 66%;
+    --danger: -14 98% 57%;
+    --danger-foreground: 0 0% 90%;
+    --danger-hover: -14 98% 37%;
+    --danger-border: -14 98% 77%;
 
     --destructive: 0 0% 78%;
     --destructive-hover: 0 0% 71%;
+
+    --tw-shadow-color: 0 0% 20%;
   }
 
   .dark {
-    --border: 240 4% 16%;
-
-    --background-primary: 221 39% 11%;
     --foreground: 0 0% 100%;
-    --foreground-hover: 49 81% 51%;
+
+    --primary-border: 240 4% 16%;
+    --primary-bg: 221 39% 11%;
+    --primary-foreground-hover: 49 81% 51%;
   }
 }
 

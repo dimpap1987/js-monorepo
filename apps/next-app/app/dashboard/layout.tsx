@@ -12,19 +12,19 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
   return (
     <main
       className="grid grid-cols-[max-content_1fr] gap-2
-                 h-[87svh] bg-bg-primary text-foreground"
+                 h-[87svh] bg-primary-bg text-foreground"
     >
       <div
         className="min-w-max flex flex-col justify-between
-                  p-2 border-r border-border rounded-md"
+                  p-2 border-r border-primary-border rounded-md"
       >
         <div className="space-y-2">
           <DpNextNavLink
             className="p-2 transition-colors duration-300 grid grid-cols-1 place-items-center
                        sm:grid-cols-[50px_auto] gap-2 items-center 
-                       border border-border rounded-md hover:ring-2"
+                       border border-primary-border rounded-md hover:ring-2"
             href={`/dashboard/users`}
-            activeClassName="bg-accent"
+            activeClassName="bg-accent text-accent-foreground"
           >
             <div className="flex justify-end">
               <RiUserSettingsFill className="shrink-0" />
@@ -34,9 +34,9 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
           <DpNextNavLink
             className="p-2 transition-colors duration-300 grid grid-cols-1 place-items-center
                        sm:grid-cols-[50px_auto] gap-2 items-center 
-                       border border-border rounded-md hover:ring-2"
+                       border border-primary-border rounded-md hover:ring-2"
             href={`/dashboard/online-users`}
-            activeClassName="bg-accent"
+            activeClassName="bg-accent text-accent-foreground"
           >
             <div className="flex justify-end">
               <HiMiniUsers className="shrink-0" />
