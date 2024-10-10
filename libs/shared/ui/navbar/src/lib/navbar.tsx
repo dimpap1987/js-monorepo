@@ -55,20 +55,19 @@ function NavUserOptions({
           profileImage={user.profile?.image}
           username={user.username}
           createdAt={user.createdAt}
-          className="mb-2 border-primary-border border-b"
+          className="mb-2 border-primary-border border-b select-none"
         ></UserMetadata>
 
         <DpNextNavLink
           href="/profile"
           onClick={() => {}}
-          className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2"
+          className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2 select-none"
         >
           <TbUserFilled className="text-2xl" />
           <span className="ml-2">Profile</span>
         </DpNextNavLink>
 
         <DpLogoutButton
-          className="text-inherit bg-inherit hover:shadow-inner hover:text-white"
           onClick={() => {
             onLogout?.()
           }}

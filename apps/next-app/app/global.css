@@ -26,7 +26,7 @@ h4 {
 
 @layer base {
   :root {
-    scrollbar-gutter: stable;
+    /* scrollbar-gutter: stable; */
     --navbar-height: 50px; /* Define the height of your navbar */
     --navbar-offset: calc(var(--navbar-height));
     --foreground: 0 0% 0%;
@@ -35,7 +35,7 @@ h4 {
     --primary-foreground: 0 0% 90%;
     --primary-foreground-hover: 0 0% 35%;
     --primary-hover: 265 76% 35%;
-    --primary-bg: 0 0% 95%;
+    --primary-bg: 43.64 47.83% 95.49%;
     --primary-border: 240 4% 56%;
 
     --secondary: 26 114% 57%;
@@ -51,9 +51,9 @@ h4 {
     --accent-foreground-hover: 0 0% 35%;
     --accent-border: 229 87% 74%;
 
-    --danger: -14 98% 57%;
+    --danger: -14 98% 47%;
     --danger-foreground: 0 0% 90%;
-    --danger-hover: -14 98% 37%;
+    --danger-hover: -14 98% 35%;
     --danger-border: -14 98% 77%;
 
     --destructive: 0 0% 78%;
