@@ -129,20 +129,20 @@ const DpDialogContent = React.forwardRef<
           bg-black/60 p-4 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out 
           data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 
           data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] 
-          data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] rounded-3xl max-h-[95svh] 
+          data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] max-h-[95svh] rounded-3xl
           overflow-y-auto`,
           className
         )}
         {...props}
       >
         <div
-          className="p-8 grid gap-4 bg-slate-100 text-base font-light overflow-auto
-         text-black shadow-2xl rounded-lg"
+          className="p-6 grid gap-4 bg-slate-100 text-base font-light overflow-auto
+         text-black shadow-2xl rounded-3xl"
         >
           {children}
         </div>
         <DialogPrimitive.Close
-          className="absolute p-[4px] right-[9px] top-[10px] rounded-full bg-red-500
+          className="absolute p-[4px] right-[10px] top-[10px] rounded-full bg-red-500
         ring-offset-background transition-all focus:outline-none focus:ring-2  hover:ring-2 ring-white
         disabled:pointer-events-none data-[state=open]:bg-accent
          data-[state=open]:text-foreground"

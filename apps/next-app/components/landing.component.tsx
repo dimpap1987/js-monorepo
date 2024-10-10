@@ -46,7 +46,7 @@ export default function LandingComponent({ children, className }: MainProps) {
         <div className="flex gap-2 flex-wrap">
           <DpButton
             className="flex-1"
-            variant="primary"
+            variant="outline"
             onClick={() => {
               addNotification({
                 message: 'This is a success message',
