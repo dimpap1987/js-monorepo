@@ -38,8 +38,9 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const connectSocket = (opts: WebSocketOptionsType) => {
     if (!opts?.url) return undefined
     try {
-      if (socketRefs.current.has(opts.url)) {
-        return socketRefs.current.get(opts.url) as PingableSocket
+      const existingSocket = socketRefs.current.get(opts.url)
+      if (existingSocket && existingSocket.active) {
+        return existingSocket as PingableSocket
       }
 
       const socket = io(opts.url, {

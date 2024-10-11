@@ -54,7 +54,12 @@ export class AdminService {
     this.logger.debug(`Updating User with id: '${userId}'`)
     UserUpdateUserSchema.parse(updateUser)
     try {
-      return await this.adminRepository.updateUser(userId, updateUser)
+      const updatedUser = await this.adminRepository.updateUser(
+        userId,
+        updateUser
+      )
+      await this.authSessionUserCacheService.invalidateAuthUserInCache(userId)
+      return updatedUser
     } catch (e) {
       this.logger.error(`Error Updating User with id: '${userId}'`, e.stack)
       throw new ApiException()
