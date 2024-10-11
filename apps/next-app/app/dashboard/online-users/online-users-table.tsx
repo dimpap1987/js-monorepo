@@ -79,11 +79,11 @@ export default function OnlineUsersTableComponent() {
         <table className="w-full">
           {!loading && (
             <thead>
-              <tr className="border-b border-blue-100 text-gray-800 font-semibold">
-                <th className="p-3 pl-4 px-3 text-left"></th>
-                <th className="p-3 px-3 text-left">Username</th>
-                <th className="p-3 px-3 text-center">WS Connections</th>
-                <th className="p-3 px-3 text-center">Actions</th>
+              <tr className="border-b border-blue-100 text-gray-800 font-semibold text-xs">
+                <th className="p-1 pl-4 px-2 text-left"></th>
+                <th className="p-1 px-2 text-left">Username</th>
+                <th className="p-1 px-2 text-center">WS Connections</th>
+                <th className="p-1 px-2 text-center">Actions</th>
               </tr>
             </thead>
           )}
@@ -94,16 +94,16 @@ export default function OnlineUsersTableComponent() {
                     key={`skeleton-${index}`}
                     className="relative border-t border-blue-100 cursor-default"
                   >
-                    <td className="p-3 pl-4 px-3">
+                    <td className="p-2 pl-2 px-2">
                       <Skeleton className="h-3 rounded-full" />
                     </td>
-                    <td className="p-3 px-3">
+                    <td className="p-2 px-2">
                       <Skeleton className="h-3" />
                     </td>
-                    <td className="p-3 px-3">
+                    <td className="p-2 px-2">
                       <Skeleton className="h-3" />
                     </td>
-                    <td className="p-3 px-3">
+                    <td className="p-2 px-2">
                       <Skeleton className="h-3" />
                     </td>
                   </tr>

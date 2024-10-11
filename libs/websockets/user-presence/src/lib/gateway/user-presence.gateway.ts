@@ -1,4 +1,4 @@
-import { Logger, UseGuards } from '@nestjs/common'
+import { Logger, OnModuleDestroy, UseGuards } from '@nestjs/common'
 import {
   ConnectedSocket,
   OnGatewayConnection,
@@ -27,9 +27,10 @@ export const ONLINE_USERS_ROOM = 'online_users_room'
   transports: ['websocket'],
 })
 export class UserPresenceGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
+  implements OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy
 {
   private logger = new Logger(UserPresenceGateway.name)
+  private intervalId?: NodeJS.Timeout
 
   @WebSocketServer()
   namespace!: Namespace
@@ -38,14 +39,18 @@ export class UserPresenceGateway
     private readonly userSocketService: UserSocketService,
     private readonly onlineUsersService: OnlineUsersService
   ) {
-    setInterval(async () => {
-      if (this.namespace?.sockets) {
-        const promises = Array.from(this.namespace.sockets).map(([_, socket]) =>
-          this.saveUserSocketAndOnlineList(socket)
-        )
-        await Promise.all(promises)
-      }
-    }, 200000)
+    this.startUserSocketSaving()
+  }
+
+  onModuleDestroy() {
+    clearInterval(this.intervalId)
+    if (this.namespace?.sockets) {
+      this.namespace.sockets.forEach((socket) => {
+        socket.disconnect()
+        this.logger.debug(`Disconnected socket: ${socket.id}`)
+      })
+    }
+    this.logger.debug('User presence onModuleDestroy')
   }
 
   async handleConnection(socket: Socket) {
@@ -109,5 +114,16 @@ export class UserPresenceGateway
     this.namespace
       .to('admin-room')
       .emit('event:online-users', await this.onlineUsersService.getList())
+  }
+
+  private startUserSocketSaving() {
+    this.intervalId = setInterval(async () => {
+      if (this.namespace?.sockets) {
+        const promises = Array.from(this.namespace.sockets).map(([_, socket]) =>
+          this.saveUserSocketAndOnlineList(socket)
+        )
+        await Promise.all(promises)
+      }
+    }, 200000)
   }
 }

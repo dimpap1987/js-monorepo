@@ -61,11 +61,7 @@ export default function MainTemplate({
         socket?.emit('subscribe:join-admin-room', {})
       }
     })
-
-    return () => {
-      socket?.disconnect()
-    }
-  }, [socket])
+  }, [socket, isAdmin])
 
   return (
     <>
