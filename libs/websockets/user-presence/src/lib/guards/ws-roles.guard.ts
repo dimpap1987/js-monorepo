@@ -21,7 +21,7 @@ export class WsRolesGuard {
     if (!userId) return false
 
     const sessionUser =
-      await this.authSessionUserCacheService.findOrSaveCacheUserById(userId)
+      await this.authSessionUserCacheService.findOrSaveAuthUserById(userId)
     return requiredRoles.some((role) => sessionUser?.roles?.includes(role))
   }
 }

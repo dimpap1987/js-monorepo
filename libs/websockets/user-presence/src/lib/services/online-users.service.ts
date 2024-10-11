@@ -13,7 +13,7 @@ export class OnlineUsersService {
     private readonly authSessionUserCacheService: AuthSessionUserCacheService
   ) {}
 
-  async getOnlineUsersList(page = 1, limit = 100) {
+  async getList(page = 1, limit = 100) {
     try {
       const start = (page - 1) * limit
       const end = start + limit - 1
@@ -26,7 +26,7 @@ export class OnlineUsersService {
       const userPromises = onlineUsers.map(async (value) => {
         const [userId, socketId] = value.split(':')
         const userCache =
-          await this.authSessionUserCacheService.findOrSaveCacheUserById(
+          await this.authSessionUserCacheService.findOrSaveAuthUserById(
             Number(userId)
           )
         return {
@@ -44,23 +44,58 @@ export class OnlineUsersService {
     }
   }
 
-  async addUser(value: string): Promise<any> {
+  async add(value: string): Promise<any> {
     if (value === undefined || value === null) return
 
-    // Add the user to the sorted set with a score (timestamp)
     return this.redisClient.zAdd(ONLINE_KEY_LIST, {
       score: Date.now(),
       value: value,
     })
   }
 
-  async removeUser(value: string): Promise<any> {
+  async remove(value: string): Promise<any> {
     if (value === undefined || value === null) return
-
     return this.redisClient.zRem(ONLINE_KEY_LIST, `${value}`)
   }
 
-  async clearUsers() {
+  async clear() {
     return this.redisClient.del(ONLINE_KEY_LIST)
+  }
+
+  async removeByUserId(userId: number) {
+    const userKeyPattern = `${userId}:*`
+    let cursor = 0
+    try {
+      do {
+        const { cursor: newCursor, members } = await this.redisClient.zScan(
+          ONLINE_KEY_LIST,
+          cursor,
+          {
+            MATCH: userKeyPattern,
+            COUNT: 100,
+          }
+        )
+        cursor = newCursor
+
+        if (members.length > 0) {
+          const deletePromises = members.map(async (member) => {
+            await this.redisClient.zRem(ONLINE_KEY_LIST, member.value)
+            this.logger.debug(`Deleted session with member: ${member.value}`)
+          })
+          await Promise.all(deletePromises)
+        } else {
+          this.logger.debug(`No members found for pattern: ${userKeyPattern}`)
+        }
+      } while (cursor !== 0)
+
+      this.logger.debug(
+        `Completed removal of sessions for user with ID: ${userId}`
+      )
+    } catch (error: any) {
+      this.logger.error(
+        'Error while removing user from online list',
+        error.stack
+      )
+    }
   }
 }

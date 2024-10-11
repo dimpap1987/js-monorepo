@@ -175,3 +175,24 @@ export type AuthRoleDTO = {
   id: number
   name: string
 }
+
+export interface SessionObject {
+  cookie: {
+    originalMaxAge: number
+    expires: string
+    secure: boolean
+    httpOnly: boolean
+    path: string
+    sameSite: string
+  }
+  passport: {
+    user: number // Assuming user ID is a number
+  }
+}
+
+export type SocketUser = {
+  userId: number
+  socket: string
+  pid: number
+  session: string
+}

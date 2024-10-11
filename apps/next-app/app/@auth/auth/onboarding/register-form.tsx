@@ -63,7 +63,7 @@ const RegisterDialogErrorComponent = ({
 
 const RegisterForm = ({ formInput }: RegisterDialogType) => {
   const [validations, setValidations] = useState(initialRegisterValidations)
-  const [addNotification] = useNotifications()
+  const { addNotification } = useNotifications()
   const { refreshSession } = useSession()
   const { replace } = useRouter()
   const form = useForm({

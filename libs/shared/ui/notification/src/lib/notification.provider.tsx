@@ -27,24 +27,24 @@ const NotificationsContext = createContext<
 >(undefined)
 
 // useNotifications hook
-export const useNotifications = (): [
-  (notification: DpNotificationProps) => number,
-  DpNotificationProps[],
-  React.Dispatch<React.SetStateAction<DpNotificationProps[]>>,
-  removeNotification: (notificationId: number) => void,
-] => {
+export const useNotifications = (): {
+  addNotification: (notification: DpNotificationProps) => number
+  notifications: DpNotificationProps[]
+  setNotifications: React.Dispatch<React.SetStateAction<DpNotificationProps[]>>
+  removeNotification: (notificationId: number) => void
+} => {
   const context = useContext(NotificationsContext)
   if (!context) {
     throw new Error(
       'useNotifications must be used within a NotificationProvider'
     )
   }
-  return [
-    context.addNotification,
-    context.notifications,
-    context.setNotifications,
-    context.removeNotification,
-  ]
+  return {
+    addNotification: context.addNotification,
+    notifications: context.notifications,
+    setNotifications: context.setNotifications,
+    removeNotification: context.removeNotification,
+  }
 }
 
 // NotificationProvider
