@@ -32,7 +32,7 @@ function DonationDialogComponent({
   const [response, setResponse] = useState<{
     clientSecret: string
   } | null>(null)
-  const [addNotification] = useNotifications()
+  const { addNotification } = useNotifications()
 
   const stripeInstance = useMemo(
     () => initStripe(stripePublishableKey),

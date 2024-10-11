@@ -1,10 +1,16 @@
 import { REDIS } from '@js-monorepo/nest/redis'
-import { SessionUserType } from '@js-monorepo/types'
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { SessionObject, SessionUserType } from '@js-monorepo/types'
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from 'redis'
+import { AuthException } from '../../common/exceptions/api-exception'
 import { AuthService } from '../../common/services/interfaces/auth.service'
 import { ServiceAuth } from '../../common/types'
 import { USER_SESSION_KEY } from '../constants'
+
+interface UserSession {
+  key: string
+  session: SessionObject
+}
 
 @Injectable()
 export class AuthSessionUserCacheService {
@@ -15,12 +21,12 @@ export class AuthSessionUserCacheService {
     @Inject(REDIS) private readonly redis: RedisClientType
   ) {}
 
-  async findOrSaveCacheUserById(
+  async findOrSaveAuthUserById(
     id: number,
     ttl = 60
   ): Promise<SessionUserType | undefined> {
     try {
-      const userCache = await this.findAuthCacheUserById(id)
+      const userCache = await this.findAuthUserById(id)
 
       if (userCache) return userCache
 
@@ -31,9 +37,7 @@ export class AuthSessionUserCacheService {
     }
   }
 
-  async findAuthCacheUserById(
-    id: number
-  ): Promise<SessionUserType | undefined> {
+  async findAuthUserById(id: number): Promise<SessionUserType | undefined> {
     const cacheUser = await this.redis.get(`${USER_SESSION_KEY}:${id}`)
     return cacheUser ? JSON.parse(cacheUser) : undefined
   }
@@ -78,6 +82,65 @@ export class AuthSessionUserCacheService {
     } catch (e: any) {
       this.logger.error('Error while saving Cache Auth user', e.stacκ)
       return undefined
+    }
+  }
+
+  async fetchUserSessionsByUserId(userId: number): Promise<UserSession[]> {
+    const sessionKeyPattern = `${process.env['REDIS_NAMESPACE']}:sessions:*`
+    let cursor = 0
+    const userSessions: UserSession[] = []
+
+    do {
+      const { cursor: newCursor, keys } = await this.redis.scan(cursor, {
+        MATCH: sessionKeyPattern,
+        COUNT: 100, // Optional count for performance
+      })
+
+      cursor = newCursor
+
+      if (keys.length > 0) {
+        const sessionPromises = keys.map(async (key: string) => {
+          const sessionData = await this.redis.get(key)
+          if (sessionData) {
+            const sessionObject: SessionObject = JSON.parse(sessionData)
+            if (sessionObject.passport?.user === userId) {
+              userSessions.push({ key, session: sessionObject })
+            }
+          }
+        })
+
+        await Promise.all(sessionPromises)
+      }
+    } while (cursor !== 0)
+
+    return userSessions
+  }
+
+  async deleteAuthUserSessions(userId: number) {
+    try {
+      const userSessions = await this.fetchUserSessionsByUserId(userId)
+      if (userSessions.length === 0) {
+        this.logger.warn(`No sessions found for user with id: ${userId}`)
+        return
+      }
+
+      // Delete each session
+      const deletePromises = userSessions.map(async (userSession) => {
+        await this.redis.del(userSession.key)
+        this.logger.log(
+          `Deleted session for user with id: ${userId}, session key: ${userSession.key}`
+        )
+      })
+
+      await Promise.all(deletePromises)
+
+      this.logger.log(`All sessions deleted for user with id: ${userId}`)
+    } catch (error: any) {
+      this.logger.error('Error while deleting user session', error.stack)
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'ERROR_USER_SESSION_DELETION'
+      )
     }
   }
 }

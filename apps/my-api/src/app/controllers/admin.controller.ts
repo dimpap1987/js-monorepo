@@ -2,11 +2,17 @@ import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { RolesGuard } from '@js-monorepo/auth/nest/session'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
-import { OnlineUsersService } from '@js-monorepo/user-presence'
+import {
+  OnlineUsersService,
+  UserPresenceWebsocketService,
+} from '@js-monorepo/user-presence'
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  Logger,
   Param,
   ParseIntPipe,
   Put,
@@ -20,9 +26,12 @@ import { AdminService } from '../services/admin.service'
 @UseGuards(RolesGuard)
 @HasRoles(RolesEnum.ADMIN)
 export class AdminController {
+  private logger = new Logger(AdminController.name)
+
   constructor(
     private readonly adminService: AdminService,
-    private readonly οnlineUsersService: OnlineUsersService
+    private readonly οnlineUsersService: OnlineUsersService,
+    private readonly userPresenceWebsocketService: UserPresenceWebsocketService
   ) {}
 
   @Get('users')
@@ -46,7 +55,7 @@ export class AdminController {
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
   ) {
-    return this.οnlineUsersService.getOnlineUsersList(page, pageSize)
+    return this.οnlineUsersService.getList(page, pageSize)
   }
 
   @Put('users/:id')
@@ -55,5 +64,11 @@ export class AdminController {
     @Body() updateUser: Omit<AuthUser, 'id' | 'email' | 'createdAt'>
   ): Promise<AuthUserDto> {
     return this.adminService.updateUser(userId, updateUser)
+  }
+
+  @Delete('users-session/:id')
+  @HttpCode(204)
+  async deleteUserSession(@Param('id', ParseIntPipe) userId: number) {
+    return this.adminService.handleUserDisconnection(userId)
   }
 }

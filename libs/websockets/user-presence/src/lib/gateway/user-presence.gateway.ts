@@ -45,7 +45,7 @@ export class UserPresenceGateway
         )
         await Promise.all(promises)
       }
-    }, 240000) //every 4 minutes
+    }, 200000)
   }
 
   async handleConnection(socket: Socket) {
@@ -63,7 +63,7 @@ export class UserPresenceGateway
     this.logger.debug(`User: ${userId} disconnected through websocket`)
     await this.userSocketService.removeSocketUserBySocketId(socket.id)
     if (userId) {
-      await this.onlineUsersService.removeUser(`${userId}:${socket.id}`)
+      await this.onlineUsersService.remove(`${userId}:${socket.id}`)
     }
     this.emitOnlineUsersToAdmins()
   }
@@ -72,10 +72,7 @@ export class UserPresenceGateway
   @HasRoles(RolesEnum.ADMIN)
   @SubscribeMessage('subscribe:online-users')
   async getOnlineUsers(@ConnectedSocket() client: Socket) {
-    client.emit(
-      'event:online-users',
-      await this.onlineUsersService.getOnlineUsersList()
-    )
+    client.emit('event:online-users', await this.onlineUsersService.getList())
   }
 
   @UseGuards(WsRolesGuard)
@@ -95,12 +92,13 @@ export class UserPresenceGateway
     const socketPromise = this.userSocketService.addSocketUser(
       {
         userId: socket.user.id,
-        socketId: socket.id,
+        socket: socket.id,
         pid: process.pid,
+        session: socket.session,
       },
       60 * 5
     )
-    const onlineUsersPromise = this.onlineUsersService.addUser(
+    const onlineUsersPromise = this.onlineUsersService.add(
       `${socket.user.id}:${socket.id}`
     )
 
@@ -110,9 +108,6 @@ export class UserPresenceGateway
   async emitOnlineUsersToAdmins() {
     this.namespace
       .to('admin-room')
-      .emit(
-        'event:online-users',
-        await this.onlineUsersService.getOnlineUsersList()
-      )
+      .emit('event:online-users', await this.onlineUsersService.getList())
   }
 }

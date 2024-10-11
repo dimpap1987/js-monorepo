@@ -11,7 +11,8 @@ import { UserSocketService } from '../services/user-socket.service'
 
 declare module 'socket.io' {
   interface Socket {
-    user?: { id: number } // Add any other properties you need
+    user: { id: number }
+    session: string
   }
 }
 
@@ -19,12 +20,13 @@ const createAuthMiddleware =
   (userSocketService: UserSocketService, logger: Logger) =>
   async (socket: Socket, next: (err?: any) => void) => {
     try {
-      const userId = await userSocketService.getUserIdFromSocket(socket)
+      const data = await userSocketService.retrieveUserSessionFromSocket(socket)
 
-      if (!userId) {
+      if (!data?.userId || !data?.session) {
         throw new ForbiddenException('User not authenticated')
       }
-      socket.user = { id: userId } // Attach user data to socket
+      socket.user = { id: data.userId } // Attach user data to socket
+      socket.session = data.session
       next()
     } catch (err) {
       logger.error('Authentication failed', err)

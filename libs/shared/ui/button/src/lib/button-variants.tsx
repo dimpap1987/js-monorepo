@@ -14,9 +14,9 @@ export const buttonVariants = {
         'border border-input bg-primary-bg hover:bg-accent text-foreground hover:text-primary-foreground',
     },
     size: {
-      default: 'h-9 px-4 py-2', // Your default size styles
-      small: 'h-8 rounded-md px-3 text-xs', // Your small size styles
-      large: 'h-12 rounded-md px-8', // Your large size styles
+      default: 'h-8 px-4 py-2',
+      small: 'h-7 rounded-md px-2 text-xs',
+      large: 'h-10 rounded-md px-8',
     },
   },
   disabled: 'cursor-not-allowed opacity-50',

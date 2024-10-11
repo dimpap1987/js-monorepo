@@ -160,6 +160,11 @@ export class HttpClientBuilder {
     return this
   }
 
+  delete(): HttpClientBuilder {
+    this.options.method = 'DELETE'
+    return this
+  }
+
   put(): HttpClientBuilder {
     this.options.method = 'PUT'
     return this

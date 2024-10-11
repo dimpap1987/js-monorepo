@@ -25,7 +25,7 @@ function AiGeneratorImageSuspense({
   const [error, setError] = useState<string | null>()
   const [loading, setLoading] = useState(false)
 
-  const [addNotification, , , removeNotification] = useNotifications()
+  const { addNotification, removeNotification } = useNotifications()
   const searchParams = useSearchParams()
   const { replace } = useRouter()
   const [prompt, setPrompt] = useState(searchParams.get('prompt') ?? '')

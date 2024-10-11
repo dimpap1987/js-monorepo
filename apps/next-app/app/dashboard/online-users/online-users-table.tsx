@@ -6,12 +6,13 @@ import { Skeleton } from '@js-monorepo/components/skeleton'
 import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { useEffect, useState } from 'react'
 import { FaCircle } from 'react-icons/fa6'
+import { DisconnectUserComponent } from './components/disconnect-user'
 
 export type OnlineUsersType = {
   id: number
   username: string
-  socketId: string
-  roles: []
+  socketId?: string
+  roles: string[]
 }
 
 export const websocketOptions: WebSocketOptionsType = {
@@ -45,13 +46,27 @@ export default function OnlineUsersTableComponent() {
 
   const groupedUsers = onlineUsers?.reduce(
     (acc, user) => {
-      if (!acc[user.username]) {
-        acc[user.username] = 0
+      if (!acc[user.id]) {
+        acc[user.id] = {
+          username: user.username,
+          roles: user.roles,
+          count: 0,
+        }
       }
-      acc[user.username]++
+      acc[user.id] = {
+        ...user,
+        count: ++acc[user.id].count,
+      }
       return acc
     },
-    {} as Record<string, number>
+    {} as Record<
+      number,
+      {
+        username: string
+        count: number
+        roles: string[]
+      }
+    >
   )
 
   return (
@@ -68,6 +83,7 @@ export default function OnlineUsersTableComponent() {
                 <th className="p-3 pl-4 px-3 text-left"></th>
                 <th className="p-3 px-3 text-left">Username</th>
                 <th className="p-3 px-3 text-center">WS Connections</th>
+                <th className="p-3 px-3 text-center">Actions</th>
               </tr>
             </thead>
           )}
@@ -87,14 +103,14 @@ export default function OnlineUsersTableComponent() {
                     <td className="p-3 px-3">
                       <Skeleton className="h-3" />
                     </td>
-                    {/* <td className="p-3 px-3">
+                    <td className="p-3 px-3">
                       <Skeleton className="h-3" />
-                    </td> */}
+                    </td>
                   </tr>
                 ))
-              : Object.entries(groupedUsers).map(([username, count]) => (
+              : Object.entries(groupedUsers).map(([userId, user]) => (
                   <tr
-                    key={username}
+                    key={userId}
                     className="relative border-t border-blue-100 cursor-default"
                   >
                     <td className="p-3 pl-4 px-3">
@@ -103,15 +119,19 @@ export default function OnlineUsersTableComponent() {
 
                     <td className="p-3 px-3">
                       <div className="leading-5 text-gray-500 font-medium">
-                        <span>{username}</span>
+                        <span>{user.username}</span>
                       </div>
                     </td>
                     <td className="p-3 px-3">
                       <div className="leading-5 text-gray-500 font-medium text-center">
-                        <Badge className="">{count}</Badge>
+                        <Badge>{user.count}</Badge>
                       </div>
                     </td>
-                    {/* <td className="p-3 px-3"></td> */}
+                    <td className="p-3 px-3 flex justify-center">
+                      <DisconnectUserComponent
+                        user={{ id: Number(userId), ...user }}
+                      ></DisconnectUserComponent>
+                    </td>
                   </tr>
                 ))}
           </tbody>
