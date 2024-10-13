@@ -29,7 +29,7 @@ export default function OnlineUsersTableComponent() {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUsersType[] | []>([])
   const [loading, setLoading] = useState(true)
   const { isLoggedIn } = useSession()
-  const socket = useWebSocket(websocketOptions, isLoggedIn)
+  const { socket } = useWebSocket(websocketOptions, isLoggedIn)
 
   useEffect(() => {
     socket?.emit('subscribe:online-users', {})

@@ -21,7 +21,7 @@ export function AnnouncementsComponent({
   const { isLoggedIn } = useSession()
   const [announcements, setAnnouncements] = useState<string[] | []>([])
 
-  const socket = useWebSocket(opts, isLoggedIn)
+  const { socket } = useWebSocket(opts, isLoggedIn)
 
   useEffect(() => {
     if (socket?.active) {
