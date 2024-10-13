@@ -49,7 +49,7 @@ export const websocketOptions: WebSocketOptionsType = {
 export default function MainTemplate({
   children,
 }: Readonly<PropsWithChildren>) {
-  const { user, isLoggedIn, isAdmin } = useSession()
+  const { user, isLoggedIn, isAdmin, refreshSession } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const { socket, disconnect } = useWebSocket(websocketOptions, isLoggedIn)
   const router = useRouter()
@@ -57,14 +57,23 @@ export default function MainTemplate({
   useEffect(() => {
     socket?.on('connect', () => {
       socket.emit('subscribe:announcements', {})
-      if (isAdmin) {
-        socket?.emit('subscribe:join-admin-room', {})
-      }
+      socket.on('events:refresh-session', () => {
+        setTimeout(() => {
+          refreshSession()
+        }, 1000)
+      })
     })
     return () => {
       disconnect()
     }
-  }, [socket, isAdmin])
+  }, [socket])
+
+  useEffect(() => {
+    if (isAdmin) {
+      socket?.emit('subscribe:join-admin-room', {})
+      //TODO remove user when from admin becomes user
+    }
+  }, [isAdmin])
 
   return (
     <>
