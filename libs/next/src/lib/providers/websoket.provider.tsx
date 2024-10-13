@@ -3,16 +3,14 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 
-type PingableSocket = Socket & { ping: () => void }
-
 export type WebSocketOptionsType = {
   url: string
   path?: string
 }
 
 type WebSocketContextType = {
-  connectSocket: (opts: WebSocketOptionsType) => PingableSocket | undefined
-  unsubscribe: (url: string) => void
+  connectSocket: (opts: WebSocketOptionsType) => Socket | undefined
+  unsubscribe: () => void
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
@@ -22,75 +20,69 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const socketRefs = useRef<Map<string, Socket>>(new Map())
-  const pingIntervalsRefs = useRef<Map<string, NodeJS.Timer>>(new Map())
+  const socketRef = useRef<Socket | null>(null) // Single socket reference
 
   useEffect(() => {
-    // Cleanup all sockets and intervals on unmount
+    // Cleanup the socket on unmount
     return () => {
-      socketRefs.current.forEach((socket) => socket.disconnect())
-      socketRefs.current.clear()
-      pingIntervalsRefs.current.forEach((url) => clearInterval(url))
-      pingIntervalsRefs.current.clear()
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+        console.log('WebSocket disconnected on cleanup')
+      }
     }
   }, [])
 
   const connectSocket = (opts: WebSocketOptionsType) => {
     if (!opts?.url) return undefined
+
     try {
-      const existingSocket = socketRefs.current.get(opts.url)
-      if (existingSocket && existingSocket.active) {
-        return existingSocket as PingableSocket
+      if (socketRef.current) {
+        if (socketRef.current.connected) {
+          return socketRef.current // Return existing connected socket
+        } else {
+          console.warn(
+            `Existing socket is not connected. Attempting to reconnect...`
+          )
+          socketRef.current.connect() // Attempt to reconnect
+          return socketRef.current // Return the existing socket regardless
+        }
       }
 
+      // Create a new socket if none exists
       const socket = io(opts.url, {
         path: opts.path ? opts.path : '/ws',
+        secure: true,
         withCredentials: true,
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionAttempts: 10,
         transports: ['websocket'],
-      }) as PingableSocket
+      })
 
-      socketRefs.current.set(opts.url, socket)
+      socketRef.current = socket
 
       socket.on('connect', () => {
         console.log(`Connected to url: ${opts.url}`)
-        socket.ping = () => {
-          clearInterval(pingIntervalsRefs.current.get(opts.url))
-          const interval = setInterval(() => {
-            if (socket.active) {
-              socket.emit('ping')
-            }
-          }, 5000)
-
-          pingIntervalsRefs.current.set(opts.url, interval)
-        }
       })
 
       socket.on('disconnect', () => {
         console.log(`Disconnected from url: ${opts.url}`)
-        socketRefs.current.delete(opts.url)
-        clearInterval(pingIntervalsRefs.current.get(opts.url))
       })
+
       return socket
     } catch (e) {
-      console.error('Error while creating websocket connection')
+      console.error('Error while creating websocket connection', e)
       return undefined
     }
   }
 
-  const unsubscribe = (url: string) => {
-    const socket = socketRefs.current.get(url)
-    if (socket) {
-      socket.disconnect() // Disconnect the socket
-      socketRefs.current.delete(url) // Remove from the map
-      if (pingIntervalsRefs.current.get(url)) {
-        clearInterval(pingIntervalsRefs.current.get(url))
-      }
-      console.log(`Unsubscribed from url: ${url}`)
+  const unsubscribe = () => {
+    if (socketRef.current) {
+      socketRef.current.disconnect()
+      console.log('WebSocket unsubscribed and disconnected')
+      socketRef.current = null
     } else {
-      console.warn(`No socket found for url: ${url}`)
+      console.warn('No active WebSocket connection to unsubscribe from')
     }
   }
 
@@ -105,9 +97,12 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useWebSocket = (
   opts: WebSocketOptionsType,
   connect: boolean
-): PingableSocket => {
+): {
+  socket: Socket | null
+  disconnect: () => void
+} => {
   const context = useContext(WebSocketContext) as WebSocketContextType
-  const [socket, setSocket] = useState<PingableSocket | undefined>(undefined)
+  const [socket, setSocket] = useState<Socket | null>(null)
 
   if (!context) {
     throw new Error('useWebSocket must be used within a WebSocketProvider')
@@ -115,16 +110,21 @@ export const useWebSocket = (
 
   useEffect(() => {
     if (connect) {
-      const newSocket = context.connectSocket(opts) as PingableSocket
+      const newSocket = context.connectSocket(opts) as Socket
       setSocket(newSocket)
     } else {
-      context.unsubscribe(opts.url)
-      setSocket(undefined)
-    }
-    return () => {
-      socket?.disconnect()
+      context.unsubscribe()
+      setSocket(null)
     }
   }, [opts.url, connect])
 
-  return socket as PingableSocket
+  return {
+    socket,
+    disconnect: () => {
+      if (socket && socket.connected) {
+        context.unsubscribe()
+        setSocket(null)
+      }
+    },
+  }
 }

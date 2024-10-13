@@ -51,7 +51,7 @@ export default function MainTemplate({
 }: Readonly<PropsWithChildren>) {
   const { user, isLoggedIn, isAdmin } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
-  const socket = useWebSocket(websocketOptions, isLoggedIn)
+  const { socket, disconnect } = useWebSocket(websocketOptions, isLoggedIn)
   const router = useRouter()
 
   useEffect(() => {
@@ -61,6 +61,9 @@ export default function MainTemplate({
         socket?.emit('subscribe:join-admin-room', {})
       }
     })
+    return () => {
+      disconnect()
+    }
   }, [socket, isAdmin])
 
   return (

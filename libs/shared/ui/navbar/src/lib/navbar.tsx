@@ -149,7 +149,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
             {/* login button */}
             {!user?.isLoggedIn && (
               <DpNextNavLink className="hidden sm:flex" href="/auth/login">
-                <DpLoginButton className="rounded-full"></DpLoginButton>
+                <DpLoginButton></DpLoginButton>
               </DpNextNavLink>
             )}
 
