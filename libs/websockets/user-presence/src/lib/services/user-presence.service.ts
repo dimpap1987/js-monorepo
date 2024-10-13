@@ -43,6 +43,17 @@ export class UserPresenceWebsocketService {
     this.userPresenceGateway.namespace.to(clientId).emit(event, message)
   }
 
+  async sendToUser(userId: number, event: string, message: any) {
+    const sockets = await this.userSocketService.findSocketsByUserId(userId)
+    if (!sockets) {
+      this.logger.warn(`Couldnt find socket/s for user id: ${userId}`)
+      return
+    }
+    sockets.forEach((socket) => {
+      this.userPresenceGateway.namespace.to(socket).emit(event, message)
+    })
+  }
+
   sendWithAcknowledgment(
     clientId: string,
     event: string,

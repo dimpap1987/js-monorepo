@@ -20,7 +20,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     Logger.error(
       `'${
         exception.message
-      }' - statusCode: '${exception.getStatus()}' - errorCode: '${exception.errorCode}'`,
+      }' - statusCode: '${exception.getStatus()}' ${exception.errorCode ? '- errorCode: ' + exception.errorCode : ''}`,
       exception.stack,
       ApiException.name
     )

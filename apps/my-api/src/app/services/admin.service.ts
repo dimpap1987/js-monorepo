@@ -59,6 +59,11 @@ export class AdminService {
         updateUser
       )
       await this.authSessionUserCacheService.invalidateAuthUserInCache(userId)
+      this.userPresenceWebsocketService.sendToUser(
+        userId,
+        'events:refresh-session',
+        true
+      )
       return updatedUser
     } catch (e) {
       this.logger.error(`Error Updating User with id: '${userId}'`, e.stack)
@@ -72,6 +77,11 @@ export class AdminService {
 
   async handleUserDisconnection(userId: number) {
     try {
+      this.userPresenceWebsocketService.sendToUser(
+        userId,
+        'events:refresh-session',
+        true
+      )
       await this.authSessionUserCacheService.deleteAuthUserSessions(userId)
       await this.userPresenceWebsocketService.disconnectUser(userId)
     } catch (e: any) {
