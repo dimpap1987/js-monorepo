@@ -1,20 +1,10 @@
 'use client'
 
 import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DpDialogContent,
-} from '@js-monorepo/components/dialog'
-
-import {
   DataTable,
   DataTableColumnHeader,
   usePagination,
 } from '@js-monorepo/components/table'
-
-import { TextareaForm } from '@js-monorepo/components/textarea'
 
 import {
   Avatar,
@@ -29,7 +19,6 @@ import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useMemo, useState } from 'react'
-import { GrAnnounce } from 'react-icons/gr'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
 import RolesTableInput from './roles-input'
@@ -263,7 +252,7 @@ const DashboardUsersTableSuspense = () => {
                   />
                 </div>
               )}
-              <Dialog>
+              {/* <Dialog>
                 <DialogTrigger asChild>
                   <div className="flex justify-center items-center border-2 rounded-lg p-1">
                     <GrAnnounce className="shrink-0 text-2xl cursor-pointer" />
@@ -298,7 +287,7 @@ const DashboardUsersTableSuspense = () => {
                     }}
                   ></TextareaForm>
                 </DpDialogContent>
-              </Dialog>
+              </Dialog> */}
             </div>
           )
         },
