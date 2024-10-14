@@ -13,7 +13,7 @@ services:
       - prometheus-data:/prometheus
     # user: "root"
     networks:
-      - monitoring
+      - super-network
     restart: unless-stopped
 
   grafana:
@@ -28,7 +28,7 @@ services:
     env_file:
       - ./grafana/config.monitoring
     networks:
-      - monitoring
+      - super-network
     restart: unless-stopped
 
   node_exporter:
@@ -42,7 +42,7 @@ services:
     volumes:
       - /:/host:ro,rslave
     networks:
-      - monitoring
+      - super-network
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
@@ -60,11 +60,20 @@ services:
     privileged: true
     restart: unless-stopped
     networks:
-      - monitoring
+      - super-network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    ports:
+      - '9187:9187'
+    environment:
+      DATA_SOURCE_NAME: ${DATABASE_DB}
+    networks:
+      - super-network
 
 networks:
-  monitoring:
-    name: monitoring_network
+  super-network:
+    external: true
 
 volumes:
   prometheus-data:

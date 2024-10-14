@@ -68,7 +68,7 @@ export function DataTable<TData, TValue>({
                     key={header.id}
                     colSpan={header.colSpan}
                     style={{ width: header.getSize() }}
-                    className="text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="text-xs font-medium text-gray-500 tracking-wider"
                   >
                     {header.isPlaceholder
                       ? null
