@@ -55,7 +55,9 @@ export default function MainTemplate({
   const router = useRouter()
 
   useEffect(() => {
-    socket?.on('connect', () => {
+    if (!socket) return
+
+    socket.on('connect', () => {
       socket.emit('subscribe:announcements', {})
       socket.on('events:refresh-session', () => {
         setTimeout(() => {
@@ -63,17 +65,17 @@ export default function MainTemplate({
         }, 1000)
       })
     })
+
     return () => {
       disconnect()
     }
   }, [socket])
 
   useEffect(() => {
-    if (isAdmin) {
-      socket?.emit('subscribe:join-admin-room', {})
-      //TODO remove user when from admin becomes user
+    if (socket && isAdmin) {
+      socket.emit('subscribe:join-admin-room', {})
     }
-  }, [isAdmin])
+  }, [socket, isAdmin])
 
   return (
     <>

@@ -1,4 +1,9 @@
-import { AuthRoleDTO, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
+import {
+  AuthRoleDTO,
+  AuthUserDto,
+  AuthUserUpdateDto,
+  Pageable,
+} from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
@@ -98,7 +103,7 @@ export class AdminRepositoryPrisma implements AdminRepository {
   async updateUser(
     userId: number,
     updateUser: AuthUserUpdateDto
-  ): Promise<any> {
+  ): Promise<AuthUserDto> {
     const currentRoleIds = await this.getCurrentUserRoleIds(userId)
     const newRoleIds = this.getNewRoleIds(updateUser.roles)
 
@@ -114,6 +119,33 @@ export class AdminRepositoryPrisma implements AdminRepository {
         userRole: {
           create: this.createRoles(rolesToAdd),
           deleteMany: this.deleteRoles(rolesToRemove),
+        },
+      },
+      select: {
+        id: true,
+        createdAt: true,
+        username: true,
+        email: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        userRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
         },
       },
     })
