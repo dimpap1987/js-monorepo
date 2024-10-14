@@ -87,4 +87,25 @@ export class UserPresenceWebsocketService {
       .to('admin-room')
       .emit('event:online-users', await this.onlineUsersService.getList())
   }
+
+  async removeUserFromRooms(userId: number, rooms: string[]) {
+    const sockets = await this.userSocketService.findSocketsByUserId(userId)
+
+    if (!sockets || sockets.length === 0) {
+      this.logger.warn(`No sockets found for user ID: ${userId}`)
+      return
+    }
+
+    sockets.forEach((socket) => {
+      const client = this.userPresenceGateway.namespace.sockets.get(socket)
+      if (client) {
+        rooms.forEach((room) => {
+          client.leave(room)
+          this.logger.log(`Client ${socket} removed from room ${room}`)
+        })
+      } else {
+        this.logger.warn(`Could not find socket with ID: ${socket}`)
+      }
+    })
+  }
 }

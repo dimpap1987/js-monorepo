@@ -59,6 +59,17 @@ export class AdminService {
         updateUser
       )
       await this.authSessionUserCacheService.invalidateAuthUserInCache(userId)
+
+      const isAdmin = updatedUser.userRole.some(
+        (role) => role.role.name === 'ADMIN'
+      )
+
+      if (!isAdmin) {
+        this.userPresenceWebsocketService.removeUserFromRooms(updatedUser.id, [
+          'admin-room',
+        ])
+      }
+
       this.userPresenceWebsocketService.sendToUser(
         userId,
         'events:refresh-session',
