@@ -19,7 +19,7 @@ services:
       - super-network
 
   my-api:
-    image: dimpap/my-api:1.0.100
+    image: dimpap/my-api:latest
     container_name: my-api_prod
     env_file:
       - .env
@@ -40,7 +40,7 @@ services:
       - postgres
 
   next-app:
-    image: dimpap/next-app:1.0.100
+    image: dimpap/next-app:latest
     container_name: next-app_prod
     env_file:
       - .env

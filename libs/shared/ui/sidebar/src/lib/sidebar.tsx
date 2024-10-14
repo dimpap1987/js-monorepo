@@ -64,63 +64,72 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
       <AnimatePresence mode="wait" initial={false}>
         {isOpen && (
           <motion.div
-            {...framerSidebarPanel(position)}
-            className={`fixed top-0 bottom-0 z-30 focus:z-50 dark ${
-              position === 'left' ? 'left-0' : 'right-0'
-            } w-full h-[100svh] max-w-xs border-r-2 border-primary-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
-            ref={localRef}
-            aria-label="Sidebar"
-            tabIndex={-1}
+            className="fixed inset-0 bg-black bg-opacity-50 z-20"
+            onClick={onClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
           >
-            <div className="flex items-center justify-between p-5 border-b-2 border-primary-border">
-              <ModeToggle></ModeToggle>
-              <span>{header}</span>
-              <button
-                onClick={() => onClose()}
-                className="p-3 border-2 border-primary-border rounded-xl hover:bg-zinc-800"
-                aria-label="close sidebar"
-              >
-                <AiOutlineRollback className="text-white" />
-              </button>
-            </div>
-            <ul>
-              {items?.map((item, idx) => {
-                const shouldRenderNavLink =
-                  item.roles?.includes('PUBLIC') || // Always render if PUBLIC role is present
-                  item.roles?.some((role) =>
-                    user?.roles?.includes(role as AuthRole)
-                  ) // Render if user has any of the required roles
+            <motion.div
+              {...framerSidebarPanel(position)}
+              className={`fixed top-0 bottom-0 z-30 focus:z-50 dark ${
+                position === 'left' ? 'left-0' : 'right-0'
+              } w-full h-[100svh] max-w-xs border-r-2 border-primary-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
+              ref={localRef}
+              aria-label="Sidebar"
+              tabIndex={-1}
+            >
+              <div className="flex items-center justify-between p-5 border-b-2 border-primary-border">
+                <ModeToggle></ModeToggle>
+                <span>{header}</span>
+                <button
+                  onClick={() => onClose()}
+                  className="p-3 border-2 border-primary-border rounded-xl hover:bg-zinc-800"
+                  aria-label="close sidebar"
+                >
+                  <AiOutlineRollback className="text-white" />
+                </button>
+              </div>
+              <ul>
+                {items?.map((item, idx) => {
+                  const shouldRenderNavLink =
+                    item.roles?.includes('PUBLIC') || // Always render if PUBLIC role is present
+                    item.roles?.some((role) =>
+                      user?.roles?.includes(role as AuthRole)
+                    ) // Render if user has any of the required roles
 
-                return (
-                  shouldRenderNavLink && (
-                    <li key={item.name}>
-                      <DpNextNavLink
-                        className={`flex items-center w-full ${
-                          position === 'right' ? 'flex-row-reverse' : ''
-                        } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-primary-border`}
-                        href={item.href}
-                        onClick={() => onClose()}
-                      >
-                        <motion.span
-                          {...framerText(position)}
-                          className="text-white"
+                  return (
+                    shouldRenderNavLink && (
+                      <li key={item.name}>
+                        <DpNextNavLink
+                          className={`flex items-center w-full ${
+                            position === 'right' ? 'flex-row-reverse' : ''
+                          } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-primary-border`}
+                          href={item.href}
+                          onClick={() => onClose()}
                         >
-                          {item.name}
-                        </motion.span>
-                        {item.Icon && (
-                          <motion.div {...framerIcon}>
-                            <item.Icon className="text-2xl" />
-                          </motion.div>
-                        )}
-                      </DpNextNavLink>
-                    </li>
+                          <motion.span
+                            {...framerText(position)}
+                            className="text-white"
+                          >
+                            {item.name}
+                          </motion.span>
+                          {item.Icon && (
+                            <motion.div {...framerIcon}>
+                              <item.Icon className="text-2xl" />
+                            </motion.div>
+                          )}
+                        </DpNextNavLink>
+                      </li>
+                    )
                   )
-                )
-              })}
-            </ul>
-            {children && (
-              <div className="mt-auto w-full text-center p-3">{children}</div>
-            )}
+                })}
+              </ul>
+              {children && (
+                <div className="mt-auto w-full text-center p-3">{children}</div>
+              )}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
