@@ -3,7 +3,7 @@ version: '3.8'
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: prometheus_prod
     # ports:
     #   - 9090:9090
     command:
@@ -18,10 +18,9 @@ services:
 
   grafana:
     image: grafana/grafana-oss:latest
-    container_name: grafana
+    container_name: grafana_prod
     ports:
       - '8000:3000'
-    # user: "root"
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
@@ -33,7 +32,7 @@ services:
 
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
-    container_name: node_exporter
+    container_name: node_exporter_prod
     command: '--path.rootfs=/host'
     # ports:
     #   - '9100:9100'
@@ -46,7 +45,7 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
-    container_name: cadvisor
+    container_name: cadvisor_prod
     command:
       - '-port=8098'
     volumes:
@@ -64,10 +63,18 @@ services:
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter
-    ports:
-      - '9187:9187'
+    container_name: postgres-exporter_prod
+    env_file:
+      - .env
+    # ports:
+    #   - '9187:9187'
     environment:
-      DATA_SOURCE_NAME: ${DATABASE_DB}
+      DATA_SOURCE_NAME: ${DATABASE_URL}
+    command:
+      - '--collector.stat_statements' # Enable stat_statements collector
+      - '--collector.stat_user_tables' # Enable stat_user_tables collector (default enabled)
+      - '--collector.stat_wal_receiver' # Enable stat_wal_receiver collector
+      - '--collector.statio_user_indexes' # Enable statio_user_indexes collector
     networks:
       - super-network
 
