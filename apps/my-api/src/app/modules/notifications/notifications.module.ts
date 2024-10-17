@@ -1,7 +1,8 @@
 import { Global, Module, Provider } from '@nestjs/common'
-import { NotificationRepo } from '../types'
-import { NotificationRepositoryPrisma } from '../repositories/implementations/prisma/notification.repository.prisma'
-import { NotificationService } from '../services/notification.service'
+import { NotificationController } from './notification.controller'
+import { NotificationRepo } from './notification.repository'
+import { NotificationRepositoryPrisma } from './notification.repository.prisma'
+import { NotificationService } from './notification.service'
 
 const providers: Provider[] = [
   {
@@ -13,6 +14,7 @@ const providers: Provider[] = [
 
 @Global()
 @Module({
+  controllers: [NotificationController],
   providers: [...providers],
   exports: [...providers],
 })

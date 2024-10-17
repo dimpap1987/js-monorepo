@@ -2,10 +2,7 @@ import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { RolesGuard } from '@js-monorepo/auth/nest/session'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
-import {
-  OnlineUsersService,
-  UserPresenceWebsocketService,
-} from '@js-monorepo/user-presence'
+import { OnlineUsersService } from '@js-monorepo/user-presence'
 import {
   Body,
   Controller,
@@ -20,7 +17,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
-import { AdminService } from '../services/admin.service'
+import { AdminService } from './admin.service'
 
 @Controller('admin')
 @UseGuards(RolesGuard)
@@ -30,8 +27,7 @@ export class AdminController {
 
   constructor(
     private readonly adminService: AdminService,
-    private readonly οnlineUsersService: OnlineUsersService,
-    private readonly userPresenceWebsocketService: UserPresenceWebsocketService
+    private readonly οnlineUsersService: OnlineUsersService
   ) {}
 
   @Get('users')

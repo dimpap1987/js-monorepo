@@ -9,7 +9,7 @@ import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import { AuthUserDto } from '@js-monorepo/types'
 import {
-  BrokerEvents,
+  Events,
   UserPresenceModule,
   UserPresenceWebsocketService,
 } from '@js-monorepo/user-presence'
@@ -24,15 +24,13 @@ import { RedisClientType } from 'redis'
 import { v4 as uuidv4 } from 'uuid'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { GLOBAL_CHANNEL } from './constants'
-import { AdminController } from './controllers/admin.controller'
 import { ExceptionController } from './controllers/exception.controller'
-import { NotificationController } from './controllers/notification.controller'
-import { AdminProviderModule } from './modules/admin.module'
-import { ChannelProviderModule } from './modules/channel.module'
+import { AdminProviderModule } from './modules/admin/admin.module'
+import { ChannelProviderModule } from './modules/channel/channel.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
-import { NotificationProviderModule } from './modules/notifications.module'
-import { ChannelService } from './services/channel.service'
+import { ChannelService } from './modules/channel/channel.service'
+import { NotificationProviderModule } from './modules/notifications/notifications.module'
 
 const ENV = process.env.NODE_ENV
 @Module({
@@ -73,12 +71,12 @@ const ENV = process.env.NODE_ENV
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUserDto) => {
           await channelService.assignUserToChannels(user.id, GLOBAL_CHANNEL)
-          userPresenceWebsocketService.broadcast(BrokerEvents.announcements, [
+          userPresenceWebsocketService.broadcast(Events.announcements, [
             `'${user.username}' has joined 🚀`,
           ])
         },
         onLogin: async (user) => {
-          userPresenceWebsocketService.broadcast(BrokerEvents.announcements, [
+          userPresenceWebsocketService.broadcast(Events.announcements, [
             `'${user.username}' is online 😎`,
           ])
         },
@@ -109,7 +107,7 @@ const ENV = process.env.NODE_ENV
       ],
     }),
   ],
-  controllers: [NotificationController, AdminController, ExceptionController],
+  controllers: [ExceptionController],
   providers: [LoggerMiddleware],
 })
 export class AppModule implements NestModule {

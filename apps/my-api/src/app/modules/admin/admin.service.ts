@@ -2,12 +2,15 @@ import { AuthException } from '@js-monorepo/auth/nest/common/exceptions/api-exce
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { UserUpdateUserSchema } from '@js-monorepo/schemas'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
-import { UserPresenceWebsocketService } from '@js-monorepo/user-presence'
+import {
+  Events,
+  Rooms,
+  UserPresenceWebsocketService,
+} from '@js-monorepo/user-presence'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
-import { ApiException } from '../exceptions/api-exception'
-import { AdminRepository } from '../repositories/interfaces/admin.repository'
-import { AdminRepo } from '../types'
+import { ApiException } from '../../exceptions/api-exception'
+import { AdminRepo, AdminRepository } from './admin.repository'
 
 @Injectable()
 export class AdminService {
@@ -41,10 +44,7 @@ export class AdminService {
         e.stack
       )
     }
-    return {
-      users: [],
-      totalCount: 0,
-    }
+    throw new ApiException(HttpStatus.BAD_REQUEST, 'Error Fetching users')
   }
 
   async updateUser(
@@ -66,19 +66,19 @@ export class AdminService {
 
       if (!isAdmin) {
         this.userPresenceWebsocketService.removeUserFromRooms(updatedUser.id, [
-          'admin-room',
+          Rooms.admin,
         ])
       }
 
       this.userPresenceWebsocketService.sendToUser(
         userId,
-        'events:refresh-session',
+        Events.refreshSession,
         true
       )
       return updatedUser
     } catch (e) {
       this.logger.error(`Error Updating User with id: '${userId}'`, e.stack)
-      throw new ApiException()
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'Error updating users')
     }
   }
 
@@ -90,7 +90,7 @@ export class AdminService {
     try {
       this.userPresenceWebsocketService.sendToUser(
         userId,
-        'events:refresh-session',
+        Events.refreshSession,
         true
       )
       await this.authSessionUserCacheService.deleteAuthUserSessions(userId)

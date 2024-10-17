@@ -34,13 +34,13 @@ export default function OnlineUsersTableComponent() {
   useEffect(() => {
     socket?.emit('subscribe:online-users', {})
 
-    socket?.on('event:online-users', async (users) => {
+    socket?.on('events:online-users', async (users) => {
       await wait(300)
       setOnlineUsers(users)
       setLoading(false)
     })
     return () => {
-      socket?.off('event:online-users')
+      socket?.off('events:online-users')
     }
   }, [socket])
 

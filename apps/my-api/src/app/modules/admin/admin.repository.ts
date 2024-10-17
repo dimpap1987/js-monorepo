@@ -6,6 +6,8 @@ import {
   Pageable,
 } from '@js-monorepo/types'
 
+export const AdminRepo = Symbol()
+
 export interface AdminRepository {
   getUsers(pageable: Pageable): Promise<{
     users: AuthUserFullDto[]

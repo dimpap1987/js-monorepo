@@ -1,7 +1,6 @@
 import { Transactional } from '@nestjs-cls/transactional'
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { ChannelRepository } from '../repositories/interfaces/channel.repository'
-import { ChannelRepo } from '../types'
+import { ChannelRepo, ChannelRepository } from './channel.repository'
 
 @Injectable()
 export class ChannelService {

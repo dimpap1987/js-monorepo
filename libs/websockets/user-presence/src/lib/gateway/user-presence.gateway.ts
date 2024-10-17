@@ -11,10 +11,10 @@ import { Namespace, Socket } from 'socket.io'
 
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
+import { Events, Rooms } from '../constants/constants'
 import { WsRolesGuard } from '../guards/ws-roles.guard'
 import { OnlineUsersService } from '../services/online-users.service'
 import { UserSocketService } from '../services/user-socket.service'
-export const ONLINE_USERS_ROOM = 'online_users_room'
 
 @WebSocketGateway({
   pingInterval: 30000,
@@ -77,14 +77,14 @@ export class UserPresenceGateway
   @HasRoles(RolesEnum.ADMIN)
   @SubscribeMessage('subscribe:online-users')
   async getOnlineUsers(@ConnectedSocket() client: Socket) {
-    client.emit('event:online-users', await this.onlineUsersService.getList())
+    client.emit(Events.onlineUsers, await this.onlineUsersService.getList())
   }
 
   @UseGuards(WsRolesGuard)
   @HasRoles(RolesEnum.ADMIN)
   @SubscribeMessage('subscribe:join-admin-room')
   async joinAdminGroup(@ConnectedSocket() client: Socket) {
-    client.join('admin-room')
+    client.join(Rooms.admin)
     client.emit('message', 'You have successfully joined the admin room')
   }
 
@@ -112,8 +112,8 @@ export class UserPresenceGateway
 
   async emitOnlineUsersToAdmins() {
     this.namespace
-      .to('admin-room')
-      .emit('event:online-users', await this.onlineUsersService.getList())
+      .to(Rooms.admin)
+      .emit(Events.onlineUsers, await this.onlineUsersService.getList())
   }
 
   private startUserSocketSaving() {

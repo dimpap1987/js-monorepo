@@ -1,6 +1,6 @@
 import { SessionUser } from '@js-monorepo/auth/nest/session'
 import { Controller, Post, Req, Sse } from '@nestjs/common'
-import { ChannelService } from '../services/channel.service'
+import { ChannelService } from '../channel/channel.service'
 
 @Controller('notifications')
 export class NotificationController {
