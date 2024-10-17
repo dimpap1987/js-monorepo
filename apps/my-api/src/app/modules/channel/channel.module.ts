@@ -1,7 +1,7 @@
 import { Global, Module, Provider } from '@nestjs/common'
-import { ChannelRepo } from '../types'
-import { ChannelRepositoryPrisma } from '../repositories/implementations/prisma/channel.repository.prisma'
-import { ChannelService } from '../services/channel.service'
+import { ChannelRepositoryPrisma } from './channel.repository.prisma'
+import { ChannelService } from './channel.service'
+import { ChannelRepo } from './channel.repository'
 
 const providers: Provider[] = [
   {

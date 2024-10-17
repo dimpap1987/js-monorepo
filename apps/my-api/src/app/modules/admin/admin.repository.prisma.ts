@@ -7,7 +7,7 @@ import {
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
-import { AdminRepository } from '../../interfaces/admin.repository'
+import { AdminRepository } from './admin.repository'
 
 @Injectable()
 export class AdminRepositoryPrisma implements AdminRepository {

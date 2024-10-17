@@ -2,7 +2,7 @@ import { NotificationCreateDto } from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
-import { NotificationRepository } from '../../interfaces/notification.repository'
+import { NotificationRepository } from './notification.repository'
 
 @Injectable()
 export class NotificationRepositoryPrisma implements NotificationRepository {

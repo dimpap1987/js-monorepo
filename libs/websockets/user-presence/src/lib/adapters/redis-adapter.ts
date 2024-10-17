@@ -9,13 +9,6 @@ import { createClient } from 'redis'
 import { ServerOptions, Socket } from 'socket.io'
 import { UserSocketService } from '../services/user-socket.service'
 
-declare module 'socket.io' {
-  interface Socket {
-    user: { id: number }
-    session: string
-  }
-}
-
 const createAuthMiddleware =
   (userSocketService: UserSocketService, logger: Logger) =>
   async (socket: Socket, next: (err?: any) => void) => {

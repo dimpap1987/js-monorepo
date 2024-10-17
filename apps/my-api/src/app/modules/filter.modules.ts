@@ -7,7 +7,7 @@ import {
   GlobalExceptionFilter,
   PrismaClientExceptionFilter,
   ZodExceptionFilter,
-} from '../exceptions/filter'
+} from '../exceptions/filters'
 
 const providers: Provider[] = [
   {

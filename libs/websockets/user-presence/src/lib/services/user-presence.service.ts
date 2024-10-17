@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { Events, Rooms } from '../constants/constants'
 import { UserPresenceGateway } from '../gateway/user-presence.gateway'
 import { OnlineUsersService } from './online-users.service'
 import { UserSocketService } from './user-socket.service'
@@ -84,8 +85,8 @@ export class UserPresenceWebsocketService {
 
   async emitOnlineUsersToAdmins() {
     this.userPresenceGateway.namespace
-      .to('admin-room')
-      .emit('event:online-users', await this.onlineUsersService.getList())
+      .to(Rooms.admin)
+      .emit(Events.onlineUsers, await this.onlineUsersService.getList())
   }
 
   async removeUserFromRooms(userId: number, rooms: string[]) {
