@@ -65,7 +65,7 @@ h4 {
   .dark {
     --foreground: 0 0% 100%;
 
-    --primary-border: 240 4% 16%;
+    --primary-border: 236 7% 28%;
     --primary-bg: 221 39% 11%;
     --primary-foreground-hover: 49 81% 51%;
   }
