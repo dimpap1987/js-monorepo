@@ -11,12 +11,12 @@ export const metadata = {
 export default async function DashboardLayout({ children }: PropsWithChildren) {
   return (
     <main
-      className="grid grid-cols-[max-content_1fr] gap-2
-                 h-[87svh] bg-primary-bg text-foreground"
+      className="grid grid-cols-[max-content_1fr]
+                 h-[93svh] bg-primary-bg text-foreground"
     >
       <div
         className="min-w-max flex flex-col justify-between
-                  p-2 border-r border-primary-border rounded-md"
+                  p-1 sm:p-2 border-r border-primary-border rounded-md"
       >
         <div className="space-y-2">
           <DpNextNavLink

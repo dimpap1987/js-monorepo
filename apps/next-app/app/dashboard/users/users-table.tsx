@@ -198,9 +198,9 @@ const DashboardUsersTableSuspense = () => {
         ),
         cell: ({ row }) => {
           return (
-            <div className="flex gap-2 justify-center items-center">
-              {update?.inProgress && update.index === row.index ? (
-                <>
+            <div className="flex gap-2 justify-center items-center ">
+              <div id="update-user">
+                {update?.inProgress && update.index === row.index ? (
                   <div className="flex border-zinc-600 border-2 rounded-lg items-center p-1 px-2 gap-2">
                     <TiTick
                       title="Submit"
@@ -236,58 +236,22 @@ const DashboardUsersTableSuspense = () => {
                       }}
                     />
                   </div>
-                </>
-              ) : (
-                <div className="flex justify-center items-center border-2 rounded-lg p-1">
-                  <MdOutlineModeEditOutline
-                    title="Edit User"
-                    className="shrink-0 text-2xl cursor-pointer "
-                    onClick={() => {
-                      row.updatedUser = undefined
-                      setUpdate({
-                        index: row.index,
-                        inProgress: true,
-                      })
-                    }}
-                  />
-                </div>
-              )}
-              {/* <Dialog>
-                <DialogTrigger asChild>
+                ) : (
                   <div className="flex justify-center items-center border-2 rounded-lg p-1">
-                    <GrAnnounce className="shrink-0 text-2xl cursor-pointer" />
-                  </div>
-                </DialogTrigger>
-                <DpDialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      Send notification to &apos;{row.original?.username}&apos;
-                    </DialogTitle>
-                  </DialogHeader>
-                  <TextareaForm
-                    submitCallBack={async (callBackData) => {
-                      const response = await API.url(
-                        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/events/emit`
-                      )
-                        .post()
-                        .body({
-                          channel: row.original?.username,
-                          type: 'notification',
-                          data: {
-                            message: callBackData.notification,
-                          },
+                    <MdOutlineModeEditOutline
+                      title="Edit User"
+                      className="shrink-0 text-2xl cursor-pointer "
+                      onClick={() => {
+                        row.updatedUser = undefined
+                        setUpdate({
+                          index: row.index,
+                          inProgress: true,
                         })
-                        .withCsrf()
-                        .withCredentials()
-                        .execute()
-
-                      if (response.ok) {
-                        console.log('Announcement sent')
-                      }
-                    }}
-                  ></TextareaForm>
-                </DpDialogContent>
-              </Dialog> */}
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           )
         },
