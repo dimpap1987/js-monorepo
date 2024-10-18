@@ -82,7 +82,7 @@ export default function OnlineUsersTableComponent() {
               <tr className="border-b border-blue-100 text-gray-800 font-semibold text-xs">
                 <th className="p-1 pl-4 px-2 text-left"></th>
                 <th className="p-1 px-2 text-left">Username</th>
-                <th className="p-1 px-2 text-center">WS Connections</th>
+                <th className="p-1 px-2 text-center">WebSockets</th>
                 <th className="p-1 px-2 text-center">Actions</th>
               </tr>
             </thead>
