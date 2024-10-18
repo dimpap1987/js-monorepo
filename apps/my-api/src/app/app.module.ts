@@ -4,6 +4,7 @@ import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
 import {
   AuthSessionMiddleware,
   AuthSessionModule,
+  SESSION_REDIS_PATH,
 } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
@@ -27,9 +28,9 @@ import { GLOBAL_CHANNEL } from './constants'
 import { ExceptionController } from './controllers/exception.controller'
 import { AdminProviderModule } from './modules/admin/admin.module'
 import { ChannelProviderModule } from './modules/channel/channel.module'
+import { ChannelService } from './modules/channel/channel.service'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
-import { ChannelService } from './modules/channel/channel.service'
 import { NotificationProviderModule } from './modules/notifications/notifications.module'
 
 const ENV = process.env.NODE_ENV
@@ -119,7 +120,7 @@ export class AppModule implements NestModule {
         session({
           store: new RedisStore({
             client: this.redis,
-            prefix: `${process.env['REDIS_NAMESPACE']}:sessions:`,
+            prefix: SESSION_REDIS_PATH,
           }),
           genid: () => uuidv4(),
           saveUninitialized: false,

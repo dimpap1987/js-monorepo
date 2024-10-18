@@ -1,5 +1,6 @@
 import {
   DynamicModule,
+  Global,
   Inject,
   MiddlewareConsumer,
   Module,
@@ -31,6 +32,8 @@ import { AuthSessionUserCacheService } from './providers/auth-session-cache.serv
 import { SessionSerializer } from './providers/session-serializer'
 import { SessionService } from './services/session.service'
 
+export const SESSION_REDIS_PATH = `${process.env['REDIS_NAMESPACE']}:sessions:`
+@Global()
 @Module({
   imports: [
     PassportModule.register({

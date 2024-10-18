@@ -19,7 +19,6 @@ import { UserSocketService } from './services/user-socket.service'
   ],
   exports: [
     UserPresenceGateway,
-    UserSocketService,
     WsLoginGuard,
     OnlineUsersService,
     RedisIoAdapter,

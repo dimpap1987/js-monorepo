@@ -5,6 +5,7 @@ import { RedisClientType } from 'redis'
 import { AuthException } from '../../common/exceptions/api-exception'
 import { AuthService } from '../../common/services/interfaces/auth.service'
 import { ServiceAuth } from '../../common/types'
+import { SESSION_REDIS_PATH } from '../auth-session.module'
 import { USER_SESSION_KEY } from '../constants'
 
 interface UserSession {
@@ -86,7 +87,7 @@ export class AuthSessionUserCacheService {
   }
 
   async fetchUserSessionsByUserId(userId: number): Promise<UserSession[]> {
-    const sessionKeyPattern = `${process.env['REDIS_NAMESPACE']}:sessions:*`
+    const sessionKeyPattern = `${SESSION_REDIS_PATH}*`
     let cursor = 0
     const userSessions: UserSession[] = []
 
