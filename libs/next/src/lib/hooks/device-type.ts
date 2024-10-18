@@ -1,7 +1,7 @@
 import { getDeviceType } from '@js-monorepo/utils/common'
 import { useEffect, useState } from 'react'
 
-export function useDeviceType() {
+function useDeviceType() {
   const [deviceType, setDeviceType] = useState('')
 
   useEffect(() => {
@@ -18,11 +18,7 @@ export function useDeviceType() {
     }
   }, [])
 
-  return [
-    deviceType === 'mobile',
-    deviceType === 'tablet',
-    deviceType === 'desktop',
-  ]
+  return { deviceType } as { deviceType: 'mobile' | 'tablet' | 'desktop' }
 }
 
-export default useDeviceType
+export { useDeviceType }

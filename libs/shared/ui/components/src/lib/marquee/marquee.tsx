@@ -53,7 +53,7 @@ const Marquee = forwardRef(
         ref={ref}
         className={cn('overflow-hidden whitespace-nowrap py-1', className)}
       >
-        <div className={`flex gap-40 min-h-6 relative items-center`}>
+        <div className={`flex gap-40 h-6 relative items-center`}>
           {React.Children.map(children, (child, index) => (
             <motion.div
               key={index}
