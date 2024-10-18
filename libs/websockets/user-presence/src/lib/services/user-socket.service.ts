@@ -1,3 +1,4 @@
+import { SESSION_REDIS_PATH } from '@js-monorepo/auth/nest/session'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { SocketUser } from '@js-monorepo/types'
 import { Inject, Injectable, Logger } from '@nestjs/common'
@@ -42,7 +43,7 @@ export class UserSocketService {
       )
 
       const sessionData = await this.redisClient.get(
-        `${process.env['REDIS_NAMESPACE']}:sessions:${decodedSession}`
+        `${SESSION_REDIS_PATH}${decodedSession}`
       )
 
       if (!sessionData) return undefined
