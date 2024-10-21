@@ -9,13 +9,22 @@ export const metadata = {
   title: 'Admin Dashboard',
 }
 
-// Styles
-const desktopNavLinkStyles =
-  'p-2 transition-colors duration-300 grid place-items-center grid-cols-[30px_auto] gap-2 items-center border border-primary-border rounded-md hover:ring-2'
-const mobileNavLinkStyles =
-  'p-2 transition-colors duration-300 grid grid-cols-1 place-items-center gap-2 items-center border border-primary-border rounded-xl hover:ring-2'
+// Define the navigation links
+const navLinks = [
+  {
+    href: '/dashboard/users',
+    icon: RiUserSettingsFill,
+    label: 'Manage Users',
+    activeClassName: 'bg-accent text-accent-foreground',
+  },
+  {
+    href: '/dashboard/online-users',
+    icon: HiMiniUsers,
+    label: 'Online Users',
+    activeClassName: 'bg-accent text-accent-foreground',
+  },
+]
 
-//
 function MobileView({ children }: PropsWithChildren) {
   return (
     <>
@@ -24,30 +33,23 @@ function MobileView({ children }: PropsWithChildren) {
       </div>
 
       <BottomNavbarComponent className="sm:hidden">
-        <div className="flex flex-col gap-1 justify-center items-center">
-          <DpNextNavLink
-            className={mobileNavLinkStyles}
-            href={`/dashboard/users`}
-            activeClassName="ring-2"
+        {navLinks.map(({ href, icon: Icon, label }) => (
+          <div
+            key={href}
+            className="flex flex-col gap-1 justify-center items-center"
           >
-            <div className="flex justify-end">
-              <RiUserSettingsFill size="1.3rem" className="shrink-0" />
-            </div>
-          </DpNextNavLink>
-          <div className="text-xs">Edit</div>
-        </div>
-        <div className="flex flex-col gap-1 justify-center items-center">
-          <DpNextNavLink
-            className={mobileNavLinkStyles}
-            href={`/dashboard/online-users`}
-            activeClassName="ring-2"
-          >
-            <div className="flex justify-end">
-              <HiMiniUsers size="1.3rem" className="shrink-0" />
-            </div>
-          </DpNextNavLink>
-          <div className="text-xs">Online</div>
-        </div>
+            <DpNextNavLink
+              className="p-2 transition-colors duration-300 grid grid-cols-1 place-items-center gap-2 items-center border border-primary-border rounded-xl hover:ring-2"
+              href={href}
+              activeClassName="ring-2"
+            >
+              <div className="flex justify-end">
+                <Icon size="1.3rem" className="shrink-0" />
+              </div>
+            </DpNextNavLink>
+            <div className="text-xs">{label}</div>
+          </div>
+        ))}
       </BottomNavbarComponent>
     </>
   )
@@ -58,26 +60,19 @@ function DesktopView({ children }: PropsWithChildren) {
     <section className="sm:grid h-[100%] grid-cols-[max-content_1fr] hidden">
       <div className="min-w-max flex flex-col justify-between p-1 sm:p-2 border-r border-primary-border rounded-md">
         <div className="space-y-2">
-          <DpNextNavLink
-            className={desktopNavLinkStyles}
-            href={`/dashboard/users`}
-            activeClassName="bg-accent text-accent-foreground"
-          >
-            <div className="flex justify-end">
-              <RiUserSettingsFill className="shrink-0" />
-            </div>
-            <div>Manage Users</div>
-          </DpNextNavLink>
-          <DpNextNavLink
-            className={desktopNavLinkStyles}
-            href={`/dashboard/online-users`}
-            activeClassName="bg-accent text-accent-foreground"
-          >
-            <div className="flex justify-end">
-              <HiMiniUsers className="shrink-0" />
-            </div>
-            <div>Online Users</div>
-          </DpNextNavLink>
+          {navLinks.map(({ href, icon: Icon, label, activeClassName }) => (
+            <DpNextNavLink
+              key={href}
+              className="p-2 transition-colors duration-300 grid place-items-center grid-cols-[30px_auto] gap-2 items-center border border-primary-border rounded-md hover:ring-2"
+              href={href}
+              activeClassName={activeClassName}
+            >
+              <div className="flex justify-end">
+                <Icon className="shrink-0" />
+              </div>
+              <div>{label}</div>
+            </DpNextNavLink>
+          ))}
         </div>
         <DpVersion className="hidden sm:block text-sm text-center"></DpVersion>
       </div>
