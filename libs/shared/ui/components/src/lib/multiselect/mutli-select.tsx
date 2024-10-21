@@ -1,5 +1,7 @@
 'use client'
 
+import { Fragment, useEffect, useRef, useState } from 'react'
+import { useClickAway } from 'react-use'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -7,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../dropdown'
-import { Fragment, useEffect, useState } from 'react'
 
 type OptionType = {
   id: number
@@ -30,6 +31,11 @@ export function MultiSelectDropdown({
 }: MultiSelectDropdownProps) {
   const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([])
   const [label, setLabel] = useState<string | undefined>(prompt)
+  const [isOpen, setIsOpen] = useState(false) // State to control dropdown visibility
+
+  const dropdownContentRef = useRef<HTMLDivElement | null>(null)
+
+  useClickAway(dropdownContentRef, () => setIsOpen(false))
 
   function constructLabel(newOptions: OptionType[]) {
     const localLabel = options
@@ -46,6 +52,7 @@ export function MultiSelectDropdown({
       selectedIds.includes(option.id)
     )
     setSelectedOptions(initialSelectedOptions)
+    setLabel(constructLabel(initialSelectedOptions)) // Set initial label based on selected options
   }, [options, selectedIds])
 
   const handleChange = (option: OptionType) => {
@@ -64,17 +71,24 @@ export function MultiSelectDropdown({
 
   return (
     <label className="block w-full">
-      <DropdownMenu>
+      <DropdownMenu
+        open={isOpen}
+        onOpenChange={(change) => change && setIsOpen(true)}
+        modal={true}
+      >
         <DropdownMenuTrigger
           asChild
-          className="w-full border-2 border-primary-border rounded-lg text-foreground
+          className="w-full border-2 border-primary-border rounded-lg text-foreground hide-scrollbar
          px-6 py-1 text-base hover:border-primary cursor-pointer shadow-sm transition-colors
          focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-primary-bg"
         >
           <div className="overflow-auto text-nowrap text-center">{label}</div>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="border rounded shadow-md bg-primary-bg text-foreground">
+        <DropdownMenuContent
+          className="border rounded shadow-md bg-primary-bg text-foreground"
+          ref={dropdownContentRef}
+        >
           {options.map((option, index) => (
             <Fragment key={option.id}>
               <DropdownMenuCheckboxItem
