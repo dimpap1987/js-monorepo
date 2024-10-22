@@ -1,3 +1,5 @@
+import { NotificationCreateDto, Pageable } from '@js-monorepo/types'
+import { Transactional } from '@nestjs-cls/transactional'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import {
   NotificationRepo,
@@ -13,22 +15,30 @@ export class NotificationService {
     private notificationRepository: NotificationRepository
   ) {}
 
-  async createNotification(
-    message: string,
-    type: string | null,
-    additionalData: Record<string, any> | null,
-    link: string | null,
-    receiverId: number,
-    senderId: number
-  ) {
-    this.logger.debug(`Creating new notification - Sender is : '${senderId}'`)
-    return this.notificationRepository.createNotification({
-      message,
-      receiverId,
-      senderId,
-      link,
-      type,
-      additionalData,
-    })
+  @Transactional()
+  async createNotification(payload: NotificationCreateDto) {
+    this.logger.debug(
+      `Creating new notification - Sender is : '${payload.senderId}'`
+    )
+    return this.notificationRepository.createNotification(payload)
+  }
+
+  @Transactional()
+  async markAsRead(notificationId: number, userId: number) {
+    return this.notificationRepository.markAsRead(notificationId, userId)
+  }
+
+  @Transactional()
+  async archiveNotification(notificationId: number) {
+    return this.notificationRepository.archiveNotification(notificationId)
+  }
+
+  @Transactional()
+  async getNotifications(userId: number, pageable: Pageable) {
+    return this.notificationRepository.getNotifications(userId, pageable)
+  }
+
+  async getTotalUnreadNotifications(userId: number): Promise<number> {
+    return this.notificationRepository.getTotalUnreadNotifications(userId)
   }
 }

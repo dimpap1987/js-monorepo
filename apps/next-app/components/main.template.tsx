@@ -5,12 +5,13 @@ import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
 import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
-import { DpNotificationBellComponent } from '@js-monorepo/notification-bell'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
-import { MenuItem } from '@js-monorepo/types'
+import { MenuItem, PaginationType } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
+import { API } from '@next-app/api-proxy'
 import { useRouter } from 'next-nprogress-bar'
+import dynamic from 'next/dynamic'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import SVGLogo from './logo-svg'
 
@@ -46,6 +47,35 @@ export const websocketOptions: WebSocketOptionsType = {
   url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
 }
 
+async function fetchUserNotifications(
+  userId: number,
+  pagination = { page: 1, pageSize: 10 }
+) {
+  return API.url(
+    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/users/${userId}?page=${pagination.page}&pageSize=${pagination.pageSize}`
+  )
+    .get()
+    .withCredentials()
+    .execute()
+}
+
+async function readNotification(notificationId: number) {
+  return API.url(
+    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/${notificationId}/read`
+  )
+    .patch()
+    .withCredentials()
+    .execute()
+}
+
+const DpNotificationBellComponentDynamic = dynamic(
+  () =>
+    import('@js-monorepo/notification-bell').then(
+      (module) => module.DpNotificationBellComponent
+    ),
+  { ssr: false }
+)
+
 export default function MainTemplate({
   children,
 }: Readonly<PropsWithChildren>) {
@@ -53,6 +83,18 @@ export default function MainTemplate({
   const [openSideBar, setOpenSideBar] = useState(false)
   const { socket, disconnect } = useWebSocket(websocketOptions, isLoggedIn)
   const router = useRouter()
+  const [notifications, setNotifications] = useState<
+    PaginationType | undefined
+  >()
+
+  useEffect(() => {
+    if (!user?.id) return
+    fetchUserNotifications(user.id).then((response) => {
+      if (response.ok) {
+        setNotifications(response.data as PaginationType)
+      }
+    })
+  }, [user])
 
   useEffect(() => {
     if (!socket) return
@@ -98,7 +140,22 @@ export default function MainTemplate({
           </DpLogo>
           <NavbarItems>
             {isLoggedIn && (
-              <DpNotificationBellComponent className="hidden sm:block"></DpNotificationBellComponent>
+              <DpNotificationBellComponentDynamic
+                pagebale={notifications}
+                className="hidden sm:block"
+                onRead={(id) => {
+                  return readNotification(id)
+                }}
+                onPaginationChange={async (pagination) => {
+                  return fetchUserNotifications(user!.id, pagination).then(
+                    (response) => {
+                      if (response.ok) {
+                        setNotifications(response.data as PaginationType)
+                      }
+                    }
+                  )
+                }}
+              ></DpNotificationBellComponentDynamic>
             )}
             <ModeToggle></ModeToggle>
           </NavbarItems>

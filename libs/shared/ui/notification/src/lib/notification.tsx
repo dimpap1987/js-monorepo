@@ -2,6 +2,7 @@ import { BsCheck2Circle } from 'react-icons/bs'
 import { FaRegTimesCircle } from 'react-icons/fa'
 import { IoMdInformationCircle } from 'react-icons/io'
 import styles from './notification.module.css'
+import { DpLoadingSpinner } from '@js-monorepo/loader'
 
 export type DpNotificationProps = {
   readonly id?: number
@@ -21,7 +22,7 @@ export default function DpNotification({
       {/* Type = 'Spinner' */}
       {type === 'spinner' && (
         <div className={`${styles.spinnerGrid} self-center p-1`}>
-          <span className={styles.spinner}></span>
+          <DpLoadingSpinner></DpLoadingSpinner>
         </div>
       )}
 
