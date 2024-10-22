@@ -169,6 +169,11 @@ export class HttpClientBuilder {
     this.options.method = 'PUT'
     return this
   }
+
+  patch(): HttpClientBuilder {
+    this.options.method = 'PATCH'
+    return this
+  }
 }
 
 export class HttpClientProxy {

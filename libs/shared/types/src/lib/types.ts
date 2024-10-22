@@ -3,6 +3,7 @@ export interface SessionUserType {
   username: string
   createdAt?: Date
   lastLoggedIn?: string
+  isAdmin?: boolean
   profile: {
     id?: number
     image?: string | null
@@ -82,6 +83,14 @@ export type UnRegisteredUserDto = {
 export type Pageable = {
   page: number
   pageSize: number
+}
+
+export type PaginationType<T = any> = {
+  page: number
+  content: T[]
+  pageSize: number
+  totalCount: number
+  totalPages: number
 }
 
 export type AuthUserUpdateDto =
@@ -195,4 +204,25 @@ export type SocketUser = {
   socket: string
   pid: number
   session: string
+}
+
+export type NotificationDetailsType = {
+  id: number
+  isArchived: boolean
+  createdAt: string
+  message: string
+}
+
+export type NotificationUserType = {
+  id: number
+  username: string
+}
+
+export type SenderType = NotificationUserType
+
+export type UserNotificationType = {
+  isRead: boolean
+  notification: NotificationDetailsType
+  sender: SenderType
+  user: NotificationUserType
 }

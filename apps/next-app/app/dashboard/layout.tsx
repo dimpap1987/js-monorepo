@@ -3,6 +3,7 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpVersion } from '@js-monorepo/version'
 import { PropsWithChildren } from 'react'
 import { HiMiniUsers } from 'react-icons/hi2'
+import { IoMdNotifications } from 'react-icons/io'
 import { RiUserSettingsFill } from 'react-icons/ri'
 
 export const metadata = {
@@ -14,13 +15,19 @@ const navLinks = [
   {
     href: '/dashboard/users',
     icon: RiUserSettingsFill,
-    label: 'Manage Users',
+    label: 'Users',
     activeClassName: 'bg-accent text-accent-foreground',
   },
   {
     href: '/dashboard/online-users',
     icon: HiMiniUsers,
-    label: 'Online Users',
+    label: 'Online',
+    activeClassName: 'bg-accent text-accent-foreground',
+  },
+  {
+    href: '/dashboard/notifications',
+    icon: IoMdNotifications,
+    label: 'Alerts',
     activeClassName: 'bg-accent text-accent-foreground',
   },
 ]

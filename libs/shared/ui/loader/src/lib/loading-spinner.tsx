@@ -23,81 +23,28 @@ export function DpLoadingSpinner({
     <div
       aria-label="Loading..."
       role="status"
-      className={cn('flex items-center', className)}
+      className={cn('flex items-center text-sm', className)}
     >
-      <svg style={{ ...spinnerLoader, ...styles }} viewBox="0 0 256 256">
-        <line
-          x1="128"
-          y1="32"
-          x2="128"
-          y2="64"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="34"
-        ></line>
-        <line
-          x1="195.9"
-          y1="60.1"
-          x2="173.3"
-          y2="82.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="34"
-        ></line>
-        <line
-          x1="224"
-          y1="128"
-          x2="192"
-          y2="128"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="34"
-        ></line>
-        <line
-          x1="195.9"
-          y1="195.9"
-          x2="173.3"
-          y2="173.3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="34"
-        ></line>
-        <line
-          x1="128"
-          y1="224"
-          x2="128"
-          y2="192"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="34"
-        ></line>
-        <line
-          x1="60.1"
-          y1="195.9"
-          x2="82.7"
-          y2="173.3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="34"
-        ></line>
-        <line
-          x1="32"
-          y1="128"
-          x2="64"
-          y2="128"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="34"
-        ></line>
-        <line
-          x1="60.1"
-          y1="60.1"
-          x2="82.7"
-          y2="82.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="34"
-        ></line>
+      <svg
+        style={{ ...spinnerLoader, ...styles }}
+        className="animate-spin h-5 w-5 text-blue-600 inline-block"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-35"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 0116 0H4z"
+        ></path>
       </svg>
       {message && (
         <div className="leading-4 font-bold ml-2 text-nowrap">{message}</div>
