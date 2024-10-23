@@ -49,7 +49,7 @@ export const websocketOptions: WebSocketOptionsType = {
 
 async function fetchUserNotifications(
   userId: number,
-  pagination = { page: 1, pageSize: 10 }
+  pagination = { page: 1, pageSize: 15 }
 ) {
   return API.url(
     `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/users/${userId}?page=${pagination.page}&pageSize=${pagination.pageSize}`
@@ -142,7 +142,7 @@ export default function MainTemplate({
             {isLoggedIn && (
               <DpNotificationBellComponentDynamic
                 pagebale={notifications}
-                className="hidden sm:block"
+                className=""
                 onRead={(id) => {
                   return readNotification(id)
                 }}
@@ -157,7 +157,7 @@ export default function MainTemplate({
                 }}
               ></DpNotificationBellComponentDynamic>
             )}
-            <ModeToggle></ModeToggle>
+            <ModeToggle className="hidden sm:inline-block"></ModeToggle>
           </NavbarItems>
         </DpNextNavbar>
       </header>

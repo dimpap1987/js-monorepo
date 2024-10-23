@@ -43,7 +43,7 @@ export function MultiSelectDropdown({
       .map((opt) => opt.name)
       .join(', ')
 
-    return localLabel ? localLabel : 'Select...'
+    return localLabel ? localLabel : 'Select ...'
   }
 
   useEffect(() => {
@@ -52,7 +52,6 @@ export function MultiSelectDropdown({
       selectedIds.includes(option.id)
     )
     setSelectedOptions(initialSelectedOptions)
-    setLabel(constructLabel(initialSelectedOptions)) // Set initial label based on selected options
   }, [options, selectedIds])
 
   const handleChange = (option: OptionType) => {

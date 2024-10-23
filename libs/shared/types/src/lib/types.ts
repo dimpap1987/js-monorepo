@@ -105,7 +105,7 @@ export type ChannelDto = {
 }
 
 export type NotificationCreateDto = {
-  receiverId: number
+  receiverIds: number[]
   senderId: number
   message: string
   link?: string
@@ -208,8 +208,8 @@ export type SocketUser = {
 
 export type NotificationDetailsType = {
   id: number
-  isArchived: boolean
-  createdAt: string
+  isArchived?: boolean
+  createdAt: Date | string
   message: string
 }
 
@@ -224,5 +224,16 @@ export type UserNotificationType = {
   isRead: boolean
   notification: NotificationDetailsType
   sender: SenderType
-  user: NotificationUserType
+  user?: NotificationUserType
+}
+
+export interface CreateUserNotificationType {
+  id: number
+  createdAt: Date
+  message: string
+  userNotification: {
+    isRead: boolean
+    user: NotificationUserType
+    sender: NotificationUserType
+  }[]
 }

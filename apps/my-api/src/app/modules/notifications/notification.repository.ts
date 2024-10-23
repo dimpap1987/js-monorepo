@@ -1,4 +1,5 @@
 import {
+  CreateUserNotificationType,
   NotificationCreateDto,
   Pageable,
   PaginationType,
@@ -8,7 +9,9 @@ import { Prisma } from '@prisma/client'
 export const NotificationRepo = Symbol()
 
 export interface NotificationRepository {
-  createNotification(payload: NotificationCreateDto): Promise<{ id: number }>
+  createNotification(
+    payload: NotificationCreateDto
+  ): Promise<CreateUserNotificationType>
   getNotifications(
     userId: number,
     pageable: Pageable

@@ -1,4 +1,10 @@
-import { NotificationCreateDto, Pageable } from '@js-monorepo/types'
+import {
+  CreateUserNotificationType,
+  NotificationCreateDto,
+  Pageable,
+  UserNotificationType,
+} from '@js-monorepo/types'
+import { UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { Transactional } from '@nestjs-cls/transactional'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import {
@@ -12,7 +18,8 @@ export class NotificationService {
 
   constructor(
     @Inject(NotificationRepo)
-    private notificationRepository: NotificationRepository
+    private notificationRepository: NotificationRepository,
+    private readonly userPresenceWebsocketService: UserPresenceWebsocketService
   ) {}
 
   @Transactional()
@@ -20,7 +27,14 @@ export class NotificationService {
     this.logger.debug(
       `Creating new notification - Sender is : '${payload.senderId}'`
     )
-    return this.notificationRepository.createNotification(payload)
+    const notification =
+      await this.notificationRepository.createNotification(payload)
+
+    this.userPresenceWebsocketService.sendToUsers(
+      payload.receiverIds,
+      'events:notifications',
+      { data: this.transformSelect(notification) }
+    )
   }
 
   @Transactional()
@@ -40,5 +54,22 @@ export class NotificationService {
 
   async getTotalUnreadNotifications(userId: number): Promise<number> {
     return this.notificationRepository.getTotalUnreadNotifications(userId)
+  }
+
+  private transformSelect(
+    data: CreateUserNotificationType
+  ): UserNotificationType {
+    return {
+      notification: {
+        id: data?.id,
+        createdAt: data?.createdAt,
+        message: data?.message,
+      },
+      isRead: false,
+      sender: {
+        id: data?.userNotification[0]?.sender?.id,
+        username: data?.userNotification[0]?.sender?.username,
+      },
+    }
   }
 }

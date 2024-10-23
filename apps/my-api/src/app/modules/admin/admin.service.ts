@@ -70,8 +70,8 @@ export class AdminService {
         ])
       }
 
-      this.userPresenceWebsocketService.sendToUser(
-        userId,
+      this.userPresenceWebsocketService.sendToUsers(
+        [userId],
         Events.refreshSession,
         true
       )
@@ -88,8 +88,8 @@ export class AdminService {
 
   async handleUserDisconnection(userId: number) {
     try {
-      this.userPresenceWebsocketService.sendToUser(
-        userId,
+      this.userPresenceWebsocketService.sendToUsers(
+        [userId],
         Events.refreshSession,
         true
       )
