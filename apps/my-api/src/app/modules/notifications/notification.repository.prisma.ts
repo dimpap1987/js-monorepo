@@ -1,4 +1,8 @@
-import { NotificationCreateDto, Pageable } from '@js-monorepo/types'
+import {
+  CreateUserNotificationType,
+  NotificationCreateDto,
+  Pageable,
+} from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
@@ -51,27 +55,27 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
       },
       orderBy: {
         notification: {
-          id: 'desc', // Sort by notification id in descending order
+          id: 'desc',
         },
       },
-      skip: (page - 1) * pageSize, // Skip records for pagination
-      take: pageSize, // Limit to pageSize records
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     })
 
     return {
-      totalCount: totalNotifications, // Total number of notifications
-      content: notifications, // Paginated notifications
-      page: page, // Current page number
-      pageSize, // Size of each page
-      totalPages: Math.ceil(totalNotifications / pageSize), // Total number of pages
+      totalCount: totalNotifications,
+      content: notifications,
+      page: page,
+      pageSize,
+      totalPages: Math.ceil(totalNotifications / pageSize),
       unReadTotal: unreadTotal,
     }
   }
 
   async createNotification(
     payload: NotificationCreateDto
-  ): Promise<{ id: number }> {
-    const { message, type, link, additionalData, senderId, receiverId } =
+  ): Promise<CreateUserNotificationType> {
+    const { message, type, link, additionalData, senderId, receiverIds } =
       payload
 
     return this.txHost.tx.notification.create({
@@ -81,14 +85,33 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
         additionalData: additionalData,
         link,
         userNotification: {
-          create: {
-            user: { connect: { id: receiverId } },
-            sender: { connect: { id: senderId } },
-          },
+          create: receiverIds.map((receiverId) => ({
+            user: { connect: { id: receiverId } }, // Connect each receiver
+            sender: { connect: { id: senderId } }, // Connect the sender
+          })),
         },
       },
       select: {
         id: true,
+        createdAt: true,
+        message: true,
+        userNotification: {
+          select: {
+            isRead: true,
+            user: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+            sender: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+          },
+        },
       },
     })
   }

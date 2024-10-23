@@ -1,4 +1,10 @@
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
+import { HasRoles } from '@js-monorepo/auth/nest/common'
+import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
+import {
+  LoggedInGuard,
+  RolesGuard,
+  SessionUser,
+} from '@js-monorepo/auth/nest/session'
 import {
   NotificationCreateDto,
   PaginationType,
@@ -29,13 +35,15 @@ export class NotificationController {
   constructor(private notificationService: NotificationService) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @HasRoles(RolesEnum.ADMIN)
   async createNotification(@Body() payload: NotificationCreateDto) {
     //TODO Validate body
     try {
       return await this.notificationService.createNotification(payload)
     } catch (e: any) {
       this.logger.error(
-        `Error while sending notification to user: ${payload?.receiverId}`,
+        `Error while sending notification to user: ${payload?.receiverIds?.join(', ')}`,
         e.stack
       )
       throw new ApiException(

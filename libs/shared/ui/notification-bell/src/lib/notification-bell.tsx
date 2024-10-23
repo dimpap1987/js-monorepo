@@ -1,27 +1,48 @@
 'use client'
 
+import { useSession } from '@js-monorepo/auth/next/client'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@js-monorepo/components/dropdown'
 import { DpLoadingSpinner } from '@js-monorepo/loader'
+import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
+import moment from 'moment'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdNotificationsActive } from 'react-icons/md'
 import './bell.css'
 
+function humanatizeNotificationDate(content: UserNotificationType) {
+  const timeDifference = moment().diff(moment(content.notification.createdAt))
+  const formattedDifference = moment.duration(timeDifference).humanize()
+
+  return {
+    ...content,
+    notification: {
+      ...content.notification,
+      createdAt: formattedDifference,
+    },
+  }
+}
+
+export const websocketOptions: WebSocketOptionsType = {
+  url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
+}
+
 export function DpNotificationBellComponent({
   pagebale = {
     page: 1,
     content: [],
-    pageSize: 10,
+    pageSize: 15,
     totalCount: 0,
     totalPages: 1,
     unReadTotal: 0,
@@ -39,14 +60,16 @@ export function DpNotificationBellComponent({
   }) => Promise<void>
 }) {
   const [notifications, setNotifications] = useState<UserNotificationType[]>(
-    pagebale?.content || []
+    pagebale?.content?.map((content) => humanatizeNotificationDate(content)) ||
+      []
   )
-
+  const { isLoggedIn } = useSession()
+  const { socket } = useWebSocket(websocketOptions, isLoggedIn)
   const [showLoader, setShowLoader] = useState(false)
 
   const paginator = useRef({
     page: pagebale?.page || 1,
-    pageSize: pagebale?.pageSize || 10,
+    pageSize: pagebale?.pageSize || 15,
     totalCount: pagebale?.totalCount || 0,
     totalPages: pagebale?.totalPages || 1,
     unReadTotal: pagebale?.unReadTotal || 0,
@@ -59,11 +82,24 @@ export function DpNotificationBellComponent({
   const isRinging = unreadNotificationCount > 0
 
   useEffect(() => {
+    if (!socket) return
+    socket.on('events:notifications', (event) => {
+      if (event.data) {
+        paginator.current.unReadTotal = paginator.current.unReadTotal + 1
+        setNotifications((prev) => [
+          humanatizeNotificationDate(event.data),
+          ...prev,
+        ])
+      }
+    })
+  }, [socket])
+
+  useEffect(() => {
     if (!pagebale) return
 
     paginator.current = {
       page: pagebale?.page || 1,
-      pageSize: pagebale?.pageSize || 10,
+      pageSize: pagebale?.pageSize || 15,
       totalCount: pagebale?.totalCount || 0,
       totalPages: pagebale?.totalPages || 1,
       unReadTotal: pagebale?.unReadTotal || 0,
@@ -77,9 +113,9 @@ export function DpNotificationBellComponent({
       ) // Create a Set of existing notification IDs
 
       // Filter out notifications that are already in the Set
-      const newNotifications = pagebale.content.filter(
-        (content) => !existingIds.has(content.notification.id)
-      )
+      const newNotifications = pagebale.content
+        .filter((content) => !existingIds.has(content.notification.id))
+        .map((content) => humanatizeNotificationDate(content))
 
       return [...prev, ...newNotifications]
     })
@@ -128,10 +164,10 @@ export function DpNotificationBellComponent({
             )
 
             if (notifications.length > 30) {
-              setNotifications((prev) => prev.slice(0, 10))
+              setNotifications((prev) => prev.slice(0, 15))
               // Reset paginator state
               paginator.current.page = 1
-              paginator.current.pageSize = 10
+              paginator.current.pageSize = 15
             }
           }
         }, 200)
@@ -155,7 +191,7 @@ export function DpNotificationBellComponent({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className={cn(
-          'p-1 bg-secondary-bg mt-3 text-white w-[460px] xl:w-[640px]',
+          'p-1 bg-secondary-bg mt-3 text-white w-[98svw] sm:w-[650px] xl:w-[850px]',
           className
         )}
       >
@@ -163,7 +199,7 @@ export function DpNotificationBellComponent({
         <DropdownMenuSeparator />
         <div
           ref={notificationContainerRef}
-          className="max-h-[320px] overflow-x-hidden overflow-y-auto"
+          className="max-h-[502px] overflow-x-hidden overflow-y-auto"
         >
           {notifications.length > 0 ? (
             notifications.map((content, index) => (
@@ -194,9 +230,12 @@ export function DpNotificationBellComponent({
                   <GoDotFill
                     className={`text-2xl mr-2 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-white'}`}
                   />
-                  <div className="p-0 max-line--height">
+                  <div className="p-1 max-line--height break-words">
                     {content.notification?.message}
                   </div>
+                  <DropdownMenuShortcut>
+                    {content.notification?.createdAt as string} ago
+                  </DropdownMenuShortcut>
                 </DropdownMenuItem>
                 {index === notifications.length - 1 && showLoader && (
                   <div className="relative flex items-center justify-center py-1">

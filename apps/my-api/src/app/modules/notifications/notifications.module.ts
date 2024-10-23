@@ -3,6 +3,7 @@ import { NotificationController } from './notification.controller'
 import { NotificationRepo } from './notification.repository'
 import { NotificationRepositoryPrisma } from './notification.repository.prisma'
 import { NotificationService } from './notification.service'
+import { UserPresenceModule } from '@js-monorepo/user-presence'
 
 const providers: Provider[] = [
   {
@@ -14,6 +15,7 @@ const providers: Provider[] = [
 
 @Global()
 @Module({
+  imports: [UserPresenceModule],
   controllers: [NotificationController],
   providers: [...providers],
   exports: [...providers],

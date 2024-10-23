@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@js-monorepo/ui/util'
 import { useTheme } from 'next-themes'
 import { KeyboardEvent, useEffect, useState } from 'react'
 import './theme-toggler.css'
@@ -22,7 +23,7 @@ export function ModeToggle({ className }: { readonly className?: string }) {
   return (
     <label
       htmlFor="theme-slider"
-      className={`switch ${className}`}
+      className={cn(`switch inline-block`, className)}
       aria-label="theme slider"
       tabIndex={0}
       onKeyDown={handleKeyDown}
