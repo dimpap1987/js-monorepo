@@ -191,7 +191,7 @@ export function DpNotificationBellComponent({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className={cn(
-          'p-1 bg-secondary-bg mt-3 text-white w-[98svw] sm:w-[650px] xl:w-[850px]',
+          'hidden sm:block p-1 bg-background-secondary mt-4 text-white w-[98svw] sm:w-[650px] xl:w-[850px]',
           className
         )}
       >
@@ -199,13 +199,13 @@ export function DpNotificationBellComponent({
         <DropdownMenuSeparator />
         <div
           ref={notificationContainerRef}
-          className="max-h-[502px] overflow-x-hidden overflow-y-auto"
+          className="h-[calc(80vh_-_var(--navbar-height))] max-h-[502px] overflow-x-hidden overflow-y-auto"
         >
           {notifications.length > 0 ? (
             notifications.map((content, index) => (
               <Fragment key={content?.notification?.id}>
                 <DropdownMenuItem
-                  className={`cursor-pointer p-2 focus:text-white ${content.isRead ? 'opacity-35' : 'bg-secondary-bg-lighter'}`}
+                  className={`cursor-pointer p-2 focus:text-white ${content.isRead ? 'opacity-35' : 'bg-background-secondary/70'}`}
                   onSelect={(e) => {
                     e.preventDefault()
                     const notIndex = notifications.findIndex(
