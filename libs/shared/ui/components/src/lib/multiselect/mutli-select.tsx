@@ -77,15 +77,15 @@ export function MultiSelectDropdown({
       >
         <DropdownMenuTrigger
           asChild
-          className="w-full border-2 border-primary-border rounded-lg text-foreground hide-scrollbar
-         px-6 py-1 text-base hover:border-primary cursor-pointer shadow-sm transition-colors
-         focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-primary-bg"
+          className="w-full border-2 border-border rounded-lg text-foreground hide-scrollbar
+         px-6 py-1 text-base hover:border-border/80 cursor-pointer shadow-sm transition-colors
+         focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-background"
         >
           <div className="overflow-auto text-nowrap text-center">{label}</div>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
-          className="border rounded shadow-md bg-primary-bg text-foreground"
+          className="border rounded shadow-md bg-background text-foreground"
           ref={dropdownContentRef}
         >
           {options.map((option, index) => (

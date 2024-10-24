@@ -10,7 +10,7 @@ export function BottomNavbarComponent({
   return (
     <div
       className={cn(
-        'fixed bottom-0 w-full dark:bg-zinc-900 border-t border-primary-border rounded-t-2xl text-foreground',
+        'fixed bottom-0 w-full dark:bg-zinc-900 border-t border-border rounded-t-2xl text-foreground',
         className
       )}
     >

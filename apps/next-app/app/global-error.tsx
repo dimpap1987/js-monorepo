@@ -44,8 +44,8 @@ export default function GlobalError({
         disableTransitionOnChange
       >
         <body
-          className={`${poppins.className} flex justify-center container mx-auto items-center min-h-100svh 
-                    bg-primary-bg text-white overflow-x-hidden`}
+          className={`${poppins.className} flex justify-center container items-center min-h-100svh 
+                    bg-background text-foreground overflow-x-hidden`}
         >
           <ErrorComponent type="global" className="container">
             <div className="flex flex-wrap gap-5 mt-5">

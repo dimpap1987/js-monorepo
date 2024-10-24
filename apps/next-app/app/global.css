@@ -27,37 +27,27 @@ h4 {
 @layer base {
   :root {
     /* scrollbar-gutter: stable; */
-    --navbar-height: 55px; /* Define the height of your navbar */
-    --navbar-offset: calc(var(--navbar-height));
+    --navbar-height: 60px; /* Define the height of your navbar */
+
     --foreground: 0 0% 0%;
+    --background: 43.64 47.83% 95.49%;
+    --background-secondary: 219 33% 21%;
+    --border: 240 4% 56%;
 
     --primary: 265 76% 54%;
     --primary-foreground: 0 0% 90%;
-    --primary-foreground-hover: 0 0% 35%;
-    --primary-hover: 265 76% 35%;
-    --primary-bg: 43.64 47.83% 95.49%;
-    --primary-border: 240 4% 56%;
 
     --secondary: 26 114% 57%;
     --secondary-foreground: 0 0% 90%;
-    --secondary-hover: 26 114% 37%;
-    --secondary-border: 26 114% 77%;
-    --secondary-bg: 219 33% 21%;
-    --secondary-lighter: 219 33% 40%;
 
     --accent: 229 87% 54%;
     --accent-foreground: 0 0% 90%;
-    --accent-hover: 229 87% 34%;
-    --accent-foreground-hover: 0 0% 35%;
-    --accent-border: 229 87% 74%;
 
     --danger: -14 98% 47%;
     --danger-foreground: 0 0% 90%;
-    --danger-hover: -14 98% 35%;
-    --danger-border: -14 98% 77%;
 
     --destructive: 0 0% 78%;
-    --destructive-hover: 0 0% 71%;
+    --destructive-foreground: 0 0% 90%;
 
     --tw-shadow-color: 0 0% 20%;
   }
@@ -65,49 +55,7 @@ h4 {
   .dark {
     --foreground: 0 0% 100%;
 
-    --primary-border: 236 7% 28%;
-    --primary-bg: 221 39% 11%;
-    --primary-foreground-hover: 49 81% 51%;
+    --border: 236 7% 28%;
+    --background: 221 39% 11%;
   }
-}
-
-/* custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #d6dee1;
-  border-radius: 20px;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #899597;
-}
-
-/* Hide scrollbar but allow scrolling */
-.hide-scrollbar {
-  overflow: auto; /* Enable scrolling */
-}
-
-/* Hide scrollbar for Chrome, Safari, and Opera */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Hides the scrollbar */
-}
-
-/* Hide scrollbar for IE and Edge */
-.hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-}
-
-/* Hide scrollbar for Firefox */
-.hide-scrollbar {
-  scrollbar-width: none; /* Firefox */
 }

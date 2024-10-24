@@ -23,7 +23,7 @@ export default function DpNotificationList({
         {notifications.map((notification, index) => (
           <div
             key={notification.id || index}
-            className={`${styles.notificationContainer} flex bg-secondary-bg p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
+            className={`${styles.notificationContainer} flex bg-background-secondary p-2 border-purple-500 border-2 rounded-md text-sm text-white`}
           >
             <Notification {...notification} />
           </div>

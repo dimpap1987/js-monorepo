@@ -142,7 +142,6 @@ export default function MainTemplate({
             {isLoggedIn && (
               <DpNotificationBellComponentDynamic
                 pagebale={notifications}
-                className=""
                 onRead={(id) => {
                   return readNotification(id)
                 }}

@@ -3,15 +3,15 @@ export const buttonVariants = {
   variants: {
     variant: {
       primary:
-        'bg-primary border border-primary-border text-primary-foreground hover:bg-primary-hover focus:bg-primary-hover [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-primary border border-primary/60 text-primary-foreground hover:bg-primary/80 focus:bg-primary/80 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       accent:
-        'bg-accent border border-accent-border text-accent-foreground hover:bg-accent-hover focus:bg-accent-hover [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-accent border border-accent/60 text-accent-foreground hover:bg-accent/80 focus:bg-accent/80 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       secondary:
-        'bg-secondary border border-secondary-border text-secondary-foreground hover:bg-secondary-hover focus:bg-secondary-hover [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-secondary border border-secondary/60 text-secondary-foreground hover:bg-secondary/80 focus:bg-secondary/80 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       danger:
-        'bg-danger border border-danger-border text-danger-foreground hover:bg-danger-hover focus:bg-danger-hover [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-danger border border-danger/60 text-danger-foreground hover:bg-danger/80 focus:bg-danger/80 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       outline:
-        'border border-input bg-primary-bg hover:bg-accent text-foreground hover:text-primary-foreground',
+        'border border-input bg-background hover:bg-accent text-foreground hover:text-primary-foreground',
     },
     size: {
       default: 'h-8 px-4 py-2',
