@@ -63,8 +63,16 @@ export function MultiSelectDropdown({
       ? selectedOptions.filter((selected) => selected.id !== option.id) // Deselect option
       : [...selectedOptions, option] // Select option
 
+    if (
+      newSelectedOptions === null ||
+      newSelectedOptions === undefined ||
+      newSelectedOptions.length === 0
+    ) {
+      setLabel(prompt)
+    } else {
+      setLabel(constructLabel(newSelectedOptions))
+    }
     setSelectedOptions(newSelectedOptions)
-    setLabel(constructLabel(newSelectedOptions))
     onChange(newSelectedOptions)
   }
 

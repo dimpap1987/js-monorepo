@@ -223,7 +223,9 @@ export function DpNotificationBellComponent({
                         paginator.current.unReadTotal =
                           paginator.current.unReadTotal - 1
                       }
-                      onRead?.(content.notification.id)
+                      if (!content.isRead) {
+                        onRead?.(content.notification.id)
+                      }
                     }
                   }}
                 >
