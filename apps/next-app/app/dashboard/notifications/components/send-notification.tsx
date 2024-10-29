@@ -4,9 +4,10 @@ import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import { Input } from '@js-monorepo/components/form'
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
+import { useNotifications } from '@js-monorepo/notification'
 import { AuthUserFullDto, NotificationCreateDto } from '@js-monorepo/types'
 import { API } from '@next-app/api-proxy'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface User {
   id: number
@@ -49,6 +50,7 @@ export const NotificationSender = () => {
   const [message, setMessage] = useState<string>('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const [usersDropDown, setUsersDropDown] = useState<User[]>([])
+  const { addNotification } = useNotifications()
 
   const handleSendMessage = async () => {
     if (user && message.trim() && selectedUserIds.length > 0) {
@@ -56,6 +58,11 @@ export const NotificationSender = () => {
         message: message.trim(),
         receiverIds: selectedUserIds,
         senderId: user.id,
+      })
+      setMessage('')
+      addNotification({
+        message: 'Notification send successfully!',
+        type: 'success',
       })
     }
   }
@@ -75,13 +82,12 @@ export const NotificationSender = () => {
         placeholder="Type your message here..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="w-full"
+        className="w-full mt-2"
       />
 
       <MultiSelectDropdown
         options={usersDropDown}
         onChange={(selected) => {
-          console.log(selected)
           setSelectedUserIds(selected.map((u) => u.id))
         }}
         prompt="Select users..."
@@ -89,7 +95,11 @@ export const NotificationSender = () => {
       />
 
       <div>
-        <DpButton className="w-full" onClick={handleSendMessage}>
+        <DpButton
+          className="w-full"
+          onClick={handleSendMessage}
+          disabled={message?.trim()?.length === 0}
+        >
           Send Message
         </DpButton>
       </div>
