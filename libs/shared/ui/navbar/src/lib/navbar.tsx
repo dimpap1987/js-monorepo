@@ -111,61 +111,63 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     }, [children])
 
     return (
-      <nav
-        className="text-foreground border-b border-border navbar-height overflow-hidden flex items-center"
-        ref={ref}
-      >
-        <div className="px-5 flex gap-2 justify-between w-full items-center">
-          {logo}
-          <ul className="hidden sm:flex font-semibold font-heading items-center space-x-1">
-            {menuItems &&
-              menuItems?.length > 0 &&
-              menuItems.map((item, index) => (
-                <li
-                  key={index}
-                  className="hover:text-primary/90 text-center text-nowrap"
-                >
-                  {(item?.roles?.includes('PUBLIC') ||
-                    item?.roles?.some((role) =>
-                      user?.roles?.includes(role as AuthRole)
-                    )) && (
-                    <DpNextNavLink
-                      className="p-2"
-                      activeClassName="underline-offset-8"
-                      href={item.href}
-                    >
-                      {item.name}
-                    </DpNextNavLink>
-                  )}
-                </li>
-              ))}
-          </ul>
+      <header>
+        <nav
+          className="text-foreground border-b border-border navbar-height overflow-hidden flex items-center"
+          ref={ref}
+        >
+          <div className="px-5 flex gap-2 justify-between w-full items-center">
+            {logo}
+            <ul className="hidden sm:flex font-semibold font-heading items-center space-x-1">
+              {menuItems &&
+                menuItems?.length > 0 &&
+                menuItems.map((item, index) => (
+                  <li
+                    key={index}
+                    className="hover:text-primary/90 text-center text-nowrap"
+                  >
+                    {(item?.roles?.includes('PUBLIC') ||
+                      item?.roles?.some((role) =>
+                        user?.roles?.includes(role as AuthRole)
+                      )) && (
+                      <DpNextNavLink
+                        className="p-2"
+                        activeClassName="underline-offset-8"
+                        href={item.href}
+                      >
+                        {item.name}
+                      </DpNextNavLink>
+                    )}
+                  </li>
+                ))}
+            </ul>
 
-          <div className="flex items-center gap-4 justify-end text-center">
-            <section className="hidden sm:flex justify-center items-center gap-3">
-              {navbarItems}
-            </section>
+            <div className="flex items-center gap-4 justify-end text-center">
+              <section className="hidden sm:flex justify-center items-center gap-3">
+                {navbarItems}
+              </section>
 
-            {/* login button */}
-            {!user?.isLoggedIn && (
-              <DpNextNavLink className="hidden sm:flex" href="/auth/login">
-                <DpLoginButton></DpLoginButton>
-              </DpNextNavLink>
-            )}
+              {/* login button */}
+              {!user?.isLoggedIn && (
+                <DpNextNavLink className="hidden sm:flex" href="/auth/login">
+                  <DpLoginButton></DpLoginButton>
+                </DpNextNavLink>
+              )}
 
-            <NavUserOptions
-              className="hidden sm:block"
-              user={user}
-              onLogout={onLogout}
-            ></NavUserOptions>
+              <NavUserOptions
+                className="hidden sm:block"
+                user={user}
+                onLogout={onLogout}
+              ></NavUserOptions>
 
-            <SideBarIcon
-              onSideBarClick={onSideBarClick}
-              className="block sm:hidden"
-            ></SideBarIcon>
+              <SideBarIcon
+                onSideBarClick={onSideBarClick}
+                className="block sm:hidden"
+              ></SideBarIcon>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
     )
   }
 )
