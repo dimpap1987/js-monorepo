@@ -96,6 +96,7 @@ export const NotificationSender = () => {
 
       <div>
         <DpButton
+          size="large"
           className="w-full"
           onClick={handleSendMessage}
           disabled={message?.trim()?.length === 0}
