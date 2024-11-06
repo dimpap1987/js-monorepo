@@ -1,4 +1,4 @@
-import { BottomNavbarComponent } from '@js-monorepo/bottom-navbar'
+import { BottomNavbar, BottomNavbarOptions } from '@js-monorepo/bottom-navbar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpVersion } from '@js-monorepo/version'
 import { PropsWithChildren } from 'react'
@@ -37,25 +37,16 @@ function MobileView({ children }: PropsWithChildren) {
     <>
       <div className="px-2 sm:hidden container overflow-hidden">{children}</div>
 
-      <BottomNavbarComponent className="sm:hidden">
+      <BottomNavbar className="sm:hidden">
         {navLinks.map(({ href, icon: Icon, label }) => (
-          <div
+          <BottomNavbarOptions
+            Icon={Icon}
+            href={href}
+            label={label}
             key={href}
-            className="flex flex-col gap-1 justify-center items-center"
-          >
-            <DpNextNavLink
-              className="p-2 transition-colors duration-300 grid grid-cols-1 place-items-center gap-2 items-center border border-border rounded-xl hover:ring-2"
-              href={href}
-              activeClassName="ring-2"
-            >
-              <div className="flex justify-end">
-                <Icon size="1.3rem" className="shrink-0" />
-              </div>
-            </DpNextNavLink>
-            <div className="text-xs">{label}</div>
-          </div>
+          ></BottomNavbarOptions>
         ))}
-      </BottomNavbarComponent>
+      </BottomNavbar>
     </>
   )
 }

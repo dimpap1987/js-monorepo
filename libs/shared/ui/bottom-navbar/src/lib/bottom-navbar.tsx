@@ -3,18 +3,18 @@
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren } from 'react'
 
-export function BottomNavbarComponent({
+export function BottomNavbar({
   children,
   className,
 }: PropsWithChildren & { className?: string }) {
   return (
     <div
       className={cn(
-        'fixed bottom-0 w-full dark:bg-zinc-900 border-t border-border rounded-t-2xl text-foreground',
+        'fixed bottom-0 w-full dark:bg-zinc-900 border-t border-border dark:text-gray-300 light:text-foreground',
         className
       )}
     >
-      <div className="flex p-3 pb-2 justify-around">{children}</div>
+      <div className="flex gap-4 justify-around">{children}</div>
     </div>
   )
 }
