@@ -26,8 +26,8 @@ const DpNextNavLink = forwardRef(
         ref={ref}
         href={href}
         className={cn(
-          `cursor-pointer dark:[text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color)) ${activeClassName && isSamePath ? activeClassName : ''}`,
-          className
+          `cursor-pointer dark:[text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))`,
+          ` ${className} ${activeClassName && isSamePath ? activeClassName : ''}`
         )}
         onClick={(e) => {
           e.preventDefault()

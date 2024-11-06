@@ -13,7 +13,7 @@ import {
 } from '@js-monorepo/components/avatar'
 import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
-import { API } from '@next-app/api-proxy'
+import { API } from '@next-app/app/utils/api-proxy'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
 import { useRouter } from 'next-nprogress-bar'

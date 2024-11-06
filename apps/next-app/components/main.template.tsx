@@ -4,16 +4,21 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
-import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
+import { useWebSocket } from '@js-monorepo/next/providers'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import { MenuItem, PaginationType } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
-import { API } from '@next-app/api-proxy'
+import {
+  fetchUserNotifications,
+  readNotification,
+} from '@next-app/app/utils/notifications'
+import { websocketOptions } from '@next-app/app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
 import dynamic from 'next/dynamic'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import SVGLogo from './logo-svg'
+import { MobileNavbar } from './mobile-navbar'
 
 const menuItems: MenuItem[] = [
   {
@@ -42,31 +47,6 @@ const menuItems: MenuItem[] = [
     roles: ['ADMIN'],
   },
 ]
-
-export const websocketOptions: WebSocketOptionsType = {
-  url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
-}
-
-async function fetchUserNotifications(
-  userId: number,
-  pagination = { page: 1, pageSize: 15 }
-) {
-  return API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/users/${userId}?page=${pagination.page}&pageSize=${pagination.pageSize}`
-  )
-    .get()
-    .withCredentials()
-    .execute()
-}
-
-async function readNotification(notificationId: number) {
-  return API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/${notificationId}/read`
-  )
-    .patch()
-    .withCredentials()
-    .execute()
-}
 
 const DpNotificationBellComponentDynamic = dynamic(
   () =>
@@ -144,6 +124,7 @@ export default function MainTemplate({
           {isLoggedIn && (
             <DpNotificationBellComponentDynamic
               pagebale={notifications}
+              websocketOptions={websocketOptions}
               onRead={(id) => {
                 return readNotification(id)
               }}
@@ -162,7 +143,10 @@ export default function MainTemplate({
         </NavbarItems>
       </DpNextNavbar>
 
-      <AnnouncementsComponent className="p-2"></AnnouncementsComponent>
+      <AnnouncementsComponent
+        websocketOptions={websocketOptions}
+        className="p-2"
+      ></AnnouncementsComponent>
 
       <DpNextSidebar
         isOpen={openSideBar}
@@ -195,6 +179,8 @@ export default function MainTemplate({
       </DpNextSidebar>
 
       {children}
+
+      <MobileNavbar></MobileNavbar>
     </>
   )
 }
