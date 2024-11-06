@@ -1,4 +1,3 @@
-import { BottomNavbar, BottomNavbarOptions } from '@js-monorepo/bottom-navbar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpVersion } from '@js-monorepo/version'
 import { PropsWithChildren } from 'react'
@@ -10,8 +9,7 @@ export const metadata = {
   title: 'Admin Dashboard',
 }
 
-// Define the navigation links
-const navLinks = [
+export const navLinksOpts = [
   {
     href: '/dashboard/users',
     icon: RiUserSettingsFill,
@@ -27,27 +25,14 @@ const navLinks = [
   {
     href: '/dashboard/notifications',
     icon: IoMdNotifications,
-    label: 'Alerts',
+    label: 'Manage Alerts',
     activeClassName: 'bg-accent text-accent-foreground',
   },
-]
+] as const
 
 function MobileView({ children }: PropsWithChildren) {
   return (
-    <>
-      <div className="px-2 sm:hidden container overflow-hidden">{children}</div>
-
-      <BottomNavbar className="sm:hidden">
-        {navLinks.map(({ href, icon: Icon, label }) => (
-          <BottomNavbarOptions
-            Icon={Icon}
-            href={href}
-            label={label}
-            key={href}
-          ></BottomNavbarOptions>
-        ))}
-      </BottomNavbar>
-    </>
+    <div className="px-2 sm:hidden container overflow-hidden">{children}</div>
   )
 }
 
@@ -56,7 +41,7 @@ function DesktopView({ children }: PropsWithChildren) {
     <section className="sm:grid h-[100%] grid-cols-[max-content_1fr] hidden">
       <div className="min-w-max flex flex-col justify-between p-1 sm:p-2 border-r border-border rounded-md">
         <div className="space-y-2">
-          {navLinks.map(({ href, icon: Icon, label, activeClassName }) => (
+          {navLinksOpts.map(({ href, icon: Icon, label, activeClassName }) => (
             <DpNextNavLink
               key={href}
               className="p-2 transition-colors duration-300 grid place-items-center grid-cols-[30px_auto] gap-2 items-center border border-border rounded-md hover:ring-2"

@@ -1,9 +1,9 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
 import { Badge } from '@js-monorepo/components/badge'
 import { Skeleton } from '@js-monorepo/components/skeleton'
-import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
+import { useWebSocket } from '@js-monorepo/next/providers'
+import { websocketOptions } from '@next-app/app/utils/websocket.config'
 import { useEffect, useState } from 'react'
 import { FaCircle } from 'react-icons/fa6'
 import { DisconnectUserComponent } from './components/disconnect-user'
@@ -15,10 +15,6 @@ export type OnlineUsersType = {
   roles: string[]
 }
 
-export const websocketOptions: WebSocketOptionsType = {
-  url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
-}
-
 async function wait(miliSeconds: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, miliSeconds)
@@ -28,8 +24,7 @@ async function wait(miliSeconds: number) {
 export default function OnlineUsersTableComponent() {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUsersType[] | []>([])
   const [loading, setLoading] = useState(true)
-  const { isLoggedIn } = useSession()
-  const { socket } = useWebSocket(websocketOptions, isLoggedIn)
+  const { socket } = useWebSocket(websocketOptions, true)
 
   useEffect(() => {
     socket?.emit('subscribe:online-users', {})

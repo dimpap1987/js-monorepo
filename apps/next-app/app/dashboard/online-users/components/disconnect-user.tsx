@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from '@js-monorepo/components/tooltip'
 import { useNotifications } from '@js-monorepo/notification'
-import { API } from '@next-app/api-proxy'
+import { API } from '@next-app/app/utils/api-proxy'
 import { VscDebugDisconnect } from 'react-icons/vsc'
 import { OnlineUsersType } from '../online-users-table'
 

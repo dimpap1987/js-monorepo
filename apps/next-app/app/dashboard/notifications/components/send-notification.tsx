@@ -6,7 +6,7 @@ import { Input } from '@js-monorepo/components/form'
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
 import { useNotifications } from '@js-monorepo/notification'
 import { AuthUserFullDto, NotificationCreateDto } from '@js-monorepo/types'
-import { API } from '@next-app/api-proxy'
+import { API } from '@next-app/app/utils/api-proxy'
 import { useEffect, useState } from 'react'
 
 interface User {

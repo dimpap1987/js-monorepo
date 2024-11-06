@@ -1,6 +1,5 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,9 +16,8 @@ import { cn } from '@js-monorepo/ui/util'
 import moment from 'moment'
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { GoDotFill } from 'react-icons/go'
-import { IoMdNotifications } from 'react-icons/io'
-import { MdNotificationsActive } from 'react-icons/md'
 import './bell.css'
+import { NotificationBellButton } from './notification-bell-trigger'
 
 function humanatizeNotificationDate(content: UserNotificationType) {
   const timeDifference = moment().diff(moment(content.notification.createdAt))
@@ -34,10 +32,6 @@ function humanatizeNotificationDate(content: UserNotificationType) {
   }
 }
 
-export const websocketOptions: WebSocketOptionsType = {
-  url: process.env['NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL'] ?? '',
-}
-
 export function DpNotificationBellComponent({
   pagebale = {
     page: 1,
@@ -50,6 +44,7 @@ export function DpNotificationBellComponent({
   className,
   onRead,
   onPaginationChange,
+  websocketOptions,
 }: {
   pagebale?: PaginationType<UserNotificationType> & { unReadTotal?: number }
   className?: string
@@ -58,13 +53,13 @@ export function DpNotificationBellComponent({
     page: number
     pageSize: number
   }) => Promise<void>
+  websocketOptions: WebSocketOptionsType
 }) {
   const [notifications, setNotifications] = useState<UserNotificationType[]>(
     pagebale?.content?.map((content) => humanatizeNotificationDate(content)) ||
       []
   )
-  const { isLoggedIn } = useSession()
-  const { socket } = useWebSocket(websocketOptions, isLoggedIn)
+  const { socket } = useWebSocket(websocketOptions, true)
   const [showLoader, setShowLoader] = useState(false)
 
   const paginator = useRef({
@@ -174,20 +169,10 @@ export function DpNotificationBellComponent({
       }}
     >
       <DropdownMenuTrigger asChild className="px-1">
-        <button className="outline-none">
-          {isRinging && (
-            <div className="absolute z-10 rounded-full border w-[20px] h-[20px] transform translate-x-[0.65rem] -translate-y-[0.5rem] bg-orange-700 border-orange-700 text-white text-sm">
-              {unreadNotificationCount}
-            </div>
-          )}
-
-          {/* Bell */}
-          {isRinging ? (
-            <MdNotificationsActive className="animate-bell text-2xl" />
-          ) : (
-            <IoMdNotifications className="text-2xl" />
-          )}
-        </button>
+        <NotificationBellButton
+          isRinging={isRinging}
+          unreadNotificationCount={unreadNotificationCount}
+        ></NotificationBellButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className={cn(

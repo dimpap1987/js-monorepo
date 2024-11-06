@@ -14,7 +14,7 @@ export function BottomNavbar({
         className
       )}
     >
-      <div className="flex gap-4 justify-around">{children}</div>
+      <div className="flex gap-2 justify-around">{children}</div>
     </div>
   )
 }
