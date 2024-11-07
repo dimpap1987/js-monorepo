@@ -3,7 +3,7 @@
 import { Badge } from '@js-monorepo/components/badge'
 import { Skeleton } from '@js-monorepo/components/skeleton'
 import { useWebSocket } from '@js-monorepo/next/providers'
-import { websocketOptions } from '@next-app/app/utils/websocket.config'
+import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useEffect, useState } from 'react'
 import { FaCircle } from 'react-icons/fa6'
 import { DisconnectUserComponent } from './components/disconnect-user'

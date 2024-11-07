@@ -2,7 +2,7 @@
 
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
 import { AuthRoleDTO, AuthUserDto } from '@js-monorepo/types'
-import { API } from '@next-app/app/utils/api-proxy'
+import { API } from '@next-app/utils/api-proxy'
 import { Row } from '@tanstack/react-table'
 import { useEffect, useState } from 'react'
 
