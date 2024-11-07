@@ -4,16 +4,16 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
-import { useWebSocket } from '@js-monorepo/next/providers'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import { MenuItem, PaginationType } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
+import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import {
   fetchUserNotifications,
   readNotification,
-} from '@next-app/app/utils/notifications'
-import { websocketOptions } from '@next-app/app/utils/websocket.config'
+} from '@next-app/utils/notifications'
+import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
 import dynamic from 'next/dynamic'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
@@ -62,11 +62,12 @@ export default function MainTemplate({
   const { user, isLoggedIn, isAdmin, refreshSession } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const fetchNotificationsRef = useRef(false)
-  const { socket, disconnect } = useWebSocket(websocketOptions, isLoggedIn)
   const router = useRouter()
   const [notifications, setNotifications] = useState<
     PaginationType | undefined
   >()
+
+  useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
 
   useEffect(() => {
     if (!user?.id || fetchNotificationsRef.current) return
@@ -78,29 +79,6 @@ export default function MainTemplate({
       }
     })
   }, [user])
-
-  useEffect(() => {
-    if (!socket) return
-
-    socket.on('connect', () => {
-      socket.emit('subscribe:announcements', {})
-      socket.on('events:refresh-session', () => {
-        setTimeout(() => {
-          refreshSession()
-        }, 1000)
-      })
-    })
-
-    return () => {
-      disconnect()
-    }
-  }, [socket])
-
-  useEffect(() => {
-    if (socket && isAdmin) {
-      socket.emit('subscribe:join-admin-room', {})
-    }
-  }, [socket, isAdmin])
 
   return (
     <>
