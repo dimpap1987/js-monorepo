@@ -1,23 +1,17 @@
 'use client'
 
-import {
-  DataTable,
-  DataTableColumnHeader,
-  usePagination,
-} from '@js-monorepo/components/table'
+import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from '@js-monorepo/components/avatar'
+import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
 import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types'
-import { constructURIQueryString } from '@js-monorepo/ui/util'
 import { API } from '@next-app/utils/api-proxy'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
-import { useRouter } from 'next-nprogress-bar'
-import { useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
@@ -60,37 +54,20 @@ const DashboardUsersTableSuspense = () => {
     user?: AuthUserFullDto
   }>()
 
-  const searchParams = useSearchParams()
-  const { replace } = useRouter()
+  const { pagination, searchQuery, setPagination } = usePaginationWithParams()
+  const pageCount = Math.round(data?.totalCount / pagination.pageSize)
 
-  const { limit, onPaginationChange, skip, pagination } = usePagination({
-    pageIndexProps: searchParams.get('page')
-      ? Number(searchParams.get('page'))
-      : undefined,
-    pageSizeProps: searchParams.get('pageSize')
-      ? Number(searchParams.get('pageSize'))
-      : undefined,
-  })
-
-  useEffect(() => {
-    //Avoid being called twice because of the below useEffect setting the pagination
-    if (!searchParams.get('page') || !searchParams.get('pageSize')) return
-    const searchQuery = constructURIQueryString(pagination)
+  function loadUsers() {
     setLoading(true)
     findUsers(searchQuery).then((response) => {
       setData(response)
       setLoading(false)
     })
-  }, [searchParams])
+  }
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams)
-    params.set('pageSize', pagination.pageSize.toString())
-    params.set('page', pagination.pageIndex.toString())
-    replace('?' + params)
-  }, [pagination, limit, onPaginationChange, skip])
-
-  const pageCount = Math.round(data?.totalCount / limit)
+    loadUsers()
+  }, [searchQuery])
 
   const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
     () => [
@@ -216,9 +193,7 @@ const DashboardUsersTableSuspense = () => {
                           .execute()
 
                         if (response.ok) {
-                          const params = new URLSearchParams(searchParams)
-                          params.set('updatedAt', new Date().toLocaleString())
-                          replace('?' + params)
+                          loadUsers()
                           setUpdate({
                             inProgress: false,
                           })
@@ -257,7 +232,7 @@ const DashboardUsersTableSuspense = () => {
         },
       },
     ],
-    [update, replace, searchParams, pagination]
+    [update, pagination]
   )
 
   return (
@@ -265,7 +240,7 @@ const DashboardUsersTableSuspense = () => {
       <DataTable
         columns={memoizedColumns}
         data={data?.users}
-        onPaginationChange={onPaginationChange}
+        onPaginationChange={setPagination}
         totalCount={pageCount}
         pagination={pagination}
         loading={loading}

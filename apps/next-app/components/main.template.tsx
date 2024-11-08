@@ -72,7 +72,7 @@ export default function MainTemplate({
   useEffect(() => {
     if (!user?.id || fetchNotificationsRef.current) return
 
-    fetchUserNotifications(user.id).then((response) => {
+    fetchUserNotifications(user.id, `page=1&pageSize=15`).then((response) => {
       if (response.ok) {
         fetchNotificationsRef.current = true
         setNotifications(response.data as PaginationType)
@@ -107,13 +107,14 @@ export default function MainTemplate({
                 return readNotification(id)
               }}
               onPaginationChange={async (pagination) => {
-                return fetchUserNotifications(user!.id, pagination).then(
-                  (response) => {
-                    if (response.ok) {
-                      setNotifications(response.data as PaginationType)
-                    }
+                return fetchUserNotifications(
+                  user!.id,
+                  `page=${pagination.page}&pageSize=${pagination.pageSize}`
+                ).then((response) => {
+                  if (response.ok) {
+                    setNotifications(response.data as PaginationType)
                   }
-                )
+                })
               }}
             ></DpNotificationBellComponentDynamic>
           )}
@@ -123,7 +124,6 @@ export default function MainTemplate({
 
       <AnnouncementsComponent
         websocketOptions={websocketOptions}
-        className="p-2"
       ></AnnouncementsComponent>
 
       <DpNextSidebar
@@ -156,9 +156,9 @@ export default function MainTemplate({
         </div>
       </DpNextSidebar>
 
-      {children}
+      <main className="p-2 mt-7">{children}</main>
 
-      <MobileNavbar></MobileNavbar>
+      {isLoggedIn && <MobileNavbar></MobileNavbar>}
     </>
   )
 }

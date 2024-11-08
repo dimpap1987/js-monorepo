@@ -23,7 +23,3 @@ h4 {
   @apply text-lg;
   @apply font-semibold;
 }
-
-html {
-  scrollbar-gutter: stable;
-}

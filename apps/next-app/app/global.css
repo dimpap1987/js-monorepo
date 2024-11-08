@@ -26,7 +26,6 @@ h4 {
 
 @layer base {
   :root {
-    /* scrollbar-gutter: stable; */
     --navbar-height: 60px; /* Define the height of your navbar */
 
     --foreground: 0 0% 0%;

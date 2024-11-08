@@ -12,7 +12,7 @@ interface MainProps {
 }
 
 export default function LandingComponent({ children, className }: MainProps) {
-  const [, setLoaderState] = useLoader()
+  const { setLoaderState } = useLoader()
   const { addNotification } = useNotifications()
   const [loading, setLoading] = useState(false)
   // const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)

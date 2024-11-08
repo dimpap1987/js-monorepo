@@ -2,10 +2,11 @@ import { API } from './api-proxy'
 
 export async function fetchUserNotifications(
   userId: number,
-  pagination = { page: 1, pageSize: 15 }
+  searchParams?: string
 ) {
+  const queryString = searchParams ? `?${searchParams}` : ''
   return API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/users/${userId}?page=${pagination.page}&pageSize=${pagination.pageSize}`
+    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/users/${userId}${queryString}`
   )
     .get()
     .withCredentials()

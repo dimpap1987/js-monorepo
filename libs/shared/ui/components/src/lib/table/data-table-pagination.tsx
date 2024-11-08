@@ -26,11 +26,7 @@ export function DataTablePagination<TData>({
 }: DataTablePaginationProps<TData>) {
   return (
     <div className={cn('flex items-center justify-between p-3', className)}>
-      <div className="flex-1 text-sm text-muted-foreground hidden sm:block">
-        {table.getFilteredSelectedRowModel()?.rows?.length} of{' '}
-        {table.getFilteredRowModel()?.rows?.length} row(s) selected.
-      </div>
-      <div className="flex items-center space-x-6 lg:space-x-8 overflow-auto">
+      <div className="flex items-center gap-1 justify-between overflow-auto w-full">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium hidden sm:block">Rows per page</p>
           <Select

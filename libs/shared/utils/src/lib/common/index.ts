@@ -54,3 +54,9 @@ export function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
     return 'desktop'
   }
 }
+
+export async function wait(miliSeconds: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, miliSeconds)
+  })
+}

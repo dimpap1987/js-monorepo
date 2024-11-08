@@ -13,14 +13,14 @@ function LoginDialog() {
   const router = useRouter()
   const pathname = usePathname()
   const pathnameRef = useRef('/') // Create a ref to store the latest pathname
-  const [loaderState, setLoaderState] = useLoader()
+  const { state, setLoaderState } = useLoader()
 
   const isDialogOpen = pathname === LOGIN_PATH_NAME
 
   useEffect(() => {
     // clean loader if exists
     return () => {
-      if (loaderState.show) {
+      if (state.show) {
         setLoaderState({ show: false })
       }
     }
