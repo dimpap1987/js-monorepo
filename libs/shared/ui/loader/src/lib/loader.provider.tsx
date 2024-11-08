@@ -25,22 +25,25 @@ const LoaderContext = createContext<
   | undefined
 >(undefined)
 
-export const useLoader = (): [
-  LoaderProps,
-  React.Dispatch<React.SetStateAction<LoaderProps>>,
-] => {
+export const useLoader = (): {
+  state: LoaderProps
+  setLoaderState: React.Dispatch<React.SetStateAction<LoaderProps>>
+} => {
   const context = useContext(LoaderContext)
   if (!context) {
     throw new Error('useLoader must be used within a LoaderProvider')
   }
-  return [context.loaderState, context.setLoaderState]
+  return {
+    state: context.loaderState,
+    setLoaderState: context.setLoaderState,
+  }
 }
 
 export const DpLoaderProvider: React.FC<LoaderProviderPros> = ({
   children,
 }) => {
   const [loaderState, setLoaderState] = useState<LoaderProps>({
-    show: false,
+    show: undefined,
     message: '',
     description: '',
   })

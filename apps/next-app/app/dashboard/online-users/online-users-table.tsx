@@ -7,18 +7,13 @@ import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useEffect, useState } from 'react'
 import { FaCircle } from 'react-icons/fa6'
 import { DisconnectUserComponent } from './components/disconnect-user'
+import { wait } from '@js-monorepo/utils/common'
 
 export type OnlineUsersType = {
   id: number
   username: string
   socketId?: string
   roles: string[]
-}
-
-async function wait(miliSeconds: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, miliSeconds)
-  })
 }
 
 export default function OnlineUsersTableComponent() {

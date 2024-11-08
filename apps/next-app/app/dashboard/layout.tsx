@@ -57,7 +57,7 @@ function Sidebar() {
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
   return (
-    <main className="h-[calc(100svh_-_var(--navbar-height)_-_2.5rem)] bg-background text-foreground">
+    <section className="h-[calc(100svh_-_var(--navbar-height)_-_2.9rem)] bg-background text-foreground">
       <div
         className={cn(
           'h-full',
@@ -68,6 +68,6 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
         <Sidebar />
         <div className="px-2 container overflow-hidden">{children}</div>
       </div>
-    </main>
+    </section>
   )
 }

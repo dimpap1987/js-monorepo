@@ -3,6 +3,7 @@
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Marquee } from '@js-monorepo/components/marquee'
 import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
+import { cn } from '@js-monorepo/ui/util'
 import { useEffect, useState } from 'react'
 
 export function AnnouncementsComponent({
@@ -34,7 +35,10 @@ export function AnnouncementsComponent({
 
   return (
     <Marquee
-      className={className}
+      className={cn(
+        `fixed top-[calc(5px_+_var(--navbar-height))] w-full`,
+        className
+      )}
       duration={15}
       onAnimationComplete={() => setAnnouncements([])}
     >

@@ -20,7 +20,7 @@ export function Example() {
 import { useLoader } from '@js-monorepo/loader'
 
 export function Component() {
-  const [loaderState, setLoaderState] = useLoader()
+  const { state, setLoaderState } = useLoader()
 
   return <button onClick={() => setLoaderState({ show: true, message: 'Loading' })}>Trigger loading</button>
 }

@@ -19,7 +19,7 @@ import { GoDotFill } from 'react-icons/go'
 import './bell.css'
 import { NotificationBellButton } from './notification-bell-trigger'
 
-function humanatizeNotificationDate(content: UserNotificationType) {
+export function humanatizeNotificationDate(content: UserNotificationType) {
   const timeDifference = moment().diff(moment(content.notification.createdAt))
   const formattedDifference = moment.duration(timeDifference).humanize()
 

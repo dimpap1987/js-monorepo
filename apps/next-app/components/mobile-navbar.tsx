@@ -4,6 +4,7 @@ import { useSession } from '@js-monorepo/auth/next/client'
 import { BottomNavbar, BottomNavbarOptions } from '@js-monorepo/bottom-navbar'
 import { AuthRole } from '@js-monorepo/types'
 import { HiBellAlert, HiMiniUsers } from 'react-icons/hi2'
+import { IoMdNotifications } from 'react-icons/io'
 import { IconType } from 'react-icons/lib'
 import { RiUserSettingsFill } from 'react-icons/ri'
 
@@ -37,13 +38,13 @@ export const navLinksOpts: NavLinkOpts[] = [
     activeClassName: 'bg-accent text-accent-foreground',
     roles: ['ADMIN'],
   },
-  // {
-  //   href: '/notifications',
-  //   icon: IoMdNotifications,
-  //   label: 'Alerts',
-  //   activeClassName: 'bg-accent text-accent-foreground',
-  //   roles: ['USER'],
-  // },
+  {
+    href: '/notifications',
+    icon: IoMdNotifications,
+    label: 'Alerts',
+    activeClassName: 'bg-accent text-accent-foreground',
+    roles: ['USER'],
+  },
 ] as const
 
 export const MobileNavbar = () => {
