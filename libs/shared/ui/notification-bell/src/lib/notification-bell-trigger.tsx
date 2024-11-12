@@ -3,6 +3,7 @@
 import { forwardRef } from 'react'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdNotificationsActive } from 'react-icons/md'
+import './bell.css'
 
 export const NotificationBellButton = forwardRef<
   HTMLButtonElement,

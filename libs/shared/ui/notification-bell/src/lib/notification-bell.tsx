@@ -3,145 +3,96 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@js-monorepo/components/dropdown'
-import { DpLoadingSpinner } from '@js-monorepo/loader'
-import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
-import { PaginationType, UserNotificationType } from '@js-monorepo/types'
+import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import moment from 'moment'
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
-import { GoDotFill } from 'react-icons/go'
-import './bell.css'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { usePagination } from './hooks'
 import { NotificationBellButton } from './notification-bell-trigger'
+import { NotificationList } from './notification-list'
 
-export function humanatizeNotificationDate(content: UserNotificationType) {
-  const timeDifference = moment().diff(moment(content.notification.createdAt))
-  const formattedDifference = moment.duration(timeDifference).humanize()
-
-  return {
-    ...content,
-    notification: {
-      ...content.notification,
-      createdAt: formattedDifference,
-    },
-  }
+interface DpNotificationBellComponentProps {
+  notificationList: UserNotificationType[]
+  pagebale: Pageable & { totalPages: number }
+  className?: string
+  onRead?: (notificationId: number) => Promise<any>
+  onPaginationChange: (pagination: Pageable) => Promise<void>
 }
 
 export function DpNotificationBellComponent({
-  pagebale = {
-    page: 1,
-    content: [],
-    pageSize: 15,
-    totalCount: 0,
-    totalPages: 1,
-    unReadTotal: 0,
-  },
+  notificationList,
+  pagebale,
   className,
   onRead,
   onPaginationChange,
-  websocketOptions,
-}: {
-  pagebale?: PaginationType<UserNotificationType> & { unReadTotal?: number }
-  className?: string
-  onRead?: (notificationId: number) => Promise<any>
-  onPaginationChange?: (pagination: {
-    page: number
-    pageSize: number
-  }) => Promise<void>
-  websocketOptions: WebSocketOptionsType
-}) {
-  const [notifications, setNotifications] = useState<UserNotificationType[]>(
-    pagebale?.content?.map((content) => humanatizeNotificationDate(content)) ||
-      []
-  )
-  const { socket } = useWebSocket(websocketOptions, true)
-  const [showLoader, setShowLoader] = useState(false)
+}: DpNotificationBellComponentProps) {
+  const [notifications, setNotifications] = useState<UserNotificationType[]>([])
 
-  const paginator = useRef({
-    page: pagebale?.page || 1,
-    pageSize: pagebale?.pageSize || 15,
-    totalCount: pagebale?.totalCount || 0,
-    totalPages: pagebale?.totalPages || 1,
-    unReadTotal: pagebale?.unReadTotal || 0,
+  const { isLoading, loadMore } = usePagination({
+    page: pagebale.page,
+    pageSize: pagebale.pageSize,
+    totalPages: pagebale.totalPages,
+    onPaginationChange,
   })
 
-  const notificationsLoading = useRef(false)
-
   const notificationContainerRef = useRef<HTMLDivElement>(null)
-  const unreadNotificationCount = paginator.current.unReadTotal
-  const isRinging = unreadNotificationCount > 0
+
+  const unreadNotificationCount = useMemo(
+    () => notifications.filter((n) => !n.isRead).length,
+    [notifications]
+  )
+
+  const isRinging = useMemo(
+    () => unreadNotificationCount > 0,
+    [unreadNotificationCount]
+  )
 
   useEffect(() => {
-    if (!socket) return
-    socket.on('events:notifications', (event) => {
-      if (event.data) {
-        paginator.current.unReadTotal = paginator.current.unReadTotal + 1
-        setNotifications((prev) => [
-          humanatizeNotificationDate(event.data),
-          ...prev,
-        ])
-      }
-    })
-  }, [socket])
-
-  useEffect(() => {
-    if (!pagebale) return
-
-    paginator.current = {
-      page: pagebale?.page || 1,
-      pageSize: pagebale?.pageSize || 15,
-      totalCount: pagebale?.totalCount || 0,
-      totalPages: pagebale?.totalPages || 1,
-      unReadTotal: pagebale?.unReadTotal || 0,
-    }
-
-    if (!pagebale.content) return
-
-    setNotifications((prev) => {
+    setNotifications((prev: UserNotificationType[]) => {
       const existingIds = new Set(
         prev.map((content) => content.notification.id)
-      ) // Create a Set of existing notification IDs
+      ) // Set of existing IDs
 
-      // Filter out notifications that are already in the Set
-      const newNotifications = pagebale.content
-        .filter((content) => !existingIds.has(content.notification.id))
-        .map((content) => humanatizeNotificationDate(content))
+      // Filter out already existing notifications by ID
+      const newNotifications = notificationList.filter(
+        (content) => !existingIds.has(content.notification.id)
+      )
 
-      return [...prev, ...newNotifications]
+      const allNots = [...prev, ...newNotifications].sort(
+        (a, b) => b.notification.id - a.notification.id
+      )
+
+      return allNots
     })
-  }, [pagebale])
+  }, [notificationList])
+
+  const handleRead = useCallback(
+    (id: number) => {
+      onRead?.(id)
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.notification.id === id
+            ? { ...notification, isRead: true }
+            : notification
+        )
+      )
+    },
+    [onRead]
+  )
 
   const handleScroll = useCallback(() => {
-    if (notificationContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } =
-        notificationContainerRef.current
+    if (!notificationContainerRef?.current) return
 
-      // Check if scrolled to the bottom and not already loading more
-      if (
-        scrollTop + clientHeight >= scrollHeight - 5 &&
-        paginator.current.page < paginator.current.totalPages &&
-        !notificationsLoading.current // Check if not already loading
-      ) {
-        notificationsLoading.current = true
-        setShowLoader(true)
+    const { scrollTop, scrollHeight, clientHeight } =
+      notificationContainerRef.current
 
-        setTimeout(() => {
-          onPaginationChange?.({
-            page: paginator.current.page + 1,
-            pageSize: paginator.current.pageSize,
-          }).finally(() => {
-            setShowLoader(false)
-            notificationsLoading.current = false
-          })
-        }, 300)
-      }
+    if (scrollTop + clientHeight >= scrollHeight - 5) {
+      loadMore()
     }
-  }, [pagebale, notificationsLoading.current, onPaginationChange])
+  }, [loadMore])
 
   return (
     <DropdownMenu
@@ -157,22 +108,15 @@ export function DpNotificationBellComponent({
               'scroll',
               handleScroll
             )
-
-            if (notifications.length > 30) {
-              setNotifications((prev) => prev.slice(0, 15))
-              // Reset paginator state
-              paginator.current.page = 1
-              paginator.current.pageSize = 15
-            }
           }
-        }, 200)
+        }, 100)
       }}
     >
-      <DropdownMenuTrigger asChild className="px-1">
+      <DropdownMenuTrigger asChild>
         <NotificationBellButton
           isRinging={isRinging}
           unreadNotificationCount={unreadNotificationCount}
-        ></NotificationBellButton>
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className={cn(
@@ -186,63 +130,11 @@ export function DpNotificationBellComponent({
           ref={notificationContainerRef}
           className="h-[calc(80vh_-_var(--navbar-height))] max-h-[502px] overflow-x-hidden overflow-y-auto"
         >
-          {notifications.length > 0 ? (
-            notifications.map((content, index) => (
-              <Fragment key={content?.notification?.id}>
-                <DropdownMenuItem
-                  className={`cursor-pointer p-2 focus:text-white ${content.isRead ? 'opacity-35' : 'bg-background-secondary/70'}`}
-                  onSelect={(e) => {
-                    e.preventDefault()
-                    const notIndex = notifications.findIndex(
-                      (item) => item.notification.id === content.notification.id
-                    )
-
-                    if (notIndex !== -1) {
-                      const newNotifications = [...notifications]
-                      newNotifications[notIndex] = {
-                        ...newNotifications[notIndex],
-                        isRead: true,
-                      }
-                      setNotifications(newNotifications)
-                      if (paginator.current.unReadTotal > 0) {
-                        paginator.current.unReadTotal =
-                          paginator.current.unReadTotal - 1
-                      }
-                      if (!content.isRead) {
-                        onRead?.(content.notification.id)
-                      }
-                    }
-                  }}
-                >
-                  <GoDotFill
-                    className={`text-2xl mr-2 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-white'}`}
-                  />
-                  <div className="p-1 max-line--height break-words">
-                    {content.notification?.message}
-                  </div>
-                  <DropdownMenuShortcut>
-                    {content.notification?.createdAt as string} ago
-                  </DropdownMenuShortcut>
-                </DropdownMenuItem>
-                {index === notifications.length - 1 && showLoader && (
-                  <div className="relative flex items-center justify-center py-1">
-                    <DpLoadingSpinner
-                      message="Loading..."
-                      className="text-sm"
-                    ></DpLoadingSpinner>
-                  </div>
-                )}
-                {index < notifications.length - 1 && <DropdownMenuSeparator />}
-              </Fragment>
-            ))
-          ) : (
-            <div className="p-2 text-sm">
-              Nothing to show{' '}
-              <span role="img" aria-label="emoji-sad">
-                😒
-              </span>
-            </div>
-          )}
+          <NotificationList
+            notifications={notifications}
+            onRead={handleRead}
+            showLoader={isLoading}
+          />
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

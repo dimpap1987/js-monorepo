@@ -4,9 +4,14 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
+import { useNotificationWebSocket } from '@js-monorepo/notification-bell'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
-import { MenuItem, PaginationType } from '@js-monorepo/types'
+import {
+  MenuItem,
+  PaginationType,
+  UserNotificationType,
+} from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import {
@@ -64,18 +69,30 @@ export default function MainTemplate({
   const fetchNotificationsRef = useRef(false)
   const router = useRouter()
   const [notifications, setNotifications] = useState<
-    PaginationType | undefined
+    Partial<PaginationType> | undefined
   >()
 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
+  useNotificationWebSocket(
+    websocketOptions,
+    (notification: UserNotificationType) => {
+      if (notification) {
+        setNotifications((prev) => {
+          return {
+            ...prev,
+            content: [notification, ...(prev?.content ?? [])],
+          }
+        })
+      }
+    }
+  )
 
   useEffect(() => {
     if (!user?.id || fetchNotificationsRef.current) return
-
     fetchUserNotifications(user.id, `page=1&pageSize=15`).then((response) => {
       if (response.ok) {
         fetchNotificationsRef.current = true
-        setNotifications(response.data as PaginationType)
+        setNotifications(response.data)
       }
     })
   }, [user])
@@ -101,8 +118,12 @@ export default function MainTemplate({
         <NavbarItems>
           {isLoggedIn && (
             <DpNotificationBellComponentDynamic
-              pagebale={notifications}
-              websocketOptions={websocketOptions}
+              pagebale={{
+                page: notifications?.page ?? 1,
+                pageSize: notifications?.pageSize ?? 15,
+                totalPages: notifications?.totalPages ?? 0,
+              }}
+              notificationList={notifications?.content ?? []}
               onRead={(id) => {
                 return readNotification(id)
               }}
@@ -112,7 +133,7 @@ export default function MainTemplate({
                   `page=${pagination.page}&pageSize=${pagination.pageSize}`
                 ).then((response) => {
                   if (response.ok) {
-                    setNotifications(response.data as PaginationType)
+                    setNotifications(response.data)
                   }
                 })
               }}
