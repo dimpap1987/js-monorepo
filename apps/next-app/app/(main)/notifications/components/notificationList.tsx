@@ -80,7 +80,7 @@ export function NotificationList() {
             <div
               className={`cursor-pointer p-2 transition-all duration-200 ${
                 content.isRead ? 'opacity-50' : ''
-              } hover:bg-background-secondary`}
+              } hover:opacity-90 hover:bg-primary/20`}
               onClick={() => {
                 // Handle the notification read state change
                 if (!content.isRead && notifications?.content) {
@@ -102,7 +102,7 @@ export function NotificationList() {
             >
               <div className="flex items-center">
                 <GoDotFill
-                  className={`text-2xl mr-2 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-white'}`}
+                  className={`text-2xl mr-2 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-foreground'}`}
                 />
                 <div className="flex-1 p-1 max-line--height break-words">
                   {content.notification?.message}
