@@ -34,19 +34,19 @@ h4 {
     --border: 240 4% 56%;
 
     --primary: 265 76% 54%;
-    --primary-foreground: 0 0% 90%;
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 26 114% 57%;
-    --secondary-foreground: 0 0% 90%;
+    --secondary-foreground: 0 0% 98%;
 
     --accent: 229 87% 54%;
-    --accent-foreground: 0 0% 90%;
+    --accent-foreground: 0 0% 98%;
 
     --danger: -14 98% 47%;
-    --danger-foreground: 0 0% 90%;
+    --danger-foreground: 0 0% 98%;
 
     --destructive: 0 0% 78%;
-    --destructive-foreground: 0 0% 90%;
+    --destructive-foreground: 0 0% 98%;
 
     --tw-shadow-color: 0 0% 20%;
   }
