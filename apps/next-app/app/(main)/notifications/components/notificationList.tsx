@@ -3,8 +3,10 @@
 import { useSession } from '@js-monorepo/auth/next/client'
 import { useLoader } from '@js-monorepo/loader'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
-import { useWebSocket } from '@js-monorepo/next/providers'
-import { humanatizeNotificationDate } from '@js-monorepo/notification-bell'
+import {
+  humanatizeNotificationDate,
+  useNotificationWebSocket,
+} from '@js-monorepo/notification-bell'
 import { PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { wait } from '@js-monorepo/utils/common'
 import {
@@ -18,15 +20,10 @@ import { GoDotFill } from 'react-icons/go'
 export function NotificationList() {
   const { user } = useSession()
   const [notifications, setNotifications] = useState<
-    PaginationType | undefined
+    Partial<PaginationType> | undefined
   >()
-
-  const { socket } = useWebSocket(websocketOptions, true)
   const { setLoaderState } = useLoader()
-  const { pagination, searchQuery, setPagination } = usePaginationWithParams(
-    1,
-    50
-  )
+  const { searchQuery } = usePaginationWithParams(1, 50)
 
   const loadingRef = useRef(true)
 
@@ -43,9 +40,7 @@ export function NotificationList() {
         })
         const response = await fetchUserNotifications(user.id, searchQuery)
         if (response.ok) {
-          setNotifications(
-            response.data as PaginationType<UserNotificationType>
-          )
+          setNotifications(response.data)
         }
         await wait(300)
       } catch (error) {
@@ -61,24 +56,19 @@ export function NotificationList() {
     fetchNotifications()
   }, [user, searchQuery])
 
-  useEffect(() => {
-    if (!socket) return
-    socket.on('events:notifications', (event) => {
-      if (event.data) {
+  useNotificationWebSocket(
+    websocketOptions,
+    (notification: UserNotificationType) => {
+      if (notification) {
         setNotifications((prev) => {
           return {
-            page: prev?.page ?? 1,
-            pageSize: prev?.pageSize ?? 50,
-            totalPages: prev?.totalPages ?? 0,
-            totalCount: prev?.totalCount ? prev.totalCount + 1 : 1,
-            content: prev?.content
-              ? [event.data, ...prev.content]
-              : [event.data],
+            ...prev,
+            content: [notification, ...(prev?.content ?? [])],
           }
         })
       }
-    })
-  }, [socket])
+    }
+  )
 
   if (loadingRef.current) return null
 
@@ -93,24 +83,20 @@ export function NotificationList() {
               } hover:bg-background-secondary`}
               onClick={() => {
                 // Handle the notification read state change
-                if (!content.isRead) {
-                  const notIndex = notifications.content.findIndex(
-                    (item) => item.notification.id === content.notification.id
+                if (!content.isRead && notifications?.content) {
+                  const updatedNotifications = notifications.content.map(
+                    (item) =>
+                      item.notification.id === content.notification.id
+                        ? { ...item, isRead: true }
+                        : item
                   )
-                  if (notIndex !== -1) {
-                    const newNotifications = [...notifications.content]
-                    newNotifications[notIndex] = {
-                      ...newNotifications[notIndex],
-                      isRead: true,
-                    }
-                    setNotifications({
-                      ...notifications,
-                      content: newNotifications,
-                    })
-                    if (!content.isRead) {
-                      readNotification(content.notification.id)
-                    }
-                  }
+
+                  setNotifications({
+                    ...notifications,
+                    content: updatedNotifications,
+                  })
+
+                  readNotification(content.notification.id)
                 }
               }}
             >
@@ -122,15 +108,18 @@ export function NotificationList() {
                   {content.notification?.message}
                 </div>
                 <span className="text-sm text-gray-500">
-                  {humanatizeNotificationDate(content)?.notification?.createdAt}{' '}
+                  {humanatizeNotificationDate(
+                    content?.notification?.createdAt || ''
+                  )}{' '}
                   ago
                 </span>
               </div>
             </div>
 
-            {index < notifications.content.length - 1 && (
-              <hr className="my-2 border-t border-border" />
-            )}
+            {notifications?.content?.length &&
+              index < notifications.content.length - 1 && (
+                <hr className="my-2 border-t border-border" />
+              )}
           </Fragment>
         ))
       ) : (

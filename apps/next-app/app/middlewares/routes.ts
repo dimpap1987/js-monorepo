@@ -23,6 +23,10 @@ export const routes: {
     roles: ['USER', 'ADMIN'],
   },
   {
+    path: '/notifications',
+    roles: ['USER', 'ADMIN'],
+  },
+  {
     path: '/dashboard',
     roles: ['ADMIN'],
   },
