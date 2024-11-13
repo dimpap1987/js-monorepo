@@ -1,10 +1,15 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { BottomNavbar, BottomNavbarOptions } from '@js-monorepo/bottom-navbar'
+import {
+  BottomNavbar,
+  BottomNavbarAlert,
+  BottomNavbarOptions,
+} from '@js-monorepo/bottom-navbar'
+import { NotificationBellButton } from '@js-monorepo/notification-bell'
 import { AuthRole } from '@js-monorepo/types'
+import { useNotificationStore } from '@next-app/state'
 import { HiBellAlert, HiMiniUsers } from 'react-icons/hi2'
-import { IoMdNotifications } from 'react-icons/io'
 import { IconType } from 'react-icons/lib'
 import { RiUserSettingsFill } from 'react-icons/ri'
 
@@ -38,17 +43,11 @@ export const navLinksOpts: NavLinkOpts[] = [
     activeClassName: 'bg-accent text-accent-foreground',
     roles: ['ADMIN'],
   },
-  {
-    href: '/notifications',
-    icon: IoMdNotifications,
-    label: 'Alerts',
-    activeClassName: 'bg-accent text-accent-foreground',
-    roles: ['USER'],
-  },
 ] as const
 
 export const MobileNavbar = () => {
   const { isAdmin } = useSession()
+  const { notificationCount } = useNotificationStore()
 
   return (
     <BottomNavbar className="sm:hidden">
@@ -65,6 +64,9 @@ export const MobileNavbar = () => {
             key={href}
           ></BottomNavbarOptions>
         ))}
+      <BottomNavbarAlert href="/notifications" label="Alerts">
+        <NotificationBellButton unreadNotificationCount={notificationCount} />
+      </BottomNavbarAlert>
     </BottomNavbar>
   )
 }

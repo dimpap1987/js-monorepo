@@ -26,13 +26,13 @@ export function BottomNavbar({
   return (
     <div
       className={cn(
-        'fixed bottom-0 w-[100vw] transition-transform duration-300',
+        'fixed bottom-0 h-[60px] w-[100vw] transition-transform duration-300 overflow-hidden',
         isVisible ? 'translate-y-0' : 'translate-y-full', // slide in/out
         'dark:bg-zinc-900 dark:text-gray-300 bg-background border-t border-border',
         className
       )}
     >
-      <div className="flex gap-2 justify-around">{children}</div>
+      <div className="flex gap-2 justify-around h-full">{children}</div>
     </div>
   )
 }
