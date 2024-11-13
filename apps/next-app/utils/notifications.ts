@@ -1,7 +1,7 @@
 import { ClientResponseType, PaginationType } from '@js-monorepo/types'
 import { API } from './api-proxy'
 
-export async function fetchUserNotifications(
+export async function apiFetchUserNotifications(
   userId: number,
   searchParams?: string
 ): Promise<
@@ -20,7 +20,7 @@ export async function fetchUserNotifications(
     .execute()
 }
 
-export async function readNotification(notificationId: number) {
+export async function apiReadNotification(notificationId: number) {
   return API.url(
     `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/${notificationId}/read`
   )

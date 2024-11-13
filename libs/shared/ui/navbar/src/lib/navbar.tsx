@@ -140,9 +140,11 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
             </ul>
 
             <div className="flex items-center gap-4 justify-end text-center">
-              <section className="hidden sm:flex justify-center items-center gap-3">
-                {navbarItems}
-              </section>
+              {navbarItems && (
+                <section className="hidden sm:flex justify-center items-center gap-5">
+                  {navbarItems}
+                </section>
+              )}
 
               {/* login button */}
               {!user?.isLoggedIn && (

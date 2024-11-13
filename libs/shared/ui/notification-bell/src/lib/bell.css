@@ -19,7 +19,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-clamp: 3;
-  -webkit-line-clamp: 3;
-  max-height: calc(1.6em * 3);
+  line-clamp: var(--line-clamp, 7); /* Default to 7 lines */
+  -webkit-line-clamp: var(--line-clamp, 7);
+  max-height: calc(1.6em * var(--line-clamp, 7));
 }

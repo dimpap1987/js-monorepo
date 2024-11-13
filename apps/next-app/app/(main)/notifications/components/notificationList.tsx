@@ -5,13 +5,15 @@ import { useLoader } from '@js-monorepo/loader'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
 import {
   humanatizeNotificationDate,
+  updateNotificationAsRead,
   useNotificationWebSocket,
 } from '@js-monorepo/notification-bell'
 import { PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { wait } from '@js-monorepo/utils/common'
+import { useNotificationStore } from '@next-app/state'
 import {
-  fetchUserNotifications,
-  readNotification,
+  apiFetchUserNotifications,
+  apiReadNotification,
 } from '@next-app/utils/notifications'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { Fragment, useEffect, useRef, useState } from 'react'
@@ -20,7 +22,7 @@ import { GoDotFill } from 'react-icons/go'
 export function NotificationList() {
   const { user } = useSession()
   const [notifications, setNotifications] = useState<
-    Partial<PaginationType> | undefined
+    Partial<PaginationType<UserNotificationType>> | undefined
   >()
   const { setLoaderState } = useLoader()
   const { searchQuery } = usePaginationWithParams(1, 50)
@@ -38,7 +40,7 @@ export function NotificationList() {
           message: 'Loading...',
           description: 'Notifications',
         })
-        const response = await fetchUserNotifications(user.id, searchQuery)
+        const response = await apiFetchUserNotifications(user.id, searchQuery)
         if (response.ok) {
           setNotifications(response.data)
         }
@@ -54,7 +56,7 @@ export function NotificationList() {
     }
 
     fetchNotifications()
-  }, [user, searchQuery])
+  }, [user?.id, searchQuery])
 
   useNotificationWebSocket(
     websocketOptions,
@@ -69,6 +71,24 @@ export function NotificationList() {
       }
     }
   )
+  const { markNotificationAsRead, latestReadNotificationId } =
+    useNotificationStore()
+
+  useEffect(() => {
+    if (latestReadNotificationId) {
+      setNotifications((prev) => {
+        if (!prev || !prev.content) return prev
+
+        return {
+          ...prev,
+          content: updateNotificationAsRead(
+            prev.content,
+            latestReadNotificationId
+          ),
+        }
+      })
+    }
+  }, [latestReadNotificationId])
 
   if (loadingRef.current) return null
 
@@ -81,22 +101,19 @@ export function NotificationList() {
               className={`cursor-pointer p-2 transition-all duration-200 ${
                 content.isRead ? 'opacity-50' : ''
               } hover:opacity-90 hover:bg-primary/20`}
-              onClick={() => {
+              onClick={async () => {
                 // Handle the notification read state change
                 if (!content.isRead && notifications?.content) {
-                  const updatedNotifications = notifications.content.map(
-                    (item) =>
-                      item.notification.id === content.notification.id
-                        ? { ...item, isRead: true }
-                        : item
-                  )
+                  await apiReadNotification(content.notification.id)
 
                   setNotifications({
                     ...notifications,
-                    content: updatedNotifications,
+                    content: updateNotificationAsRead(
+                      notifications?.content,
+                      content.notification.id
+                    ),
                   })
-
-                  readNotification(content.notification.id)
+                  markNotificationAsRead(content.notification.id)
                 }
               }}
             >
@@ -104,7 +121,7 @@ export function NotificationList() {
                 <GoDotFill
                   className={`text-2xl mr-2 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-foreground'}`}
                 />
-                <div className="flex-1 p-1 max-line--height break-words">
+                <div className="flex-1 p-1 max-line--height break-all overflow-hidden text-ellipsis whitespace-normal">
                   {content.notification?.message}
                 </div>
                 <span className="text-sm text-gray-500">

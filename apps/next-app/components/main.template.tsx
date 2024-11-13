@@ -14,9 +14,10 @@ import {
 } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
+import { useNotificationStore } from '@next-app/state'
 import {
-  fetchUserNotifications,
-  readNotification,
+  apiFetchUserNotifications,
+  apiReadNotification,
 } from '@next-app/utils/notifications'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
@@ -72,6 +73,14 @@ export default function MainTemplate({
     Partial<PaginationType> | undefined
   >()
 
+  const {
+    notificationCount,
+    markNotificationAsRead,
+    latestReadNotificationId,
+    setNotificationCount,
+    incrementNotificationCountByOne,
+  } = useNotificationStore()
+
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
   useNotificationWebSocket(
     websocketOptions,
@@ -83,18 +92,22 @@ export default function MainTemplate({
             content: [notification, ...(prev?.content ?? [])],
           }
         })
+        incrementNotificationCountByOne()
       }
     }
   )
 
   useEffect(() => {
     if (!user?.id || fetchNotificationsRef.current) return
-    fetchUserNotifications(user.id, `page=1&pageSize=15`).then((response) => {
-      if (response.ok) {
-        fetchNotificationsRef.current = true
-        setNotifications(response.data)
+    apiFetchUserNotifications(user.id, `page=1&pageSize=15`).then(
+      (response) => {
+        if (response.ok) {
+          fetchNotificationsRef.current = true
+          setNotifications(response.data)
+          setNotificationCount(response.data?.unReadTotal ?? 0)
+        }
       }
-    })
+    )
   }, [user])
 
   return (
@@ -123,12 +136,15 @@ export default function MainTemplate({
                 pageSize: notifications?.pageSize ?? 15,
                 totalPages: notifications?.totalPages ?? 0,
               }}
+              unreadNotificationCount={notificationCount}
+              latestReadNotificationId={latestReadNotificationId}
               notificationList={notifications?.content ?? []}
               onRead={(id) => {
-                return readNotification(id)
+                markNotificationAsRead(id)
+                return apiReadNotification(id)
               }}
               onPaginationChange={async (pagination) => {
-                return fetchUserNotifications(
+                return apiFetchUserNotifications(
                   user!.id,
                   `page=${pagination.page}&pageSize=${pagination.pageSize}`
                 ).then((response) => {

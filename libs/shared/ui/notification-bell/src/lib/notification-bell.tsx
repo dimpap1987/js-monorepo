@@ -9,13 +9,16 @@ import {
 } from '@js-monorepo/components/dropdown'
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePagination } from './hooks'
 import { NotificationBellButton } from './notification-bell-trigger'
 import { NotificationList } from './notification-list'
+import { updateNotificationAsRead } from './utils'
 
 interface DpNotificationBellComponentProps {
   notificationList: UserNotificationType[]
+  unreadNotificationCount: number
+  latestReadNotificationId?: number
   pagebale: Pageable & { totalPages: number }
   className?: string
   onRead?: (notificationId: number) => Promise<any>
@@ -24,6 +27,8 @@ interface DpNotificationBellComponentProps {
 
 export function DpNotificationBellComponent({
   notificationList,
+  unreadNotificationCount,
+  latestReadNotificationId,
   pagebale,
   className,
   onRead,
@@ -39,16 +44,6 @@ export function DpNotificationBellComponent({
   })
 
   const notificationContainerRef = useRef<HTMLDivElement>(null)
-
-  const unreadNotificationCount = useMemo(
-    () => notifications.filter((n) => !n.isRead).length,
-    [notifications]
-  )
-
-  const isRinging = useMemo(
-    () => unreadNotificationCount > 0,
-    [unreadNotificationCount]
-  )
 
   useEffect(() => {
     setNotifications((prev: UserNotificationType[]) => {
@@ -69,16 +64,18 @@ export function DpNotificationBellComponent({
     })
   }, [notificationList])
 
+  useEffect(() => {
+    if (latestReadNotificationId) {
+      setNotifications((prev) =>
+        updateNotificationAsRead(prev, latestReadNotificationId)
+      )
+    }
+  }, [latestReadNotificationId])
+
   const handleRead = useCallback(
     (id: number) => {
       onRead?.(id)
-      setNotifications((prev) =>
-        prev.map((notification) =>
-          notification.notification.id === id
-            ? { ...notification, isRead: true }
-            : notification
-        )
-      )
+      setNotifications((prev) => updateNotificationAsRead(prev, id))
     },
     [onRead]
   )
@@ -114,7 +111,6 @@ export function DpNotificationBellComponent({
     >
       <DropdownMenuTrigger asChild>
         <NotificationBellButton
-          isRinging={isRinging}
           unreadNotificationCount={unreadNotificationCount}
         />
       </DropdownMenuTrigger>

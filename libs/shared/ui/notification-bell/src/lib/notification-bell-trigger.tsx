@@ -8,10 +8,11 @@ import './bell.css'
 export const NotificationBellButton = forwardRef<
   HTMLButtonElement,
   {
-    isRinging: boolean
     unreadNotificationCount: number
   }
->(({ isRinging, unreadNotificationCount, ...props }, forwardedRef) => {
+>(({ unreadNotificationCount = 0, ...props }, forwardedRef) => {
+  const isRinging = unreadNotificationCount > 0
+
   return (
     <button className="outline-none" ref={forwardedRef} {...props}>
       {isRinging && (
@@ -22,9 +23,9 @@ export const NotificationBellButton = forwardRef<
 
       {/* Bell */}
       {isRinging ? (
-        <MdNotificationsActive className="animate-bell text-2xl" />
+        <MdNotificationsActive className="animate-bell text-xl" />
       ) : (
-        <IoMdNotifications className="text-2xl" />
+        <IoMdNotifications className="text-xl" />
       )}
     </button>
   )
