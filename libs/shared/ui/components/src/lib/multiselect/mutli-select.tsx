@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@js-monorepo/ui/util'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { useClickAway } from 'react-use'
 import {
@@ -21,6 +22,7 @@ interface MultiSelectDropdownProps {
   onChange: (selectedOptions: OptionType[]) => void // Callback function for selected options
   prompt?: string
   selectedIds?: (number | string)[] // New property for selected IDs
+  className?: string
 }
 
 export function MultiSelectDropdown({
@@ -28,14 +30,21 @@ export function MultiSelectDropdown({
   onChange,
   prompt,
   selectedIds = [],
+  className,
 }: MultiSelectDropdownProps) {
   const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([])
   const [label, setLabel] = useState<string | undefined>(prompt)
   const [isOpen, setIsOpen] = useState(false) // State to control dropdown visibility
 
   const dropdownContentRef = useRef<HTMLDivElement | null>(null)
+  const dropdownTriggerRef = useRef<HTMLButtonElement | null>(null)
 
-  useClickAway(dropdownContentRef, () => setIsOpen(false))
+  useClickAway(dropdownContentRef, (event) => {
+    if (dropdownTriggerRef.current?.contains(event.target as Node)) {
+      return
+    }
+    setIsOpen(false)
+  })
 
   function constructLabel(newOptions: OptionType[]) {
     const localLabel = options
@@ -77,41 +86,43 @@ export function MultiSelectDropdown({
   }
 
   return (
-    <label className="block w-full">
-      <DropdownMenu
-        open={isOpen}
-        onOpenChange={(change) => change && setIsOpen(true)}
-        modal={true}
-      >
-        <DropdownMenuTrigger
-          asChild
-          className="w-full border-2 border-border rounded-lg text-foreground hide-scrollbar
+    <DropdownMenu
+      open={isOpen}
+      onOpenChange={(change) => change && setIsOpen(true)}
+      modal={true}
+    >
+      <DropdownMenuTrigger
+        ref={dropdownTriggerRef}
+        asChild
+        className="w-full border-2 border-border rounded-lg text-foreground hide-scrollbar
          px-6 py-1 text-base hover:border-border/80 cursor-pointer shadow-sm transition-colors
          focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-background"
-        >
-          <div className="overflow-auto text-nowrap text-center">{label}</div>
-        </DropdownMenuTrigger>
+      >
+        <div className="overflow-auto text-nowrap text-center">{label}</div>
+      </DropdownMenuTrigger>
 
-        <DropdownMenuContent
-          className="border rounded shadow-md bg-background text-foreground"
-          ref={dropdownContentRef}
-        >
-          {options.map((option, index) => (
-            <Fragment key={option.id}>
-              <DropdownMenuCheckboxItem
-                checked={selectedOptions.some(
-                  (selected) => selected.id === option.id
-                )}
-                onCheckedChange={() => handleChange(option)}
-              >
-                {option.name}
-              </DropdownMenuCheckboxItem>
-              {/* Render separator only if it's not the last option */}
-              {index < options.length - 1 && <DropdownMenuSeparator />}
-            </Fragment>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </label>
+      <DropdownMenuContent
+        className={cn(
+          'border rounded shadow-md bg-background text-foreground max-h-[235px] overflow-y-auto',
+          className
+        )}
+        ref={dropdownContentRef}
+      >
+        {options.map((option, index) => (
+          <Fragment key={option.id}>
+            <DropdownMenuCheckboxItem
+              checked={selectedOptions.some(
+                (selected) => selected.id === option.id
+              )}
+              onCheckedChange={() => handleChange(option)}
+            >
+              {option.name}
+            </DropdownMenuCheckboxItem>
+            {/* Render separator only if it's not the last option */}
+            {index < options.length - 1 && <DropdownMenuSeparator />}
+          </Fragment>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
