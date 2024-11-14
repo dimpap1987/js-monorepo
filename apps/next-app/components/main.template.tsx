@@ -193,7 +193,7 @@ export default function MainTemplate({
         </div>
       </DpNextSidebar>
 
-      <main className="p-2 mt-7">{children}</main>
+      <main className="container mt-7">{children}</main>
 
       {isLoggedIn && <MobileNavbar></MobileNavbar>}
     </>

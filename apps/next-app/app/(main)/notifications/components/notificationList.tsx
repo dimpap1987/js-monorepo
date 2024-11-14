@@ -93,12 +93,12 @@ export function NotificationList() {
   if (loadingRef.current) return null
 
   return (
-    <div className="text-sm sm:text-md">
+    <div className="text-sm sm:text-base select-none">
       {notifications?.content && notifications.content.length > 0 ? (
         notifications.content.map((content, index) => (
           <Fragment key={content?.notification?.id}>
             <div
-              className={`cursor-pointer p-2 transition-all duration-200 ${
+              className={`cursor-pointer py-2 transition-all duration-200 ${
                 content.isRead ? 'opacity-50' : ''
               } hover:opacity-90 hover:bg-primary/20`}
               onClick={async () => {
@@ -119,17 +119,19 @@ export function NotificationList() {
             >
               <div className="flex items-center">
                 <GoDotFill
-                  className={`text-2xl mr-2 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-foreground'}`}
+                  className={`text-sm mr-1 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-foreground'}`}
                 />
-                <div className="flex-1 p-1 max-line--height break-all overflow-hidden text-ellipsis whitespace-normal">
+                <div className="flex-1 p-1 max-line--height break-all overflow-hidden text-ellipsis whitespace-normal select-text">
                   {content.notification?.message}
                 </div>
-                <span className="text-sm text-gray-500">
-                  {humanatizeNotificationDate(
-                    content?.notification?.createdAt || ''
-                  )}{' '}
-                  ago
-                </span>
+                <div className="flex flex-col sm:gap-1 gap-0 items-end sm:flex-row text-[10px] md:text-sm text-gray-500">
+                  <span>
+                    {humanatizeNotificationDate(
+                      content?.notification?.createdAt || ''
+                    )}
+                  </span>
+                  <span>ago</span>
+                </div>
               </div>
             </div>
 
