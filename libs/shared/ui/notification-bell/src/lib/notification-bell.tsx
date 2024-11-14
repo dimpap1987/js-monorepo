@@ -9,6 +9,7 @@ import {
 } from '@js-monorepo/components/dropdown'
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
+import { NotificationPermissionPrompt } from '@js-monorepo/web-notification'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePagination } from './hooks'
 import { NotificationBellButton } from './notification-bell-trigger'
@@ -120,7 +121,10 @@ export function DpNotificationBellComponent({
           className
         )}
       >
-        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+        <DropdownMenuLabel className="flex justify-between">
+          <div>Notifications</div>
+          <NotificationPermissionPrompt></NotificationPermissionPrompt>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div
           ref={notificationContainerRef}

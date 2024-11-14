@@ -61,6 +61,9 @@
       ],
       "@js-monorepo/utils/*": ["libs/shared/utils/src/lib/*"],
       "@js-monorepo/version": ["libs/shared/ui/version/src/index.ts"],
+      "@js-monorepo/web-notification": [
+        "libs/shared/ui/web-notification/src/index.ts"
+      ],
       "@next-app/*": ["./apps/next-app/*"]
     }
   },

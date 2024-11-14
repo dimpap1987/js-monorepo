@@ -27,7 +27,7 @@ export function NotificationList({
         notifications.map((content, index) => (
           <Fragment key={content.notification.id}>
             <DropdownMenuItem
-              className={`cursor-pointer p-2 focus:text-white ${content.isRead ? 'opacity-35' : ''}`}
+              className={`cursor-pointer rounded p-2 focus:text-white ${content.isRead ? 'opacity-35' : ''}`}
               onSelect={(e) => {
                 e.preventDefault()
                 if (content.isRead) return
