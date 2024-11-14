@@ -10,6 +10,7 @@ import {
 } from '@js-monorepo/notification-bell'
 import { PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { wait } from '@js-monorepo/utils/common'
+import { NotificationPermissionPrompt } from '@js-monorepo/web-notification'
 import { useNotificationStore } from '@next-app/state'
 import {
   apiFetchUserNotifications,
@@ -94,11 +95,15 @@ export function NotificationList() {
 
   return (
     <div className="text-sm sm:text-base select-none">
+      <div className="flex justify-between mb-3">
+        <h1 className="text-base sm:text-lg">Notifications</h1>
+        <NotificationPermissionPrompt></NotificationPermissionPrompt>
+      </div>
       {notifications?.content && notifications.content.length > 0 ? (
         notifications.content.map((content, index) => (
           <Fragment key={content?.notification?.id}>
             <div
-              className={`cursor-pointer py-2 transition-all duration-200 ${
+              className={`cursor-pointer py-2 px-1 rounded transition-all duration-200 ${
                 content.isRead ? 'opacity-50' : ''
               } hover:opacity-90 hover:bg-primary/20`}
               onClick={async () => {

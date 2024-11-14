@@ -13,6 +13,7 @@ import {
   UserNotificationType,
 } from '@js-monorepo/types'
 import { DpVersion } from '@js-monorepo/version'
+import { useWebPushNotification } from '@js-monorepo/web-notification'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import { useNotificationStore } from '@next-app/state'
 import {
@@ -73,6 +74,7 @@ export default function MainTemplate({
     Partial<PaginationType> | undefined
   >()
 
+  const { permission, createNotification } = useWebPushNotification()
   const {
     notificationCount,
     markNotificationAsRead,
@@ -93,6 +95,11 @@ export default function MainTemplate({
           }
         })
         incrementNotificationCountByOne()
+        if (permission === 'granted') {
+          createNotification('Notification', {
+            body: 'You have a new notification 😎',
+          })
+        }
       }
     }
   )

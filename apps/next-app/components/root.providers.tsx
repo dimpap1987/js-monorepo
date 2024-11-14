@@ -4,6 +4,7 @@ import { WebSocketProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
+import { WebNotificationProvider } from '@js-monorepo/web-notification'
 import { getCurrentUser } from '@next-app/actions/session'
 import { ReactNode } from 'react'
 
@@ -30,7 +31,9 @@ export default async function RootProviders({
             disableTransitionOnChange
           >
             <DpLoaderProvider>
-              <DpNotificationProvider>{children}</DpNotificationProvider>
+              <DpNotificationProvider>
+                <WebNotificationProvider>{children}</WebNotificationProvider>
+              </DpNotificationProvider>
             </DpLoaderProvider>
           </ThemeProvider>
         </DpNextPageProgressBar>
