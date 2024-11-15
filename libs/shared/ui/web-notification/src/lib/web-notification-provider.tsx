@@ -28,7 +28,7 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
-        .register('sw.js')
+        .register('/sw.js')
         .then(function (registration) {
           console.log(
             'Service Worker registered with scope:',
