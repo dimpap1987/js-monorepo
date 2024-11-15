@@ -5,6 +5,7 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from 'react'
 
@@ -23,6 +24,23 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
     Notification.permission
   )
 
+  // Register the service worker
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('sw.js')
+        .then(function (registration) {
+          console.log(
+            'Service Worker registered with scope:',
+            registration.scope
+          )
+        })
+        .catch(function (error) {
+          console.error('Service Worker registration failed:', error)
+        })
+    }
+  }, [])
+
   const requestPermission = useCallback(() => {
     if ('Notification' in window && permission !== 'granted') {
       Notification.requestPermission().then((perm) => {
@@ -34,7 +52,10 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
   const createNotification = useCallback(
     (title: string, options: NotificationOptions) => {
       if (permission === 'granted') {
-        new Notification(title, options)
+        // Use ServiceWorkerRegistration to show the notification
+        navigator.serviceWorker.ready.then(function (registration) {
+          registration.showNotification(title, options)
+        })
       }
     },
     [permission]

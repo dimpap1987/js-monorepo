@@ -14,7 +14,7 @@ const NotificationPermissionPrompt = () => {
 
   const handleDisableNotifications = () => {
     alert(
-      "Please enable notifications in your browser settings if you'd like to receive alerts."
+      "Please enable Push Notifications in your browser settings if you'd like to receive alerts."
     )
   }
 
@@ -27,12 +27,12 @@ const NotificationPermissionPrompt = () => {
           <TooltipTrigger asChild>
             {permission === 'default' && (
               <DpButton size="small" onClick={requestPermission}>
-                Enable Notifications
+                Enable Push Notifications
               </DpButton>
             )}
           </TooltipTrigger>
           <TooltipContent>
-            Click to enable browser notifications for alerts and updates.
+            Click to enable Push notifications for alerts and updates.
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -46,13 +46,13 @@ const NotificationPermissionPrompt = () => {
                 size="small"
                 onClick={handleDisableNotifications}
               >
-                Notifications are Disabled
+                Push Notifications are Disabled
               </DpButton>
             )}
           </TooltipTrigger>
           <TooltipContent>
-            Notifications are disabled. To re-enable, change the settings in
-            your browser.
+            Push Notifications are disabled. To re-enable, change the settings
+            in your browser.
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
