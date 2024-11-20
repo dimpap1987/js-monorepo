@@ -65,6 +65,7 @@ export const PushNotificationSender = () => {
       <DpButton
         size="large"
         className="w-full"
+        variant="accent"
         onClick={handleSendMessage}
         disabled={
           title.trim().length === 0 ||

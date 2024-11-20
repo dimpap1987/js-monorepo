@@ -1,4 +1,5 @@
-export * from './lib/notification-bell'
+export * from './lib/components/notification-bell-trigger'
+export * from './lib/components/notification-read-all'
 export * from './lib/hooks'
+export * from './lib/notification-bell'
 export * from './lib/utils'
-export * from './lib/notification-bell-trigger'

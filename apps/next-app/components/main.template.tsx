@@ -17,6 +17,7 @@ import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import { useNotificationStore } from '@next-app/state'
 import {
   apiFetchUserNotifications,
+  apiReadAllNotifications,
   apiReadNotification,
 } from '@next-app/utils/notifications'
 import { websocketOptions } from '@next-app/utils/websocket.config'
@@ -24,18 +25,17 @@ import { useRouter } from 'next-nprogress-bar'
 import dynamic from 'next/dynamic'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { IoIosSettings } from 'react-icons/io'
-import { MdHome } from 'react-icons/md'
 import { RiAdminFill } from 'react-icons/ri'
 import SVGLogo from './logo-svg'
 import { MobileNavbar } from './mobile-navbar'
 
 const menuItems: MenuItem[] = [
-  {
-    href: '/',
-    name: 'Home',
-    roles: ['PUBLIC'],
-    Icon: MdHome,
-  },
+  // {
+  //   href: '/',
+  //   name: 'Home',
+  //   roles: ['PUBLIC'],
+  //   Icon: MdHome,
+  // },
   // {
   //   href: '/ai-image-generator',
   //   name: 'AI Image Generator',
@@ -56,6 +56,7 @@ const menuItems: MenuItem[] = [
     name: 'Settings',
     roles: ['USER', 'ADMIN'],
     Icon: IoIosSettings,
+    className: 'inline-block sm:hidden',
   },
   {
     href: '/dashboard',
@@ -153,6 +154,16 @@ export default function MainTemplate({
               onRead={(id) => {
                 markNotificationAsRead(id)
                 return apiReadNotification(id)
+              }}
+              onReadAll={async () => {
+                if (notificationCount === 0) return false
+
+                const response = await apiReadAllNotifications()
+                if (response.ok) {
+                  setNotificationCount(0)
+                  return true
+                }
+                return false
               }}
               onPaginationChange={async (pagination) => {
                 return apiFetchUserNotifications(

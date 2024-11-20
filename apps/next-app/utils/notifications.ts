@@ -28,3 +28,12 @@ export async function apiReadNotification(notificationId: number) {
     .withCredentials()
     .execute()
 }
+
+export async function apiReadAllNotifications() {
+  return API.url(
+    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/read-all`
+  )
+    .patch()
+    .withCredentials()
+    .execute()
+}

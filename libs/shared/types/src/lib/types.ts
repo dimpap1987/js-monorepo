@@ -37,6 +37,7 @@ export type MenuItem = {
   href: string
   Icon?: any
   roles: (AuthRole | 'PUBLIC')[]
+  className?: string
 }
 
 export interface CreateCheckoutSessionRequestBody {

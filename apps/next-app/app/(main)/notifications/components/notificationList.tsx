@@ -5,6 +5,7 @@ import { useLoader } from '@js-monorepo/loader'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
 import {
   humanatizeNotificationDate,
+  NotificationReadAllButton,
   updateNotificationAsRead,
   useNotificationWebSocket,
 } from '@js-monorepo/notification-bell'
@@ -13,6 +14,7 @@ import { wait } from '@js-monorepo/utils/common'
 import { useNotificationStore } from '@next-app/state'
 import {
   apiFetchUserNotifications,
+  apiReadAllNotifications,
   apiReadNotification,
 } from '@next-app/utils/notifications'
 import { websocketOptions } from '@next-app/utils/websocket.config'
@@ -71,8 +73,12 @@ export function NotificationList() {
       }
     }
   )
-  const { markNotificationAsRead, latestReadNotificationId } =
-    useNotificationStore()
+  const {
+    markNotificationAsRead,
+    latestReadNotificationId,
+    setNotificationCount,
+    notificationCount,
+  } = useNotificationStore()
 
   useEffect(() => {
     if (latestReadNotificationId) {
@@ -90,12 +96,43 @@ export function NotificationList() {
     }
   }, [latestReadNotificationId])
 
+  useEffect(() => {
+    if (notificationCount === 0) {
+      setNotifications((prev) => {
+        return {
+          ...prev,
+          content: prev?.content?.map((content) => ({
+            ...content,
+            isRead: true,
+          })),
+        }
+      })
+    }
+  }, [notificationCount])
+
   if (loadingRef.current) return null
 
   return (
-    <div className="text-sm sm:text-base select-none">
+    <div className="text-sm sm:text-base select-none p-1 sm:p-3">
       <div className="flex justify-between mb-3">
         <h1 className="text-base sm:text-lg">Notifications</h1>
+        <NotificationReadAllButton
+          onReadAll={async () => {
+            if (notifications?.content?.some((content) => !content.isRead)) {
+              const response = await apiReadAllNotifications()
+              if (response.ok) {
+                setNotifications({
+                  ...notifications,
+                  content: notifications?.content?.map((content) => ({
+                    ...content,
+                    isRead: true,
+                  })),
+                })
+                setNotificationCount(0)
+              }
+            }
+          }}
+        ></NotificationReadAllButton>
       </div>
       {notifications?.content && notifications.content.length > 0 ? (
         notifications.content.map((content, index) => (

@@ -126,6 +126,15 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
     })
   }
 
+  async markAllAsRead(userId: number) {
+    return this.txHost.tx.userNotification.updateMany({
+      where: {
+        receiverId: userId,
+      },
+      data: { isRead: true },
+    })
+  }
+
   async archiveNotification(notificationId: number) {
     return this.txHost.tx.notification.update({
       where: { id: notificationId },

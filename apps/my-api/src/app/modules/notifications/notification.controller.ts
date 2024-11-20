@@ -96,6 +96,23 @@ export class NotificationController {
     }
   }
 
+  @Patch('read-all')
+  @HttpCode(204)
+  async markAllAsRead(@SessionUser() sessionUser: SessionUserType) {
+    try {
+      await this.notificationService.markAllAsRead(sessionUser.id)
+    } catch (e: any) {
+      this.logger.error(
+        'Error while marking all notifications as read',
+        e.stack
+      )
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'ERROR_READ_ALL_NOTIFICATIONS'
+      )
+    }
+  }
+
   @Patch(':notificationId/archive')
   @HttpCode(204)
   async archiveNotification(@Param('notificationId') notificationId: number) {
@@ -103,6 +120,10 @@ export class NotificationController {
       await this.notificationService.archiveNotification(notificationId)
     } catch (e: any) {
       this.logger.error('Error while set notification archieve', e.stack)
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'ERROR_ARCHIVE_NOTIFICATIONS'
+      )
     }
   }
 

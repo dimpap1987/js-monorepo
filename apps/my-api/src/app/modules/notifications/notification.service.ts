@@ -134,6 +134,11 @@ export class NotificationService {
   }
 
   @Transactional()
+  async markAllAsRead(userId: number) {
+    return this.notificationRepository.markAllAsRead(userId)
+  }
+
+  @Transactional()
   async archiveNotification(notificationId: number) {
     return this.notificationRepository.archiveNotification(notificationId)
   }

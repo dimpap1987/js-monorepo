@@ -4,7 +4,7 @@ import {
   DropdownMenuShortcut,
 } from '@js-monorepo/components/dropdown'
 import { GoDotFill } from 'react-icons/go'
-import { humanatizeNotificationDate } from './utils'
+import { humanatizeNotificationDate } from '../utils'
 import { UserNotificationType } from '@js-monorepo/types'
 
 interface NotificationItemProps {
