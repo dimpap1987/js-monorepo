@@ -10,8 +10,8 @@ import {
 export default async function NotificationsController() {
   return (
     <>
-      <div className="">
-        <Accordion type="single" collapsible className="w-full">
+      <div className="p-2">
+        <Accordion type="multiple" className="w-full">
           <AccordionItem value="item-1">
             <AccordionTrigger>Send User Notification</AccordionTrigger>
             <AccordionContent>

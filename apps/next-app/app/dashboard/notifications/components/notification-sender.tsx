@@ -43,7 +43,7 @@ export const NotificationSender = () => {
   }, [])
 
   return (
-    <Card className="space-y-4 w-full p-5">
+    <Card className="space-y-4 w-full p-5 bg-background/60">
       <Input
         type="text"
         placeholder="Type your message here..."
@@ -64,6 +64,7 @@ export const NotificationSender = () => {
       <div>
         <DpButton
           size="large"
+          variant="accent"
           className="w-full"
           onClick={handleSendMessage}
           disabled={message?.trim()?.length === 0}

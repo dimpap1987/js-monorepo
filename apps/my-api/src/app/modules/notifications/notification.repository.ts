@@ -20,6 +20,7 @@ export interface NotificationRepository {
     notificationId: number,
     userId: number
   ): Promise<Prisma.BatchPayload>
+  markAllAsRead(userId: number): Promise<Prisma.BatchPayload>
   archiveNotification(notificationId: number): Promise<{ id: number }>
   getTotalUnreadNotifications(userId: number): Promise<number>
 }

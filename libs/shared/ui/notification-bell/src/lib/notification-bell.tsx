@@ -10,9 +10,10 @@ import {
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
+import { NotificationBellButton } from './components/notification-bell-trigger'
+import { NotificationList } from './components/notification-list'
+import { NotificationReadAllButton } from './components/notification-read-all'
 import { usePagination } from './hooks'
-import { NotificationBellButton } from './notification-bell-trigger'
-import { NotificationList } from './notification-list'
 import { updateNotificationAsRead } from './utils'
 
 interface DpNotificationBellComponentProps {
@@ -22,6 +23,7 @@ interface DpNotificationBellComponentProps {
   pagebale: Pageable & { totalPages: number }
   className?: string
   onRead?: (notificationId: number) => Promise<any>
+  onReadAll?: () => Promise<boolean>
   onPaginationChange: (pagination: Pageable) => Promise<void>
 }
 
@@ -32,6 +34,7 @@ export function DpNotificationBellComponent({
   pagebale,
   className,
   onRead,
+  onReadAll,
   onPaginationChange,
 }: DpNotificationBellComponentProps) {
   const [notifications, setNotifications] = useState<UserNotificationType[]>([])
@@ -77,6 +80,14 @@ export function DpNotificationBellComponent({
       })
     }
   }, [latestReadNotificationId])
+
+  useEffect(() => {
+    if (unreadNotificationCount === 0) {
+      setNotifications((prev) =>
+        prev?.map((content) => ({ ...content, isRead: true }))
+      )
+    }
+  }, [unreadNotificationCount])
 
   const handleRead = useCallback(
     (id: number) => {
@@ -132,6 +143,16 @@ export function DpNotificationBellComponent({
       >
         <DropdownMenuLabel className="flex justify-between">
           <div>Notifications</div>
+          <NotificationReadAllButton
+            onReadAll={async () => {
+              const isReadAll = await onReadAll?.()
+              if (!isReadAll) return
+
+              setNotifications((prev) =>
+                prev.map((content) => ({ ...content, isRead: true }))
+              )
+            }}
+          ></NotificationReadAllButton>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <div

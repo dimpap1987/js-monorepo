@@ -142,7 +142,10 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               {menuItems &&
                 menuItems?.length > 0 &&
                 menuItems.map((item, index) => (
-                  <li key={index} className="text-center text-nowrap">
+                  <li
+                    key={index}
+                    className={cn(`text-center text-nowrap`, item.className)}
+                  >
                     {(item?.roles?.includes('PUBLIC') ||
                       item?.roles?.some((role) =>
                         user?.roles?.includes(role as AuthRole)
