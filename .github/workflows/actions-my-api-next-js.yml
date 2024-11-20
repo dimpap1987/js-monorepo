@@ -61,6 +61,7 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD}}
           NEXT_PUBLIC_AUTH_URL: ${{ secrets.NEXT_PUBLIC_AUTH_URL_PROD}}
           NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL: ${{ secrets.NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL_PROD}}
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD}}
         run: npm run build:next
 
   build-and-push-docker:
@@ -105,4 +106,5 @@ jobs:
           --build-arg NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }} \
           --build-arg NEXT_PUBLIC_AUTH_URL=${{ secrets.NEXT_PUBLIC_AUTH_URL_PROD }} \
           --build-arg NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL=${{ secrets.NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL_PROD }} \
+          --build-arg NEXT_PUBLIC_VAPID_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD}} \
           -f apps/next-app/Dockerfile . --push
