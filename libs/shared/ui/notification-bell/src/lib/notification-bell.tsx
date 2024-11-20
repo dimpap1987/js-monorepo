@@ -9,7 +9,7 @@ import {
 } from '@js-monorepo/components/dropdown'
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { usePagination } from './hooks'
 import { NotificationBellButton } from './notification-bell-trigger'
 import { NotificationList } from './notification-list'
@@ -36,6 +36,8 @@ export function DpNotificationBellComponent({
 }: DpNotificationBellComponentProps) {
   const [notifications, setNotifications] = useState<UserNotificationType[]>([])
 
+  const [isPending, startTransition] = useTransition()
+
   const { isLoading, loadMore } = usePagination({
     page: pagebale.page,
     pageSize: pagebale.pageSize,
@@ -46,36 +48,42 @@ export function DpNotificationBellComponent({
   const notificationContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setNotifications((prev: UserNotificationType[]) => {
-      const existingIds = new Set(
-        prev.map((content) => content.notification.id)
-      ) // Set of existing IDs
+    startTransition(() => {
+      setNotifications((prev: UserNotificationType[]) => {
+        const existingIds = new Set(
+          prev.map((content) => content.notification.id)
+        ) // Set of existing IDs
 
-      // Filter out already existing notifications by ID
-      const newNotifications = notificationList.filter(
-        (content) => !existingIds.has(content.notification.id)
-      )
+        // Filter out already existing notifications by ID
+        const newNotifications = notificationList.filter(
+          (content) => !existingIds.has(content.notification.id)
+        )
 
-      const allNots = [...prev, ...newNotifications].sort(
-        (a, b) => b.notification.id - a.notification.id
-      )
+        const allNots = [...prev, ...newNotifications].sort(
+          (a, b) => b.notification.id - a.notification.id
+        )
 
-      return allNots
+        return allNots
+      })
     })
   }, [notificationList])
 
   useEffect(() => {
     if (latestReadNotificationId) {
-      setNotifications((prev) =>
-        updateNotificationAsRead(prev, latestReadNotificationId)
-      )
+      startTransition(() => {
+        setNotifications((prev) =>
+          updateNotificationAsRead(prev, latestReadNotificationId)
+        )
+      })
     }
   }, [latestReadNotificationId])
 
   const handleRead = useCallback(
     (id: number) => {
       onRead?.(id)
-      setNotifications((prev) => updateNotificationAsRead(prev, id))
+      startTransition(() => {
+        setNotifications((prev) => updateNotificationAsRead(prev, id))
+      })
     },
     [onRead]
   )
@@ -87,7 +95,9 @@ export function DpNotificationBellComponent({
       notificationContainerRef.current
 
     if (scrollTop + clientHeight >= scrollHeight - 5) {
-      loadMore()
+      startTransition(() => {
+        loadMore()
+      })
     }
   }, [loadMore])
 

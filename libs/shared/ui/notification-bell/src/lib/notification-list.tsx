@@ -1,14 +1,9 @@
-import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-} from '@js-monorepo/components/dropdown'
+import { DropdownMenuSeparator } from '@js-monorepo/components/dropdown'
 import { DpLoadingSpinner } from '@js-monorepo/loader'
 import { UserNotificationType } from '@js-monorepo/types'
 import { Fragment } from 'react'
-import { GoDotFill } from 'react-icons/go'
 import './bell.css'
-import { humanatizeNotificationDate } from './utils'
+import { NotificationItem } from './notifications-item'
 
 interface NotificationListProps {
   notifications: UserNotificationType[]
@@ -26,32 +21,14 @@ export function NotificationList({
       {notifications?.length > 0 ? (
         notifications.map((content, index) => (
           <Fragment key={content.notification.id}>
-            <DropdownMenuItem
-              className={`cursor-pointer rounded p-2 focus:text-white ${content.isRead ? 'opacity-35' : ''}`}
-              onSelect={(e) => {
-                e.preventDefault()
-                if (content.isRead) return
-                onRead(content.notification.id)
-              }}
-            >
-              <GoDotFill
-                className={`text-2xl mr-2 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-white'}`}
-              />
-              <div className="p-1 max-line--height break-words select-text">
-                {content.notification.message}
-              </div>
-              <DropdownMenuShortcut>
-                {humanatizeNotificationDate(content.notification.createdAt)} ago
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
+            <NotificationItem content={content} onRead={onRead} />
+            {/* Show loader at the end of the list */}
             {index === notifications.length - 1 && showLoader && (
               <div className="relative flex items-center justify-center py-1">
-                <DpLoadingSpinner
-                  message="Loading..."
-                  className="text-sm"
-                ></DpLoadingSpinner>
+                <DpLoadingSpinner message="Loading..." className="text-sm" />
               </div>
             )}
+            {/* Add separator between items */}
             {index < notifications.length - 1 && <DropdownMenuSeparator />}
           </Fragment>
         ))
