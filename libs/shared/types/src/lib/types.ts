@@ -227,6 +227,13 @@ export type UserNotificationType = {
   user?: NotificationUserType
 }
 
+export interface CreatePushNotificationType {
+  receiverIds: number[]
+  message: string
+  title: string
+  url?: string
+}
+
 export interface CreateUserNotificationType {
   id: number
   createdAt: Date

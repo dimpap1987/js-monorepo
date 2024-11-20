@@ -27,6 +27,10 @@ export const routes: {
     roles: ['USER', 'ADMIN'],
   },
   {
+    path: '/settings',
+    roles: ['USER', 'ADMIN'],
+  },
+  {
     path: '/dashboard',
     roles: ['ADMIN'],
   },

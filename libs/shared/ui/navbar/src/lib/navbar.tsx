@@ -3,12 +3,16 @@ import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import React, { ReactNode, forwardRef, useMemo } from 'react'
+import React, { ReactNode, forwardRef, useMemo, useRef } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import { IoIosSettings } from 'react-icons/io'
 import { TbUserFilled } from 'react-icons/tb'
-import UserMetadata from './components/user-metadata'
-import { UserOptionsDropdown } from './components/user-options.component'
+import { UserMetadata } from './components/user-metadata'
+import {
+  OptionsDropdownRef,
+  UserOptionsDropdown,
+} from './components/user-options.component'
 
 function SideBarIcon({
   onSideBarClick,
@@ -48,9 +52,15 @@ function NavUserOptions({
   readonly onLogout?: () => void
   readonly className?: string
 }) {
+  const userOptionsDropdownRef = useRef<OptionsDropdownRef>(null)
+
   return (
     user?.isLoggedIn && (
-      <UserOptionsDropdown IconComponent={FaCircleUser} className={className}>
+      <UserOptionsDropdown
+        ref={userOptionsDropdownRef}
+        IconComponent={FaCircleUser}
+        className={className}
+      >
         <UserMetadata
           profileImage={user.profile?.image}
           username={user.username}
@@ -60,15 +70,25 @@ function NavUserOptions({
 
         <DpNextNavLink
           href="/profile"
-          onClick={() => {}}
+          onClick={() => userOptionsDropdownRef.current?.setVisibility(false)}
           className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2 select-none"
         >
           <TbUserFilled className="text-2xl" />
           <span className="ml-2">Profile</span>
         </DpNextNavLink>
 
+        <DpNextNavLink
+          href="/settings"
+          onClick={() => userOptionsDropdownRef.current?.setVisibility(false)}
+          className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2 select-none"
+        >
+          <IoIosSettings className="text-2xl" />
+          <span className="ml-2">Settings</span>
+        </DpNextNavLink>
+
         <DpLogoutButton
           onClick={() => {
+            userOptionsDropdownRef.current?.setVisibility(false)
             onLogout?.()
           }}
         ></DpLogoutButton>
