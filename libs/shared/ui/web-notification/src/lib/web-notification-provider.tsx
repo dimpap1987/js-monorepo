@@ -8,6 +8,12 @@ import {
   useEffect,
   useState,
 } from 'react'
+import {
+  registerServiceWorker,
+  requestPushPermission,
+  subscribeNotifactionToServer,
+} from './utils'
+import { useSession } from '@js-monorepo/auth/next/client'
 
 interface WebNotificationContextType {
   permission: NotificationPermission
@@ -24,29 +30,23 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
     Notification.permission
   )
 
-  // Register the service worker
+  const { user } = useSession()
+
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then(function (registration) {
-          console.log(
-            'Service Worker registered with scope:',
-            registration.scope
-          )
-        })
-        .catch(function (error) {
-          console.error('Service Worker registration failed:', error)
-        })
-    }
+    registerServiceWorker().then(() => {
+      if (Notification.permission === 'granted' && user?.id) {
+        subscribeNotifactionToServer(user?.id)
+      }
+    })
   }, [])
 
   const requestPermission = useCallback(() => {
-    if ('Notification' in window && permission !== 'granted') {
-      Notification.requestPermission().then((perm) => {
-        setPermission(perm)
-      })
-    }
+    requestPushPermission().then(async (perm) => {
+      setPermission(perm)
+      if (perm === 'granted' && user?.id) {
+        subscribeNotifactionToServer(user?.id)
+      }
+    })
   }, [permission])
 
   const createNotification = useCallback(
@@ -70,7 +70,6 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
-// Custom hook to use the notification context
 const useWebPushNotification = (): WebNotificationContextType => {
   const context = useContext(WebNotificationContext)
   if (!context) {

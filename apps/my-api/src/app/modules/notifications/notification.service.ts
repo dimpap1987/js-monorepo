@@ -1,40 +1,131 @@
-import {
-  CreateUserNotificationType,
-  NotificationCreateDto,
-  Pageable,
-  UserNotificationType,
-} from '@js-monorepo/types'
-import { UserPresenceWebsocketService } from '@js-monorepo/user-presence'
+import { REDIS } from '@js-monorepo/nest/redis'
+import { NotificationCreateDto, Pageable } from '@js-monorepo/types'
 import { Transactional } from '@nestjs-cls/transactional'
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { RedisClientType } from '@redis/client'
+import { sendNotification, setVapidDetails } from 'web-push'
 import {
   NotificationRepo,
   NotificationRepository,
 } from './notification.repository'
 
+export interface Subscription {
+  endpoint: string
+  keys: {
+    p256dh: string
+    auth: string
+  }
+  updatedAt: string
+  createdAt: string
+}
+
+export interface UserSubscription {
+  endpoint: string
+  subscription: Subscription
+}
+
+export const getUserSubscriptionRedisKey = (userId: number) =>
+  `${process.env['REDIS_NAMESPACE']}:push_subscription:user:${userId}`
+
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name)
 
+  private readonly vapidKeys = {
+    publicKey: process.env.VAPID_PUBLIC_KEY,
+    privateKey: process.env.VAPID_PRIVATE_KEY,
+  }
+
   constructor(
     @Inject(NotificationRepo)
     private notificationRepository: NotificationRepository,
-    private readonly userPresenceWebsocketService: UserPresenceWebsocketService
-  ) {}
+    @Inject(REDIS) private readonly redis: RedisClientType
+  ) {
+    setVapidDetails(
+      `mailto:${process.env.ADMIN_EMAIL}`,
+      this.vapidKeys.publicKey,
+      this.vapidKeys.privateKey
+    )
+  }
+
+  async saveUserSubscription(userId: number, subscription: any): Promise<void> {
+    const redisKey = getUserSubscriptionRedisKey(userId)
+
+    const currentTime = new Date().toISOString()
+    const value = JSON.stringify({
+      endpoint: subscription.endpoint,
+      keys: subscription.keys,
+      updatedAt: currentTime,
+      createdAt: currentTime,
+    })
+
+    await this.redis.hSet(redisKey, subscription.endpoint, value)
+    await this.redis.expire(redisKey, 3600 * 24 * 3)
+  }
+
+  async getUserSubscriptions(
+    userId: number
+  ): Promise<UserSubscription[] | null> {
+    const redisKey = getUserSubscriptionRedisKey(userId)
+
+    const subscriptionsData = await this.redis.hGetAll(redisKey)
+
+    if (!subscriptionsData || Object.keys(subscriptionsData).length === 0)
+      return null
+
+    return Object.keys(subscriptionsData).map((endpoint) => ({
+      endpoint,
+      subscription: JSON.parse(subscriptionsData[endpoint]),
+    }))
+  }
+
+  async sendPushNotification(
+    userIds: number[],
+    payload: { title: string; message: string } & Record<string, any>
+  ): Promise<void> {
+    try {
+      const subscriptionPromises = userIds.map(async (userId) => {
+        const subscriptions = await this.getUserSubscriptions(userId)
+
+        if (!subscriptions) {
+          console.log(`No subscriptions found for user ${userId}`)
+          return []
+        }
+
+        return subscriptions.map(({ subscription }) => subscription)
+      })
+
+      const allSubscriptions = await Promise.all(subscriptionPromises)
+
+      const allSubscriptionsFlattened = allSubscriptions.flat()
+
+      if (allSubscriptionsFlattened.length === 0) {
+        console.log('No subscriptions to send notifications to.')
+        return
+      }
+
+      const sendNotificationPromises = allSubscriptionsFlattened.map(
+        (subscription) => {
+          if (!subscription?.endpoint) {
+            throw new Error('Subscription is missing endpoint')
+          }
+          return sendNotification(subscription, JSON.stringify(payload))
+        }
+      )
+
+      await Promise.all(sendNotificationPromises)
+      console.log('Notifications sent successfully to all users!')
+    } catch (error) {
+      console.error('Error sending notifications:', error)
+    }
+  }
 
   @Transactional()
   async createNotification(payload: NotificationCreateDto) {
     this.logger.debug(
       `Creating new notification - Sender is : '${payload.senderId}'`
     )
-    const notification =
-      await this.notificationRepository.createNotification(payload)
-
-    this.userPresenceWebsocketService.sendToUsers(
-      payload.receiverIds,
-      'events:notifications',
-      { data: this.transformSelect(notification) }
-    )
+    return this.notificationRepository.createNotification(payload)
   }
 
   @Transactional()
@@ -54,22 +145,5 @@ export class NotificationService {
 
   async getTotalUnreadNotifications(userId: number): Promise<number> {
     return this.notificationRepository.getTotalUnreadNotifications(userId)
-  }
-
-  private transformSelect(
-    data: CreateUserNotificationType
-  ): UserNotificationType {
-    return {
-      notification: {
-        id: data?.id,
-        createdAt: data?.createdAt,
-        message: data?.message,
-      },
-      isRead: false,
-      sender: {
-        id: data?.userNotification[0]?.sender?.id,
-        username: data?.userNotification[0]?.sender?.username,
-      },
-    }
   }
 }

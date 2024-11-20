@@ -2,68 +2,35 @@
 
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
+import { Card } from '@js-monorepo/components/card'
 import { Input } from '@js-monorepo/components/form'
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
 import { useNotifications } from '@js-monorepo/notification'
-import { AuthUserFullDto, NotificationCreateDto } from '@js-monorepo/types'
-import { API } from '@next-app/utils/api-proxy'
 import { useEffect, useState } from 'react'
-
-interface User {
-  id: number
-  name: string
-}
-
-const findUsers = async () => {
-  const response = await API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users?page=0&pageSize=100`
-  )
-    .get()
-    .withCredentials()
-    .execute()
-
-  if (response.ok)
-    return response.data as {
-      users: AuthUserFullDto[] | []
-      totalCount: number
-    }
-
-  return {
-    users: [],
-    totalCount: 0,
-  }
-}
-
-const submitNotifications = async (payload: NotificationCreateDto) => {
-  const response = await API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications`
-  )
-    .post()
-    .body(payload)
-    .withCredentials()
-    .withCsrf()
-    .execute()
-}
+import { findUsers, submitNotification } from '../utils'
+import { UserDropdown } from './types'
 
 export const NotificationSender = () => {
   const { user } = useSession()
   const [message, setMessage] = useState<string>('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
-  const [usersDropDown, setUsersDropDown] = useState<User[]>([])
+  const [usersDropDown, setUsersDropDown] = useState<UserDropdown[]>([])
   const { addNotification } = useNotifications()
 
   const handleSendMessage = async () => {
     if (user && message.trim() && selectedUserIds.length > 0) {
-      await submitNotifications({
+      const submitResponse = await submitNotification({
         message: message.trim(),
         receiverIds: selectedUserIds,
         senderId: user.id,
       })
-      setMessage('')
-      addNotification({
-        message: 'Notification send successfully!',
-        type: 'success',
-      })
+      if (submitResponse.ok) {
+        setMessage('')
+        addNotification({
+          message: 'Notification send successfully!',
+          type: 'success',
+        })
+      }
     }
   }
 
@@ -76,7 +43,7 @@ export const NotificationSender = () => {
   }, [])
 
   return (
-    <div className="space-y-4 w-full">
+    <Card className="space-y-4 w-full p-5">
       <Input
         type="text"
         placeholder="Type your message here..."
@@ -101,9 +68,9 @@ export const NotificationSender = () => {
           onClick={handleSendMessage}
           disabled={message?.trim()?.length === 0}
         >
-          Send Message
+          Submit
         </DpButton>
       </div>
-    </div>
+    </Card>
   )
 }

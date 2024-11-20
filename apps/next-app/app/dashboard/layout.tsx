@@ -29,9 +29,14 @@ const navLinksOpts = [
   },
 ] as const
 
-function Sidebar() {
+function Sidebar({ className }: { className?: string }) {
   return (
-    <div className="hidden min-w-max sm:flex flex-col justify-between p-2 border-r border-border rounded-md">
+    <div
+      className={cn(
+        'hidden min-w-max sm:flex flex-col justify-between p-2 border-r border-border rounded-md',
+        className
+      )}
+    >
       <div className="space-y-2">
         {navLinksOpts.map(({ href, icon: Icon, label, activeClassName }) => (
           <DpNextNavLink
@@ -57,16 +62,10 @@ function Sidebar() {
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
   return (
-    <section className="h-[calc(100svh_-_var(--navbar-height)_-_2.9rem)] bg-background text-foreground">
-      <div
-        className={cn(
-          'h-full',
-          'grid grid-rows-[auto_1fr]', // Mobile: stacked layout
-          'sm:grid-rows-1 sm:grid-cols-[max-content_1fr]' // Desktop: side-by-side layout
-        )}
-      >
-        <Sidebar />
-        <div className="px-2 container overflow-hidden">{children}</div>
+    <section>
+      <Sidebar className="fixed top-[calc(35px_+_var(--navbar-height))] left-0 bottom-0" />
+      <div className="absolute container sm:left-[180px] w-full sm:w-[calc(100vw_-_180px)] overflow-y-hidden">
+        {children}
       </div>
     </section>
   )

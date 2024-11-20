@@ -9,7 +9,8 @@
     "!**/*",
     ".next/**/*",
     "jest.config.ts",
-    "tailwind.config.js"
+    "tailwind.config.js",
+    "sw.js"
   ],
   "overrides": [
     {

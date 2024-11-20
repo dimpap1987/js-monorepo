@@ -1,15 +1,8 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@js-monorepo/components/tooltip'
 import { useWebPushNotification } from './web-notification-provider'
 
-const NotificationPermissionPrompt = () => {
+const NotificationPermissionComponent = () => {
   const { permission, requestPermission } = useWebPushNotification()
 
   const handleDisableNotifications = () => {
@@ -18,46 +11,59 @@ const NotificationPermissionPrompt = () => {
     )
   }
 
-  if (permission === 'granted') return
+  const permissionStates = {
+    default: {
+      label: 'Enable Push notifications for alerts and updates.',
+      checkboxProps: {
+        onClick: requestPermission,
+        checked: permission === 'granted',
+        onChange: () => {},
+      },
+    },
+    denied: {
+      label:
+        'Push Notifications are disabled. To re-enable, change the browser settings.',
+      checkboxProps: {
+        onClick: handleDisableNotifications,
+        readOnly: true,
+        checked: false,
+      },
+    },
+    granted: {
+      label: 'Push Notifications are enabled.',
+      checkboxProps: {
+        checked: true,
+        readOnly: true,
+      },
+    },
+  }
+
+  const { label, checkboxProps } = permissionStates[permission] || {
+    label: 'Permission state unknown.',
+    checkboxProps: { disabled: true },
+  }
 
   return (
-    <div className="text-center text-xs">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {permission === 'default' && (
-              <DpButton size="small" onClick={requestPermission}>
-                Enable Push Notifications
-              </DpButton>
-            )}
-          </TooltipTrigger>
-          <TooltipContent>
-            Click to enable Push notifications for alerts and updates.
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {permission === 'denied' && (
-              <DpButton
-                variant="outline"
-                size="small"
-                onClick={handleDisableNotifications}
-              >
-                Push Notifications are Disabled
-              </DpButton>
-            )}
-          </TooltipTrigger>
-          <TooltipContent>
-            Push Notifications are disabled. To re-enable, change the settings
-            in your browser.
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+    <section className="bg-white shadow rounded-lg p-4 sm:p-6">
+      <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+        Push Notifications
+      </h2>
+      <p className="text-xs sm:text-sm text-gray-600 mt-1 flex gap-1 flex-wrap">
+        <span>Control how you receive </span> <span>push notifications.</span>
+      </p>
+      <div className="mt-4">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            className="h-5 w-5 border-gray-300 rounded focus:ring-blue-500 checked:bg-blue-600 shrink-0 hover:cursor-pointer focus:outline-none"
+            aria-label={label}
+            {...checkboxProps}
+          />
+          <span className="ml-3 text-gray-700 text-sm">{label}</span>
+        </label>
+      </div>
+    </section>
   )
 }
 
-export { NotificationPermissionPrompt }
+export { NotificationPermissionComponent }

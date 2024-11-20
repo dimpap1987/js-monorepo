@@ -1,8 +1,8 @@
 'use client'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { ModeToggle } from '@js-monorepo/theme-provider'
 import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { AnimatePresence, motion } from 'framer-motion'
+import { UserMetadata } from '@js-monorepo/navbar'
 import { ReactNode, RefObject, forwardRef, useEffect, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
 import { useClickAway } from 'react-use'
@@ -36,17 +36,6 @@ const framerText = (position: SidebarPositionType, delay?: number) => {
   }
 }
 
-const framerIcon = {
-  initial: { scale: 0 },
-  animate: { scale: 1 },
-  transition: {
-    type: 'spring',
-    stiffness: 260,
-    damping: 20,
-    delay: 1.5,
-  },
-}
-
 const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
   (
     { children, isOpen, onClose, user, items = [], position = 'left', header },
@@ -64,7 +53,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
       <AnimatePresence mode="wait" initial={false}>
         {isOpen && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 z-20"
+            className="fixed inset-0 bg-black bg-opacity-50 z-20 text-gray-300"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -80,14 +69,22 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
               tabIndex={-1}
             >
               <div className="flex items-center justify-between p-5 border-b-2 border-border">
-                <ModeToggle></ModeToggle>
+                {/* <ModeToggle></ModeToggle> */}
+                {user?.username && (
+                  <UserMetadata
+                    profileImage={user.profile?.image}
+                    username={user.username}
+                    createdAt={user.createdAt}
+                    className="select-none text-sm"
+                  ></UserMetadata>
+                )}
                 <span>{header}</span>
                 <button
                   onClick={() => onClose()}
                   className="p-3 border-2 border-border rounded-xl hover:bg-zinc-800"
                   aria-label="close sidebar"
                 >
-                  <AiOutlineRollback className="text-white" />
+                  <AiOutlineRollback />
                 </button>
               </div>
               <ul>
@@ -102,23 +99,21 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
                     shouldRenderNavLink && (
                       <li key={item.name}>
                         <DpNextNavLink
-                          className={`flex items-center w-full ${
+                          className={`flex text-sm sm:text-base items-center w-full ${
                             position === 'right' ? 'flex-row-reverse' : ''
-                          } justify-between gap-5 p-5 px-8 transition-all border-b-2 hover:bg-zinc-800 border-border`}
+                          } justify-between gap-5 p-5 transition-all border-b-2 hover:bg-zinc-800 border-border`}
                           href={item.href}
                           onClick={() => onClose()}
                         >
-                          <motion.span
+                          <motion.div
                             {...framerText(position)}
-                            className="text-white"
+                            className="grid grid-cols-[max-content_25px] gap-2"
                           >
-                            {item.name}
-                          </motion.span>
-                          {item.Icon && (
-                            <motion.div {...framerIcon}>
-                              <item.Icon className="text-2xl" />
-                            </motion.div>
-                          )}
+                            <div>{item.name}</div>
+                            <div>
+                              {item.Icon && <item.Icon className="text-xl" />}
+                            </div>
+                          </motion.div>
                         </DpNextNavLink>
                       </li>
                     )

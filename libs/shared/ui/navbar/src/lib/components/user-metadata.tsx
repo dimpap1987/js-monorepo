@@ -6,7 +6,7 @@ import {
 import { cn } from '@js-monorepo/ui/util'
 import { FaAt } from 'react-icons/fa'
 
-export default function UserMetadata({
+export function UserMetadata({
   profileImage,
   username,
   createdAt,
@@ -34,12 +34,12 @@ export default function UserMetadata({
 
         {createdAt && (
           <div>
-            <div className="mb-1 text-base font-semibold flex items-center">
+            <div className="font-semibold flex items-center">
               <FaAt className="text-foreground" />
               <span className="ml-1">{username}</span>
             </div>
             {createdAt && (
-              <div className="text-xs italic">
+              <div className="text-xs italic hidden sm:block mt-1">
                 created at &#x2022; {new Date(createdAt).toLocaleDateString()}
               </div>
             )}

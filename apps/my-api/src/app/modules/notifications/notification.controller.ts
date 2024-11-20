@@ -6,11 +6,14 @@ import {
   SessionUser,
 } from '@js-monorepo/auth/nest/session'
 import {
+  CreatePushNotificationType,
+  CreateUserNotificationType,
   NotificationCreateDto,
   PaginationType,
   SessionUserType,
   UserNotificationType,
 } from '@js-monorepo/types'
+import { UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import {
   Body,
   Controller,
@@ -32,7 +35,10 @@ import { NotificationService } from './notification.service'
 @UseGuards(LoggedInGuard)
 export class NotificationController {
   private logger = new Logger(NotificationController.name)
-  constructor(private notificationService: NotificationService) {}
+  constructor(
+    private notificationService: NotificationService,
+    private readonly userPresenceWebsocketService: UserPresenceWebsocketService
+  ) {}
 
   @Post()
   @UseGuards(RolesGuard)
@@ -40,7 +46,14 @@ export class NotificationController {
   async createNotification(@Body() payload: NotificationCreateDto) {
     //TODO Validate body
     try {
-      return await this.notificationService.createNotification(payload)
+      const notification =
+        await this.notificationService.createNotification(payload)
+
+      await this.userPresenceWebsocketService.sendToUsers(
+        payload.receiverIds,
+        'events:notifications',
+        { data: this.transformSelect(notification) }
+      )
     } catch (e: any) {
       this.logger.error(
         `Error while sending notification to user: ${payload?.receiverIds?.join(', ')}`,
@@ -90,6 +103,66 @@ export class NotificationController {
       await this.notificationService.archiveNotification(notificationId)
     } catch (e: any) {
       this.logger.error('Error while set notification archieve', e.stack)
+    }
+  }
+
+  @Post('subscribe/:userId')
+  @HttpCode(204)
+  async subscribeUser(
+    @Param('userId') userId: number,
+    @Body() subscription: any
+  ) {
+    if (!subscription || !subscription.endpoint || !subscription.keys) {
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'Invalid subscription payload'
+      )
+    }
+    await this.notificationService.saveUserSubscription(userId, subscription)
+  }
+
+  private transformSelect(
+    data: CreateUserNotificationType
+  ): UserNotificationType {
+    return {
+      notification: {
+        id: data?.id,
+        createdAt: data?.createdAt,
+        message: data?.message,
+      },
+      isRead: false,
+      sender: {
+        id: data?.userNotification[0]?.sender?.id,
+        username: data?.userNotification[0]?.sender?.username,
+      },
+    }
+  }
+
+  @Post('push-notification')
+  @UseGuards(RolesGuard)
+  @HasRoles(RolesEnum.ADMIN)
+  async sendPushNotification(
+    @Body()
+    payload: CreatePushNotificationType
+  ) {
+    //TODO Validate body
+    try {
+      await this.notificationService.sendPushNotification(payload.receiverIds, {
+        title: payload.title,
+        message: payload.message,
+        data: {
+          url: process.env['AUTH_LOGIN_REDIRECT'],
+        },
+      })
+    } catch (e: any) {
+      this.logger.error(
+        `Error while sending push notification to users: ${payload?.receiverIds?.join(', ')}`,
+        e.stack
+      )
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'ERROR_CREATE_PUSH_NOTIFICATION'
+      )
     }
   }
 }
