@@ -157,7 +157,7 @@ export function DpNotificationBellComponent({
         <DropdownMenuSeparator />
         <div
           ref={notificationContainerRef}
-          className="h-[calc(80vh_-_var(--navbar-height))] max-h-[502px] overflow-x-hidden overflow-y-auto"
+          className="max-h-[calc(80vh_-_var(--navbar-height))] overflow-x-hidden overflow-y-auto"
         >
           <NotificationList
             notifications={notifications}

@@ -113,9 +113,9 @@ export function NotificationList() {
   if (loadingRef.current) return null
 
   return (
-    <div className="text-sm sm:text-base select-none p-1 sm:p-3">
+    <div className="text-sm sm:text-base select-none p-1 py-2 rounded-md sm:p-3 bg-background-secondary">
       <div className="flex justify-between mb-3">
-        <h1 className="text-base sm:text-lg">Notifications</h1>
+        <h1 className="text-base sm:text-lg px-2">Notifications</h1>
         <NotificationReadAllButton
           onReadAll={async () => {
             if (notifications?.content?.some((content) => !content.isRead)) {
