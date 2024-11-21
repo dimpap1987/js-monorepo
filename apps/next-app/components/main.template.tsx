@@ -202,16 +202,13 @@ export default function MainTemplate({
           )}
           {!!user && (
             <DpLogoutButton
-              className="p-3 justify-center"
+              className="p-3 mb-6 justify-center"
               size="large"
               onClick={async () => {
                 authClient.logout()
               }}
             ></DpLogoutButton>
           )}
-        </div>
-        <div className="p-2">
-          <DpVersion className="text-white"></DpVersion>
         </div>
       </DpNextSidebar>
 

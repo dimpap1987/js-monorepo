@@ -9,10 +9,8 @@ import {
 import { NotificationBellButton } from '@js-monorepo/notification-bell'
 import { AuthRole } from '@js-monorepo/types'
 import { useNotificationStore } from '@next-app/state'
-import { HiBellAlert, HiMiniUsers } from 'react-icons/hi2'
+import { AiFillHome } from 'react-icons/ai'
 import { IconType } from 'react-icons/lib'
-import { RiUserSettingsFill } from 'react-icons/ri'
-
 type NavLinkOpts = {
   href: string
   icon: IconType
@@ -23,25 +21,11 @@ type NavLinkOpts = {
 
 export const navLinksOpts: NavLinkOpts[] = [
   {
-    href: '/dashboard/users',
-    icon: RiUserSettingsFill,
-    label: 'Users',
+    href: '/',
+    icon: AiFillHome,
+    label: 'Home',
     activeClassName: 'bg-accent text-accent-foreground',
-    roles: ['ADMIN'],
-  },
-  {
-    href: '/dashboard/online-users',
-    icon: HiMiniUsers,
-    label: 'Online',
-    activeClassName: 'bg-accent text-accent-foreground',
-    roles: ['ADMIN'],
-  },
-  {
-    href: '/dashboard/notifications',
-    icon: HiBellAlert,
-    label: 'Manage',
-    activeClassName: 'bg-accent text-accent-foreground',
-    roles: ['ADMIN'],
+    roles: ['USER', 'ADMIN'],
   },
 ] as const
 
