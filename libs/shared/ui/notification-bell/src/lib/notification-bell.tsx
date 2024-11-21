@@ -142,7 +142,7 @@ export function DpNotificationBellComponent({
         )}
       >
         <DropdownMenuLabel className="flex justify-between">
-          <div>Notifications</div>
+          <div className="content-center">Notifications</div>
           <NotificationReadAllButton
             onReadAll={async () => {
               const isReadAll = await onReadAll?.()
