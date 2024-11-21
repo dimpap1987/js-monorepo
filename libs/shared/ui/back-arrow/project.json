@@ -1,0 +1,9 @@
+{
+  "name": "back-arrow",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/ui/back-arrow/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project back-arrow --web",
+  "targets": {}
+}

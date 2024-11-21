@@ -1,3 +1,4 @@
+import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 import { NotificationSender } from './components/notification-sender'
 import { PushNotificationSender } from './components/push-notification-sender'
 import {
@@ -10,7 +11,13 @@ import {
 export default async function NotificationsController() {
   return (
     <>
-      <div className="p-2">
+      <BackArrowWithLabel arrowClassName="sm:hidden">
+        <h1 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
+          Manage Notifications
+        </h1>
+      </BackArrowWithLabel>
+
+      <div className="p-4">
         <Accordion type="multiple" className="w-full">
           <AccordionItem value="item-1">
             <AccordionTrigger>Send User Notification</AccordionTrigger>

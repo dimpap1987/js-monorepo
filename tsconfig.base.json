@@ -24,6 +24,7 @@
       ],
       "@js-monorepo/auth/nest/*": ["libs/auth/nest/src/*"],
       "@js-monorepo/auth/next/*": ["libs/auth/next/src/lib/*"],
+      "@js-monorepo/back-arrow": ["libs/shared/ui/back-arrow/src/index.ts"],
       "@js-monorepo/base": ["libs/shared/styles/src/lib/_base.css"],
       "@js-monorepo/bottom-navbar": [
         "libs/shared/ui/bottom-navbar/src/index.ts"

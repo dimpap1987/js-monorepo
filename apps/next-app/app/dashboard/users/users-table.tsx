@@ -175,7 +175,7 @@ const DashboardUsersTableSuspense = () => {
         ),
         cell: ({ row }) => {
           return (
-            <div className="flex gap-2 justify-center items-center ">
+            <div className="flex gap-2 p-4 justify-center items-center ">
               <div id="update-user">
                 {update?.inProgress && update.index === row.index ? (
                   <div className="flex border-zinc-600 border-2 rounded-lg items-center p-1 px-2 gap-2">
@@ -236,7 +236,7 @@ const DashboardUsersTableSuspense = () => {
   )
 
   return (
-    <>
+    <div className="mt-2">
       <DataTable
         columns={memoizedColumns}
         data={data?.users}
@@ -245,7 +245,7 @@ const DashboardUsersTableSuspense = () => {
         pagination={pagination}
         loading={loading}
       ></DataTable>
-    </>
+    </div>
   )
 }
 
