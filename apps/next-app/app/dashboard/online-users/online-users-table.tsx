@@ -3,11 +3,11 @@
 import { Badge } from '@js-monorepo/components/badge'
 import { Skeleton } from '@js-monorepo/components/skeleton'
 import { useWebSocket } from '@js-monorepo/next/providers'
+import { wait } from '@js-monorepo/utils/common'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useEffect, useState } from 'react'
 import { FaCircle } from 'react-icons/fa6'
 import { DisconnectUserComponent } from './components/disconnect-user'
-import { wait } from '@js-monorepo/utils/common'
 
 export type OnlineUsersType = {
   id: number
@@ -60,11 +60,7 @@ export default function OnlineUsersTableComponent() {
   )
 
   return (
-    <div className="flex flex-col p-2 bg-white border-b rounded-lg shadow overflow-hidden text-sm">
-      <div className="text-center text-gray-500 font-bold py-1 shadow rounded-lg border-gray-300">
-        Online Users
-      </div>
-
+    <div className="flex flex-col p-2 mt-2 bg-white border-b rounded-lg shadow overflow-hidden text-sm">
       <div className="overflow-auto whitespace-nowrap">
         <table className="w-full">
           {!loading && (

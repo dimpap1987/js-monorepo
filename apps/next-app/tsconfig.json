@@ -26,7 +26,8 @@
     "../../apps/next-app/.next/types/**/*.ts",
     "../../dist/apps/next-app/.next/types/**/*.ts",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "app/(main)/settings/back-button.tsx"
   ],
   "exclude": [
     "node_modules",
