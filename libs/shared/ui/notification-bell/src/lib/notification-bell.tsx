@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@js-monorepo/components/dropdown'
+import { ScrollArea } from '@js-monorepo/components/scroll'
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
@@ -155,16 +156,16 @@ export function DpNotificationBellComponent({
           ></NotificationReadAllButton>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <div
-          ref={notificationContainerRef}
-          className="max-h-[calc(80vh_-_var(--navbar-height))] overflow-x-hidden overflow-y-auto"
+        <ScrollArea
+          className={`${pagebale?.totalPages > 1 ? 'h-[400px]' : ''} rounded-md`}
+          viewPortRef={notificationContainerRef}
         >
           <NotificationList
             notifications={notifications}
             onRead={handleRead}
-            showLoader={isLoading}
+            showLoader={isPending}
           />
-        </div>
+        </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>
   )

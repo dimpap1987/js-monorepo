@@ -24,8 +24,8 @@ export function useNotificationWebSocket(
 }
 
 export function usePagination({
-  page = 1,
-  pageSize = 15,
+  page,
+  pageSize,
   totalPages,
   onPaginationChange,
 }: Pageable & {
