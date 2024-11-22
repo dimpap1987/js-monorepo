@@ -81,8 +81,6 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       socketRef.current.disconnect()
       console.log('WebSocket unsubscribed and disconnected')
       socketRef.current = null
-    } else {
-      console.warn('No active WebSocket connection to unsubscribe from')
     }
   }
 
