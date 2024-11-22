@@ -12,7 +12,6 @@ import {
   PaginationType,
   UserNotificationType,
 } from '@js-monorepo/types'
-import { DpVersion } from '@js-monorepo/version'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import { useNotificationStore } from '@next-app/state'
 import {
@@ -66,6 +65,9 @@ const menuItems: MenuItem[] = [
   },
 ]
 
+const initialPage = 1
+const initialPageSize = 10
+
 const DpNotificationBellComponentDynamic = dynamic(
   () =>
     import('@js-monorepo/notification-bell').then(
@@ -111,15 +113,16 @@ export default function MainTemplate({
 
   useEffect(() => {
     if (!user?.id || fetchNotificationsRef.current) return
-    apiFetchUserNotifications(user.id, `page=1&pageSize=15`).then(
-      (response) => {
-        if (response.ok) {
-          fetchNotificationsRef.current = true
-          setNotifications(response.data)
-          setNotificationCount(response.data?.unReadTotal ?? 0)
-        }
+    apiFetchUserNotifications(
+      user.id,
+      `page=${initialPage}&pageSize=${initialPageSize}`
+    ).then((response) => {
+      if (response.ok) {
+        fetchNotificationsRef.current = true
+        setNotifications(response.data)
+        setNotificationCount(response.data?.unReadTotal ?? 0)
       }
-    )
+    })
   }, [user])
 
   return (
@@ -144,8 +147,8 @@ export default function MainTemplate({
           {isLoggedIn && (
             <DpNotificationBellComponentDynamic
               pagebale={{
-                page: notifications?.page ?? 1,
-                pageSize: notifications?.pageSize ?? 15,
+                page: notifications?.page ?? initialPage,
+                pageSize: notifications?.pageSize ?? initialPageSize,
                 totalPages: notifications?.totalPages ?? 0,
               }}
               unreadNotificationCount={notificationCount}
