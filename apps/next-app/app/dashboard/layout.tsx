@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
   return (
     <section>
       <Sidebar className="fixed top-[calc(35px_+_var(--navbar-height))] left-0 bottom-0" />
-      <div className="absolute p-2 left-0 sm:left-[180px] right-0 overflow-y-hidden max-w-6xl mx-auto">
+      <div className="absolute p-3 left-0 sm:left-[165px] right-0 overflow-y-hidden max-w-6xl mx-auto">
         {children}
       </div>
     </section>
