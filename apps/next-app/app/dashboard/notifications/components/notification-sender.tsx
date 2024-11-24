@@ -3,7 +3,6 @@
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import { Card } from '@js-monorepo/components/card'
-import { Input } from '@js-monorepo/components/form'
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
 import { useNotifications } from '@js-monorepo/notification'
 import { useEffect, useState } from 'react'
@@ -30,6 +29,11 @@ export const NotificationSender = () => {
           message: 'Notification send successfully!',
           type: 'success',
         })
+      } else {
+        addNotification({
+          message: 'Error sending Notification',
+          type: 'error',
+        })
       }
     }
   }
@@ -44,12 +48,12 @@ export const NotificationSender = () => {
 
   return (
     <Card className="space-y-4 w-full p-5 bg-background/60">
-      <Input
-        type="text"
+      <textarea
         placeholder="Type your message here..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="w-full mt-2"
+        className="w-full border border-gray-300 rounded-md p-2"
+        rows={4}
       />
 
       <MultiSelectDropdown
@@ -67,9 +71,11 @@ export const NotificationSender = () => {
           variant="accent"
           className="w-full"
           onClick={handleSendMessage}
-          disabled={message?.trim()?.length === 0}
+          disabled={
+            message?.trim()?.length === 0 || !(selectedUserIds?.length > 0)
+          }
         >
-          Submit
+          Send Notification
         </DpButton>
       </div>
     </Card>

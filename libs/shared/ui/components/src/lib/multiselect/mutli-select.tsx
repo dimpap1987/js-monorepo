@@ -23,6 +23,7 @@ interface MultiSelectDropdownProps {
   prompt?: string
   selectedIds?: (number | string)[] // New property for selected IDs
   className?: string
+  classNameTrigger?: string
 }
 
 export function MultiSelectDropdown({
@@ -31,6 +32,7 @@ export function MultiSelectDropdown({
   prompt,
   selectedIds = [],
   className,
+  classNameTrigger,
 }: MultiSelectDropdownProps) {
   const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([])
   const [label, setLabel] = useState<string | undefined>(prompt)
@@ -94,16 +96,19 @@ export function MultiSelectDropdown({
       <DropdownMenuTrigger
         ref={dropdownTriggerRef}
         asChild
-        className="w-full border-2 border-border rounded-lg text-foreground hide-scrollbar
-         px-6 py-1 text-base hover:border-border/80 cursor-pointer shadow-sm transition-colors
-         focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-background"
+        className={cn(
+          'w-full border-2 border-border rounded-lg text-foreground hide-scrollbar text-primary-foreground',
+          'px-6 py-1 text-base hover:border-border/80 cursor-pointer shadow-sm transition-colors',
+          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring bg-primary',
+          classNameTrigger
+        )}
       >
         <div className="overflow-auto text-nowrap text-center">{label}</div>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
         className={cn(
-          'border rounded shadow-md bg-background text-foreground max-h-[235px] overflow-y-auto',
+          'border rounded shadow-md bg-background text-foreground max-h-[235px] overflow-y-auto bg-background-secondary',
           className
         )}
         ref={dropdownContentRef}

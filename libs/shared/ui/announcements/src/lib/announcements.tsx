@@ -35,10 +35,7 @@ export function AnnouncementsComponent({
 
   return (
     <Marquee
-      className={cn(
-        `fixed top-[calc(5px_+_var(--navbar-height))] w-full`,
-        className
-      )}
+      className={cn(`w-full`, className)}
       duration={15}
       onAnimationComplete={() => setAnnouncements([])}
     >

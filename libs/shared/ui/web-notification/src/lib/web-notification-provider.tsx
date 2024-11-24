@@ -1,5 +1,6 @@
 'use client'
 
+import { useSession } from '@js-monorepo/auth/next/client'
 import {
   createContext,
   ReactNode,
@@ -13,7 +14,6 @@ import {
   requestPushPermission,
   subscribeNotifactionToServer,
 } from './utils'
-import { useSession } from '@js-monorepo/auth/next/client'
 
 interface WebNotificationContextType {
   permission: NotificationPermission
@@ -29,16 +29,16 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
   const [permission, setPermission] = useState<NotificationPermission>(
     Notification.permission
   )
-
   const { user } = useSession()
 
   useEffect(() => {
-    registerServiceWorker().then(() => {
+    registerServiceWorker().then(async () => {
       if (Notification.permission === 'granted' && user?.id) {
-        subscribeNotifactionToServer(user?.id)
+        await navigator.serviceWorker.ready
+        await subscribeNotifactionToServer(user.id)
       }
     })
-  }, [])
+  }, [user])
 
   const requestPermission = useCallback(() => {
     requestPushPermission().then(async (perm) => {
@@ -47,7 +47,7 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
         subscribeNotifactionToServer(user?.id)
       }
     })
-  }, [permission])
+  }, [permission, user])
 
   const createNotification = useCallback(
     (title: string, options: NotificationOptions) => {
