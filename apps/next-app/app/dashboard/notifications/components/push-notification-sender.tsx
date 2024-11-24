@@ -3,6 +3,7 @@
 import { DpButton } from '@js-monorepo/button'
 import { Card } from '@js-monorepo/components/card'
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
+import { useNotifications } from '@js-monorepo/notification'
 import { useEffect, useState } from 'react'
 import { findUsers, submitPushNotification } from '../utils'
 import { UserDropdown } from './types'
@@ -12,19 +13,27 @@ export const PushNotificationSender = () => {
   const [message, setMessage] = useState('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const [usersDropDown, setUsersDropDown] = useState<UserDropdown[]>([])
+  const { addNotification } = useNotifications()
 
   const handleSendMessage = async () => {
-    // Logic to send the push notification
-    console.log('Sending notification:', { title, message, selectedUserIds })
-    await submitPushNotification({
+    const response = await submitPushNotification({
       message,
       title,
       receiverIds: selectedUserIds,
     })
-    // Reset form after sending
-    setTitle('')
-    setMessage('')
-    setSelectedUserIds([])
+    if (response.ok) {
+      addNotification({
+        message: 'Push Notification send successfully!',
+        type: 'success',
+      })
+      setTitle('')
+      setMessage('')
+    } else {
+      addNotification({
+        message: 'Error sending Push Notification',
+        type: 'error',
+      })
+    }
   }
 
   useEffect(() => {
@@ -73,7 +82,7 @@ export const PushNotificationSender = () => {
           selectedUserIds.length === 0
         }
       >
-        Submit
+        Send Push Notification
       </DpButton>
     </Card>
   )

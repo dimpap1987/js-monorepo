@@ -1,5 +1,3 @@
-console.log('Hi from service worker')
-
 self.addEventListener('push', (event) => {
   console.log('Push message received', event)
 

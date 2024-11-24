@@ -1,9 +1,10 @@
 import { REDIS } from '@js-monorepo/nest/redis'
 import { NotificationCreateDto, Pageable } from '@js-monorepo/types'
 import { Transactional } from '@nestjs-cls/transactional'
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
 import { sendNotification, setVapidDetails } from 'web-push'
+import { ApiException } from '../../exceptions/api-exception'
 import {
   NotificationRepo,
   NotificationRepository,
@@ -51,6 +52,11 @@ export class NotificationService {
   async saveUserSubscription(userId: number, subscription: any): Promise<void> {
     const redisKey = getUserSubscriptionRedisKey(userId)
 
+    // Validate subscription object
+    if (!subscription || !subscription.endpoint || !subscription.keys) {
+      throw new Error('Invalid subscription object')
+    }
+
     const currentTime = new Date().toISOString()
     const value = JSON.stringify({
       endpoint: subscription.endpoint,
@@ -59,8 +65,16 @@ export class NotificationService {
       createdAt: currentTime,
     })
 
-    await this.redis.hSet(redisKey, subscription.endpoint, value)
-    await this.redis.expire(redisKey, 3600 * 24 * 3)
+    try {
+      await this.redis.hSet(redisKey, subscription.endpoint, value)
+      await this.redis.expire(redisKey, 3600 * 24 * 3) // Set expiration to 3 days
+    } catch (error) {
+      console.error('Error saving user subscription:', error)
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'Failed to save user subscription'
+      )
+    }
   }
 
   async getUserSubscriptions(
