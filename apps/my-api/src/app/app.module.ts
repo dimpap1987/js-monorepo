@@ -32,6 +32,7 @@ import { ChannelService } from './modules/channel/channel.service'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { NotificationProviderModule } from './modules/notifications/notifications.module'
+import { AnnouncementsController } from './controllers/announcements'
 
 const ENV = process.env.NODE_ENV
 @Module({
@@ -108,7 +109,7 @@ const ENV = process.env.NODE_ENV
       ],
     }),
   ],
-  controllers: [ExceptionController],
+  controllers: [ExceptionController, AnnouncementsController],
   providers: [LoggerMiddleware],
 })
 export class AppModule implements NestModule {

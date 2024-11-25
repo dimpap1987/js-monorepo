@@ -7,6 +7,7 @@ import { PropsWithChildren } from 'react'
 import { HiMiniUsers } from 'react-icons/hi2'
 import { IoMdNotifications } from 'react-icons/io'
 import { RiUserSettingsFill } from 'react-icons/ri'
+import { GrAnnounce } from 'react-icons/gr'
 
 const navLinksOpts = [
   {
@@ -25,6 +26,12 @@ const navLinksOpts = [
     href: '/dashboard/notifications',
     icon: IoMdNotifications,
     label: 'Manage Alerts',
+    activeClassName: 'bg-accent text-accent-foreground',
+  },
+  {
+    href: '/dashboard/announcements',
+    icon: GrAnnounce,
+    label: 'Announcements',
     activeClassName: 'bg-accent text-accent-foreground',
   },
 ] as const
@@ -64,7 +71,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
   return (
     <section>
       <Sidebar className="fixed top-[calc(35px_+_var(--navbar-height))] left-0 bottom-0" />
-      <div className="absolute p-3 left-0 sm:left-[165px] right-0 overflow-y-hidden max-w-6xl mx-auto">
+      <div className="absolute p-3 left-0 sm:left-[180px] right-0 overflow-y-hidden max-w-6xl mx-auto">
         {children}
       </div>
     </section>

@@ -1,35 +1,33 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import { Card } from '@js-monorepo/components/card'
 import { useNotifications } from '@js-monorepo/notification'
 import { SelectUsersComponent } from '@next-app/components/select-users'
+import { API } from '@next-app/utils/api-proxy'
 import { useState } from 'react'
-import { submitNotification } from '../utils'
 
-export const NotificationSender = () => {
-  const { user } = useSession()
+const CreateAnnouncement = () => {
   const [message, setMessage] = useState<string>('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const { addNotification } = useNotifications()
 
   const handleSendMessage = async () => {
-    if (user && message.trim() && selectedUserIds.length > 0) {
-      const submitResponse = await submitNotification({
-        message: message.trim(),
-        receiverIds: selectedUserIds,
-        senderId: user.id,
-      })
+    if (message.trim() && selectedUserIds.length > 0) {
+      const submitResponse = await API.url(
+        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/announcements`
+      )
+        .post()
+        .body({ announcement: message.trim() })
+        .withCredentials()
+        .withCsrf()
+        .execute()
+
       if (submitResponse.ok) {
         setMessage('')
-        addNotification({
-          message: 'Notification send successfully!',
-          type: 'success',
-        })
       } else {
         addNotification({
-          message: 'Error sending Notification',
+          message: 'Error sending Announcement',
           type: 'error',
         })
       }
@@ -37,7 +35,7 @@ export const NotificationSender = () => {
   }
 
   return (
-    <Card className="space-y-4 w-full p-5 bg-background/60">
+    <Card className="space-y-4 w-full p-5">
       <textarea
         placeholder="Type your message here..."
         value={message}
@@ -53,19 +51,17 @@ export const NotificationSender = () => {
         selectedUserIds={selectedUserIds}
       />
 
-      <div>
-        <DpButton
-          size="large"
-          variant="accent"
-          className="w-full"
-          onClick={handleSendMessage}
-          disabled={
-            message?.trim()?.length === 0 || !(selectedUserIds?.length > 0)
-          }
-        >
-          Send Notification
-        </DpButton>
-      </div>
+      <DpButton
+        size="large"
+        className="w-full"
+        variant="accent"
+        onClick={handleSendMessage}
+        disabled={message.trim().length === 0 || selectedUserIds.length === 0}
+      >
+        Send Announcement
+      </DpButton>
     </Card>
   )
 }
+
+export { CreateAnnouncement }
