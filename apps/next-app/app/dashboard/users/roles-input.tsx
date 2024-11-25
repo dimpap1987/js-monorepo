@@ -24,11 +24,8 @@ function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([])
 
   useEffect(() => {
-    // Fetch roles and set initial selected roles
     getRoles().then((fetchedRoles) => {
       setRoles(fetchedRoles)
-
-      // Assuming userRole is an array of objects with a 'name' property
       const userRoleNames =
         row?.original.userRole?.map(({ role }) => role.name) || []
 
@@ -41,19 +38,22 @@ function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
   }, [row])
 
   return (
-    <MultiSelectDropdown
-      onChange={(localRoles) => {
-        row.updatedUser = {
-          ...row.updatedUser,
-          roles: localRoles.map((role) => ({
-            id: role.id,
-          })),
-        }
-      }}
-      prompt={row?.original?.userRole?.map((r) => r.role.name).join(',')}
-      options={roles}
-      selectedIds={selectedRoleIds}
-    ></MultiSelectDropdown>
+    roles && (
+      <MultiSelectDropdown
+        classNameTrigger="bg-background text-foreground"
+        onChange={(localRoles) => {
+          row.updatedUser = {
+            ...row.updatedUser,
+            roles: localRoles.map((role) => ({
+              id: role.id,
+            })),
+          }
+        }}
+        prompt={row?.original?.userRole?.map((r) => r.role.name).join(',')}
+        options={roles}
+        selectedIds={selectedRoleIds}
+      ></MultiSelectDropdown>
+    )
   )
 }
 

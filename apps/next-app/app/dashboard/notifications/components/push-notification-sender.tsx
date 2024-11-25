@@ -2,17 +2,15 @@
 
 import { DpButton } from '@js-monorepo/button'
 import { Card } from '@js-monorepo/components/card'
-import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
 import { useNotifications } from '@js-monorepo/notification'
-import { useEffect, useState } from 'react'
-import { findUsers, submitPushNotification } from '../utils'
-import { UserDropdown } from './types'
+import { SelectUsersComponent } from '@next-app/components/select-users'
+import { useState } from 'react'
+import { submitPushNotification } from '../utils'
 
 export const PushNotificationSender = () => {
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
-  const [usersDropDown, setUsersDropDown] = useState<UserDropdown[]>([])
   const { addNotification } = useNotifications()
 
   const handleSendMessage = async () => {
@@ -36,14 +34,6 @@ export const PushNotificationSender = () => {
     }
   }
 
-  useEffect(() => {
-    findUsers().then((users) =>
-      setUsersDropDown(
-        users.users?.map((u) => ({ id: u.id, name: u.username }))
-      )
-    )
-  }, [])
-
   return (
     <Card className="space-y-4 w-full p-5">
       <input
@@ -62,13 +52,11 @@ export const PushNotificationSender = () => {
         rows={4}
       />
 
-      <MultiSelectDropdown
-        options={usersDropDown}
+      <SelectUsersComponent
         onChange={(selected) => {
           setSelectedUserIds(selected.map((u) => u.id))
         }}
-        prompt="Select users..."
-        selectedIds={selectedUserIds}
+        selectedUserIds={selectedUserIds}
       />
 
       <DpButton

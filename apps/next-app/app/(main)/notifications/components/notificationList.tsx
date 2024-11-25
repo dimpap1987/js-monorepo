@@ -6,6 +6,7 @@ import { useLoader } from '@js-monorepo/loader'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
 import {
   humanatizeNotificationDate,
+  NoticationItemContext,
   NotificationReadAllButton,
   updateNotificationAsRead,
   useNotificationWebSocket,
@@ -114,7 +115,7 @@ export function NotificationList() {
   if (loadingRef.current) return null
 
   return (
-    <div className="text-sm sm:text-base select-none p-1 py-2 rounded-md sm:p-3 bg-background-secondary">
+    <div className="text-sm sm:text-base select-none p-1 py-2 rounded-md sm:p-3 bg-background-secondary text-white">
       <div className="flex justify-between mb-3">
         <BackArrowWithLabel className="flex-1" arrowClassName="sm:hidden">
           <h1 className="text-base sm:text-lg px-2 ml-5 sm:ml-0 text-center sm:text-left">
@@ -167,7 +168,9 @@ export function NotificationList() {
                   className={`text-sm mr-1 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-foreground'}`}
                 />
                 <div className="flex-1 p-1 max-line--height break-all overflow-hidden text-ellipsis whitespace-normal select-text">
-                  {content.notification?.message}
+                  <NoticationItemContext
+                    message={content.notification.message}
+                  ></NoticationItemContext>
                 </div>
                 <div className="flex flex-col sm:gap-1 gap-0 items-end sm:flex-row text-[10px] md:text-sm text-gray-500">
                   <span>

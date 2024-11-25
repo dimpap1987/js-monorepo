@@ -80,7 +80,7 @@ const DashboardUsersTableSuspense = () => {
         cell: ({ row }) => {
           return (
             <div className="flex justify-center items-center">
-              <Avatar className='h-10 w-10"'>
+              <Avatar className="h-12 w-12">
                 {row.original?.userProfiles?.[0].profileImage && (
                   <AvatarImage
                     src={row.original?.userProfiles?.[0].profileImage}

@@ -2,6 +2,25 @@ import { Card } from '@js-monorepo/components/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpVersion } from '@js-monorepo/version'
 
+const opts = [
+  {
+    label: 'Manage Users',
+    href: 'dashboard/users',
+  },
+  {
+    label: 'See who is currently online',
+    href: 'dashboard/online-users',
+  },
+  {
+    label: 'Manage Notifications',
+    href: 'dashboard/notifications',
+  },
+  {
+    label: 'Announcements',
+    href: 'dashboard/announcements',
+  },
+]
+
 export default function DashboardController() {
   return (
     <>
@@ -13,26 +32,16 @@ export default function DashboardController() {
 
       <div className="p-2 flex justify-center font-semibold sm:hidden">
         <div className="space-y-4">
-          {/* Users Button */}
-          <Card className="text-center transition-transform transform hover:scale-105 cursor-pointer hover:bg-primary grid">
-            <DpNextNavLink className="p-6" href="dashboard/users">
-              Manage Users
-            </DpNextNavLink>
-          </Card>
-
-          {/* Online Users Button */}
-          <Card className="text-center transition-transform transform hover:scale-105 cursor-pointer hover:bg-primary grid">
-            <DpNextNavLink className="p-6" href="dashboard/online-users">
-              See who is currently online
-            </DpNextNavLink>
-          </Card>
-
-          {/* Notifications Button */}
-          <Card className="text-center transition-transform transform hover:scale-105 cursor-pointer hover:bg-primary grid">
-            <DpNextNavLink className="p-6" href="dashboard/notifications">
-              Manage Notifications
-            </DpNextNavLink>
-          </Card>
+          {opts?.map((opt) => (
+            <Card
+              key={opt.href}
+              className="text-center transition-transform transform hover:scale-105 cursor-pointer hover:bg-primary grid"
+            >
+              <DpNextNavLink className="p-6" href={opt.href}>
+                {opt.label}
+              </DpNextNavLink>
+            </Card>
+          ))}
         </div>
       </div>
     </>

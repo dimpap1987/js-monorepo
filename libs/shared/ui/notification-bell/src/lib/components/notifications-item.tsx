@@ -1,11 +1,12 @@
-import React from 'react'
 import {
   DropdownMenuItem,
   DropdownMenuShortcut,
 } from '@js-monorepo/components/dropdown'
+import { UserNotificationType } from '@js-monorepo/types'
+import React from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { humanatizeNotificationDate } from '../utils'
-import { UserNotificationType } from '@js-monorepo/types'
+import { NoticationItemContext } from './notification-item-content'
 
 interface NotificationItemProps {
   content: UserNotificationType
@@ -27,7 +28,9 @@ const NotificationItem = React.memo(
           className={`text-2xl mr-2 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-white'}`}
         />
         <div className="p-1 max-line--height break-words select-text">
-          {content.notification.message}
+          <NoticationItemContext
+            message={content.notification.message}
+          ></NoticationItemContext>
         </div>
         <DropdownMenuShortcut>
           {humanatizeNotificationDate(content.notification.createdAt)} ago
