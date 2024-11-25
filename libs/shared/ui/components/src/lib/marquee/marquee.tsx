@@ -1,3 +1,5 @@
+'use client'
+
 import { cn } from '@js-monorepo/ui/util'
 import { motion } from 'framer-motion'
 import React, {
@@ -6,6 +8,7 @@ import React, {
   ReactNode,
   useEffect,
   useRef,
+  useState,
 } from 'react'
 
 interface MarqueeProps {
@@ -16,6 +19,7 @@ interface MarqueeProps {
   onAnimationComplete?: () => void // Callback to clear announcements
 }
 
+//TODO needs refactor
 const Marquee = forwardRef(
   (
     {
@@ -27,18 +31,29 @@ const Marquee = forwardRef(
     }: MarqueeProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
-    const animationStatusRef = useRef(new Map<number, boolean>()) // Ref to track animation completion
+    const childRefs = useRef<Map<number, HTMLDivElement | null>>(new Map())
+    const [childWidths, setChildWidths] = useState<number[]>([])
+    const animationStatusRef = useRef(new Map<number, boolean>())
 
     useEffect(() => {
-      // Initialize the animation status map when children change
-      animationStatusRef.current?.clear() // Clear previous status
+      const widths: number[] = []
+      childRefs.current.forEach((child, index) => {
+        if (child) {
+          widths[index] = child.offsetWidth
+        }
+      })
+      setChildWidths(widths)
+    }, [children])
+
+    useEffect(() => {
+      animationStatusRef.current?.clear()
       React.Children.forEach(children, (child, index) => {
-        animationStatusRef.current?.set(index, false) // Set initial status to false
+        animationStatusRef.current.set(index, false)
       })
     }, [children])
 
     const checkAllAnimationsCompleted = () => {
-      // check if all animations are completed
+      // Check if all animations are completed
       const allCompleted = Array.from(
         animationStatusRef.current.values()
       ).every((status) => status)
@@ -53,13 +68,16 @@ const Marquee = forwardRef(
         ref={ref}
         className={cn('overflow-hidden whitespace-nowrap py-1', className)}
       >
-        <div className={`flex gap-40 h-6 relative items-center`}>
+        <div className="flex gap-40 h-6 relative items-center">
           {React.Children.map(children, (child, index) => (
             <motion.div
               key={index}
               className="px-4 absolute"
+              ref={(node) => {
+                childRefs.current.set(index, node)
+              }}
               initial={{ x: `100vw` }}
-              animate={{ x: `-300px` }}
+              animate={{ x: `-${childWidths[index] || 400}px` }} // Animate to negative of the width
               transition={{
                 duration,
                 ease: 'linear',
@@ -67,7 +85,7 @@ const Marquee = forwardRef(
                 onComplete: () => {
                   // Mark this animation as completed
                   animationStatusRef.current.set(index, true)
-                  setTimeout(checkAllAnimationsCompleted, 400) // Small delay to ensure state updates
+                  setTimeout(checkAllAnimationsCompleted, 400)
                 },
               }}
             >

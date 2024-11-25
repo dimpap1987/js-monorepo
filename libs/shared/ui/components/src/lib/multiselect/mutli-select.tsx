@@ -29,7 +29,7 @@ interface MultiSelectDropdownProps {
 export function MultiSelectDropdown({
   options,
   onChange,
-  prompt = 'Select ...',
+  prompt = 'Select',
   selectedIds = [],
   className,
   classNameTrigger,
