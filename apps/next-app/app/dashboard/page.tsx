@@ -35,7 +35,7 @@ export default function DashboardController() {
           {opts?.map((opt) => (
             <Card
               key={opt.href}
-              className="text-center transition-transform transform hover:scale-105 cursor-pointer hover:bg-primary grid"
+              className="text-center transition-transform transform hover:scale-105 cursor-pointer bg-accent grid"
             >
               <DpNextNavLink className="p-6" href={opt.href}>
                 {opt.label}
