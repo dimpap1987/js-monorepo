@@ -9,7 +9,10 @@ const NoticationItemContext = ({ message }: { message: string }) => {
   return message.split(urlRegex).map((part, index) => {
     if (urls.includes(part)) {
       return (
-        <span key={index} className="relative inline-block pr-4 pt-1">
+        <span
+          key={index}
+          className="relative inline-block pr-4 pt-1 select-all"
+        >
           <span className="text-blue-500 underline">{part}</span>
           <FaExternalLinkAlt
             className="absolute right-0 top-[-3px] text-xs text-gray-400"
