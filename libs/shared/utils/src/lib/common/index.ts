@@ -46,9 +46,9 @@ export function getColorizedText(
 export function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
   const width = window.innerWidth
 
-  if (width < 768) {
+  if (width < 640) {
     return 'mobile'
-  } else if (width >= 768 && width < 1024) {
+  } else if (width >= 640 && width < 1024) {
     return 'tablet'
   } else {
     return 'desktop'

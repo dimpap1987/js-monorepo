@@ -34,23 +34,31 @@ export function usePagination({
   const paginator = useRef({ page, pageSize })
   const [isLoading, setIsLoading] = useState(false)
 
-  const loadMore = useCallback(() => {
+  const setPaginator = (_page: number, _pageSize: number) => {
+    paginator.current = {
+      page: _page,
+      pageSize: _pageSize,
+    }
+  }
+
+  const loadMore = useCallback(async () => {
     if (isLoading || (totalPages && paginator.current.page >= totalPages))
       return
 
     setIsLoading(true)
 
-    onPaginationChange({
-      page: paginator.current.page + 1,
-      pageSize: paginator.current.pageSize,
-    })
-      .then(() => {
-        paginator.current.page += 1
+    paginator.current.page = paginator.current.page + 1
+    try {
+      await onPaginationChange({
+        page: paginator.current.page,
+        pageSize: paginator.current.pageSize,
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
+    } catch (e) {
+      paginator.current.page = paginator.current.page - 1
+    }
+
+    setIsLoading(false)
   }, [isLoading, onPaginationChange, totalPages])
 
-  return { loadMore, paginator, isLoading }
+  return { loadMore, paginator, isLoading, setPaginator }
 }

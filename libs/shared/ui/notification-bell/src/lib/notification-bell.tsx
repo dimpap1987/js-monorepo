@@ -10,7 +10,8 @@ import {
 import { ScrollArea } from '@js-monorepo/components/scroll'
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
+import { debounce } from 'lodash'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { NotificationBellButton } from './components/notification-bell-trigger'
 import { NotificationList } from './components/notification-list'
 import { NotificationReadAllButton } from './components/notification-read-all'
@@ -26,6 +27,7 @@ interface DpNotificationBellComponentProps {
   onRead?: (notificationId: number) => Promise<any>
   onReadAll?: () => Promise<boolean>
   onPaginationChange: (pagination: Pageable) => Promise<void>
+  resetOnClose: boolean
 }
 
 export function DpNotificationBellComponent({
@@ -37,12 +39,11 @@ export function DpNotificationBellComponent({
   onRead,
   onReadAll,
   onPaginationChange,
+  resetOnClose = false,
 }: DpNotificationBellComponentProps) {
   const [notifications, setNotifications] = useState<UserNotificationType[]>([])
 
-  const [isPending, startTransition] = useTransition()
-
-  const { isLoading, loadMore } = usePagination({
+  const { isLoading, loadMore, setPaginator } = usePagination({
     page: pagebale.page,
     pageSize: pagebale.pageSize,
     totalPages: pagebale.totalPages,
@@ -52,33 +53,29 @@ export function DpNotificationBellComponent({
   const notificationContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    startTransition(() => {
-      setNotifications((prev: UserNotificationType[]) => {
-        const existingIds = new Set(
-          prev.map((content) => content.notification.id)
-        ) // Set of existing IDs
+    setNotifications((prev) => {
+      const existingIds = new Set(
+        prev.map((content) => content.notification.id)
+      )
 
-        // Filter out already existing notifications by ID
-        const newNotifications = notificationList.filter(
-          (content) => !existingIds.has(content.notification.id)
-        )
+      const newNotifications = notificationList.filter(
+        (content) => !existingIds.has(content.notification.id)
+      )
 
-        const allNots = [...prev, ...newNotifications].sort(
-          (a, b) => b.notification.id - a.notification.id
-        )
+      // Only update if there are new notifications
+      if (newNotifications.length === 0) return prev
 
-        return allNots
-      })
+      return [...prev, ...newNotifications].sort(
+        (a, b) => b.notification.id - a.notification.id
+      )
     })
   }, [notificationList])
 
   useEffect(() => {
     if (latestReadNotificationId) {
-      startTransition(() => {
-        setNotifications((prev) =>
-          updateNotificationAsRead(prev, latestReadNotificationId)
-        )
-      })
+      setNotifications((prev) =>
+        updateNotificationAsRead(prev, latestReadNotificationId)
+      )
     }
   }, [latestReadNotificationId])
 
@@ -93,25 +90,24 @@ export function DpNotificationBellComponent({
   const handleRead = useCallback(
     (id: number) => {
       onRead?.(id)
-      startTransition(() => {
-        setNotifications((prev) => updateNotificationAsRead(prev, id))
-      })
+      setNotifications((prev) => updateNotificationAsRead(prev, id))
     },
     [onRead]
   )
 
-  const handleScroll = useCallback(() => {
-    if (!notificationContainerRef?.current) return
+  const handleScroll = useCallback(
+    debounce(() => {
+      if (!notificationContainerRef?.current) return
 
-    const { scrollTop, scrollHeight, clientHeight } =
-      notificationContainerRef.current
+      const { scrollTop, scrollHeight, clientHeight } =
+        notificationContainerRef.current
 
-    if (scrollTop + clientHeight >= scrollHeight - 5) {
-      startTransition(() => {
+      if (scrollTop + clientHeight >= scrollHeight - 5) {
         loadMore()
-      })
-    }
-  }, [loadMore])
+      }
+    }, 200),
+    [loadMore]
+  )
 
   return (
     <DropdownMenu
@@ -127,6 +123,10 @@ export function DpNotificationBellComponent({
               'scroll',
               handleScroll
             )
+            if (resetOnClose) {
+              setPaginator(1, pagebale.pageSize)
+              setNotifications(notifications.slice(0, 10))
+            }
           }
         }, 100)
       }}
@@ -157,13 +157,13 @@ export function DpNotificationBellComponent({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <ScrollArea
-          className={`${pagebale?.totalPages > 1 ? 'h-[400px]' : ''} rounded-md`}
+          className={`${pagebale?.totalPages > 1 ? 'h-[27.2rem]' : ''} rounded-md`}
           viewPortRef={notificationContainerRef}
         >
           <NotificationList
             notifications={notifications}
             onRead={handleRead}
-            showLoader={isPending}
+            showLoader={isLoading}
           />
         </ScrollArea>
       </DropdownMenuContent>

@@ -6,11 +6,13 @@ import {
   BottomNavbarAlert,
   BottomNavbarOptions,
 } from '@js-monorepo/bottom-navbar'
+import { useDeviceType } from '@js-monorepo/next/hooks'
 import { NotificationBellButton } from '@js-monorepo/notification-bell'
 import { AuthRole } from '@js-monorepo/types'
 import { useNotificationStore } from '@next-app/state'
 import { AiFillHome } from 'react-icons/ai'
 import { IconType } from 'react-icons/lib'
+
 type NavLinkOpts = {
   href: string
   icon: IconType
@@ -32,6 +34,9 @@ export const navLinksOpts: NavLinkOpts[] = [
 export const MobileNavbar = () => {
   const { isAdmin } = useSession()
   const { notificationCount } = useNotificationStore()
+  const { deviceType } = useDeviceType()
+
+  if (deviceType !== 'mobile') return null
 
   return (
     <BottomNavbar className="sm:hidden">

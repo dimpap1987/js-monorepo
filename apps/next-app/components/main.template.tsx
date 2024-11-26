@@ -178,6 +178,7 @@ export default function MainTemplate({
                   }
                 })
               }}
+              resetOnClose={true}
             ></DpNotificationBellComponentDynamic>
           )}
           <ModeToggle className="hidden sm:inline-block"></ModeToggle>
