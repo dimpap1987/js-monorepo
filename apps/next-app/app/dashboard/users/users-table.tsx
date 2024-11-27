@@ -79,7 +79,7 @@ const DashboardUsersTableSuspense = () => {
         ),
         cell: ({ row }) => {
           return (
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center select-none">
               <Avatar className="h-12 w-12">
                 {row.original?.userProfiles?.[0].profileImage && (
                   <AvatarImage
@@ -175,7 +175,7 @@ const DashboardUsersTableSuspense = () => {
         ),
         cell: ({ row }) => {
           return (
-            <div className="flex gap-2 p-4 justify-center items-center ">
+            <div className="flex gap-2 p-4 justify-center items-center select-none">
               <div id="update-user">
                 {update?.inProgress && update.index === row.index ? (
                   <div className="flex border-zinc-600 border-2 rounded-lg items-center p-1 px-2 gap-2">

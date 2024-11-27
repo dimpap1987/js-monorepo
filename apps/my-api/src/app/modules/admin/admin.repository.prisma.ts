@@ -62,10 +62,9 @@ export class AdminRepositoryPrisma implements AdminRepository {
     }
 
     const totalCount = await this.txHost.tx.authUser.count()
-    // Fetch users with pagination using txHost.tx
     const users = await this.txHost.tx.authUser.findMany({
       take: pageSize,
-      skip: page * pageSize,
+      skip: (page - 1) * pageSize,
       select: {
         id: true,
         createdAt: true,

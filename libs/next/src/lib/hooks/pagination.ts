@@ -1,6 +1,13 @@
 import { constructURIQueryString } from '@js-monorepo/ui/util'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 interface Pagination {
   pageIndex: number
@@ -26,7 +33,7 @@ function updateUrlParams(
 
 // Pagination hook with URL parameter synchronization
 export function usePaginationWithParams(
-  pageInit = 0,
+  pageInit = 1,
   pageSizeInit = 10
 ): UsePaginationWithParamsResult {
   const searchParams = useSearchParams()
@@ -44,6 +51,10 @@ export function usePaginationWithParams(
     pageSize: initialPageSize,
   })
 
+  useEffect(() => {
+    updateUrlParams(paginationInner, replace, searchParams)
+  }, [paginationInner])
+
   const setPagination = useCallback<Dispatch<SetStateAction<Pagination>>>(
     (newPaginationOrUpdater) => {
       setPaginationInner((prevPagination) => {
@@ -52,8 +63,6 @@ export function usePaginationWithParams(
           typeof newPaginationOrUpdater === 'function'
             ? newPaginationOrUpdater(prevPagination)
             : newPaginationOrUpdater
-
-        updateUrlParams(newPagination, replace, searchParams)
 
         return newPagination
       })

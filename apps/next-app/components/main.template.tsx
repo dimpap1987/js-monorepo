@@ -115,7 +115,7 @@ export default function MainTemplate({
     if (!user?.id || fetchNotificationsRef.current) return
     apiFetchUserNotifications(
       user.id,
-      `page=${initialPage}&pageSize=${initialPageSize}`
+      `?page=${initialPage}&pageSize=${initialPageSize}`
     ).then((response) => {
       if (response.ok) {
         fetchNotificationsRef.current = true
@@ -171,7 +171,7 @@ export default function MainTemplate({
               onPaginationChange={async (pagination) => {
                 return apiFetchUserNotifications(
                   user!.id,
-                  `page=${pagination.page}&pageSize=${pagination.pageSize}`
+                  `?page=${pagination.page}&pageSize=${pagination.pageSize}`
                 ).then((response) => {
                   if (response.ok) {
                     setNotifications(response.data)
