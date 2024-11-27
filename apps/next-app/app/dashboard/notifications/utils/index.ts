@@ -5,9 +5,9 @@ import {
 } from '@js-monorepo/types'
 import { API } from '@next-app/utils/api-proxy'
 
-export const findUsers = async () => {
+export const findUsers = async (page = 1, pageSize = 50) => {
   const response = await API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users?page=0&pageSize=100`
+    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users?page=${page}&pageSize=${pageSize}`
   )
     .get()
     .withCredentials()

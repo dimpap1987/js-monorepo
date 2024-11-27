@@ -1,4 +1,5 @@
 import { DpButton } from '@js-monorepo/button'
+import { cn } from '@js-monorepo/ui/util'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -13,12 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select'
-import { cn } from '@js-monorepo/ui/util'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
   className?: string
 }
+
+// Page starts from '1'
 
 export function DataTablePagination<TData>({
   table,
@@ -48,15 +50,17 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{' '}
-          {table.getPageCount()}
+          Page {table.getState().pagination.pageIndex} of{' '}
+          {table.getPageCount() + 1}
         </div>
         <div className="flex items-center space-x-2">
           <DpButton
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => table.setPageIndex(1)}
+            disabled={
+              table.getState().pagination.pageIndex === table.getPageCount() + 1
+            }
           >
             <span className="sr-only">Go to first page</span>
             <DoubleArrowLeftIcon className="h-4 w-4" />
@@ -65,7 +69,7 @@ export function DataTablePagination<TData>({
             variant="outline"
             className="h-8 w-8 p-0"
             onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            disabled={table.getState().pagination.pageIndex === 1}
           >
             <span className="sr-only">Go to previous page</span>
             <ChevronLeftIcon className="h-4 w-4" />
@@ -82,7 +86,7 @@ export function DataTablePagination<TData>({
           <DpButton
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            onClick={() => table.setPageIndex(table.getPageCount())}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to last page</span>

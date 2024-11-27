@@ -11,7 +11,7 @@ export async function apiFetchUserNotifications(
     }
   >
 > {
-  const queryString = searchParams ? `?${searchParams}` : ''
+  const queryString = searchParams ? `${searchParams}` : ''
   return API.url(
     `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/users/${userId}${queryString}`
   )
