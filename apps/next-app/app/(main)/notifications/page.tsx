@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { NotificationList } from './components/notificationList'
+import { DynamicHeightTemplate } from '@js-monorepo/templates'
 
 export const metadata: Metadata = {
   title: 'Notifications',
@@ -7,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function Notifications() {
   return (
-    <section className="space-y-2 sm:max-w-6xl mx-auto h-[78svh] sm:h-[calc(100svh_-_var(--navbar-height)_-_30px_-_23px)] ">
+    <DynamicHeightTemplate>
       <NotificationList></NotificationList>
-    </section>
+    </DynamicHeightTemplate>
   )
 }

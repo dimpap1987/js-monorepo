@@ -3,6 +3,7 @@ import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
 import MainTemplate from '../components/main.template'
 import './global.css'
+import { BodyTemplate } from '@js-monorepo/templates'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -25,18 +26,14 @@ export default async function RootLayout(props: {
 }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body
-        className={`${poppins.className} 
-        flex flex-col min-h-100svh min-w-[200px]
-        bg-background text-foreground overflow-x-hidden w-[100vw]`}
-      >
+      <BodyTemplate className={poppins.className}>
         <DynamicRootProvicers>
           <MainTemplate>
             {props.auth}
             {props.children}
           </MainTemplate>
         </DynamicRootProvicers>
-      </body>
+      </BodyTemplate>
     </html>
   )
 }

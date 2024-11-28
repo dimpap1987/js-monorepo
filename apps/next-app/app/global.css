@@ -33,6 +33,7 @@ h4 {
 @layer base {
   :root {
     --navbar-height: 60px; /* Define the height of your navbar */
+    --bottom-navbar-height: 60px; /* Define the height of your bottom-navbar */
 
     --foreground: 0 0% 5%;
     --background: 43.64 47.83% 95.49%;

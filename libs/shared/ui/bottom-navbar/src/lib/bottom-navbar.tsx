@@ -26,7 +26,7 @@ export function BottomNavbar({
   return (
     <div
       className={cn(
-        'fixed bottom-0 h-[60px] w-[100vw] transition-transform duration-300 overflow-hidden',
+        'fixed bottom-0 h-[var(--bottom-navbar-height)] w-[100vw] transition-transform duration-300 overflow-hidden',
         isVisible ? 'translate-y-0' : 'translate-y-full', // slide in/out
         'dark:bg-zinc-900 dark:text-gray-300 bg-background border-t border-border',
         className
