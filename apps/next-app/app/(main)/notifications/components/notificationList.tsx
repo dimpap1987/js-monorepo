@@ -37,7 +37,7 @@ export function NotificationList({ className }: { className?: string }) {
   >()
   const { searchQuery, setPagination, pagination } = usePaginationWithParams(
     1,
-    8
+    15
   )
 
   const loadingRef = useRef(true)
