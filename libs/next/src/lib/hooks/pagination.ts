@@ -1,3 +1,4 @@
+import { Pageable } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
