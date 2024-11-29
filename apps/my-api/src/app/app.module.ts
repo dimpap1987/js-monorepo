@@ -127,6 +127,7 @@ export class AppModule implements NestModule {
           saveUninitialized: false,
           secret: process.env['SESSION_SECRET'],
           resave: false,
+          rolling: true, // Reset the expiration on every request
           name: 'JSESSIONID',
           cookie: {
             ...authCookiesOptions,

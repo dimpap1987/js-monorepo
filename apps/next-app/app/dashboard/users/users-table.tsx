@@ -8,7 +8,11 @@ import {
   AvatarImage,
 } from '@js-monorepo/components/avatar'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
-import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types'
+import {
+  AuthUserFullDto,
+  AuthUserUpdateDto,
+  Pageable,
+} from '@js-monorepo/types'
 import { API } from '@next-app/utils/api-proxy'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
@@ -247,7 +251,7 @@ const DashboardUsersTableSuspense = () => {
     Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>
   >(
     (newPaginationOrUpdater) => {
-      setPagination((prevPagination) => {
+      setPagination((prevPagination: Pageable) => {
         const currentState = {
           pageSize: prevPagination.pageSize,
           pageIndex: prevPagination.page, // Zero-based
