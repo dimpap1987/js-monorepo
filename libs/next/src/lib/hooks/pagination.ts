@@ -9,25 +9,20 @@ import {
   useState,
 } from 'react'
 
-interface Pagination {
-  pageIndex: number
-  pageSize: number
-}
-
 interface UsePaginationWithParamsResult {
-  pagination: Pagination
-  setPagination: Dispatch<SetStateAction<Pagination>>
+  pagination: Pageable
+  setPagination: Dispatch<SetStateAction<Pageable>>
   searchQuery: string
 }
 
 function updateUrlParams(
-  pagination: Pagination,
+  pagination: Pageable,
   replace: (url: string) => void,
   searchParams: URLSearchParams
 ) {
   const newParams = new URLSearchParams(searchParams)
-  newParams.set('page', pagination.pageIndex.toString())
-  newParams.set('pageSize', pagination.pageSize.toString())
+  newParams.set('page', pagination?.page?.toString())
+  newParams.set('pageSize', pagination?.pageSize?.toString())
   replace('?' + newParams.toString())
 }
 
@@ -46,8 +41,8 @@ export function usePaginationWithParams(
     ? Number(searchParams.get('pageSize'))
     : pageSizeInit
 
-  const [paginationInner, setPaginationInner] = useState<Pagination>({
-    pageIndex: initialPage,
+  const [paginationInner, setPaginationInner] = useState<Pageable>({
+    page: initialPage,
     pageSize: initialPageSize,
   })
 
@@ -55,7 +50,7 @@ export function usePaginationWithParams(
     updateUrlParams(paginationInner, replace, searchParams)
   }, [paginationInner])
 
-  const setPagination = useCallback<Dispatch<SetStateAction<Pagination>>>(
+  const setPagination = useCallback<Dispatch<SetStateAction<Pageable>>>(
     (newPaginationOrUpdater) => {
       setPaginationInner((prevPagination) => {
         // Determine the new pagination state

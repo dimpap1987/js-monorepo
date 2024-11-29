@@ -12,7 +12,15 @@ import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types'
 import { API } from '@next-app/utils/api-proxy'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
 import RolesTableInput from './roles-input'
@@ -235,12 +243,36 @@ const DashboardUsersTableSuspense = () => {
     [update, pagination]
   )
 
+  const onPaginationChange = useCallback<
+    Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>
+  >(
+    (newPaginationOrUpdater) => {
+      setPagination((prevPagination) => {
+        const currentState = {
+          pageSize: prevPagination.pageSize,
+          pageIndex: prevPagination.page, // Zero-based
+        }
+
+        const updated =
+          typeof newPaginationOrUpdater === 'function'
+            ? newPaginationOrUpdater(currentState)
+            : newPaginationOrUpdater
+
+        return {
+          pageSize: updated.pageSize,
+          page: updated.pageIndex + 1, // Convert back to one-based for API
+        }
+      })
+    },
+    [setPagination]
+  )
+
   return (
     <div className="mt-4">
       <DataTable
         columns={memoizedColumns}
         data={data?.users}
-        onPaginationChange={setPagination}
+        onPaginationChange={onPaginationChange}
         totalCount={pageCount}
         pagination={pagination}
         loading={loading}

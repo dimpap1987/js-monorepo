@@ -7,6 +7,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
+import { Pageable } from '@js-monorepo/types'
 import { Dispatch, SetStateAction } from 'react'
 import { Skeleton } from '../skeleton'
 import { DataTablePagination } from './data-table-pagination'
@@ -23,17 +24,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   totalCount: number
-  pagination: {
-    pageSize: number
-    pageIndex: number
-  }
+  pagination: Pageable
   onPaginationChange: Dispatch<
     SetStateAction<{
       pageSize: number
       pageIndex: number
     }>
   >
-  loading?: boolean // Add loading prop
+  loading?: boolean
 }
 
 export function DataTable<TData, TValue>({
@@ -42,12 +40,15 @@ export function DataTable<TData, TValue>({
   totalCount,
   onPaginationChange,
   pagination,
-  loading = false, // Default to false if not provided
+  loading = false,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data: data,
     state: {
-      pagination: pagination,
+      pagination: {
+        pageIndex: pagination.page - 1, //tanstack/react-table page is zero based
+        pageSize: pagination.pageSize,
+      },
     },
     onPaginationChange: onPaginationChange,
     pageCount: totalCount ?? 0,

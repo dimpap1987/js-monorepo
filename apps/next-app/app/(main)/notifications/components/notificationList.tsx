@@ -2,7 +2,6 @@
 
 import { useSession } from '@js-monorepo/auth/next/client'
 import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
-import { DpButton } from '@js-monorepo/button'
 import { ScrollArea } from '@js-monorepo/components/scroll'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
 import {
@@ -23,12 +22,8 @@ import {
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { GoDotFill } from 'react-icons/go'
-import {
-  MdOutlineKeyboardDoubleArrowLeft,
-  MdOutlineKeyboardDoubleArrowRight,
-  MdOutlineNavigateBefore,
-  MdOutlineNavigateNext,
-} from 'react-icons/md'
+
+import { PaginationComponent } from '@js-monorepo/pagination'
 
 export function NotificationList({ className }: { className?: string }) {
   const { user } = useSession()
@@ -65,7 +60,7 @@ export function NotificationList({ className }: { className?: string }) {
   useNotificationWebSocket(
     websocketOptions,
     (notification: UserNotificationType) => {
-      if (notification && pagination.pageIndex === 1) {
+      if (notification && pagination.page === 1) {
         setNotifications((prev) => ({
           ...prev,
           content: [notification, ...(prev?.content ?? [])],
@@ -123,6 +118,7 @@ export function NotificationList({ className }: { className?: string }) {
             Notifications
           </h1>
         </BackArrowWithLabel>
+
         <NotificationReadAllButton
           onReadAll={async () => {
             if (notifications?.content?.some((content) => !content.isRead)) {
@@ -182,7 +178,6 @@ export function NotificationList({ className }: { className?: string }) {
                             content?.notification?.createdAt || ''
                           )}
                         </span>
-                        <span>ago</span>
                       </div>
                     </div>
                   </div>
@@ -206,78 +201,15 @@ export function NotificationList({ className }: { className?: string }) {
         </ScrollArea>
       </section>
 
-      {/* Pagination // TODO create component */}
       {notifications &&
         notifications.totalPages &&
-        notifications.totalPages >= pagination.pageIndex &&
+        notifications.totalPages >= pagination.page &&
         notifications.totalPages !== 1 && (
-          <div className="flex justify-around p-2 pb-0 gap-2 border-t border-border">
-            <div className="flex gap-2">
-              <DpButton
-                variant="primary"
-                onClick={() =>
-                  setPagination((prev) => ({
-                    pageSize: prev.pageSize,
-                    pageIndex: 1,
-                  }))
-                }
-                disabled={pagination.pageIndex === 1}
-                className={`px-2 py-1 rounded ${pagination.pageIndex === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <MdOutlineKeyboardDoubleArrowLeft />
-              </DpButton>
-
-              <DpButton
-                variant="primary"
-                onClick={() =>
-                  setPagination((prev) => ({
-                    pageSize: prev.pageSize,
-                    pageIndex: Math.max(prev.pageIndex - 1, 0),
-                  }))
-                }
-                disabled={pagination.pageIndex === 1}
-                className={`px-2 py-1 rounded ${pagination.pageIndex === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <MdOutlineNavigateBefore />
-              </DpButton>
-            </div>
-
-            <span className="text-xs sm:text-md font-semibold self-center">
-              Page {pagination.pageIndex || 1} of {notifications.totalPages}
-            </span>
-
-            <div className="flex gap-2">
-              <DpButton
-                variant="primary"
-                onClick={() =>
-                  setPagination((prev) => ({
-                    pageSize: prev.pageSize,
-                    pageIndex: Math.min(
-                      prev.pageIndex + 1,
-                      notifications.totalPages || 1
-                    ),
-                  }))
-                }
-                disabled={pagination.pageIndex === notifications.totalPages}
-                className={`px-2 py-1 rounded ${pagination.pageIndex === notifications.totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <MdOutlineNavigateNext />
-              </DpButton>
-              <DpButton
-                variant="primary"
-                onClick={() =>
-                  setPagination((prev) => ({
-                    pageSize: prev.pageSize,
-                    pageIndex: notifications.totalPages || 1,
-                  }))
-                }
-                disabled={pagination.pageIndex === notifications.totalPages}
-                className={`px-2 py-1 rounded ${pagination.pageIndex === notifications.totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <MdOutlineKeyboardDoubleArrowRight />
-              </DpButton>
-            </div>
-          </div>
+          <PaginationComponent
+            pagination={pagination}
+            totalPages={notifications.totalPages}
+            onChange={setPagination}
+          ></PaginationComponent>
         )}
     </div>
   )
