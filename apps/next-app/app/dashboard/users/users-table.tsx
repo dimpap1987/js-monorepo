@@ -272,7 +272,7 @@ const DashboardUsersTableSuspense = () => {
   )
 
   return (
-    <div className="mt-4">
+    <div>
       <DataTable
         columns={memoizedColumns}
         data={data?.users}

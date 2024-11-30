@@ -10,9 +10,7 @@ export default async function AnnouncementsController() {
         </h1>
       </BackArrowWithLabel>
 
-      <div className="mt-5">
-        <CreateAnnouncement></CreateAnnouncement>
-      </div>
+      <CreateAnnouncement></CreateAnnouncement>
     </>
   )
 }

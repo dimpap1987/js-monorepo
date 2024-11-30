@@ -60,7 +60,7 @@ export default function OnlineUsersTableComponent() {
   )
 
   return (
-    <div className="flex flex-col p-2 mt-4 bg-white border-b rounded-lg shadow overflow-hidden text-sm">
+    <div className="flex flex-col p-2 bg-white border-b rounded-lg shadow overflow-hidden text-sm">
       <div className="overflow-auto whitespace-nowrap">
         <table className="w-full">
           {!loading && (

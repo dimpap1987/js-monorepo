@@ -18,10 +18,10 @@ export const routes: {
     path: '/terms-of-use',
     roles: ['PUBLIC'],
   },
-  {
-    path: '/profile',
-    roles: ['USER', 'ADMIN'],
-  },
+  // {
+  //   path: '/profile',
+  //   roles: ['USER', 'ADMIN'],
+  // },
   {
     path: '/notifications',
     roles: ['USER', 'ADMIN'],
