@@ -33,6 +33,7 @@ import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { NotificationProviderModule } from './modules/notifications/notifications.module'
 import { AnnouncementsController } from './controllers/announcements'
+import { UserModule } from './modules/user/user.module'
 
 const ENV = process.env.NODE_ENV
 @Module({
@@ -89,6 +90,7 @@ const ENV = process.env.NODE_ENV
     ChannelProviderModule,
     AdminProviderModule,
     NotificationProviderModule,
+    UserModule,
     ClsModule.forRoot({
       global: true,
       middleware: {

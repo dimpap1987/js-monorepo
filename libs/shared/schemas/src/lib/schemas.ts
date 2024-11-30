@@ -1,6 +1,15 @@
 import { PROVIDERS_ARRAY } from '@js-monorepo/types'
 import * as z from 'zod'
 
+export const UsernameSchema = z
+  .string()
+  .min(3, { message: 'Username must be at least 3 characters long.' })
+  .max(20, { message: 'Username must not exceed 20 characters.' })
+  // eslint-disable-next-line no-useless-escape
+  .regex(/^[^\s!@#$%^&*()_+|~=`{}\[\]:";'<>?,.\/\\]+$/, {
+    message: 'Username contains invalid characters.',
+  })
+
 class RegisterUserSchemaConfig {
   private readonly MIN_VALUE = 4
 
@@ -15,27 +24,14 @@ class RegisterUserSchemaConfig {
   /* eslint-disable */
   createSchema() {
     return z.object({
-      username: z
-        .string()
-        .min(this.MIN_VALUE, { message: this.MIN_ERROR_MESSAGE })
-        .max(this.MAX_VALUE, { message: this.MAX_ERROR_MESSAGE })
-        .regex(/^[^\s!@#$%^&*()_+|~=`{}\[\]:";'<>?,.\/\\]+$/, {
-          message: this.MAX_ERROR_REGEX,
-        }),
+      username: UsernameSchema,
     })
   }
 
   updateSchema() {
     return z
       .object({
-        username: z
-          .string()
-          .min(this.MIN_VALUE, { message: this.MIN_ERROR_MESSAGE })
-          .max(this.MAX_VALUE, { message: this.MAX_ERROR_MESSAGE })
-          .regex(/^[^\s!@#$%^&*()_+|~=`{}\[\]:";'<>?,.\/\\]+$/, {
-            message: this.MAX_ERROR_REGEX,
-          })
-          .optional(),
+        username: UsernameSchema.optional(),
         roles: z.array(ObjectIdSchema).optional(),
       })
       .refine(
@@ -73,3 +69,16 @@ export const CreateUnregisteredUserSchema = z.object({
     .nullable()
     .optional(),
 })
+
+export const EditUserSchema = z
+  .object({
+    username: UsernameSchema.optional(),
+    profileImage: z.string().optional(),
+  })
+  .refine(
+    (data) => data.username !== undefined || data.profileImage !== undefined,
+    {
+      message: 'At least one of "username" or "profileImage" must be provided.',
+      path: [], // Applies to the entire object
+    }
+  )

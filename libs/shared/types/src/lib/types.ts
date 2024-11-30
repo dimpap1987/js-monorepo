@@ -245,3 +245,8 @@ export interface CreateUserNotificationType {
     sender: NotificationUserType
   }[]
 }
+
+export interface EditUserDto {
+  username?: string
+  profileImage?: string
+}
