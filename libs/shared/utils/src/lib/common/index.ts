@@ -68,3 +68,32 @@ export const toBase64 = (file: File) =>
     reader.onload = () => resolve(reader.result as string)
     reader.onerror = (error) => reject(error)
   })
+
+export function compareObjects<T extends object>(
+  obj1: T,
+  obj2: T
+): Partial<T> | null {
+  const differences: Partial<T> = {}
+
+  const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)])
+
+  for (const key of allKeys) {
+    if (obj1[key as keyof T] !== obj2[key as keyof T]) {
+      differences[key as keyof T] = obj2[key as keyof T]
+    }
+  }
+
+  // If there are no differences, return null
+  return Object.keys(differences).length > 0 ? differences : null
+}
+
+export async function tryCatch<T>(
+  fn: (() => T) | (() => Promise<T>)
+): Promise<{ result: T | null; error: any | null }> {
+  try {
+    const result = await fn()
+    return { result, error: null }
+  } catch (error) {
+    return { result: null, error }
+  }
+}

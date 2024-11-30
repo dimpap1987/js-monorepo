@@ -3,6 +3,7 @@ import * as React from 'react'
 import {
   Controller,
   ControllerProps,
+  FieldErrors,
   FieldPath,
   FieldValues,
   FormProvider,
@@ -191,6 +192,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 )
 Input.displayName = 'Input'
 
+//TODO remove - DEPRECATED
 const FormErrorMessage = React.forwardRef<
   HTMLInputElement,
   FormErrorMessageProps
@@ -202,7 +204,7 @@ const FormErrorMessage = React.forwardRef<
           {Array.isArray(errors) &&
             errors?.map((errorMessage, index) => (
               <div key={index} className="flex items-center gap-2 py-1">
-                <FaRegTimesCircle className="text-red-600 text-xl" />
+                <FaRegTimesCircle className="text-red-600 text-xl shrink-0" />
                 <p className="font-semibold">{errorMessage}</p>
               </div>
             ))}
@@ -211,6 +213,33 @@ const FormErrorMessage = React.forwardRef<
     </div>
   )
 })
+
+interface FormErrorProps {
+  errors: FieldErrors
+  fields: Record<string, string> // Mapping of field names to display labels
+  className?: string
+}
+
+const FormErrorDisplay: React.FC<FormErrorProps> = ({
+  errors,
+  fields,
+  className,
+}) => {
+  return (
+    <div className={cn('space-y-2', className)}>
+      {Object.entries(fields).map(([fieldKey, label]) => {
+        const error = errors[fieldKey]
+        return (
+          error && (
+            <p key={fieldKey} className="text-sm text-danger">
+              {error.message?.toString()}
+            </p>
+          )
+        )
+      })}
+    </div>
+  )
+}
 
 export {
   useFormField,
@@ -223,4 +252,5 @@ export {
   FormField,
   Input,
   FormErrorMessage,
+  FormErrorDisplay,
 }

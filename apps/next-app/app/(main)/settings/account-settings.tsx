@@ -1,5 +1,6 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import {
@@ -10,39 +11,67 @@ import {
 import {
   Form,
   FormControl,
+  FormErrorDisplay,
   FormField,
   FormItem,
   FormLabel,
   Input,
 } from '@js-monorepo/components/form'
-import { useState } from 'react'
+import { useNotifications } from '@js-monorepo/notification'
+import { EditUserSchema } from '@js-monorepo/schemas'
+import { compareObjects, toBase64 } from '@js-monorepo/utils/common'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { SettingsItem } from './settings-items'
-import { toBase64 } from '@js-monorepo/utils/common'
+import { apiUserUpdate } from './utils'
 
 export function AccountSettings() {
   const { user, refreshSession, isAdmin } = useSession()
   const [isEditing, setIsEditing] = useState(false)
+  const { addNotification } = useNotifications()
+
+  const initUser = {
+    username: user?.username || '',
+    profileImage: user?.profile?.image || '',
+  }
 
   const form = useForm({
-    defaultValues: {
-      username: user?.username || '',
-      profileImage: user?.profile?.image || '',
-    },
+    defaultValues: initUser,
+    resolver: zodResolver(EditUserSchema),
   })
 
-  const onSubmit = (data: { username: string; profileImage: string }) => {
-    console.log('Form Data:', data)
+  useEffect(() => {
+    if (user) {
+      form.reset(initUser)
+    }
+  }, [user, form])
+
+  const onSubmit = async (data: { username: string; profileImage: string }) => {
     setIsEditing(false)
-    // refreshSession()
+    form.clearErrors()
+    const changes = compareObjects(initUser, data)
+
+    if (!changes) return
+
+    const response = await apiUserUpdate(data)
+    if (response.ok) {
+      refreshSession()
+      addNotification({
+        message: 'Account successfully updated!',
+        type: 'success',
+      })
+    } else {
+      form.reset(initUser)
+      addNotification({
+        message: 'Something went wrong...',
+        type: 'error',
+      })
+    }
   }
 
   const handleCancel = () => {
     setIsEditing(false)
-    form.reset({
-      username: user?.username || '',
-      profileImage: user?.profile?.image || '',
-    })
+    form.reset(initUser)
   }
 
   return (
@@ -51,7 +80,7 @@ export function AccountSettings() {
       <Form {...form}>
         <SettingsItem label="Profile">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 place-items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 place-items-center sm:place-items-start">
               {/* Profile Image */}
               <div className="relative flex justify-center">
                 <Avatar className="h-24 w-24">
@@ -115,13 +144,22 @@ export function AccountSettings() {
                           {field.value}
                         </p>
                       )}
+
+                      <FormErrorDisplay
+                        className="mt-4 min-h-10"
+                        errors={form.formState.errors}
+                        fields={{
+                          username: 'Username',
+                          profileImage: 'Profile Image',
+                        }}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
               />
 
               {/* Edit/Save Buttons */}
-              <div className="self-end justify-self-end w-full">
+              <div className="self-center sm:self-end sm:justify-self-end w-[80%]">
                 {isEditing ? (
                   <div className="flex gap-3 flex-wrap justify-end">
                     <DpButton
