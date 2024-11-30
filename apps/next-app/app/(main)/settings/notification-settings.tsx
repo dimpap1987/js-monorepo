@@ -1,6 +1,7 @@
 'use client'
 
-import { useWebPushNotification } from './web-notification-provider'
+import { useWebPushNotification } from '@js-monorepo/web-notification'
+import { SettingsItem } from './settings-items'
 
 const NotificationPermissionComponent = () => {
   const { permission, requestPermission } = useWebPushNotification()
@@ -44,24 +45,23 @@ const NotificationPermissionComponent = () => {
   }
 
   return (
-    <section className="bg-white shadow rounded-lg p-4 sm:p-6">
-      <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-        Push Notifications
-      </h2>
-      <p className="text-xs sm:text-sm text-gray-600 mt-1 flex gap-1 flex-wrap">
-        <span>Control how you receive </span> <span>push notifications.</span>
-      </p>
-      <div className="mt-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            className="h-5 w-5 border-gray-300 rounded focus:ring-blue-500 checked:bg-blue-600 shrink-0 hover:cursor-pointer focus:outline-none"
-            aria-label={label}
-            {...checkboxProps}
-          />
-          <span className="ml-3 text-gray-700 text-sm">{label}</span>
-        </label>
-      </div>
+    <section className="p-2 space-y-6 text-white">
+      <SettingsItem label="Push Notifications">
+        <p className="text-xs font-semibold sm:text-sm mt-1 flex gap-1 flex-wrap">
+          <span>Control how you receive </span> <span>push notifications.</span>
+        </p>
+        <div className="mt-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              className="h-5 w-5 border-border rounded focus:ring-blue-500 checked:bg-blue-600 shrink-0 hover:cursor-pointer focus:outline-none"
+              aria-label={label}
+              {...checkboxProps}
+            />
+            <span className="ml-3 text-gray-200 text-sm">{label}</span>
+          </label>
+        </div>
+      </SettingsItem>
     </section>
   )
 }

@@ -68,14 +68,14 @@ function NavUserOptions({
           className="mb-2 border-border border-b select-none"
         ></UserMetadata>
 
-        <DpNextNavLink
+        {/* <DpNextNavLink
           href="/profile"
           onClick={() => userOptionsDropdownRef.current?.setVisibility(false)}
           className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2 select-none"
         >
           <TbUserFilled className="text-2xl" />
           <span className="ml-2">Profile</span>
-        </DpNextNavLink>
+        </DpNextNavLink> */}
 
         <DpNextNavLink
           href="/settings"
