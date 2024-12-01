@@ -71,7 +71,7 @@ const UserOptionsDropdown = forwardRef<OptionsDropdownRef, DropdownProps>(
                 transition: { duration: 0.2 },
               }}
               ref={dropdownRef}
-              className="w-80 fixed right-0 mt-[19px] p-1 border border-gray-500 rounded-xl text-foreground z-30 shadow-2xl bg-background space-y-2"
+              className="w-80 fixed right-0 mt-[19px] p-2 px-3 border border-gray-500 rounded-xl text-foreground z-30 shadow-2xl bg-background space-y-2"
             >
               {children}
             </motion.div>

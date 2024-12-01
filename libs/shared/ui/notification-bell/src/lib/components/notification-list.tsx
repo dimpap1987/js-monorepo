@@ -1,7 +1,7 @@
 import { DropdownMenuSeparator } from '@js-monorepo/components/dropdown'
 import { DpLoadingSpinner } from '@js-monorepo/loader'
 import { UserNotificationType } from '@js-monorepo/types'
-import { Fragment } from 'react'
+import { Fragment, memo } from 'react'
 import './bell.css'
 import { NotificationItem } from './notifications-item'
 
@@ -11,7 +11,7 @@ interface NotificationListProps {
   showLoader: boolean
 }
 
-export function NotificationList({
+function Notifications({
   notifications,
   onRead,
   showLoader,
@@ -43,3 +43,5 @@ export function NotificationList({
     </>
   )
 }
+
+export const NotificationList = memo(Notifications)

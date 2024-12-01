@@ -68,25 +68,17 @@ function NavUserOptions({
           className="mb-2 border-border border-b select-none"
         ></UserMetadata>
 
-        {/* <DpNextNavLink
-          href="/profile"
-          onClick={() => userOptionsDropdownRef.current?.setVisibility(false)}
-          className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2 select-none"
-        >
-          <TbUserFilled className="text-2xl" />
-          <span className="ml-2">Profile</span>
-        </DpNextNavLink> */}
-
         <DpNextNavLink
           href="/settings"
           onClick={() => userOptionsDropdownRef.current?.setVisibility(false)}
-          className="flex gap-1 justify-start px-4 py-2 mb-1 w-full hover:shadow-2xl hover:ring-2 select-none"
+          className="flex gap-1 justify-start px-4 py-2 rounded-xl w-full select-none group hover:ring-1 hover:ring-primary"
         >
-          <IoIosSettings className="text-2xl" />
+          <IoIosSettings className="text-2xl transition-transform duration-1000 group-hover:rotate-180" />
           <span className="ml-2">Settings</span>
         </DpNextNavLink>
 
         <DpLogoutButton
+          className="hover:ring-1 hover:ring-primary"
           onClick={() => {
             userOptionsDropdownRef.current?.setVisibility(false)
             onLogout?.()

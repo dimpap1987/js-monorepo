@@ -80,9 +80,9 @@ export function AccountSettings() {
       <Form {...form}>
         <SettingsItem label="Profile">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 place-items-center sm:place-items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 place-items-center sm:place-items-start">
               {/* Profile Image */}
-              <div className="relative flex justify-center">
+              <div className="relative flex justify-center self-center">
                 <Avatar className="h-24 w-24">
                   {form.watch('profileImage') && (
                     <AvatarImage
@@ -140,7 +140,7 @@ export function AccountSettings() {
                           {...field}
                         />
                       ) : (
-                        <p className="w-full px-4 py-2 bg-background text-secondary rounded-xl border border-border font-semibold flex items-center shadow-md">
+                        <p className="w-full h-10 px-6 py-2 bg-background text-secondary rounded-xl border border-border font-semibold flex items-center shadow-md">
                           {field.value}
                         </p>
                       )}
@@ -158,10 +158,12 @@ export function AccountSettings() {
                 )}
               />
 
+              <div></div>
+
               {/* Edit/Save Buttons */}
               <div className="self-center sm:self-end sm:justify-self-end w-[80%]">
                 {isEditing ? (
-                  <div className="flex gap-3 flex-wrap justify-end">
+                  <div className="flex gap-3 flex-wrap sm:flex-nowrap justify-end">
                     <DpButton
                       onClick={handleCancel}
                       variant="outline"

@@ -107,12 +107,12 @@ export function NotificationList({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'text-sm sm:text-base select-none p-1 py-2 rounded-md sm:p-3 bg-background-secondary text-white',
+        'text-sm sm:text-base select-none sm:p-3 text-white',
         'flex flex-col h-full',
         className
       )}
     >
-      <div className="flex justify-between mb-3">
+      <div className="flex justify-between">
         <BackArrowWithLabel className="flex-1" arrowClassName="sm:hidden">
           <h1 className="text-base sm:text-lg px-2 ml-5 sm:ml-0 text-center sm:text-left">
             Notifications
@@ -139,14 +139,14 @@ export function NotificationList({ className }: { className?: string }) {
       </div>
 
       {/* Render Notifications */}
-      <section className="flex-1 overflow-hidden">
+      <section className="flex-1 overflow-hidden  bg-background-secondary rounded-md p-1 py-2">
         <ScrollArea className="h-full">
           {loadingRef.current === false ? (
             notifications?.content && notifications.content.length > 0 ? (
               notifications.content.map((content, index) => (
                 <Fragment key={content?.notification?.id}>
                   <div
-                    className={`cursor-pointer py-2 px-1 rounded transition-all duration-200 ${content.isRead ? 'opacity-50' : ''} hover:opacity-90 hover:bg-primary/20`}
+                    className={`cursor-pointer p-1 sm:py-2 rounded transition-all duration-200 ${content.isRead ? 'opacity-50' : ''} hover:opacity-90 hover:bg-primary/20`}
                     onClick={async () => {
                       // Handle the notification read state change
                       if (!content.isRead && notifications?.content) {

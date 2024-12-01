@@ -10,7 +10,7 @@ export function AdminTemplateSideBar({
   return (
     <div
       className={cn(
-        'fixed top-[calc(35px_+_var(--navbar-height))] left-0 bottom-0',
+        'fixed top-[calc(20px_+_var(--navbar-height))] left-0 bottom-0',
         'hidden min-w-max sm:flex flex-col justify-between p-2 border-r border-border rounded-md',
         className
       )}

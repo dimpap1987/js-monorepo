@@ -16,25 +16,25 @@ const navLinksOpts = [
     href: '/dashboard/users',
     icon: RiUserSettingsFill,
     label: 'Users',
-    activeClassName: 'bg-accent text-accent-foreground',
+    activeClassName: 'bg-primary text-primary-foreground',
   },
   {
     href: '/dashboard/online-users',
     icon: HiMiniUsers,
     label: 'Online',
-    activeClassName: 'bg-accent text-accent-foreground',
+    activeClassName: 'bg-primary text-primary-foreground',
   },
   {
     href: '/dashboard/notifications',
     icon: IoMdNotifications,
     label: 'Manage Alerts',
-    activeClassName: 'bg-accent text-accent-foreground',
+    activeClassName: 'bg-primary text-primary-foreground',
   },
   {
     href: '/dashboard/announcements',
     icon: GrAnnounce,
     label: 'Announcements',
-    activeClassName: 'bg-accent text-accent-foreground',
+    activeClassName: 'bg-primary text-primary-foreground',
   },
 ] as const
 
@@ -45,7 +45,7 @@ function SidebarOpts() {
         <DpNextNavLink
           key={href}
           className={cn(
-            'p-2 transition-colors duration-300 grid place-items-center gap-2 items-center border border-border rounded-md hover:ring-2',
+            'p-2 transition-colors duration-300 grid place-items-center gap-2 items-center border border-border rounded-md hover:ring-1 ring-primary',
             'grid-cols-[30px_auto]'
           )}
           href={href}
