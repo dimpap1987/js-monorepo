@@ -186,7 +186,7 @@ export default function MainTemplate({
       </DpNextNavbar>
 
       <AnnouncementsComponent
-        className="fixed top-[var(--navbar-height)]"
+        className="fixed top-[calc(var(--navbar-height)_+_5px)] h-4"
         websocketOptions={websocketOptions}
       ></AnnouncementsComponent>
 
@@ -217,7 +217,7 @@ export default function MainTemplate({
         </div>
       </DpNextSidebar>
 
-      <main className="mt-7">{children}</main>
+      <main className="mt-5">{children}</main>
 
       {isLoggedIn && <MobileNavbar></MobileNavbar>}
     </>
