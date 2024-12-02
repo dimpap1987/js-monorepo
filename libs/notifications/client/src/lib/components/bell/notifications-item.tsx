@@ -5,8 +5,8 @@ import {
 import { UserNotificationType } from '@js-monorepo/types'
 import React from 'react'
 import { GoDotFill } from 'react-icons/go'
-import { humanatizeNotificationDate } from '../utils'
 import { NoticationItemContext } from './notification-item-content'
+import { humanatizeNotificationDate } from '../../utils/notifications'
 
 interface NotificationItemProps {
   content: UserNotificationType

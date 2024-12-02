@@ -1,3 +1,5 @@
+'use client'
+
 import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { useCallback, useEffect, useRef, useState } from 'react'

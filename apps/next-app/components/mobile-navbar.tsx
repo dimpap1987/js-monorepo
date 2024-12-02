@@ -7,9 +7,11 @@ import {
   BottomNavbarOptions,
 } from '@js-monorepo/bottom-navbar'
 import { useDeviceType } from '@js-monorepo/next/hooks'
-import { NotificationBellButton } from '@js-monorepo/notification-bell'
+import {
+  NotificationBellButton,
+  useNotificationStore,
+} from '@js-monorepo/notifications-client'
 import { AuthRole } from '@js-monorepo/types'
-import { useNotificationStore } from '@next-app/state'
 import { AiFillHome } from 'react-icons/ai'
 import { IconType } from 'react-icons/lib'
 

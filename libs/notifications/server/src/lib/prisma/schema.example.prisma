@@ -1,0 +1,25 @@
+// model Notification {
+//     id               Int                @id @default(autoincrement())
+//     message          String
+//     createdAt        DateTime           @default(now()) @map("createdAt")
+//     type             String?
+//     isArchived       Boolean            @default(false) @map("is_archived")
+//     additionalData   Json?              @map("additional_data")
+//     link             String?
+//     userNotification UserNotification[]
+
+//     @@map(name: "notifications")
+// }
+
+// model UserNotification {
+//     receiverId     Int          @map("receiver_id")
+//     notificationId Int          @map("notification_id")
+//     user           AuthUser     @relation("receiver", fields: [receiverId], references: [id])
+//     notification   Notification @relation(fields: [notificationId], references: [id])
+//     sender         AuthUser?    @relation("sender", fields: [senderId], references: [id])
+//     senderId       Int?         @map("sender_id")
+//     isRead         Boolean      @default(false) @map("is_read")
+
+//     @@id([receiverId, notificationId])
+//     @@map(name: "users_notifications")
+// }

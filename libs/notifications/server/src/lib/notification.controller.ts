@@ -28,8 +28,8 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
-import { ApiException } from '../../exceptions/api-exception'
 import { NotificationService } from './notification.service'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 
 @Controller('notifications')
 @UseGuards(LoggedInGuard)

@@ -4,7 +4,13 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
-import { useNotificationWebSocket } from '@js-monorepo/notification-bell'
+import {
+  apiFetchUserNotifications,
+  apiReadAllNotifications,
+  apiReadNotification,
+  useNotificationStore,
+  useNotificationWebSocket,
+} from '@js-monorepo/notifications-client'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import {
@@ -13,12 +19,6 @@ import {
   UserNotificationType,
 } from '@js-monorepo/types'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
-import { useNotificationStore } from '@next-app/state'
-import {
-  apiFetchUserNotifications,
-  apiReadAllNotifications,
-  apiReadNotification,
-} from '@next-app/utils/notifications'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
 import dynamic from 'next/dynamic'
@@ -70,7 +70,7 @@ const initialPageSize = 10
 
 const DpNotificationBellComponentDynamic = dynamic(
   () =>
-    import('@js-monorepo/notification-bell').then(
+    import('@js-monorepo/notifications-client').then(
       (module) => module.DpNotificationBellComponent
     ),
   { ssr: false }

@@ -1,10 +1,10 @@
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { NotificationCreateDto, Pageable } from '@js-monorepo/types'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
 import { sendNotification, setVapidDetails } from 'web-push'
-import { ApiException } from '../../exceptions/api-exception'
 import {
   NotificationRepo,
   NotificationRepository,

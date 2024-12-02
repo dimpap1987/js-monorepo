@@ -8,6 +8,7 @@ import {
 } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
+import { NotificationServerModule } from '@js-monorepo/notifications-server'
 import { AuthUserDto } from '@js-monorepo/types'
 import {
   Events,
@@ -25,14 +26,13 @@ import { RedisClientType } from 'redis'
 import { v4 as uuidv4 } from 'uuid'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { GLOBAL_CHANNEL } from './constants'
+import { AnnouncementsController } from './controllers/announcements'
 import { ExceptionController } from './controllers/exception.controller'
 import { AdminProviderModule } from './modules/admin/admin.module'
 import { ChannelProviderModule } from './modules/channel/channel.module'
 import { ChannelService } from './modules/channel/channel.service'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
-import { NotificationProviderModule } from './modules/notifications/notifications.module'
-import { AnnouncementsController } from './controllers/announcements'
 import { UserModule } from './modules/user/user.module'
 
 const ENV = process.env.NODE_ENV
@@ -89,7 +89,7 @@ const ENV = process.env.NODE_ENV
     FilterProviderModule,
     ChannelProviderModule,
     AdminProviderModule,
-    NotificationProviderModule,
+    NotificationServerModule,
     UserModule,
     ClsModule.forRoot({
       global: true,
