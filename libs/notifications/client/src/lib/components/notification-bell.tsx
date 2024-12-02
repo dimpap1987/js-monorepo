@@ -12,11 +12,11 @@ import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import { debounce } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { NotificationBellButton } from './components/notification-bell-trigger'
-import { NotificationList } from './components/notification-list'
-import { NotificationReadAllButton } from './components/notification-read-all'
-import { usePagination } from './hooks'
-import { updateNotificationAsRead } from './utils'
+import { usePagination } from '../hooks'
+import { NotificationBellButton } from './bell/notification-bell-trigger'
+import { NotificationReadAllButton } from './bell/notification-read-all'
+import { NotificationList } from './bell/notification-list'
+import { updateNotificationAsRead } from '../utils/notifications'
 
 interface DpNotificationBellComponentProps {
   notificationList: UserNotificationType[]

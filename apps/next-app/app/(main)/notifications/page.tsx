@@ -1,6 +1,7 @@
-import { Metadata } from 'next'
-import { NotificationList } from './components/notificationList'
+import { NotificationsPage } from '@js-monorepo/notifications-client'
 import { DynamicHeightTemplate } from '@js-monorepo/templates'
+import { websocketOptions } from '@next-app/utils/websocket.config'
+import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Notifications',
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
 export default function Notifications() {
   return (
     <DynamicHeightTemplate>
-      <NotificationList></NotificationList>
+      <NotificationsPage
+        websocketOptions={websocketOptions}
+      ></NotificationsPage>
     </DynamicHeightTemplate>
   )
 }

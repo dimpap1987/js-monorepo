@@ -4,28 +4,31 @@ import { useSession } from '@js-monorepo/auth/next/client'
 import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 import { ScrollArea } from '@js-monorepo/components/scroll'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
-import {
-  humanatizeNotificationDate,
-  NoticationItemContext,
-  NotificationReadAllButton,
-  updateNotificationAsRead,
-  useNotificationWebSocket,
-} from '@js-monorepo/notification-bell'
+import { WebSocketOptionsType } from '@js-monorepo/next/providers'
+import { PaginationComponent } from '@js-monorepo/pagination'
 import { PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import { useNotificationStore } from '@next-app/state'
+import { Fragment, useEffect, useRef, useState } from 'react'
+import { GoDotFill } from 'react-icons/go'
+import { useNotificationWebSocket } from '../hooks/index'
+import { useNotificationStore } from '../state'
 import {
   apiFetchUserNotifications,
   apiReadAllNotifications,
   apiReadNotification,
-} from '@next-app/utils/notifications'
-import { websocketOptions } from '@next-app/utils/websocket.config'
-import { Fragment, useEffect, useRef, useState } from 'react'
-import { GoDotFill } from 'react-icons/go'
+  humanatizeNotificationDate,
+  updateNotificationAsRead,
+} from '../utils/notifications'
+import { NoticationItemContext } from './bell/notification-item-content'
+import { NotificationReadAllButton } from './bell/notification-read-all'
 
-import { PaginationComponent } from '@js-monorepo/pagination'
-
-export function NotificationList({ className }: { className?: string }) {
+export function NotificationsPage({
+  className,
+  websocketOptions,
+}: {
+  className?: string
+  websocketOptions: WebSocketOptionsType
+}) {
   const { user } = useSession()
   const [notifications, setNotifications] = useState<
     Partial<PaginationType<UserNotificationType>> | undefined

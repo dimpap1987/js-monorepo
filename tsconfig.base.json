@@ -42,8 +42,11 @@
       "@js-monorepo/nest/*": ["libs/nest-utils/src/lib/*"],
       "@js-monorepo/next/*": ["libs/next/src/lib/*"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
-      "@js-monorepo/notification-bell": [
-        "libs/shared/ui/notification-bell/src/index.ts"
+      "@js-monorepo/notifications-server": [
+        "libs/notifications/server/src/index.ts"
+      ],
+      "@js-monorepo/notifications-client": [
+        "libs/notifications/client/src/index.ts"
       ],
       "@js-monorepo/package.json": ["package.json"],
       "@js-monorepo/page-progress-bar": [

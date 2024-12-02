@@ -20,4 +20,4 @@ const providers: Provider[] = [
   providers: [...providers],
   exports: [...providers],
 })
-export class NotificationProviderModule {}
+export class NotificationServerModule {}
