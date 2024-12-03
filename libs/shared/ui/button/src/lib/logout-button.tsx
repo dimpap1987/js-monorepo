@@ -13,7 +13,7 @@ const DpLogoutButton = forwardRef<HTMLButtonElement, DpLogoutButtonProps>(
         variant="danger"
         title="Sign out"
         className={cn(
-          'flex gap-1 py-5 justify-start w-full border rounded-xl',
+          'flex gap-1 py-5 justify-start w-full border rounded-xl select-none',
           className
         )}
         ref={ref}

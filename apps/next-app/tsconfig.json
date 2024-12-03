@@ -27,8 +27,9 @@
     "../../dist/apps/next-app/.next/types/**/*.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts",
-    "app/(main)/settings/back-button.tsx"
-, "../../libs/notifications/client/src/lib/utils/notifications.ts"  ],
+    "app/(main)/settings/back-button.tsx",
+    "../../libs/notifications/client/src/lib/utils/notifications.ts"
+  ],
   "exclude": [
     "node_modules",
     "jest.config.ts",

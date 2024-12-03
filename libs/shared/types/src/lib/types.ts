@@ -224,7 +224,7 @@ export type SenderType = NotificationUserType
 export type UserNotificationType = {
   isRead: boolean
   notification: NotificationDetailsType
-  sender: SenderType
+  sender?: SenderType
   user?: NotificationUserType
 }
 
@@ -239,11 +239,6 @@ export interface CreateUserNotificationType {
   id: number
   createdAt: Date
   message: string
-  userNotification: {
-    isRead: boolean
-    user: NotificationUserType
-    sender: NotificationUserType
-  }[]
 }
 
 export interface EditUserDto {

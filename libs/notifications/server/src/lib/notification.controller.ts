@@ -46,13 +46,16 @@ export class NotificationController {
   async createNotification(@Body() payload: NotificationCreateDto) {
     //TODO Validate body
     try {
-      const notification =
-        await this.notificationService.createNotification(payload)
+      const result = await this.notificationService.createNotification(payload)
 
       await this.userPresenceWebsocketService.sendToUsers(
         payload.receiverIds,
         'events:notifications',
-        { data: this.transformSelect(notification) }
+        { data: this.transformSelect(result.notification) }
+      )
+
+      this.logger.log(
+        `Notifications successfully created and sent to '${result.total}' users`
       )
     } catch (e: any) {
       this.logger.error(
@@ -152,10 +155,6 @@ export class NotificationController {
         message: data?.message,
       },
       isRead: false,
-      sender: {
-        id: data?.userNotification[0]?.sender?.id,
-        username: data?.userNotification[0]?.sender?.username,
-      },
     }
   }
 
