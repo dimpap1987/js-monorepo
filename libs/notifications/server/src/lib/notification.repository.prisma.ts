@@ -72,48 +72,47 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
     }
   }
 
-  async createNotification(
-    payload: NotificationCreateDto
-  ): Promise<CreateUserNotificationType> {
+  async createNotification(payload: NotificationCreateDto): Promise<{
+    notification: CreateUserNotificationType
+    total: number
+  }> {
     const { message, type, link, additionalData, senderId, receiverIds } =
       payload
 
-    return this.txHost.tx.notification.create({
+    const notification = await this.txHost.tx.notification.create({
       data: {
         message,
         type,
         additionalData: additionalData,
         link,
-        userNotification: {
-          create: receiverIds.map((receiverId) => ({
-            user: { connect: { id: receiverId } }, // Connect each receiver
-            sender: { connect: { id: senderId } }, // Connect the sender
-          })),
-        },
       },
       select: {
         id: true,
         createdAt: true,
         message: true,
-        userNotification: {
-          select: {
-            isRead: true,
-            user: {
-              select: {
-                id: true,
-                username: true,
-              },
-            },
-            sender: {
-              select: {
-                id: true,
-                username: true,
-              },
-            },
-          },
-        },
       },
     })
+
+    // Split receiverIds into batches of 500
+    const batchSize = 500
+    let totalInserted = 0
+
+    for (let i = 0; i < receiverIds.length; i += batchSize) {
+      const batch = receiverIds.slice(i, i + batchSize)
+
+      // Insert UserNotification records for each batch
+      const result = await this.txHost.tx.userNotification.createMany({
+        data: batch.map((receiverId) => ({
+          receiverId,
+          notificationId: notification.id,
+          senderId,
+        })),
+      })
+
+      totalInserted += result.count
+    }
+
+    return { notification, total: totalInserted }
   }
 
   async markAsRead(notificationId: number, userId: number) {
