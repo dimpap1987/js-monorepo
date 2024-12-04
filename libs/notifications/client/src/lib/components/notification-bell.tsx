@@ -42,6 +42,7 @@ export function DpNotificationBellComponent({
   resetOnClose = false,
 }: DpNotificationBellComponentProps) {
   const [notifications, setNotifications] = useState<UserNotificationType[]>([])
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const { isLoading, loadMore, setPaginator } = usePagination({
     page: pagebale.page,
@@ -110,63 +111,71 @@ export function DpNotificationBellComponent({
   )
 
   return (
-    <DropdownMenu
-      onOpenChange={(open) => {
-        setTimeout(() => {
-          if (open) {
-            notificationContainerRef?.current?.addEventListener(
-              'scroll',
-              handleScroll
-            )
-          } else {
-            notificationContainerRef?.current?.removeEventListener(
-              'scroll',
-              handleScroll
-            )
-            if (resetOnClose) {
-              setPaginator(1, pagebale.pageSize)
-              setNotifications(notifications.slice(0, 10))
-            }
-          }
-        }, 100)
-      }}
-    >
-      <DropdownMenuTrigger asChild>
-        <NotificationBellButton
-          unreadNotificationCount={unreadNotificationCount}
-        />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className={cn(
-          'hidden sm:block p-1 bg-background-secondary mt-4 text-white w-[98svw] sm:w-[650px] xl:w-[850px]',
-          className
-        )}
-      >
-        <DropdownMenuLabel className="flex justify-between">
-          <div className="content-center">Notifications</div>
-          <NotificationReadAllButton
-            onReadAll={async () => {
-              const isReadAll = await onReadAll?.()
-              if (!isReadAll) return
+    <>
+      {/* Backdrop */}
+      {isDropdownOpen && (
+        <div className="fixed inset-0 top-navbar-offset bg-black bg-opacity-50 z-10" />
+      )}
 
-              setNotifications((prev) =>
-                prev.map((content) => ({ ...content, isRead: true }))
+      <DropdownMenu
+        onOpenChange={(open) => {
+          setIsDropdownOpen(open)
+          setTimeout(() => {
+            if (open) {
+              notificationContainerRef?.current?.addEventListener(
+                'scroll',
+                handleScroll
               )
-            }}
-          ></NotificationReadAllButton>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <ScrollArea
-          className={`${pagebale?.totalPages > 1 ? 'h-[27.2rem]' : ''} rounded-md`}
-          viewPortRef={notificationContainerRef}
-        >
-          <NotificationList
-            notifications={notifications}
-            onRead={handleRead}
-            showLoader={isLoading}
+            } else {
+              notificationContainerRef?.current?.removeEventListener(
+                'scroll',
+                handleScroll
+              )
+              if (resetOnClose) {
+                setPaginator(1, pagebale.pageSize)
+                setNotifications(notifications.slice(0, 10))
+              }
+            }
+          })
+        }}
+      >
+        <DropdownMenuTrigger asChild>
+          <NotificationBellButton
+            unreadNotificationCount={unreadNotificationCount}
           />
-        </ScrollArea>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className={cn(
+            'hidden sm:block p-1 bg-background-secondary mt-4 text-white w-[98svw] sm:w-[650px] xl:w-[850px] z-20',
+            className
+          )}
+        >
+          <DropdownMenuLabel className="flex justify-between">
+            <div className="content-center">Notifications</div>
+            <NotificationReadAllButton
+              onReadAll={async () => {
+                const isReadAll = await onReadAll?.()
+                if (!isReadAll) return
+
+                setNotifications((prev) =>
+                  prev.map((content) => ({ ...content, isRead: true }))
+                )
+              }}
+            ></NotificationReadAllButton>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <ScrollArea
+            className={`${pagebale?.totalPages > 1 ? 'h-[26.7rem]' : ''} rounded-md`}
+            viewPortRef={notificationContainerRef}
+          >
+            <NotificationList
+              notifications={notifications}
+              onRead={handleRead}
+              showLoader={isLoading}
+            />
+          </ScrollArea>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   )
 }
