@@ -13,7 +13,7 @@ import {
   AuthUserUpdateDto,
   Pageable,
 } from '@js-monorepo/types'
-import { API } from '@next-app/utils/api-proxy'
+import { apiClient } from '@js-monorepo/utils/http'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
 import {
@@ -41,12 +41,7 @@ declare module '@tanstack/table-core' {
 }
 
 const findUsers = async (searchParams?: string) => {
-  const response = await API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users${searchParams}`
-  )
-    .get()
-    .withCredentials()
-    .execute()
+  const response = await apiClient.get(`/admin/users${searchParams}`)
 
   if (response.ok) return response.data as UsersReponse
 
@@ -195,14 +190,10 @@ const DashboardUsersTableSuspense = () => {
                       title="Submit"
                       className="shrink-0 text-2xl cursor-pointer transform hover:scale-125 transition duration-300 border rounded-lg"
                       onClick={async () => {
-                        const response = await API.url(
-                          `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users/${row.original.id}`
+                        const response = await apiClient.put(
+                          `/admin/users/${row.original.id}`,
+                          { ...row.updatedUser }
                         )
-                          .put()
-                          .body({ ...row.updatedUser })
-                          .withCsrf()
-                          .withCredentials()
-                          .execute()
 
                         if (response.ok) {
                           loadUsers()

@@ -1,4 +1,4 @@
-import { HttpClientProxy } from '@js-monorepo/utils/http'
+import { apiClient } from '@js-monorepo/utils/http'
 
 const check = () => {
   if (!('serviceWorker' in navigator)) {
@@ -114,18 +114,7 @@ async function subscribeNotifactionToServer(userId: number) {
     applicationServerKey: urlB64ToUint8Array(vapidPublicKey),
   })
 
-  const response = await new HttpClientProxy()
-    .builder()
-    .url(
-      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/subscribe/${userId}`
-    )
-    .body(subscription)
-    .withCredentials()
-    .withCsrf()
-    .post()
-    .execute()
-
-  return response
+  return apiClient.post(`/notifications/subscribe/${userId}`, subscription)
 }
 
 export {

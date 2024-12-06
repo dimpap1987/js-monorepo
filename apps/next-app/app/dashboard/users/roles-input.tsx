@@ -2,17 +2,12 @@
 
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
 import { AuthRoleDTO, AuthUserDto } from '@js-monorepo/types'
-import { API } from '@next-app/utils/api-proxy'
+import { apiClient } from '@js-monorepo/utils/http'
 import { Row } from '@tanstack/react-table'
 import { useEffect, useState } from 'react'
 
 const getRoles = async () => {
-  const response = await API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/roles`
-  )
-    .get()
-    .withCredentials()
-    .execute()
+  const response = await apiClient.get(`/admin/roles`)
 
   if (response.ok) return response.data as AuthRoleDTO[]
 

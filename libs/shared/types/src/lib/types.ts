@@ -30,7 +30,7 @@ export type ErrorResponse = {
   httpStatusCode: number
 }
 
-export type ClientResponseType<T> = SuccessResponse<T> | ErrorResponse
+export type ClientResponseType<T = any> = SuccessResponse<T> | ErrorResponse
 
 export type MenuItem = {
   name: string
