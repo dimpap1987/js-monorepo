@@ -3,8 +3,8 @@
 import { DpButton } from '@js-monorepo/button'
 import { Card } from '@js-monorepo/components/card'
 import { useNotifications } from '@js-monorepo/notification'
+import { apiClient } from '@js-monorepo/utils/http'
 import { SelectUsersComponent } from '@next-app/components/select-users'
-import { API } from '@next-app/utils/api-proxy'
 import { useState } from 'react'
 
 const CreateAnnouncement = () => {
@@ -14,14 +14,9 @@ const CreateAnnouncement = () => {
 
   const handleSendMessage = async () => {
     if (message.trim() && selectedUserIds.length > 0) {
-      const submitResponse = await API.url(
-        `${process.env.NEXT_PUBLIC_AUTH_URL}/api/announcements`
-      )
-        .post()
-        .body({ announcement: message.trim() })
-        .withCredentials()
-        .withCsrf()
-        .execute()
+      const submitResponse = await apiClient.post('/announcements', {
+        announcement: message.trim(),
+      })
 
       if (submitResponse.ok) {
         setMessage('')

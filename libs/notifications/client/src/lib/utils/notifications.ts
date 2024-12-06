@@ -3,7 +3,7 @@ import {
   PaginationType,
   UserNotificationType,
 } from '@js-monorepo/types'
-import { HttpClientProxy } from '@js-monorepo/utils/http'
+import { apiClient } from '@js-monorepo/utils/http'
 import moment from 'moment'
 
 export async function apiFetchUserNotifications(
@@ -17,34 +17,15 @@ export async function apiFetchUserNotifications(
   >
 > {
   const queryString = searchParams ? `${searchParams}` : ''
-  return new HttpClientProxy()
-    .builder()
-    .url(
-      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/users/${userId}${queryString}`
-    )
-    .get()
-    .withCredentials()
-    .execute()
+  return apiClient.get(`/notifications/users/${userId}${queryString}`)
 }
 
 export async function apiReadNotification(notificationId: number) {
-  return new HttpClientProxy()
-    .builder()
-    .url(
-      `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/${notificationId}/read`
-    )
-    .patch()
-    .withCredentials()
-    .execute()
+  return apiClient.patch(`/notifications/${notificationId}/read`)
 }
 
 export async function apiReadAllNotifications() {
-  return new HttpClientProxy()
-    .builder()
-    .url(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/read-all`)
-    .patch()
-    .withCredentials()
-    .execute()
+  return apiClient.patch('/notifications/read-all')
 }
 
 export function humanatizeNotificationDate(date: string | Date) {

@@ -3,15 +3,12 @@ import {
   CreatePushNotificationType,
   NotificationCreateDto,
 } from '@js-monorepo/types'
-import { API } from '@next-app/utils/api-proxy'
+import { apiClient } from '@js-monorepo/utils/http'
 
 export const findUsers = async (page = 1, pageSize = 50) => {
-  const response = await API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users?page=${page}&pageSize=${pageSize}`
+  const response = await apiClient.get(
+    `/admin/users?page=${page}&pageSize=${pageSize}`
   )
-    .get()
-    .withCredentials()
-    .execute()
 
   if (response.ok)
     return response.data as {
@@ -26,27 +23,11 @@ export const findUsers = async (page = 1, pageSize = 50) => {
 }
 
 export const submitNotification = async (payload: NotificationCreateDto) => {
-  const response = await API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications`
-  )
-    .post()
-    .body(payload)
-    .withCredentials()
-    .withCsrf()
-    .execute()
-  return response
+  return apiClient.post(`/notifications`, payload)
 }
 
 export const submitPushNotification = async (
   payload: CreatePushNotificationType
 ) => {
-  const response = await API.url(
-    `${process.env.NEXT_PUBLIC_AUTH_URL}/api/notifications/push-notification`
-  )
-    .post()
-    .body(payload)
-    .withCredentials()
-    .withCsrf()
-    .execute()
-  return response
+  return apiClient.post('/notifications/push-notification', payload)
 }

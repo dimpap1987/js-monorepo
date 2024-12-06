@@ -1,11 +1,8 @@
 'use client'
 
 import { SessionUserType } from '@js-monorepo/types'
-import {
-  getCookie,
-  HttpClientBuilder,
-  HttpClientProxy,
-} from '@js-monorepo/utils/http'
+import { getCookie } from '@js-monorepo/utils/http'
+import axios, { AxiosInstance } from 'axios'
 import React, {
   createContext,
   useCallback,
@@ -27,21 +24,21 @@ const SessionContext = createContext<{
   refreshSession: () => {},
 })
 
+const apiClient = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_AUTH_URL}/api`,
+  timeout: 5000,
+  withCredentials: true,
+})
+
 const fetchSession = async (
   successCallback: (user: any) => void,
   errorCallback?: (error?: any) => void,
-  clientBuilder: HttpClientBuilder = new HttpClientProxy().builder()
+  clientBuilder = apiClient
 ) => {
   try {
-    const response = await clientBuilder
-      .url(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/session`)
-      .get()
-      .withCredentials()
-      .execute<{
-        user: SessionUserType
-      }>()
+    const response = await clientBuilder.get('/auth/session')
 
-    if (response.ok) {
+    if (response.status >= 200 && response.status < 300) {
       successCallback(response.data?.user)
     } else {
       errorCallback?.()
@@ -62,7 +59,7 @@ export const SessionProvider = ({
     user: SessionUserType | null | undefined
     isLoggedIn: boolean
   }
-  clientBuilder?: HttpClientBuilder
+  clientBuilder?: AxiosInstance
 }) => {
   const [user, setUser] = useState(value.user)
 

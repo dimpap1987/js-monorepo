@@ -1,6 +1,6 @@
 import { CreateCheckoutSessionRequestBody } from '@js-monorepo/types'
 import { calculateThirtyMinutesFromNow } from '@js-monorepo/utils/common'
-import { HttpClientBuilder, HttpClientProxy } from '@js-monorepo/utils/http'
+import { apiClient, CustomAxiosInstance } from '@js-monorepo/utils/http'
 import Stripe from 'stripe'
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -105,19 +105,14 @@ export async function checkoutSessionClient(
     price: number
     isDonate: boolean
     customSubmitMessage: string
-    fetchBuilder?: HttpClientBuilder
+    axiosClient?: CustomAxiosInstance
   },
-  fetchBuilder: HttpClientBuilder = new HttpClientProxy().builder()
+  axiosClient: CustomAxiosInstance = apiClient
 ) {
-  return fetchBuilder
-    .url(url)
-    .body({
-      username,
-      price,
-      isDonate,
-      customSubmitMessage,
-    })
-    .withCsrf()
-    .post()
-    .execute()
+  return axiosClient.post(url, {
+    username,
+    price,
+    isDonate,
+    customSubmitMessage,
+  })
 }

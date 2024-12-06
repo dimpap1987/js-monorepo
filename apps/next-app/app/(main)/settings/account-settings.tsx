@@ -20,10 +20,10 @@ import {
 import { useNotifications } from '@js-monorepo/notification'
 import { EditUserSchema } from '@js-monorepo/schemas'
 import { compareObjects, toBase64 } from '@js-monorepo/utils/common'
+import { apiClient } from '@js-monorepo/utils/http'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { SettingsItem } from './settings-items'
-import { apiUserUpdate } from './utils'
 
 export function AccountSettings() {
   const { user, refreshSession, isAdmin } = useSession()
@@ -53,7 +53,7 @@ export function AccountSettings() {
 
     if (!changes) return
 
-    const response = await apiUserUpdate(data)
+    const response = await apiClient.patch('/users', data)
     if (response.ok) {
       refreshSession()
       addNotification({

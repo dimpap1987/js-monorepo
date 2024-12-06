@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from '@js-monorepo/components/tooltip'
 import { useNotifications } from '@js-monorepo/notification'
-import { API } from '@next-app/utils/api-proxy'
+import { apiClient } from '@js-monorepo/utils/http'
 import { VscDebugDisconnect } from 'react-icons/vsc'
 import { OnlineUsersType } from '../online-users-table'
 
@@ -25,12 +25,9 @@ export function DisconnectUserComponent({ user }: { user: OnlineUsersType }) {
             disabled={user.id === 1 && user?.roles?.some((r) => r === 'ADMIN')}
             variant="accent"
             onClick={async () => {
-              const response = await API.url(
-                `${process.env.NEXT_PUBLIC_AUTH_URL}/api/admin/users-session/${user.id}`
+              const response = await apiClient.delete(
+                `/admin/users-session/${user.id}`
               )
-                .delete()
-                .withCredentials()
-                .execute()
 
               if (response.ok) {
                 addNotification({
