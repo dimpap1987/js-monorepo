@@ -80,7 +80,7 @@ export function AccountSettings() {
       <Form {...form}>
         <SettingsItem label="Profile">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 place-items-center sm:place-items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 place-items-center sm:place-items-start px-3">
               {/* Profile Image */}
               <div className="relative flex justify-center self-center">
                 <Avatar className="h-24 w-24">
@@ -128,7 +128,7 @@ export function AccountSettings() {
                 control={form.control}
                 name="username"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full">
                     <FormLabel className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">
                       Username
                     </FormLabel>
@@ -146,7 +146,7 @@ export function AccountSettings() {
                       )}
 
                       <FormErrorDisplay
-                        className="mt-4 min-h-10"
+                        className="mt-4 sm:min-h-10"
                         errors={form.formState.errors}
                         fields={{
                           username: 'Username',
@@ -158,27 +158,27 @@ export function AccountSettings() {
                 )}
               />
 
-              <div></div>
+              <div className="hidden sm:block"></div>
 
               {/* Edit/Save Buttons */}
-              <div className="self-center sm:self-end sm:justify-self-end w-[80%]">
+              <div className="self-center sm:self-end sm:justify-self-end w-full">
                 {isEditing ? (
                   <div className="flex gap-3 flex-wrap sm:flex-nowrap justify-end">
+                    <DpButton type="submit" className="flex-1">
+                      Save
+                    </DpButton>
                     <DpButton
                       onClick={handleCancel}
                       variant="outline"
-                      className="w-full sm:w-auto"
+                      className="flex-1"
                     >
                       Cancel
-                    </DpButton>
-                    <DpButton type="submit" className="w-full sm:w-auto">
-                      Save
                     </DpButton>
                   </div>
                 ) : (
                   <div className="flex justify-end">
                     <DpButton
-                      className="w-full sm:w-auto"
+                      className="flex-1"
                       type="button" // Prevents form submission
                       onClick={(e) => {
                         e.preventDefault() // Prevents form submission
@@ -197,7 +197,7 @@ export function AccountSettings() {
 
       {/* Account Metadata Section */}
       <SettingsItem label="Account details">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-3">
           <div>
             <dt className="text-sm font-medium text-gray-300 uppercase tracking-wide">
               Account Created

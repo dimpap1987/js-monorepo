@@ -1,19 +1,10 @@
 import { PROVIDERS_ARRAY } from '@js-monorepo/types'
 import * as z from 'zod'
 
-export const UsernameSchema = z
-  .string()
-  .min(3, { message: 'Username must be at least 3 characters long.' })
-  .max(20, { message: 'Username must not exceed 20 characters.' })
-  // eslint-disable-next-line no-useless-escape
-  .regex(/^[^\s!@#$%^&*()_+|~=`{}\[\]:";'<>?,.\/\\]+$/, {
-    message: 'Username contains invalid characters.',
-  })
-
 class RegisterUserSchemaConfig {
-  private readonly MIN_VALUE = 4
+  public readonly MIN_VALUE = 4
 
-  private readonly MAX_VALUE = 16
+  public readonly MAX_VALUE = 16
 
   public readonly MIN_ERROR_MESSAGE = `Username must be at least ${this.MIN_VALUE} characters long.`
 
@@ -48,6 +39,19 @@ const ObjectIdSchema = z.object({
 })
 
 export const registerUserSchemaConfig = new RegisterUserSchemaConfig()
+
+export const UsernameSchema = z
+  .string()
+  .min(registerUserSchemaConfig.MIN_VALUE, {
+    message: registerUserSchemaConfig.MIN_ERROR_MESSAGE,
+  })
+  .max(registerUserSchemaConfig.MAX_VALUE, {
+    message: registerUserSchemaConfig.MAX_ERROR_MESSAGE,
+  })
+  // eslint-disable-next-line no-useless-escape
+  .regex(/^[^\s!@#$%^&*()_+|~=`{}\[\]:";'<>?,.\/\\]+$/, {
+    message: 'Username contains invalid characters.',
+  })
 
 export const RegisterUserSchema = registerUserSchemaConfig.createSchema()
 
