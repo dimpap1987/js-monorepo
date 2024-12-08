@@ -231,7 +231,7 @@ const FormErrorDisplay: React.FC<FormErrorProps> = ({
         const error = errors[fieldKey]
         return (
           error && (
-            <p key={fieldKey} className="text-sm text-danger">
+            <p key={fieldKey} className="text-sm text-red-500 tracking-wider">
               {error.message?.toString()}
             </p>
           )

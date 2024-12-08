@@ -67,7 +67,7 @@ const Marquee = forwardRef(
       <div
         ref={ref}
         className={cn(
-          'overflow-hidden whitespace-nowrap flex items-center',
+          'overflow-hidden whitespace-nowrap flex items-center pointer-events-none focus:pointer-events-auto',
           className
         )}
       >
