@@ -62,20 +62,20 @@ async function handleAxiosResponse<T>(
   const errorMessage = 'Something went wrong, please try again later...'
 
   // Check for a successful response
-  if (response.status >= 200 && response.status < 300) {
+  if (response?.status >= 200 && response?.status < 300) {
     const finalResponse = {
       ok: true,
-      httpStatusCode: response.status,
+      status: response.status,
       data: response.data,
     }
     return finalResponse as SuccessResponse<T>
   }
 
   // For non-successful responses, handle errors
-  const errorData = response.data || {}
+  const errorData = response?.data || {}
   return {
     ok: false,
-    httpStatusCode: response.status,
+    status: response?.status || 500,
     message: errorData.message || errorMessage,
     errors: errorData.errors || [],
   } as ErrorResponse
@@ -129,16 +129,14 @@ apiClient.interceptors.response.use(
     }
   },
   async (error) => {
-    if (error.response && error.response.status === 401) {
-      console.log(error.request.responseURL)
-
+    if (error?.response?.status === 401) {
       window.location.replace('/auth/login')
       return
     }
 
-    const transformedResponse = await handleAxiosResponse(error.response)
+    const transformedResponse = await handleAxiosResponse(error?.response)
 
-    return Promise.reject({ ...error.response, ...transformedResponse })
+    return { ...error, ...transformedResponse }
   }
 )
 

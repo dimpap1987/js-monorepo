@@ -80,7 +80,7 @@ export function AccountSettings() {
       <Form {...form}>
         <SettingsItem label="Profile">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 place-items-center sm:place-items-start px-3">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 place-items-center sm:place-items-start">
               {/* Profile Image */}
               <div className="relative flex justify-center self-center">
                 <Avatar className="h-24 w-24">
@@ -197,7 +197,7 @@ export function AccountSettings() {
 
       {/* Account Metadata Section */}
       <SettingsItem label="Account details">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <dt className="text-sm font-medium text-gray-300 uppercase tracking-wide">
               Account Created
