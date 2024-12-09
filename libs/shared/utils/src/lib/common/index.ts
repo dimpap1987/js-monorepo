@@ -69,6 +69,64 @@ export const toBase64 = (file: File) =>
     reader.onerror = (error) => reject(error)
   })
 
+export const compressAvatar = async (
+  file: File,
+  maxSize = 200, // Max dimensions for width or height (square avatar)
+  quality = 0.7 // Compression quality
+): Promise<string> => {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = (event) => {
+      const img = new Image()
+
+      img.onload = () => {
+        // Create a canvas for the compression
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'))
+          return
+        }
+
+        // Ensure the image is square by resizing
+        const size = Math.min(img.width, img.height) // Use the smaller dimension
+        canvas.width = maxSize
+        canvas.height = maxSize
+
+        // Calculate cropping points to make the image square
+        const startX = (img.width - size) / 2
+        const startY = (img.height - size) / 2
+
+        // Draw the cropped and resized image
+        ctx.drawImage(
+          img,
+          startX,
+          startY,
+          size, // Crop the smaller dimension
+          size,
+          0,
+          0,
+          maxSize,
+          maxSize
+        )
+
+        // Export the compressed image as Base64
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
+        resolve(compressedDataUrl)
+      }
+
+      img.onerror = (err) => reject(new Error('Failed to load image'))
+
+      img.src = event.target?.result as string
+    }
+
+    reader.onerror = (error) => reject(new Error('Failed to read file'))
+    reader.readAsDataURL(file) // Load the file
+  })
+}
+
 export function compareObjects<T extends object>(
   obj1: T,
   obj2: T
