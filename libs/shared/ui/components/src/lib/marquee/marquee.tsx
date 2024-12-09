@@ -75,12 +75,12 @@ const Marquee = forwardRef(
           {React.Children.map(children, (child, index) => (
             <motion.div
               key={index}
-              className="px-4 absolute"
+              className="px-4 absolute bg-background"
               ref={(node) => {
                 childRefs.current.set(index, node)
               }}
               initial={{ x: `100vw` }}
-              animate={{ x: `-${childWidths[index] || 400}px` }} // Animate to negative of the width
+              animate={{ x: `-${childWidths[index] || 400}px` }}
               transition={{
                 duration,
                 ease: 'linear',
