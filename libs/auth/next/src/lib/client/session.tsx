@@ -1,8 +1,8 @@
 'use client'
 
 import { SessionUserType } from '@js-monorepo/types'
-import { getCookie } from '@js-monorepo/utils/http'
-import axios, { AxiosInstance } from 'axios'
+import { apiClientBase, getCookie } from '@js-monorepo/utils/http'
+import { AxiosInstance } from 'axios'
 import React, {
   createContext,
   useCallback,
@@ -24,16 +24,10 @@ const SessionContext = createContext<{
   refreshSession: () => {},
 })
 
-const apiClient = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_AUTH_URL}/api`,
-  timeout: 5000,
-  withCredentials: true,
-})
-
 const fetchSession = async (
   successCallback: (user: any) => void,
   errorCallback?: (error?: any) => void,
-  clientBuilder = apiClient
+  clientBuilder = apiClientBase
 ) => {
   try {
     const response = await clientBuilder.get('/auth/session')
