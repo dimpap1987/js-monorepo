@@ -1,18 +1,12 @@
 import { ClientResponseType } from '@js-monorepo/types'
-import axios from 'axios'
-
-const apiClient = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_AUTH_URL}/api`,
-  timeout: 5000,
-  withCredentials: true,
-})
+import { apiClientBase } from '@js-monorepo/utils/http'
 
 export class AuthClient {
   constructor(private readonly authUrl: string) {
     this.authUrl = authUrl
   }
 
-  async logout(axiosClient = apiClient) {
+  async logout(axiosClient = apiClientBase) {
     const response = await axiosClient.get('/auth/logout')
     if (response.status >= 200 && response.status < 300) {
       window.location.replace('/')
@@ -27,7 +21,7 @@ export class AuthClient {
     payload: {
       username: string
     },
-    axiosClient = apiClient
+    axiosClient = apiClientBase
   ): Promise<ClientResponseType<any>> {
     return axiosClient.post('/auth/register', payload)
   }

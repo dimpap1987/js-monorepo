@@ -3,7 +3,12 @@ import {
   ErrorResponse,
   SuccessResponse,
 } from '@js-monorepo/types'
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios'
 import { Request } from 'express'
 
 export interface CustomAxiosInstance extends AxiosInstance {
@@ -103,41 +108,48 @@ export function getBrowserInfo(req: Request): string | undefined {
   return req.headers['user-agent'] || undefined
 }
 
-const apiClient = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_AUTH_URL}/api`,
-  timeout: 10000,
-  withCredentials: true,
-}) as CustomAxiosInstance
-
-apiClient.interceptors.request.use((config) => {
+const setupRequestWithCsrf = (config: InternalAxiosRequestConfig<any>) => {
   const csrfHeader = 'XSRF-TOKEN'
   const csrfValue = getCookie(csrfHeader)
-
   if (csrfValue) {
     config.headers[csrfHeader] = csrfValue
   }
-
   return config
-})
+}
 
-apiClient.interceptors.response.use(
-  async (response) => {
-    const transformedResponse = await handleAxiosResponse(response)
-    return {
-      ...response,
-      ...transformedResponse,
+const createApiClient = (handle401Error = false) => {
+  const instance = axios.create({
+    baseURL: `${process.env.NEXT_PUBLIC_AUTH_URL}/api`,
+    timeout: 10000,
+    withCredentials: true,
+  }) as CustomAxiosInstance
+
+  instance.interceptors.request.use(setupRequestWithCsrf)
+
+  // Conditionally add the response interceptor for 401 handling
+  instance.interceptors.response.use(
+    async (response) => {
+      const transformedResponse = await handleAxiosResponse(response)
+      return { ...response, ...transformedResponse }
+    },
+    async (error) => {
+      if (handle401Error && error?.response?.status === 401) {
+        window.location.replace('/auth/login')
+        return
+      }
+
+      const transformedResponse = await handleAxiosResponse(error?.response)
+      return { ...error, ...transformedResponse }
     }
-  },
-  async (error) => {
-    if (error?.response?.status === 401) {
-      window.location.replace('/auth/login')
-      return
-    }
+  )
 
-    const transformedResponse = await handleAxiosResponse(error?.response)
+  return instance
+}
 
-    return { ...error, ...transformedResponse }
-  }
-)
+// Instance with 401 error handling (redirect to login)
+const apiClient = createApiClient(true)
 
-export { apiClient }
+// Instance without 401 error handling
+const apiClientBase = createApiClient(false)
+
+export { apiClient, apiClientBase }
