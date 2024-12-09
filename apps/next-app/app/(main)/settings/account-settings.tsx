@@ -19,7 +19,7 @@ import {
 } from '@js-monorepo/components/form'
 import { useNotifications } from '@js-monorepo/notification'
 import { EditUserSchema } from '@js-monorepo/schemas'
-import { compareObjects, toBase64 } from '@js-monorepo/utils/common'
+import { compareObjects, compressAvatar } from '@js-monorepo/utils/common'
 import { apiClient } from '@js-monorepo/utils/http'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -95,7 +95,7 @@ export function AccountSettings() {
                 {isEditing && (
                   <label
                     htmlFor="profileImage"
-                    className="absolute bottom-0 right-0 bg-background rounded-full cursor-pointer flex items-center justify-center h-8 w-8 text-sm font-medium border border-border"
+                    className="absolute bottom-0 right-0 bg-background rounded-full cursor-pointer flex items-center justify-center h-8 w-8 text-sm font-medium border border-border text-foreground"
                   >
                     <input
                       type="file"
@@ -105,7 +105,7 @@ export function AccountSettings() {
                       onChange={async (e) => {
                         if (e.target.files?.[0]) {
                           try {
-                            const base64Image = await toBase64(
+                            const base64Image = await compressAvatar(
                               e.target.files[0]
                             )
                             form.setValue('profileImage', base64Image)
@@ -129,7 +129,7 @@ export function AccountSettings() {
                 name="username"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">
+                    <FormLabel className="text-sm font-medium text-gray-300 mb-2 uppercase tracking-wide">
                       Username
                     </FormLabel>
                     <FormControl>
@@ -163,8 +163,12 @@ export function AccountSettings() {
               {/* Edit/Save Buttons */}
               <div className="self-center sm:self-end sm:justify-self-end w-full">
                 {isEditing ? (
-                  <div className="flex gap-3 flex-wrap sm:flex-nowrap justify-end">
-                    <DpButton type="submit" className="flex-1">
+                  <div className="flex gap-3 flex-wrap sm:flex-nowrap sm:justify-end">
+                    <DpButton
+                      variant="primary"
+                      type="submit"
+                      className="flex-1"
+                    >
                       Save
                     </DpButton>
                     <DpButton

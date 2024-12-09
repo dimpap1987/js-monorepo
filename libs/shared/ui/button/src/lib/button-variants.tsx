@@ -11,7 +11,7 @@ export const buttonVariants = {
       danger:
         'bg-danger border-2 border-danger/80 text-danger-foreground hover:bg-danger/60 focus:bg-danger/60 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       outline:
-        'border-2 border-primary/80 bg-background hover:bg-primary text-foreground hover:text-primary-foreground tracking-[0.04em]',
+        'border-2 border-primary/80 bg-background text-foreground tracking-[0.04em]',
     },
     size: {
       default: 'h-8 px-4 py-2',
