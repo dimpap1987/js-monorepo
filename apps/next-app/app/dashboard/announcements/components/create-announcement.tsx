@@ -16,6 +16,7 @@ const CreateAnnouncement = () => {
     if (message.trim() && selectedUserIds.length > 0) {
       const submitResponse = await apiClient.post('/announcements', {
         announcement: message.trim(),
+        userIds: selectedUserIds,
       })
 
       if (submitResponse.ok) {

@@ -114,7 +114,7 @@ export function MultiSelectDropdown({
 
       <DropdownMenuContent
         className={cn(
-          'border rounded shadow-md bg-background text-foreground max-h-[235px] min-w-44 overflow-y-auto bg-background-secondary',
+          'border rounded shadow-md bg-background text-foreground max-h-[240px] min-w-44 overflow-y-auto bg-background-secondary',
           className
         )}
         ref={dropdownContentRef}

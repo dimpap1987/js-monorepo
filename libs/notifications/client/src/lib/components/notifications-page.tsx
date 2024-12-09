@@ -107,6 +107,12 @@ export function NotificationsPage({
     }
   }, [notificationCount])
 
+  const hasPagination: boolean =
+    notifications !== undefined &&
+    notifications.totalPages !== undefined &&
+    notifications.totalPages > 1 &&
+    notifications.totalPages >= pagination?.page
+
   return (
     <div
       className={cn(
@@ -142,16 +148,15 @@ export function NotificationsPage({
       </div>
 
       {/* Render Notifications */}
-      <section className="flex-1 overflow-hidden  bg-background-secondary rounded-md p-1 py-2">
-        <ScrollArea className="h-full">
-          {loadingRef.current === false ? (
-            notifications?.content && notifications.content.length > 0 ? (
-              notifications.content.map((content, index) => (
+      <section className="flex-1 overflow-hidden bg-background-secondary rounded-md p-1 py-2">
+        {loadingRef.current === false ? (
+          notifications?.content && notifications.content.length > 0 ? (
+            <ScrollArea className="h-full">
+              {notifications.content.map((content, index) => (
                 <Fragment key={content?.notification?.id}>
                   <div
                     className={`cursor-pointer p-1 sm:py-2 rounded transition-all duration-200 ${content.isRead ? 'opacity-50' : ''} hover:opacity-90 hover:bg-primary/20`}
                     onClick={async () => {
-                      // Handle the notification read state change
                       if (!content.isRead && notifications?.content) {
                         await apiReadNotification(content.notification.id)
 
@@ -189,31 +194,28 @@ export function NotificationsPage({
                     <hr className="my-2 border-t border-border" />
                   )}
                 </Fragment>
-              ))
-            ) : (
-              <div className="p-2 text-center">
-                Nothing to show{' '}
-                <span role="img" aria-label="emoji-sad">
-                  😒
-                </span>
-              </div>
-            )
+              ))}
+            </ScrollArea>
           ) : (
-            <></>
-          )}
-        </ScrollArea>
+            <div className="p-2 text-center h-full flex justify-center items-center font-semibold">
+              Nothing to show{' '}
+              <span role="img" aria-label="emoji-sad">
+                😒
+              </span>
+            </div>
+          )
+        ) : (
+          <></>
+        )}
       </section>
 
-      {notifications &&
-        notifications.totalPages &&
-        notifications.totalPages >= pagination.page &&
-        notifications.totalPages !== 1 && (
-          <PaginationComponent
-            pagination={pagination}
-            totalPages={notifications.totalPages}
-            onChange={setPagination}
-          ></PaginationComponent>
-        )}
+      {hasPagination && (
+        <PaginationComponent
+          pagination={pagination}
+          totalPages={notifications?.totalPages as number}
+          onChange={setPagination}
+        ></PaginationComponent>
+      )}
     </div>
   )
 }

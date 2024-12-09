@@ -18,9 +18,14 @@ export class AnnouncementsController {
   ) {}
 
   @Post()
-  async save(@Body() { announcement }: { announcement: string }) {
-    this.userPresenceWebsocketService.broadcast(Events.announcements, [
-      announcement,
-    ])
+  async save(
+    @Body()
+    { announcement, userIds }: { announcement: string; userIds: number[] }
+  ) {
+    this.userPresenceWebsocketService.sendToUsers(
+      userIds,
+      Events.announcements,
+      [announcement]
+    )
   }
 }

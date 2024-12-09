@@ -75,7 +75,7 @@ export function AccountSettings() {
   }
 
   return (
-    <section className="p-2 space-y-6 text-white">
+    <section className="p-2 space-y-6 text-white min-w-[200px]">
       {/* Profile Section */}
       <Form {...form}>
         <SettingsItem label="Profile">
