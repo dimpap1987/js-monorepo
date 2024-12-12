@@ -127,6 +127,7 @@ export const compressAvatar = async (
   })
 }
 
+// shalow comparison
 export function compareObjects<T extends object>(
   obj1: T,
   obj2: T

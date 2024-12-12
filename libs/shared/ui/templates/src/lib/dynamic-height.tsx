@@ -8,7 +8,7 @@ export function DynamicHeightTemplate({
   return (
     <section
       className={cn(
-        'space-y-2 sm:max-w-6xl mx-auto overflow-y-auto overflow-x-hidden',
+        'space-y-2 sm:max-w-[1200px] mx-auto overflow-y-auto overflow-x-hidden',
         'h-[calc(100svh_-_var(--navbar-height)_-_30px_-_var(--bottom-navbar-height))]',
         'sm:h-[calc(100svh_-_var(--navbar-height)_-_30px_-_20px)] ',
         className

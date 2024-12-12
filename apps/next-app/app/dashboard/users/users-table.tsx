@@ -88,9 +88,9 @@ const DashboardUsersTableSuspense = () => {
           return (
             <div className="flex justify-center items-center select-none">
               <Avatar className="h-12 w-12">
-                {row.original?.userProfiles?.[0].profileImage && (
+                {row.original?.userProfiles?.[0]?.profileImage && (
                   <AvatarImage
-                    src={row.original?.userProfiles?.[0].profileImage}
+                    src={row.original?.userProfiles?.[0]?.profileImage}
                     alt={`${row.original.username} picture`}
                   ></AvatarImage>
                 )}

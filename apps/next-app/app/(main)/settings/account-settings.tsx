@@ -19,10 +19,10 @@ import {
 } from '@js-monorepo/components/form'
 import { useNotifications } from '@js-monorepo/notification'
 import { EditUserSchema } from '@js-monorepo/schemas'
-import { compareObjects, compressAvatar } from '@js-monorepo/utils/common'
+import { compressAvatar } from '@js-monorepo/utils/common'
 import { apiClient } from '@js-monorepo/utils/http'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { SettingsItem } from './settings-items'
 
 export function AccountSettings() {
@@ -38,6 +38,7 @@ export function AccountSettings() {
   const form = useForm({
     defaultValues: initUser,
     resolver: zodResolver(EditUserSchema),
+    mode: 'onChange',
   })
 
   useEffect(() => {
@@ -49,9 +50,6 @@ export function AccountSettings() {
   const onSubmit = async (data: { username: string; profileImage: string }) => {
     setIsEditing(false)
     form.clearErrors()
-    const changes = compareObjects(initUser, data)
-
-    if (!changes) return
 
     const response = await apiClient.patch('/users', data)
     if (response.ok) {
@@ -83,44 +81,56 @@ export function AccountSettings() {
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 place-items-center sm:place-items-start">
               {/* Profile Image */}
               <div className="relative flex justify-center self-center">
-                <Avatar className="h-24 w-24">
-                  {form.watch('profileImage') && (
-                    <AvatarImage
-                      src={form.watch('profileImage')}
-                      alt={`user's picture`}
-                    />
+                <Controller
+                  control={form.control}
+                  name="profileImage"
+                  render={({ field }) => (
+                    <div className="relative flex justify-center self-center">
+                      <Avatar className="h-24 w-24">
+                        {form.watch('profileImage') && (
+                          <AvatarImage
+                            src={form.watch('profileImage')}
+                            alt="user's picture"
+                          />
+                        )}
+                        <AvatarFallback className="bg-background">
+                          NA
+                        </AvatarFallback>
+                      </Avatar>
+
+                      {isEditing && (
+                        <label
+                          htmlFor="profileImage"
+                          className="absolute bottom-0 right-0 bg-background rounded-full cursor-pointer flex items-center justify-center h-8 w-8 text-sm font-medium border border-border text-foreground"
+                        >
+                          <input
+                            type="file"
+                            id="profileImage"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              if (e.target.files?.[0]) {
+                                try {
+                                  // Convert image to base64 and update form value using `field.onChange`
+                                  const base64Image = await compressAvatar(
+                                    e.target.files[0]
+                                  )
+                                  field.onChange(base64Image) // Update form state with the image
+                                } catch (error) {
+                                  console.error(
+                                    'Error converting file to Base64:',
+                                    error
+                                  )
+                                }
+                              }
+                            }}
+                          />
+                          ✎
+                        </label>
+                      )}
+                    </div>
                   )}
-                  <AvatarFallback className="bg-background">NA</AvatarFallback>
-                </Avatar>
-                {isEditing && (
-                  <label
-                    htmlFor="profileImage"
-                    className="absolute bottom-0 right-0 bg-background rounded-full cursor-pointer flex items-center justify-center h-8 w-8 text-sm font-medium border border-border text-foreground"
-                  >
-                    <input
-                      type="file"
-                      id="profileImage"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        if (e.target.files?.[0]) {
-                          try {
-                            const base64Image = await compressAvatar(
-                              e.target.files[0]
-                            )
-                            form.setValue('profileImage', base64Image)
-                          } catch (error) {
-                            console.error(
-                              'Error converting file to Base64:',
-                              error
-                            )
-                          }
-                        }
-                      }}
-                    />
-                    ✎
-                  </label>
-                )}
+                />
               </div>
 
               {/* Username Field */}
@@ -165,6 +175,9 @@ export function AccountSettings() {
                 {isEditing ? (
                   <div className="flex gap-3 flex-wrap sm:flex-nowrap sm:justify-end">
                     <DpButton
+                      disabled={
+                        !form.formState.isValid || !form.formState.isDirty
+                      }
                       variant="primary"
                       type="submit"
                       className="flex-1"
@@ -183,9 +196,9 @@ export function AccountSettings() {
                   <div className="flex justify-end">
                     <DpButton
                       className="flex-1"
-                      type="button" // Prevents form submission
+                      type="button"
                       onClick={(e) => {
-                        e.preventDefault() // Prevents form submission
+                        e.preventDefault()
                         setIsEditing(true)
                       }}
                     >
