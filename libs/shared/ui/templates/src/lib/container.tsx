@@ -7,7 +7,10 @@ export function ContainerTemplate({
 }: PropsWithChildren & { className?: string }) {
   return (
     <section
-      className={cn('container max-w-6xl mx-auto overflow-x-hidden', className)}
+      className={cn(
+        'container max-w-[1200px] mx-auto overflow-x-hidden',
+        className
+      )}
     >
       {children}
     </section>
