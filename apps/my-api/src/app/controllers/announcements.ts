@@ -20,12 +20,32 @@ export class AnnouncementsController {
   @Post()
   async save(
     @Body()
-    { announcement, userIds }: { announcement: string; userIds: number[] }
-  ) {
-    this.userPresenceWebsocketService.sendToUsers(
+    {
+      announcement,
       userIds,
-      Events.announcements,
-      [announcement]
+      isGlobal,
+    }: {
+      announcement: string
+      userIds: number[]
+      isGlobal: boolean
+    }
+  ) {
+    this.logger.debug(
+      `Create announcement | Global: ${isGlobal} and message: ${announcement}`
     )
+
+    if (isGlobal) {
+      this.userPresenceWebsocketService.broadcast(Events.announcements, [
+        announcement,
+      ])
+    } else {
+      if (userIds?.length > 0) {
+        this.userPresenceWebsocketService.sendToUsers(
+          userIds,
+          Events.announcements,
+          [announcement]
+        )
+      }
+    }
   }
 }

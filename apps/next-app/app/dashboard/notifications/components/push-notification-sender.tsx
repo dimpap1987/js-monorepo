@@ -35,20 +35,20 @@ export const PushNotificationSender = () => {
   }
 
   return (
-    <Card className="space-y-4 w-full p-5">
+    <Card className="space-y-4 w-full p-5 bg-background-secondary">
       <input
         type="text"
         placeholder="Enter notification title..."
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2"
+        className="w-full border border-gray-300 rounded-md p-2 bg-gray-900"
       />
 
       <textarea
         placeholder="Type your message here..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2"
+        className="w-full border border-gray-300 rounded-md p-2 bg-gray-900"
         rows={4}
       />
 
@@ -57,6 +57,8 @@ export const PushNotificationSender = () => {
           setSelectedUserIds(selected.map((u) => u.id))
         }}
         selectedUserIds={selectedUserIds}
+        classNameTrigger="text-white bg-gray-900"
+        className="text-white"
       />
 
       <DpButton

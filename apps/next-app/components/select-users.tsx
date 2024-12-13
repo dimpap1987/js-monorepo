@@ -12,10 +12,12 @@ const SelectUsersComponent = ({
   selectedUserIds,
   onChange,
   className,
+  classNameTrigger,
 }: {
   selectedUserIds: number[]
   onChange: (selectedOptions: OptionType[]) => void
   className?: string
+  classNameTrigger?: string
 }) => {
   const [usersDropDown, setUsersDropDown] = useState<UserDropdown[]>([])
 
@@ -30,6 +32,7 @@ const SelectUsersComponent = ({
   return (
     <MultiSelectDropdown
       className={className}
+      classNameTrigger={classNameTrigger}
       options={usersDropDown}
       onChange={onChange}
       prompt="Select users..."
