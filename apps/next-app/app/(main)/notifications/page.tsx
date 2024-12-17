@@ -1,4 +1,4 @@
-import { NotificationsPage } from '@js-monorepo/notifications-client'
+import { NotificationsPage } from '@js-monorepo/notifications-ui'
 import { DynamicHeightTemplate } from '@js-monorepo/templates'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { Metadata } from 'next'
