@@ -10,7 +10,7 @@ import { useDeviceType } from '@js-monorepo/next/hooks'
 import {
   NotificationBellButton,
   useNotificationStore,
-} from '@js-monorepo/notifications-client'
+} from '@js-monorepo/notifications-ui'
 import { AuthRole } from '@js-monorepo/types'
 import { AiFillHome } from 'react-icons/ai'
 import { IconType } from 'react-icons/lib'

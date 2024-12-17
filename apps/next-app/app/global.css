@@ -30,14 +30,28 @@ h4 {
   @apply font-semibold;
 }
 
+*::selection {
+  background: hsl(var(--primary));
+}
+*::-moz-selection {
+  background: hsl(var(--primary));
+}
+*::-webkit-selection {
+  background: hsl(var(--primary));
+}
+
 @layer base {
   :root {
     --navbar-height: 60px; /* Define the height of your navbar */
     --bottom-navbar-height: 60px; /* Define the height of your bottom-navbar */
 
     --foreground: 0 0% 5%;
+    --foreground-neutral: 220, 9%, 46%;
+
     --background: 43.64 47.83% 95.49%;
     --background-secondary: 219 33% 21%;
+    --background-card: 0, 0%, 100%;
+
     --border: 240 4% 56%;
 
     --primary: 265 76% 54%;
@@ -60,8 +74,10 @@ h4 {
 
   .dark {
     --foreground: 0 0% 98%;
+    --foreground-neutral: 218, 11%, 65%;
 
     --border: 236 7% 28%;
     --background: 221 39% 11%;
+    --background-card: 215, 28%, 17%;
   }
 }

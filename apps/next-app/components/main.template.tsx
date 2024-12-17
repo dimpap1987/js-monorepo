@@ -10,7 +10,7 @@ import {
   apiReadNotification,
   useNotificationStore,
   useNotificationWebSocket,
-} from '@js-monorepo/notifications-client'
+} from '@js-monorepo/notifications-ui'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
 import {
@@ -45,6 +45,11 @@ const menuItems: MenuItem[] = [
   //   name: 'About',
   //   roles: ['PUBLIC'],
   // },
+  {
+    href: '/pricing',
+    name: 'Pricing',
+    roles: ['PUBLIC'],
+  },
   // {
   //   href: '/feedback',
   //   name: 'Feedback',
@@ -70,7 +75,7 @@ const initialPageSize = 10
 
 const DpNotificationBellComponentDynamic = dynamic(
   () =>
-    import('@js-monorepo/notifications-client').then(
+    import('@js-monorepo/notifications-ui').then(
       (module) => module.DpNotificationBellComponent
     ),
   { ssr: false }

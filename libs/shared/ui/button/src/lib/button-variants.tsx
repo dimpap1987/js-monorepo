@@ -3,13 +3,13 @@ export const buttonVariants = {
   variants: {
     variant: {
       primary:
-        'bg-primary border-2 border-primary/80 text-primary-foreground hover:bg-primary/60 focus:bg-primary/60 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-primary border-2 border-primary/80 text-primary-foreground hover:bg-primary/85 focus:bg-primary/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       accent:
-        'bg-accent border-2 border-accent/80 text-accent-foreground hover:bg-accent/60 focus:bg-accent/60 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-accent border-2 border-accent/80 text-accent-foreground hover:bg-accent/85 focus:bg-accent/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       secondary:
-        'bg-secondary border-2 border-secondary/80 text-secondary-foreground hover:bg-secondary/60 focus:bg-secondary/60 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-secondary border-2 border-secondary/80 text-secondary-foreground hover:bg-secondary/85 focus:bg-secondary/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       danger:
-        'bg-danger border-2 border-danger/80 text-danger-foreground hover:bg-danger/60 focus:bg-danger/60 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-danger border-2 border-danger/80 text-danger-foreground hover:bg-danger/85 focus:bg-danger/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       outline:
         'border-2 border-primary/80 bg-background text-foreground tracking-[0.04em]',
     },

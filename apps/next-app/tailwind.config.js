@@ -32,7 +32,9 @@ module.exports = {
       colors: {
         background: 'hsl(var(--background))',
         'background-secondary': 'hsl(var(--background-secondary))',
+        'background-card': 'hsl(var(--background-card))',
         foreground: 'hsl(var(--foreground))',
+        'foreground-neutral': 'hsl(var(--foreground-neutral))',
         border: 'hsl(var(--border))',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
