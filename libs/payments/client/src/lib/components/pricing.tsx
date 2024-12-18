@@ -5,27 +5,33 @@ import { useRouter } from 'next-nprogress-bar'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import { Tabs, TabsList, TabsTrigger } from '@js-monorepo/components/tabs'
+import { PricingPlanType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import { loadStripe } from '@stripe/stripe-js'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  apiCheckoutPlan,
+  apiGetPlans,
+  freePlanMonth,
+  freePlanYear,
+} from '../utils/api'
 
 type PricingCardProps = {
   handleCheckout: any
-  priceIdMonthly: any
-  priceIdYearly: any
-  isYearly?: boolean
+  price: number
   title: string
-  monthlyPrice?: number
-  yearlyPrice?: number
   description: string
-  features: string[]
-  actionLabel: string
+  features: Record<string, string>
+  interval?: string
+  actionLabel?: string
   popular?: boolean
   active?: boolean
 }
 
+type PlansInterval = 'month' | 'year'
+
 type PricingSwitchProps = {
-  onSwitch: (value: string) => void
+  onSwitch: (value: PlansInterval) => void
 }
 
 const CheckItem = ({ text }: { text: string }) => (
@@ -48,9 +54,7 @@ const CheckItem = ({ text }: { text: string }) => (
 
 const PricingHeader = ({ title }: { title: string }) => (
   <section className="text-center">
-    <h1
-      className={`text-2xl sm:text-4xl mt-2 font-semibold tracking-tight`}
-    >
+    <h1 className={`text-2xl sm:text-4xl mt-2 font-semibold tracking-tight`}>
       {title}
     </h1>
     <br />
@@ -59,15 +63,15 @@ const PricingHeader = ({ title }: { title: string }) => (
 
 const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => (
   <Tabs
-    defaultValue="0"
+    defaultValue="month"
     className="max-w-max mx-auto dark:bg-gray-800 p-2 mt-2 rounded-lg"
-    onValueChange={onSwitch}
+    onValueChange={(value) => onSwitch(value as PlansInterval)}
   >
     <TabsList className="p1">
-      <TabsTrigger value="0" className="font-semibold text-lg">
+      <TabsTrigger value="month" className="font-semibold text-lg">
         <p>Monthly</p>
       </TabsTrigger>
-      <TabsTrigger value="1" className="font-semibold text-lg">
+      <TabsTrigger value="year" className="font-semibold text-lg">
         <p>Yearly</p>
       </TabsTrigger>
     </TabsList>
@@ -76,12 +80,9 @@ const PricingSwitch = ({ onSwitch }: PricingSwitchProps) => (
 
 const PricingCard = ({
   handleCheckout,
-  isYearly,
   title,
-  priceIdMonthly,
-  priceIdYearly,
-  monthlyPrice,
-  yearlyPrice,
+  price,
+  interval,
   description,
   features,
   actionLabel,
@@ -90,6 +91,8 @@ const PricingCard = ({
 }: PricingCardProps) => {
   const router = useRouter()
   const { isLoggedIn } = useSession()
+  const [isLoading, setIsLoading] = useState(false)
+
   return (
     <div
       className={cn(
@@ -116,23 +119,19 @@ const PricingCard = ({
       {/* Pricing */}
       <div className="flex justify-center items-baseline my-6">
         <span className="mr-2 text-5xl font-extrabold text-gray-900 dark:text-white">
-          {isYearly && yearlyPrice
-            ? `$${yearlyPrice}`
-            : monthlyPrice
-              ? `$${monthlyPrice}`
-              : '0'}
+          {`$${price}`}
         </span>
 
         <span className="text-gray-500 dark:text-gray-400">
-          {isYearly ? '/year' : '/month'}
+          {interval && `/${interval}`}
         </span>
       </div>
 
       {/* Features List */}
       <ul role="list" className="mb-8 space-y-3 text-left mt-2">
-        {features.map((feature: string) => (
-          <li key={feature} className="flex items-center space-x-3">
-            <CheckItem text={feature} />
+        {Object.entries(features)?.map(([key, value]) => (
+          <li key={key} className="flex items-center space-x-3">
+            <CheckItem text={value} />
           </li>
         ))}
       </ul>
@@ -140,9 +139,16 @@ const PricingCard = ({
       {/* Action Button */}
       <DpButton
         size="large"
-        onClick={() => {
+        loading={isLoading}
+        onClick={async () => {
           if (isLoggedIn) {
-            handleCheckout(isYearly ? priceIdYearly : priceIdMonthly, true)
+            setIsLoading(true)
+            try {
+              await handleCheckout()
+            } catch (e) {
+              console.error('Stripe Checkout Error:', e)
+            }
+            setIsLoading(false)
           } else {
             router.push('/auth/login')
           }
@@ -156,95 +162,74 @@ const PricingCard = ({
 }
 
 export function Pricing() {
-  const [isYearly, setIsYearly] = useState<boolean>(false)
-  const togglePricingPeriod = (value: string) =>
-    setIsYearly(parseInt(value) === 1)
-  const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null)
+  const [interval, setInterval] = useState<PlansInterval>('month')
+  const [plans, setPlans] = useState<PricingPlanType[]>([])
+
+  const stripePromise = useMemo(
+    () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!),
+    []
+  )
+
+  const filteredPlans = useMemo(() => {
+    if (plans?.length <= 0) return
+
+    const basePlans = plans.filter((plan) => plan.interval === interval)
+    if (interval === 'month') {
+      return [freePlanMonth, ...basePlans]
+    } else if (interval === 'year') {
+      return [freePlanYear, ...basePlans]
+    }
+    return basePlans
+  }, [plans, interval])
 
   useEffect(() => {
-    setStripePromise(
-      loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-    )
+    apiGetPlans().then((response) => {
+      if (response.ok) {
+        setPlans(response.data)
+      }
+    })
   }, [])
 
-  const handleCheckout = async (priceId: string, subscription: boolean) => {
-    alert('Not implemented yet 😔')
-
-    // try {
-    //   const { data } = await axios.post(`/api/payments/create-checkout-session`,
-    //     { userId: user?.id, email: user?.emailAddresses?.[0]?.emailAddress, priceId, subscription });
-    //   if (data.sessionId) {
-    //     const stripe = await stripePromise;
-    //     const response = await stripe?.redirectToCheckout({
-    //       sessionId: data.sessionId,
-    //     });
-    //     return response
-    //   } else {
-    //     console.error('Failed to create checkout session');
-    //     toast('Failed to create checkout session')
-    //     return
-    //   }
-    // } catch (error) {
-    //   console.error('Error during checkout:', error);
-    //   toast('Error during checkout')
-    //   return
-  }
-
-  const plans = [
-    {
-      title: 'Free',
-      monthlyPrice: 0,
-      yearlyPrice: 0,
-      description: 'Essential features you need to get started',
-      features: ['Example Feature Number 1'],
-      priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 1,
-      priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 2,
-      actionLabel: 'Get Started',
-      active: true,
+  const handleCheckout = useCallback(
+    async (priceId: string) => {
+      const response = await apiCheckoutPlan(priceId)
+      if (response.ok) {
+        const stripe = await stripePromise
+        const stripeResponse = await stripe?.redirectToCheckout({
+          sessionId: response.data?.sessionId,
+        })
+        if (stripeResponse?.error) {
+          console.error('Stripe Checkout Error:', stripeResponse.error.message)
+        }
+      }
     },
-    {
-      title: 'Basic',
-      monthlyPrice: 10,
-      yearlyPrice: 100,
-      description: 'Essential features you need to get started',
-      features: ['Example Feature Number 1', 'Example Feature Number 2'],
-      priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 1,
-      priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 2,
-      actionLabel: 'Get Started',
-    },
-    {
-      title: 'Pro',
-      monthlyPrice: 25,
-      yearlyPrice: 250,
-      description: 'Perfect for owners of small & medium businessess',
-      features: [
-        'Example Feature Number 1',
-        'Example Feature Number 2',
-        'Example Feature Number 3',
-      ],
-      actionLabel: 'Get Started',
-      priceIdMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 3,
-      priceIdYearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 4,
-      popular: true,
-    },
-  ]
+    [stripePromise]
+  )
 
   return (
-    <div>
-      <PricingHeader title="Select a Pricing Plan" />
-      <PricingSwitch onSwitch={togglePricingPeriod} />
-      <section className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-6 mt-10">
-        {plans.map((plan) => {
-          return (
-            <PricingCard
-              handleCheckout={handleCheckout}
-              key={plan.title}
-              {...plan}
-              isYearly={isYearly}
-            />
-          )
-        })}
-      </section>
-    </div>
+    filteredPlans &&
+    filteredPlans?.length > 0 && (
+      <div>
+        <PricingHeader title="Select a Pricing Plan" />
+        <PricingSwitch onSwitch={(value) => setInterval(value)} />
+        <section className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-6 mt-10">
+          {filteredPlans?.map((plan) => {
+            return (
+              <PricingCard
+                handleCheckout={() => handleCheckout(plan.priceId)}
+                key={plan.priceId}
+                description={plan.description}
+                features={plan.features}
+                price={plan.price}
+                title={plan.title}
+                interval={plan.interval}
+                actionLabel={plan.features['label'] || 'Get Started'}
+                active={plan.active}
+              />
+            )
+          })}
+        </section>
+      </div>
+    )
   )
 }
