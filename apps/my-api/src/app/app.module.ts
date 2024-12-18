@@ -1,3 +1,4 @@
+import { PaymentsModule } from '@js-monorepo/payments-server'
 import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
 import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
@@ -69,7 +70,12 @@ const ENV = process.env.NODE_ENV
         },
         csrf: {
           enabled: true,
-          middlewareExclusions: ['exceptions', 'admin/(.*)', 'health'],
+          middlewareExclusions: [
+            'exceptions',
+            'admin/(.*)',
+            'health',
+            'payments/webhook',
+          ],
         },
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUserDto) => {
@@ -91,6 +97,7 @@ const ENV = process.env.NODE_ENV
     AdminProviderModule,
     NotificationServerModule,
     UserModule,
+    PaymentsModule,
     ClsModule.forRoot({
       global: true,
       middleware: {
@@ -143,7 +150,7 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware) // Apply LoggerMiddleware
       .forRoutes('*')
       .apply(AuthSessionMiddleware)
-      .exclude('health')
+      .exclude('health', 'payments/(.*)')
       .forRoutes('*')
   }
 }

@@ -1,6 +1,6 @@
 import { SessionProvider } from '@js-monorepo/auth/next/client'
 import { DpLoaderProvider } from '@js-monorepo/loader'
-import { WebSocketProvider } from '@js-monorepo/next/providers'
+import { QClientProvider, WebSocketProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
@@ -32,7 +32,9 @@ export default async function RootProviders({
           >
             <DpLoaderProvider>
               <DpNotificationProvider>
-                <WebNotificationProvider>{children}</WebNotificationProvider>
+                <WebNotificationProvider>
+                  <QClientProvider>{children}</QClientProvider>
+                </WebNotificationProvider>
               </DpNotificationProvider>
             </DpLoaderProvider>
           </ThemeProvider>

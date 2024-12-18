@@ -1,3 +1,5 @@
+import Stripe from 'stripe'
+
 export interface SessionUserType {
   id: number
   username: string
@@ -10,6 +12,7 @@ export interface SessionUserType {
     provider?: string
   }
   roles: string[]
+  email?: string
 }
 
 export interface SessionPayload {
@@ -244,4 +247,14 @@ export interface CreateUserNotificationType {
 export interface EditUserDto {
   username?: string
   profileImage?: string
+}
+
+export interface PricingPlanType {
+  title: string
+  price: number
+  description: string
+  features: Stripe.Metadata
+  priceId: string
+  interval: Stripe.Price.Recurring.Interval
+  active?: boolean
 }

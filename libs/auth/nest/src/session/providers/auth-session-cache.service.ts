@@ -62,6 +62,7 @@ export class AuthSessionUserCacheService {
         userCache = {
           id: userDb.id,
           username: userDb?.username,
+          email: userDb?.email,
           roles: userDb.userRole?.map((userRole) => userRole.role.name),
           createdAt: userDb?.createdAt,
           profile: {

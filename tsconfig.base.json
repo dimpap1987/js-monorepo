@@ -42,11 +42,11 @@
       "@js-monorepo/nest/*": ["libs/nest-utils/src/lib/*"],
       "@js-monorepo/next/*": ["libs/next/src/lib/*"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
-      "@js-monorepo/notifications-ui": [
-        "libs/notifications/client/src/index.ts"
-      ],
       "@js-monorepo/notifications-server": [
         "libs/notifications/server/src/index.ts"
+      ],
+      "@js-monorepo/notifications-ui": [
+        "libs/notifications/client/src/index.ts"
       ],
       "@js-monorepo/package.json": ["package.json"],
       "@js-monorepo/page-progress-bar": [
@@ -54,6 +54,7 @@
       ],
       "@js-monorepo/pagination": ["libs/shared/ui/pagination/src/index.ts"],
       "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
+      "@js-monorepo/payments-server": ["libs/payments/server/src/index.ts"],
       "@js-monorepo/payments-ui": ["libs/payments/client/src/index.ts"],
       "@js-monorepo/schemas": ["libs/shared/schemas/src/index.ts"],
       "@js-monorepo/sidebar": ["libs/shared/ui/sidebar/src/index.ts"],

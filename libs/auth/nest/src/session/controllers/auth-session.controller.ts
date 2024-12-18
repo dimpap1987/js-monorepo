@@ -72,8 +72,12 @@ export class AuthSessionController {
 
   @Get('session')
   getSession(@Req() req: Request) {
+    const user = req.user?.user
+    if (!user) return null
+
+    const { email, ...restUser } = user
     return {
-      user: req.user?.user,
+      user: { ...restUser },
     }
   }
 
