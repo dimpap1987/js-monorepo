@@ -71,6 +71,7 @@ export function AccountSettings() {
     setIsEditing(false)
     form.reset(initUser)
   }
+  const profileImageWatch = form.watch('profileImage')
 
   return (
     <section className="p-2 space-y-6 text-white min-w-[200px]">
@@ -87,9 +88,9 @@ export function AccountSettings() {
                   render={({ field }) => (
                     <div className="relative flex justify-center self-center">
                       <Avatar className="h-24 w-24">
-                        {form.watch('profileImage') && (
+                        {profileImageWatch && (
                           <AvatarImage
-                            src={form.watch('profileImage')}
+                            src={profileImageWatch}
                             alt="user's picture"
                           />
                         )}
@@ -104,6 +105,7 @@ export function AccountSettings() {
                           className="absolute bottom-0 right-0 bg-background rounded-full cursor-pointer flex items-center justify-center h-8 w-8 text-sm font-medium border border-border text-foreground"
                         >
                           <input
+                            {...form.register('profileImage')}
                             type="file"
                             id="profileImage"
                             className="hidden"
@@ -111,11 +113,11 @@ export function AccountSettings() {
                             onChange={async (e) => {
                               if (e.target.files?.[0]) {
                                 try {
-                                  // Convert image to base64 and update form value using `field.onChange`
-                                  const base64Image = await compressAvatar(
+                                  const base64Image = (await compressAvatar(
                                     e.target.files[0]
-                                  )
-                                  field.onChange(base64Image) // Update form state with the image
+                                  )) as string
+
+                                  field.onChange(base64Image)
                                 } catch (error) {
                                   console.error(
                                     'Error converting file to Base64:',

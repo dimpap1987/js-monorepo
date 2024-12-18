@@ -49,7 +49,7 @@ const CheckItem = ({ text }: { text: string }) => (
 const PricingHeader = ({ title }: { title: string }) => (
   <section className="text-center">
     <h1
-      className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl mt-2 font-semibold tracking-tight`}
+      className={`text-2xl sm:text-4xl mt-2 font-semibold tracking-tight`}
     >
       {title}
     </h1>
