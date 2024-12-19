@@ -4,6 +4,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Logger,
   Post,
   RawBodyRequest,
@@ -11,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { StripeService } from '../service/stripe.service'
+import { RequestWithRawBody } from '../rawBody.middleware'
 
 @Controller('payments')
 export class PaymentsController {
@@ -26,10 +28,11 @@ export class PaymentsController {
   }
 
   @Post('webhook')
-  async handleStripeWebhook(@Req() req: RawBodyRequest<Request>) {
-    const sig = req.headers['stripe-signature']
-
-    return this.stripeService.handleWebhookEvent(sig, req.rawBody)
+  async handleStripeWebhook(
+    @Headers('stripe-signature') signature: string,
+    @Req() request: RequestWithRawBody
+  ) {
+    return this.stripeService.handleWebhookEvent(signature, request.rawBody)
   }
 
   @Post('checkout')

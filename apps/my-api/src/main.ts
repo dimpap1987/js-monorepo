@@ -8,6 +8,7 @@ import { expand } from 'dotenv-expand'
 import helmet from 'helmet'
 import { ClsService } from 'nestjs-cls'
 import { AppModule } from './app/app.module'
+import { rawBodyMiddleware } from '@js-monorepo/payments-server'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
@@ -36,6 +37,8 @@ async function bootstrap() {
       contentSecurityPolicy: false,
     })
   )
+
+  app.use(rawBodyMiddleware())
 
   app.useGlobalPipes(
     new ValidationPipe({

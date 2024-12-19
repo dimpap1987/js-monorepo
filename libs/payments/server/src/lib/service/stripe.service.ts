@@ -61,10 +61,10 @@ export class StripeService {
     }
   }
 
-  async handleWebhookEvent(sig: string, payload: string | Buffer) {
+  async constructEventFromPayload(signature: string, payload: Buffer) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
-    if (!sig) {
+    if (!signature) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'INVALID_SIGNATURE')
     }
 
@@ -75,11 +75,15 @@ export class StripeService {
       )
     }
 
-    const event = this.stripe.webhooks.constructEvent(
+    return this.stripe.webhooks.constructEvent(
       payload,
-      sig,
+      signature,
       webhookSecret
     )
+  }
+
+  async handleWebhookEvent(sig: string, payload: Buffer) {
+    const event = await this.constructEventFromPayload(sig, payload)
 
     await this.handleEvent(event)
     return { received: true }
