@@ -1,0 +1,52 @@
+model Subscription {
+    id                   Int       @id @default(autoincrement())
+    userId               Int
+    stripeCustomerId     String?   @map("stripe_customer_id")
+    stripeSubscriptionId String?   @map("stripe_subscription_id")
+    planId               Int
+    status               String
+    currentPeriodStart   DateTime?
+    currentPeriodEnd     DateTime?
+    trialStart           DateTime?
+    trialEnd             DateTime?
+    cancelAt             DateTime?
+    canceledAt           DateTime?
+    createdAt            DateTime  @default(now())
+    updatedAt            DateTime  @updatedAt
+
+    // Relations
+    user       AuthUser @relation(fields: [userId], references: [id])
+    plan       Plan     @relation(fields: [planId], references: [id])
+    authUserId Int?
+
+    @@index([userId])
+    @@index([planId])
+    @@map("subscriptions")
+}
+
+model Plan {
+    id            Int      @id @default(autoincrement())
+    stripePriceId String?  @map("stripe_price_id")
+    name          String?
+    interval      String?
+    priceCents    Int      @map("price_cents")
+    features      Json?
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    // Relations
+    subscriptions Subscription[]
+
+    @@map("plans")
+}
+
+model StripeWebhookEvent {
+    id        Int      @id @default(autoincrement())
+    eventId   String   @map("event_id")
+    eventType String   @map("event_type")
+    data      Json     @map("data")
+    createdAt DateTime @default(now())
+
+    @@index([eventId])
+    @@map("stripe_webhook_events")
+}
