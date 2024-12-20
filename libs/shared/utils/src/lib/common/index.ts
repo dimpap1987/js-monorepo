@@ -147,10 +147,10 @@ export function compareObjects<T extends object>(
 }
 
 export async function tryCatch<T>(
-  fn: (() => T) | (() => Promise<T>)
+  fn: (() => Promise<T>) | (() => T)
 ): Promise<{ result: T | null; error: any | null }> {
   try {
-    const result = await fn()
+    const result = await fn() // Ensures result is always resolved
     return { result, error: null }
   } catch (error) {
     return { result: null, error }

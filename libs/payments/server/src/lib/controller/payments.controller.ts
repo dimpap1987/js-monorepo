@@ -43,6 +43,7 @@ export class PaymentsController {
   ) {
     const { session } = await this.stripeService.createCheckoutSession(
       priceId,
+      sessionUser.id,
       sessionUser.email
     )
     return { sessionId: session.id }
