@@ -106,14 +106,25 @@ export class PaymentsRepository {
 
   async findUserSubscriptionStatus(
     paymentCustomerId: number,
-    statuses = ['active', 'trialing']
+    statuses = ['active', 'trialing', 'canceled']
   ) {
-    return this.txHost.tx.subscription.findFirst({
+    const now = new Date()
+    return this.txHost.tx.subscription.findMany({
       where: {
         paymentCustomerId,
         status: {
           in: statuses,
         },
+        currentPeriodEnd: {
+          gt: now, // Only consider subscriptions where the current period hasn't ended
+        },
+      },
+      orderBy: {
+        currentPeriodEnd: 'desc', // Order by most recent subscription first
+      },
+      select: {
+        id: true,
+        priceId: true,
       },
     })
   }
