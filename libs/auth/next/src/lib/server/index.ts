@@ -12,7 +12,7 @@ export async function getCurrentSession() {
         headers.append('Cookie', `${cookie.name}=${cookie.value}`)
       })
 
-    const response = await fetch(`${process.env.API_URL}/api/auth/session`, {
+    const response = await fetch(`${process.env.API_URL}/api/session`, {
       method: 'GET',
       headers: headers,
     })

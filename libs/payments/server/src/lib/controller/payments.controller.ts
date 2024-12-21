@@ -7,18 +7,21 @@ import {
   Headers,
   Logger,
   Post,
-  RawBodyRequest,
   Req,
   UseGuards,
 } from '@nestjs/common'
-import { StripeService } from '../service/stripe.service'
 import { RequestWithRawBody } from '../rawBody.middleware'
+import { PaymentsService } from '../service/payments.service'
+import { StripeService } from '../service/stripe.service'
 
 @Controller('payments')
 export class PaymentsController {
   private logger = new Logger(PaymentsController.name)
 
-  constructor(private readonly stripeService: StripeService) {}
+  constructor(
+    private readonly stripeService: StripeService,
+    private readonly paymentsService: PaymentsService
+  ) {}
 
   @Get('plans')
   async getPlans() {

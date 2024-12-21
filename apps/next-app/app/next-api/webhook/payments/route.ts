@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const event = stripe.webhooks.constructEvent(
       payload,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET as string
+      process.env.STRIPE_SECRET_KEY as string
     )
 
     switch (event?.type) {
