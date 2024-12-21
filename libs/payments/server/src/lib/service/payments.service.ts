@@ -1,11 +1,11 @@
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
-import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
-import { PaymentsRepository } from '../repository/payments.repository'
-import { CreatePlanDto } from '../dto/create-plan.dto'
-import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
-import { ApiException } from '@js-monorepo/nest/exceptions'
 import Stripe from 'stripe'
+import { CreatePlanDto } from '../dto/create-plan.dto'
+import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
+import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
+import { PaymentsRepository } from '../repository/payments.repository'
 
 @Injectable()
 export class PaymentsService {
@@ -121,21 +121,25 @@ export class PaymentsService {
   }
 
   async findUserSubscriptionStatus(paymentCustomerId: number) {
-    const subscription =
+    const subscriptions =
       await this.paymentsRepository.findUserSubscriptionStatus(
         paymentCustomerId
       )
 
-    if (!subscription) {
+    if (!subscriptions || subscriptions.length === 0) {
       return {
         isSubscribed: false,
         plan: null,
       }
     }
 
+    // Return the user as subscribed and provide the relevant plan(s)
     return {
       isSubscribed: true,
-      plan: subscription.priceId,
+      plans: subscriptions.map((subscription) => ({
+        id: subscription.id, //TODO replace with plan id when plan will be created
+        priceId: subscription.priceId,
+      })), // Return all valid plans
     }
   }
 }
