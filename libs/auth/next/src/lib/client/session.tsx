@@ -27,10 +27,11 @@ const SessionContext = createContext<{
 const fetchSession = async (
   successCallback: (user: any) => void,
   errorCallback?: (error?: any) => void,
-  clientBuilder = apiClientBase
+  clientBuilder = apiClientBase,
+  endpoint = '/auth/session'
 ) => {
   try {
-    const response = await clientBuilder.get('/auth/session')
+    const response = await clientBuilder.get(endpoint)
 
     if (response.status >= 200 && response.status < 300) {
       successCallback(response.data?.user)
@@ -47,6 +48,7 @@ export const SessionProvider = ({
   children,
   value,
   clientBuilder,
+  endpoint = '/auth/session',
 }: {
   readonly children?: React.ReactNode
   readonly value: {
@@ -54,6 +56,7 @@ export const SessionProvider = ({
     isLoggedIn: boolean
   }
   clientBuilder?: AxiosInstance
+  endpoint?: string
 }) => {
   const [user, setUser] = useState(value.user)
 
@@ -66,16 +69,22 @@ export const SessionProvider = ({
         setUser(null)
         window.location.reload()
       },
-      clientBuilder
+      clientBuilder,
+      endpoint
     )
-  }, [clientBuilder])
+  }, [clientBuilder, endpoint])
 
   useEffect(() => {
     if (!!user || getCookie('UNREGISTERED-USER')) return
-    fetchSession((userResponse) => {
-      setUser(userResponse)
-    })
-  }, [])
+    fetchSession(
+      (userResponse) => {
+        setUser(userResponse)
+      },
+      undefined,
+      clientBuilder,
+      endpoint
+    )
+  }, [clientBuilder, endpoint])
 
   useEffect(() => {
     if (!user) return

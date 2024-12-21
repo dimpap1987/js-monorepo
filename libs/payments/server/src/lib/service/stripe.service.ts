@@ -147,6 +147,10 @@ export class StripeService {
         cancelAt: toDate(subscriptionData.cancel_at),
         canceledAt: toDate(subscriptionData.canceled_at),
       })
+    } else if (type == 'updated') {
+      await this.paymentsService.updateSubscription(subscriptionData)
+    } else if (type == 'deleted') {
+      await this.paymentsService.deleteSubscription(subscriptionData)
     }
   }
 

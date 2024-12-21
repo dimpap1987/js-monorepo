@@ -17,10 +17,8 @@ export default async function RootProviders({
 
   return (
     <SessionProvider
-      value={{
-        user: session?.user,
-        isLoggedIn: !!session?.user,
-      }}
+      value={{ user: null, isLoggedIn: false }}
+      endpoint="/session"
     >
       <WebSocketProvider>
         <DpNextPageProgressBar>

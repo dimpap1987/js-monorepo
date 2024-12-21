@@ -5,6 +5,7 @@ import { PaymentsRepository } from '../repository/payments.repository'
 import { CreatePlanDto } from '../dto/create-plan.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import Stripe from 'stripe'
 
 @Injectable()
 export class PaymentsService {
@@ -64,6 +65,32 @@ export class PaymentsService {
     return result
   }
 
+  async updateSubscription(subscriptionData: Stripe.Subscription) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.handleSubscriptionUpdated(subscriptionData)
+    )
+
+    if (error) {
+      this.logger.error(
+        `Error UPDATING subscription with id: ${subscriptionData.id}`
+      )
+    }
+    return result
+  }
+
+  async deleteSubscription(subscriptionData: Stripe.Subscription) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.handleSubscriptionDeleted(subscriptionData)
+    )
+
+    if (error) {
+      this.logger.error(
+        `Error DELETING subscription with id: ${subscriptionData.id}`
+      )
+    }
+    return result
+  }
+
   async findStripeWebhookEvent(eventId: string) {
     this.logger.debug(`Search for Stripe Event with id: '${eventId}'`)
     return tryCatch(() => this.paymentsRepository.findStripeEventById(eventId))
@@ -91,5 +118,24 @@ export class PaymentsService {
       throw new ApiException(HttpStatus.NOT_FOUND, 'PAYMENT_CUSTOMER_NOT_FOUND')
     }
     return result
+  }
+
+  async findUserSubscriptionStatus(paymentCustomerId: number) {
+    const subscription =
+      await this.paymentsRepository.findUserSubscriptionStatus(
+        paymentCustomerId
+      )
+
+    if (!subscription) {
+      return {
+        isSubscribed: false,
+        plan: null,
+      }
+    }
+
+    return {
+      isSubscribed: true,
+      plan: subscription.priceId,
+    }
   }
 }
