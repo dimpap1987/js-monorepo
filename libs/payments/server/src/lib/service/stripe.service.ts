@@ -1,7 +1,7 @@
+import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import Stripe from 'stripe'
-import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { StripeClient } from '../stripe.module'
 import { PaymentsService } from './payments.service'
 
@@ -63,18 +63,20 @@ export class StripeService {
       const paymentCustomer =
         await this.paymentsService.findPaymentCustomerById(userId)
 
-      if (paymentCustomer.result?.stripeCustomerId) {
-        stripeCustomerId = paymentCustomer.result?.stripeCustomerId
+      if (paymentCustomer?.stripeCustomerId) {
+        stripeCustomerId = paymentCustomer?.stripeCustomerId
       } else {
+        //create payment customer
         const stripeCustomer = await this.createCustomer(email)
         const createdCustomer =
           await this.paymentsService.createPaymentCustomer({
             userId,
             stripeCustomerId: stripeCustomer.id,
           })
-        stripeCustomerId = createdCustomer.result.stripeCustomerId
+        stripeCustomerId = createdCustomer.stripeCustomerId
       }
 
+      // checkout
       const session = await this.stripe.checkout.sessions.create({
         customer: stripeCustomerId,
         line_items: [{ price: priceId, quantity: 1 }],
@@ -123,7 +125,7 @@ export class StripeService {
   ) {
     const subscriptionData = event.data.object as Stripe.Subscription
 
-    this.logger.log(
+    this.logger.debug(
       `Stripe - RECEIVED Subscription Event: ${JSON.stringify(event)} with type: ${type}, from stripe user: ${subscriptionData.customer}`
     )
 
@@ -132,45 +134,19 @@ export class StripeService {
         subscriptionData.customer as string
       )
 
-    this.logger.log(` PAYMENT - CUSTOMER ${JSON.stringify(paymentCustomer)}`)
     if (type === 'created') {
-      // Prepare the data for the DTO
-      const subscriptionDto: CreateSubscriptionDto = {
-        paymentCustomerId: paymentCustomer.result?.userId,
+      await this.paymentsService.createSubscription({
+        paymentCustomerId: paymentCustomer?.userId,
         stripeSubscriptionId: subscriptionData.id,
         priceId: subscriptionData.items.data[0]?.price.id,
         status: subscriptionData.status,
-        currentPeriodStart: subscriptionData.current_period_start
-          ? new Date(subscriptionData.current_period_start * 1000)
-          : undefined,
-        currentPeriodEnd: subscriptionData.current_period_end
-          ? new Date(subscriptionData.current_period_end * 1000)
-          : undefined,
-        trialStart: subscriptionData.trial_start
-          ? new Date(subscriptionData.trial_start * 1000)
-          : undefined,
-        trialEnd: subscriptionData.trial_end
-          ? new Date(subscriptionData.trial_end * 1000)
-          : undefined,
-        cancelAt: subscriptionData.cancel_at
-          ? new Date(subscriptionData.cancel_at * 1000)
-          : undefined,
-        canceledAt: subscriptionData.canceled_at
-          ? new Date(subscriptionData.canceled_at * 1000)
-          : undefined,
-      }
-
-      // Call the service to create the subscription
-      const { result, error } =
-        await this.paymentsService.createSubscription(subscriptionDto)
-
-      if (error) {
-        this.logger.error(`Failed to create subscription: ${error.message}`)
-      } else {
-        this.logger.log(
-          `Subscription created successfully: ${JSON.stringify(result)}`
-        )
-      }
+        currentPeriodStart: toDate(subscriptionData.current_period_start),
+        currentPeriodEnd: toDate(subscriptionData.current_period_end),
+        trialStart: toDate(subscriptionData.trial_start),
+        trialEnd: toDate(subscriptionData.trial_end),
+        cancelAt: toDate(subscriptionData.cancel_at),
+        canceledAt: toDate(subscriptionData.canceled_at),
+      })
     }
   }
 
@@ -195,8 +171,9 @@ export class StripeService {
     )
 
     if (storedEvent?.result?.id) {
-      this.logger.warn('Duplicate stripe event occured.')
-      this.logger.warn(`Stripe - id: ${event.id} type: ${event.type}`)
+      this.logger.warn(
+        `Duplicate stripe event occured. - Stripe - id: ${event.id} type: ${event.type}`
+      )
       return
     }
 

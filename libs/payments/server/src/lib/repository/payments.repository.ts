@@ -53,7 +53,7 @@ export class PaymentsRepository {
   }
 
   async findPaymentCustomerById(userId: number) {
-    return this.txHost.tx.paymentCustomer.findFirst({
+    return this.txHost.tx.paymentCustomer.findUniqueOrThrow({
       where: {
         userId: userId,
       },
@@ -65,7 +65,7 @@ export class PaymentsRepository {
   }
 
   async findPaymentCustomerByStripeId(stripeCustomerId: string) {
-    return this.txHost.tx.paymentCustomer.findFirst({
+    return this.txHost.tx.paymentCustomer.findUniqueOrThrow({
       where: {
         stripeCustomerId: stripeCustomerId,
       },

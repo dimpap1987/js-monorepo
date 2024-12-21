@@ -1,9 +1,10 @@
 import { tryCatch } from '@js-monorepo/utils/common'
-import { Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { PaymentsRepository } from '../repository/payments.repository'
 import { CreatePlanDto } from '../dto/create-plan.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 
 @Injectable()
 export class PaymentsService {
@@ -15,7 +16,22 @@ export class PaymentsService {
     this.logger.debug(
       `Create Subscription for price Id: '${payload.priceId}' and paymentCustomer_id : '${payload.paymentCustomerId}'`
     )
-    return tryCatch(() => this.paymentsRepository.createSubscription(payload))
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.createSubscription(payload)
+    )
+
+    if (error) {
+      this.logger.error(`Failed to create subscription: ${error.message}`)
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'SUBSCRIPTION_CREATION_ERROR'
+      )
+    }
+
+    this.logger.log(
+      `Subscription created successfully with subscription id: '${result.id}'`
+    )
+    return result
   }
 
   async createPlan(plan: CreatePlanDto) {
@@ -39,9 +55,13 @@ export class PaymentsService {
     this.logger.debug(
       `Create Payment customer for user_id: '${payload.userId}'`
     )
-    return tryCatch(() =>
+    const { result, error } = await tryCatch(() =>
       this.paymentsRepository.createPaymentCustomer(payload)
     )
+    if (error) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'CREATE_PAYMENT_CUSTOMER')
+    }
+    return result
   }
 
   async findStripeWebhookEvent(eventId: string) {
@@ -51,17 +71,25 @@ export class PaymentsService {
 
   async findPaymentCustomerById(userId: number) {
     this.logger.debug(`Search for Payment Customer with id: '${userId}'`)
-    return tryCatch(() =>
+    const { result, error } = await tryCatch(() =>
       this.paymentsRepository.findPaymentCustomerById(userId)
     )
+    if (error) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'PAYMENT_CUSTOMER_NOT_FOUND')
+    }
+    return result
   }
 
   async findPaymentCustomerByStripeId(stripeCustomerId: string) {
     this.logger.debug(
       `Search for Payment Customer by stripeCustomerId: '${stripeCustomerId}'`
     )
-    return tryCatch(() =>
+    const { result, error } = await tryCatch(() =>
       this.paymentsRepository.findPaymentCustomerByStripeId(stripeCustomerId)
     )
+    if (error) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'PAYMENT_CUSTOMER_NOT_FOUND')
+    }
+    return result
   }
 }
