@@ -1,9 +1,14 @@
 import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { CreateProductWithPricesRequest } from '../../'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import Stripe from 'stripe'
 import { StripeClient } from '../stripe.module'
 import { PaymentsService } from './payments.service'
+import {
+  Events,
+  UserPresenceWebsocketService,
+} from '@js-monorepo/user-presence'
 
 @Injectable()
 export class StripeService {
@@ -11,49 +16,14 @@ export class StripeService {
 
   constructor(
     @Inject(StripeClient) private readonly stripe: Stripe,
-    private readonly paymentsService: PaymentsService
+    private readonly paymentsService: PaymentsService,
+    private userPresenceWebsocketService: UserPresenceWebsocketService
   ) {}
 
   async createCustomer(email: string) {
     return this.stripe.customers.create({
       email,
     })
-  }
-
-  async findPlansByPriceId(priceIds?: string[]) {
-    try {
-      const [products, prices] = await Promise.all([
-        this.stripe.products.list(),
-        this.stripe.prices.list(),
-      ])
-
-      const pricingDetails = prices.data
-        .map((price) => {
-          const product = products.data.find((pro) => pro.id === price.product)
-
-          if (
-            product.active &&
-            priceIds?.some((priceId) => priceId === price.id)
-          ) {
-            return {
-              title: product?.name,
-              price: price.unit_amount / 100,
-              description: product.description,
-              features: product.metadata,
-              priceId: price.id,
-              interval: price.recurring?.interval,
-            }
-          } else {
-            return null
-          }
-        })
-        .filter(Boolean)
-        .sort((a, b) => a.price - b.price)
-
-      return pricingDetails
-    } catch (e) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'STRIPE_ERROR')
-    }
   }
 
   async createCheckoutSession(priceId: string, userId: number, email: string) {
@@ -152,6 +122,11 @@ export class StripeService {
     } else if (type == 'deleted') {
       await this.paymentsService.deleteSubscription(subscriptionData)
     }
+    this.userPresenceWebsocketService.sendToUsers(
+      [paymentCustomer.userId],
+      Events.refreshSession,
+      true
+    )
   }
 
   private async handleInvoiceEvent(
@@ -206,6 +181,32 @@ export class StripeService {
       default:
         this.logger.warn(`Stripe - unhandled event received: ${event.type}`)
         break
+    }
+  }
+
+  async createProductWithPrices(data: CreateProductWithPricesRequest) {
+    const stripeProduct = await this.stripe.products.create({
+      name: data.name,
+      description: data.description,
+    })
+
+    // Create Prices in Stripe
+    const stripePrices = await Promise.all(
+      data.prices.map((price) =>
+        this.stripe.prices.create({
+          product: stripeProduct.id,
+          unit_amount: price.unitAmount,
+          currency: price.currency,
+          recurring: {
+            interval: price.interval,
+          },
+        })
+      )
+    )
+
+    return {
+      product: stripeProduct,
+      prices: stripePrices,
     }
   }
 }

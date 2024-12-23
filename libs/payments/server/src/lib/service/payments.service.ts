@@ -2,10 +2,10 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import Stripe from 'stripe'
-import { CreatePlanDto } from '../dto/create-plan.dto'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { PaymentsRepository } from '../repository/payments.repository'
+import { CreateProductType } from '../../'
 
 @Injectable()
 export class PaymentsService {
@@ -35,9 +35,15 @@ export class PaymentsService {
     return result
   }
 
-  async createPlan(plan: CreatePlanDto) {
-    this.logger.debug(`Create Plan for plan name: ${plan.name}`)
-    return tryCatch(() => this.paymentsRepository.createPlan(plan))
+  async createProduct(product: CreateProductType) {
+    this.logger.debug(`Create Product with name: ${product.name}`)
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.createProduct(product)
+    )
+    if (error) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'CREATE_PAYMENT_CUSTOMER')
+    }
+    return result
   }
 
   async createStripeWebhookEvent(event: CreateStripeWebhookEventDto) {
@@ -141,5 +147,31 @@ export class PaymentsService {
         priceId: subscription.priceId,
       })), // Return all valid plans
     }
+  }
+
+  async findActiveProductsWithPrices() {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.findActiveProductsWithPrices()
+    )
+    if (error) {
+      throw new ApiException(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'FETCH_PRODUCTS_ERROR'
+      )
+    }
+    return result.map((product) => ({
+      id: product.id,
+      title: product.name,
+      description: product.description,
+      features: product.features,
+      // active: product.active,
+      prices: product.prices?.map((prices) => ({
+        id: prices.id,
+        priceId: prices.stripeId,
+        unitAmount: prices.unitAmount,
+        currency: prices.currency,
+        interval: prices.interval,
+      })),
+    }))
   }
 }

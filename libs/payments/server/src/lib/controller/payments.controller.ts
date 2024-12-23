@@ -27,7 +27,7 @@ export class PaymentsController {
   async getPlans() {
     const plansToSearch = process.env.PRICING_PLANS || ''
     const pricingIds = plansToSearch.split(',').map((name) => name.trim())
-    return this.stripeService.findPlansByPriceId(pricingIds)
+    return this.paymentsService.findActiveProductsWithPrices()
   }
 
   @Post('webhook')

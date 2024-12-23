@@ -18,7 +18,7 @@ export class AppController {
     return {
       user: { ...restUser },
       subscription: {
-        plan: sub.plans,
+        plans: sub.plans,
         isSubscribed: sub.isSubscribed,
       },
     }

@@ -5,30 +5,35 @@ import { useRouter } from 'next-nprogress-bar'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import { Tabs, TabsList, TabsTrigger } from '@js-monorepo/components/tabs'
-import { PricingPlanType } from '@js-monorepo/types'
+import { PricingPlanResponse } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import { loadStripe } from '@stripe/stripe-js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   apiCheckoutPlan,
   apiGetPlans,
-  freePlanMonth,
-  freePlanYear,
+  getFreePlansByInterval,
 } from '../utils/api'
 
 type PricingCardProps = {
-  handleCheckout: any
+  handleCheckout?: () => Promise<any>
   price: number
   title: string
   description: string
   features: Record<string, string>
-  interval?: string
+  interval: string
   actionLabel?: string
   popular?: boolean
-  active?: boolean
+  subscribed?: boolean
+  isFree?: boolean
 }
 
 type PlansInterval = 'month' | 'year'
+
+type PricingCardWithPriceId = Omit<
+  { priceId: string } & PricingCardProps,
+  'isLoggedIn' | 'handleCheckout'
+>
 
 type PricingSwitchProps = {
   onSwitch: (value: PlansInterval) => void
@@ -86,26 +91,35 @@ const PricingCard = ({
   description,
   features,
   actionLabel,
-  popular,
-  active,
+  subscribed,
+  isFree,
 }: PricingCardProps) => {
-  const router = useRouter()
-  const { isLoggedIn } = useSession()
   const [isLoading, setIsLoading] = useState(false)
+
+  const onCheckout = async () => {
+    setIsLoading(true)
+    try {
+      await handleCheckout?.()
+    } catch (error) {
+      console.error('Stripe Checkout Error:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div
       className={cn(
         'relative bg-background-card w-full max-w-[360px] sm:w-[360px] shadow-lg',
         'flex flex-col justify-around p-6 mx-auto text-center rounded-lg border',
-        active && isLoggedIn ? 'border-primary' : 'border-border'
+        subscribed ? 'border-primary border-2' : 'border-border'
       )}
     >
-      {active && isLoggedIn && (
+      {subscribed && (
         <div
           className="bg-green-50 text-green-600 absolute top-0 
-                      -translate-y-1/2 right-5 z-10 p-1.5 px-3 border border-green-400 
-                      rounded-full shadow-md font-medium"
+                    -translate-y-1/2 right-5 z-10 p-1.5 px-3 border border-green-400 
+                    rounded-full shadow-md font-medium"
         >
           Active
         </div>
@@ -115,8 +129,6 @@ const PricingCard = ({
       <p className="font-light text-foreground-neutral sm:text-lg">
         {description}
       </p>
-
-      {/* Pricing */}
       <div className="flex justify-center items-baseline my-6">
         <span className="mr-2 text-5xl font-extrabold text-gray-900 dark:text-white">
           {`$${price}`}
@@ -126,34 +138,18 @@ const PricingCard = ({
           {interval && `/${interval}`}
         </span>
       </div>
-
-      {/* Features List */}
       <ul role="list" className="mb-8 space-y-3 text-left mt-2">
-        {Object.entries(features)?.map(([key, value]) => (
+        {Object.entries(features).map(([key, value]) => (
           <li key={key} className="flex items-center space-x-3">
             <CheckItem text={value} />
           </li>
         ))}
       </ul>
-
-      {/* Action Button */}
       <DpButton
         size="large"
         loading={isLoading}
-        onClick={async () => {
-          if (isLoggedIn) {
-            setIsLoading(true)
-            try {
-              await handleCheckout()
-            } catch (e) {
-              console.error('Stripe Checkout Error:', e)
-            }
-            setIsLoading(false)
-          } else {
-            router.push('/auth/login')
-          }
-        }}
-        disabled={active && isLoggedIn}
+        onClick={onCheckout}
+        disabled={subscribed || isFree}
       >
         {actionLabel}
       </DpButton>
@@ -163,73 +159,101 @@ const PricingCard = ({
 
 export function Pricing() {
   const [interval, setInterval] = useState<PlansInterval>('month')
-  const [plans, setPlans] = useState<PricingPlanType[]>([])
-
+  const [plans, setPlans] = useState<PricingPlanResponse[]>([])
+  const router = useRouter()
+  const {
+    session: { subscription: userSubscription },
+    isLoggedIn,
+  } = useSession()
   const stripePromise = useMemo(
     () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!),
     []
   )
+  const pricingCards: PricingCardWithPriceId[] = useMemo(() => {
+    if (!plans || plans.length === 0) return [] as PricingCardWithPriceId[]
 
-  const filteredPlans = useMemo(() => {
-    if (plans?.length <= 0) return
+    const baseCards = plans.flatMap((plan) =>
+      plan.prices
+        .filter((price) => price.interval === interval)
+        .map((price) => ({
+          priceId: price.priceId,
+          title: plan.title,
+          description: plan.description,
+          price: price.unitAmount / 100,
+          interval: price.interval,
+          features: plan.features,
+          actionLabel: plan.features['label'] || 'Get Started',
+          subscribed: userSubscription?.plans?.some(
+            (p: { priceId: string }) => p.priceId === price.priceId
+          ),
+        }))
+    )
 
-    const basePlans = plans.filter((plan) => plan.interval === interval)
-    if (interval === 'month') {
-      return [freePlanMonth, ...basePlans]
-    } else if (interval === 'year') {
-      return [freePlanYear, ...basePlans]
-    }
-    return basePlans
-  }, [plans, interval])
+    // Add free plans based on interval
+    const freeCards = getFreePlansByInterval(interval)
+
+    return [...freeCards, ...baseCards]
+  }, [plans, interval, isLoggedIn])
 
   useEffect(() => {
-    apiGetPlans().then((response) => {
-      if (response.ok) {
-        setPlans(response.data)
+    const fetchPlans = async () => {
+      try {
+        const response = await apiGetPlans()
+        if (response.ok) setPlans(response.data)
+      } catch (error) {
+        console.error('Error fetching plans:', error)
       }
-    })
+    }
+    fetchPlans()
   }, [])
 
   const handleCheckout = useCallback(
     async (priceId: string) => {
-      const response = await apiCheckoutPlan(priceId)
-      if (response.ok) {
-        const stripe = await stripePromise
-        const stripeResponse = await stripe?.redirectToCheckout({
-          sessionId: response.data?.sessionId,
-        })
-        if (stripeResponse?.error) {
-          console.error('Stripe Checkout Error:', stripeResponse.error.message)
+      try {
+        if (!isLoggedIn) {
+          router.push('/auth/login')
+          return
         }
+        const response = await apiCheckoutPlan(priceId)
+        if (response.ok) {
+          const stripe = await stripePromise
+          const stripeResponse = await stripe?.redirectToCheckout({
+            sessionId: response.data.sessionId,
+          })
+          if (stripeResponse?.error) {
+            console.error(
+              'Stripe Checkout Error:',
+              stripeResponse.error.message
+            )
+          }
+        }
+      } catch (error) {
+        console.error('Checkout Error:', error)
       }
     },
     [stripePromise]
   )
 
   return (
-    filteredPlans &&
-    filteredPlans?.length > 0 && (
-      <div>
-        <PricingHeader title="Select a Pricing Plan" />
-        <PricingSwitch onSwitch={(value) => setInterval(value)} />
-        <section className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-6 mt-10">
-          {filteredPlans?.map((plan) => {
-            return (
-              <PricingCard
-                handleCheckout={() => handleCheckout(plan.priceId)}
-                key={plan.priceId}
-                description={plan.description}
-                features={plan.features}
-                price={plan.price}
-                title={plan.title}
-                interval={plan.interval}
-                actionLabel={plan.features['label'] || 'Get Started'}
-                active={plan.active}
-              />
-            )
-          })}
-        </section>
-      </div>
-    )
+    <div>
+      <PricingHeader title="Select a Pricing Plan" />
+      <PricingSwitch onSwitch={setInterval} />
+      <section className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-6 mt-10">
+        {pricingCards?.map((card) => (
+          <PricingCard
+            key={card.priceId}
+            description={card.description}
+            features={card.features}
+            handleCheckout={() => handleCheckout(card.priceId)}
+            price={card.price}
+            title={card.title}
+            isFree={card.isFree}
+            actionLabel={card.actionLabel}
+            subscribed={card.subscribed}
+            interval={card.interval}
+          />
+        ))}
+      </section>
+    </div>
   )
 }
