@@ -108,7 +108,7 @@ export class PaymentsService {
       this.paymentsRepository.findPaymentCustomerById(userId)
     )
     if (error) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'PAYMENT_CUSTOMER_NOT_FOUND')
+      this.logger.log(`Payment Customer with id: '${userId}' not found`)
     }
     return result
   }
