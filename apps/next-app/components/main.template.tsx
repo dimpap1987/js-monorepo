@@ -84,7 +84,12 @@ const DpNotificationBellComponentDynamic = dynamic(
 export default function MainTemplate({
   children,
 }: Readonly<PropsWithChildren>) {
-  const { user, isLoggedIn, isAdmin, refreshSession } = useSession()
+  const {
+    session: { user },
+    isLoggedIn,
+    isAdmin,
+    refreshSession,
+  } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const fetchNotificationsRef = useRef(false)
   const router = useRouter()

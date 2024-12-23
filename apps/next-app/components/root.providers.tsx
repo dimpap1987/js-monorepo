@@ -5,7 +5,7 @@ import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
 import { WebNotificationProvider } from '@js-monorepo/web-notification'
-import { getCurrentUser } from '@next-app/actions/session'
+// import { getCurrentUser } from '@next-app/actions/session'
 import { ReactNode } from 'react'
 
 export default async function RootProviders({
@@ -13,11 +13,14 @@ export default async function RootProviders({
 }: {
   readonly children: ReactNode
 }) {
-  const session = await getCurrentUser()
+  // const session = await getCurrentUser()
 
   return (
     <SessionProvider
-      value={{ user: null, isLoggedIn: false }}
+      value={{
+        session: {},
+        isLoggedIn: false,
+      }}
       endpoint="/session"
     >
       <WebSocketProvider>

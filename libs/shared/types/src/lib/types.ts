@@ -249,12 +249,19 @@ export interface EditUserDto {
   profileImage?: string
 }
 
-export interface PricingPlanType {
+export interface PricingPlanResponse {
+  id: number
   title: string
-  price: number
   description: string
-  features: Stripe.Metadata
-  priceId: string
-  interval: Stripe.Price.Recurring.Interval
+  price: number
+  features: Record<string, string>
   active?: boolean
+  actionLabel: string
+  prices: {
+    id: number
+    priceId: string
+    unitAmount: number
+    currency: string
+    interval: string
+  }[]
 }

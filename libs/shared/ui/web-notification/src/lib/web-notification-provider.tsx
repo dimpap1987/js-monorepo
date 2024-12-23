@@ -29,7 +29,9 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
   const [permission, setPermission] = useState<NotificationPermission>(
     Notification.permission
   )
-  const { user } = useSession()
+  const {
+    session: { user },
+  } = useSession()
 
   useEffect(() => {
     registerServiceWorker().then(async () => {

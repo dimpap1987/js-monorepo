@@ -3,9 +3,9 @@ import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-pr
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { Injectable } from '@nestjs/common'
-import { CreatePlanDto } from '../dto/create-plan.dto'
 import Stripe from 'stripe'
 import { toDate } from '@js-monorepo/auth/nest/common/utils'
+import { CreateProductType } from '../../'
 
 @Injectable()
 export class PaymentsRepository {
@@ -13,9 +13,25 @@ export class PaymentsRepository {
     private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
   ) {}
 
-  async createPlan(payload: CreatePlanDto) {
-    return this.txHost.tx.plan.create({
-      data: payload,
+  async createProduct(payload: CreateProductType) {
+    return this.txHost.tx.product.create({
+      data: {
+        stripeId: payload.stripeId,
+        name: payload.name,
+        description: payload.description || '',
+        features: payload.features,
+        prices: {
+          create: payload.prices.map((stripePrice) => ({
+            stripeId: stripePrice.stripePrice,
+            unitAmount: stripePrice.unitAmount,
+            currency: stripePrice.currency,
+            interval: stripePrice.interval,
+          })),
+        },
+      },
+      include: {
+        prices: true,
+      },
     })
   }
 
@@ -125,6 +141,17 @@ export class PaymentsRepository {
       select: {
         id: true,
         priceId: true,
+      },
+    })
+  }
+
+  async findActiveProductsWithPrices() {
+    return this.txHost.tx.product.findMany({
+      where: {
+        active: true,
+      },
+      include: {
+        prices: true,
       },
     })
   }

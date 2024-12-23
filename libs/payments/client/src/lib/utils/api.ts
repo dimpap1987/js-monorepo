@@ -1,4 +1,3 @@
-import { PricingPlanType } from '@js-monorepo/types'
 import { apiClient } from '@js-monorepo/utils/http'
 
 export async function apiCheckoutPlan(priceId: string) {
@@ -11,26 +10,44 @@ export async function apiGetPlans() {
   return apiClient.get('/payments/plans')
 }
 
-export const freePlanMonth = {
-  title: 'Free',
-  description: 'Starter Montlhy Plan',
-  price: 0,
-  features: {
-    feat1: 'Starter feature',
+export const freePlanMonth = [
+  {
+    id: 0, // Unique identifier for this plan
+    title: 'Free',
+    priceId: '',
+    description: 'Starter Monthly Plan',
+    actionLabel: 'Get Started',
+    price: 0,
+    features: {
+      feat1: 'Starter feature',
+    },
+    isFree: true,
+    currency: 'EUR',
+    interval: 'month',
   },
-  interval: 'month',
-  priceId: 'price_123',
-  active: true,
-} as PricingPlanType
+]
 
-export const freePlanYear = {
-  title: 'Free',
-  description: 'Starter Yearly Plan',
-  price: 0,
-  features: {
-    feat1: 'Starter feature',
+export const freePlanYear = [
+  {
+    id: 0, // Unique identifier for this plan
+    title: 'Free',
+    priceId: '',
+    description: 'Starter Yearly Plan',
+    actionLabel: 'Get Started',
+    price: 0,
+    features: {
+      feat1: 'Starter feature',
+    },
+    isFree: true,
+    currency: 'EUR',
+    interval: 'year',
   },
-  interval: 'year',
-  priceId: 'price_4324',
-  active: true,
-} as PricingPlanType
+]
+
+export function getFreePlansByInterval(interval: string) {
+  return interval === 'month'
+    ? freePlanMonth
+    : interval === 'year'
+      ? freePlanYear
+      : []
+}

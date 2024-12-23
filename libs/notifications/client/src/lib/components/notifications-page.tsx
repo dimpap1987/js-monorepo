@@ -29,7 +29,10 @@ export function NotificationsPage({
   className?: string
   websocketOptions: WebSocketOptionsType
 }) {
-  const { user } = useSession()
+  const {
+    session: { user },
+  } = useSession()
+
   const [notifications, setNotifications] = useState<
     Partial<PaginationType<UserNotificationType>> | undefined
   >()

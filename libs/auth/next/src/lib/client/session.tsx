@@ -1,6 +1,5 @@
 'use client'
 
-import { SessionUserType } from '@js-monorepo/types'
 import { apiClientBase, getCookie } from '@js-monorepo/utils/http'
 import { AxiosInstance } from 'axios'
 import React, {
@@ -12,13 +11,15 @@ import React, {
   useState,
 } from 'react'
 
-const SessionContext = createContext<{
-  user: SessionUserType | null | undefined
+export interface SessionContextType {
+  session: Record<string, any>
   isLoggedIn: boolean
   isAdmin: boolean
   refreshSession: () => void
-}>({
-  user: null,
+}
+
+const SessionContext = createContext<SessionContextType>({
+  session: {},
   isLoggedIn: false,
   isAdmin: false,
   refreshSession: () => {},
@@ -34,7 +35,7 @@ const fetchSession = async (
     const response = await clientBuilder.get(endpoint)
 
     if (response.status >= 200 && response.status < 300) {
-      successCallback(response.data?.user)
+      successCallback(response.data)
     } else {
       errorCallback?.()
     }
@@ -46,28 +47,25 @@ const fetchSession = async (
 
 export const SessionProvider = ({
   children,
-  value,
+  value = {},
   clientBuilder,
   endpoint = '/auth/session',
 }: {
   readonly children?: React.ReactNode
-  readonly value: {
-    user: SessionUserType | null | undefined
-    isLoggedIn: boolean
-  }
+  readonly value: Record<string, any> // No longer optional, will default to empty object
   clientBuilder?: AxiosInstance
   endpoint?: string
 }) => {
-  const [user, setUser] = useState(value.user)
+  const [session, setSession] = useState<Record<string, any>>(value)
 
   const refreshSession = useCallback(() => {
     fetchSession(
       (userResponse) => {
-        setUser(userResponse)
+        setSession(userResponse)
       },
       () => {
-        setUser(null)
-        window.location.reload()
+        setSession({}) // Reset to empty if an error occurs
+        window.location.reload() // Redirect after error
       },
       clientBuilder,
       endpoint
@@ -75,10 +73,10 @@ export const SessionProvider = ({
   }, [clientBuilder, endpoint])
 
   useEffect(() => {
-    if (!!user || getCookie('UNREGISTERED-USER')) return
+    if (!!session?.user || getCookie('UNREGISTERED-USER')) return
     fetchSession(
       (userResponse) => {
-        setUser(userResponse)
+        setSession(userResponse)
       },
       undefined,
       clientBuilder,
@@ -87,25 +85,28 @@ export const SessionProvider = ({
   }, [clientBuilder, endpoint])
 
   useEffect(() => {
-    if (!user) return
+    if (!session?.user) return
 
     const intervalId = setInterval(() => {
-      refreshSession() // Refresh session if logged in
-    }, 60000 * 30) // 30 minutes
+      refreshSession() // Refresh session every 30 minutes
+    }, 60000 * 30)
 
     return () => {
       clearInterval(intervalId)
     }
-  }, [refreshSession, user])
+  }, [refreshSession, session?.user])
 
   const contextValue = useMemo(() => {
+    const isLoggedIn = !!session?.user
+    const isAdmin = session?.user?.roles?.includes('ADMIN') ?? false
+
     return {
-      user,
-      isLoggedIn: !!user,
+      session,
+      isLoggedIn,
+      isAdmin,
       refreshSession,
-      isAdmin: user?.roles?.includes('ADMIN') ?? false,
     }
-  }, [user, refreshSession])
+  }, [session, refreshSession])
 
   return (
     <SessionContext.Provider value={contextValue}>

@@ -9,7 +9,9 @@ import { useState } from 'react'
 import { submitNotification } from '../utils'
 
 export const NotificationSender = () => {
-  const { user } = useSession()
+  const {
+    session: { user },
+  } = useSession()
   const [message, setMessage] = useState<string>('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const { addNotification } = useNotifications()

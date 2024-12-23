@@ -34,21 +34,6 @@ model Subscription {
     @@map("subscriptions")
 }
 
-model Plan {
-    id            Int      @id @default(autoincrement())
-    stripePriceId String   @unique @map("stripe_price_id") // Ensures priceId uniqueness
-    name          String?
-    interval      String?
-    priceCents    Int      @map("price_cents")
-    features      Json?
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
-    enabled       Boolean?
-
-    @@index([stripePriceId])
-    @@map("plans")
-}
-
 model StripeWebhookEvent {
     id        Int      @id @default(autoincrement())
     eventId   String   @unique @map("event_id")
@@ -57,4 +42,30 @@ model StripeWebhookEvent {
 
     @@index([eventId])
     @@map("stripe_webhook_events")
+}
+
+model Product {
+    id          Int     @id @default(autoincrement())
+    stripeId    String  @unique
+    name        String
+    description String
+    active      Boolean @default(true)
+    prices      Price[]
+    features    Json?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Price {
+    id         Int     @id @default(autoincrement())
+    stripeId   String  @unique
+    unitAmount Int
+    currency   String
+    interval   String
+    productId  Int
+    product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
