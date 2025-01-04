@@ -140,14 +140,7 @@ export class AuthSessionModule implements NestModule {
       consumer
         .apply(CsrfGeneratorMiddleware)
         .exclude(...(this.config.csrf?.middlewareExclusions || []))
-        .forRoutes(
-          { path: '*google/login*', method: RequestMethod.GET },
-          { path: '*github/login*', method: RequestMethod.GET },
-          { path: '*facebook/login*', method: RequestMethod.GET },
-          { path: '*', method: RequestMethod.POST },
-          { path: '*', method: RequestMethod.PUT },
-          { path: '*', method: RequestMethod.DELETE }
-        )
+        .forRoutes('*')
     }
   }
 }
