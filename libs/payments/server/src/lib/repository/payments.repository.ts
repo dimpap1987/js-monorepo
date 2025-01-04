@@ -114,6 +114,7 @@ export class PaymentsRepository {
         stripeCustomerId: stripeCustomerId,
       },
       select: {
+        id: true,
         userId: true,
         stripeCustomerId: true,
       },
@@ -121,13 +122,15 @@ export class PaymentsRepository {
   }
 
   async findUserSubscriptionStatus(
-    paymentCustomerId: number,
+    userId: number,
     statuses = ['active', 'trialing', 'canceled']
   ) {
     const now = new Date()
     return this.txHost.tx.subscription.findMany({
       where: {
-        paymentCustomerId,
+        paymentCustomer: {
+          userId: userId,
+        },
         status: {
           in: statuses,
         },

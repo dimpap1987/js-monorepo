@@ -1,3 +1,4 @@
+import { tryCatch } from '@js-monorepo/utils/common'
 import { PaymentsService } from '@js-monorepo/payments-server'
 import { Controller, Get, Logger, Req } from '@nestjs/common'
 import { Request } from 'express'
@@ -12,15 +13,23 @@ export class AppController {
   async getSession(@Req() req: Request) {
     const user = req.user?.user
     if (!user) return null
-
-    const sub = await this.paymentsService.findUserSubscriptionStatus(user.id)
     const { email, ...restUser } = user
+
+    const { result, error } = await tryCatch(() =>
+      this.paymentsService.findUserSubscriptionStatus(user.id)
+    )
+
+    if (!error) {
+      return {
+        user: { ...restUser },
+        subscription: {
+          plans: result.plans,
+          isSubscribed: result.isSubscribed,
+        },
+      }
+    }
     return {
       user: { ...restUser },
-      subscription: {
-        plans: sub.plans,
-        isSubscribed: sub.isSubscribed,
-      },
     }
   }
 }

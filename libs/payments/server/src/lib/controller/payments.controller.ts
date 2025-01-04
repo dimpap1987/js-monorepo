@@ -25,8 +25,6 @@ export class PaymentsController {
 
   @Get('plans')
   async getPlans() {
-    const plansToSearch = process.env.PRICING_PLANS || ''
-    const pricingIds = plansToSearch.split(',').map((name) => name.trim())
     return this.paymentsService.findActiveProductsWithPrices()
   }
 

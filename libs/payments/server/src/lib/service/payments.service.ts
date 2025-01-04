@@ -126,11 +126,9 @@ export class PaymentsService {
     return result
   }
 
-  async findUserSubscriptionStatus(paymentCustomerId: number) {
+  async findUserSubscriptionStatus(userId: number) {
     const subscriptions =
-      await this.paymentsRepository.findUserSubscriptionStatus(
-        paymentCustomerId
-      )
+      await this.paymentsRepository.findUserSubscriptionStatus(userId)
 
     if (!subscriptions || subscriptions.length === 0) {
       return {
@@ -139,13 +137,12 @@ export class PaymentsService {
       }
     }
 
-    // Return the user as subscribed and provide the relevant plan(s)
     return {
       isSubscribed: true,
       plans: subscriptions.map((subscription) => ({
         id: subscription.id, //TODO replace with plan id when plan will be created
         priceId: subscription.priceId,
-      })), // Return all valid plans
+      })),
     }
   }
 

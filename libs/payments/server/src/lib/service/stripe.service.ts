@@ -104,9 +104,18 @@ export class StripeService {
         subscriptionData.customer as string
       )
 
+    if (!paymentCustomer?.id) {
+      this.logger.debug(
+        `Payment customer not found for stripe customer: ${subscriptionData.customer}`
+      )
+      throw new Error(
+        `Payment customer not found for stripe customer: ${subscriptionData.customer}`
+      )
+    }
+
     if (type === 'created') {
       await this.paymentsService.createSubscription({
-        paymentCustomerId: paymentCustomer?.userId,
+        paymentCustomerId: paymentCustomer?.id,
         stripeSubscriptionId: subscriptionData.id,
         priceId: subscriptionData.items.data[0]?.price.id,
         status: subscriptionData.status,

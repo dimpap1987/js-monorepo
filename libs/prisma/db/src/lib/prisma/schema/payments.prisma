@@ -8,6 +8,8 @@ model PaymentCustomer {
     // Relations
     subscriptions Subscription[]
 
+    @@index([userId])
+    @@index([stripeCustomerId])
     @@map("stripe_customers")
 }
 
