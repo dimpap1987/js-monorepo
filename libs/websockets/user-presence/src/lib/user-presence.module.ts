@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Global, Module } from '@nestjs/common'
 import { RedisIoAdapter } from './adapters/redis-adapter'
 import { UserPresenceGateway } from './gateway/user-presence.gateway'
 import { WsLoginGuard } from './guards/ws-login.guard'
@@ -7,6 +7,7 @@ import { OnlineUsersService } from './services/online-users.service'
 import { UserPresenceWebsocketService } from './services/user-presence.service'
 import { UserSocketService } from './services/user-socket.service'
 
+@Global()
 @Module({
   providers: [
     UserPresenceGateway,
