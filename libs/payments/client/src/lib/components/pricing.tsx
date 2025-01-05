@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next-nprogress-bar'
-
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import { Tabs, TabsList, TabsTrigger } from '@js-monorepo/components/tabs'
@@ -89,7 +88,8 @@ const PricingCard = ({
   actionLabel,
   subscribed,
   isLoggedIn,
-}: PricingCardProps) => {
+  anySubscribed,
+}: PricingCardProps & { anySubscribed: boolean }) => {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
@@ -113,9 +113,10 @@ const PricingCard = ({
   return (
     <div
       className={cn(
-        'relative w-full max-w-[360px] sm:w-[360px] shadow-lg flex',
-        'mx-auto rounded-xl border-2',
-        subscribed ? 'border-primary border-2 glow ' : 'border-border'
+        'relative w-full max-w-[360px] sm:w-[360px] shadow-lg flex mx-auto rounded-xl border-2 border-border transform transition-transform duration-300',
+        anySubscribed && !subscribed && 'grayscale-[50%] opacity-55',
+        subscribed && 'glow',
+        'hover:opacity-100'
       )}
     >
       <div className="content bg-background-card p-6 rounded-xl flex flex-col justify-around text-center w-full">
@@ -176,6 +177,11 @@ export function Pricing() {
 
   const isSubscribed = (priceId: string) =>
     subscription?.plans?.some((p: { priceId: string }) => p.priceId === priceId)
+
+  const anySubscribed = useMemo(
+    () => subscription?.plans?.length > 0,
+    [subscription]
+  )
 
   const pricingCards: PricingCardWithPriceId[] = plans
     .flatMap((plan) =>
@@ -247,6 +253,7 @@ export function Pricing() {
             subscribed={card.subscribed}
             interval={card.interval}
             isLoggedIn={isLoggedIn}
+            anySubscribed={anySubscribed}
           />
         ))}
       </section>
