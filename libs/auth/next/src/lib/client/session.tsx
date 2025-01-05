@@ -1,5 +1,6 @@
 'use client'
 
+import { deepCloneAndUpdate } from '@js-monorepo/utils/common'
 import { apiClientBase, getCookie } from '@js-monorepo/utils/http'
 import { AxiosInstance } from 'axios'
 import React, {
@@ -61,10 +62,9 @@ export const SessionProvider = ({
   const refreshSession = useCallback(() => {
     fetchSession(
       (userResponse) => {
-        setSession((prevSession) => ({
-          ...prevSession,
-          ...userResponse,
-        }))
+        setSession((prevSession) =>
+          deepCloneAndUpdate(prevSession, userResponse)
+        )
       },
       () => {
         setSession({}) // Reset to empty if an error occurs
@@ -79,10 +79,9 @@ export const SessionProvider = ({
     if (!!session?.user || getCookie('UNREGISTERED-USER')) return
     fetchSession(
       (userResponse) => {
-        setSession((prevSession) => ({
-          ...prevSession,
-          ...userResponse,
-        }))
+        setSession((prevSession) =>
+          deepCloneAndUpdate(prevSession, userResponse)
+        )
       },
       undefined,
       clientBuilder,

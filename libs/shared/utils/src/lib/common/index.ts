@@ -156,3 +156,18 @@ export async function tryCatch<T>(
     return { result: null, error }
   }
 }
+
+export function deepCloneAndUpdate<T>(prevState: T, updates: Partial<T>): T {
+  return {
+    ...prevState,
+    ...updates,
+    // Recursively deep clone nested objects (if any)
+    // Ensure you're not accidentally modifying nested structures directly
+    ...Object.fromEntries(
+      Object.entries(updates).map(([key, value]) => [
+        key,
+        value && typeof value === 'object' ? structuredClone(value) : value,
+      ])
+    ),
+  }
+}

@@ -182,10 +182,6 @@ export function Pricing() {
     [subscription]
   )
 
-  useEffect(() => {
-    console.log('Subscription has changed:', subscription)
-  }, [subscription])
-
   const pricingCards: PricingCardWithPriceId[] = useMemo(() => {
     if (!plans || plans.length === 0) return [] as PricingCardWithPriceId[]
 
