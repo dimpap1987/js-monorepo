@@ -33,7 +33,16 @@ const fetchSession = async (
   endpoint = '/auth/session'
 ) => {
   try {
-    const response = await clientBuilder.get(endpoint)
+    const response = await clientBuilder.get(endpoint, {
+      headers: {
+        'Cache-Control': 'no-cache',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
+      params: {
+        _: new Date().getTime(), // Add a unique timestamp as a query parameter
+      },
+    })
 
     if (response.status >= 200 && response.status < 300) {
       successCallback(response.data)
