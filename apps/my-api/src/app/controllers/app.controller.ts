@@ -22,10 +22,7 @@ export class AppController {
     if (!error) {
       return {
         user: { ...restUser },
-        subscription: {
-          plans: result.plans,
-          isSubscribed: result.isSubscribed,
-        },
+        subscription: { ...result },
       }
     }
     return {
