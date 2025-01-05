@@ -114,11 +114,11 @@ const PricingCard = ({
     <div
       className={cn(
         'relative w-full max-w-[360px] sm:w-[360px] shadow-lg flex',
-        'mx-auto rounded-2xl border-2',
+        'mx-auto rounded-xl border-2',
         subscribed ? 'border-primary border-2 glow ' : 'border-border'
       )}
     >
-      <div className="content bg-background-card p-6 rounded-lg flex flex-col justify-around text-center w-full">
+      <div className="content bg-background-card p-6 rounded-xl flex flex-col justify-around text-center w-full">
         {subscribed && (
           <div
             className="bg-green-50 text-green-600 absolute top-0 
@@ -174,10 +174,13 @@ export function Pricing() {
     []
   )
 
-  const isSubscribed = (priceId: string) =>
-    userSubscription?.plans?.some(
-      (p: { priceId: string }) => p.priceId === priceId
-    )
+  const isSubscribed = useCallback(
+    (priceId: string) =>
+      userSubscription?.plans?.some(
+        (p: { priceId: string }) => p.priceId === priceId
+      ),
+    [userSubscription]
+  )
 
   const pricingCards: PricingCardWithPriceId[] = useMemo(() => {
     if (!plans || plans.length === 0) return [] as PricingCardWithPriceId[]
@@ -194,12 +197,12 @@ export function Pricing() {
           features: plan.features,
           actionLabel: plan.features['label'] || 'Get Started',
           subscribed: isSubscribed(price.priceId),
-          isLoggedIn,
+          isLoggedIn: isLoggedIn,
         }))
     )
     baseCards.sort((a, b) => a.price - b.price)
     return [...baseCards]
-  }, [plans, interval, userSubscription])
+  }, [plans, interval, isSubscribed, isLoggedIn])
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -252,6 +255,7 @@ export function Pricing() {
             actionLabel={card.actionLabel}
             subscribed={card.subscribed}
             interval={card.interval}
+            isLoggedIn={isLoggedIn}
           />
         ))}
       </section>
