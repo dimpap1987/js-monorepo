@@ -61,7 +61,10 @@ export const SessionProvider = ({
   const refreshSession = useCallback(() => {
     fetchSession(
       (userResponse) => {
-        setSession(userResponse)
+        setSession((prevSession) => ({
+          ...prevSession,
+          ...userResponse,
+        }))
       },
       () => {
         setSession({}) // Reset to empty if an error occurs
