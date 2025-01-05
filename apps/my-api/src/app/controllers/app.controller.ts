@@ -19,7 +19,7 @@ export class AppController {
       this.paymentsService.findUserSubscriptionStatus(user.id)
     )
 
-    if (!error) {
+    if (!error && result?.isSubscribed) {
       return {
         user: { ...restUser },
         subscription: { ...result },
