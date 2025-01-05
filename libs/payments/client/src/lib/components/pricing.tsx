@@ -182,6 +182,10 @@ export function Pricing() {
     [subscription]
   )
 
+  useEffect(() => {
+    console.log('Subscription has changed:', subscription)
+  }, [subscription])
+
   const pricingCards: PricingCardWithPriceId[] = useMemo(() => {
     if (!plans || plans.length === 0) return [] as PricingCardWithPriceId[]
 
@@ -202,7 +206,7 @@ export function Pricing() {
     )
     baseCards.sort((a, b) => a.price - b.price)
     return [...baseCards]
-  }, [plans, interval, isSubscribed, isLoggedIn, subscription])
+  }, [plans, interval, isSubscribed, isLoggedIn])
 
   useEffect(() => {
     const fetchPlans = async () => {
