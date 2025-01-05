@@ -99,7 +99,7 @@ export const SessionProvider = ({
     return () => {
       clearInterval(intervalId)
     }
-  }, [refreshSession, session?.user])
+  }, [refreshSession, session])
 
   const contextValue = useMemo(() => {
     const isLoggedIn = !!session?.user

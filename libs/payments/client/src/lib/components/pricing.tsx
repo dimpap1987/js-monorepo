@@ -174,18 +174,11 @@ export function Pricing() {
     []
   )
 
-  const isSubscribed = useCallback(
-    (priceId: string) =>
-      subscription?.plans?.some(
-        (p: { priceId: string }) => p.priceId === priceId
-      ),
-    [subscription]
-  )
+  const isSubscribed = (priceId: string) =>
+    subscription?.plans?.some((p: { priceId: string }) => p.priceId === priceId)
 
-  const pricingCards: PricingCardWithPriceId[] = useMemo(() => {
-    if (!plans || plans.length === 0) return [] as PricingCardWithPriceId[]
-
-    const baseCards = plans.flatMap((plan) =>
+  const pricingCards: PricingCardWithPriceId[] = plans
+    .flatMap((plan) =>
       plan.prices
         .filter((price) => price.interval === interval)
         .map((price) => ({
@@ -200,9 +193,7 @@ export function Pricing() {
           isLoggedIn: isLoggedIn,
         }))
     )
-    baseCards.sort((a, b) => a.price - b.price)
-    return [...baseCards]
-  }, [plans, interval, isSubscribed, isLoggedIn])
+    .sort((a, b) => a.price - b.price)
 
   useEffect(() => {
     const fetchPlans = async () => {
