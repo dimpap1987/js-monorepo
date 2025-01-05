@@ -79,7 +79,10 @@ export const SessionProvider = ({
     if (!!session?.user || getCookie('UNREGISTERED-USER')) return
     fetchSession(
       (userResponse) => {
-        setSession(userResponse)
+        setSession((prevSession) => ({
+          ...prevSession,
+          ...userResponse,
+        }))
       },
       undefined,
       clientBuilder,

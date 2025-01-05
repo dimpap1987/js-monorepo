@@ -166,7 +166,7 @@ export function Pricing() {
   const [interval, setInterval] = useState<PlansInterval>('month')
   const [plans, setPlans] = useState<PricingPlanResponse[]>([])
   const {
-    session: { subscription: userSubscription },
+    session: { subscription },
     isLoggedIn,
   } = useSession()
   const stripePromise = useMemo(
@@ -176,10 +176,10 @@ export function Pricing() {
 
   const isSubscribed = useCallback(
     (priceId: string) =>
-      userSubscription?.plans?.some(
+      subscription?.plans?.some(
         (p: { priceId: string }) => p.priceId === priceId
       ),
-    [userSubscription]
+    [subscription]
   )
 
   const pricingCards: PricingCardWithPriceId[] = useMemo(() => {
@@ -202,7 +202,7 @@ export function Pricing() {
     )
     baseCards.sort((a, b) => a.price - b.price)
     return [...baseCards]
-  }, [plans, interval, isSubscribed, isLoggedIn])
+  }, [plans, interval, isSubscribed, isLoggedIn, subscription])
 
   useEffect(() => {
     const fetchPlans = async () => {
