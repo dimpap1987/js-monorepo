@@ -15,7 +15,7 @@ const providers: Provider[] = [
 @Module({
   controllers: [PaymentsController],
   providers: [...providers],
-  exports: [...providers, StripeModule],
+  exports: [...providers],
   imports: [
     StripeModule.forRoot({
       apiKey: process.env.STRIPE_SECRET_KEY,

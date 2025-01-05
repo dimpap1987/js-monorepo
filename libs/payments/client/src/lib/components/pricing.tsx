@@ -21,6 +21,7 @@ type PricingCardProps = {
   actionLabel?: string
   popular?: boolean
   subscribed?: boolean
+  isLoggedIn?: boolean
 }
 
 type PlansInterval = 'month' | 'year'
@@ -87,9 +88,9 @@ const PricingCard = ({
   features,
   actionLabel,
   subscribed,
+  isLoggedIn,
 }: PricingCardProps) => {
   const [isLoading, setIsLoading] = useState(false)
-  const { isLoggedIn } = useSession()
   const router = useRouter()
 
   const isFree = price === 0
@@ -113,7 +114,7 @@ const PricingCard = ({
     <div
       className={cn(
         'relative w-full max-w-[360px] sm:w-[360px] shadow-lg flex',
-        'mx-auto rounded-lg border-2',
+        'mx-auto rounded-2xl border-2',
         subscribed ? 'border-primary border-2 glow ' : 'border-border'
       )}
     >
@@ -193,11 +194,12 @@ export function Pricing() {
           features: plan.features,
           actionLabel: plan.features['label'] || 'Get Started',
           subscribed: isSubscribed(price.priceId),
+          isLoggedIn,
         }))
     )
     baseCards.sort((a, b) => a.price - b.price)
     return [...baseCards]
-  }, [plans, interval])
+  }, [plans, interval, userSubscription])
 
   useEffect(() => {
     const fetchPlans = async () => {
