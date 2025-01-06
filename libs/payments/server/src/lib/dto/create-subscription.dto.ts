@@ -1,4 +1,10 @@
-import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator'
 
 export class CreateSubscriptionDto {
   @IsNotEmpty()
@@ -10,8 +16,8 @@ export class CreateSubscriptionDto {
   stripeSubscriptionId: string
 
   @IsNotEmpty()
-  @IsString()
-  priceId: string
+  @IsNumber()
+  priceId: number
 
   @IsNotEmpty()
   @IsString()
