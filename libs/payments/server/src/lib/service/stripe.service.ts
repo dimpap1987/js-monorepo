@@ -21,10 +21,35 @@ export class StripeService {
     private userPresenceWebsocketService: UserPresenceWebsocketService
   ) {}
 
+  async findCustomerByEmail(email: string) {
+    const customers = await this.stripe.customers.list({
+      email,
+    })
+
+    return customers.data.length > 0 ? customers.data[0] : null
+  }
+
   async createCustomer(email: string) {
     return this.stripe.customers.create({
       email,
     })
+  }
+
+  async createCustomerIfNotExists(email: string) {
+    const existingCustomer = await this.findCustomerByEmail(email)
+
+    if (existingCustomer) {
+      this.logger.warn(
+        `Customer with email ${email} already exists in stripe`,
+        existingCustomer.id
+      )
+      return existingCustomer
+    }
+
+    const newCustomer = await this.createCustomer(email)
+
+    this.logger.log(`New Stripe customer created:`, newCustomer.id)
+    return newCustomer
   }
 
   @Transactional()
@@ -41,7 +66,7 @@ export class StripeService {
         stripeCustomerId = paymentCustomer?.stripeCustomerId
       } else {
         //create payment customer
-        const stripeCustomer = await this.createCustomer(email)
+        const stripeCustomer = await this.createCustomerIfNotExists(email)
         const createdCustomer =
           await this.paymentsService.createPaymentCustomer({
             userId,
