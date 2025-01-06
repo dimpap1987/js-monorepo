@@ -101,13 +101,6 @@ export type AuthUserUpdateDto =
   | { username: string; roles?: { id: number }[] }
   | { username?: string; roles: { id: number }[] }
 
-export type ChannelDto = {
-  id: number
-  name: string
-  description?: string
-  createdAt: Date
-}
-
 export type NotificationCreateDto = {
   receiverIds: number[]
   senderId: number
@@ -115,11 +108,6 @@ export type NotificationCreateDto = {
   link?: string
   type?: string
   additionalData?: Record<string, any>
-}
-
-export type UserChannelDto = {
-  userId: number
-  channelId: number
 }
 
 export type NotificationDto = {
@@ -130,7 +118,6 @@ export type NotificationDto = {
 }
 
 export type AuthUserFullDto = AuthUserDto & {
-  userChannels?: UserChannelDto[]
   sentNotifications?: NotificationDto[]
   receivedNotifications?: NotificationDto[]
 }

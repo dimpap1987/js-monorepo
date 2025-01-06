@@ -1,8 +1,8 @@
 INSERT INTO "products" (id, "stripeId", name, description, active, features, "updatedAt")
 VALUES
-  (1, 'prod_RQDnAmArtPERmBh', 'Basic Plan', 'The basic plan to start', true, '{"key1":"feature 1","key2":"feature 2"}', now()),
-  (2, 'prod_RQJlgfOPUlPKEH', 'Pro Plan', 'All features unlocked', true, '{"key1":"feature 1","key2":"feature 2"}', now()),
-  (3, 'prod_RQNmZkTFUlPKEXH', 'Free Plan', 'Free features', true, '{"key1":"feature 1"}', now());
+  (1, 'prod_RQNmZkTFUlPKEXH', 'Free Plan', 'Free features', true, '{"key1":"feature 1"}', now()),
+  (2, 'prod_RQDnAmArtPERmBh', 'Basic Plan', 'The basic plan to start', true, '{"key1":"feature 1","key2":"feature 2"}', now()),
+  (3, 'prod_RQJlgfOPUlPKEH', 'Pro Plan', 'All features unlocked', true, '{"key1":"feature 1","key2":"feature 2","key3":"feature 3"}', now());
 
 INSERT INTO "prices" ("stripeId", "unitAmount", "currency", "interval", "productId", "updatedAt")
 VALUES

@@ -35,23 +35,3 @@ model UserNotification {
     @@id([receiverId, notificationId])
     @@map(name: "users_notifications")
 }
-
-model Channel {
-    id          Int           @id @default(autoincrement())
-    name        String        @unique
-    description String?
-    createdAt   DateTime      @default(now()) @map("created_at")
-    UserChannel UserChannel[]
-
-    @@map(name: "channels")
-}
-
-model UserChannel {
-    userId    Int      @map("user_id")
-    channelId Int      @map("channel_id")
-    user      AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
-    channel   Channel  @relation(fields: [channelId], references: [id])
-
-    @@id([userId, channelId])
-    @@map(name: "users_channels")
-}

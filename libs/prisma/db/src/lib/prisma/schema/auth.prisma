@@ -4,7 +4,6 @@ model AuthUser {
     updatedAt             DateTime           @updatedAt
     username              String             @unique
     email                 String             @unique
-    userChannels          UserChannel[]
     userProfiles          UserProfile[]
     sentNotifications     UserNotification[] @relation("sender")
     receivedNotifications UserNotification[] @relation("receiver")

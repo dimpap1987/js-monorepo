@@ -26,16 +26,13 @@ import passport from 'passport'
 import { RedisClientType } from 'redis'
 import { v4 as uuidv4 } from 'uuid'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
-import { GLOBAL_CHANNEL } from './constants'
 import { AnnouncementsController } from './controllers/announcements'
+import { AppController } from './controllers/app.controller'
 import { ExceptionController } from './controllers/exception.controller'
 import { AdminProviderModule } from './modules/admin/admin.module'
-import { ChannelProviderModule } from './modules/channel/channel.module'
-import { ChannelService } from './modules/channel/channel.service'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { UserModule } from './modules/user/user.module'
-import { AppController } from './controllers/app.controller'
 
 const ENV = process.env.NODE_ENV
 @Module({
@@ -54,9 +51,8 @@ const ENV = process.env.NODE_ENV
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
       imports: [UserPresenceModule],
-      inject: [ChannelService, UserPresenceWebsocketService],
+      inject: [UserPresenceWebsocketService],
       useFactory: async (
-        channelService: ChannelService,
         userPresenceWebsocketService: UserPresenceWebsocketService
       ) => ({
         google: {
@@ -80,7 +76,6 @@ const ENV = process.env.NODE_ENV
         },
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUserDto) => {
-          await channelService.assignUserToChannels(user.id, GLOBAL_CHANNEL)
           userPresenceWebsocketService.broadcast(Events.announcements, [
             `'${user.username}' has joined 🚀`,
           ])
@@ -94,7 +89,6 @@ const ENV = process.env.NODE_ENV
     }),
     PrismaModule,
     FilterProviderModule,
-    ChannelProviderModule,
     AdminProviderModule,
     NotificationServerModule,
     UserModule,
