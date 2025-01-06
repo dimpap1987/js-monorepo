@@ -39,7 +39,7 @@ export class PaymentsController {
   @Post('checkout')
   @UseGuards(LoggedInGuard)
   async createCheckoutSession(
-    @Body() { priceId }: { priceId: string },
+    @Body() { priceId }: { priceId: number },
     @SessionUser() sessionUser: SessionUserType
   ) {
     const { session } = await this.stripeService.createCheckoutSession(

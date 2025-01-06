@@ -17,7 +17,7 @@ model Subscription {
     id                   Int       @id @default(autoincrement())
     paymentCustomerId    Int       @map("payment_customer_id")
     stripeSubscriptionId String?   @unique @map("stripe_subscription_id")
-    priceId              String
+    priceId              Int
     status               String
     currentPeriodStart   DateTime?
     currentPeriodEnd     DateTime?
@@ -30,6 +30,7 @@ model Subscription {
 
     // Relations
     paymentCustomer PaymentCustomer @relation(fields: [paymentCustomerId], references: [id])
+    price           Price           @relation(fields: [priceId], references: [id])
 
     @@index([paymentCustomerId])
     @@index([priceId])
@@ -70,8 +71,9 @@ model Price {
     productId  Int
     product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @updatedAt
+    Subscription Subscription[]
 
     @@map("prices")
 }

@@ -59,11 +59,14 @@ export class PaymentsRepository {
     })
   }
 
-  async handleSubscriptionUpdated(subscriptionData: Stripe.Subscription) {
+  async handleSubscriptionUpdated(
+    subscriptionData: Stripe.Subscription,
+    priceId: number
+  ) {
     return this.txHost.tx.subscription.update({
       where: { stripeSubscriptionId: subscriptionData.id },
       data: {
-        priceId: subscriptionData.items.data[0]?.price.id,
+        priceId: priceId,
         status: subscriptionData.status,
         currentPeriodStart: toDate(subscriptionData.current_period_start),
         currentPeriodEnd: toDate(subscriptionData.current_period_end),
@@ -143,7 +146,16 @@ export class PaymentsRepository {
       },
       select: {
         id: true,
-        priceId: true,
+        price: {
+          select: {
+            id: true,
+            product: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
       },
     })
   }
@@ -155,6 +167,22 @@ export class PaymentsRepository {
       },
       include: {
         prices: true,
+      },
+    })
+  }
+
+  async findPriceByStripeId(stripeId: string) {
+    return this.txHost.tx.price.findUniqueOrThrow({
+      where: {
+        stripeId: stripeId,
+      },
+    })
+  }
+
+  async findPriceById(id: number) {
+    return this.txHost.tx.price.findUniqueOrThrow({
+      where: {
+        id: id,
       },
     })
   }

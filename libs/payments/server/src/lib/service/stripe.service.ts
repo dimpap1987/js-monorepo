@@ -9,6 +9,7 @@ import {
   Events,
   UserPresenceWebsocketService,
 } from '@js-monorepo/user-presence'
+import { Transactional } from '@nestjs-cls/transactional'
 
 @Injectable()
 export class StripeService {
@@ -26,9 +27,12 @@ export class StripeService {
     })
   }
 
-  async createCheckoutSession(priceId: string, userId: number, email: string) {
+  @Transactional()
+  async createCheckoutSession(priceId: number, userId: number, email: string) {
     try {
       let stripeCustomerId: string
+
+      const price = await this.paymentsService.findPriceById(priceId)
 
       const paymentCustomer =
         await this.paymentsService.findPaymentCustomerById(userId)
@@ -49,7 +53,7 @@ export class StripeService {
       // checkout
       const session = await this.stripe.checkout.sessions.create({
         customer: stripeCustomerId,
-        line_items: [{ price: priceId, quantity: 1 }],
+        line_items: [{ price: price.stripeId, quantity: 1 }],
         mode: 'subscription',
         success_url: `${process.env.AUTH_LOGIN_REDIRECT}/pricing?success=true`,
         cancel_url: `${process.env.AUTH_LOGIN_REDIRECT}/pricing?success=false`,
@@ -96,7 +100,7 @@ export class StripeService {
     const subscriptionData = event.data.object as Stripe.Subscription
 
     this.logger.debug(
-      `Stripe - RECEIVED Subscription Event: ${JSON.stringify(event)} with type: ${type}, from stripe user: ${subscriptionData.customer}`
+      `Stripe - RECEIVED Subscription Event with type: ${type}, from stripe user: ${subscriptionData.customer} and price_id: '${subscriptionData.items.data[0]?.price.id}'`
     )
 
     const paymentCustomer =
@@ -113,11 +117,15 @@ export class StripeService {
       )
     }
 
+    const price = await this.paymentsService.findPriceByStripeId(
+      subscriptionData.items.data[0]?.price.id
+    )
+
     if (type === 'created') {
       await this.paymentsService.createSubscription({
         paymentCustomerId: paymentCustomer?.id,
         stripeSubscriptionId: subscriptionData.id,
-        priceId: subscriptionData.items.data[0]?.price.id,
+        priceId: price.id,
         status: subscriptionData.status,
         currentPeriodStart: toDate(subscriptionData.current_period_start),
         currentPeriodEnd: toDate(subscriptionData.current_period_end),

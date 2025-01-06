@@ -26,7 +26,7 @@ type PricingCardProps = {
 type PlansInterval = 'month' | 'year'
 
 type PricingCardWithPriceId = Omit<
-  { priceId: string } & PricingCardProps,
+  { id: number } & PricingCardProps,
   'isLoggedIn' | 'handleCheckout'
 >
 
@@ -175,8 +175,8 @@ export function Pricing() {
     []
   )
 
-  const isSubscribed = (priceId: string) =>
-    subscription?.plans?.some((p: { priceId: string }) => p.priceId === priceId)
+  const isSubscribed = (priceId: number) =>
+    subscription?.plans?.some((p: { priceId: number }) => p.priceId === priceId)
 
   const anySubscribed = useMemo(
     () => subscription?.plans?.length > 0,
@@ -188,14 +188,14 @@ export function Pricing() {
       plan.prices
         .filter((price) => price.interval === interval)
         .map((price) => ({
-          priceId: price.priceId,
+          id: price.id,
           title: plan.title,
           description: plan.description,
           price: price.unitAmount / 100,
           interval: price.interval,
           features: plan.features,
           actionLabel: plan.features['label'] || 'Get Started',
-          subscribed: isSubscribed(price.priceId),
+          subscribed: isSubscribed(price.id),
           isLoggedIn: isLoggedIn,
         }))
     )
@@ -214,7 +214,7 @@ export function Pricing() {
   }, [])
 
   const handleCheckout = useCallback(
-    async (priceId: string) => {
+    async (priceId: number) => {
       try {
         const response = await apiCheckoutPlan(priceId)
         if (response.ok) {
@@ -243,10 +243,10 @@ export function Pricing() {
       <section className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-6 mt-10">
         {pricingCards?.map((card) => (
           <PricingCard
-            key={card.priceId}
+            key={card.id}
             description={card.description}
             features={card.features}
-            handleCheckout={() => handleCheckout(card.priceId)}
+            handleCheckout={() => handleCheckout(card.id)}
             price={card.price}
             title={card.title}
             actionLabel={card.actionLabel}

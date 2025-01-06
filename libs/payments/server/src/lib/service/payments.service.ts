@@ -6,6 +6,7 @@ import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { PaymentsRepository } from '../repository/payments.repository'
 import { CreateProductType } from '../../'
+import { Transactional } from '@nestjs-cls/transactional'
 
 @Injectable()
 export class PaymentsService {
@@ -71,9 +72,17 @@ export class PaymentsService {
     return result
   }
 
+  @Transactional()
   async updateSubscription(subscriptionData: Stripe.Subscription) {
+    const price = await this.findPriceByStripeId(
+      subscriptionData.items.data[0]?.price.id
+    )
+
     const { result, error } = await tryCatch(() =>
-      this.paymentsRepository.handleSubscriptionUpdated(subscriptionData)
+      this.paymentsRepository.handleSubscriptionUpdated(
+        subscriptionData,
+        price.id
+      )
     )
 
     if (error) {
@@ -133,15 +142,14 @@ export class PaymentsService {
     if (!subscriptions || subscriptions.length === 0) {
       return {
         isSubscribed: false,
-        plan: null,
       }
     }
 
     return {
       isSubscribed: true,
       plans: subscriptions.map((subscription) => ({
-        id: subscription.id, //TODO replace with plan id when plan will be created
-        priceId: subscription.priceId,
+        id: subscription.price?.id,
+        priceId: subscription?.price?.product?.id,
       })),
     }
   }
@@ -164,11 +172,38 @@ export class PaymentsService {
       // active: product.active,
       prices: product.prices?.map((prices) => ({
         id: prices.id,
-        priceId: prices.stripeId,
         unitAmount: prices.unitAmount,
         currency: prices.currency,
         interval: prices.interval,
       })),
     }))
+  }
+
+  async findPriceByStripeId(stripeId: string) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.findPriceByStripeId(stripeId)
+    )
+    if (error) {
+      throw new ApiException(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'FETCH_PRICE_BY_STIPE_ID'
+      )
+    }
+
+    return result
+  }
+
+  async findPriceById(priceId: number) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.findPriceById(priceId)
+    )
+    if (error) {
+      throw new ApiException(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'FETCH_PRICE_BY_ID'
+      )
+    }
+
+    return result
   }
 }
