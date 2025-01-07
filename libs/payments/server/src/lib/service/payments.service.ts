@@ -148,8 +148,8 @@ export class PaymentsService {
     return {
       isSubscribed: true,
       plans: subscriptions.map((subscription) => ({
-        id: subscription.price?.id,
-        priceId: subscription?.price?.product?.id,
+        subscriptionId: subscription.id,
+        price: { ...subscription.price },
       })),
     }
   }
