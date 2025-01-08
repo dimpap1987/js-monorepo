@@ -5,9 +5,7 @@ export default async function AnnouncementsController() {
   return (
     <>
       <BackArrowWithLabel arrowClassName="sm:hidden">
-        <h1 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
-          Announcements
-        </h1>
+        <h2 className="text-center sm:text-left">Announcements</h2>
       </BackArrowWithLabel>
 
       <CreateAnnouncement></CreateAnnouncement>

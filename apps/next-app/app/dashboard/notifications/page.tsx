@@ -12,9 +12,7 @@ export default async function NotificationsController() {
   return (
     <>
       <BackArrowWithLabel arrowClassName="sm:hidden">
-        <h1 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
-          Manage Notifications
-        </h1>
+        <h2 className="text-center sm:text-left">Manage Notifications</h2>
       </BackArrowWithLabel>
 
       <div className="p-4">

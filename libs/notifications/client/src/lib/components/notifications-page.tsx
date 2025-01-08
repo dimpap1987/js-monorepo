@@ -126,9 +126,9 @@ export function NotificationsPage({
     >
       <div className="flex justify-between">
         <BackArrowWithLabel className="flex-1" arrowClassName="sm:hidden">
-          <h1 className="text-base sm:text-lg px-2 ml-5 sm:ml-0 text-center sm:text-left">
+          <h2 className="px-2 ml-5 sm:ml-0 text-center sm:text-left">
             Notifications
-          </h1>
+          </h2>
         </BackArrowWithLabel>
 
         <NotificationReadAllButton
