@@ -1,85 +1,44 @@
-@import '@js-monorepo/base';
+@import '@js-monorepo/styles/_base';
+@import '@js-monorepo/styles/_tailwind';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+  --navbar-height: 60px; /* Define the height of your navbar */
+  --bottom-navbar-height: 60px; /* Define the height of your bottom-navbar */
 
-@layer components {
-  .container {
-    @apply p-2 max-w-[90rem] mx-auto;
-  }
+  --foreground: 0 0% 5%;
+  --foreground-neutral: 220, 9%, 46%;
+
+  --background: 43.64 47.83% 95.49%;
+  --background-secondary: 219 33% 21%;
+  --background-card: 0, 0%, 100%;
+
+  --border: 240 4% 56%;
+
+  --primary: 265 76% 54%;
+  --primary-foreground: 0 0% 98%;
+
+  --secondary: 26 114% 57%;
+  --secondary-foreground: 0 0% 98%;
+
+  --accent: 229 87% 54%;
+  --accent-foreground: 0 0% 98%;
+
+  --danger: -14 98% 47%;
+  --danger-foreground: 0 0% 98%;
+
+  --destructive: 0 0% 78%;
+  --destructive-foreground: 0 0% 98%;
+
+  --tw-shadow-color: 0 0% 20%;
 }
 
-h1 {
-  @apply text-2xl;
-  @apply font-bold;
-}
+.dark {
+  --foreground: 0 0% 98%;
+  --foreground-neutral: 218, 11%, 65%;
 
-h2 {
-  @apply text-xl;
-  @apply font-bold;
-}
-
-h3 {
-  @apply text-lg;
-  @apply font-bold;
-}
-
-h4 {
-  @apply text-lg;
-  @apply font-semibold;
-}
-
-*::selection {
-  background: hsl(var(--primary));
-}
-*::-moz-selection {
-  background: hsl(var(--primary));
-}
-*::-webkit-selection {
-  background: hsl(var(--primary));
-}
-
-@layer base {
-  :root {
-    --navbar-height: 60px; /* Define the height of your navbar */
-    --bottom-navbar-height: 60px; /* Define the height of your bottom-navbar */
-
-    --foreground: 0 0% 5%;
-    --foreground-neutral: 220, 9%, 46%;
-
-    --background: 43.64 47.83% 95.49%;
-    --background-secondary: 219 33% 21%;
-    --background-card: 0, 0%, 100%;
-
-    --border: 240 4% 56%;
-
-    --primary: 265 76% 54%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 26 114% 57%;
-    --secondary-foreground: 0 0% 98%;
-
-    --accent: 229 87% 54%;
-    --accent-foreground: 0 0% 98%;
-
-    --danger: -14 98% 47%;
-    --danger-foreground: 0 0% 98%;
-
-    --destructive: 0 0% 78%;
-    --destructive-foreground: 0 0% 98%;
-
-    --tw-shadow-color: 0 0% 20%;
-  }
-
-  .dark {
-    --foreground: 0 0% 98%;
-    --foreground-neutral: 218, 11%, 65%;
-
-    --border: 236 7% 28%;
-    --background: 221 39% 11%;
-    --background-card: 215, 28%, 17%;
-  }
+  --border: 236 7% 28%;
+  --background: 221 39% 11%;
+  --background-card: 215, 28%, 17%;
 }
 
 .glow {

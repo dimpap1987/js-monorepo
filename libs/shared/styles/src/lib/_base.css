@@ -67,3 +67,15 @@ img {
 .hide-scrollbar {
   scrollbar-width: none; /* Firefox */
 }
+
+*::selection {
+  background: hsl(var(--primary));
+}
+
+*::-moz-selection {
+  background: hsl(var(--primary));
+}
+
+*::-webkit-selection {
+  background: hsl(var(--primary));
+}

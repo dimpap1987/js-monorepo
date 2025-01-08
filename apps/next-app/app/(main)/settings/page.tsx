@@ -13,9 +13,7 @@ export default function SettingsPage() {
   return (
     <div className="px-2">
       <BackArrowWithLabel arrowClassName="sm:hidden">
-        <h1 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
-          Settings
-        </h1>
+        <h2 className="text-center sm:text-left">Settings</h2>
       </BackArrowWithLabel>
 
       <Tabs

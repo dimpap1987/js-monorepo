@@ -32,9 +32,7 @@ const isSubscribed = (subscription: Subscription, planId: number) =>
 
 const PricingHeader = ({ title }: { title: string }) => (
   <section className="text-center">
-    <h1 className={`text-2xl sm:text-4xl mt-2 font-semibold tracking-tight`}>
-      {title}
-    </h1>
+    <h1 className="mt-2 tracking-tight">{title}</h1>
     <br />
   </section>
 )

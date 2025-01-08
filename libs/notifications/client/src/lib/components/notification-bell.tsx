@@ -146,7 +146,7 @@ export function DpNotificationBellComponent({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           className={cn(
-            'hidden sm:block p-1 bg-background-secondary mt-4 text-white w-[98svw] sm:w-[650px] xl:w-[850px] z-20',
+            'hidden z-30 sm:block p-1 bg-background-secondary mt-4 text-white w-[98svw] sm:w-[650px] xl:w-[850px]',
             className
           )}
         >

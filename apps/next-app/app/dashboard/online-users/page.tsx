@@ -5,9 +5,7 @@ export default async function OnlineUsersController() {
   return (
     <>
       <BackArrowWithLabel arrowClassName="sm:hidden">
-        <h1 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
-          Online Users
-        </h1>
+        <h2 className="text-center sm:text-left">Online Users</h2>
       </BackArrowWithLabel>
       <OnlineUsersTableComponent></OnlineUsersTableComponent>
     </>
