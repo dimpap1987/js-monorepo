@@ -1,5 +1,5 @@
 export const buttonVariants = {
-  base: 'relative text-base rounded font-semibold flex items-center justify-center whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-500 ease-in-out',
+  base: 'relative text-base rounded font-semibold flex items-center justify-center whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-500 ease-in-out overflow-hidden',
   variants: {
     variant: {
       primary:

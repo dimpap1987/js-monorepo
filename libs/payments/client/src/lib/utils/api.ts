@@ -9,3 +9,9 @@ export async function apiCheckoutPlan(priceId: number) {
 export async function apiGetPlans() {
   return apiClient.get('/payments/plans')
 }
+
+export async function apiCancelSubscription(priceId: number) {
+  return apiClient.post('/payments/cancel', {
+    priceId: priceId,
+  })
+}

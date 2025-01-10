@@ -1,11 +1,11 @@
+import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
-import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
-import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { Injectable } from '@nestjs/common'
 import Stripe from 'stripe'
-import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { CreateProductType } from '../../'
+import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
+import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 
 @Injectable()
 export class PaymentsRepository {
@@ -105,6 +105,7 @@ export class PaymentsRepository {
         userId: userId,
       },
       select: {
+        id: true,
         userId: true,
         stripeCustomerId: true,
       },
@@ -183,6 +184,17 @@ export class PaymentsRepository {
     return this.txHost.tx.price.findUniqueOrThrow({
       where: {
         id: id,
+      },
+    })
+  }
+
+  async findSubscriptionByPriceIdAndUserId(priceId: number, userId: number) {
+    const paymentCustomer = await this.findPaymentCustomerById(userId)
+
+    return this.txHost.tx.subscription.findFirstOrThrow({
+      where: {
+        priceId: priceId,
+        paymentCustomerId: paymentCustomer.id,
       },
     })
   }

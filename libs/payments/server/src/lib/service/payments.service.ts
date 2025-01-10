@@ -1,12 +1,12 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
+import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import Stripe from 'stripe'
+import { CreateProductType } from '../../'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { PaymentsRepository } from '../repository/payments.repository'
-import { CreateProductType } from '../../'
-import { Transactional } from '@nestjs-cls/transactional'
 
 @Injectable()
 export class PaymentsService {
@@ -159,10 +159,7 @@ export class PaymentsService {
       this.paymentsRepository.findActiveProductsWithPrices()
     )
     if (error) {
-      throw new ApiException(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        'FETCH_PRODUCTS_ERROR'
-      )
+      throw new ApiException(HttpStatus.NOT_FOUND, 'FETCH_PRODUCTS_ERROR')
     }
     return result.map((product) => ({
       id: product.id,
@@ -184,10 +181,7 @@ export class PaymentsService {
       this.paymentsRepository.findPriceByStripeId(stripeId)
     )
     if (error) {
-      throw new ApiException(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        'FETCH_PRICE_BY_STIPE_ID'
-      )
+      throw new ApiException(HttpStatus.NOT_FOUND, 'FETCH_PRICE_BY_STIPE_ID')
     }
 
     return result
@@ -198,9 +192,23 @@ export class PaymentsService {
       this.paymentsRepository.findPriceById(priceId)
     )
     if (error) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'FETCH_PRICE_BY_ID')
+    }
+
+    return result
+  }
+
+  async findSubscriptionByPriceIdAndUserId(priceId: number, userId: number) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.findSubscriptionByPriceIdAndUserId(
+        priceId,
+        userId
+      )
+    )
+    if (error) {
       throw new ApiException(
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        'FETCH_PRICE_BY_ID'
+        HttpStatus.NOT_FOUND,
+        'FETCH_SUBSCRIPTION_BY_ID_USER_ID'
       )
     }
 

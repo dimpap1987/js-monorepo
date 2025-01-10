@@ -1,4 +1,5 @@
 import { DpButton } from '@js-monorepo/button'
+import { ConfirmationDialog } from '@js-monorepo/dialog'
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren, useState } from 'react'
 
@@ -23,7 +24,7 @@ export function PlanCardContainer({
         anySubscribed && !isFree && 'hover:opacity-100'
       )}
     >
-      <div className="content bg-background-card p-6 rounded-xl flex flex-col justify-around text-center w-full">
+      <div className="content bg-background-card py-6 px-3 sm:px-6 rounded-xl flex flex-col justify-around text-center w-full">
         {children}
       </div>
     </div>
@@ -113,6 +114,7 @@ type PlanCardActionsType = {
   isLoggedIn?: boolean
   isFree?: boolean
   onCheckout?: () => Promise<any>
+  onCancel?: () => Promise<any>
   actionLabel?: string
 }
 
@@ -122,37 +124,68 @@ export function PlanCardActions({
   isLoggedIn,
   isFree,
   onCheckout,
+  onCancel,
   actionLabel = 'Get Started',
 }: PlanCardActionsType) {
+  const [isDialogOpen, setDialogOpen] = useState(false)
   if (!isLoggedIn) {
     return (
       <DpButton size="large" loading={isLoading} onClick={onCheckout}>
-        Get Started
+        <div className="text-base whitespace-break-spaces">Get Started</div>
       </DpButton>
     )
   }
 
-  return isSubscribed || isFree ? (
-    <div
-      className="h-10 rounded-md px-8 bg-primary [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]
+  if (isFree) {
+    return (
+      <div
+        className="h-10 rounded-md px-8 bg-primary [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]
                  text-white flex items-center justify-center font-semibold"
-    >
-      {isSubscribed ? 'Current Plan' : 'Free Plan'}
-    </div>
+      >
+        <div className="text-base whitespace-break-spaces">Free Plan</div>
+      </div>
+    )
+  }
+  return isSubscribed ? (
+    <>
+      <DpButton
+        size="large"
+        variant="danger"
+        className="w-full"
+        onClick={() => setDialogOpen(true)}
+      >
+        <div className="text-base whitespace-break-spaces">
+          Cancel Subscription
+        </div>
+      </DpButton>
+      <ConfirmationDialog
+        isOpen={isDialogOpen}
+        title="Cancel subscription"
+        content="Are you sure you want to procceed ?"
+        onClose={(yes) => {
+          setDialogOpen(false)
+          if (yes) {
+            onCancel?.()
+          }
+        }}
+      />
+    </>
   ) : (
     <DpButton
       size="large"
+      className="w-full"
       loading={isLoading}
       onClick={onCheckout}
       disabled={isSubscribed || isFree}
     >
-      {actionLabel}
+      <div className="text-base whitespace-break-spaces">{actionLabel}</div>
     </DpButton>
   )
 }
 
 export type PlanCardProps = {
   handleCheckout?: () => Promise<any>
+  handleCancelSubscription?: () => Promise<any>
   price: number
   title: string
   description: string
@@ -176,6 +209,7 @@ export const PlanCard = ({
   subscribed,
   anySubscribed,
   isLoggedIn,
+  handleCancelSubscription,
 }: PlanCardProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const isFree = price === 0
@@ -214,6 +248,7 @@ export const PlanCard = ({
         isSubscribed={subscribed}
         onCheckout={onCheckout}
         actionLabel={actionLabel}
+        onCancel={handleCancelSubscription}
       ></PlanCardActions>
     </PlanCardContainer>
   )

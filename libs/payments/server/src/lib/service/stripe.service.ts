@@ -251,4 +251,10 @@ export class StripeService {
       prices: stripePrices,
     }
   }
+
+  async cancelSubscription(stripeSubscriptionId: string) {
+    this.stripe.subscriptions.update(stripeSubscriptionId, {
+      cancel_at_period_end: true,
+    })
+  }
 }

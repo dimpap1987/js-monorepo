@@ -5,8 +5,13 @@ import { PricingPlanResponse } from '@js-monorepo/types'
 import { loadStripe } from '@stripe/stripe-js'
 import { useRouter } from 'next-nprogress-bar'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { apiCheckoutPlan, apiGetPlans } from '../utils/api'
+import {
+  apiCancelSubscription,
+  apiCheckoutPlan,
+  apiGetPlans,
+} from '../utils/api'
 import { PlanCard, PlanCardProps } from './plan-card'
+import { useNotifications } from '@js-monorepo/notification'
 
 interface Product {
   id: number
@@ -44,6 +49,7 @@ export function Pricing() {
     isLoggedIn,
   } = useSession()
   const router = useRouter()
+  const { addNotification } = useNotifications()
   const stripePromise = useMemo(
     () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!),
     []
@@ -100,10 +106,37 @@ export function Pricing() {
         }
       } catch (error) {
         console.error('Checkout Error:', error)
+        addNotification({
+          message: 'Something went wrong',
+          description: 'Please try again later',
+          type: 'error',
+        })
       }
     },
-    [stripePromise]
+    [stripePromise, isLoggedIn]
   )
+
+  const handleCancelSubscription = useCallback(async (priceId: number) => {
+    try {
+      const response = await apiCancelSubscription(priceId)
+      if (response.ok) {
+        addNotification({
+          message: 'Cancelling Subscription',
+          duration: 4000,
+          description: 'Please wait...',
+          type: 'spinner',
+        })
+      } else {
+        addNotification({
+          message: 'Something went wrong',
+          description: 'Please try again later',
+          type: 'error',
+        })
+      }
+    } catch (error) {
+      console.error('Checkout Error:', error)
+    }
+  }, [])
 
   return (
     <div>
@@ -113,6 +146,7 @@ export function Pricing() {
           <PlanCard
             key={card.id}
             handleCheckout={() => handleCheckout(card.id)}
+            handleCancelSubscription={() => handleCancelSubscription(card.id)}
             anySubscribed={subscription?.plans?.length > 0}
             isLoggedIn={isLoggedIn}
             {...card}
