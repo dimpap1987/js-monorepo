@@ -1,13 +1,16 @@
 import { DpButton } from '@js-monorepo/button'
 import { ConfirmationDialog } from '@js-monorepo/dialog'
 import { cn } from '@js-monorepo/ui/util'
-import { PropsWithChildren, useState } from 'react'
-
-export type PlanCardContainerType = {
-  anySubscribed?: boolean
-  subscribed?: boolean
-  isFree?: boolean
-}
+import moment from 'moment'
+import { PropsWithChildren, useRef, useState } from 'react'
+import { HiOutlineDotsVertical } from 'react-icons/hi'
+import { useClickAway } from 'react-use'
+import {
+  PlanCardActionsType,
+  PlanCardContainerType,
+  PlanCardContentType,
+  PlanCardProps,
+} from '../types'
 
 export function PlanCardContainer({
   anySubscribed,
@@ -67,14 +70,6 @@ const CheckItem = ({ text }: { text: string }) => (
   </>
 )
 
-type PlanCardContentType = {
-  title: string
-  description: string
-  price: number
-  interval: string
-  features: Record<string, string>
-}
-
 export function PlanCardContent({
   title,
   description,
@@ -108,16 +103,6 @@ export function PlanCardContent({
   )
 }
 
-type PlanCardActionsType = {
-  isSubscribed?: boolean
-  isLoading?: boolean
-  isLoggedIn?: boolean
-  isFree?: boolean
-  onCheckout?: () => Promise<any>
-  onCancel?: () => Promise<any>
-  actionLabel?: string
-}
-
 export function PlanCardActions({
   isSubscribed,
   isLoading,
@@ -126,6 +111,7 @@ export function PlanCardActions({
   onCheckout,
   onCancel,
   actionLabel = 'Get Started',
+  status,
 }: PlanCardActionsType) {
   const [isDialogOpen, setDialogOpen] = useState(false)
   if (!isLoggedIn) {
@@ -146,6 +132,20 @@ export function PlanCardActions({
       </div>
     )
   }
+
+  if (isSubscribed && status === 'canceled') {
+    return (
+      <DpButton
+        size="large"
+        className="w-full"
+        loading={isLoading}
+        onClick={onCheckout}
+      >
+        <div className="text-base whitespace-break-spaces">Renew</div>
+      </DpButton>
+    )
+  }
+
   return isSubscribed ? (
     <>
       <DpButton
@@ -183,19 +183,42 @@ export function PlanCardActions({
   )
 }
 
-export type PlanCardProps = {
-  handleCheckout?: () => Promise<any>
-  handleCancelSubscription?: () => Promise<any>
-  price: number
-  title: string
-  description: string
-  features: Record<string, string>
-  interval: string
-  actionLabel?: string
-  popular?: boolean
-  subscribed: boolean
-  anySubscribed?: boolean
-  isLoggedIn?: boolean
+export const PlanInfo = ({ children }: PropsWithChildren) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const infoContentRef = useRef<HTMLDivElement | null>(null)
+  const buttonRef = useRef<HTMLButtonElement | null>(null)
+
+  const toggleInfo = () => setIsOpen((prev) => !prev)
+
+  useClickAway(infoContentRef, (event) => {
+    if (buttonRef?.current?.contains(event.target as Node)) {
+      return
+    }
+    setIsOpen(false)
+  })
+
+  return (
+    <div>
+      <div className="absolute right-4 top-7">
+        <button
+          ref={buttonRef}
+          onClick={toggleInfo}
+          aria-label="Toggle subscription info"
+        >
+          <HiOutlineDotsVertical size={26} />
+        </button>
+      </div>
+      {/* Info dropdown */}
+      {isOpen && (
+        <div
+          ref={infoContentRef}
+          className="absolute right-5 top-16 w-[90%] rounded-lg bg-white shadow-xl p-4"
+        >
+          <div className="text-sm text-gray-600 space-y-1">{children}</div>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export const PlanCard = ({
@@ -209,6 +232,8 @@ export const PlanCard = ({
   subscribed,
   anySubscribed,
   isLoggedIn,
+  endDateSubscription,
+  status = 'default',
   handleCancelSubscription,
 }: PlanCardProps) => {
   const [isLoading, setIsLoading] = useState(false)
@@ -224,6 +249,8 @@ export const PlanCard = ({
       setIsLoading(false)
     }
   }
+  const formattedDate = moment(endDateSubscription).format('YYYY-MM-DD')
+  const formattedTime = moment(endDateSubscription).format('hh:mm A')
 
   return (
     <PlanCardContainer
@@ -232,6 +259,29 @@ export const PlanCard = ({
       subscribed={subscribed}
     >
       <ActiveSubscriptionLabel subscribed={subscribed} />
+
+      {subscribed && (
+        <PlanInfo>
+          <ol>
+            {status === 'active' && (
+              <li>
+                Your <strong>{title}</strong> plan will renew automatically on{' '}
+                <strong>{formattedDate}</strong> at{' '}
+                <strong>{formattedTime}</strong>. <br /> Want to make changes?
+                You can cancel your subscription anytime before the renewal
+                date.
+              </li>
+            )}
+            {status === 'canceled' && (
+              <li>
+                Your <strong>{title}</strong> plan have been cancelled so after
+                the <strong>{formattedDate}</strong> at{' '}
+                <strong>{formattedTime}</strong>, you will lose the benefits
+              </li>
+            )}
+          </ol>
+        </PlanInfo>
+      )}
 
       <PlanCardContent
         title={title}

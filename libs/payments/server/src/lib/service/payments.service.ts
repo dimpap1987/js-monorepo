@@ -214,4 +214,18 @@ export class PaymentsService {
 
     return result
   }
+
+  async findSubscriptionByid(id: number) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.findSubscriptionByid(id)
+    )
+    if (error) {
+      throw new ApiException(
+        HttpStatus.NOT_FOUND,
+        'FETCH_SUBSCRIPTION_BY_ID_USER_ID'
+      )
+    }
+
+    return result
+  }
 }

@@ -47,7 +47,7 @@ export const ConfirmationDialog = ({
           </DialogTitle>
         </DialogHeader>
         <div className="flex gap-2 items-center">
-          <TiWarning size={46} className="text-danger" />
+          <TiWarning size={46} className="text-danger shrink-0" />
           <div className="flex flex-col text-base gap-4 font-medium p-5 text-gray-700">
             {content}
           </div>
@@ -60,7 +60,7 @@ export const ConfirmationDialog = ({
               Cancel
             </DpButton>
             <DpButton
-              variant="accent"
+              variant="primary"
               onClick={() => {
                 onClose?.(true)
               }}

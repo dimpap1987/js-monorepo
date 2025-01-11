@@ -1,39 +1,30 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
+import { useNotifications } from '@js-monorepo/notification'
 import { PricingPlanResponse } from '@js-monorepo/types'
 import { loadStripe } from '@stripe/stripe-js'
 import { useRouter } from 'next-nprogress-bar'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
+  PlanCardPropsWithId,
+  PlanCardStatus,
+  SessionSubscription,
+  Subscription,
+  SubscriptionPlan,
+} from '../types'
+import {
   apiCancelSubscription,
   apiCheckoutPlan,
   apiGetPlans,
+  apiGetSubscription,
 } from '../utils/api'
-import { PlanCard, PlanCardProps } from './plan-card'
-import { useNotifications } from '@js-monorepo/notification'
+import { PlanCard } from './plan-card'
 
-interface Product {
-  id: number
-}
-interface Price {
-  product: Product
-}
-interface Plan {
-  price?: Price
-}
-interface Subscription {
-  plans?: Plan[]
-}
-
-type PlanCardPropsWithId = Omit<
-  { id: number } & PlanCardProps,
-  'isLoggedIn' | 'handleCheckout'
->
-
-const isSubscribed = (subscription: Subscription, planId: number) =>
-  subscription?.plans?.some((p: Plan) => p.price?.product?.id === planId) ||
-  false
+const isSubscribed = (subscription: SessionSubscription, planId: number) =>
+  subscription?.plans?.some(
+    (p: SubscriptionPlan) => p.price?.product?.id === planId
+  ) || false
 
 const PricingHeader = ({ title }: { title: string }) => (
   <section className="text-center">
@@ -44,16 +35,18 @@ const PricingHeader = ({ title }: { title: string }) => (
 
 export function Pricing() {
   const [plans, setPlans] = useState<PricingPlanResponse[]>([])
-  const {
-    session: { subscription },
-    isLoggedIn,
-  } = useSession()
+  const [subscriptionMap, setSubscriptionMap] = useState<
+    Map<number, Subscription>
+  >(new Map())
+  const { session, isLoggedIn } = useSession()
   const router = useRouter()
   const { addNotification } = useNotifications()
   const stripePromise = useMemo(
     () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!),
     []
   )
+
+  const sessionSubscription = session?.subscription as SessionSubscription
 
   const pricingCards: PlanCardPropsWithId[] = plans
     .flatMap((plan) =>
@@ -67,7 +60,7 @@ export function Pricing() {
           interval: price.interval,
           features: plan.features,
           actionLabel: 'Get Started',
-          subscribed: isSubscribed(subscription, plan.id),
+          subscribed: isSubscribed(sessionSubscription, plan.id),
         }))
     )
     .sort((a, b) => a.price - b.price)
@@ -83,6 +76,23 @@ export function Pricing() {
     }
     fetchPlans()
   }, [])
+
+  useEffect(() => {
+    sessionSubscription?.plans?.forEach((element) => {
+      if (element.subscriptionId) {
+        apiGetSubscription(element.subscriptionId).then((res) => {
+          if (res.ok) {
+            const sub = res.data as Subscription
+            setSubscriptionMap((prev) => {
+              const updatedMap = new Map(prev)
+              updatedMap.set(sub?.priceId, sub)
+              return updatedMap
+            })
+          }
+        })
+      }
+    })
+  }, [sessionSubscription?.plans])
 
   const handleCheckout = useCallback(
     async (priceId: number) => {
@@ -147,8 +157,13 @@ export function Pricing() {
             key={card.id}
             handleCheckout={() => handleCheckout(card.id)}
             handleCancelSubscription={() => handleCancelSubscription(card.id)}
-            anySubscribed={subscription?.plans?.length > 0}
+            anySubscribed={!!sessionSubscription?.plans?.length}
             isLoggedIn={isLoggedIn}
+            endDateSubscription={subscriptionMap.get(card.id)?.cancelAt}
+            status={
+              (subscriptionMap.get(card.id)?.status as PlanCardStatus) ||
+              'default'
+            }
             {...card}
           />
         ))}

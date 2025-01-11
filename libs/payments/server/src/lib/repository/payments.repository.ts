@@ -198,4 +198,12 @@ export class PaymentsRepository {
       },
     })
   }
+
+  async findSubscriptionByid(id: number) {
+    return this.txHost.tx.subscription.findFirstOrThrow({
+      where: {
+        id: id,
+      },
+    })
+  }
 }

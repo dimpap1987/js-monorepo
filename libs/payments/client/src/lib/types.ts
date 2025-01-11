@@ -1,0 +1,87 @@
+export interface Subscription {
+  id: number
+  paymentCustomerId: number
+  stripeSubscriptionId?: string
+  priceId: number
+  status: string
+  currentPeriodStart?: Date
+  currentPeriodEnd?: Date
+  trialStart?: Date
+  trialEnd?: Date
+  cancelAt?: Date
+  canceledAt?: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface SessionSubscription {
+  plans?: SubscriptionPlan[]
+}
+
+export interface SubscriptionPlan {
+  subscriptionId: number
+  price: PriceDetails
+}
+
+export interface PriceDetails {
+  id: number
+  product: ProductDetails
+}
+
+export interface ProductDetails {
+  id: number
+}
+
+export interface SubscriptionData {
+  isSubscribed: boolean
+  plans: SubscriptionPlan[]
+}
+
+export type PlanCardStatus = 'active' | 'canceled' | 'default'
+
+export type PlanCardProps = {
+  handleCheckout?: () => Promise<any>
+  handleCancelSubscription?: () => Promise<any>
+  price: number
+  title: string
+  description: string
+  features: Record<string, string>
+  interval: string
+  actionLabel?: string
+  popular?: boolean
+  subscribed: boolean
+  anySubscribed?: boolean
+  isLoggedIn?: boolean
+  endDateSubscription?: Date
+  status?: PlanCardStatus
+}
+
+export type PlanCardPropsWithId = Omit<
+  { id: number } & PlanCardProps,
+  'isLoggedIn' | 'handleCheckout'
+>
+
+export type PlanCardActionsType = {
+  isSubscribed?: boolean
+  isLoading?: boolean
+  isLoggedIn?: boolean
+  isFree?: boolean
+  onCheckout?: () => Promise<any>
+  onCancel?: () => Promise<any>
+  actionLabel?: string
+  status?: PlanCardStatus
+}
+
+export type PlanCardContainerType = {
+  anySubscribed?: boolean
+  subscribed?: boolean
+  isFree?: boolean
+}
+
+export type PlanCardContentType = {
+  title: string
+  description: string
+  price: number
+  interval: string
+  features: Record<string, string>
+}

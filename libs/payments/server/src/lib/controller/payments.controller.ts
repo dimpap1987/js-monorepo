@@ -7,6 +7,7 @@ import {
   Headers,
   HttpStatus,
   Logger,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -29,6 +30,11 @@ export class PaymentsController {
   @Get('plans')
   async getPlans() {
     return this.paymentsService.findActiveProductsWithPrices()
+  }
+
+  @Get('subscriptions/:subscriptionId')
+  async getSubscription(@Param('subscriptionId') subscriptionId: number) {
+    return this.paymentsService.findSubscriptionByid(subscriptionId)
   }
 
   @Post('webhook')
