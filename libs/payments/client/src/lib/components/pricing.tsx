@@ -159,7 +159,7 @@ export function Pricing() {
             handleCancelSubscription={() => handleCancelSubscription(card.id)}
             anySubscribed={!!sessionSubscription?.plans?.length}
             isLoggedIn={isLoggedIn}
-            endDateSubscription={subscriptionMap.get(card.id)?.cancelAt}
+            currentPeriodEnd={subscriptionMap.get(card.id)?.currentPeriodEnd}
             status={
               (subscriptionMap.get(card.id)?.status as PlanCardStatus) ||
               'default'

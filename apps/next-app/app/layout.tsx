@@ -1,9 +1,9 @@
-import dynamic from 'next/dynamic'
+import { BodyTemplate } from '@js-monorepo/templates'
+import RootProviders from '@next-app/components/root.providers'
 import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
 import MainTemplate from '../components/main.template'
 import './global.css'
-import { BodyTemplate } from '@js-monorepo/templates'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -13,13 +13,6 @@ const poppins = Poppins({
   adjustFontFallback: false,
 })
 
-const DynamicRootProvicers = dynamic(
-  () => import('@next-app/components/root.providers'),
-  {
-    ssr: false,
-  }
-)
-
 export default async function RootLayout(props: {
   readonly children: ReactNode
   readonly auth: ReactNode
@@ -27,12 +20,12 @@ export default async function RootLayout(props: {
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <BodyTemplate className={poppins.className}>
-        <DynamicRootProvicers>
+        <RootProviders>
           <MainTemplate>
             {props.auth}
             {props.children}
           </MainTemplate>
-        </DynamicRootProvicers>
+        </RootProviders>
       </BodyTemplate>
     </html>
   )

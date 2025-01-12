@@ -232,7 +232,7 @@ export const PlanCard = ({
   subscribed,
   anySubscribed,
   isLoggedIn,
-  endDateSubscription,
+  currentPeriodEnd,
   status = 'default',
   handleCancelSubscription,
 }: PlanCardProps) => {
@@ -249,8 +249,8 @@ export const PlanCard = ({
       setIsLoading(false)
     }
   }
-  const formattedDate = moment(endDateSubscription).format('YYYY-MM-DD')
-  const formattedTime = moment(endDateSubscription).format('hh:mm A')
+  const formattedDate = moment(currentPeriodEnd).format('YYYY-MM-DD')
+  const formattedTime = moment(currentPeriodEnd).format('hh:mm A')
 
   return (
     <PlanCardContainer

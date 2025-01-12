@@ -52,7 +52,7 @@ export type PlanCardProps = {
   subscribed: boolean
   anySubscribed?: boolean
   isLoggedIn?: boolean
-  endDateSubscription?: Date
+  currentPeriodEnd?: Date
   status?: PlanCardStatus
 }
 
