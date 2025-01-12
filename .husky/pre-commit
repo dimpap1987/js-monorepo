@@ -8,4 +8,5 @@ echo "Precommit Triggered..."
 # npx prettier --write .
 
 echo "Run Lint to all files"
-npm run lint:all
+# npm run lint:all
+npx nx affected:lint
