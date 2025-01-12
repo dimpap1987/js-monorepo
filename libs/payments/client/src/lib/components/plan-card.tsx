@@ -212,7 +212,7 @@ export const PlanInfo = ({ children }: PropsWithChildren) => {
       {isOpen && (
         <div
           ref={infoContentRef}
-          className="absolute right-5 top-16 w-[90%] rounded-lg bg-white shadow-xl p-4"
+          className="absolute right top-16 w-[90%] rounded-lg bg-white shadow-xl p-4"
         >
           <div className="text-sm text-gray-600 space-y-1">{children}</div>
         </div>
@@ -265,7 +265,7 @@ export const PlanCard = ({
           <ol>
             {status === 'active' && (
               <li>
-                Your <strong>{title}</strong> plan will renew automatically on{' '}
+                Your <strong>{title}</strong> will renew automatically on{' '}
                 <strong>{formattedDate}</strong> at{' '}
                 <strong>{formattedTime}</strong>. <br /> Want to make changes?
                 You can cancel your subscription anytime before the renewal

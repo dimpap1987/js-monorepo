@@ -20,7 +20,7 @@ model Subscription {
     priceId              Int
     status               String
     currentPeriodStart   DateTime?
-    currentPeriodEnd     DateTime?
+    currentPeriodEnd     DateTime
     trialStart           DateTime?
     trialEnd             DateTime?
     cancelAt             DateTime?

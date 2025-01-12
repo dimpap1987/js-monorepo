@@ -2,7 +2,7 @@ import { Pricing } from '@js-monorepo/payments-ui'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Pricing',
+  title: 'Pricing Plans',
 }
 
 function PricingPage() {
