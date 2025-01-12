@@ -23,18 +23,13 @@ import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
 import dynamic from 'next/dynamic'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'
 import { RiAdminFill } from 'react-icons/ri'
 import SVGLogo from './logo-svg'
 import { MobileNavbar } from './mobile-navbar'
 
 const menuItems: MenuItem[] = [
-  // {
-  //   href: '/',
-  //   name: 'Home',
-  //   roles: ['PUBLIC'],
-  //   Icon: MdHome,
-  // },
   // {
   //   href: '/ai-image-generator',
   //   name: 'AI Image Generator',
@@ -48,6 +43,7 @@ const menuItems: MenuItem[] = [
   {
     href: '/pricing',
     name: 'Pricing',
+    Icon: ImPriceTags,
     roles: ['PUBLIC'],
   },
   // {
