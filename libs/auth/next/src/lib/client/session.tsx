@@ -71,9 +71,7 @@ export const SessionProvider = ({
   const refreshSession = useCallback(() => {
     fetchSession(
       (userResponse) => {
-        setSession((prevSession) =>
-          deepCloneAndUpdate(prevSession, userResponse)
-        )
+        setSession({ ...userResponse })
       },
       () => {
         setSession({}) // Reset to empty if an error occurs
@@ -88,9 +86,7 @@ export const SessionProvider = ({
     if (!!session?.user || getCookie('UNREGISTERED-USER')) return
     fetchSession(
       (userResponse) => {
-        setSession((prevSession) =>
-          deepCloneAndUpdate(prevSession, userResponse)
-        )
+        setSession({ ...userResponse })
       },
       undefined,
       clientBuilder,
