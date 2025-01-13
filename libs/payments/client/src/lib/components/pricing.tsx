@@ -166,7 +166,7 @@ export function Pricing() {
   return (
     <div>
       <PricingHeader title="Select a Pricing Plan" />
-      <section className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-6 mt-10">
+      <section className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(325px,1fr))] gap-6 py-5 px-5">
         {pricingCards?.map((card) => (
           <PlanCard
             key={card.id}
