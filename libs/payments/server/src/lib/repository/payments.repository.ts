@@ -82,7 +82,7 @@ export class PaymentsRepository {
     return this.txHost.tx.subscription.update({
       where: { stripeSubscriptionId: subscriptionData.id },
       data: {
-        status: 'canceled',
+        status: subscriptionData.status,
         canceledAt: toDate(subscriptionData.cancel_at),
       },
     })
@@ -127,7 +127,7 @@ export class PaymentsRepository {
 
   async findUserSubscriptionStatus(
     userId: number,
-    statuses = ['active', 'trialing', 'canceled']
+    statuses = ['active', 'trialing']
   ) {
     const now = new Date()
     return this.txHost.tx.subscription.findMany({
@@ -137,9 +137,6 @@ export class PaymentsRepository {
         },
         status: {
           in: statuses,
-        },
-        currentPeriodEnd: {
-          gt: now, // Only consider subscriptions where the current period hasn't ended
         },
       },
       orderBy: {
@@ -195,6 +192,9 @@ export class PaymentsRepository {
       where: {
         priceId: priceId,
         paymentCustomerId: paymentCustomer.id,
+      },
+      orderBy: {
+        id: 'desc',
       },
     })
   }

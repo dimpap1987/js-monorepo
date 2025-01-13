@@ -1,9 +1,11 @@
+import Stripe from 'stripe'
+
 export interface Subscription {
   id: number
   paymentCustomerId: number
   stripeSubscriptionId?: string
   priceId: number
-  status: string
+  status: Stripe.Subscription.Status
   currentPeriodStart?: Date
   currentPeriodEnd?: Date
   trialStart?: Date
@@ -37,8 +39,6 @@ export interface SubscriptionData {
   plans: SubscriptionPlan[]
 }
 
-export type SubscriptionStatus = 'active' | 'canceled' | 'trialing' | 'default'
-
 export type PlanCardProps = {
   handleCheckout?: () => Promise<any>
   handleCancelSubscription?: () => Promise<any>
@@ -52,8 +52,7 @@ export type PlanCardProps = {
   subscribed: boolean
   anySubscribed?: boolean
   isLoggedIn?: boolean
-  currentPeriodEnd?: Date
-  status?: SubscriptionStatus
+  subscription?: Subscription
 }
 
 export type PlanCardPropsWithId = Omit<
@@ -69,13 +68,14 @@ export type PlanCardActionsType = {
   onCheckout?: () => Promise<any>
   onCancel?: () => Promise<any>
   actionLabel?: string
-  status?: SubscriptionStatus
+  subscription?: Subscription
 }
 
 export type PlanCardContainerType = {
   anySubscribed?: boolean
   subscribed?: boolean
   isFree?: boolean
+  isLoggedIn?: boolean
 }
 
 export type PlanCardContentType = {

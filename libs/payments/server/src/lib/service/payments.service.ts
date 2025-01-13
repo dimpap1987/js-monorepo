@@ -192,7 +192,7 @@ export class PaymentsService {
       this.paymentsRepository.findPriceById(priceId)
     )
     if (error) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'FETCH_PRICE_BY_ID')
+      throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_PRICE_BY_ID')
     }
 
     return result
@@ -208,7 +208,7 @@ export class PaymentsService {
     if (error) {
       throw new ApiException(
         HttpStatus.NOT_FOUND,
-        'FETCH_SUBSCRIPTION_BY_ID_USER_ID'
+        'ERROR_FETCH_SUBSCRIPTION_BY_ID_USER_ID'
       )
     }
 
@@ -222,7 +222,7 @@ export class PaymentsService {
     if (error) {
       throw new ApiException(
         HttpStatus.NOT_FOUND,
-        'FETCH_SUBSCRIPTION_BY_ID_USER_ID'
+        'ERROR_FETCH_SUBSCRIPTION_BY_ID_USER_ID'
       )
     }
 
