@@ -86,7 +86,7 @@ export class StripeService {
       return { session: session }
     } catch (e) {
       this.logger.error('Error while checking out', e.stack)
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'STRIPE_CHECKOUT')
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_STRIPE_CHECKOUT')
     }
   }
 
@@ -94,13 +94,13 @@ export class StripeService {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
     if (!signature) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'INVALID_SIGNATURE')
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_SIGNATURE')
     }
 
     if (!webhookSecret) {
       throw new ApiException(
         HttpStatus.BAD_REQUEST,
-        'INVALID_STRIPE_WEBHOOK_SECRET'
+        'ERROR_INVALID_STRIPE_WEBHOOK_SECRET'
       )
     }
 

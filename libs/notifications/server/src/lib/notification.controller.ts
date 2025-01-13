@@ -137,10 +137,7 @@ export class NotificationController {
     @Body() subscription: any
   ) {
     if (!subscription || !subscription.endpoint || !subscription.keys) {
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        'Invalid subscription payload'
-      )
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_PAYLOAD')
     }
     await this.notificationService.saveUserSubscription(userId, subscription)
   }

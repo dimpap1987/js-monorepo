@@ -20,7 +20,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     Logger.error(
       `'${
         exception.message
-      }' - statusCode: '${exception.getStatus()}' ${exception.errorCode ? '- errorCode: ' + exception.errorCode : ''}`,
+      }' - statusCode: '${exception.getStatus()}' ${exception.getErrorCode() ? '- errorCode: ' + exception.getErrorCode() : ''}`,
       exception.stack,
       ApiException.name
     )
@@ -31,7 +31,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
 
     return response.status(exception.getStatus()).json({
       createdBy: 'ApiExceptionFilter',
-      errorCode: exception.errorCode,
+      errorCode: exception.getErrorCode(),
       path: request.originalUrl,
       message: exception.message,
     })

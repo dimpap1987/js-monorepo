@@ -3,7 +3,7 @@ import { EditUserDto } from '@js-monorepo/types'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { UserRepo, UserRepository } from './user.repository'
-import { ApiException } from '../../exceptions/api-exception'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 
 @Injectable()
 export class UserService {
