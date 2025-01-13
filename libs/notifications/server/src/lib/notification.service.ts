@@ -72,7 +72,7 @@ export class NotificationService {
       console.error('Error saving user subscription:', error)
       throw new ApiException(
         HttpStatus.BAD_REQUEST,
-        'Failed to save user subscription'
+        'ERROR_SAVE_USER_SUBSCRIPTION'
       )
     }
   }

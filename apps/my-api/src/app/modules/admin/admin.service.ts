@@ -9,8 +9,8 @@ import {
 } from '@js-monorepo/user-presence'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
-import { ApiException } from '../../exceptions/api-exception'
 import { AdminRepo, AdminRepository } from './admin.repository'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 
 @Injectable()
 export class AdminService {
@@ -44,7 +44,7 @@ export class AdminService {
         e.stack
       )
     }
-    throw new ApiException(HttpStatus.BAD_REQUEST, 'Error Fetching users')
+    throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_FETCHING_USERS')
   }
 
   async updateUser(
@@ -78,7 +78,7 @@ export class AdminService {
       return updatedUser
     } catch (e) {
       this.logger.error(`Error Updating User with id: '${userId}'`, e.stack)
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'Error updating users')
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_UPDATING_USERS')
     }
   }
 

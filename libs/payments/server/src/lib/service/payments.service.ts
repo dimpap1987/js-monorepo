@@ -26,7 +26,7 @@ export class PaymentsService {
       this.logger.error(`Failed to create subscription: ${error.message}`)
       throw new ApiException(
         HttpStatus.BAD_REQUEST,
-        'SUBSCRIPTION_CREATION_ERROR'
+        'ERROR_SUBSCRIPTION_CREATION_ERROR'
       )
     }
 
@@ -42,7 +42,10 @@ export class PaymentsService {
       this.paymentsRepository.createProduct(product)
     )
     if (error) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'CREATE_PAYMENT_CUSTOMER')
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'ERROR_CREATE_PAYMENT_CUSTOMER'
+      )
     }
     return result
   }
@@ -67,7 +70,10 @@ export class PaymentsService {
       this.paymentsRepository.createPaymentCustomer(payload)
     )
     if (error) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'CREATE_PAYMENT_CUSTOMER')
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'ERROR_CREATE_PAYMENT_CUSTOMER'
+      )
     }
     return result
   }
@@ -130,7 +136,10 @@ export class PaymentsService {
       this.paymentsRepository.findPaymentCustomerByStripeId(stripeCustomerId)
     )
     if (error) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'PAYMENT_CUSTOMER_NOT_FOUND')
+      throw new ApiException(
+        HttpStatus.NOT_FOUND,
+        'ERROR_PAYMENT_CUSTOMER_NOT_FOUND'
+      )
     }
     return result
   }
@@ -159,7 +168,7 @@ export class PaymentsService {
       this.paymentsRepository.findActiveProductsWithPrices()
     )
     if (error) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'FETCH_PRODUCTS_ERROR')
+      throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_PRODUCTS')
     }
     return result.map((product) => ({
       id: product.id,
@@ -181,7 +190,10 @@ export class PaymentsService {
       this.paymentsRepository.findPriceByStripeId(stripeId)
     )
     if (error) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'FETCH_PRICE_BY_STIPE_ID')
+      throw new ApiException(
+        HttpStatus.NOT_FOUND,
+        'ERROR_FETCH_PRICE_BY_STIPE_ID'
+      )
     }
 
     return result
