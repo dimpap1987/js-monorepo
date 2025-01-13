@@ -1,10 +1,13 @@
 import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import { SessionUserType } from '@js-monorepo/types'
+import { tryCatch } from '@js-monorepo/utils/common'
 import {
   Body,
   Controller,
   Get,
   Headers,
+  HttpCode,
   HttpStatus,
   Logger,
   Param,
@@ -15,8 +18,6 @@ import {
 import { RequestWithRawBody } from '../rawBody.middleware'
 import { PaymentsService } from '../service/payments.service'
 import { StripeService } from '../service/stripe.service'
-import { tryCatch } from '@js-monorepo/utils/common'
-import { ApiException } from '@js-monorepo/nest/exceptions'
 
 @Controller('payments')
 export class PaymentsController {
@@ -60,6 +61,7 @@ export class PaymentsController {
   }
 
   @Post('cancel')
+  @HttpCode(204)
   @UseGuards(LoggedInGuard)
   async cancelSubscription(
     @Body() { priceId }: { priceId: number },
@@ -74,15 +76,12 @@ export class PaymentsController {
     const { error } = await tryCatch(() =>
       this.stripeService.cancelSubscription(subscription.stripeSubscriptionId)
     )
+
     if (error) {
       throw new ApiException(
         HttpStatus.NOT_FOUND,
-        'FETCH_SUBSCRIPTION_STRIPE_CANCEL'
+        'ERROR_SUBSCRIPTION_STRIPE_CANCEL'
       )
-    }
-
-    return {
-      success: true,
     }
   }
 }

@@ -259,8 +259,27 @@ export class StripeService {
   }
 
   async cancelSubscription(stripeSubscriptionId: string) {
-    this.stripe.subscriptions.update(stripeSubscriptionId, {
-      cancel_at_period_end: true,
-    })
+    try {
+      const subscription =
+        await this.stripe.subscriptions.retrieve(stripeSubscriptionId)
+
+      // Check if the subscription is already canceled
+      if (subscription.status === 'canceled') {
+        this.logger.warn(
+          `Cannot cancel a subscription that is already canceled. with subscriptionId: '${subscription.id}' and stripe_subscription_id: '${stripeSubscriptionId}'`
+        )
+        throw new Error(
+          'Cannot cancel a subscription that is already canceled.'
+        )
+      }
+
+      // Update the subscription to cancel at the end of the period
+      return await this.stripe.subscriptions.update(stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      })
+    } catch (error) {
+      console.error('Error canceling subscription:', error.message)
+      throw error
+    }
   }
 }
