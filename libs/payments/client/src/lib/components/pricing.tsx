@@ -6,12 +6,7 @@ import { PricingPlanResponse } from '@js-monorepo/types'
 import { loadStripe } from '@stripe/stripe-js'
 import { useRouter } from 'next-nprogress-bar'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import {
-  SessionSubscription,
-  Subscription,
-  SubscriptionPlan,
-  SubscriptionStatus,
-} from '../types'
+import { SessionSubscription, Subscription, SubscriptionPlan } from '../types'
 import {
   apiCancelSubscription,
   apiCheckoutPlan,

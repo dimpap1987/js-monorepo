@@ -2,7 +2,7 @@ model AuthUser {
     id                    Int                @id @default(autoincrement())
     createdAt             DateTime           @default(now())
     updatedAt             DateTime           @updatedAt
-    username              String             @unique
+    username              String             @unique(map: "unique_username") @db.Citext
     email                 String             @unique
     userProfiles          UserProfile[]
     sentNotifications     UserNotification[] @relation("sender")
