@@ -146,7 +146,7 @@ export class PaymentsService {
 
   async findUserSubscriptionStatus(userId: number) {
     const subscriptions =
-      await this.paymentsRepository.findUserSubscriptionStatus(userId)
+      await this.paymentsRepository.findUserSubscriptions(userId)
 
     if (!subscriptions || subscriptions.length === 0) {
       return {

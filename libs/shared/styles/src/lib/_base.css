@@ -70,12 +70,15 @@ img {
 
 *::selection {
   background: hsl(var(--primary));
+  color: white;
 }
 
 *::-moz-selection {
   background: hsl(var(--primary));
+  color: white;
 }
 
 *::-webkit-selection {
   background: hsl(var(--primary));
+  color: white;
 }

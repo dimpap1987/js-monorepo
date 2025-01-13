@@ -80,6 +80,42 @@ function getSubscriptionMessage({
   }
 }
 
+export function CancelActionButton({
+  setDialogOpen,
+  isDialogOpen,
+  onCancel,
+}: {
+  isDialogOpen: boolean
+  setDialogOpen: Dispatch<SetStateAction<boolean>>
+  onCancel?: () => Promise<any>
+}) {
+  return (
+    <>
+      <DpButton
+        size="large"
+        variant="danger"
+        className="w-full"
+        onClick={() => setDialogOpen(true)}
+      >
+        <div className="text-base whitespace-break-spaces">
+          Cancel Subscription
+        </div>
+      </DpButton>
+      <ConfirmationDialog
+        isOpen={isDialogOpen}
+        title="Cancel subscription"
+        content="Are you sure you want to procceed ?"
+        onClose={(yes) => {
+          setDialogOpen(false)
+          if (yes) {
+            onCancel?.()
+          }
+        }}
+      />
+    </>
+  )
+}
+
 export function PlanCardContainer({
   anySubscribed,
   subscribed,
@@ -90,14 +126,14 @@ export function PlanCardContainer({
   return (
     <div
       className={cn(
-        'relative w-full max-w-[360px] sm:w-[360px] shadow-lg flex mx-auto rounded-xl border border-border transform transition-transform duration-300',
+        'relative w-full max-w-[340px] sm:w-[340px] shadow-lg flex mx-auto rounded-xl border border-border transform transition-transform duration-300',
         anySubscribed && !subscribed && 'opacity-55',
         isLoggedIn && isFree && !anySubscribed && 'border-accent',
         subscribed && 'glow',
         anySubscribed && !isFree && 'hover:opacity-100'
       )}
     >
-      <div className="content bg-background-card py-10 px-3 sm:px-6 rounded-xl flex flex-col justify-around text-center w-full">
+      <div className="content bg-background-card py-10 px-3 sm:px-6 rounded-xl flex flex-col text-center w-full">
         {children}
       </div>
     </div>
@@ -140,6 +176,54 @@ const CheckItem = ({ text }: { text: string }) => (
   </>
 )
 
+const renderSubscribedActions = (
+  sub: Subscription,
+  isLoading: boolean,
+  isDialogOpen: boolean,
+  setDialogOpen: Dispatch<SetStateAction<boolean>>,
+  onCheckout?: () => Promise<any>,
+  onCancel?: () => Promise<any>
+) => {
+  switch (sub.status) {
+    case 'active':
+      return sub.cancelAt ? (
+        <DpButton
+          size="large"
+          className="w-full"
+          loading={isLoading}
+          onClick={onCheckout}
+        >
+          <span className="text-base whitespace-break-spaces">Renew</span>
+        </DpButton>
+      ) : (
+        <CancelActionButton
+          isDialogOpen={isDialogOpen}
+          onCancel={onCancel}
+          setDialogOpen={setDialogOpen}
+        />
+      )
+    case 'trialing':
+      return (
+        <DpButton
+          size="large"
+          className="w-full"
+          loading={isLoading}
+          onClick={onCheckout}
+        >
+          <span className="text-base whitespace-break-spaces">Renew</span>
+        </DpButton>
+      )
+    default:
+      return (
+        <CancelActionButton
+          isDialogOpen={isDialogOpen}
+          onCancel={onCancel}
+          setDialogOpen={setDialogOpen}
+        />
+      )
+  }
+}
+
 export function PlanCardContent({
   title,
   description,
@@ -149,62 +233,26 @@ export function PlanCardContent({
 }: PlanCardContentType) {
   return (
     <>
-      <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
+      <h1 className="mb-4">{title}</h1>
       <p className="font-light text-foreground-neutral sm:text-lg">
         {description}
       </p>
       <div className="flex justify-center items-baseline my-6">
-        <span className="mr-2 text-5xl font-extrabold text-gray-900 dark:text-white">
-          {`$${price}`}
-        </span>
+        <h1 className="mr-1 font-extrabold text-gray-900 dark:text-white inline-block">
+          {`€${price}`}
+        </h1>
 
-        <span className="text-gray-500 dark:text-gray-400">
+        <h2 className="text-gray-500 dark:text-gray-400 ">
           {interval && `/${interval}`}
-        </span>
+        </h2>
       </div>
-      <ul role="list" className="mb-8 space-y-3 text-left mt-2">
+      <ul role="list" className="mb-8 space-y-2 text-left mt-2 text-sm">
         {Object.entries(features).map(([key, value]) => (
           <li key={key} className="flex items-center space-x-3">
             <CheckItem text={value as string} />
           </li>
         ))}
       </ul>
-    </>
-  )
-}
-
-export function CancelActionButton({
-  setDialogOpen,
-  isDialogOpen,
-  onCancel,
-}: {
-  isDialogOpen: boolean
-  setDialogOpen: Dispatch<SetStateAction<boolean>>
-  onCancel?: () => Promise<any>
-}) {
-  return (
-    <>
-      <DpButton
-        size="large"
-        variant="danger"
-        className="w-full"
-        onClick={() => setDialogOpen(true)}
-      >
-        <div className="text-base whitespace-break-spaces">
-          Cancel Subscription
-        </div>
-      </DpButton>
-      <ConfirmationDialog
-        isOpen={isDialogOpen}
-        title="Cancel subscription"
-        content="Are you sure you want to procceed ?"
-        onClose={(yes) => {
-          setDialogOpen(false)
-          if (yes) {
-            onCancel?.()
-          }
-        }}
-      />
     </>
   )
 }
@@ -223,7 +271,12 @@ export function PlanCardActions({
 
   if (!isLoggedIn) {
     return (
-      <DpButton size="large" loading={isLoading} onClick={onCheckout}>
+      <DpButton
+        className="w-full"
+        size="large"
+        loading={isLoading}
+        onClick={onCheckout}
+      >
         <span className="text-base whitespace-break-spaces">{actionLabel}</span>
       </DpButton>
     )
@@ -237,49 +290,15 @@ export function PlanCardActions({
     )
   }
 
-  const renderSubscribedActions = (sub: Subscription) => {
-    switch (sub.status) {
-      case 'active':
-        return sub.cancelAt ? (
-          <DpButton
-            size="large"
-            className="w-full"
-            loading={isLoading}
-            onClick={onCheckout}
-          >
-            <span className="text-base whitespace-break-spaces">Renew</span>
-          </DpButton>
-        ) : (
-          <CancelActionButton
-            isDialogOpen={isDialogOpen}
-            onCancel={onCancel}
-            setDialogOpen={setDialogOpen}
-          />
-        )
-      case 'trialing':
-        return (
-          <DpButton
-            size="large"
-            className="w-full"
-            loading={isLoading}
-            onClick={onCheckout}
-          >
-            <span className="text-base whitespace-break-spaces">Renew</span>
-          </DpButton>
-        )
-      default:
-        return (
-          <CancelActionButton
-            isDialogOpen={isDialogOpen}
-            onCancel={onCancel}
-            setDialogOpen={setDialogOpen}
-          />
-        )
-    }
-  }
-
   return isSubscribed && subscription ? (
-    renderSubscribedActions(subscription)
+    renderSubscribedActions(
+      subscription,
+      isLoading,
+      isDialogOpen,
+      setDialogOpen,
+      onCheckout,
+      onCancel
+    )
   ) : (
     <DpButton
       size="large"
@@ -390,16 +409,18 @@ export const PlanCard = ({
         features={features}
       ></PlanCardContent>
 
-      <PlanCardActions
-        isFree={isFree}
-        isLoading={isLoading}
-        isLoggedIn={isLoggedIn}
-        isSubscribed={subscribed}
-        onCheckout={onCheckout}
-        actionLabel={actionLabel}
-        onCancel={handleCancelSubscription}
-        subscription={subscription}
-      ></PlanCardActions>
+      <div className="mt-auto">
+        <PlanCardActions
+          isFree={isFree}
+          isLoading={isLoading}
+          isLoggedIn={isLoggedIn}
+          isSubscribed={subscribed}
+          onCheckout={onCheckout}
+          actionLabel={actionLabel}
+          onCancel={handleCancelSubscription}
+          subscription={subscription}
+        ></PlanCardActions>
+      </div>
     </PlanCardContainer>
   )
 }

@@ -62,7 +62,7 @@ export type PlanCardPropsWithId = Omit<
 
 export type PlanCardActionsType = {
   isSubscribed?: boolean
-  isLoading?: boolean
+  isLoading: boolean
   isLoggedIn?: boolean
   isFree?: boolean
   onCheckout?: () => Promise<any>

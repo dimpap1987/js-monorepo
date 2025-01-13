@@ -125,11 +125,10 @@ export class PaymentsRepository {
     })
   }
 
-  async findUserSubscriptionStatus(
+  async findUserSubscriptions(
     userId: number,
     statuses = ['active', 'trialing']
   ) {
-    const now = new Date()
     return this.txHost.tx.subscription.findMany({
       where: {
         paymentCustomer: {
