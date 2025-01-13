@@ -7,10 +7,10 @@ import { loadStripe } from '@stripe/stripe-js'
 import { useRouter } from 'next-nprogress-bar'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  PlanCardStatus,
   SessionSubscription,
   Subscription,
   SubscriptionPlan,
+  SubscriptionStatus,
 } from '../types'
 import {
   apiCancelSubscription,
@@ -181,7 +181,7 @@ export function Pricing() {
             isLoggedIn={isLoggedIn}
             currentPeriodEnd={subscriptionMap.get(card.id)?.currentPeriodEnd}
             status={
-              (subscriptionMap.get(card.id)?.status as PlanCardStatus) ||
+              (subscriptionMap.get(card.id)?.status as SubscriptionStatus) ||
               'default'
             }
             {...card}

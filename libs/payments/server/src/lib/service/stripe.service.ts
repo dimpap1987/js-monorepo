@@ -207,22 +207,28 @@ export class StripeService {
       this.logger.error('Error while storing stripe event')
     }
 
-    switch (event.type) {
-      case 'customer.subscription.created':
-        return this.handleSubscriptionEvent(event, 'created')
-      case 'customer.subscription.updated':
-        return this.handleSubscriptionEvent(event, 'updated')
-      case 'customer.subscription.deleted':
-        return this.handleSubscriptionEvent(event, 'deleted')
-      case 'invoice.payment_succeeded':
-        return this.handleInvoiceEvent(event, 'succeeded')
-      case 'invoice.payment_failed':
-        return this.handleInvoiceEvent(event, 'failed')
-      case 'checkout.session.completed':
-        return this.handleCheckoutSessionCompleted(event)
-      default:
-        this.logger.warn(`Stripe - unhandled event received: ${event.type}`)
-        break
+    try {
+      switch (event.type) {
+        case 'customer.subscription.created':
+          return await this.handleSubscriptionEvent(event, 'created')
+        case 'customer.subscription.updated':
+          return await this.handleSubscriptionEvent(event, 'updated')
+        case 'customer.subscription.deleted':
+          return await this.handleSubscriptionEvent(event, 'deleted')
+        case 'invoice.payment_succeeded':
+          return await this.handleInvoiceEvent(event, 'succeeded')
+        case 'invoice.payment_failed':
+          return await this.handleInvoiceEvent(event, 'failed')
+        case 'checkout.session.completed':
+          return await this.handleCheckoutSessionCompleted(event)
+        default:
+          this.logger.warn(`Stripe - unhandled event received: ${event.type}`)
+          break
+      }
+    } catch (e) {
+      this.logger.error(
+        `There was an Error in stripe webhook event with id:${event.id}`
+      )
     }
   }
 

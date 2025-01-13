@@ -2,7 +2,13 @@ import { DpButton } from '@js-monorepo/button'
 import { ConfirmationDialog } from '@js-monorepo/dialog'
 import { cn } from '@js-monorepo/ui/util'
 import moment from 'moment'
-import { PropsWithChildren, useRef, useState } from 'react'
+import {
+  Dispatch,
+  PropsWithChildren,
+  SetStateAction,
+  useRef,
+  useState,
+} from 'react'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
 import { useClickAway } from 'react-use'
 import {
@@ -11,6 +17,54 @@ import {
   PlanCardContentType,
   PlanCardProps,
 } from '../types'
+
+function getSubscriptionMessage({
+  status,
+  title,
+  endDate,
+}: {
+  status: string
+  title: string
+  endDate?: Date
+}): JSX.Element | null {
+  if (!endDate) return null
+
+  const formattedDate = moment(endDate).format('YYYY-MM-DD')
+  const formattedTime = moment(endDate).format('hh:mm A')
+
+  switch (status) {
+    case 'active':
+      return (
+        <li>
+          Your <strong>{title}</strong> will renew automatically on{' '}
+          <strong>{formattedDate}</strong> at <strong>{formattedTime}</strong>.
+          <br />
+          You can cancel your subscription anytime before the renewal date.
+        </li>
+      )
+    case 'trialing':
+      return (
+        <li>
+          You're currently on a <strong>trial</strong> for the{' '}
+          <strong>{title}</strong>. Your trial will end on{' '}
+          <strong>{formattedDate}</strong> at <strong>{formattedTime}</strong>.{' '}
+          <br />
+          To continue enjoying the benefits, ensure you subscribe before the
+          trial ends.
+        </li>
+      )
+    case 'canceled':
+      return (
+        <li>
+          Your <strong>{title}</strong> plan has been cancelled. After{' '}
+          <strong>{formattedDate}</strong> at <strong>{formattedTime}</strong>,
+          you will lose the benefits.
+        </li>
+      )
+    default:
+      return null
+  }
+}
 
 export function PlanCardContainer({
   anySubscribed,
@@ -103,50 +157,16 @@ export function PlanCardContent({
   )
 }
 
-export function PlanCardActions({
-  isSubscribed,
-  isLoading,
-  isLoggedIn,
-  isFree,
-  onCheckout,
+export function CancelActionButton({
+  setDialogOpen,
+  isDialogOpen,
   onCancel,
-  actionLabel = 'Get Started',
-  status,
-}: PlanCardActionsType) {
-  const [isDialogOpen, setDialogOpen] = useState(false)
-  if (!isLoggedIn) {
-    return (
-      <DpButton size="large" loading={isLoading} onClick={onCheckout}>
-        <div className="text-base whitespace-break-spaces">Get Started</div>
-      </DpButton>
-    )
-  }
-
-  if (isFree) {
-    return (
-      <div
-        className="h-10 rounded-md px-8 bg-primary [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]
-                 text-white flex items-center justify-center font-semibold"
-      >
-        <div className="text-base whitespace-break-spaces">Free Plan</div>
-      </div>
-    )
-  }
-
-  if (isSubscribed && status === 'canceled') {
-    return (
-      <DpButton
-        size="large"
-        className="w-full"
-        loading={isLoading}
-        onClick={onCheckout}
-      >
-        <div className="text-base whitespace-break-spaces">Renew</div>
-      </DpButton>
-    )
-  }
-
-  return isSubscribed ? (
+}: {
+  isDialogOpen: boolean
+  setDialogOpen: Dispatch<SetStateAction<boolean>>
+  onCancel?: () => Promise<any>
+}) {
+  return (
     <>
       <DpButton
         size="large"
@@ -170,6 +190,64 @@ export function PlanCardActions({
         }}
       />
     </>
+  )
+}
+
+export function PlanCardActions({
+  isSubscribed,
+  isLoading,
+  isLoggedIn,
+  isFree,
+  onCheckout,
+  onCancel,
+  actionLabel = 'Get Started',
+  status,
+}: PlanCardActionsType) {
+  const [isDialogOpen, setDialogOpen] = useState(false)
+
+  if (!isLoggedIn) {
+    return (
+      <DpButton size="large" loading={isLoading} onClick={onCheckout}>
+        <span className="text-base whitespace-break-spaces">{actionLabel}</span>
+      </DpButton>
+    )
+  }
+
+  if (isFree) {
+    return (
+      <div className="h-10 rounded-md px-8 bg-primary text-white flex items-center justify-center font-semibold shadow-md">
+        <span className="text-base whitespace-break-spaces">Free Plan</span>
+      </div>
+    )
+  }
+
+  const renderSubscribedActions = () => {
+    switch (status) {
+      case 'canceled':
+      case 'trialing':
+        return (
+          <DpButton
+            size="large"
+            className="w-full"
+            loading={isLoading}
+            onClick={onCheckout}
+          >
+            <span className="text-base whitespace-break-spaces">Renew</span>
+          </DpButton>
+        )
+      default:
+        return (
+          <CancelActionButton
+            isDialogOpen={isDialogOpen}
+            onCancel={onCancel}
+            setDialogOpen={setDialogOpen}
+          />
+        )
+    }
+  }
+
+  return isSubscribed ? (
+    renderSubscribedActions()
   ) : (
     <DpButton
       size="large"
@@ -178,7 +256,7 @@ export function PlanCardActions({
       onClick={onCheckout}
       disabled={isSubscribed || isFree}
     >
-      <div className="text-base whitespace-break-spaces">{actionLabel}</div>
+      <span className="text-base whitespace-break-spaces">{actionLabel}</span>
     </DpButton>
   )
 }
@@ -249,8 +327,6 @@ export const PlanCard = ({
       setIsLoading(false)
     }
   }
-  const formattedDate = moment(currentPeriodEnd).format('YYYY-MM-DD')
-  const formattedTime = moment(currentPeriodEnd).format('hh:mm A')
 
   return (
     <PlanCardContainer
@@ -263,22 +339,24 @@ export const PlanCard = ({
       {subscribed && (
         <PlanInfo>
           <ol>
-            {status === 'active' && (
-              <li>
-                Your <strong>{title}</strong> will renew automatically on{' '}
-                <strong>{formattedDate}</strong> at{' '}
-                <strong>{formattedTime}</strong>. <br /> Want to make changes?
-                You can cancel your subscription anytime before the renewal
-                date.
-              </li>
-            )}
-            {status === 'canceled' && (
-              <li>
-                Your <strong>{title}</strong> plan have been cancelled so after
-                the <strong>{formattedDate}</strong> at{' '}
-                <strong>{formattedTime}</strong>, you will lose the benefits
-              </li>
-            )}
+            {status === 'active' &&
+              getSubscriptionMessage({
+                status,
+                title,
+                endDate: currentPeriodEnd,
+              })}
+            {status === 'trialing' &&
+              getSubscriptionMessage({
+                status,
+                title,
+                endDate: currentPeriodEnd,
+              })}
+            {status === 'canceled' &&
+              getSubscriptionMessage({
+                status,
+                title,
+                endDate: currentPeriodEnd,
+              })}
           </ol>
         </PlanInfo>
       )}
@@ -299,6 +377,7 @@ export const PlanCard = ({
         onCheckout={onCheckout}
         actionLabel={actionLabel}
         onCancel={handleCancelSubscription}
+        status={status}
       ></PlanCardActions>
     </PlanCardContainer>
   )

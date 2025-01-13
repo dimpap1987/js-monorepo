@@ -37,7 +37,7 @@ export interface SubscriptionData {
   plans: SubscriptionPlan[]
 }
 
-export type PlanCardStatus = 'active' | 'canceled' | 'default'
+export type SubscriptionStatus = 'active' | 'canceled' | 'trialing' | 'default'
 
 export type PlanCardProps = {
   handleCheckout?: () => Promise<any>
@@ -53,7 +53,7 @@ export type PlanCardProps = {
   anySubscribed?: boolean
   isLoggedIn?: boolean
   currentPeriodEnd?: Date
-  status?: PlanCardStatus
+  status?: SubscriptionStatus
 }
 
 export type PlanCardPropsWithId = Omit<
@@ -69,7 +69,7 @@ export type PlanCardActionsType = {
   onCheckout?: () => Promise<any>
   onCancel?: () => Promise<any>
   actionLabel?: string
-  status?: PlanCardStatus
+  status?: SubscriptionStatus
 }
 
 export type PlanCardContainerType = {
