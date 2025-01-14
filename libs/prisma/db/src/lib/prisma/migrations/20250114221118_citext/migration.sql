@@ -1,9 +1,11 @@
+CREATE EXTENSION IF NOT EXISTS citext;
+
 -- CreateTable
 CREATE TABLE "auth_users" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "username" TEXT NOT NULL,
+    "username" CITEXT NOT NULL,
     "email" TEXT NOT NULL,
 
     CONSTRAINT "auth_users_pkey" PRIMARY KEY ("id")
@@ -76,10 +78,10 @@ CREATE TABLE "subscriptions" (
     "id" SERIAL NOT NULL,
     "payment_customer_id" INTEGER NOT NULL,
     "stripe_subscription_id" TEXT,
-    "priceId" TEXT NOT NULL,
+    "priceId" INTEGER NOT NULL,
     "status" TEXT NOT NULL,
     "currentPeriodStart" TIMESTAMP(3),
-    "currentPeriodEnd" TIMESTAMP(3),
+    "currentPeriodEnd" TIMESTAMP(3) NOT NULL,
     "trialStart" TIMESTAMP(3),
     "trialEnd" TIMESTAMP(3),
     "cancelAt" TIMESTAMP(3),
@@ -108,6 +110,7 @@ CREATE TABLE "products" (
     "description" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "features" JSONB,
+    "hierarchy" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -152,7 +155,7 @@ CREATE TABLE "users_notifications" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "auth_users_username_key" ON "auth_users"("username");
+CREATE UNIQUE INDEX "unique_username" ON "auth_users"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "auth_users_email_key" ON "auth_users"("email");
@@ -212,6 +215,9 @@ CREATE INDEX "stripe_webhook_events_event_id_idx" ON "stripe_webhook_events"("ev
 CREATE UNIQUE INDEX "products_stripeId_key" ON "products"("stripeId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "products_name_key" ON "products"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "prices_stripeId_key" ON "prices"("stripeId");
 
 -- AddForeignKey
@@ -231,6 +237,9 @@ ALTER TABLE "user_role" ADD CONSTRAINT "user_role_roleId_fkey" FOREIGN KEY ("rol
 
 -- AddForeignKey
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_payment_customer_id_fkey" FOREIGN KEY ("payment_customer_id") REFERENCES "stripe_customers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_priceId_fkey" FOREIGN KEY ("priceId") REFERENCES "prices"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "prices" ADD CONSTRAINT "prices_productId_fkey" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;

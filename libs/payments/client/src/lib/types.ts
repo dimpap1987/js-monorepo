@@ -43,7 +43,7 @@ export type PlanCardProps = {
   handleCheckout?: () => Promise<any>
   handleCancelSubscription?: () => Promise<any>
   price: number
-  title: string
+  name: string
   description: string
   features: Record<string, string>
   interval: string

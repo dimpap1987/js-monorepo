@@ -5,11 +5,13 @@ import { PaymentsRepository } from './repository/payments.repository'
 import { PaymentsService } from './service/payments.service'
 import { StripeService } from './service/stripe.service'
 import { StripeModule } from './stripe.module'
+import { SubscriptionGuard } from './guards/subscription.guard'
 
 const providers: Provider[] = [
   StripeService,
   PaymentsRepository,
   PaymentsService,
+  SubscriptionGuard,
 ]
 
 @Module({

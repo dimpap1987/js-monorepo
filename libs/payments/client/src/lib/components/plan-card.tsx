@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
+import { MdCancel } from 'react-icons/md'
 import { useClickAway } from 'react-use'
 import {
   PlanCardActionsType,
@@ -22,10 +23,10 @@ import {
 
 function getSubscriptionMessage({
   subscription,
-  title,
+  name,
 }: {
   subscription: Subscription
-  title: string
+  name: string
 }) {
   if (!subscription) return null
 
@@ -33,15 +34,16 @@ function getSubscriptionMessage({
     case 'active':
       return subscription.cancelAt ? (
         <li>
-          Your <strong>{title}</strong> will be canceled at the end of the
-          period{' '}
+          Your <strong className="capitalize">{name}</strong> will be canceled
+          at the end of the period{' '}
           <strong>{moment(subscription.cancelAt).format('YYYY-MM-DD')}</strong>{' '}
           at <strong>{moment(subscription.cancelAt).format('hh:mm A')}</strong>.
           <br />
         </li>
       ) : (
         <li>
-          Your <strong>{title}</strong> will renew automatically on{' '}
+          Your <strong className="capitalize">{name}</strong> will renew
+          automatically on{' '}
           <strong>
             {moment(subscription.currentPeriodEnd).format('YYYY-MM-DD')}
           </strong>{' '}
@@ -58,7 +60,7 @@ function getSubscriptionMessage({
       return (
         <li>
           You're currently on a <strong>trial</strong> for the{' '}
-          <strong>{title}</strong>. Your trial will end on{' '}
+          <strong className="capitalize">{name}</strong>. Your trial will end on{' '}
           <strong>{moment(subscription.trialEnd).format('YYYY-MM-DD')}</strong>{' '}
           at <strong>{moment(subscription.trialEnd).format('hh:mm A')}</strong>.{' '}
           <br />
@@ -69,8 +71,8 @@ function getSubscriptionMessage({
     case 'canceled':
       return (
         <li>
-          Your <strong>{title}</strong> plan has been cancelled. Date of
-          Cancellation:{' '}
+          Your <strong className="capitalize">{name}</strong> plan has been
+          cancelled. Date of Cancellation:{' '}
           <strong>{moment(subscription.cancelAt).format('YYYY-MM-DD')}</strong>{' '}
           at <strong>{moment(subscription.cancelAt).format('hh:mm A')}</strong>,
         </li>
@@ -84,21 +86,23 @@ export function CancelActionButton({
   setDialogOpen,
   isDialogOpen,
   onCancel,
+  className,
 }: {
   isDialogOpen: boolean
   setDialogOpen: Dispatch<SetStateAction<boolean>>
   onCancel?: () => Promise<any>
+  className?: string
 }) {
   return (
     <>
       <DpButton
-        size="large"
         variant="danger"
-        className="w-full"
+        size="small"
+        className={cn('rounded-full p-0', className)}
         onClick={() => setDialogOpen(true)}
       >
         <div className="text-base whitespace-break-spaces">
-          Cancel Subscription
+          <MdCancel size={26} />
         </div>
       </DpButton>
       <ConfirmationDialog
@@ -196,11 +200,19 @@ const renderSubscribedActions = (
           <span className="text-base whitespace-break-spaces">Renew</span>
         </DpButton>
       ) : (
-        <CancelActionButton
-          isDialogOpen={isDialogOpen}
-          onCancel={onCancel}
-          setDialogOpen={setDialogOpen}
-        />
+        <div>
+          <div className="h-10 rounded-md px-8 bg-background border border-border text-foreground flex items-center justify-center font-semibold shadow-md relative">
+            <span className="text-base whitespace-break-spaces">
+              Current Plan
+            </span>
+            <CancelActionButton
+              className="absolute right-3"
+              isDialogOpen={isDialogOpen}
+              onCancel={onCancel}
+              setDialogOpen={setDialogOpen}
+            />
+          </div>
+        </div>
       )
     case 'trialing':
       return (
@@ -233,7 +245,7 @@ export function PlanCardContent({
 }: PlanCardContentType) {
   return (
     <>
-      <h1 className="mb-4">{title}</h1>
+      <h1 className="mb-4 capitalize">{title}</h1>
       <p className="font-light text-foreground-neutral sm:text-lg">
         {description}
       </p>
@@ -352,7 +364,7 @@ export const PlanInfo = ({ children }: PropsWithChildren) => {
 
 export const PlanCard = ({
   handleCheckout,
-  title,
+  name,
   price,
   interval,
   description,
@@ -395,14 +407,14 @@ export const PlanCard = ({
               subscription?.status === 'canceled') &&
               getSubscriptionMessage({
                 subscription,
-                title,
+                name: `${name} plan`,
               })}
           </ol>
         </PlanInfo>
       )}
 
       <PlanCardContent
-        title={title}
+        title={`${name} plan`}
         description={description}
         price={price}
         interval={interval}
