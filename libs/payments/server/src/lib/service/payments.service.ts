@@ -172,7 +172,7 @@ export class PaymentsService {
     }
     return result.map((product) => ({
       id: product.id,
-      title: product.name,
+      name: product.name,
       description: product.description,
       features: product.features,
       // active: product.active,
@@ -235,6 +235,71 @@ export class PaymentsService {
       throw new ApiException(
         HttpStatus.NOT_FOUND,
         'ERROR_FETCH_SUBSCRIPTION_BY_ID_USER_ID'
+      )
+    }
+
+    return result
+  }
+
+  async getActiveSubscriptionByProductAndUserId(
+    userId: number,
+    productName: string
+  ) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.getActiveSubscriptionByProductAndUserId(
+        userId,
+        productName
+      )
+    )
+    if (error) {
+      this.logger.error(
+        `Failed to find active subscription for user with id: ${userId} and product name: ${productName}`
+      )
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'ERROR_FETCH_ACTIVE_SUBSCRIPTION'
+      )
+    }
+    return result
+  }
+
+  async hasActiveSubscription(userId: number, productName: string) {
+    const subscription = await this.getActiveSubscriptionByProductAndUserId(
+      userId,
+      productName
+    )
+
+    return !!subscription
+  }
+
+  async getHighestActivePlanByUser(userId: number) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.getHighestActivePlanByUser(userId)
+    )
+
+    if (error) {
+      this.logger.error(
+        `Error getting highest active plan for user: '${userId}'`
+      )
+      throw new ApiException(
+        HttpStatus.NOT_FOUND,
+        'ERROR_FETCH_HIGHEST_ACTIVE_USER_PLAN'
+      )
+    }
+
+    return result
+  }
+
+  async findProductyByName(name: string) {
+    const { result, error } = await tryCatch(() =>
+      this.paymentsRepository.findProductyByName(name)
+    )
+
+    if (error) {
+      this.logger.error(`Error getting product with name: '${name}'`)
+      throw new ApiException(
+        HttpStatus.NOT_FOUND,
+        'ERROR_FETCH_PRODUCT_BY_NAME'
       )
     }
 

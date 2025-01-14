@@ -87,7 +87,7 @@ export function Pricing() {
           .filter((price) => price.interval === 'month')
           .map((price) => ({
             id: price.id,
-            title: plan.title,
+            name: plan.name,
             description: plan.description,
             price: price.unitAmount / 100,
             interval: price.interval,

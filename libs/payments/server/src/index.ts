@@ -1,8 +1,10 @@
-export * from './lib/stripe.module'
+export * from './lib/decorators/has-product.decorator'
+export * from './lib/guards/subscription.guard'
 export * from './lib/payments.module'
-export * from './lib/service/stripe.service'
-export * from './lib/service/payments.service'
 export * from './lib/rawBody.middleware'
+export * from './lib/service/payments.service'
+export * from './lib/service/stripe.service'
+export * from './lib/stripe.module'
 
 export type CreateProductType = {
   stripeId: string

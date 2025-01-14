@@ -205,4 +205,66 @@ export class PaymentsRepository {
       },
     })
   }
+
+  async getActiveSubscriptionByProductAndUserId(
+    userId: number,
+    productName: string
+  ) {
+    return this.txHost.tx.subscription.findFirst({
+      where: {
+        paymentCustomerId: userId,
+        status: 'active',
+        currentPeriodEnd: {
+          gte: new Date(),
+        },
+        price: {
+          product: {
+            name: productName,
+          },
+        },
+      },
+      include: {
+        price: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    })
+  }
+
+  async getHighestActivePlanByUser(userId: number): Promise<number | null> {
+    const activeSubscription = await this.txHost.tx.subscription.findFirst({
+      where: {
+        paymentCustomerId: userId,
+        status: 'active',
+        currentPeriodEnd: {
+          gte: new Date(),
+        },
+      },
+      include: {
+        price: {
+          include: {
+            product: true,
+          },
+        },
+      },
+      orderBy: {
+        price: {
+          product: {
+            hierarchy: 'desc',
+          },
+        },
+      },
+    })
+
+    return activeSubscription?.price?.product?.hierarchy || null
+  }
+
+  async findProductyByName(name: string) {
+    return this.txHost.tx.product.findUnique({
+      where: { name: name },
+      select: { hierarchy: true, id: true, name: true },
+    })
+  }
 }

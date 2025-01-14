@@ -238,7 +238,7 @@ export interface EditUserDto {
 
 export interface PricingPlanResponse {
   id: number
-  title: string
+  name: string
   description: string
   price: number
   features: Record<string, string>
