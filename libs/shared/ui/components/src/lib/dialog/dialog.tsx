@@ -72,7 +72,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'flex flex-col-reverse sm:flex-row sm:justify-end gap-1 sm:space-x-2 pt-4 border-t border-gray-400',
+      'flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:space-x-2 pt-4 border-t border-gray-400',
       className
     )}
     {...props}
@@ -136,7 +136,7 @@ const DpDialogContent = React.forwardRef<
         {...props}
       >
         <div
-          className="p-4 sm:p-6 grid gap-4 bg-gray-200 text-base font-light
+          className="py-4 px-8 grid gap-4 bg-gray-200 text-base font-light
          text-black shadow-2xl rounded-3xl overflow-hidden"
         >
           {children}

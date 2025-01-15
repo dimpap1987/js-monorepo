@@ -1,17 +1,23 @@
 import { DpButton } from '@js-monorepo/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@js-monorepo/components/tooltip'
 import { ConfirmationDialog } from '@js-monorepo/dialog'
 import { cn } from '@js-monorepo/ui/util'
 import moment from 'moment'
-
 import {
   Dispatch,
   PropsWithChildren,
+  ReactNode,
   SetStateAction,
   useRef,
   useState,
 } from 'react'
 import { HiOutlineDotsVertical } from 'react-icons/hi'
-import { MdCancel } from 'react-icons/md'
+import { MdExitToApp } from 'react-icons/md'
 import { useClickAway } from 'react-use'
 import {
   PlanCardActionsType,
@@ -87,28 +93,40 @@ export function CancelActionButton({
   isDialogOpen,
   onCancel,
   className,
+  smallMessage,
 }: {
   isDialogOpen: boolean
   setDialogOpen: Dispatch<SetStateAction<boolean>>
   onCancel?: () => Promise<any>
   className?: string
+  smallMessage?: ReactNode
 }) {
   return (
     <>
-      <DpButton
-        variant="danger"
-        size="small"
-        className={cn('rounded-full p-0', className)}
-        onClick={() => setDialogOpen(true)}
-      >
-        <div className="text-base whitespace-break-spaces">
-          <MdCancel size={26} />
-        </div>
-      </DpButton>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DpButton
+              variant="secondary"
+              size="small"
+              className={cn('p-1', className)}
+              onClick={() => setDialogOpen(true)}
+            >
+              <div className="text-base whitespace-break-spaces">
+                <MdExitToApp size={26} />
+              </div>
+            </DpButton>
+          </TooltipTrigger>
+          <TooltipContent className="text-white">
+            Cancel Subscription
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={isDialogOpen}
         title="Cancel subscription"
-        content="Are you sure you want to procceed ?"
+        smallMessage={smallMessage}
         onClose={(yes) => {
           setDialogOpen(false)
           if (yes) {
@@ -210,6 +228,20 @@ const renderSubscribedActions = (
               isDialogOpen={isDialogOpen}
               onCancel={onCancel}
               setDialogOpen={setDialogOpen}
+              smallMessage={
+                <div className="text-xs">
+                  Your plan will remain active until{' '}
+                  <strong>
+                    {moment(sub.currentPeriodEnd).format('YYYY-MM-DD')}
+                  </strong>{' '}
+                  at{' '}
+                  <strong>
+                    {moment(sub.currentPeriodEnd).format('hh:mm A')}
+                  </strong>
+                  . You will retain access to all features until this time, even
+                  after cancellation.
+                </div>
+              }
             />
           </div>
         </div>

@@ -82,8 +82,11 @@ export function AccountSettings() {
       {/* Profile Section */}
       <Form {...form}>
         <SettingsItem label="Profile">
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 place-items-center sm:place-items-start">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 px-4"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr,auto] gap-6 place-items-center sm:place-items-start">
               {/* Profile Image */}
               <div className="relative flex justify-center self-center">
                 <Controller
@@ -144,7 +147,7 @@ export function AccountSettings() {
                 control={form.control}
                 name="username"
                 render={({ field }) => (
-                  <FormItem className="w-full">
+                  <FormItem className="sm:max-w-[300px] w-full">
                     <FormLabel className="text-sm font-medium text-gray-300 mb-2 uppercase tracking-wide">
                       Username
                     </FormLabel>
@@ -174,32 +177,30 @@ export function AccountSettings() {
                 )}
               />
 
-              <div className="hidden sm:block"></div>
-
               {/* Edit/Save Buttons */}
               <div className="self-center sm:self-end sm:justify-self-end w-full">
                 {isEditing ? (
-                  <div className="flex gap-3 flex-wrap sm:flex-nowrap sm:justify-end">
+                  <div className="flex gap-3 flex-col-reverse sm:flex-row flex-wrap justify-center sm:flex-nowrap sm:justify-end">
+                    <DpButton
+                      onClick={handleCancel}
+                      variant="outline"
+                      className="flex-1 sm:w-24"
+                    >
+                      Cancel
+                    </DpButton>
                     <DpButton
                       disabled={
                         !form.formState.isValid || !form.formState.isDirty
                       }
                       variant="primary"
                       type="submit"
-                      className="flex-1"
+                      className="flex-1 sm:w-24"
                     >
                       Save
                     </DpButton>
-                    <DpButton
-                      onClick={handleCancel}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      Cancel
-                    </DpButton>
                   </div>
                 ) : (
-                  <div className="flex justify-end">
+                  <div className="flex justify-end flex-col sm:flex-row">
                     <DpButton
                       className="flex-1"
                       type="button"
