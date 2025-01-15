@@ -1,4 +1,3 @@
-import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren } from 'react'
 
 export function SettingsItem({

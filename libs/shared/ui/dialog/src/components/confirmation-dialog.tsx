@@ -16,14 +16,18 @@ export type ConfirmationDialogProps = {
   content?: React.ReactNode
   footer?: React.ReactNode
   onClose?: (yes: boolean) => void
+  smallMessage?: React.ReactNode
 }
 
 export const ConfirmationDialog = ({
   isOpen = false,
   title = 'Confirm Action',
-  content = 'Are you sure you want to proceed?',
+  content = (
+    <span className="font-semibold">Are you sure you want to proceed?</span>
+  ),
   footer,
   onClose,
+  smallMessage,
 }: ConfirmationDialogProps) => {
   const dialogContentRef = useRef<HTMLDivElement | null>(null)
   useClickAway(dialogContentRef, (event) => {
@@ -48,8 +52,9 @@ export const ConfirmationDialog = ({
         </DialogHeader>
         <div className="flex gap-2 items-center">
           <TiWarning size={46} className="text-danger shrink-0" />
-          <div className="flex flex-col text-base gap-4 font-medium p-5 text-gray-700">
-            {content}
+          <div className="flex flex-col text-base gap-3 font-medium p-5 text-gray-700">
+            <div>{content}</div>
+            <div>{smallMessage}</div>
           </div>
         </div>
         {footer ? (
