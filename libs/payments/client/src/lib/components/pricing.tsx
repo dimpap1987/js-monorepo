@@ -14,6 +14,8 @@ import {
   apiGetSubscription,
 } from '../utils/api'
 import { PlanCard } from './plan-card'
+import { useSearchParams } from 'next/navigation'
+import { ErrorDialog } from '@js-monorepo/dialog'
 
 const PricingHeader = ({ title }: { title: string }) => (
   <section className="text-center">
@@ -70,11 +72,13 @@ function usePlans() {
 export function Pricing() {
   const { session, isLoggedIn } = useSession()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { addNotification } = useNotifications()
   const stripePromise = useMemo(
     () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!),
     []
   )
+  const [hasErrors, setHasErrors] = useState(false)
   const { plans, fetchPlans } = usePlans()
   const { subscriptionMap, fetchSubscriptions } = useSubscriptionMap()
 
@@ -98,6 +102,12 @@ export function Pricing() {
       )
       .sort((a, b) => a.price - b.price)
   }, [plans, subscriptionMap])
+
+  useEffect(() => {
+    if (searchParams?.get('success') === 'false') {
+      setHasErrors(true)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     fetchPlans()
@@ -163,6 +173,13 @@ export function Pricing() {
     }
   }, [])
 
+  const handleErrorDialogClose = () => {
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+    newSearchParams.delete('success')
+    router.replace(`${window.location.pathname}?${newSearchParams.toString()}`)
+    setHasErrors(false)
+  }
+
   return (
     <div>
       <PricingHeader title="Select a Pricing Plan" />
@@ -179,6 +196,14 @@ export function Pricing() {
           />
         ))}
       </section>
+      {hasErrors && (
+        <ErrorDialog
+          isOpen={hasErrors}
+          title="Payment Unsuccessful"
+          errorMessage="Something went wrong, please verify your payment details."
+          onClose={handleErrorDialogClose}
+        />
+      )}
     </div>
   )
 }

@@ -6,8 +6,6 @@ import {
   DialogTitle,
   DpDialogContent,
 } from '@js-monorepo/components/dialog'
-import { useRef } from 'react'
-import { useClickAway } from 'react-use'
 import { TiWarning } from 'react-icons/ti'
 
 export type ConfirmationDialogProps = {
@@ -29,11 +27,6 @@ export const ConfirmationDialog = ({
   onClose,
   smallMessage,
 }: ConfirmationDialogProps) => {
-  const dialogContentRef = useRef<HTMLDivElement | null>(null)
-  useClickAway(dialogContentRef, (event) => {
-    onClose?.(false)
-  })
-
   return (
     <Dialog
       open={isOpen}
@@ -44,7 +37,7 @@ export const ConfirmationDialog = ({
         }
       }}
     >
-      <DpDialogContent ref={dialogContentRef}>
+      <DpDialogContent>
         <DialogHeader className="font-semibold justify-center">
           <DialogTitle className="text-left font-semibold text-lg">
             {title}
