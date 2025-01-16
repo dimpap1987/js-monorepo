@@ -3,7 +3,6 @@
 import { Badge } from '@js-monorepo/components/badge'
 import { Skeleton } from '@js-monorepo/components/skeleton'
 import { useWebSocket } from '@js-monorepo/next/providers'
-import { wait } from '@js-monorepo/utils/common'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useEffect, useState } from 'react'
 import { FaCircle } from 'react-icons/fa6'
@@ -22,15 +21,27 @@ export default function OnlineUsersTableComponent() {
   const { socket } = useWebSocket(websocketOptions, true)
 
   useEffect(() => {
-    socket?.emit('subscribe:online-users', {})
+    if (!socket) return
 
-    socket?.on('events:online-users', async (users) => {
-      await wait(300)
+    const handleConnect = () => {
+      socket.emit('subscribe:online-users', {})
+    }
+
+    const handleOnlineUsersEvent = async (users: any) => {
       setOnlineUsers(users)
       setLoading(false)
-    })
+    }
+
+    socket.on('connect', handleConnect)
+    socket.on('events:online-users', handleOnlineUsersEvent)
+
+    if (socket.connected) {
+      handleConnect()
+    }
+
     return () => {
-      socket?.off('events:online-users')
+      socket.off('connect', handleConnect)
+      socket.off('events:online-users', handleOnlineUsersEvent)
     }
   }, [socket])
 
