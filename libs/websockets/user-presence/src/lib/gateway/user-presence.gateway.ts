@@ -43,14 +43,9 @@ export class UserPresenceGateway
   }
 
   onModuleDestroy() {
+    this.logger.debug('UserPresenceGateway webscoket service shut down')
     clearInterval(this.intervalId)
-    if (this.namespace?.sockets) {
-      this.namespace.sockets.forEach((socket) => {
-        socket.disconnect()
-        this.logger.debug(`Disconnected socket: ${socket.id}`)
-      })
-    }
-    this.logger.debug('User presence onModuleDestroy')
+    this.namespace?.disconnectSockets()
   }
 
   async handleConnection(socket: Socket) {

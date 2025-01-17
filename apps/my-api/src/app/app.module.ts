@@ -5,7 +5,7 @@ import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
 import {
   AuthSessionMiddleware,
   AuthSessionModule,
-  SESSION_REDIS_PATH,
+  getRedisSessionPath,
 } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
@@ -22,9 +22,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
 import { ClsModule } from 'nestjs-cls'
+import { GracefulShutdownModule } from 'nestjs-graceful-shutdown'
 import passport from 'passport'
 import { RedisClientType } from 'redis'
 import { v4 as uuidv4 } from 'uuid'
+import { apiLogger } from '../main'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { AnnouncementsController } from './controllers/announcements'
 import { AppController } from './controllers/app.controller'
@@ -37,6 +39,16 @@ import { UserModule } from './modules/user/user.module'
 const ENV = process.env.NODE_ENV
 @Module({
   imports: [
+    GracefulShutdownModule.forRoot({
+      cleanup: async (app, signal) => {
+        apiLogger.warn(`Shutdown hook received with signal: ${signal}`)
+        app.close()
+      },
+      gracefulShutdownTimeout: Number(
+        process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 3000
+      ),
+      keepNodeProcessAlive: true,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [`.env.${ENV}`, `.env`],
@@ -125,7 +137,7 @@ export class AppModule implements NestModule {
         session({
           store: new RedisStore({
             client: this.redis,
-            prefix: SESSION_REDIS_PATH,
+            prefix: getRedisSessionPath(),
           }),
           genid: () => uuidv4(),
           saveUninitialized: false,

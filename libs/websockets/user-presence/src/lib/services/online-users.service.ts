@@ -2,7 +2,7 @@ import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
-import { ONLINE_KEY_LIST } from '../constants/constants'
+import { getRedisOnlineKeyList } from '../constants/constants'
 
 @Injectable()
 export class OnlineUsersService {
@@ -19,7 +19,7 @@ export class OnlineUsersService {
       const end = start + limit - 1
 
       const onlineUsers = await this.redisClient.zRange(
-        ONLINE_KEY_LIST,
+        getRedisOnlineKeyList(),
         start,
         end
       )
@@ -47,7 +47,7 @@ export class OnlineUsersService {
   async add(value: string): Promise<any> {
     if (value === undefined || value === null) return
 
-    return this.redisClient.zAdd(ONLINE_KEY_LIST, {
+    return this.redisClient.zAdd(getRedisOnlineKeyList(), {
       score: Date.now(),
       value: value,
     })
@@ -55,11 +55,11 @@ export class OnlineUsersService {
 
   async remove(value: string): Promise<any> {
     if (value === undefined || value === null) return
-    return this.redisClient.zRem(ONLINE_KEY_LIST, `${value}`)
+    return this.redisClient.zRem(getRedisOnlineKeyList(), `${value}`)
   }
 
   async clear() {
-    return this.redisClient.del(ONLINE_KEY_LIST)
+    return this.redisClient.del(getRedisOnlineKeyList())
   }
 
   async removeByUserId(userId: number) {
@@ -68,7 +68,7 @@ export class OnlineUsersService {
     try {
       do {
         const { cursor: newCursor, members } = await this.redisClient.zScan(
-          ONLINE_KEY_LIST,
+          getRedisOnlineKeyList(),
           cursor,
           {
             MATCH: userKeyPattern,
@@ -79,7 +79,7 @@ export class OnlineUsersService {
 
         if (members.length > 0) {
           const deletePromises = members.map(async (member) => {
-            await this.redisClient.zRem(ONLINE_KEY_LIST, member.value)
+            await this.redisClient.zRem(getRedisOnlineKeyList(), member.value)
             this.logger.debug(`Deleted session with member: ${member.value}`)
           })
           await Promise.all(deletePromises)

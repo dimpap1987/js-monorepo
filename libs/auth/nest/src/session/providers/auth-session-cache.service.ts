@@ -5,8 +5,8 @@ import { RedisClientType } from 'redis'
 import { AuthException } from '../../common/exceptions/api-exception'
 import { AuthService } from '../../common/services/interfaces/auth.service'
 import { ServiceAuth } from '../../common/types'
-import { SESSION_REDIS_PATH } from '../auth-session.module'
-import { USER_SESSION_KEY } from '../constants'
+import { getRedisSessionPath } from '../auth-session.module'
+import { getRedisUserSessionKey } from '../constants'
 
 interface UserSession {
   key: string
@@ -39,7 +39,7 @@ export class AuthSessionUserCacheService {
   }
 
   async findAuthUserById(id: number): Promise<SessionUserType | undefined> {
-    const cacheUser = await this.redis.get(`${USER_SESSION_KEY}:${id}`)
+    const cacheUser = await this.redis.get(`${getRedisUserSessionKey()}:${id}`)
     return cacheUser ? JSON.parse(cacheUser) : undefined
   }
 
@@ -74,7 +74,7 @@ export class AuthSessionUserCacheService {
       }
 
       await this.redis.set(
-        `${USER_SESSION_KEY}:${userCache.id}`,
+        `${getRedisUserSessionKey()}:${userCache.id}`,
         JSON.stringify(userCache),
         {
           EX: ttl, // Set expiration time
@@ -88,7 +88,7 @@ export class AuthSessionUserCacheService {
   }
 
   async fetchUserSessionsByUserId(userId: number): Promise<UserSession[]> {
-    const sessionKeyPattern = `${SESSION_REDIS_PATH}*`
+    const sessionKeyPattern = `${getRedisSessionPath()}*`
     let cursor = 0
     const userSessions: UserSession[] = []
 
@@ -146,6 +146,6 @@ export class AuthSessionUserCacheService {
     }
   }
   async invalidateAuthUserInCache(userId: number) {
-    return this.redis.del(`${USER_SESSION_KEY}:${userId}`)
+    return this.redis.del(`${getRedisUserSessionKey()}:${userId}`)
   }
 }
