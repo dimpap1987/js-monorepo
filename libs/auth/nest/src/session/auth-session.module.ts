@@ -32,7 +32,12 @@ import { AuthSessionUserCacheService } from './providers/auth-session-cache.serv
 import { SessionSerializer } from './providers/session-serializer'
 import { SessionService } from './services/session.service'
 
-export const SESSION_REDIS_PATH = `${process.env['REDIS_NAMESPACE']}:sessions:`
+export const getRedisSessionPath = () => {
+  return process.env['REDIS_NAMESPACE']
+    ? `${process.env['REDIS_NAMESPACE']}:sessions:`
+    : 'sessions:'
+}
+
 @Global()
 @Module({
   imports: [

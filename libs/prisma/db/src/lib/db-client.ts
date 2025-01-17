@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
+import {
+  Injectable,
+  Logger,
+  OnApplicationShutdown,
+  OnModuleInit,
+} from '@nestjs/common'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 @Injectable()
@@ -7,7 +12,7 @@ export class PrismaService
     Prisma.PrismaClientOptions,
     'query' | 'info' | 'warn' | 'error'
   >
-  implements OnModuleInit
+  implements OnModuleInit, OnApplicationShutdown
 {
   private readonly logger = new Logger(PrismaService.name)
 
@@ -31,6 +36,12 @@ export class PrismaService
   async onModuleInit() {
     await this.handleDatabaseConnection()
     this.handleEvents()
+  }
+
+  async onApplicationShutdown(signal?: string) {
+    this.logger.warn(`Application shutting down... Signal: ${signal}`)
+    await this.$disconnect()
+    this.logger.warn('Disconnected from database.')
   }
 
   private async handleDatabaseConnection() {

@@ -1,4 +1,4 @@
-import { SESSION_REDIS_PATH } from '@js-monorepo/auth/nest/session'
+import { getRedisSessionPath } from '@js-monorepo/auth/nest/session'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { SocketUser } from '@js-monorepo/types'
 import { Inject, Injectable, Logger } from '@nestjs/common'
@@ -6,7 +6,7 @@ import { RedisClientType } from '@redis/client'
 import * as cookie from 'cookie'
 import * as cookieParser from 'cookie-parser'
 import { Socket } from 'socket.io'
-import { SOCKET_KEY } from '../constants/constants'
+import { getRedisSocketKey } from '../constants/constants'
 @Injectable()
 export class UserSocketService {
   private logger = new Logger(UserSocketService.name)
@@ -18,7 +18,7 @@ export class UserSocketService {
     ttl?: number
   ) {
     return this.redisClient.set(
-      `${SOCKET_KEY}:${socket}`,
+      `${getRedisSocketKey()}:${socket}`,
       JSON.stringify({
         userId: userId,
         socket: socket,
@@ -30,7 +30,7 @@ export class UserSocketService {
   }
 
   async removeSocketUserBySocketId(socketId: number | string) {
-    return this.redisClient.del(`${SOCKET_KEY}:${socketId}`)
+    return this.redisClient.del(`${getRedisSocketKey()}:${socketId}`)
   }
 
   async retrieveUserSessionFromSocket(socket: Socket) {
@@ -43,7 +43,7 @@ export class UserSocketService {
       )
 
       const sessionData = await this.redisClient.get(
-        `${SESSION_REDIS_PATH}${decodedSession}`
+        `${getRedisSessionPath()}${decodedSession}`
       )
 
       if (!sessionData) return undefined
@@ -60,7 +60,7 @@ export class UserSocketService {
   }
 
   async findSocketsByUserId(userId: string | number): Promise<string[]> {
-    const userKeyPattern = `${SOCKET_KEY}:*`
+    const userKeyPattern = `${getRedisSocketKey()}:*`
     let cursor = 0
     const matchingSockets: string[] = []
 

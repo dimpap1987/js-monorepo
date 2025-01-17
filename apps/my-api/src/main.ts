@@ -1,4 +1,5 @@
 import { LoggerService } from '@js-monorepo/nest/logger'
+import { rawBodyMiddleware } from '@js-monorepo/payments-server'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
@@ -7,26 +8,40 @@ import { config } from 'dotenv'
 import { expand } from 'dotenv-expand'
 import helmet from 'helmet'
 import { ClsService } from 'nestjs-cls'
+import { setupGracefulShutdown } from 'nestjs-graceful-shutdown'
 import { AppModule } from './app/app.module'
-import { rawBodyMiddleware } from '@js-monorepo/payments-server'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
+export const apiLogger = new Logger('API')
+const port = process.env.PORT || 3333
+const globalPrefix = 'api'
+
+function logServerMetadata() {
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
+  const host = process.env.HOST || 'localhost'
+  apiLogger.log('Process ID: ' + process.pid)
+  apiLogger.log('Parent Process ID: ' + process.ppid)
+  apiLogger.log('Node Version: ' + process.version)
+  apiLogger.log('Platform: ' + process.platform)
+  apiLogger.log(
+    `🚀 Api is up on: ${protocol}://${host}:${port}/${globalPrefix}`
+  )
+}
+
 async function bootstrap() {
+  apiLogger.log('Starting application...')
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
     forceCloseConnections: true,
   })
 
+  setupGracefulShutdown({ app })
+
   app.useLogger(
     new LoggerService(app.get(ClsService), process.env.LOGGER_LEVEL)
   )
-
-  const port = process.env.PORT || 3333
-  const globalPrefix = 'api'
-
   app.setGlobalPrefix(globalPrefix)
-
   app.use(cookieParser())
   app.enableCors({
     origin: process.env.CORS_ORIGIN_DOMAINS,
@@ -37,9 +52,7 @@ async function bootstrap() {
       contentSecurityPolicy: false,
     })
   )
-
   app.use(rawBodyMiddleware())
-
   app.useGlobalPipes(
     new ValidationPipe({
       forbidNonWhitelisted: true,
@@ -55,10 +68,7 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(redisIoAdapter)
   await app.listen(port)
-
-  Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
-  )
+  logServerMetadata()
 }
 
 bootstrap()
