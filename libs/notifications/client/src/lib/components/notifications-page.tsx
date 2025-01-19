@@ -119,7 +119,7 @@ export function NotificationsPage({
   return (
     <div
       className={cn(
-        'text-sm sm:text-base select-none sm:p-3 text-white',
+        'text-sm sm:text-base select-none sm:p-3',
         'flex flex-col h-full',
         className
       )}
@@ -151,7 +151,7 @@ export function NotificationsPage({
       </div>
 
       {/* Render Notifications */}
-      <section className="flex-1 overflow-hidden bg-background-secondary rounded-md p-1 py-2">
+      <section className="flex-1 overflow-hidden text-white bg-background-secondary rounded-md p-1 py-2">
         {loadingRef.current === false ? (
           notifications?.content && notifications.content.length > 0 ? (
             <ScrollArea className="h-full">

@@ -41,14 +41,14 @@ export const PushNotificationSender = () => {
         placeholder="Enter notification title..."
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 bg-gray-900"
+        className="w-full border border-gray-300 rounded-md p-2 bg-gray-900 text-white"
       />
 
       <textarea
         placeholder="Type your message here..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="w-full border border-gray-300 rounded-md p-2 bg-gray-900"
+        className="w-full border border-gray-300 rounded-md p-2 bg-gray-900 text-white"
         rows={4}
       />
 

@@ -21,7 +21,7 @@ import * as z from 'zod'
 
 const schema = z
   .object({
-    message: z.string().nonempty('Message cannot be empty'),
+    message: z.string().min(1, 'Message cannot be empty'),
     selectedUserIds: z.array(z.number()).optional(),
     isGlobal: z.boolean(),
   })
@@ -58,13 +58,7 @@ const CreateAnnouncement = () => {
       isGlobal: data.isGlobal,
     })
 
-    if (submitResponse.ok) {
-      form.reset()
-      addNotification({
-        message: 'Announcement sent successfully',
-        type: 'success',
-      })
-    } else {
+    if (!submitResponse.ok) {
       addNotification({
         message: 'Error sending Announcement',
         type: 'error',
@@ -89,7 +83,7 @@ const CreateAnnouncement = () => {
                   <textarea
                     {...field}
                     placeholder="Type your message here..."
-                    className="w-full border border-gray-300 rounded-md p-2 bg-gray-900"
+                    className="w-full border border-gray-300 rounded-md p-2 bg-gray-900 text-white"
                     rows={4}
                   />
                 </FormControl>
