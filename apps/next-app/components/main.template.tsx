@@ -192,7 +192,7 @@ export default function MainTemplate({
       </DpNextNavbar>
 
       <AnnouncementsComponent
-        className="fixed top-[calc(var(--navbar-height)_+_5px)] h-4"
+        className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-50"
         websocketOptions={websocketOptions}
       ></AnnouncementsComponent>
 

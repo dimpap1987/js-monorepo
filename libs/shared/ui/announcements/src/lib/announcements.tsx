@@ -41,7 +41,7 @@ export function AnnouncementsComponent({
     >
       {announcements.map((message, index) => (
         <span
-          className="dark:text-lime-300 font-semibold tracking-wider font-mono select-none"
+          className="text-lime-600 dark:text-lime-300 font-semibold tracking-wider font-mono select-none"
           key={index}
         >
           {message}

@@ -171,7 +171,7 @@ export function ActiveSubscriptionLabel({
     subscribed && (
       <div
         className="bg-green-50 text-green-600 absolute top-0 
-                -translate-y-1/2 right-5 z-10 p-1.5 px-3 border border-green-400 
+                -translate-y-1/2 right-5 p-1.5 px-3 border border-green-400 
                 rounded-full shadow-md font-medium"
       >
         Active

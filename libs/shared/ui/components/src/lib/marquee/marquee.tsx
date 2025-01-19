@@ -75,7 +75,7 @@ const Marquee = forwardRef(
           {React.Children.map(children, (child, index) => (
             <motion.div
               key={index}
-              className="px-4 absolute bg-background"
+              className="px-4 absolute"
               ref={(node) => {
                 childRefs.current.set(index, node)
               }}
