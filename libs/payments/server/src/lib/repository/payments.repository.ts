@@ -38,6 +38,13 @@ export class PaymentsRepository {
   async createSubscription(payload: CreateSubscriptionDto) {
     return this.txHost.tx.subscription.create({
       data: payload,
+      include: {
+        price: {
+          select: {
+            product: true,
+          },
+        },
+      },
     })
   }
 
@@ -75,6 +82,13 @@ export class PaymentsRepository {
         cancelAt: toDate(subscriptionData.cancel_at),
         canceledAt: toDate(subscriptionData.canceled_at),
       },
+      include: {
+        price: {
+          select: {
+            product: true,
+          },
+        },
+      },
     })
   }
 
@@ -84,6 +98,13 @@ export class PaymentsRepository {
       data: {
         status: subscriptionData.status,
         canceledAt: toDate(subscriptionData.cancel_at),
+      },
+      include: {
+        price: {
+          select: {
+            product: true,
+          },
+        },
       },
     })
   }

@@ -1,15 +1,11 @@
 import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { ApiException } from '@js-monorepo/nest/exceptions'
-import { CreateProductWithPricesRequest } from '../../'
+import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import Stripe from 'stripe'
+import { CreateProductWithPricesRequest, PaymentsModuleOptions } from '../../'
 import { StripeClient } from '../stripe.module'
 import { PaymentsService } from './payments.service'
-import {
-  Events,
-  UserPresenceWebsocketService,
-} from '@js-monorepo/user-presence'
-import { Transactional } from '@nestjs-cls/transactional'
 
 @Injectable()
 export class StripeService {
@@ -18,7 +14,8 @@ export class StripeService {
   constructor(
     @Inject(StripeClient) private readonly stripe: Stripe,
     private readonly paymentsService: PaymentsService,
-    private userPresenceWebsocketService: UserPresenceWebsocketService
+    @Inject('PAYMENTS_OPTIONS')
+    private readonly paymentsModuleOptions: PaymentsModuleOptions
   ) {}
 
   async findCustomerByEmail(email: string) {
@@ -147,7 +144,7 @@ export class StripeService {
     )
 
     if (type === 'created') {
-      await this.paymentsService.createSubscription({
+      const sub = await this.paymentsService.createSubscription({
         paymentCustomerId: paymentCustomer?.id,
         stripeSubscriptionId: subscriptionData.id,
         priceId: price.id,
@@ -159,15 +156,44 @@ export class StripeService {
         cancelAt: toDate(subscriptionData.cancel_at),
         canceledAt: toDate(subscriptionData.canceled_at),
       })
+
+      //callback
+      this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(
+        paymentCustomer.userId,
+        {
+          id: sub.id,
+          name: sub.price?.product?.name,
+        }
+      )
     } else if (type == 'updated') {
-      await this.paymentsService.updateSubscription(subscriptionData)
+      const sub =
+        await this.paymentsService.updateSubscription(subscriptionData)
+
+      //callback
+      this.paymentsModuleOptions.onSubscriptionUpdateSuccess?.(
+        paymentCustomer.userId,
+        {
+          id: sub.id,
+          name: sub.price?.product?.name,
+        }
+      )
     } else if (type == 'deleted') {
-      await this.paymentsService.deleteSubscription(subscriptionData)
+      const sub =
+        await this.paymentsService.deleteSubscription(subscriptionData)
+
+      //callback
+      this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(
+        paymentCustomer.userId,
+        {
+          id: sub.id,
+          name: sub.price?.product?.name,
+        }
+      )
     }
-    this.userPresenceWebsocketService.sendToUsers(
-      [paymentCustomer.userId],
-      Events.refreshSession,
-      true
+
+    this.paymentsModuleOptions.onSubscriptionEvent?.(
+      paymentCustomer.userId,
+      type
     )
   }
 

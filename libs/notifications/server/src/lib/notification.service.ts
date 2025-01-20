@@ -1,6 +1,11 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { REDIS } from '@js-monorepo/nest/redis'
-import { NotificationCreateDto, Pageable } from '@js-monorepo/types'
+import {
+  CreateUserNotificationType,
+  NotificationCreateDto,
+  Pageable,
+  UserNotificationType,
+} from '@js-monorepo/types'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
@@ -164,5 +169,18 @@ export class NotificationService {
 
   async getTotalUnreadNotifications(userId: number): Promise<number> {
     return this.notificationRepository.getTotalUnreadNotifications(userId)
+  }
+
+  notificationToPresenceMessage(
+    data: CreateUserNotificationType
+  ): UserNotificationType {
+    return {
+      notification: {
+        id: data?.id,
+        createdAt: data?.createdAt,
+        message: data?.message,
+      },
+      isRead: false,
+    }
   }
 }
