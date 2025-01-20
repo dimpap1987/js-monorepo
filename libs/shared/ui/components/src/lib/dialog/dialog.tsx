@@ -140,12 +140,12 @@ const DpDialogContent = React.forwardRef<
           {children}
         </div>
         <DialogPrimitive.Close
-          className="absolute p-[4px] right-[10px] top-[10px] rounded-full bg-red-500
+          className="absolute p-[4px] right-[7px] top-[7px] rounded-full bg-red-500
         ring-offset-background transition-all focus:outline-none focus:ring-2  hover:ring-2 ring-white
         disabled:pointer-events-none data-[state=open]:bg-accent
          data-[state=open]:text-foreground"
         >
-          <Cross2Icon className="h-3 w-3 stroke-white" />
+          <Cross2Icon className="h-5 w-5 stroke-white" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
