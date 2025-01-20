@@ -13,7 +13,6 @@ import {
   SessionUserType,
   UserNotificationType,
 } from '@js-monorepo/types'
-import { UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import {
   Body,
   Controller,
@@ -34,10 +33,7 @@ import { NotificationService } from './notification.service'
 @UseGuards(LoggedInGuard)
 export class NotificationController {
   private logger = new Logger(NotificationController.name)
-  constructor(
-    private notificationService: NotificationService,
-    private readonly userPresenceWebsocketService: UserPresenceWebsocketService
-  ) {}
+  constructor(private notificationService: NotificationService) {}
 
   @Post()
   @UseGuards(RolesGuard)
@@ -46,17 +42,6 @@ export class NotificationController {
     //TODO Validate body
     try {
       const result = await this.notificationService.createNotification(payload)
-
-      await this.userPresenceWebsocketService.sendToUsers(
-        payload.receiverIds,
-        'events:notifications',
-        {
-          data: this.notificationService.notificationToPresenceMessage(
-            result.notification
-          ),
-        }
-      )
-
       this.logger.log(
         `Notifications successfully created and sent to '${result.total}' users`
       )
