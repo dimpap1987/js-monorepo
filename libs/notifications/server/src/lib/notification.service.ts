@@ -6,16 +6,17 @@ import {
   Pageable,
   UserNotificationType,
 } from '@js-monorepo/types'
+import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
+import sanitizeHtml from 'sanitize-html'
 import { sendNotification, setVapidDetails } from 'web-push'
 import {
   NotificationRepo,
   NotificationRepository,
 } from './notification.repository'
 import { NotificationModuleOptions } from './notifications.module'
-import { tryCatch } from '@js-monorepo/utils/common'
 
 export interface Subscription {
   endpoint: string
@@ -148,7 +149,11 @@ export class NotificationService {
     this.logger.debug(
       `Creating new notification - Sender is : '${payload.senderId}'`
     )
-    const not = await this.notificationRepository.createNotification(payload)
+    const sanitizedMessage = sanitizeHtml(payload.message)
+    const not = await this.notificationRepository.createNotification({
+      ...payload,
+      message: sanitizedMessage,
+    })
 
     tryCatch(() => {
       this.notificationModuleOptions.onNotificationCreation?.(

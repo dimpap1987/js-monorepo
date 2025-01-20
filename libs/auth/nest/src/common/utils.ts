@@ -19,3 +19,6 @@ export const authCookiesOptions: CookieOptions = {
 
 export const toDate = (timestamp?: number): Date | undefined =>
   timestamp ? new Date(timestamp * 1000) : undefined
+
+export const capitalize = (s: string) =>
+  s && String(s[0]).toUpperCase() + String(s).slice(1)
