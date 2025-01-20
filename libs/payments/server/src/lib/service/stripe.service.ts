@@ -1,5 +1,6 @@
 import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import Stripe from 'stripe'
@@ -158,43 +159,51 @@ export class StripeService {
       })
 
       //callback
-      this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(
-        paymentCustomer.userId,
-        {
-          id: sub.id,
-          name: sub.price?.product?.name,
-        }
-      )
+      tryCatch(() => {
+        this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(
+          paymentCustomer.userId,
+          {
+            id: sub.id,
+            name: sub.price?.product?.name,
+          }
+        )
+      })
     } else if (type == 'updated') {
       const sub =
         await this.paymentsService.updateSubscription(subscriptionData)
 
       //callback
-      this.paymentsModuleOptions.onSubscriptionUpdateSuccess?.(
-        paymentCustomer.userId,
-        {
-          id: sub.id,
-          name: sub.price?.product?.name,
-        }
-      )
+      tryCatch(() => {
+        this.paymentsModuleOptions.onSubscriptionUpdateSuccess?.(
+          paymentCustomer.userId,
+          {
+            id: sub.id,
+            name: sub.price?.product?.name,
+          }
+        )
+      })
     } else if (type == 'deleted') {
       const sub =
         await this.paymentsService.deleteSubscription(subscriptionData)
 
       //callback
-      this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(
-        paymentCustomer.userId,
-        {
-          id: sub.id,
-          name: sub.price?.product?.name,
-        }
-      )
+      tryCatch(() => {
+        this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(
+          paymentCustomer.userId,
+          {
+            id: sub.id,
+            name: sub.price?.product?.name,
+          }
+        )
+      })
     }
 
-    this.paymentsModuleOptions.onSubscriptionEvent?.(
-      paymentCustomer.userId,
-      type
-    )
+    tryCatch(() => {
+      this.paymentsModuleOptions.onSubscriptionEvent?.(
+        paymentCustomer.userId,
+        type
+      )
+    })
   }
 
   private async handleInvoiceEvent(

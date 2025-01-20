@@ -10,6 +10,7 @@ import {
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import {
+  Events as NotificationEvent,
   NotificationServerModule,
   NotificationService,
 } from '@js-monorepo/notifications-server'
@@ -42,6 +43,30 @@ import { UserModule } from './modules/user/user.module'
 const ENV = process.env.NODE_ENV
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [`.env.${ENV}`, `.env`],
+    }),
+    ClsModule.forRoot({
+      global: true,
+      middleware: {
+        mount: true,
+        setup: (cls, req) => {
+          if (req.cookies['JSESSIONID']) {
+            cls.set('session-id', req.cookies['JSESSIONID'])
+          }
+        },
+      },
+      plugins: [
+        new ClsPluginTransactional({
+          imports: [PrismaModule],
+          adapter: new TransactionalAdapterPrisma({
+            prismaInjectionToken: PrismaService,
+          }),
+        }),
+      ],
+    }),
+    PrismaModule,
     GracefulShutdownModule.forRoot({
       cleanup: async (app, signal) => {
         apiLogger.warn(`Shutdown hook received with signal: ${signal}`)
@@ -51,10 +76,6 @@ const ENV = process.env.NODE_ENV
         process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 3000
       ),
       keepNodeProcessAlive: true,
-    }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: [`.env.${ENV}`, `.env`],
     }),
     HealthModule,
     RedisModule.forRootAsync({
@@ -102,29 +123,28 @@ const ENV = process.env.NODE_ENV
         },
       }),
     }),
-    PrismaModule,
     FilterProviderModule,
     AdminProviderModule,
-    NotificationServerModule,
     UserModule,
-    ClsModule.forRoot({
-      global: true,
-      middleware: {
-        mount: true,
-        setup: (cls, req) => {
-          if (req.cookies['JSESSIONID']) {
-            cls.set('session-id', req.cookies['JSESSIONID'])
-          }
+    NotificationServerModule.forRootAsync({
+      imports: [UserPresenceModule],
+      inject: [UserPresenceWebsocketService],
+      useFactory: async (userPresenceWebsocketService) => ({
+        onNotificationCreation(receiverIds, notification) {
+          apiLogger.log(
+            `Notification created with id: '${notification.id}' and publish it to users : [${receiverIds?.join(', ')}]`
+          )
+          userPresenceWebsocketService.sendToUsers(
+            receiverIds,
+            NotificationEvent.notifications,
+            {
+              data: {
+                notification,
+              },
+            }
+          )
         },
-      },
-      plugins: [
-        new ClsPluginTransactional({
-          imports: [PrismaModule],
-          adapter: new TransactionalAdapterPrisma({
-            prismaInjectionToken: PrismaService,
-          }),
-        }),
-      ],
+      }),
     }),
     PaymentsModule.forRootAsync({
       imports: [UserPresenceModule, NotificationServerModule],

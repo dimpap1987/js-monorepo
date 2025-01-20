@@ -14,6 +14,8 @@ import {
   NotificationRepo,
   NotificationRepository,
 } from './notification.repository'
+import { NotificationModuleOptions } from './notifications.module'
+import { tryCatch } from '@js-monorepo/utils/common'
 
 export interface Subscription {
   endpoint: string
@@ -45,7 +47,9 @@ export class NotificationService {
   constructor(
     @Inject(NotificationRepo)
     private notificationRepository: NotificationRepository,
-    @Inject(REDIS) private readonly redis: RedisClientType
+    @Inject(REDIS) private readonly redis: RedisClientType,
+    @Inject('NOTIFICATION_OPTIONS')
+    private readonly notificationModuleOptions: NotificationModuleOptions
   ) {
     setVapidDetails(
       `mailto:${process.env.ADMIN_EMAIL}`,
@@ -144,7 +148,18 @@ export class NotificationService {
     this.logger.debug(
       `Creating new notification - Sender is : '${payload.senderId}'`
     )
-    return this.notificationRepository.createNotification(payload)
+    const not = await this.notificationRepository.createNotification(payload)
+
+    tryCatch(() => {
+      this.notificationModuleOptions.onNotificationCreation?.(
+        payload.receiverIds,
+        {
+          ...not.notification,
+        }
+      )
+    })
+
+    return not
   }
 
   @Transactional()
