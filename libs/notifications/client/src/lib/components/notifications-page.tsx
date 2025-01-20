@@ -19,7 +19,6 @@ import {
   humanatizeNotificationDate,
   updateNotificationAsRead,
 } from '../utils/notifications'
-import { NoticationItemContext } from './bell/notification-item-content'
 import { NotificationReadAllButton } from './bell/notification-read-all'
 
 export function NotificationsPage({
@@ -176,13 +175,14 @@ export function NotificationsPage({
                   >
                     <div className="flex items-center">
                       <GoDotFill
-                        className={`text-sm mr-1 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-foreground'}`}
+                        className={`text-sm mr-1 shrink-0 ${content.isRead ? 'text-gray-500' : 'text-white'}`}
                       />
-                      <div className="flex-1 p-1 max-line--height break-all overflow-hidden text-ellipsis whitespace-normal select-text">
-                        <NoticationItemContext
-                          message={content.notification.message}
-                        ></NoticationItemContext>
-                      </div>
+                      <div
+                        className="flex-1 p-1 max-line--height break-all overflow-hidden text-ellipsis whitespace-normal select-text text-gray-300"
+                        dangerouslySetInnerHTML={{
+                          __html: content.notification?.message,
+                        }}
+                      ></div>
                       <div className="flex px-2 flex-col sm:gap-1 gap-0 items-end sm:flex-row text-[10px] md:text-sm text-gray-500">
                         <span>
                           {humanatizeNotificationDate(

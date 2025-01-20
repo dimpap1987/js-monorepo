@@ -1,3 +1,4 @@
+import { capitalize } from '@js-monorepo/auth/nest/common/utils'
 import { PaymentsModule } from '@js-monorepo/payments-server'
 import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
@@ -157,7 +158,7 @@ const ENV = process.env.NODE_ENV
           notificationService.createNotification({
             receiverIds: [userId],
             senderId: 1,
-            message: `Your subscription plan '${subscription.name?.toUpperCase()}' has been successfully activated! 🎉`,
+            message: `Your <strong>${capitalize(subscription.name)}</strong> subscription plan has been successfully activated! 🎉`,
           })
         },
         onSubscriptionEvent: (userId, event) => {
