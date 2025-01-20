@@ -9,7 +9,10 @@ import {
 } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
-import { NotificationServerModule } from '@js-monorepo/notifications-server'
+import {
+  NotificationServerModule,
+  NotificationService,
+} from '@js-monorepo/notifications-server'
 import { AuthUserDto } from '@js-monorepo/types'
 import {
   Events,
@@ -104,7 +107,6 @@ const ENV = process.env.NODE_ENV
     AdminProviderModule,
     NotificationServerModule,
     UserModule,
-    PaymentsModule,
     ClsModule.forRoot({
       global: true,
       middleware: {
@@ -123,6 +125,32 @@ const ENV = process.env.NODE_ENV
           }),
         }),
       ],
+    }),
+    PaymentsModule.forRootAsync({
+      imports: [UserPresenceModule, NotificationServerModule],
+      inject: [UserPresenceWebsocketService, NotificationService],
+      useFactory: async (
+        userPresenceWebsocketService,
+        notificationService
+      ) => ({
+        onSubscriptionCreateSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            senderId: 1,
+            message: `Your subscription plan: '${subscription.name?.toUpperCase()}' has been successfully activated! 🎉`,
+          })
+        },
+        onSubscriptionEvent: (userId, event) => {
+          apiLogger.log(
+            `Subscription event callback received with event: '${event}' and userId id : ${userId}`
+          )
+          userPresenceWebsocketService.sendToUsers(
+            [userId],
+            Events.refreshSession,
+            true
+          )
+        },
+      }),
     }),
   ],
   controllers: [ExceptionController, AnnouncementsController, AppController],

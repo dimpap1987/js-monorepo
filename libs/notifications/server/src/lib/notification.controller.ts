@@ -5,9 +5,9 @@ import {
   RolesGuard,
   SessionUser,
 } from '@js-monorepo/auth/nest/session'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import {
   CreatePushNotificationType,
-  CreateUserNotificationType,
   NotificationCreateDto,
   PaginationType,
   SessionUserType,
@@ -29,7 +29,6 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { NotificationService } from './notification.service'
-import { ApiException } from '@js-monorepo/nest/exceptions'
 
 @Controller('notifications')
 @UseGuards(LoggedInGuard)
@@ -51,7 +50,11 @@ export class NotificationController {
       await this.userPresenceWebsocketService.sendToUsers(
         payload.receiverIds,
         'events:notifications',
-        { data: this.transformSelect(result.notification) }
+        {
+          data: this.notificationService.notificationToPresenceMessage(
+            result.notification
+          ),
+        }
       )
 
       this.logger.log(
@@ -140,19 +143,6 @@ export class NotificationController {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_PAYLOAD')
     }
     await this.notificationService.saveUserSubscription(userId, subscription)
-  }
-
-  private transformSelect(
-    data: CreateUserNotificationType
-  ): UserNotificationType {
-    return {
-      notification: {
-        id: data?.id,
-        createdAt: data?.createdAt,
-        message: data?.message,
-      },
-      isRead: false,
-    }
   }
 
   @Post('push-notification')
