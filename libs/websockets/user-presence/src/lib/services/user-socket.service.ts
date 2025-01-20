@@ -2,23 +2,33 @@ import { getRedisSessionPath } from '@js-monorepo/auth/nest/session'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { SocketUser } from '@js-monorepo/types'
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { RedisClientType } from '@redis/client'
-import * as cookie from 'cookie'
-import * as cookieParser from 'cookie-parser'
+import cookie from 'cookie'
+import cookieParser from 'cookie-parser'
 import { Socket } from 'socket.io'
-import { getRedisSocketKey } from '../constants/constants'
+
 @Injectable()
 export class UserSocketService {
   private logger = new Logger(UserSocketService.name)
+  private readonly redisNamespace: string
 
-  constructor(@Inject(REDIS) private readonly redisClient: RedisClientType) {}
+  constructor(
+    @Inject(REDIS) private readonly redisClient: RedisClientType,
+    private readonly configService: ConfigService
+  ) {
+    const onlineSocketUser = 'online:socket-user'
+    this.redisNamespace = this.configService.get<string>('REDIS_NAMESPACE')
+      ? `${this.configService.get<string>('REDIS_NAMESPACE')}:${onlineSocketUser}`
+      : onlineSocketUser
+  }
 
   async addSocketUser(
     { userId, socket, pid, session }: SocketUser,
     ttl?: number
   ) {
     return this.redisClient.set(
-      `${getRedisSocketKey()}:${socket}`,
+      `${this.redisNamespace}:${socket}`,
       JSON.stringify({
         userId: userId,
         socket: socket,
@@ -30,7 +40,7 @@ export class UserSocketService {
   }
 
   async removeSocketUserBySocketId(socketId: number | string) {
-    return this.redisClient.del(`${getRedisSocketKey()}:${socketId}`)
+    return this.redisClient.del(`${this.redisNamespace}:${socketId}`)
   }
 
   async retrieveUserSessionFromSocket(socket: Socket) {
@@ -39,7 +49,7 @@ export class UserSocketService {
 
       const decodedSession = cookieParser.signedCookie(
         cookies['JSESSIONID'],
-        process.env['SESSION_SECRET'] ?? ''
+        this.configService.get('SESSION_SECRET') ?? ''
       )
 
       const sessionData = await this.redisClient.get(
@@ -60,7 +70,7 @@ export class UserSocketService {
   }
 
   async findSocketsByUserId(userId: string | number): Promise<string[]> {
-    const userKeyPattern = `${getRedisSocketKey()}:*`
+    const userKeyPattern = `${this.redisNamespace}:*`
     let cursor = 0
     const matchingSockets: string[] = []
 

@@ -17,6 +17,7 @@ import {
   NotificationRepository,
 } from './notification.repository'
 import { NotificationModuleOptions } from './notifications.module'
+import { ConfigService } from '@nestjs/config'
 
 export interface Subscription {
   endpoint: string
@@ -33,34 +34,32 @@ export interface UserSubscription {
   subscription: Subscription
 }
 
-export const getUserSubscriptionRedisKey = (userId: number) =>
-  `${process.env['REDIS_NAMESPACE']}:push_subscription:user:${userId}`
-
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name)
-
-  private readonly vapidKeys = {
-    publicKey: process.env.VAPID_PUBLIC_KEY,
-    privateKey: process.env.VAPID_PRIVATE_KEY,
-  }
+  private readonly redisNamespace: string
 
   constructor(
     @Inject(NotificationRepo)
     private notificationRepository: NotificationRepository,
     @Inject(REDIS) private readonly redis: RedisClientType,
     @Inject('NOTIFICATION_OPTIONS')
-    private readonly notificationModuleOptions: NotificationModuleOptions
+    private readonly notificationModuleOptions: NotificationModuleOptions,
+    private readonly configService: ConfigService
   ) {
     setVapidDetails(
-      `mailto:${process.env.ADMIN_EMAIL}`,
-      this.vapidKeys.publicKey,
-      this.vapidKeys.privateKey
+      `mailto:${this.configService.get<string>('ADMIN_EMAIL')}`,
+      this.configService.get<string>('VAPID_PUBLIC_KEY'),
+      this.configService.get<string>('VAPID_PRIVATE_KEY')
     )
+
+    this.redisNamespace = this.configService.get<string>('REDIS_NAMESPACE')
+      ? `${this.configService.get<string>('REDIS_NAMESPACE')}:push_subscription:user:`
+      : 'push_subscription:user:'
   }
 
   async saveUserSubscription(userId: number, subscription: any): Promise<void> {
-    const redisKey = getUserSubscriptionRedisKey(userId)
+    const redisKey = this.redisNamespace + userId
 
     // Validate subscription object
     if (!subscription || !subscription.endpoint || !subscription.keys) {
@@ -90,7 +89,7 @@ export class NotificationService {
   async getUserSubscriptions(
     userId: number
   ): Promise<UserSubscription[] | null> {
-    const redisKey = getUserSubscriptionRedisKey(userId)
+    const redisKey = this.redisNamespace + userId
 
     const subscriptionsData = await this.redis.hGetAll(redisKey)
 

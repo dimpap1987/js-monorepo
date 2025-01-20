@@ -1,17 +1,24 @@
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { RedisClientType } from '@redis/client'
-import { getRedisOnlineKeyList } from '../constants/constants'
 
 @Injectable()
 export class OnlineUsersService {
-  logger = new Logger(OnlineUsersService.name)
+  private logger = new Logger(OnlineUsersService.name)
+  private readonly redisNamespace: string
 
   constructor(
     @Inject(REDIS) private readonly redisClient: RedisClientType,
-    private readonly authSessionUserCacheService: AuthSessionUserCacheService
-  ) {}
+    private readonly authSessionUserCacheService: AuthSessionUserCacheService,
+    private readonly configService: ConfigService
+  ) {
+    const onlineUsersList = 'online:online-users-list'
+    this.redisNamespace = this.configService.get<string>('REDIS_NAMESPACE')
+      ? `${this.configService.get<string>('REDIS_NAMESPACE')}:${onlineUsersList}`
+      : onlineUsersList
+  }
 
   async getList(page = 1, limit = 100) {
     try {
@@ -19,7 +26,7 @@ export class OnlineUsersService {
       const end = start + limit - 1
 
       const onlineUsers = await this.redisClient.zRange(
-        getRedisOnlineKeyList(),
+        this.redisNamespace,
         start,
         end
       )
@@ -47,7 +54,7 @@ export class OnlineUsersService {
   async add(value: string): Promise<any> {
     if (value === undefined || value === null) return
 
-    return this.redisClient.zAdd(getRedisOnlineKeyList(), {
+    return this.redisClient.zAdd(this.redisNamespace, {
       score: Date.now(),
       value: value,
     })
@@ -55,11 +62,11 @@ export class OnlineUsersService {
 
   async remove(value: string): Promise<any> {
     if (value === undefined || value === null) return
-    return this.redisClient.zRem(getRedisOnlineKeyList(), `${value}`)
+    return this.redisClient.zRem(this.redisNamespace, `${value}`)
   }
 
   async clear() {
-    return this.redisClient.del(getRedisOnlineKeyList())
+    return this.redisClient.del(this.redisNamespace)
   }
 
   async removeByUserId(userId: number) {
@@ -68,7 +75,7 @@ export class OnlineUsersService {
     try {
       do {
         const { cursor: newCursor, members } = await this.redisClient.zScan(
-          getRedisOnlineKeyList(),
+          this.redisNamespace,
           cursor,
           {
             MATCH: userKeyPattern,
@@ -79,7 +86,7 @@ export class OnlineUsersService {
 
         if (members.length > 0) {
           const deletePromises = members.map(async (member) => {
-            await this.redisClient.zRem(getRedisOnlineKeyList(), member.value)
+            await this.redisClient.zRem(this.redisNamespace, member.value)
             this.logger.debug(`Deleted session with member: ${member.value}`)
           })
           await Promise.all(deletePromises)
