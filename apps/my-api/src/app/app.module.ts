@@ -157,7 +157,7 @@ const ENV = process.env.NODE_ENV
           notificationService.createNotification({
             receiverIds: [userId],
             senderId: 1,
-            message: `Your subscription plan: '${subscription.name?.toUpperCase()}' has been successfully activated! 🎉`,
+            message: `Your subscription plan '${subscription.name?.toUpperCase()}' has been successfully activated! 🎉`,
           })
         },
         onSubscriptionEvent: (userId, event) => {
