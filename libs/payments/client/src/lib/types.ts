@@ -34,11 +34,6 @@ export interface ProductDetails {
   id: number
 }
 
-export interface SubscriptionData {
-  isSubscribed: boolean
-  plans: SubscriptionPlan[]
-}
-
 export type PlanCardProps = {
   handleCheckout?: () => Promise<any>
   handleCancelSubscription?: () => Promise<any>
@@ -54,11 +49,6 @@ export type PlanCardProps = {
   isLoggedIn?: boolean
   subscription?: Subscription
 }
-
-export type PlanCardPropsWithId = Omit<
-  { id: number } & PlanCardProps,
-  'isLoggedIn' | 'handleCheckout'
->
 
 export type PlanCardActionsType = {
   isSubscribed?: boolean
