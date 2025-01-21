@@ -15,10 +15,6 @@ export interface SessionUserType {
   email?: string
 }
 
-export interface SessionPayload {
-  user: SessionUserType
-}
-
 export type SuccessResponse<T = any> = {
   ok: true
   data?: T
@@ -56,13 +52,6 @@ export const PROVIDERS_ARRAY = ['GITHUB', 'GOOGLE', 'FACEBOOK'] as const
 export type ProviderName = (typeof PROVIDERS_ARRAY)[number]
 
 export type AuthRole = 'ADMIN' | 'USER'
-
-export type ProviderDto = {
-  id: number
-  profileImage?: string | null
-  type: ProviderName
-  userId: number
-}
 
 export type ProvidersDto = {
   id: number
