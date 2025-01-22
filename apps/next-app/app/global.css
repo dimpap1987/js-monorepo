@@ -43,13 +43,7 @@
 
 .glow {
   --border-angle: 0turn;
-  --main-bg: conic-gradient(
-    from var(--border-angle),
-    #213,
-    #112 5%,
-    #112 60%,
-    #213 95%
-  );
+  --main-bg: conic-gradient(from var(--border-angle), #213, #112 5%, #112 60%, #213 95%);
   border: solid 2px transparent;
   --gradient-border: conic-gradient(
     from var(--border-angle),

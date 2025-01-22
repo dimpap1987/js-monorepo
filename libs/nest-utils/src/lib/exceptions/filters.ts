@@ -64,11 +64,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         GlobalExceptionFilter.name
       )
     } else {
-      Logger.error(
-        `Unkown error happened - path: '${request.originalUrl}'`,
-        exception,
-        GlobalExceptionFilter.name
-      )
+      Logger.error(`Unkown error happened - path: '${request.originalUrl}'`, exception, GlobalExceptionFilter.name)
     }
 
     return response.status(status).json({
@@ -85,10 +81,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
-  override catch(
-    exception: Prisma.PrismaClientKnownRequestError,
-    host: ArgumentsHost
-  ) {
+  override catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     Logger.error(
       `Exception of type: 'PrismaClientKnownRequestError' - message: '${exception.message}' - code: '${exception.code}'`,
       exception.stack,
@@ -112,9 +105,7 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const errorMessage = exception.response?.message
     Logger.error(
-      `Exception of type: 'BadRequestException' - message: '${
-        errorMessage ? errorMessage : exception.message
-      }'`,
+      `Exception of type: 'BadRequestException' - message: '${errorMessage ? errorMessage : exception.message}'`,
       exception.stack,
       BadRequestExceptionFilter.name
     )

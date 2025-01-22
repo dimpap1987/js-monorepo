@@ -14,17 +14,9 @@ const spinnerLoader = {
   stroke: 'white',
 }
 
-export function DpLoadingSpinner({
-  message,
-  styles,
-  className,
-}: DpLoadingProps) {
+export function DpLoadingSpinner({ message, styles, className }: DpLoadingProps) {
   return (
-    <div
-      aria-label="Loading..."
-      role="status"
-      className={cn('flex items-center text-sm', className)}
-    >
+    <div aria-label="Loading..." role="status" className={cn('flex items-center text-sm', className)}>
       <svg
         style={{ ...spinnerLoader, ...styles }}
         className="animate-spin h-5 w-5 text-blue-600 inline-block"
@@ -32,23 +24,10 @@ export function DpLoadingSpinner({
         fill="none"
         viewBox="0 0 24 24"
       >
-        <circle
-          className="opacity-35"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        ></circle>
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 0116 0H4z"
-        ></path>
+        <circle className="opacity-35" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0H4z"></path>
       </svg>
-      {message && (
-        <div className="leading-4 font-bold ml-2 text-nowrap">{message}</div>
-      )}
+      {message && <div className="leading-4 font-bold ml-2 text-nowrap">{message}</div>}
     </div>
   )
 }

@@ -9,9 +9,7 @@ import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 
 @Injectable()
 export class PaymentsRepository {
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
-  ) {}
+  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async createProduct(payload: CreateProductType) {
     return this.txHost.tx.product.create({
@@ -48,10 +46,7 @@ export class PaymentsRepository {
     })
   }
 
-  async createOrUpdatePaymentCustomer(payload: {
-    stripeCustomerId: string
-    userId: number
-  }) {
+  async createOrUpdatePaymentCustomer(payload: { stripeCustomerId: string; userId: number }) {
     return this.txHost.tx.paymentCustomer.upsert({
       where: { userId: payload.userId },
       create: payload,
@@ -68,10 +63,7 @@ export class PaymentsRepository {
     })
   }
 
-  async handleSubscriptionUpdated(
-    subscriptionData: Stripe.Subscription,
-    priceId: number
-  ) {
+  async handleSubscriptionUpdated(subscriptionData: Stripe.Subscription, priceId: number) {
     return this.txHost.tx.subscription.update({
       where: { stripeSubscriptionId: subscriptionData.id },
       data: {
@@ -148,10 +140,7 @@ export class PaymentsRepository {
     })
   }
 
-  async findUserSubscriptions(
-    userId: number,
-    statuses = ['active', 'trialing']
-  ) {
+  async findUserSubscriptions(userId: number, statuses = ['active', 'trialing']) {
     return this.txHost.tx.subscription.findMany({
       where: {
         paymentCustomer: {
@@ -229,10 +218,7 @@ export class PaymentsRepository {
     })
   }
 
-  async getActiveSubscriptionByProductAndUserId(
-    userId: number,
-    productName: string
-  ) {
+  async getActiveSubscriptionByProductAndUserId(userId: number, productName: string) {
     return this.txHost.tx.subscription.findFirst({
       where: {
         paymentCustomerId: userId,

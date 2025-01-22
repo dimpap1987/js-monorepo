@@ -3,11 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@js-monorepo/components/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
 import {
   Form,
   FormControl,
@@ -82,10 +78,7 @@ export function AccountSettings() {
       {/* Profile Section */}
       <Form {...form}>
         <SettingsItem label="Profile">
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 px-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 px-4">
             <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr,auto] gap-6 place-items-center sm:place-items-start">
               {/* Profile Image */}
               <div className="relative flex justify-center self-center">
@@ -95,15 +88,8 @@ export function AccountSettings() {
                   render={({ field }) => (
                     <div className="relative flex justify-center self-center">
                       <Avatar className="h-24 w-24">
-                        {profileImageWatch && (
-                          <AvatarImage
-                            src={profileImageWatch}
-                            alt="user's picture"
-                          />
-                        )}
-                        <AvatarFallback className="bg-background">
-                          NA
-                        </AvatarFallback>
+                        {profileImageWatch && <AvatarImage src={profileImageWatch} alt="user's picture" />}
+                        <AvatarFallback className="bg-background">NA</AvatarFallback>
                       </Avatar>
 
                       {isEditing && (
@@ -120,16 +106,11 @@ export function AccountSettings() {
                             onChange={async (e) => {
                               if (e.target.files?.[0]) {
                                 try {
-                                  const base64Image = (await compressAvatar(
-                                    e.target.files[0]
-                                  )) as string
+                                  const base64Image = (await compressAvatar(e.target.files[0])) as string
 
                                   field.onChange(base64Image)
                                 } catch (error) {
-                                  console.error(
-                                    'Error converting file to Base64:',
-                                    error
-                                  )
+                                  console.error('Error converting file to Base64:', error)
                                 }
                               }
                             }}
@@ -153,11 +134,7 @@ export function AccountSettings() {
                     </FormLabel>
                     <FormControl>
                       {isEditing ? (
-                        <Input
-                          id="username"
-                          className="h-10 w-full"
-                          {...field}
-                        />
+                        <Input id="username" className="h-10 w-full" {...field} />
                       ) : (
                         <p className="w-full h-10 px-6 py-2 bg-background text-secondary rounded-xl border border-border font-semibold flex items-center shadow-md">
                           {field.value}
@@ -181,17 +158,11 @@ export function AccountSettings() {
               <div className="self-center sm:self-end sm:justify-self-end w-full">
                 {isEditing ? (
                   <div className="flex gap-3 flex-col-reverse sm:flex-row flex-wrap justify-center sm:flex-nowrap sm:justify-end">
-                    <DpButton
-                      onClick={handleCancel}
-                      variant="outline"
-                      className="flex-1 sm:w-24"
-                    >
+                    <DpButton onClick={handleCancel} variant="outline" className="flex-1 sm:w-24">
                       Cancel
                     </DpButton>
                     <DpButton
-                      disabled={
-                        !form.formState.isValid || !form.formState.isDirty
-                      }
+                      disabled={!form.formState.isValid || !form.formState.isDirty}
                       variant="primary"
                       type="submit"
                       className="flex-1 sm:w-24"
@@ -223,24 +194,16 @@ export function AccountSettings() {
       <SettingsItem label="Account details">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <dt className="text-sm font-medium text-gray-300 uppercase tracking-wide">
-              Account Created
-            </dt>
+            <dt className="text-sm font-medium text-gray-300 uppercase tracking-wide">Account Created</dt>
             <dd className="mt-1 font-semibold">
-              {user?.createdAt
-                ? new Date(user.createdAt).toLocaleDateString()
-                : 'N/A'}
+              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
             </dd>
           </div>
 
           {isAdmin && (
             <div>
-              <dt className="text-sm font-medium text-gray-300 uppercase tracking-wide">
-                Roles
-              </dt>
-              <dd className="mt-1 font-semibold">
-                {user?.roles.join(', ') || 'None'}
-              </dd>
+              <dt className="text-sm font-medium text-gray-300 uppercase tracking-wide">Roles</dt>
+              <dd className="mt-1 font-semibold">{user?.roles.join(', ') || 'None'}</dd>
             </div>
           )}
         </div>

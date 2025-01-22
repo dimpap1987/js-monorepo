@@ -12,38 +12,19 @@ export interface SubscriptionCallback {
 }
 
 export interface PaymentsModuleOptions {
-  onSubscriptionCreateSuccess?: (
-    userId: number,
-    subscription: SubscriptionCallback
-  ) => void
-  onSubscriptionUpdateSuccess?: (
-    userId: number,
-    subscription: SubscriptionCallback
-  ) => void
-  onSubscriptionDeleteSuccess?: (
-    userId: number,
-    subscription: SubscriptionCallback
-  ) => void
-  onSubscriptionEvent?: (
-    userId: number,
-    event: 'created' | 'updated' | 'deleted'
-  ) => void
+  onSubscriptionCreateSuccess?: (userId: number, subscription: SubscriptionCallback) => void
+  onSubscriptionUpdateSuccess?: (userId: number, subscription: SubscriptionCallback) => void
+  onSubscriptionDeleteSuccess?: (userId: number, subscription: SubscriptionCallback) => void
+  onSubscriptionEvent?: (userId: number, event: 'created' | 'updated' | 'deleted') => void
 }
 
-const providers: Provider[] = [
-  StripeService,
-  PaymentsRepository,
-  PaymentsService,
-  SubscriptionGuard,
-]
+const providers: Provider[] = [StripeService, PaymentsRepository, PaymentsService, SubscriptionGuard]
 
 @Global()
 @Module({})
 export class PaymentsModule {
   static forRootAsync(options: {
-    useFactory?: (
-      ...args: any[]
-    ) => PaymentsModuleOptions | Promise<PaymentsModuleOptions>
+    useFactory?: (...args: any[]) => PaymentsModuleOptions | Promise<PaymentsModuleOptions>
     inject?: any[]
     imports?: any[]
   }): DynamicModule {

@@ -11,10 +11,7 @@ export class RedisEventEmitter implements EventEmitterInterface {
     private eventEmitter: EventEmitter2
   ) {}
 
-  emit(
-    eventName: string,
-    { data, publish = true }: PublishableDataInterface
-  ): void {
+  emit(eventName: string, { data, publish = true }: PublishableDataInterface): void {
     if (publish) {
       this.redisPubClient.publish(eventName, JSON.stringify({ data }))
     } else {

@@ -1,19 +1,8 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
-import {
-  registerServiceWorker,
-  requestPushPermission,
-  subscribeNotifactionToServer,
-} from './utils'
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
+import { registerServiceWorker, requestPushPermission, subscribeNotifactionToServer } from './utils'
 
 interface WebNotificationContextType {
   permission: NotificationPermission
@@ -21,14 +10,10 @@ interface WebNotificationContextType {
   requestPermission: () => void
 }
 
-const WebNotificationContext = createContext<
-  WebNotificationContextType | undefined
->(undefined)
+const WebNotificationContext = createContext<WebNotificationContextType | undefined>(undefined)
 
 const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
-  const [permission, setPermission] = useState<NotificationPermission>(
-    Notification.permission
-  )
+  const [permission, setPermission] = useState<NotificationPermission>(Notification.permission)
   const {
     session: { user },
   } = useSession()
@@ -64,9 +49,7 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
   )
 
   return (
-    <WebNotificationContext.Provider
-      value={{ permission, createNotification, requestPermission }}
-    >
+    <WebNotificationContext.Provider value={{ permission, createNotification, requestPermission }}>
       {children}
     </WebNotificationContext.Provider>
   )
@@ -75,9 +58,7 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
 const useWebPushNotification = (): WebNotificationContextType => {
   const context = useContext(WebNotificationContext)
   if (!context) {
-    throw new Error(
-      'useWebPushNotification must be used within a WebNotificationProvider'
-    )
+    throw new Error('useWebPushNotification must be used within a WebNotificationProvider')
   }
   return context
 }

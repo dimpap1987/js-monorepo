@@ -9,10 +9,7 @@ export interface DpMarkdownProps {
   readonly className?: string
 }
 
-export function DpMarkdown({
-  markdownCode,
-  className: innerClassName,
-}: DpMarkdownProps) {
+export function DpMarkdown({ markdownCode, className: innerClassName }: DpMarkdownProps) {
   return (
     markdownCode && (
       <Markdown

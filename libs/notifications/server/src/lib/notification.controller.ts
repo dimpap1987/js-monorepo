@@ -1,10 +1,6 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
-import {
-  LoggedInGuard,
-  RolesGuard,
-  SessionUser,
-} from '@js-monorepo/auth/nest/session'
+import { LoggedInGuard, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import {
   CreatePushNotificationType,
@@ -42,18 +38,10 @@ export class NotificationController {
     //TODO Validate body
     try {
       const result = await this.notificationService.createNotification(payload)
-      this.logger.log(
-        `Notifications successfully created and sent to '${result.total}' users`
-      )
+      this.logger.log(`Notifications successfully created and sent to '${result.total}' users`)
     } catch (e: any) {
-      this.logger.error(
-        `Error while sending notification to user: ${payload?.receiverIds?.join(', ')}`,
-        e.stack
-      )
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        'ERROR_CREATE_NOTIFICATION'
-      )
+      this.logger.error(`Error while sending notification to user: ${payload?.receiverIds?.join(', ')}`, e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATE_NOTIFICATION')
     }
   }
 
@@ -76,10 +64,7 @@ export class NotificationController {
 
   @Patch(':notificationId/read')
   @HttpCode(204)
-  async markAsRead(
-    @Param('notificationId') notificationId: number,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async markAsRead(@Param('notificationId') notificationId: number, @SessionUser() sessionUser: SessionUserType) {
     try {
       await this.notificationService.markAsRead(notificationId, sessionUser.id)
     } catch (e: any) {
@@ -93,14 +78,8 @@ export class NotificationController {
     try {
       await this.notificationService.markAllAsRead(sessionUser.id)
     } catch (e: any) {
-      this.logger.error(
-        'Error while marking all notifications as read',
-        e.stack
-      )
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        'ERROR_READ_ALL_NOTIFICATIONS'
-      )
+      this.logger.error('Error while marking all notifications as read', e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_READ_ALL_NOTIFICATIONS')
     }
   }
 
@@ -111,19 +90,13 @@ export class NotificationController {
       await this.notificationService.archiveNotification(notificationId)
     } catch (e: any) {
       this.logger.error('Error while set notification archieve', e.stack)
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        'ERROR_ARCHIVE_NOTIFICATIONS'
-      )
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_ARCHIVE_NOTIFICATIONS')
     }
   }
 
   @Post('subscribe/:userId')
   @HttpCode(204)
-  async subscribeUser(
-    @Param('userId') userId: number,
-    @Body() subscription: any
-  ) {
+  async subscribeUser(@Param('userId') userId: number, @Body() subscription: any) {
     if (!subscription || !subscription.endpoint || !subscription.keys) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_PAYLOAD')
     }
@@ -147,14 +120,8 @@ export class NotificationController {
         },
       })
     } catch (e: any) {
-      this.logger.error(
-        `Error while sending push notification to users: ${payload?.receiverIds?.join(', ')}`,
-        e.stack
-      )
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        'ERROR_CREATE_PUSH_NOTIFICATION'
-      )
+      this.logger.error(`Error while sending push notification to users: ${payload?.receiverIds?.join(', ')}`, e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATE_PUSH_NOTIFICATION')
     }
   }
 }

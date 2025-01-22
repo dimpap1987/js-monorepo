@@ -7,12 +7,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { useRouter } from 'next-nprogress-bar'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { SessionSubscription, Subscription, SubscriptionPlan } from '../types'
-import {
-  apiCancelSubscription,
-  apiCheckoutPlan,
-  apiGetPlans,
-  apiGetSubscription,
-} from '../utils/api'
+import { apiCancelSubscription, apiCheckoutPlan, apiGetPlans, apiGetSubscription } from '../utils/api'
 import { PlanCard } from './plan-card'
 import { useSearchParams } from 'next/navigation'
 import { ErrorDialog } from '@js-monorepo/dialog'
@@ -25,9 +20,7 @@ const PricingHeader = ({ title }: { title: string }) => (
 )
 
 function useSubscriptionMap() {
-  const [subscriptionMap, setSubscriptionMap] = useState<
-    Map<number, Subscription>
-  >(new Map())
+  const [subscriptionMap, setSubscriptionMap] = useState<Map<number, Subscription>>(new Map())
 
   const fetchSubscriptions = useCallback(async (plans: SubscriptionPlan[]) => {
     try {
@@ -74,10 +67,7 @@ export function Pricing() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { addNotification } = useNotifications()
-  const stripePromise = useMemo(
-    () => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!),
-    []
-  )
+  const stripePromise = useMemo(() => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!), [])
   const [hasErrors, setHasErrors] = useState(false)
   const { plans, fetchPlans } = usePlans()
   const { subscriptionMap, fetchSubscriptions } = useSubscriptionMap()
@@ -133,10 +123,7 @@ export function Pricing() {
             sessionId: response.data.sessionId,
           })
           if (stripeResponse?.error) {
-            console.error(
-              'Stripe Checkout Error:',
-              stripeResponse.error.message
-            )
+            console.error('Stripe Checkout Error:', stripeResponse.error.message)
           }
         }
       } catch (error) {

@@ -28,13 +28,10 @@ export async function getCurrentSession() {
 
 export async function findUnregisteredUser(headers?: Headers) {
   try {
-    const response = await fetch(
-      `${process.env.API_URL}/api/auth/unregistered-user`,
-      {
-        method: 'GET',
-        headers: headers,
-      }
-    )
+    const response = await fetch(`${process.env.API_URL}/api/auth/unregistered-user`, {
+      method: 'GET',
+      headers: headers,
+    })
     if (response.ok) {
       const unRegisteredUser = await response.json()
       return unRegisteredUser

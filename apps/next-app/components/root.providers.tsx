@@ -10,20 +10,13 @@ import dynamic from 'next/dynamic'
 import { ReactNode } from 'react'
 
 const DynamicWebsocketProvider = dynamic(
-  () =>
-    import('@js-monorepo/next/providers').then(
-      (module) => module.WebSocketProvider
-    ),
+  () => import('@js-monorepo/next/providers').then((module) => module.WebSocketProvider),
   {
     ssr: false,
   }
 )
 
-export default async function RootProviders({
-  children,
-}: {
-  readonly children: ReactNode
-}) {
+export default async function RootProviders({ children }: { readonly children: ReactNode }) {
   const session = await getCurrentUser()
 
   return (
@@ -36,12 +29,7 @@ export default async function RootProviders({
     >
       <DynamicWebsocketProvider>
         <DpNextPageProgressBar>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             <DpLoaderProvider>
               <DpNotificationProvider>
                 <WebNotificationProvider>

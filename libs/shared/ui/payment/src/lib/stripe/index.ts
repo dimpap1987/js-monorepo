@@ -10,14 +10,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 export async function createCheckoutSession(
   str: Stripe,
-  {
-    username,
-    price,
-    customSubmitMessage,
-    isDonate,
-    paymentDescription,
-    paymentName,
-  }: CreateCheckoutSessionRequestBody
+  { username, price, customSubmitMessage, isDonate, paymentDescription, paymentName }: CreateCheckoutSessionRequestBody
 ) {
   if (!price) {
     throw Error('INVALID_PRICE')

@@ -30,10 +30,7 @@ export class AuthSessionUserCacheService {
       : USER_SESSION
   }
 
-  async findOrSaveAuthUserById(
-    id: number,
-    ttl = 60
-  ): Promise<SessionUserType | undefined> {
+  async findOrSaveAuthUserById(id: number, ttl = 60): Promise<SessionUserType | undefined> {
     try {
       const userCache = await this.findAuthUserById(id)
 
@@ -51,10 +48,7 @@ export class AuthSessionUserCacheService {
     return cacheUser ? JSON.parse(cacheUser) : undefined
   }
 
-  async saveAuthUserInCache(
-    payload: { user: SessionUserType } | { id: number },
-    ttl = 60
-  ) {
+  async saveAuthUserInCache(payload: { user: SessionUserType } | { id: number }, ttl = 60) {
     try {
       let userCache: SessionUserType | null = null
 
@@ -81,13 +75,9 @@ export class AuthSessionUserCacheService {
         } satisfies SessionUserType
       }
 
-      await this.redis.set(
-        `${this.redisNamespace}:${userCache.id}`,
-        JSON.stringify(userCache),
-        {
-          EX: ttl, // Set expiration time
-        }
-      )
+      await this.redis.set(`${this.redisNamespace}:${userCache.id}`, JSON.stringify(userCache), {
+        EX: ttl, // Set expiration time
+      })
       return userCache
     } catch (e: any) {
       this.logger.error('Error while saving Cache Auth user', e.stacκ)
@@ -137,9 +127,7 @@ export class AuthSessionUserCacheService {
       // Delete each session
       const deletePromises = userSessions.map(async (userSession) => {
         await this.redis.del(userSession.key)
-        this.logger.log(
-          `Deleted session for user with id: ${userId}, session key: ${userSession.key}`
-        )
+        this.logger.log(`Deleted session for user with id: ${userId}, session key: ${userSession.key}`)
       })
 
       await Promise.all(deletePromises)
@@ -147,10 +135,7 @@ export class AuthSessionUserCacheService {
       this.logger.log(`All sessions deleted for user with id: ${userId}`)
     } catch (error: any) {
       this.logger.error('Error while deleting user session', error.stack)
-      throw new AuthException(
-        HttpStatus.BAD_REQUEST,
-        'ERROR_USER_SESSION_DELETION'
-      )
+      throw new AuthException(HttpStatus.BAD_REQUEST, 'ERROR_USER_SESSION_DELETION')
     }
   }
   async invalidateAuthUserInCache(userId: number) {

@@ -27,10 +27,7 @@ export class StripeService {
     return customers.data.length > 0 ? customers.data[0] : null
   }
 
-  async createCustomer(
-    params?: Stripe.CustomerCreateParams,
-    options?: Stripe.RequestOptions
-  ) {
+  async createCustomer(params?: Stripe.CustomerCreateParams, options?: Stripe.RequestOptions) {
     return this.stripe.customers.create(params, options)
   }
 
@@ -38,10 +35,7 @@ export class StripeService {
     const existingCustomer = await this.findCustomerByEmail(email)
 
     if (existingCustomer) {
-      this.logger.warn(
-        `Customer with email ${email} already exists in stripe`,
-        existingCustomer.id
-      )
+      this.logger.warn(`Customer with email ${email} already exists in stripe`, existingCustomer.id)
       return existingCustomer
     }
 
@@ -58,24 +52,18 @@ export class StripeService {
 
       const price = await this.paymentsService.findPriceById(priceId)
 
-      const paymentCustomer =
-        await this.paymentsService.findPaymentCustomerById(userId)
+      const paymentCustomer = await this.paymentsService.findPaymentCustomerById(userId)
 
       if (paymentCustomer?.stripeCustomerId) {
         // validate that the stripeId exists in stripe or else create new
-        stripeCustomerId = await this.validateOrCreateCustomer(
-          paymentCustomer?.stripeCustomerId,
-          email,
-          userId
-        )
+        stripeCustomerId = await this.validateOrCreateCustomer(paymentCustomer?.stripeCustomerId, email, userId)
       } else {
         //create payment customer
         const stripeCustomer = await this.createCustomerIfNotExists(email)
-        const createdCustomer =
-          await this.paymentsService.createOrUpdatePaymentCustomer({
-            userId,
-            stripeCustomerId: stripeCustomer.id,
-          })
+        const createdCustomer = await this.paymentsService.createOrUpdatePaymentCustomer({
+          userId,
+          stripeCustomerId: stripeCustomer.id,
+        })
         stripeCustomerId = createdCustomer.stripeCustomerId
       }
 
@@ -102,17 +90,10 @@ export class StripeService {
     }
 
     if (!webhookSecret) {
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        'ERROR_INVALID_STRIPE_WEBHOOK_SECRET'
-      )
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_STRIPE_WEBHOOK_SECRET')
     }
 
-    return this.stripe.webhooks.constructEvent(
-      payload,
-      signature,
-      webhookSecret
-    )
+    return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret)
   }
 
   async handleWebhookEvent(sig: string, payload: Buffer) {
@@ -122,33 +103,23 @@ export class StripeService {
     return { received: true }
   }
 
-  private async handleSubscriptionEvent(
-    event: Stripe.Event,
-    type: 'created' | 'updated' | 'deleted'
-  ) {
+  private async handleSubscriptionEvent(event: Stripe.Event, type: 'created' | 'updated' | 'deleted') {
     const subscriptionData = event.data.object as Stripe.Subscription
 
     this.logger.debug(
       `Stripe - RECEIVED Subscription Event with type: ${type}, from stripe user: ${subscriptionData.customer} and price_id: '${subscriptionData.items.data[0]?.price.id}'`
     )
 
-    const paymentCustomer =
-      await this.paymentsService.findPaymentCustomerByStripeId(
-        subscriptionData.customer as string
-      )
+    const paymentCustomer = await this.paymentsService.findPaymentCustomerByStripeId(
+      subscriptionData.customer as string
+    )
 
     if (!paymentCustomer?.id) {
-      this.logger.debug(
-        `Payment customer not found for stripe customer: ${subscriptionData.customer}`
-      )
-      throw new Error(
-        `Payment customer not found for stripe customer: ${subscriptionData.customer}`
-      )
+      this.logger.debug(`Payment customer not found for stripe customer: ${subscriptionData.customer}`)
+      throw new Error(`Payment customer not found for stripe customer: ${subscriptionData.customer}`)
     }
 
-    const price = await this.paymentsService.findPriceByStripeId(
-      subscriptionData.items.data[0]?.price.id
-    )
+    const price = await this.paymentsService.findPriceByStripeId(subscriptionData.items.data[0]?.price.id)
 
     if (type === 'created') {
       const sub = await this.paymentsService.createSubscription({
@@ -166,76 +137,51 @@ export class StripeService {
 
       //callback
       tryCatch(() => {
-        this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(
-          paymentCustomer.userId,
-          {
-            id: sub.id,
-            name: sub.price?.product?.name,
-          }
-        )
+        this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(paymentCustomer.userId, {
+          id: sub.id,
+          name: sub.price?.product?.name,
+        })
       })
     } else if (type == 'updated') {
-      const sub =
-        await this.paymentsService.updateSubscription(subscriptionData)
+      const sub = await this.paymentsService.updateSubscription(subscriptionData)
 
       //callback
       tryCatch(() => {
-        this.paymentsModuleOptions.onSubscriptionUpdateSuccess?.(
-          paymentCustomer.userId,
-          {
-            id: sub.id,
-            name: sub.price?.product?.name,
-          }
-        )
+        this.paymentsModuleOptions.onSubscriptionUpdateSuccess?.(paymentCustomer.userId, {
+          id: sub.id,
+          name: sub.price?.product?.name,
+        })
       })
     } else if (type == 'deleted') {
-      const sub =
-        await this.paymentsService.deleteSubscription(subscriptionData)
+      const sub = await this.paymentsService.deleteSubscription(subscriptionData)
 
       //callback
       tryCatch(() => {
-        this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(
-          paymentCustomer.userId,
-          {
-            id: sub.id,
-            name: sub.price?.product?.name,
-          }
-        )
+        this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(paymentCustomer.userId, {
+          id: sub.id,
+          name: sub.price?.product?.name,
+        })
       })
     }
 
     tryCatch(() => {
-      this.paymentsModuleOptions.onSubscriptionEvent?.(
-        paymentCustomer.userId,
-        type
-      )
+      this.paymentsModuleOptions.onSubscriptionEvent?.(paymentCustomer.userId, type)
     })
   }
 
-  private async handleInvoiceEvent(
-    event: Stripe.Event,
-    status: 'succeeded' | 'failed'
-  ) {
-    this.logger.log(
-      `Stripe - RECEIVED Invoice Event: ${JSON.stringify(event)} with type: ${status}`
-    )
+  private async handleInvoiceEvent(event: Stripe.Event, status: 'succeeded' | 'failed') {
+    this.logger.log(`Stripe - RECEIVED Invoice Event: ${JSON.stringify(event)} with type: ${status}`)
   }
 
   private async handleCheckoutSessionCompleted(event: Stripe.Event) {
-    this.logger.log(
-      `Stripe - RECEIVED Checkout Session event: ${JSON.stringify(event)}`
-    )
+    this.logger.log(`Stripe - RECEIVED Checkout Session event: ${JSON.stringify(event)}`)
   }
 
   private async handleEvent(event: Stripe.Event) {
-    const storedEvent = await this.paymentsService.findStripeWebhookEvent(
-      event.id
-    )
+    const storedEvent = await this.paymentsService.findStripeWebhookEvent(event.id)
 
     if (storedEvent?.result?.id) {
-      this.logger.warn(
-        `Duplicate stripe event occured. - Stripe - id: ${event.id} type: ${event.type}`
-      )
+      this.logger.warn(`Duplicate stripe event occured. - Stripe - id: ${event.id} type: ${event.type}`)
       return
     }
 
@@ -267,9 +213,7 @@ export class StripeService {
           break
       }
     } catch (e) {
-      this.logger.error(
-        `There was an Error in stripe webhook event with id:${event.id}`
-      )
+      this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`)
     }
   }
 
@@ -301,17 +245,14 @@ export class StripeService {
 
   async cancelSubscription(stripeSubscriptionId: string) {
     try {
-      const subscription =
-        await this.stripe.subscriptions.retrieve(stripeSubscriptionId)
+      const subscription = await this.stripe.subscriptions.retrieve(stripeSubscriptionId)
 
       // Check if the subscription is already canceled
       if (subscription.status === 'canceled') {
         this.logger.warn(
           `Cannot cancel a subscription that is already canceled. with subscriptionId: '${subscription.id}' and stripe_subscription_id: '${stripeSubscriptionId}'`
         )
-        throw new Error(
-          'Cannot cancel a subscription that is already canceled.'
-        )
+        throw new Error('Cannot cancel a subscription that is already canceled.')
       }
 
       // Update the subscription to cancel at the end of the period
@@ -324,14 +265,9 @@ export class StripeService {
     }
   }
 
-  async validateOrCreateCustomer(
-    stripeCustomerId: string,
-    email: string,
-    userId: number
-  ) {
+  async validateOrCreateCustomer(stripeCustomerId: string, email: string, userId: number) {
     try {
-      const existingCustomer =
-        await this.stripe.customers.retrieve(stripeCustomerId)
+      const existingCustomer = await this.stripe.customers.retrieve(stripeCustomerId)
 
       if (existingCustomer && !existingCustomer.deleted) {
         return stripeCustomerId
@@ -341,20 +277,14 @@ export class StripeService {
         email,
       })
 
-      const createdCustomer =
-        await this.paymentsService.createOrUpdatePaymentCustomer({
-          userId,
-          stripeCustomerId: stripeCustomer.id,
-        })
+      const createdCustomer = await this.paymentsService.createOrUpdatePaymentCustomer({
+        userId,
+        stripeCustomerId: stripeCustomer.id,
+      })
       return createdCustomer.stripeCustomerId
     } catch (error) {
-      this.logger.error(
-        'An error occured when validation or creating a stripe customer'
-      )
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        'ERROR_CREATE_STRIPE_CUSTOMER'
-      )
+      this.logger.error('An error occured when validation or creating a stripe customer')
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATE_STRIPE_CUSTOMER')
     }
   }
 }

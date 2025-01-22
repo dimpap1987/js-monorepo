@@ -1,13 +1,7 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@js-monorepo/components/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@js-monorepo/components/card'
 
 function CardList({ className }: { className: string }) {
   return (
@@ -27,12 +21,7 @@ function CardList({ className }: { className: string }) {
           <DpButton
             className="w-full"
             size="large"
-            onClick={() =>
-              window.open(
-                'https://github.com/dimpap1987/js-monorepo/issues/new/choose',
-                '_blank'
-              )
-            }
+            onClick={() => window.open('https://github.com/dimpap1987/js-monorepo/issues/new/choose', '_blank')}
           >
             Report
           </DpButton>
@@ -54,12 +43,7 @@ function CardList({ className }: { className: string }) {
           <DpButton
             size="large"
             className="w-full"
-            onClick={() =>
-              window.open(
-                'https://github.com/dimpap1987/js-monorepo/issues/new/choose',
-                '_blank'
-              )
-            }
+            onClick={() => window.open('https://github.com/dimpap1987/js-monorepo/issues/new/choose', '_blank')}
           >
             Make Request
           </DpButton>

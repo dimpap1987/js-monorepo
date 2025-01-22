@@ -87,10 +87,7 @@ export default function OnlineUsersTableComponent() {
           <tbody>
             {loading
               ? Array.from({ length: 5 }).map((_, index) => (
-                  <tr
-                    key={`skeleton-${index}`}
-                    className="relative border-t border-blue-100 cursor-default"
-                  >
+                  <tr key={`skeleton-${index}`} className="relative border-t border-blue-100 cursor-default">
                     <td className="p-2 pl-2 px-2">
                       <Skeleton className="h-3 rounded-full" />
                     </td>
@@ -106,10 +103,7 @@ export default function OnlineUsersTableComponent() {
                   </tr>
                 ))
               : Object.entries(groupedUsers).map(([userId, user]) => (
-                  <tr
-                    key={userId}
-                    className="relative border-t border-blue-100 cursor-default"
-                  >
+                  <tr key={userId} className="relative border-t border-blue-100 cursor-default">
                     <td className="p-3 pl-4 px-3">
                       <FaCircle className="text-green-500 animate-pulse" />
                     </td>
@@ -125,9 +119,7 @@ export default function OnlineUsersTableComponent() {
                       </div>
                     </td>
                     <td className="p-3 px-3 flex justify-center">
-                      <DisconnectUserComponent
-                        user={{ id: Number(userId), ...user }}
-                      ></DisconnectUserComponent>
+                      <DisconnectUserComponent user={{ id: Number(userId), ...user }}></DisconnectUserComponent>
                     </td>
                   </tr>
                 ))}

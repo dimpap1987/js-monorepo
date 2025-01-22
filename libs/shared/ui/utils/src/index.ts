@@ -1,23 +1,13 @@
 import { twMerge } from 'tailwind-merge'
 
 export function cn(
-  ...classNames: (
-    | string
-    | undefined
-    | null
-    | false
-    | (string | undefined | null | false)[]
-  )[]
+  ...classNames: (string | undefined | null | false | (string | undefined | null | false)[])[]
 ): string {
-  const flattenedClassNames = classNames
-    .filter(Boolean)
-    .flat(Infinity) as string[]
+  const flattenedClassNames = classNames.filter(Boolean).flat(Infinity) as string[]
   return twMerge(...flattenedClassNames)
 }
 
-export function constructURIQueryString(
-  searchParams: URLSearchParams | Record<string, any>
-) {
+export function constructURIQueryString(searchParams: URLSearchParams | Record<string, any>) {
   const params = new URLSearchParams(searchParams)
   // Convert search parameters to an array of [key, value] pairs and encode them
   const paramStrings = Array.from(params).map(([key, value]) => {

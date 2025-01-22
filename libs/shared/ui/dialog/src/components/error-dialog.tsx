@@ -1,11 +1,5 @@
 import { DpButton } from '@js-monorepo/button'
-import {
-  Dialog,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DpDialogContent,
-} from '@js-monorepo/components/dialog'
+import { Dialog, DialogFooter, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/dialog'
 import { TiWarning } from 'react-icons/ti'
 export type ErrorDialogProps = {
   isOpen: boolean
@@ -39,15 +33,11 @@ export const ErrorDialog = ({
         }}
       >
         <DialogHeader className="justify-center">
-          <DialogTitle className="text-left text-lg font-semibold">
-            {title}
-          </DialogTitle>
+          <DialogTitle className="text-left text-lg font-semibold">{title}</DialogTitle>
         </DialogHeader>
         <div className="flex gap-3 items-center">
           <TiWarning size={46} className="text-danger shrink-0" />
-          <div className="text-base text-gray-700 p-4 font-medium">
-            {errorMessage}
-          </div>
+          <div className="text-base text-gray-700 p-4 font-medium">{errorMessage}</div>
         </div>
         {footer ? (
           <DialogFooter>{footer}</DialogFooter>

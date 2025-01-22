@@ -37,10 +37,7 @@ const framerText = (position: SidebarPositionType, delay?: number) => {
 }
 
 const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
-  (
-    { children, isOpen, onClose, user, items = [], position = 'left', header },
-    forwardedRef
-  ) => {
+  ({ children, isOpen, onClose, user, items = [], position = 'left', header }, forwardedRef) => {
     const localRef = useRef<HTMLDivElement | null>(null)
     useClickAway(localRef as RefObject<HTMLElement | null>, () => onClose())
     useEffect(() => {
@@ -91,9 +88,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
                 {items?.map((item, idx) => {
                   const shouldRenderNavLink =
                     item.roles?.includes('PUBLIC') || // Always render if PUBLIC role is present
-                    item.roles?.some((role) =>
-                      user?.roles?.includes(role as AuthRole)
-                    ) // Render if user has any of the required roles
+                    item.roles?.some((role) => user?.roles?.includes(role as AuthRole)) // Render if user has any of the required roles
 
                   return (
                     shouldRenderNavLink && (
@@ -105,14 +100,9 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
                           href={item.href}
                           onClick={() => onClose()}
                         >
-                          <motion.div
-                            {...framerText(position)}
-                            className="grid grid-cols-[max-content_25px] gap-2"
-                          >
+                          <motion.div {...framerText(position)} className="grid grid-cols-[max-content_25px] gap-2">
                             <div>{item.name}</div>
-                            <div>
-                              {item.Icon && <item.Icon className="text-xl" />}
-                            </div>
+                            <div>{item.Icon && <item.Icon className="text-xl" />}</div>
                           </motion.div>
                         </DpNextNavLink>
                       </li>
@@ -120,9 +110,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
                   )
                 })}
               </ul>
-              {children && (
-                <div className="mt-auto w-full text-center p-3">{children}</div>
-              )}
+              {children && <div className="mt-auto w-full text-center p-3">{children}</div>}
             </motion.div>
           </motion.div>
         )}

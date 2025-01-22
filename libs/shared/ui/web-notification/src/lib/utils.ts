@@ -17,10 +17,7 @@ const handleRegistrationUpdate = (registration: ServiceWorkerRegistration) => {
     const installingWorker = registration.installing
     if (installingWorker) {
       installingWorker.onstatechange = () => {
-        if (
-          installingWorker.state === 'installed' &&
-          navigator.serviceWorker.controller
-        ) {
+        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
           console.log('New service worker installed. Please refresh.')
           // Optionally, you can notify the user to refresh the page
         }
@@ -29,18 +26,14 @@ const handleRegistrationUpdate = (registration: ServiceWorkerRegistration) => {
   }
 }
 
-const registerServiceWorker = async (
-  workerPath = '/sw.js',
-  specificScope = '/'
-) => {
+const registerServiceWorker = async (workerPath = '/sw.js', specificScope = '/') => {
   check()
 
   try {
     // Check if there's already a service worker controller
     if (navigator.serviceWorker.controller) {
       console.log('Service Worker already controlling the page.')
-      const existingRegistration =
-        await navigator.serviceWorker.getRegistration(specificScope)
+      const existingRegistration = await navigator.serviceWorker.getRegistration(specificScope)
 
       if (existingRegistration) {
         handleRegistrationUpdate(existingRegistration)
@@ -117,8 +110,4 @@ async function subscribeNotifactionToServer(userId: number) {
   return apiClient.post(`/notifications/subscribe/${userId}`, subscription)
 }
 
-export {
-  registerServiceWorker,
-  requestPushPermission,
-  subscribeNotifactionToServer,
-}
+export { registerServiceWorker, requestPushPermission, subscribeNotifactionToServer }

@@ -21,8 +21,7 @@ function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
   useEffect(() => {
     getRoles().then((fetchedRoles) => {
       setRoles(fetchedRoles)
-      const userRoleNames =
-        row?.original.userRole?.map(({ role }) => role.name) || []
+      const userRoleNames = row?.original.userRole?.map(({ role }) => role.name) || []
 
       const initialSelectedRoles = fetchedRoles
         .filter((role) => userRoleNames.includes(role.name))

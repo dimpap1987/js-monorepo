@@ -2,12 +2,9 @@
 
 import dynamic from 'next/dynamic'
 
-const DynamicDpMarkdown = dynamic(
-  () => import('@js-monorepo/markdown').then((module) => module.DpMarkdown),
-  {
-    ssr: false,
-  }
-)
+const DynamicDpMarkdown = dynamic(() => import('@js-monorepo/markdown').then((module) => module.DpMarkdown), {
+  ssr: false,
+})
 
 function DocPage({ path, data }: { path: string; data: string }) {
   return (

@@ -3,15 +3,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { apiAuthPrefix, authRoutes, isPublicRoute, routes } from './routes'
 
 export function withAuth(
-  nextMiddleware: (
-    request: NextRequest
-  ) => Promise<NextResponse<unknown>> | NextResponse<unknown>
-): (
-  request: NextRequest
-) => Promise<NextResponse<unknown>> | NextResponse<unknown> {
-  return async function middleAuth(
-    request: NextRequest
-  ): Promise<NextResponse<unknown>> {
+  nextMiddleware: (request: NextRequest) => Promise<NextResponse<unknown>> | NextResponse<unknown>
+): (request: NextRequest) => Promise<NextResponse<unknown>> | NextResponse<unknown> {
+  return async function middleAuth(request: NextRequest): Promise<NextResponse<unknown>> {
     const { nextUrl } = request
 
     // initialize flags
@@ -21,9 +15,7 @@ export function withAuth(
 
     const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 
-    const routeExists = routes.some((route) =>
-      nextUrl.pathname.startsWith(route.path)
-    )
+    const routeExists = routes.some((route) => nextUrl.pathname.startsWith(route.path))
 
     // start the middleware logic
     if (isApiAuthRoute || isPublic) {

@@ -23,16 +23,8 @@ export class UserPresenceWebsocketService {
     this.userPresenceGateway.namespace.to(rooms).emit(event, message)
   }
 
-  sendToRoomExceptClient(
-    room: string,
-    clientId: string,
-    event: string,
-    message: any
-  ) {
-    this.userPresenceGateway.namespace
-      .to(room)
-      .except(clientId)
-      .emit(event, message)
+  sendToRoomExceptClient(room: string, clientId: string, event: string, message: any) {
+    this.userPresenceGateway.namespace.to(room).except(clientId).emit(event, message)
   }
 
   // Broadcast to all clients in the presence namespace
@@ -59,15 +51,8 @@ export class UserPresenceWebsocketService {
     }
   }
 
-  sendWithAcknowledgment(
-    clientId: string,
-    event: string,
-    message: any,
-    callback: (response: any) => void
-  ) {
-    this.userPresenceGateway.namespace
-      .to(clientId)
-      .emit(event, message, callback)
+  sendWithAcknowledgment(clientId: string, event: string, message: any, callback: (response: any) => void) {
+    this.userPresenceGateway.namespace.to(clientId).emit(event, message, callback)
   }
 
   disconnectClient(socketId: string) {
@@ -88,9 +73,7 @@ export class UserPresenceWebsocketService {
   }
 
   async emitOnlineUsersToAdmins() {
-    this.userPresenceGateway.namespace
-      .to(Rooms.admin)
-      .emit(Events.onlineUsers, await this.onlineUsersService.getList())
+    this.userPresenceGateway.namespace.to(Rooms.admin).emit(Events.onlineUsers, await this.onlineUsersService.getList())
   }
 
   async removeUserFromRooms(userId: number, rooms: string[]) {

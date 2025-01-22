@@ -16,18 +16,12 @@ export class UserService {
   ) {}
 
   @Transactional()
-  async handleUserUpdate(
-    payload: EditUserDto,
-    userId: number,
-    profileId: number
-  ) {
+  async handleUserUpdate(payload: EditUserDto, userId: number, profileId: number) {
     try {
       await this.userRepo.editUser(payload, userId, profileId)
       await this.authSessionUserCacheService.invalidateAuthUserInCache(userId)
     } catch (e: any) {
-      this.logger.error(
-        `Error while editing user with id: ${userId} and profile id :${profileId}`
-      )
+      this.logger.error(`Error while editing user with id: ${userId} and profile id :${profileId}`)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_UPDATE_USER')
     }
   }

@@ -28,15 +28,10 @@ export function getCurrentDateFormatted() {
 }
 
 export function isPromise(pro: any) {
-  return (
-    pro != null && (pro instanceof Promise || typeof pro.then === 'function')
-  )
+  return pro != null && (pro instanceof Promise || typeof pro.then === 'function')
 }
 
-export function getColorizedText(
-  text: number | string,
-  ansiC0de = '\x1b[33m'
-): string {
+export function getColorizedText(text: number | string, ansiC0de = '\x1b[33m'): string {
   // ANSI escape codes for colorization
   const reset = '\x1b[0m'
 
@@ -128,10 +123,7 @@ export const compressAvatar = async (
 }
 
 // shalow comparison
-export function compareObjects<T extends object>(
-  obj1: T,
-  obj2: T
-): Partial<T> | null {
+export function compareObjects<T extends object>(obj1: T, obj2: T): Partial<T> | null {
   const differences: Partial<T> = {}
 
   const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)])

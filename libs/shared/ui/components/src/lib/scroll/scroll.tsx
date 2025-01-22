@@ -4,9 +4,7 @@ import { cn } from '@js-monorepo/ui/util'
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area'
 import * as React from 'react'
 
-type ScrollAreaProps = React.ComponentPropsWithoutRef<
-  typeof ScrollAreaPrimitive.Root
-> & {
+type ScrollAreaProps = React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
   viewPortRef?: React.RefObject<HTMLDivElement>
 }
 
@@ -19,10 +17,8 @@ const ScrollBar = React.forwardRef<
     orientation={orientation}
     className={cn(
       'flex touch-none select-none transition-colors',
-      orientation === 'vertical' &&
-        'h-full w-2.5 border-l border-l-transparent p-[1px]',
-      orientation === 'horizontal' &&
-        'h-2.5 flex-col border-t border-t-transparent p-[1px]',
+      orientation === 'vertical' && 'h-full w-2.5 border-l border-l-transparent p-[1px]',
+      orientation === 'horizontal' && 'h-2.5 flex-col border-t border-t-transparent p-[1px]',
       className
     )}
     {...props}
@@ -33,25 +29,17 @@ const ScrollBar = React.forwardRef<
 
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
-const ScrollArea = React.forwardRef<
-  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  ScrollAreaProps
->(({ className, children, viewPortRef, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn('relative overflow-hidden', className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport
-      className="h-full w-full rounded-[inherit]"
-      ref={viewPortRef}
-    >
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-))
+const ScrollArea = React.forwardRef<React.ElementRef<typeof ScrollAreaPrimitive.Root>, ScrollAreaProps>(
+  ({ className, children, viewPortRef, ...props }, ref) => (
+    <ScrollAreaPrimitive.Root ref={ref} className={cn('relative overflow-hidden', className)} {...props}>
+      <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]" ref={viewPortRef}>
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  )
+)
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
 
 export { ScrollArea, ScrollBar }

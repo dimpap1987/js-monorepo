@@ -63,9 +63,7 @@ export const NotificationSender = () => {
           variant="accent"
           className="w-full"
           onClick={handleSendMessage}
-          disabled={
-            message?.trim()?.length === 0 || !(selectedUserIds?.length > 0)
-          }
+          disabled={message?.trim()?.length === 0 || !(selectedUserIds?.length > 0)}
         >
           Send Notification
         </DpButton>

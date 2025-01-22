@@ -1,10 +1,4 @@
-import {
-  AuthRoleDTO,
-  AuthUserDto,
-  AuthUserFullDto,
-  AuthUserUpdateDto,
-  Pageable,
-} from '@js-monorepo/types'
+import { AuthRoleDTO, AuthUserDto, AuthUserFullDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
 
 export const AdminRepo = Symbol()
 
@@ -16,8 +10,5 @@ export interface AdminRepository {
 
   getRoles(): Promise<AuthRoleDTO[]>
 
-  updateUser(
-    userId: number,
-    updateUser: AuthUserUpdateDto
-  ): Promise<AuthUserDto>
+  updateUser(userId: number, updateUser: AuthUserUpdateDto): Promise<AuthUserDto>
 }

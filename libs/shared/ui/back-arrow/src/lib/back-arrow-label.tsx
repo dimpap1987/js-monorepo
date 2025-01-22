@@ -12,12 +12,7 @@ function BackArrowWithLabel({
 }) {
   return (
     <div className={cn('relative content-center mb-4 mt-1', className)}>
-      <BackArrow
-        className={cn(
-          'absolute top-1/2 left-2 transform -translate-y-1/2',
-          arrowClassName
-        )}
-      ></BackArrow>
+      <BackArrow className={cn('absolute top-1/2 left-2 transform -translate-y-1/2', arrowClassName)}></BackArrow>
       {children}
     </div>
   )

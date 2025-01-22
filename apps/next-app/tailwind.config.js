@@ -6,10 +6,7 @@ module.exports = {
   presets: [sharedConfig],
   darkMode: ['class'],
   content: [
-    join(
-      __dirname,
-      '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
-    ),
+    join(__dirname, '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'),
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
@@ -59,8 +56,7 @@ module.exports = {
         },
       },
       boxShadow: {
-        primary:
-          '0 0 40px -2px hsl(var(--primary), 0.1), 0 2px 4px -1px hsl(var(--primary), 0.06)',
+        primary: '0 0 40px -2px hsl(var(--primary), 0.1), 0 2px 4px -1px hsl(var(--primary), 0.06)',
       },
     },
   },

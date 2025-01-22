@@ -68,11 +68,7 @@ function AiGeneratorImageSuspense({
     <div className="text-foreground">
       <div className="flex justify-center">
         <form className="w-full sm:w-[40ch] gap-2">
-          <Input
-            placeholder="Enter your prompt"
-            value={prompt}
-            onChange={(event) => setPrompt(event.target?.value)}
-          />
+          <Input placeholder="Enter your prompt" value={prompt} onChange={(event) => setPrompt(event.target?.value)} />
 
           <DpButton
             className="mt-3 w-full"
@@ -101,10 +97,7 @@ function AiGeneratorImageSuspense({
         <section className="mt-4">
           <div className="flex flex-col items-center justify-center">
             {predictions.map((prediction) => (
-              <div
-                className="relative w-full aspect-square sm:w-[500px]"
-                key={prediction}
-              >
+              <div className="relative w-full aspect-square sm:w-[500px]" key={prediction}>
                 <Image
                   src={prediction}
                   loading="lazy"

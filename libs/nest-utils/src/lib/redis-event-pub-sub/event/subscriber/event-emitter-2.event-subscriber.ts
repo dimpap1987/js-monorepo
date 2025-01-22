@@ -13,10 +13,7 @@ export class EventEmitter2EventSubscriber implements EventSubscriberInterface {
     this.eventEmitter.removeListener(name, listener)
   }
 
-  private handleWebsocketStream<T = any>(
-    socket: any,
-    eventName: string
-  ): Observable<T> {
+  private handleWebsocketStream<T = any>(socket: any, eventName: string): Observable<T> {
     return new Observable((observer) => {
       const dynamicListener = (data: T) => {
         observer.next(data)

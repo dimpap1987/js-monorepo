@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  INestApplicationContext,
-  Logger,
-} from '@nestjs/common'
+import { ForbiddenException, INestApplicationContext, Logger } from '@nestjs/common'
 import { IoAdapter } from '@nestjs/platform-socket.io'
 import { createAdapter } from '@socket.io/redis-adapter'
 import { createClient } from 'redis'
@@ -10,8 +6,7 @@ import { ServerOptions, Socket } from 'socket.io'
 import { UserSocketService } from '../services/user-socket.service'
 
 const createAuthMiddleware =
-  (userSocketService: UserSocketService, logger: Logger) =>
-  async (socket: Socket, next: (err?: any) => void) => {
+  (userSocketService: UserSocketService, logger: Logger) => async (socket: Socket, next: (err?: any) => void) => {
     try {
       const data = await userSocketService.retrieveUserSessionFromSocket(socket)
 

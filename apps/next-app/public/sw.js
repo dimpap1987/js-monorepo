@@ -26,9 +26,7 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     clients.matchAll({ type: 'window' }).then((clientList) => {
       // Check if there is an existing window/tab open with your site
-      const client = clientList.find(
-        (client) => client.url === url && 'focus' in client
-      )
+      const client = clientList.find((client) => client.url === url && 'focus' in client)
       if (client) {
         return client.focus() // Focus on the existing tab
       }

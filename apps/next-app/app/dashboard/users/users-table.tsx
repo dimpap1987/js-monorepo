@@ -2,29 +2,13 @@
 
 import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@js-monorepo/components/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
-import {
-  AuthUserFullDto,
-  AuthUserUpdateDto,
-  Pageable,
-} from '@js-monorepo/types'
+import { AuthUserFullDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
 import { apiClient } from '@js-monorepo/utils/http'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
-import {
-  Dispatch,
-  SetStateAction,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { Dispatch, SetStateAction, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
 import RolesTableInput from './roles-input'
@@ -81,9 +65,7 @@ const DashboardUsersTableSuspense = () => {
       {
         accessorKey: 'profileImage',
         size: 50,
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="" />
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
         cell: ({ row }) => {
           return (
             <div className="flex justify-center items-center select-none">
@@ -94,9 +76,7 @@ const DashboardUsersTableSuspense = () => {
                     alt={`${row.original.username} picture`}
                   ></AvatarImage>
                 )}
-                <AvatarFallback>
-                  {row.original.username?.slice(0, 3)?.toUpperCase() || 'A'}
-                </AvatarFallback>
+                <AvatarFallback>{row.original.username?.slice(0, 3)?.toUpperCase() || 'A'}</AvatarFallback>
               </Avatar>
             </div>
           )
@@ -105,18 +85,12 @@ const DashboardUsersTableSuspense = () => {
       {
         accessorKey: 'id',
         size: 50,
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="ID" />
-        ),
-        cell: ({ row }) => (
-          <div className="text-center">{row.getValue('id')}</div>
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
+        cell: ({ row }) => <div className="text-center">{row.getValue('id')}</div>,
       },
       {
         accessorKey: 'username',
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Username" />
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Username" />,
         cell: ({ row }) => {
           return update?.index === row.index ? (
             <UsernameTableInput row={row} />
@@ -127,40 +101,26 @@ const DashboardUsersTableSuspense = () => {
       },
       {
         accessorKey: 'email',
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Email" />
-        ),
-        cell: ({ row }) => (
-          <div className="text-center">{row.getValue('email')}</div>
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
+        cell: ({ row }) => <div className="text-center">{row.getValue('email')}</div>,
       },
       {
         accessorKey: 'roles',
         size: 140,
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Roles" />
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Roles" />,
         cell: ({ row }) => {
           return update?.index === row.index ? (
             <RolesTableInput row={row} />
           ) : (
-            <div className="text-center">
-              {row.original?.userRole?.map((r) => r.role.name).join(', ')}
-            </div>
+            <div className="text-center">{row.original?.userRole?.map((r) => r.role.name).join(', ')}</div>
           )
         },
       },
       {
         accessorKey: 'createdAt',
         size: 100,
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Created At" />
-        ),
-        cell: ({ row }) => (
-          <div className="text-center">
-            {moment(row.original.createdAt).format('YYYY-MM-DD')}
-          </div>
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+        cell: ({ row }) => <div className="text-center">{moment(row.original.createdAt).format('YYYY-MM-DD')}</div>,
       },
       // {
       //   accessorKey: 'provider',
@@ -177,9 +137,7 @@ const DashboardUsersTableSuspense = () => {
       {
         id: 'actions',
         size: 100,
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Actions" />
-        ),
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" />,
         cell: ({ row }) => {
           return (
             <div className="flex gap-2 p-4 justify-center items-center select-none">
@@ -190,10 +148,7 @@ const DashboardUsersTableSuspense = () => {
                       title="Submit"
                       className="shrink-0 text-2xl cursor-pointer transform hover:scale-125 transition duration-300 border rounded-lg"
                       onClick={async () => {
-                        const response = await apiClient.put(
-                          `/admin/users/${row.original.id}`,
-                          { ...row.updatedUser }
-                        )
+                        const response = await apiClient.put(`/admin/users/${row.original.id}`, { ...row.updatedUser })
 
                         if (response.ok) {
                           loadUsers()
@@ -238,9 +193,7 @@ const DashboardUsersTableSuspense = () => {
     [update, pagination]
   )
 
-  const onPaginationChange = useCallback<
-    Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>
-  >(
+  const onPaginationChange = useCallback<Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>>(
     (newPaginationOrUpdater) => {
       setPagination((prevPagination: Pageable) => {
         const currentState = {
@@ -249,9 +202,7 @@ const DashboardUsersTableSuspense = () => {
         }
 
         const updated =
-          typeof newPaginationOrUpdater === 'function'
-            ? newPaginationOrUpdater(currentState)
-            : newPaginationOrUpdater
+          typeof newPaginationOrUpdater === 'function' ? newPaginationOrUpdater(currentState) : newPaginationOrUpdater
 
         return {
           pageSize: updated.pageSize,

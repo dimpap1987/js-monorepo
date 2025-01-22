@@ -17,19 +17,13 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "paths": {
-      "@js-monorepo/ai-image-generator": [
-        "libs/shared/ui/ai-image-generator/src/index.ts"
-      ],
-      "@js-monorepo/announcements": [
-        "libs/shared/ui/announcements/src/index.ts"
-      ],
+      "@js-monorepo/ai-image-generator": ["libs/shared/ui/ai-image-generator/src/index.ts"],
+      "@js-monorepo/announcements": ["libs/shared/ui/announcements/src/index.ts"],
       "@js-monorepo/auth/nest/*": ["libs/auth/nest/src/*"],
       "@js-monorepo/auth/next/*": ["libs/auth/next/src/lib/*"],
       "@js-monorepo/back-arrow": ["libs/shared/ui/back-arrow/src/index.ts"],
       "@js-monorepo/styles/*": ["libs/shared/styles/src/lib/*"],
-      "@js-monorepo/bottom-navbar": [
-        "libs/shared/ui/bottom-navbar/src/index.ts"
-      ],
+      "@js-monorepo/bottom-navbar": ["libs/shared/ui/bottom-navbar/src/index.ts"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
       "@js-monorepo/components/*": ["libs/shared/ui/components/src/lib/*"],
       "@js-monorepo/db": ["libs/prisma/db/src/index.ts"],
@@ -43,16 +37,10 @@
       "@js-monorepo/nest/*": ["libs/nest-utils/src/lib/*"],
       "@js-monorepo/next/*": ["libs/next/src/lib/*"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
-      "@js-monorepo/notifications-server": [
-        "libs/notifications/server/src/index.ts"
-      ],
-      "@js-monorepo/notifications-ui": [
-        "libs/notifications/client/src/index.ts"
-      ],
+      "@js-monorepo/notifications-server": ["libs/notifications/server/src/index.ts"],
+      "@js-monorepo/notifications-ui": ["libs/notifications/client/src/index.ts"],
       "@js-monorepo/package.json": ["package.json"],
-      "@js-monorepo/page-progress-bar": [
-        "libs/shared/ui/page-progress-bar/src/index.ts"
-      ],
+      "@js-monorepo/page-progress-bar": ["libs/shared/ui/page-progress-bar/src/index.ts"],
       "@js-monorepo/pagination": ["libs/shared/ui/pagination/src/index.ts"],
       "@js-monorepo/payment": ["libs/shared/ui/payment/src/index.ts"],
       "@js-monorepo/payments-server": ["libs/payments/server/src/index.ts"],
@@ -60,19 +48,13 @@
       "@js-monorepo/schemas": ["libs/shared/schemas/src/index.ts"],
       "@js-monorepo/sidebar": ["libs/shared/ui/sidebar/src/index.ts"],
       "@js-monorepo/templates": ["libs/shared/ui/templates/src/index.ts"],
-      "@js-monorepo/theme-provider": [
-        "libs/shared/ui/theme-provider/src/index.ts"
-      ],
+      "@js-monorepo/theme-provider": ["libs/shared/ui/theme-provider/src/index.ts"],
       "@js-monorepo/types": ["libs/shared/types/src/index.ts"],
       "@js-monorepo/ui/util": ["libs/shared/ui/utils/src/index.ts"],
-      "@js-monorepo/user-presence": [
-        "libs/websockets/user-presence/src/index.ts"
-      ],
+      "@js-monorepo/user-presence": ["libs/websockets/user-presence/src/index.ts"],
       "@js-monorepo/utils/*": ["libs/shared/utils/src/lib/*"],
       "@js-monorepo/version": ["libs/shared/ui/version/src/index.ts"],
-      "@js-monorepo/web-notification": [
-        "libs/shared/ui/web-notification/src/index.ts"
-      ],
+      "@js-monorepo/web-notification": ["libs/shared/ui/web-notification/src/index.ts"],
       "@next-app/*": ["./apps/next-app/*"]
     }
   },

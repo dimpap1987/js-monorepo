@@ -1,18 +1,9 @@
 import { RegisterUserSchema } from '@js-monorepo/schemas'
-import {
-  AuthRole,
-  AuthUserCreateDto,
-  AuthUserDto,
-  ProvidersDto,
-  SessionUserType,
-} from '@js-monorepo/types'
+import { AuthRole, AuthUserCreateDto, AuthUserDto, ProvidersDto, SessionUserType } from '@js-monorepo/types'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
-import {
-  ConstraintCode,
-  ConstraintViolationException,
-} from '../../exceptions/contraint-violation'
+import { ConstraintCode, ConstraintViolationException } from '../../exceptions/contraint-violation'
 import { AuthRepository } from '../../repositories/auth.repository'
 import { RepoAuth, ServiceRole } from '../../types'
 import { AuthService } from '../interfaces/auth.service'
@@ -53,36 +44,23 @@ export class AuthServiceImpl implements AuthService {
     providerDTO: ProvidersDto,
     roles: AuthRole[] = ['USER']
   ): Promise<AuthUserDto> {
-    this.logger.debug(
-      `Create auth user with username : '${authUserDTO?.username}'`
-    )
+    this.logger.debug(`Create auth user with username : '${authUserDTO?.username}'`)
     RegisterUserSchema.parse(authUserDTO)
 
     try {
       const roleIds = await this.getRoleIds(roles)
-      return await this.authRepository.createAuthUser(
-        authUserDTO,
-        providerDTO,
-        roleIds
-      )
+      return await this.authRepository.createAuthUser(authUserDTO, providerDTO, roleIds)
     } catch (err: any) {
       if (err instanceof ConstraintViolationException) {
         if (err.code === ConstraintCode.USERNAME_EXISTS) {
           this.logger.warn(`Username: '${authUserDTO.username}' already exists`)
-          throw new AuthException(
-            HttpStatus.BAD_REQUEST,
-            'Username already exists',
-            'USERNAME_EXISTS'
-          )
+          throw new AuthException(HttpStatus.BAD_REQUEST, 'Username already exists', 'USERNAME_EXISTS')
         }
       } else if (err instanceof AuthException) {
         throw err
       }
 
-      this.logger.error(
-        `There was an error when creating a user with username: ${authUserDTO.username}`,
-        err.stack
-      )
+      this.logger.error(`There was an error when creating a user with username: ${authUserDTO.username}`, err.stack)
       throw new AuthException(
         HttpStatus.BAD_REQUEST,
         'Something went wrong while creating user',
@@ -105,16 +83,10 @@ export class AuthServiceImpl implements AuthService {
   }
 
   private async getRoleIds(roles: AuthRole[]) {
-    const roleIds = (await this.rolesService.getRolesByNames(roles))?.map(
-      (role) => role.id
-    )
+    const roleIds = (await this.rolesService.getRolesByNames(roles))?.map((role) => role.id)
     if (!roleIds?.length) {
       this.logger.error(`Invalid roles in database : ${roles?.join(', ')}`)
-      throw new AuthException(
-        HttpStatus.BAD_REQUEST,
-        'Invalid roles',
-        'CREATE_USER_EXCEPTION'
-      )
+      throw new AuthException(HttpStatus.BAD_REQUEST, 'Invalid roles', 'CREATE_USER_EXCEPTION')
     }
     return roleIds
   }

@@ -14,8 +14,7 @@ export class SessionService {
 
   @Transactional()
   async handleRegister(token: string, username: string) {
-    const unregisteredUser =
-      await this.unRegisteredUserService.findUnRegisteredUserByToken(token)
+    const unregisteredUser = await this.unRegisteredUserService.findUnRegisteredUserByToken(token)
 
     return this.authService.createAuthUser(
       {

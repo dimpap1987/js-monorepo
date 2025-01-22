@@ -1,10 +1,5 @@
 import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@js-monorepo/components/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@js-monorepo/components/tabs'
 import { Separator } from '@js-monorepo/components/separator'
 import { AccountSettings } from './account-settings'
 import { NotificationPermissionComponent } from './notification-settings'

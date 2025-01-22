@@ -11,18 +11,15 @@ export class RolesGuard extends LoggedInGuard {
   }
 
   override canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<RolesEnum[]>(
-      'roles',
-      [context.getHandler(), context.getClass()]
-    )
+    const requiredRoles = this.reflector.getAllAndOverride<RolesEnum[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ])
     if (!requiredRoles) return true
 
     const req = context.switchToHttp().getRequest()
 
-    if (
-      super.canActivate(context) &&
-      requiredRoles.some((role) => req.user?.user?.roles?.includes(role))
-    ) {
+    if (super.canActivate(context) && requiredRoles.some((role) => req.user?.user?.roles?.includes(role))) {
       return true
     }
 

@@ -11,17 +11,16 @@ export class WsRolesGuard {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRoles = this.reflector.getAllAndOverride<RolesEnum[]>(
-      'roles',
-      [context.getHandler(), context.getClass()]
-    )
+    const requiredRoles = this.reflector.getAllAndOverride<RolesEnum[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ])
     if (!requiredRoles) return false
 
     const userId = context.switchToWs().getClient().user.id
     if (!userId) return false
 
-    const sessionUser =
-      await this.authSessionUserCacheService.findOrSaveAuthUserById(userId)
+    const sessionUser = await this.authSessionUserCacheService.findOrSaveAuthUserById(userId)
     return requiredRoles.some((role) => sessionUser?.roles?.includes(role))
   }
 }

@@ -1,8 +1,5 @@
 import { Inject, LoggerService as LS } from '@nestjs/common'
-import {
-  utilities as nestWinstonModuleUtilities,
-  WinstonModule,
-} from 'nest-winston'
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston'
 import { ClsService } from 'nestjs-cls'
 import * as winston from 'winston'
 import 'winston-daily-rotate-file'
@@ -78,11 +75,7 @@ export class LoggerService implements LS {
   }
 
   error(message: any, stack: any, context: string) {
-    this.logger.error(
-      '❌ ' + message + this.sessionMessage(),
-      this.toPrettyJson(stack),
-      context
-    )
+    this.logger.error('❌ ' + message + this.sessionMessage(), this.toPrettyJson(stack), context)
   }
 
   warn(message: any, context?: any) {
@@ -99,8 +92,7 @@ export class LoggerService implements LS {
 
   private stripAnsiCodes(input: string): string {
     // Define the regex pattern to match ANSI color codes
-    const ansiRegex =
-      /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
+    const ansiRegex = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
 
     // Use the replace method to remove ANSI codes
     return input.replace(ansiRegex, '')
@@ -113,19 +105,16 @@ export class LoggerService implements LS {
       log['message'] = this.stripAnsiCodes(message)
     } else if (typeof message === 'object') {
       for (const [key, value] of Object.entries(message)) {
-        log[key] =
-          typeof value === 'string' ? this.stripAnsiCodes(value) : value
+        log[key] = typeof value === 'string' ? this.stripAnsiCodes(value) : value
       }
     }
     if (fields) {
       if (typeof fields === 'object') {
         for (const [key, value] of Object.entries(fields)) {
-          log[key] =
-            typeof value === 'string' ? this.stripAnsiCodes(value) : value
+          log[key] = typeof value === 'string' ? this.stripAnsiCodes(value) : value
         }
       } else if (typeof fields === 'string') {
-        log['context'] =
-          typeof fields === 'string' ? this.stripAnsiCodes(fields) : fields
+        log['context'] = typeof fields === 'string' ? this.stripAnsiCodes(fields) : fields
       }
     }
     return log

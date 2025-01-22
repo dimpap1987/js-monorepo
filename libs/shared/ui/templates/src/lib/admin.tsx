@@ -28,10 +28,7 @@ export function AdminTemplateContent({
 }) {
   return (
     <div
-      className={cn(
-        'absolute p-3 left-0 sm:left-[180px] right-0 overflow-y-hidden max-w-[1400px] mx-auto',
-        className
-      )}
+      className={cn('absolute p-3 left-0 sm:left-[180px] right-0 overflow-y-hidden max-w-[1400px] mx-auto', className)}
     >
       {children}
     </div>

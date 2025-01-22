@@ -6,10 +6,7 @@ import { NotificationRepositoryPrisma } from './notification.repository.prisma'
 import { NotificationService } from './notification.service'
 
 export interface NotificationModuleOptions {
-  onNotificationCreation?: (
-    receiverIds: number[],
-    notification: CreateUserNotificationType
-  ) => void
+  onNotificationCreation?: (receiverIds: number[], notification: CreateUserNotificationType) => void
 }
 
 const providers: Provider[] = [
@@ -29,9 +26,7 @@ const providers: Provider[] = [
 @Global()
 export class NotificationServerModule {
   static forRootAsync(options: {
-    useFactory?: (
-      ...args: any[]
-    ) => NotificationModuleOptions | Promise<NotificationModuleOptions>
+    useFactory?: (...args: any[]) => NotificationModuleOptions | Promise<NotificationModuleOptions>
     inject?: any[]
     imports?: any[]
   }): DynamicModule {

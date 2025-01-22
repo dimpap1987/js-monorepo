@@ -4,11 +4,7 @@ import { Logger } from '@nestjs/common'
 const logger = new Logger('Retry')
 
 export function Retry(retries: number, timeout = 2000) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
     let originalError: unknown = null
 
@@ -25,10 +21,7 @@ export function Retry(retries: number, timeout = 2000) {
           if (i == 0) {
             logger.error(`[${className}] - ${methodName}`, error.stack)
           } else {
-            logger.error(
-              `[${className}] - Attempt ${i} - ${methodName}`,
-              error.stack
-            )
+            logger.error(`[${className}] - Attempt ${i} - ${methodName}`, error.stack)
           }
           if (i < retries) {
             const currentTimeout = timeout * Math.pow(2, i) // Exponential backoff

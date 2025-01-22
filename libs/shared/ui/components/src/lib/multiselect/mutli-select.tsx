@@ -49,10 +49,7 @@ export function MultiSelectDropdown({
     return localLabel ? localLabel : prompt
   }
 
-  const label = useMemo(
-    () => constructLabel(selectedOptions),
-    [selectedOptions]
-  )
+  const label = useMemo(() => constructLabel(selectedOptions), [selectedOptions])
 
   useClickAway(dropdownContentRef, (event) => {
     if (dropdownTriggerRef.current?.contains(event.target as Node)) {
@@ -62,16 +59,12 @@ export function MultiSelectDropdown({
   })
 
   useEffect(() => {
-    const initialSelectedOptions = options.filter((option) =>
-      selectedIds.includes(option.id)
-    )
+    const initialSelectedOptions = options.filter((option) => selectedIds.includes(option.id))
     setSelectedOptions(initialSelectedOptions)
   }, [options, selectedIds])
 
   const handleChange = (option: OptionType) => {
-    const isSelected = selectedOptions.some(
-      (selected) => selected.id === option.id
-    )
+    const isSelected = selectedOptions.some((selected) => selected.id === option.id)
 
     const newSelectedOptions = isSelected
       ? selectedOptions.filter((selected) => selected.id !== option.id)
@@ -94,11 +87,7 @@ export function MultiSelectDropdown({
   }
 
   return (
-    <DropdownMenu
-      open={isOpen}
-      onOpenChange={(change) => change && setIsOpen(true)}
-      modal={true}
-    >
+    <DropdownMenu open={isOpen} onOpenChange={(change) => change && setIsOpen(true)} modal={true}>
       <DropdownMenuTrigger
         ref={dropdownTriggerRef}
         asChild
@@ -144,12 +133,7 @@ export function MultiSelectDropdown({
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             )}
           </span>
@@ -161,9 +145,7 @@ export function MultiSelectDropdown({
           <Fragment key={option.id}>
             <DropdownMenuCheckboxItem
               className="cursor-pointer"
-              checked={selectedOptions.some(
-                (selected) => selected.id === option.id
-              )}
+              checked={selectedOptions.some((selected) => selected.id === option.id)}
               onCheckedChange={() => handleChange(option)}
             >
               {option.name}

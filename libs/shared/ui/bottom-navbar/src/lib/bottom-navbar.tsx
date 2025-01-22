@@ -3,10 +3,7 @@
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
-export function BottomNavbar({
-  children,
-  className,
-}: PropsWithChildren & { className?: string }) {
+export function BottomNavbar({ children, className }: PropsWithChildren & { className?: string }) {
   const [isVisible, setIsVisible] = useState(true)
   const lastScrollY = useRef(0)
 

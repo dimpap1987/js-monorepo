@@ -44,8 +44,7 @@ export function usePagination({
   }
 
   const loadMore = useCallback(async () => {
-    if (isLoading || (totalPages && paginator.current.page >= totalPages))
-      return
+    if (isLoading || (totalPages && paginator.current.page >= totalPages)) return
 
     setIsLoading(true)
 

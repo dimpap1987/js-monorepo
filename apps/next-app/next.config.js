@@ -14,10 +14,7 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
-  webpack: (
-    config,
-    { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
-  ) => {
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
     const newConfig = {
       ...config,
       optimization: {

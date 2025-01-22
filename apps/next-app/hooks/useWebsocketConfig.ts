@@ -4,11 +4,7 @@ import { useWebSocket } from '@js-monorepo/next/providers'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useEffect } from 'react'
 
-export const useWebSocketConfig = (
-  isLoggedIn: boolean,
-  isAdmin: boolean,
-  refreshSession: () => void
-) => {
+export const useWebSocketConfig = (isLoggedIn: boolean, isAdmin: boolean, refreshSession: () => void) => {
   const { socket, disconnect } = useWebSocket(websocketOptions, isLoggedIn)
 
   useEffect(() => {

@@ -4,11 +4,7 @@ import { Logger } from '@nestjs/common'
 const logger = new Logger('Catch')
 
 export function Catch(outputWhenError?: any, errorDesciption?: string) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
 
     descriptor.value = async function (...args: any[]) {

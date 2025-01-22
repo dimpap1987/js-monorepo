@@ -26,9 +26,7 @@ import { UserSocketService } from '../services/user-socket.service'
   },
   transports: ['websocket'],
 })
-export class UserPresenceGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy
-{
+export class UserPresenceGateway implements OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy {
   private logger = new Logger(UserPresenceGateway.name)
   private intervalId?: NodeJS.Timeout
 
@@ -98,17 +96,13 @@ export class UserPresenceGateway
       },
       60 * 5
     )
-    const onlineUsersPromise = this.onlineUsersService.add(
-      `${socket.user.id}:${socket.id}`
-    )
+    const onlineUsersPromise = this.onlineUsersService.add(`${socket.user.id}:${socket.id}`)
 
     await Promise.all([socketPromise, onlineUsersPromise])
   }
 
   async emitOnlineUsersToAdmins() {
-    this.namespace
-      .to(Rooms.admin)
-      .emit(Events.onlineUsers, await this.onlineUsersService.getList())
+    this.namespace.to(Rooms.admin).emit(Events.onlineUsers, await this.onlineUsersService.getList())
   }
 
   private startUserSocketSaving() {

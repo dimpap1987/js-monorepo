@@ -1,12 +1,4 @@
-import {
-  DynamicModule,
-  Global,
-  Inject,
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common'
+import { DynamicModule, Global, Inject, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { PassportModule } from '@nestjs/passport'
 
 import { CsrfGeneratorMiddleware } from '../common/middlewares/csrf-generator.middleware'
@@ -17,13 +9,7 @@ import { AuthService } from '../common/services/interfaces/auth.service'
 import { UnregisteredService } from '../common/services/interfaces/unregistered-user.service'
 import { GithubOauthStrategy } from '../common/strategies/github.strategy'
 import { GoogleStrategy } from '../common/strategies/google.strategy'
-import {
-  AuthConfig,
-  AuthOpts,
-  ServiceAuth,
-  ServiceUnRegisteredUser,
-  SessionConfiguration,
-} from '../common/types'
+import { AuthConfig, AuthOpts, ServiceAuth, ServiceUnRegisteredUser, SessionConfiguration } from '../common/types'
 import { AuthSessionController } from './controllers/auth-session.controller'
 import { LoggedInGuard } from './guards/login.guard'
 import { RolesGuard } from './guards/roles-guard'
@@ -33,9 +19,7 @@ import { SessionSerializer } from './providers/session-serializer'
 import { SessionService } from './services/session.service'
 
 export const getRedisSessionPath = () => {
-  return process.env['REDIS_NAMESPACE']
-    ? `${process.env['REDIS_NAMESPACE']}:sessions:`
-    : 'sessions:'
+  return process.env['REDIS_NAMESPACE'] ? `${process.env['REDIS_NAMESPACE']}:sessions:` : 'sessions:'
 }
 
 @Global()
@@ -57,13 +41,7 @@ export const getRedisSessionPath = () => {
     AuthSessionMiddleware,
     AuthSessionUserCacheService,
   ],
-  exports: [
-    RolesGuard,
-    LoggedInGuard,
-    SessionSerializer,
-    AuthSessionMiddleware,
-    AuthSessionUserCacheService,
-  ],
+  exports: [RolesGuard, LoggedInGuard, SessionSerializer, AuthSessionMiddleware, AuthSessionUserCacheService],
 })
 export class AuthSessionModule implements NestModule {
   constructor(
@@ -74,9 +52,7 @@ export class AuthSessionModule implements NestModule {
   ) {}
 
   static forRootAsync(options: {
-    useFactory: (
-      ...fn: any
-    ) => Promise<SessionConfiguration> | SessionConfiguration
+    useFactory: (...fn: any) => Promise<SessionConfiguration> | SessionConfiguration
     inject?: any[]
     imports?: any[]
   }): DynamicModule {
@@ -109,12 +85,7 @@ export class AuthSessionModule implements NestModule {
             authService: AuthService,
             unRegisteredUserService: UnregisteredService
           ) => {
-            if (config.google)
-              return new GoogleStrategy(
-                config,
-                authService,
-                unRegisteredUserService
-              )
+            if (config.google) return new GoogleStrategy(config, authService, unRegisteredUserService)
             return null
           },
           inject: [AuthOpts, ServiceAuth, ServiceUnRegisteredUser],
@@ -126,12 +97,7 @@ export class AuthSessionModule implements NestModule {
             authService: AuthService,
             unRegisteredUserService: UnregisteredService
           ) => {
-            if (config.github)
-              new GithubOauthStrategy(
-                config,
-                authService,
-                unRegisteredUserService
-              )
+            if (config.github) new GithubOauthStrategy(config, authService, unRegisteredUserService)
             return null
           },
           inject: [AuthOpts, ServiceAuth, ServiceUnRegisteredUser],

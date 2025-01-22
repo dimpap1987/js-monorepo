@@ -1,16 +1,9 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import {
-  BottomNavbar,
-  BottomNavbarAlert,
-  BottomNavbarOptions,
-} from '@js-monorepo/bottom-navbar'
+import { BottomNavbar, BottomNavbarAlert, BottomNavbarOptions } from '@js-monorepo/bottom-navbar'
 import { useDeviceType } from '@js-monorepo/next/hooks'
-import {
-  NotificationBellButton,
-  useNotificationStore,
-} from '@js-monorepo/notifications-ui'
+import { NotificationBellButton, useNotificationStore } from '@js-monorepo/notifications-ui'
 import { AuthRole } from '@js-monorepo/types'
 import { AiFillHome } from 'react-icons/ai'
 import { IconType } from 'react-icons/lib'
@@ -43,17 +36,9 @@ export const MobileNavbar = () => {
   return (
     <BottomNavbar className="sm:hidden">
       {navLinksOpts
-        .filter(
-          ({ roles }) =>
-            (roles.includes('ADMIN') && isAdmin) || roles.includes('USER')
-        )
+        .filter(({ roles }) => (roles.includes('ADMIN') && isAdmin) || roles.includes('USER'))
         .map(({ href, icon: Icon, label }) => (
-          <BottomNavbarOptions
-            Icon={Icon}
-            href={href}
-            label={label}
-            key={href}
-          ></BottomNavbarOptions>
+          <BottomNavbarOptions Icon={Icon} href={href} label={label} key={href}></BottomNavbarOptions>
         ))}
       <BottomNavbarAlert href="/notifications" label="Alerts">
         <NotificationBellButton unreadNotificationCount={notificationCount} />

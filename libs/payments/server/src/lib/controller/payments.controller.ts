@@ -39,49 +39,27 @@ export class PaymentsController {
   }
 
   @Post('webhook')
-  async handleStripeWebhook(
-    @Headers('stripe-signature') signature: string,
-    @Req() request: RequestWithRawBody
-  ) {
+  async handleStripeWebhook(@Headers('stripe-signature') signature: string, @Req() request: RequestWithRawBody) {
     return this.stripeService.handleWebhookEvent(signature, request.rawBody)
   }
 
   @Post('checkout')
   @UseGuards(LoggedInGuard)
-  async createCheckoutSession(
-    @Body() { priceId }: { priceId: number },
-    @SessionUser() sessionUser: SessionUserType
-  ) {
-    const { session } = await this.stripeService.createCheckoutSession(
-      priceId,
-      sessionUser.id,
-      sessionUser.email
-    )
+  async createCheckoutSession(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
+    const { session } = await this.stripeService.createCheckoutSession(priceId, sessionUser.id, sessionUser.email)
     return { sessionId: session.id }
   }
 
   @Post('cancel')
   @HttpCode(204)
   @UseGuards(LoggedInGuard)
-  async cancelSubscription(
-    @Body() { priceId }: { priceId: number },
-    @SessionUser() sessionUser: SessionUserType
-  ) {
-    const subscription =
-      await this.paymentsService.findSubscriptionByPriceIdAndUserId(
-        priceId,
-        sessionUser.id
-      )
+  async cancelSubscription(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
+    const subscription = await this.paymentsService.findSubscriptionByPriceIdAndUserId(priceId, sessionUser.id)
 
-    const { error } = await tryCatch(() =>
-      this.stripeService.cancelSubscription(subscription.stripeSubscriptionId)
-    )
+    const { error } = await tryCatch(() => this.stripeService.cancelSubscription(subscription.stripeSubscriptionId))
 
     if (error) {
-      throw new ApiException(
-        HttpStatus.NOT_FOUND,
-        'ERROR_SUBSCRIPTION_STRIPE_CANCEL'
-      )
+      throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_SUBSCRIPTION_STRIPE_CANCEL')
     }
   }
 }

@@ -6,15 +6,9 @@ import { UserRepository } from './user.repository'
 
 @Injectable()
 export class UserRepositoryPrisma implements UserRepository {
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
-  ) {}
+  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
 
-  async editUser(
-    payload: EditUserDto,
-    userId: number,
-    profileId: number
-  ): Promise<void> {
+  async editUser(payload: EditUserDto, userId: number, profileId: number): Promise<void> {
     if (payload.profileImage && profileId) {
       await this.txHost.tx.userProfile.update({
         where: { id: profileId },

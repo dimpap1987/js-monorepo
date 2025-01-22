@@ -1,8 +1,4 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@js-monorepo/components/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
 import { cn } from '@js-monorepo/ui/util'
 import { FaAt } from 'react-icons/fa'
 
@@ -21,15 +17,8 @@ export function UserMetadata({
     <>
       <div className={cn('p-1 flex gap-4 items-center', className)}>
         <Avatar>
-          {profileImage && (
-            <AvatarImage
-              src={profileImage}
-              alt={`${username} picture`}
-            ></AvatarImage>
-          )}
-          <AvatarFallback>
-            {username?.slice(0, 2)?.toUpperCase() || 'A'}
-          </AvatarFallback>
+          {profileImage && <AvatarImage src={profileImage} alt={`${username} picture`}></AvatarImage>}
+          <AvatarFallback>{username?.slice(0, 2)?.toUpperCase() || 'A'}</AvatarFallback>
         </Avatar>
 
         {createdAt && (

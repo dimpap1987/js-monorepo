@@ -1,24 +1,12 @@
 'use client'
 
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 
 import { Pageable } from '@js-monorepo/types'
 import { Dispatch, SetStateAction } from 'react'
 import { Skeleton } from '../skeleton'
 import { DataTablePagination } from './data-table-pagination'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from './table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -71,12 +59,7 @@ export function DataTable<TData, TValue>({
                     style={{ width: header.getSize() }}
                     className="text-xs font-medium text-gray-500 tracking-wider"
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 )
               })}
@@ -89,10 +72,7 @@ export function DataTable<TData, TValue>({
             Array.from({ length: 5 }).map((_, rowIndex) => (
               <TableRow key={`skeleton-${rowIndex}`}>
                 {columns.map((__, colIndex) => (
-                  <TableCell
-                    key={`skeleton-cell-${rowIndex}-${colIndex}`}
-                    className="text-sm text-gray-900"
-                  >
+                  <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`} className="text-sm text-gray-900">
                     <Skeleton className="h-4" />
                   </TableCell>
                 ))}
@@ -100,10 +80,7 @@ export function DataTable<TData, TValue>({
             ))
           ) : table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-              >
+              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-sm text-gray-900">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -120,12 +97,7 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      {!loading && (
-        <DataTablePagination
-          table={table}
-          className="bg-white text-sm text-gray-900"
-        />
-      )}
+      {!loading && <DataTablePagination table={table} className="bg-white text-sm text-gray-900" />}
     </div>
   )
 }

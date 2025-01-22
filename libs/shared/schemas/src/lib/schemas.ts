@@ -25,12 +25,9 @@ class RegisterUserSchemaConfig {
         username: UsernameSchema.optional(),
         roles: z.array(ObjectIdSchema).optional(),
       })
-      .refine(
-        (data) => data.username || (data.roles && data.roles.length > 0),
-        {
-          message: "At least one of 'username' or 'roles' must be provided.",
-        }
-      )
+      .refine((data) => data.username || (data.roles && data.roles.length > 0), {
+        message: "At least one of 'username' or 'roles' must be provided.",
+      })
   }
 }
 
@@ -67,11 +64,7 @@ export const CreateUnregisteredUserSchema = z.object({
     })
     .nullable()
     .optional(),
-  profileImage: z
-    .string()
-    .url({ message: 'Profile image must be a valid URL.' })
-    .nullable()
-    .optional(),
+  profileImage: z.string().url({ message: 'Profile image must be a valid URL.' }).nullable().optional(),
 })
 
 export const EditUserSchema = z
@@ -79,10 +72,7 @@ export const EditUserSchema = z
     username: UsernameSchema.optional(),
     profileImage: z.string().optional(),
   })
-  .refine(
-    (data) => data.username !== undefined || data.profileImage !== undefined,
-    {
-      message: 'At least one of "username" or "profileImage" must be provided.',
-      path: [], // Applies to the entire object
-    }
-  )
+  .refine((data) => data.username !== undefined || data.profileImage !== undefined, {
+    message: 'At least one of "username" or "profileImage" must be provided.',
+    path: [], // Applies to the entire object
+  })

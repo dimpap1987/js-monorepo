@@ -5,9 +5,7 @@ import { Injectable } from '@nestjs/common'
 
 @Injectable()
 export class RolesRepository {
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
-  ) {}
+  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async findRoleById(id: number) {
     return this.txHost.tx.role.findUniqueOrThrow({

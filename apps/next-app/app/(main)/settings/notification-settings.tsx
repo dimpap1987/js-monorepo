@@ -7,9 +7,7 @@ const NotificationPermissionComponent = () => {
   const { permission, requestPermission } = useWebPushNotification()
 
   const handleDisableNotifications = () => {
-    alert(
-      "Please enable Push Notifications in your browser settings if you'd like to receive alerts."
-    )
+    alert("Please enable Push Notifications in your browser settings if you'd like to receive alerts.")
   }
 
   const permissionStates = {
@@ -22,8 +20,7 @@ const NotificationPermissionComponent = () => {
       },
     },
     denied: {
-      label:
-        'Push Notifications are disabled. To re-enable, change the browser settings.',
+      label: 'Push Notifications are disabled. To re-enable, change the browser settings.',
       checkboxProps: {
         onClick: handleDisableNotifications,
         readOnly: true,

@@ -12,8 +12,7 @@ function FeedBack() {
         <div>
           <h2 className="text-center p-2">How can we make the App better?</h2>
           <h4 className="text-center p-2 hidden sm:block">
-            Below, you’ll find all the options to directly communicate your
-            needs to our team.
+            Below, you’ll find all the options to directly communicate your needs to our team.
           </h4>
         </div>
         <CardList className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]"></CardList>

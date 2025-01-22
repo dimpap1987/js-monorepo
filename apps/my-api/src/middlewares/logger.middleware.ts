@@ -17,13 +17,9 @@ export class LoggerMiddleware implements NestMiddleware {
     res.on('close', () => {
       const { statusCode } = res
       if (userAgent?.includes('Next.js Middleware') || userAgent === 'node') {
-        this.nextLogger.debug(
-          `[${method} - ${statusCode} - ${url}] - [IP=${ip}] - [USER_AGENT=${userAgent}]`
-        )
+        this.nextLogger.debug(`[${method} - ${statusCode} - ${url}] - [IP=${ip}] - [USER_AGENT=${userAgent}]`)
       } else {
-        this.httpLogger.log(
-          `[${method} - ${statusCode} - ${url}] - [IP=${ip}] - [USER_AGENT=${userAgent}]`
-        )
+        this.httpLogger.log(`[${method} - ${statusCode} - ${url}] - [IP=${ip}] - [USER_AGENT=${userAgent}]`)
       }
     })
     next()
