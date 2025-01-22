@@ -92,7 +92,7 @@ export type AuthUserUpdateDto =
 
 export type NotificationCreateDto = {
   receiverIds: number[]
-  senderId: number
+  senderId?: number
   message: string
   link?: string
   type?: string
