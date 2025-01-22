@@ -9,6 +9,7 @@ import { StripeModule } from './stripe.module'
 export interface SubscriptionCallback {
   id: number
   name: string
+  cancelAt?: Date
 }
 
 export interface PaymentsModuleOptions {
