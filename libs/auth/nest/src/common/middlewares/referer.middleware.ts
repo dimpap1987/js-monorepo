@@ -14,11 +14,7 @@ export class RefererMiddleware implements NestMiddleware {
         req.session['redirect-after-login'] = referer
       }
     } catch (error: any) {
-      Logger.error(
-        `Error in RefererMiddleware: ${error}`,
-        error.stack,
-        RefererMiddleware.name
-      )
+      Logger.error(`Error in RefererMiddleware: ${error}`, error.stack, RefererMiddleware.name)
     }
     next()
   }

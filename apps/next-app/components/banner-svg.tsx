@@ -65,16 +65,9 @@ export default function BannerSVG() {
     for (let i = 0; i < bubbleConfig.count; ++i) {
       const cx = Math.random() * w
       const cy = bubbleConfig.height + Math.random() * bubbleConfig.height
-      const radius =
-        Math.random() * (bubbleConfig.maxRadius - bubbleConfig.minRadius) +
-        bubbleConfig.minRadius
-      const fill =
-        bubbleConfig.colors[
-          Math.floor(Math.random() * bubbleConfig.colors?.length)
-        ]
-      const delay =
-        Math.random() * (bubbleConfig.maxDelay - bubbleConfig.minDelay) +
-        bubbleConfig.minDelay
+      const radius = Math.random() * (bubbleConfig.maxRadius - bubbleConfig.minRadius) + bubbleConfig.minRadius
+      const fill = bubbleConfig.colors[Math.floor(Math.random() * bubbleConfig.colors?.length)]
+      const delay = Math.random() * (bubbleConfig.maxDelay - bubbleConfig.minDelay) + bubbleConfig.minDelay
       const dur = (Math.ceil(Math.random() * 5) * 0.5) / bubbleConfig.speed
 
       bubbleArray.push({
@@ -90,11 +83,7 @@ export default function BannerSVG() {
   }, [width])
 
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="absolute h-full w-full left-0 top-0 z-[-1]"
-      fill="none"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" className="absolute h-full w-full left-0 top-0 z-[-1]" fill="none">
       <g id="bubbleContainer" className="[&>*]:animate-bubble">
         {bubbles.map((item, index) => (
           <circle

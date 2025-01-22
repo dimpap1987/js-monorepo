@@ -17,13 +17,7 @@ const poppins = Poppins({
   adjustFontFallback: false,
 })
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string }
-  reset: () => void
-}) {
+export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     submitErrors(
       JSON.parse(
@@ -37,28 +31,17 @@ export default function GlobalError({
 
   return (
     <html lang="en">
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        enableSystem
-        disableTransitionOnChange
-      >
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
         <body
           className={`${poppins.className} flex justify-center container items-center min-h-100svh 
                     bg-background text-foreground overflow-x-hidden`}
         >
           <ErrorComponent type="global" className="container">
             <div className="flex flex-wrap gap-5 mt-5">
-              <DpButton
-                className="flex-grow flex-shrink basis-0 min-w-[180px]:"
-                onClick={() => reset()}
-              >
+              <DpButton className="flex-grow flex-shrink basis-0 min-w-[180px]:" onClick={() => reset()}>
                 Try again
               </DpButton>
-              <DpButton
-                className="flex-grow flex-shrink basis-0"
-                onClick={() => (window.location.href = '/')}
-              >
+              <DpButton className="flex-grow flex-shrink basis-0" onClick={() => (window.location.href = '/')}>
                 Go to Welcome Page
               </DpButton>
             </div>

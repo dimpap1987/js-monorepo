@@ -1,21 +1,9 @@
-import {
-  ClientResponseType,
-  ErrorResponse,
-  SuccessResponse,
-} from '@js-monorepo/types'
-import axios, {
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-  InternalAxiosRequestConfig,
-} from 'axios'
+import { ClientResponseType, ErrorResponse, SuccessResponse } from '@js-monorepo/types'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { Request } from 'express'
 
 export interface CustomAxiosInstance extends AxiosInstance {
-  get<T = any, R = ClientResponseType<T> & AxiosResponse>(
-    url: string,
-    config?: AxiosRequestConfig
-  ): Promise<R>
+  get<T = any, R = ClientResponseType<T> & AxiosResponse>(url: string, config?: AxiosRequestConfig): Promise<R>
 
   patch<T = any, R = ClientResponseType<T> & AxiosResponse>(
     url: string,
@@ -35,10 +23,7 @@ export interface CustomAxiosInstance extends AxiosInstance {
     config?: AxiosRequestConfig
   ): Promise<R>
 
-  delete<T = any, R = ClientResponseType<T> & AxiosResponse>(
-    url: string,
-    config?: AxiosRequestConfig
-  ): Promise<R>
+  delete<T = any, R = ClientResponseType<T> & AxiosResponse>(url: string, config?: AxiosRequestConfig): Promise<R>
 }
 
 export type Middleware = (
@@ -61,9 +46,7 @@ export function getCookie(name: string) {
   return null
 }
 
-async function handleAxiosResponse<T>(
-  response: AxiosResponse
-): Promise<ClientResponseType<T>> {
+async function handleAxiosResponse<T>(response: AxiosResponse): Promise<ClientResponseType<T>> {
   const errorMessage = 'Something went wrong, please try again later...'
 
   // Check for a successful response

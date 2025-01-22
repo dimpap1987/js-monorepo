@@ -58,10 +58,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   word-wrap: break-word;
-  border-image: var(
-    --notifications--border,
-    linear-gradient(rgb(214, 10, 190) 1%, rgba(0, 255, 255, 1)) 30%
-  );
+  border-image: var(--notifications--border, linear-gradient(rgb(214, 10, 190) 1%, rgba(0, 255, 255, 1)) 30%);
 }
 
 @keyframes slideRight {

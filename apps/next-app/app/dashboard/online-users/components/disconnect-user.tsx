@@ -1,12 +1,7 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@js-monorepo/components/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@js-monorepo/components/tooltip'
 import { useNotifications } from '@js-monorepo/notification'
 import { apiClient } from '@js-monorepo/utils/http'
 import { VscDebugDisconnect } from 'react-icons/vsc'
@@ -25,9 +20,7 @@ export function DisconnectUserComponent({ user }: { user: OnlineUsersType }) {
             disabled={user.id === 1 && user?.roles?.some((r) => r === 'ADMIN')}
             variant="accent"
             onClick={async () => {
-              const response = await apiClient.delete(
-                `/admin/users-session/${user.id}`
-              )
+              const response = await apiClient.delete(`/admin/users-session/${user.id}`)
 
               if (response.ok) {
                 addNotification({

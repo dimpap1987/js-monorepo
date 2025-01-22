@@ -12,11 +12,7 @@ export type DpNotificationProps = {
   readonly duration?: number
 }
 
-export default function DpNotification({
-  type = 'information',
-  message,
-  description,
-}: DpNotificationProps) {
+export default function DpNotification({ type = 'information', message, description }: DpNotificationProps) {
   return (
     <div className={styles.containerGrid}>
       {/* Type = 'Spinner' */}
@@ -49,18 +45,14 @@ export default function DpNotification({
 
       {/* Message */}
       {message && (
-        <div
-          className={`${styles.gridItem1} overflow-hidden text-ellipsis self-center`}
-        >
+        <div className={`${styles.gridItem1} overflow-hidden text-ellipsis self-center`}>
           <strong className="block p-0.5">{message}</strong>
         </div>
       )}
 
       {/* Description */}
       {description && (
-        <div
-          className={`${styles.gridItem2} overflow-hidden text-ellipsis self-center`}
-        >
+        <div className={`${styles.gridItem2} overflow-hidden text-ellipsis self-center`}>
           <small className="block p-0.5">{description}</small>
         </div>
       )}

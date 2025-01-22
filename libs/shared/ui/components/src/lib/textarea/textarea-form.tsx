@@ -4,15 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '../button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '../form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../form'
 import { Textarea } from './textarea'
 import { DpButton } from '@js-monorepo/button'
 
@@ -28,11 +20,7 @@ const FormSchema = z.object({
 })
 
 //TODO REFACTOR THIS COMPONENT - MAKE IT REUSABLE
-export function TextareaForm({
-  submitCallBack,
-}: {
-  submitCallBack: (data: z.infer<typeof FormSchema>) => any
-}) {
+export function TextareaForm({ submitCallBack }: { submitCallBack: (data: z.infer<typeof FormSchema>) => any }) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
@@ -53,9 +41,7 @@ export function TextareaForm({
               <FormControl>
                 <Textarea className="resize-none" {...field} />
               </FormControl>
-              <FormDescription>
-                Send this notification directly to the user
-              </FormDescription>
+              <FormDescription>Send this notification directly to the user</FormDescription>
               <FormMessage />
             </FormItem>
           )}

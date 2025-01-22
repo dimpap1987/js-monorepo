@@ -12,9 +12,7 @@ export async function apiGetPlans() {
   return apiClient.get('/payments/plans')
 }
 
-export async function apiGetSubscription(
-  id: number
-): Promise<ClientResponseType<Subscription>> {
+export async function apiGetSubscription(id: number): Promise<ClientResponseType<Subscription>> {
   return apiClient.get(`/payments/subscriptions/${id}`)
 }
 

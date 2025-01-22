@@ -1,10 +1,7 @@
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren } from 'react'
 
-export function DynamicHeightTemplate({
-  children,
-  className,
-}: PropsWithChildren & { className?: string }) {
+export function DynamicHeightTemplate({ children, className }: PropsWithChildren & { className?: string }) {
   return (
     <section
       className={cn(

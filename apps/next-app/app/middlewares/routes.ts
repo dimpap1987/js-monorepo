@@ -47,8 +47,6 @@ export const apiAuthPrefix = '/api/auth'
 export function isPublicRoute(pathname: string) {
   return (
     pathname === '/' ||
-    routes
-      .filter((route) => route.roles?.includes('PUBLIC'))
-      .some((route) => pathname.startsWith(route.path))
+    routes.filter((route) => route.roles?.includes('PUBLIC')).some((route) => pathname.startsWith(route.path))
   )
 }

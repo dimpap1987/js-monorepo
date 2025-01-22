@@ -1,8 +1,4 @@
-import {
-  ProviderName,
-  UserProfileCreateDto,
-  UserProfileDto,
-} from '@js-monorepo/types'
+import { ProviderName, UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types'
 import { Inject, Injectable } from '@nestjs/common'
 import { UserProfileRepository } from '../../repositories/user-profile.repository'
 import { RepoUserProfile } from '../../types'
@@ -23,29 +19,15 @@ export class UserProfileServiceImpl implements UserProfileService {
     return this.userProfileRepository.findUserProfilesByUserId(userId)
   }
 
-  async findUserProfilesByUserIdAndProviderName(
-    userId: number,
-    providerName: ProviderName
-  ): Promise<UserProfileDto[]> {
-    return this.userProfileRepository.findUserProfilesByUserIdAndProviderName(
-      userId,
-      providerName
-    )
+  async findUserProfilesByUserIdAndProviderName(userId: number, providerName: ProviderName): Promise<UserProfileDto[]> {
+    return this.userProfileRepository.findUserProfilesByUserIdAndProviderName(userId, providerName)
   }
 
-  async createUserProfile(
-    userProfileCreateDto: UserProfileCreateDto
-  ): Promise<UserProfileDto> {
+  async createUserProfile(userProfileCreateDto: UserProfileCreateDto): Promise<UserProfileDto> {
     return this.userProfileRepository.createUserProfile(userProfileCreateDto)
   }
 
-  async updateUserProfile(
-    id: number,
-    userProfileUpdateDto: Partial<UserProfileCreateDto>
-  ): Promise<UserProfileDto> {
-    return this.userProfileRepository.updateUserProfile(
-      id,
-      userProfileUpdateDto
-    )
+  async updateUserProfile(id: number, userProfileUpdateDto: Partial<UserProfileCreateDto>): Promise<UserProfileDto> {
+    return this.userProfileRepository.updateUserProfile(id, userProfileUpdateDto)
   }
 }

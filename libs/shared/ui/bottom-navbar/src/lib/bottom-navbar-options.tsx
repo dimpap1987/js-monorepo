@@ -2,15 +2,7 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { ReactNode } from 'react'
 import { IconType } from 'react-icons/lib'
 
-const BottomNavbarOptions = ({
-  href,
-  Icon,
-  label,
-}: {
-  href: string
-  Icon: IconType
-  label: string
-}) => {
+const BottomNavbarOptions = ({ href, Icon, label }: { href: string; Icon: IconType; label: string }) => {
   return (
     <div className="flex flex-col gap-1 justify-center items-center flex-1 h-full">
       <DpNextNavLink
@@ -28,15 +20,7 @@ const BottomNavbarOptions = ({
   )
 }
 
-const BottomNavbarAlert = ({
-  href,
-  label,
-  children,
-}: {
-  label: string
-  href: string
-  children: ReactNode
-}) => {
+const BottomNavbarAlert = ({ href, label, children }: { label: string; href: string; children: ReactNode }) => {
   return (
     <div className="flex flex-col gap-1 justify-center items-center flex-1 h-full">
       <DpNextNavLink

@@ -1,23 +1,14 @@
-import {
-  AuthUserCreateDto,
-  AuthUserDto,
-  ProvidersDto,
-} from '@js-monorepo/types'
+import { AuthUserCreateDto, AuthUserDto, ProvidersDto } from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
-import {
-  ConstraintCode,
-  ConstraintViolationException,
-} from '../../../exceptions/contraint-violation'
+import { ConstraintCode, ConstraintViolationException } from '../../../exceptions/contraint-violation'
 import { AuthRepository } from '../../auth.repository'
 
 @Injectable()
 export class AuthRepositoryPrismaImpl implements AuthRepository {
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
-  ) {}
+  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async findAuthUserByEmail(email: string): Promise<AuthUserDto> {
     return this.txHost.tx.authUser.findUniqueOrThrow({
@@ -64,9 +55,7 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
       .catch((e) => {
         if (e instanceof PrismaClientKnownRequestError) {
           if (e.code === 'P2002') {
-            throw new ConstraintViolationException(
-              ConstraintCode.USERNAME_EXISTS
-            )
+            throw new ConstraintViolationException(ConstraintCode.USERNAME_EXISTS)
           }
         }
         throw e // Re-throw any other errors

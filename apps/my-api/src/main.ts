@@ -24,9 +24,7 @@ function logServerMetadata() {
   apiLogger.log('Parent Process ID: ' + process.ppid)
   apiLogger.log('Node Version: ' + process.version)
   apiLogger.log('Platform: ' + process.platform)
-  apiLogger.log(
-    `🚀 Api is up on: ${protocol}://${host}:${port}/${globalPrefix}`
-  )
+  apiLogger.log(`🚀 Api is up on: ${protocol}://${host}:${port}/${globalPrefix}`)
 }
 
 async function bootstrap() {
@@ -38,9 +36,7 @@ async function bootstrap() {
 
   setupGracefulShutdown({ app })
 
-  app.useLogger(
-    new LoggerService(app.get(ClsService), process.env.LOGGER_LEVEL)
-  )
+  app.useLogger(new LoggerService(app.get(ClsService), process.env.LOGGER_LEVEL))
   app.setGlobalPrefix(globalPrefix)
   app.use(cookieParser())
   app.enableCors({

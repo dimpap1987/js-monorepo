@@ -23,10 +23,7 @@ export class UserSocketService {
       : onlineSocketUser
   }
 
-  async addSocketUser(
-    { userId, socket, pid, session }: SocketUser,
-    ttl?: number
-  ) {
+  async addSocketUser({ userId, socket, pid, session }: SocketUser, ttl?: number) {
     return this.redisClient.set(
       `${this.redisNamespace}:${socket}`,
       JSON.stringify({
@@ -52,9 +49,7 @@ export class UserSocketService {
         this.configService.get('SESSION_SECRET') ?? ''
       )
 
-      const sessionData = await this.redisClient.get(
-        `${getRedisSessionPath()}${decodedSession}`
-      )
+      const sessionData = await this.redisClient.get(`${getRedisSessionPath()}${decodedSession}`)
 
       if (!sessionData) return undefined
 
@@ -76,13 +71,10 @@ export class UserSocketService {
 
     try {
       do {
-        const { cursor: newCursor, keys } = await this.redisClient.scan(
-          cursor,
-          {
-            MATCH: userKeyPattern,
-            COUNT: 100,
-          }
-        )
+        const { cursor: newCursor, keys } = await this.redisClient.scan(cursor, {
+          MATCH: userKeyPattern,
+          COUNT: 100,
+        })
         cursor = newCursor
 
         if (keys.length > 0) {
@@ -100,9 +92,7 @@ export class UserSocketService {
         }
       } while (cursor !== 0) // Continue until the cursor is back to zero
 
-      this.logger.debug(
-        `Found '${matchingSockets?.length}' sockets for user ID: ${userId}`
-      )
+      this.logger.debug(`Found '${matchingSockets?.length}' sockets for user ID: ${userId}`)
       return matchingSockets
     } catch (error: any) {
       this.logger.error('Error while finding socket users', error.stack)

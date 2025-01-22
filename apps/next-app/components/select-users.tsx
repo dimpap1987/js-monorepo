@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  MultiSelectDropdown,
-  OptionType,
-} from '@js-monorepo/components/multiselect'
+import { MultiSelectDropdown, OptionType } from '@js-monorepo/components/multiselect'
 import { UserDropdown } from '@next-app/app/dashboard/notifications/components/types'
 import { findUsers } from '@next-app/app/dashboard/notifications/utils'
 import { useEffect, useState } from 'react'
@@ -22,11 +19,7 @@ const SelectUsersComponent = ({
   const [usersDropDown, setUsersDropDown] = useState<UserDropdown[]>([])
 
   useEffect(() => {
-    findUsers().then((users) =>
-      setUsersDropDown(
-        users.users?.map((u) => ({ id: u.id, name: u.username }))
-      )
-    )
+    findUsers().then((users) => setUsersDropDown(users.users?.map((u) => ({ id: u.id, name: u.username }))))
   }, [])
 
   return (

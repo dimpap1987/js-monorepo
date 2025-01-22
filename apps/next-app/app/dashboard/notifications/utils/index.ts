@@ -1,14 +1,8 @@
-import {
-  AuthUserFullDto,
-  CreatePushNotificationType,
-  NotificationCreateDto,
-} from '@js-monorepo/types'
+import { AuthUserFullDto, CreatePushNotificationType, NotificationCreateDto } from '@js-monorepo/types'
 import { apiClient } from '@js-monorepo/utils/http'
 
 export const findUsers = async (page = 1, pageSize = 50) => {
-  const response = await apiClient.get(
-    `/admin/users?page=${page}&pageSize=${pageSize}`
-  )
+  const response = await apiClient.get(`/admin/users?page=${page}&pageSize=${pageSize}`)
 
   if (response.ok)
     return response.data as {
@@ -26,8 +20,6 @@ export const submitNotification = async (payload: NotificationCreateDto) => {
   return apiClient.post(`/notifications`, payload)
 }
 
-export const submitPushNotification = async (
-  payload: CreatePushNotificationType
-) => {
+export const submitPushNotification = async (payload: CreatePushNotificationType) => {
   return apiClient.post('/notifications/push-notification', payload)
 }

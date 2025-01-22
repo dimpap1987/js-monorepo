@@ -9,27 +9,12 @@ import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosSettings } from 'react-icons/io'
 import { TbUserFilled } from 'react-icons/tb'
 import { UserMetadata } from './components/user-metadata'
-import {
-  OptionsDropdownRef,
-  UserOptionsDropdown,
-} from './components/user-options.component'
+import { OptionsDropdownRef, UserOptionsDropdown } from './components/user-options.component'
 
-function SideBarIcon({
-  onSideBarClick,
-  className,
-}: {
-  onSideBarClick?: () => void
-  className?: string
-}) {
+function SideBarIcon({ onSideBarClick, className }: { onSideBarClick?: () => void; className?: string }) {
   return (
     onSideBarClick && (
-      <div
-        className={cn(
-          `navbar-burger self-center cursor-pointer select-none`,
-          className
-        )}
-        aria-label="user-options"
-      >
+      <div className={cn(`navbar-burger self-center cursor-pointer select-none`, className)} aria-label="user-options">
         <button
           onClick={onSideBarClick}
           className="p-2 border-2 border-border rounded-xl"
@@ -56,11 +41,7 @@ function NavUserOptions({
 
   return (
     user?.isLoggedIn && (
-      <UserOptionsDropdown
-        ref={userOptionsDropdownRef}
-        IconComponent={FaCircleUser}
-        className={className}
-      >
+      <UserOptionsDropdown ref={userOptionsDropdownRef} IconComponent={FaCircleUser} className={className}>
         <UserMetadata
           profileImage={user.profile?.image}
           username={user.username}
@@ -112,9 +93,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
         if (React.isValidElement(child) && typeof child.type !== 'string') {
           if ((child.type as React.ComponentType).displayName === 'DpLogo') {
             logoElement = child
-          } else if (
-            (child.type as React.ComponentType).displayName === 'NavbarItems'
-          ) {
+          } else if ((child.type as React.ComponentType).displayName === 'NavbarItems') {
             navbarItemsElement = child
           }
         }
@@ -134,19 +113,10 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
               {menuItems &&
                 menuItems?.length > 0 &&
                 menuItems.map((item, index) => (
-                  <li
-                    key={index}
-                    className={cn(`text-center text-nowrap`, item.className)}
-                  >
+                  <li key={index} className={cn(`text-center text-nowrap`, item.className)}>
                     {(item?.roles?.includes('PUBLIC') ||
-                      item?.roles?.some((role) =>
-                        user?.roles?.includes(role as AuthRole)
-                      )) && (
-                      <DpNextNavLink
-                        className="p-2"
-                        activeClassName="underline-offset-8"
-                        href={item.href}
-                      >
+                      item?.roles?.some((role) => user?.roles?.includes(role as AuthRole))) && (
+                      <DpNextNavLink className="p-2" activeClassName="underline-offset-8" href={item.href}>
                         {item.name}
                       </DpNextNavLink>
                     )}
@@ -156,9 +126,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
 
             <div className="flex items-center gap-4 justify-end text-center">
               {navbarItems && (
-                <section className="hidden sm:flex justify-center items-center gap-5">
-                  {navbarItems}
-                </section>
+                <section className="hidden sm:flex justify-center items-center gap-5">{navbarItems}</section>
               )}
 
               {/* login button */}
@@ -168,16 +136,9 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 </DpNextNavLink>
               )}
 
-              <NavUserOptions
-                className="hidden sm:block"
-                user={user}
-                onLogout={onLogout}
-              ></NavUserOptions>
+              <NavUserOptions className="hidden sm:block" user={user} onLogout={onLogout}></NavUserOptions>
 
-              <SideBarIcon
-                onSideBarClick={onSideBarClick}
-                className="block sm:hidden"
-              ></SideBarIcon>
+              <SideBarIcon onSideBarClick={onSideBarClick} className="block sm:hidden"></SideBarIcon>
             </div>
           </div>
         </nav>

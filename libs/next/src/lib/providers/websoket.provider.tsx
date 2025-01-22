@@ -13,13 +13,9 @@ type WebSocketContextType = {
   unsubscribe: () => void
 }
 
-const WebSocketContext = createContext<WebSocketContextType | undefined>(
-  undefined
-)
+const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined)
 
-export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const socketRef = useRef<Socket | null>(null) // Single socket reference
 
   useEffect(() => {
@@ -40,9 +36,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
         if (socketRef.current.connected) {
           return socketRef.current // Return existing connected socket
         } else {
-          console.warn(
-            `Existing socket is not connected. Attempting to reconnect...`
-          )
+          console.warn(`Existing socket is not connected. Attempting to reconnect...`)
           socketRef.current.connect() // Attempt to reconnect
           return socketRef.current // Return the existing socket regardless
         }
@@ -84,11 +78,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
-  return (
-    <WebSocketContext.Provider value={{ connectSocket, unsubscribe }}>
-      {children}
-    </WebSocketContext.Provider>
-  )
+  return <WebSocketContext.Provider value={{ connectSocket, unsubscribe }}>{children}</WebSocketContext.Provider>
 }
 
 // Create a custom hook to use the WebSocket context

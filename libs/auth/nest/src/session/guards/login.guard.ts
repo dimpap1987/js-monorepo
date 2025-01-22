@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common'
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common'
 import { AuthException } from '../../common/exceptions/api-exception'
 
 @Injectable()

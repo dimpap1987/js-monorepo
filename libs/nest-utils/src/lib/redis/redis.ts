@@ -28,15 +28,10 @@ export class RedisModule {
             logger.log(`Creating connection for Redis...`)
 
             client.on('error', (err) =>
-              logger.error(
-                `Error while connecting to Redis with url: ${redisOptions.url}`,
-                err.stack
-              )
+              logger.error(`Error while connecting to Redis with url: ${redisOptions.url}`, err.stack)
             )
 
-            client.on('ready', () =>
-              logger.log(`Connected to Redis successfully`)
-            )
+            client.on('ready', () => logger.log(`Connected to Redis successfully`))
 
             await client.connect()
             return client

@@ -7,7 +7,14 @@ import { DpNextSidebar, MenuItem } from '@js-monorepo/sidebar'
 
 export function Example() {
   const [openSideBar, setOpenSideBar] = useState(false)
-  return <DpNextSidebar isOpen={openSideBar} onClose={() => setOpenSideBar(false)} position="right" items={menuItems}></DpNextSidebar>
+  return (
+    <DpNextSidebar
+      isOpen={openSideBar}
+      onClose={() => setOpenSideBar(false)}
+      position="right"
+      items={menuItems}
+    ></DpNextSidebar>
+  )
 }
 ```
 

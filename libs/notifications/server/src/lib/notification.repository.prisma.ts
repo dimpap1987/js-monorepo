@@ -1,8 +1,4 @@
-import {
-  CreateUserNotificationType,
-  NotificationCreateDto,
-  Pageable,
-} from '@js-monorepo/types'
+import { CreateUserNotificationType, NotificationCreateDto, Pageable } from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
@@ -10,9 +6,7 @@ import { NotificationRepository } from './notification.repository'
 
 @Injectable()
 export class NotificationRepositoryPrisma implements NotificationRepository {
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
-  ) {}
+  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async getNotifications(
     userId: number,
@@ -76,8 +70,7 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
     notification: CreateUserNotificationType
     total: number
   }> {
-    const { message, type, link, additionalData, senderId, receiverIds } =
-      payload
+    const { message, type, link, additionalData, senderId, receiverIds } = payload
 
     const notification = await this.txHost.tx.notification.create({
       data: {

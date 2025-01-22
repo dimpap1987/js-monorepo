@@ -10,8 +10,7 @@ export const buttonVariants = {
         'bg-secondary border-2 border-secondary/80 text-secondary-foreground hover:bg-secondary/85 focus:bg-secondary/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
       danger:
         'bg-danger border-2 border-danger/80 text-danger-foreground hover:bg-danger/85 focus:bg-danger/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
-      outline:
-        'border-2 border-primary/80 bg-background text-foreground tracking-[0.04em]',
+      outline: 'border-2 border-primary/80 bg-background text-foreground tracking-[0.04em]',
     },
     size: {
       default: 'h-8 px-4 py-2',

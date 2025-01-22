@@ -10,9 +10,7 @@ export const metadata: Metadata = {
 export default function Notifications() {
   return (
     <DynamicHeightTemplate>
-      <NotificationsPage
-        websocketOptions={websocketOptions}
-      ></NotificationsPage>
+      <NotificationsPage websocketOptions={websocketOptions}></NotificationsPage>
     </DynamicHeightTemplate>
   )
 }

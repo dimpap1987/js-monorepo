@@ -55,36 +55,26 @@ export function DpNotificationBellComponent({
 
   useEffect(() => {
     setNotifications((prev) => {
-      const existingIds = new Set(
-        prev.map((content) => content.notification.id)
-      )
+      const existingIds = new Set(prev.map((content) => content.notification.id))
 
-      const newNotifications = notificationList.filter(
-        (content) => !existingIds.has(content.notification.id)
-      )
+      const newNotifications = notificationList.filter((content) => !existingIds.has(content.notification.id))
 
       // Only update if there are new notifications
       if (newNotifications.length === 0) return prev
 
-      return [...prev, ...newNotifications].sort(
-        (a, b) => b.notification.id - a.notification.id
-      )
+      return [...prev, ...newNotifications].sort((a, b) => b.notification.id - a.notification.id)
     })
   }, [notificationList])
 
   useEffect(() => {
     if (latestReadNotificationId) {
-      setNotifications((prev) =>
-        updateNotificationAsRead(prev, latestReadNotificationId)
-      )
+      setNotifications((prev) => updateNotificationAsRead(prev, latestReadNotificationId))
     }
   }, [latestReadNotificationId])
 
   useEffect(() => {
     if (unreadNotificationCount === 0) {
-      setNotifications((prev) =>
-        prev?.map((content) => ({ ...content, isRead: true }))
-      )
+      setNotifications((prev) => prev?.map((content) => ({ ...content, isRead: true })))
     }
   }, [unreadNotificationCount])
 
@@ -100,8 +90,7 @@ export function DpNotificationBellComponent({
     debounce(() => {
       if (!notificationContainerRef?.current) return
 
-      const { scrollTop, scrollHeight, clientHeight } =
-        notificationContainerRef.current
+      const { scrollTop, scrollHeight, clientHeight } = notificationContainerRef.current
 
       if (scrollTop + clientHeight >= scrollHeight - 5) {
         loadMore()
@@ -113,24 +102,16 @@ export function DpNotificationBellComponent({
   return (
     <>
       {/* Backdrop */}
-      {isDropdownOpen && (
-        <div className="fixed inset-0 top-navbar-offset bg-black bg-opacity-50 z-10" />
-      )}
+      {isDropdownOpen && <div className="fixed inset-0 top-navbar-offset bg-black bg-opacity-50 z-10" />}
 
       <DropdownMenu
         onOpenChange={(open) => {
           setIsDropdownOpen(open)
           setTimeout(() => {
             if (open) {
-              notificationContainerRef?.current?.addEventListener(
-                'scroll',
-                handleScroll
-              )
+              notificationContainerRef?.current?.addEventListener('scroll', handleScroll)
             } else {
-              notificationContainerRef?.current?.removeEventListener(
-                'scroll',
-                handleScroll
-              )
+              notificationContainerRef?.current?.removeEventListener('scroll', handleScroll)
               if (resetOnClose) {
                 setPaginator(1, pagebale.pageSize)
                 setNotifications(notifications.slice(0, 10))
@@ -140,9 +121,7 @@ export function DpNotificationBellComponent({
         }}
       >
         <DropdownMenuTrigger asChild>
-          <NotificationBellButton
-            unreadNotificationCount={unreadNotificationCount}
-          />
+          <NotificationBellButton unreadNotificationCount={unreadNotificationCount} />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           className={cn(
@@ -157,9 +136,7 @@ export function DpNotificationBellComponent({
                 const isReadAll = await onReadAll?.()
                 if (!isReadAll) return
 
-                setNotifications((prev) =>
-                  prev.map((content) => ({ ...content, isRead: true }))
-                )
+                setNotifications((prev) => prev.map((content) => ({ ...content, isRead: true })))
               }}
             ></NotificationReadAllButton>
           </DropdownMenuLabel>
@@ -168,11 +145,7 @@ export function DpNotificationBellComponent({
             className={`${pagebale?.totalPages > 1 ? 'h-[26.7rem]' : ''} rounded-md`}
             viewPortRef={notificationContainerRef}
           >
-            <NotificationList
-              notifications={notifications}
-              onRead={handleRead}
-              showLoader={isLoading}
-            />
+            <NotificationList notifications={notifications} onRead={handleRead} showLoader={isLoading} />
           </ScrollArea>
         </DropdownMenuContent>
       </DropdownMenu>

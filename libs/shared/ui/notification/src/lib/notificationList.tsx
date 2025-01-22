@@ -7,19 +7,11 @@ interface DpNotificationListProps {
   readonly overlayClassName?: string
 }
 
-export default function DpNotificationList({
-  notifications,
-  overlayClassName,
-}: DpNotificationListProps) {
+export default function DpNotificationList({ notifications, overlayClassName }: DpNotificationListProps) {
   return (
     notifications &&
     notifications?.length > 0 && (
-      <section
-        className={cn(
-          `fixed top-navbar-offset right-2 p-2 z-40 flex flex-col-reverse gap-2`,
-          overlayClassName
-        )}
-      >
+      <section className={cn(`fixed top-navbar-offset right-2 p-2 z-40 flex flex-col-reverse gap-2`, overlayClassName)}>
         {notifications.map((notification, index) => (
           <div
             key={notification.id || index}

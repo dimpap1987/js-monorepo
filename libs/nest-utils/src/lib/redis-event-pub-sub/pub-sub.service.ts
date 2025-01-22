@@ -3,10 +3,7 @@ import { Observable } from 'rxjs'
 import { EventEmitterInterface } from './event/emitter/contract/event-emitter.interface'
 import { PublishableDataInterface } from './event/emitter/contract/publishable-event.interface'
 import { EVENT_EMITTER_TOKEN } from './event/emitter/redis.event-emitter'
-import {
-  EVENT_SUBSCRIBER_TOKEN,
-  EventSubscriberInterface,
-} from './event/subscriber/event-subscriber.interface'
+import { EVENT_SUBSCRIBER_TOKEN, EventSubscriberInterface } from './event/subscriber/event-subscriber.interface'
 
 @Injectable()
 export class PubSubService {
@@ -25,10 +22,7 @@ export class PubSubService {
     this.eventSubscriber.off(name, listener)
   }
 
-  async emit(
-    eventName: string,
-    { data, publish = true }: PublishableDataInterface
-  ): Promise<void> {
+  async emit(eventName: string, { data, publish = true }: PublishableDataInterface): Promise<void> {
     this.eventEmitter.emit(eventName, { data, publish })
   }
 
@@ -37,10 +31,6 @@ export class PubSubService {
     eventName: string,
     responseEvent: string
   ): Promise<Observable<{ event: string; data: T }>> {
-    return this.eventSubscriber.createWebsocketStream(
-      socket,
-      eventName,
-      responseEvent
-    )
+    return this.eventSubscriber.createWebsocketStream(socket, eventName, responseEvent)
   }
 }

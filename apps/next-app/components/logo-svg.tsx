@@ -1,12 +1,7 @@
 export default function SVGLogo() {
   return (
     <div className="shrink-0">
-      <svg
-        width={64}
-        height={50}
-        viewBox="0 0 160 79.30288924357912"
-        className="looka-1j8o68f"
-      >
+      <svg width={64} height={50} viewBox="0 0 160 79.30288924357912" className="looka-1j8o68f">
         <defs id="SvgjsDefs1413" />
         <g
           id="SvgjsG1414"

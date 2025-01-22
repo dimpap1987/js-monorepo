@@ -1,11 +1,5 @@
 import { DpButton } from '@js-monorepo/button'
-import {
-  Dialog,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DpDialogContent,
-} from '@js-monorepo/components/dialog'
+import { Dialog, DialogFooter, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/dialog'
 import { TiWarning } from 'react-icons/ti'
 
 export type ConfirmationDialogProps = {
@@ -20,9 +14,7 @@ export type ConfirmationDialogProps = {
 export const ConfirmationDialog = ({
   isOpen = false,
   title = 'Confirm Action',
-  content = (
-    <span className="font-semibold">Are you sure you want to proceed?</span>
-  ),
+  content = <span className="font-semibold">Are you sure you want to proceed?</span>,
   footer,
   onClose,
   smallMessage,
@@ -39,9 +31,7 @@ export const ConfirmationDialog = ({
     >
       <DpDialogContent>
         <DialogHeader className="font-semibold justify-center">
-          <DialogTitle className="text-left font-semibold text-lg">
-            {title}
-          </DialogTitle>
+          <DialogTitle className="text-left font-semibold text-lg">{title}</DialogTitle>
         </DialogHeader>
         <div className="flex gap-2 items-center">
           <TiWarning size={46} className="text-danger shrink-0" />

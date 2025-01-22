@@ -13,11 +13,7 @@ import {
 } from '@js-monorepo/notifications-ui'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { ModeToggle } from '@js-monorepo/theme-provider'
-import {
-  MenuItem,
-  PaginationType,
-  UserNotificationType,
-} from '@js-monorepo/types'
+import { MenuItem, PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
@@ -70,16 +66,11 @@ const initialPage = 1
 const initialPageSize = 10
 
 const DpNotificationBellComponentDynamic = dynamic(
-  () =>
-    import('@js-monorepo/notifications-ui').then(
-      (module) => module.DpNotificationBellComponent
-    ),
+  () => import('@js-monorepo/notifications-ui').then((module) => module.DpNotificationBellComponent),
   { ssr: false }
 )
 
-export default function MainTemplate({
-  children,
-}: Readonly<PropsWithChildren>) {
+export default function MainTemplate({ children }: Readonly<PropsWithChildren>) {
   const {
     session: { user },
     isLoggedIn,
@@ -89,9 +80,7 @@ export default function MainTemplate({
   const [openSideBar, setOpenSideBar] = useState(false)
   const fetchNotificationsRef = useRef(false)
   const router = useRouter()
-  const [notifications, setNotifications] = useState<
-    Partial<PaginationType> | undefined
-  >()
+  const [notifications, setNotifications] = useState<Partial<PaginationType> | undefined>()
 
   const {
     notificationCount,
@@ -102,27 +91,21 @@ export default function MainTemplate({
   } = useNotificationStore()
 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
-  useNotificationWebSocket(
-    websocketOptions,
-    (notification: UserNotificationType) => {
-      if (notification) {
-        setNotifications((prev) => {
-          return {
-            ...prev,
-            content: [notification, ...(prev?.content ?? [])],
-          }
-        })
-        incrementNotificationCountByOne()
-      }
+  useNotificationWebSocket(websocketOptions, (notification: UserNotificationType) => {
+    if (notification) {
+      setNotifications((prev) => {
+        return {
+          ...prev,
+          content: [notification, ...(prev?.content ?? [])],
+        }
+      })
+      incrementNotificationCountByOne()
     }
-  )
+  })
 
   useEffect(() => {
     if (!user?.id || fetchNotificationsRef.current) return
-    apiFetchUserNotifications(
-      user.id,
-      `?page=${initialPage}&pageSize=${initialPageSize}`
-    ).then((response) => {
+    apiFetchUserNotifications(user.id, `?page=${initialPage}&pageSize=${initialPageSize}`).then((response) => {
       if (response.ok) {
         fetchNotificationsRef.current = true
         setNotifications(response.data)

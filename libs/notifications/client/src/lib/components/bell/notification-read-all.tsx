@@ -2,11 +2,7 @@
 
 import { DpButton } from '@js-monorepo/button'
 
-export function NotificationReadAllButton({
-  onReadAll,
-}: {
-  onReadAll?: () => Promise<any>
-}) {
+export function NotificationReadAllButton({ onReadAll }: { onReadAll?: () => Promise<any> }) {
   return (
     <DpButton
       size="small"

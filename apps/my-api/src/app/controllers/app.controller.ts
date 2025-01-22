@@ -15,9 +15,7 @@ export class AppController {
     if (!user) return null
     const { email, ...restUser } = user
 
-    const { result, error } = await tryCatch(() =>
-      this.paymentsService.findUserSubscriptionStatus(user.id)
-    )
+    const { result, error } = await tryCatch(() => this.paymentsService.findUserSubscriptionStatus(user.id))
 
     if (!error && result?.isSubscribed) {
       return {

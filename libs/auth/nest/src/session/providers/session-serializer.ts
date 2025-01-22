@@ -5,9 +5,7 @@ import { AuthSessionUserCacheService } from './auth-session-cache.service'
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  constructor(
-    private readonly authSessionUserCacheService: AuthSessionUserCacheService
-  ) {
+  constructor(private readonly authSessionUserCacheService: AuthSessionUserCacheService) {
     super()
   }
 
@@ -16,9 +14,7 @@ export class SessionSerializer extends PassportSerializer {
   }
 
   async deserializeUser(userId: string, done: CallableFunction) {
-    const user = await this.authSessionUserCacheService.findOrSaveAuthUserById(
-      Number(userId)
-    )
+    const user = await this.authSessionUserCacheService.findOrSaveAuthUserById(Number(userId))
 
     if (user) {
       done(null, { user })

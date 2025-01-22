@@ -2,14 +2,7 @@
 
 import { cn } from '@js-monorepo/ui/util'
 import { motion } from 'framer-motion'
-import React, {
-  ForwardedRef,
-  forwardRef,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { ForwardedRef, forwardRef, ReactNode, useEffect, useRef, useState } from 'react'
 
 interface MarqueeProps {
   children?: ReactNode
@@ -22,13 +15,7 @@ interface MarqueeProps {
 //TODO needs refactor
 const Marquee = forwardRef(
   (
-    {
-      children,
-      duration = 15,
-      repeat = undefined,
-      onAnimationComplete,
-      className,
-    }: MarqueeProps,
+    { children, duration = 15, repeat = undefined, onAnimationComplete, className }: MarqueeProps,
     ref: ForwardedRef<HTMLDivElement>
   ) => {
     const childRefs = useRef<Map<number, HTMLDivElement | null>>(new Map())
@@ -54,9 +41,7 @@ const Marquee = forwardRef(
 
     const checkAllAnimationsCompleted = () => {
       // Check if all animations are completed
-      const allCompleted = Array.from(
-        animationStatusRef.current.values()
-      ).every((status) => status)
+      const allCompleted = Array.from(animationStatusRef.current.values()).every((status) => status)
 
       if (allCompleted) {
         onAnimationComplete?.()

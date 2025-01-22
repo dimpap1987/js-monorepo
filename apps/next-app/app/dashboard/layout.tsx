@@ -1,10 +1,7 @@
 'use client'
 
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import {
-  AdminTemplateContent,
-  AdminTemplateSideBar,
-} from '@js-monorepo/templates'
+import { AdminTemplateContent, AdminTemplateSideBar } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren } from 'react'
 import { GrAnnounce } from 'react-icons/gr'

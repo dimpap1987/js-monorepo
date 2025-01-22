@@ -18,9 +18,7 @@ const NotificationsContext = createContext<
   | {
       addNotification: (notification: DpNotificationProps) => number
       notifications: DpNotificationProps[]
-      setNotifications: React.Dispatch<
-        React.SetStateAction<DpNotificationProps[]>
-      >
+      setNotifications: React.Dispatch<React.SetStateAction<DpNotificationProps[]>>
       removeNotification: (notificationId: number) => void
     }
   | undefined
@@ -35,9 +33,7 @@ export const useNotifications = (): {
 } => {
   const context = useContext(NotificationsContext)
   if (!context) {
-    throw new Error(
-      'useNotifications must be used within a NotificationProvider'
-    )
+    throw new Error('useNotifications must be used within a NotificationProvider')
   }
   return {
     addNotification: context.addNotification,
@@ -48,9 +44,7 @@ export const useNotifications = (): {
 }
 
 // NotificationProvider
-export const DpNotificationProvider: React.FC<PropsWithChildren> = ({
-  children,
-}) => {
+export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [notifications, setNotifications] = useState<DpNotificationProps[]>([])
 
   //useCallback hook which will ensure that the addNotification function itself is memoized and not recreated on every render
@@ -61,9 +55,7 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({
   }, [])
 
   const removeNotification = useCallback((notificationId: number) => {
-    setNotifications((prev) => [
-      ...prev.filter((not) => not.id !== notificationId),
-    ])
+    setNotifications((prev) => [...prev.filter((not) => not.id !== notificationId)])
   }, [])
 
   const timeoutsRef = useRef<Record<number | string, NodeJS.Timeout>>({})

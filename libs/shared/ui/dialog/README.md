@@ -73,7 +73,14 @@ export default function Example() {
 export default function Example() {
   const [isOpenDialog, setOpenDialog] = useState(false)
 
-  return <DpConfirmationDialog isOpen={isOpenDialog} onClose={() => setOpenDialog(false)} onCancel={() => setOpenDialog(false)} onConfirm={async () => setOpenDialog(false)}></DpConfirmationDialog>
+  return (
+    <DpConfirmationDialog
+      isOpen={isOpenDialog}
+      onClose={() => setOpenDialog(false)}
+      onCancel={() => setOpenDialog(false)}
+      onConfirm={async () => setOpenDialog(false)}
+    ></DpConfirmationDialog>
+  )
 }
 ```
 

@@ -3,12 +3,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { Strategy, VerifyCallback } from 'passport-google-oauth20'
 import { AuthService } from '../services/interfaces/auth.service'
 import { UnregisteredService } from '../services/interfaces/unregistered-user.service'
-import {
-  AuthOpts,
-  ServiceAuth,
-  ServiceUnRegisteredUser,
-  SessionConfiguration,
-} from '../types'
+import { AuthOpts, ServiceAuth, ServiceUnRegisteredUser, SessionConfiguration } from '../types'
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -28,12 +23,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     })
   }
 
-  async validate(
-    accessToken: string,
-    refreshToken: string,
-    profile: any,
-    done: VerifyCallback
-  ): Promise<any> {
+  async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback): Promise<any> {
     const { name, emails, photos, id } = profile
     const email = emails[0].value
     const user = await this.authService.findAuthUserByEmail(email)
@@ -46,12 +36,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     } else {
       // If the user doesn't exist in the database
       try {
-        const unRegisteredUser =
-          await this.unRegisteredUserService.createUnRegisteredUser({
-            email: email,
-            provider: 'GOOGLE',
-            profileImage: photos[0].value,
-          })
+        const unRegisteredUser = await this.unRegisteredUserService.createUnRegisteredUser({
+          email: email,
+          provider: 'GOOGLE',
+          profileImage: photos[0].value,
+        })
 
         done(null, {
           unRegisteredUser: unRegisteredUser,

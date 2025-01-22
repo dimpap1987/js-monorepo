@@ -1,14 +1,7 @@
 import { Pageable } from '@js-monorepo/types'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
 interface UsePaginationWithParamsResult {
   pagination: Pageable
@@ -16,11 +9,7 @@ interface UsePaginationWithParamsResult {
   searchQuery: string
 }
 
-function updateUrlParams(
-  pagination: Pageable,
-  replace: (url: string) => void,
-  searchParams: URLSearchParams
-) {
+function updateUrlParams(pagination: Pageable, replace: (url: string) => void, searchParams: URLSearchParams) {
   const newParams = new URLSearchParams(searchParams)
   newParams.set('page', pagination?.page?.toString())
   newParams.set('pageSize', pagination?.pageSize?.toString())
@@ -28,19 +17,12 @@ function updateUrlParams(
 }
 
 // Pagination hook with URL parameter synchronization
-export function usePaginationWithParams(
-  pageInit = 1,
-  pageSizeInit = 10
-): UsePaginationWithParamsResult {
+export function usePaginationWithParams(pageInit = 1, pageSizeInit = 10): UsePaginationWithParamsResult {
   const searchParams = useSearchParams()
   const { replace } = useRouter()
 
-  const initialPage = searchParams.get('page')
-    ? Number(searchParams.get('page'))
-    : pageInit
-  const initialPageSize = searchParams.get('pageSize')
-    ? Number(searchParams.get('pageSize'))
-    : pageSizeInit
+  const initialPage = searchParams.get('page') ? Number(searchParams.get('page')) : pageInit
+  const initialPageSize = searchParams.get('pageSize') ? Number(searchParams.get('pageSize')) : pageSizeInit
 
   const [paginationInner, setPaginationInner] = useState<Pageable>({
     page: initialPage,
@@ -56,9 +38,7 @@ export function usePaginationWithParams(
       setPaginationInner((prevPagination) => {
         // Determine the new pagination state
         const newPagination =
-          typeof newPaginationOrUpdater === 'function'
-            ? newPaginationOrUpdater(prevPagination)
-            : newPaginationOrUpdater
+          typeof newPaginationOrUpdater === 'function' ? newPaginationOrUpdater(prevPagination) : newPaginationOrUpdater
 
         return newPagination
       })
@@ -66,10 +46,7 @@ export function usePaginationWithParams(
     [replace, searchParams]
   )
 
-  const searchQuery = useMemo(
-    () => constructURIQueryString(paginationInner),
-    [paginationInner]
-  )
+  const searchQuery = useMemo(() => constructURIQueryString(paginationInner), [paginationInner])
 
   return {
     pagination: paginationInner,

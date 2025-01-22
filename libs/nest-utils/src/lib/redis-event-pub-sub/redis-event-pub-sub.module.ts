@@ -1,10 +1,7 @@
 import { DynamicModule, Logger, Module } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { RedisClientType, createClient } from 'redis'
-import {
-  EVENT_EMITTER_TOKEN,
-  RedisEventEmitter,
-} from './event/emitter/redis.event-emitter'
+import { EVENT_EMITTER_TOKEN, RedisEventEmitter } from './event/emitter/redis.event-emitter'
 import { EventEmitter2EventSubscriber } from './event/subscriber/event-emitter-2.event-subscriber'
 import { EVENT_SUBSCRIBER_TOKEN } from './event/subscriber/event-subscriber.interface'
 import { PubSubService } from './pub-sub.service'
@@ -16,8 +13,7 @@ import {
 
 export const REDIS_PUB_CLIENT = 'REDIS_PUB_CLIENT'
 export const REDIS_SUB_CLIENT = 'REDIS_SUB_CLIENT'
-export const REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS =
-  'REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS'
+export const REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS = 'REDIS_EVENT_PUB_SUB_REGISTER_EVENT_OPTIONS'
 
 const logger = new Logger('RedisEventPubSubModule')
 
@@ -43,10 +39,7 @@ const logger = new Logger('RedisEventPubSubModule')
     },
     {
       provide: EVENT_EMITTER_TOKEN,
-      useFactory: (
-        redisPubClient: RedisClientType,
-        eventEmitter: EventEmitter2
-      ) => {
+      useFactory: (redisPubClient: RedisClientType, eventEmitter: EventEmitter2) => {
         return new RedisEventEmitter(redisPubClient, eventEmitter)
       },
       inject: [REDIS_PUB_CLIENT, EventEmitter2],
@@ -74,16 +67,11 @@ export class RedisEventPubSubModule extends ConfigurableModuleClass {
       providers: [
         {
           provide: REDIS_SUB_CLIENT,
-          useFactory: async (
-            options: RedisEventPubSubModuleOptions,
-            eventEmitter: EventEmitter2
-          ) => {
+          useFactory: async (options: RedisEventPubSubModuleOptions, eventEmitter: EventEmitter2) => {
             const client = createClient({
               url: options.url,
             })
-            client.on('error', (err: any) =>
-              logger.error('Redis Client Error', err)
-            )
+            client.on('error', (err: any) => logger.error('Redis Client Error', err))
             await client.connect()
             for (const eventPublishableName of eventsPublishableNames) {
               await client.subscribe(eventPublishableName, (response) => {

@@ -15,9 +15,7 @@ type FormItemContextValue = {
   id: string
 }
 
-const FormItemContext = React.createContext<FormItemContextValue>(
-  {} as FormItemContextValue
-)
+const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue)
 
 type FormErrorMessageProps = {
   errors?: string[]
@@ -35,9 +33,7 @@ type FormFieldContextValue<
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 
-const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue
-)
+const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFieldContextValue)
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
@@ -75,59 +71,43 @@ const useFormField = () => {
   }
 }
 
-const FormItem = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-  const id = React.useId()
+const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => {
+    const id = React.useId()
 
-  return (
-    <FormItemContext.Provider value={{ id }}>
-      <div
-        ref={ref}
-        className={cn('space-y-2 mb-4 overflow-hidden', className)}
-        {...props}
-      />
-    </FormItemContext.Provider>
-  )
-})
+    return (
+      <FormItemContext.Provider value={{ id }}>
+        <div ref={ref} className={cn('space-y-2 mb-4 overflow-hidden', className)} {...props} />
+      </FormItemContext.Provider>
+    )
+  }
+)
 FormItem.displayName = 'FormItem'
 
-const FormLabel = React.forwardRef<
-  HTMLLabelElement,
-  React.ButtonHTMLAttributes<HTMLLabelElement>
->(({ className, ...props }, ref) => {
-  const { error, formItemId } = useFormField()
+const FormLabel = React.forwardRef<HTMLLabelElement, React.ButtonHTMLAttributes<HTMLLabelElement>>(
+  ({ className, ...props }, ref) => {
+    const { error, formItemId } = useFormField()
 
-  return (
-    <label
-      ref={ref}
-      className={cn(
-        `font-semibold ${error ? 'text-destructive' : ''}`,
-        className
-      )}
-      htmlFor={formItemId}
-      {...props}
-    />
-  )
-})
+    return (
+      <label
+        ref={ref}
+        className={cn(`font-semibold ${error ? 'text-destructive' : ''}`, className)}
+        htmlFor={formItemId}
+        {...props}
+      />
+    )
+  }
+)
 FormLabel.displayName = 'FormLabel'
 
-const FormControl = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ ...props }, ref) => {
+const FormControl = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
     <div
       ref={ref}
       id={formItemId}
-      aria-describedby={
-        !error
-          ? `${formDescriptionId}`
-          : `${formDescriptionId} ${formMessageId}`
-      }
+      aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
       aria-invalid={!!error}
       {...props}
     ></div>
@@ -135,72 +115,57 @@ const FormControl = React.forwardRef<
 })
 FormControl.displayName = 'FormControl'
 
-const FormDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => {
-  const { formDescriptionId } = useFormField()
+const FormDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => {
+    const { formDescriptionId } = useFormField()
 
+    return (
+      <p ref={ref} id={formDescriptionId} className={cn('text-[0.8rem] text-muted-foreground', className)} {...props} />
+    )
+  }
+)
+FormDescription.displayName = 'FormDescription'
+
+const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, children, ...props }, ref) => {
+    const { error, formMessageId } = useFormField()
+    const body = error ? String(error?.message) : children
+
+    return (
+      <div className="h-5">
+        {body && (
+          <p
+            ref={ref}
+            id={formMessageId}
+            className={cn('text-[0.8rem] font-medium text-foreground h-5', className)}
+            {...props}
+          >
+            {body}
+          </p>
+        )}
+      </div>
+    )
+  }
+)
+FormMessage.displayName = 'FormMessage'
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
   return (
-    <p
+    <input
+      type={type}
+      className={cn(
+        'w-full border-2 border-border rounded-lg text-foreground px-6 py-2 text-base hover:border-primary cursor-pointer shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+        className
+      )}
       ref={ref}
-      id={formDescriptionId}
-      className={cn('text-[0.8rem] text-muted-foreground', className)}
       {...props}
     />
   )
 })
-FormDescription.displayName = 'FormDescription'
-
-const FormMessage = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, children, ...props }, ref) => {
-  const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message) : children
-
-  return (
-    <div className="h-5">
-      {body && (
-        <p
-          ref={ref}
-          id={formMessageId}
-          className={cn(
-            'text-[0.8rem] font-medium text-foreground h-5',
-            className
-          )}
-          {...props}
-        >
-          {body}
-        </p>
-      )}
-    </div>
-  )
-})
-FormMessage.displayName = 'FormMessage'
-
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
-    return (
-      <input
-        type={type}
-        className={cn(
-          'w-full border-2 border-border rounded-lg text-foreground px-6 py-2 text-base hover:border-primary cursor-pointer shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
-          className
-        )}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
 Input.displayName = 'Input'
 
 //TODO remove - DEPRECATED
-const FormErrorMessage = React.forwardRef<
-  HTMLInputElement,
-  FormErrorMessageProps
->(({ className, errors }, ref) => {
+const FormErrorMessage = React.forwardRef<HTMLInputElement, FormErrorMessageProps>(({ className, errors }, ref) => {
   return (
     <div className={cn('min-h-5', className)}>
       {errors?.length && errors?.length > 0 && (
@@ -224,11 +189,7 @@ interface FormErrorProps {
   className?: string
 }
 
-const FormErrorDisplay: React.FC<FormErrorProps> = ({
-  errors,
-  fields,
-  className,
-}) => {
+const FormErrorDisplay: React.FC<FormErrorProps> = ({ errors, fields, className }) => {
   return (
     <div className={cn('space-y-2', className)}>
       {Object.entries(fields).map(([fieldKey, label]) => {

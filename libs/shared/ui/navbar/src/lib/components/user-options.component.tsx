@@ -1,12 +1,6 @@
 import { cn } from '@js-monorepo/ui/util'
 import { AnimatePresence, motion } from 'framer-motion'
-import React, {
-  KeyboardEvent,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react'
+import React, { KeyboardEvent, forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { useClickAway } from 'react-use'
 
 export type OptionsDropdownRef = {
@@ -55,10 +49,7 @@ const UserOptionsDropdown = forwardRef<OptionsDropdownRef, DropdownProps>(
         onKeyDown={handleKeyDown}
       >
         <div ref={iconRef} className="select-none">
-          <IconComponent
-            className="text-2xl hover:cursor-pointer"
-            onClick={() => setIsVisible((prev) => !prev)}
-          />
+          <IconComponent className="text-2xl hover:cursor-pointer" onClick={() => setIsVisible((prev) => !prev)} />
         </div>
 
         <AnimatePresence mode="wait" initial={false}>

@@ -25,17 +25,10 @@ export class OnlineUsersService {
       const start = (page - 1) * limit
       const end = start + limit - 1
 
-      const onlineUsers = await this.redisClient.zRange(
-        this.redisNamespace,
-        start,
-        end
-      )
+      const onlineUsers = await this.redisClient.zRange(this.redisNamespace, start, end)
       const userPromises = onlineUsers.map(async (value) => {
         const [userId, socketId] = value.split(':')
-        const userCache =
-          await this.authSessionUserCacheService.findOrSaveAuthUserById(
-            Number(userId)
-          )
+        const userCache = await this.authSessionUserCacheService.findOrSaveAuthUserById(Number(userId))
         return {
           id: userCache?.id,
           username: userCache?.username,
@@ -74,14 +67,10 @@ export class OnlineUsersService {
     let cursor = 0
     try {
       do {
-        const { cursor: newCursor, members } = await this.redisClient.zScan(
-          this.redisNamespace,
-          cursor,
-          {
-            MATCH: userKeyPattern,
-            COUNT: 100,
-          }
-        )
+        const { cursor: newCursor, members } = await this.redisClient.zScan(this.redisNamespace, cursor, {
+          MATCH: userKeyPattern,
+          COUNT: 100,
+        })
         cursor = newCursor
 
         if (members.length > 0) {
@@ -95,14 +84,9 @@ export class OnlineUsersService {
         }
       } while (cursor !== 0)
 
-      this.logger.debug(
-        `Completed removal of sessions for user with ID: ${userId}`
-      )
+      this.logger.debug(`Completed removal of sessions for user with ID: ${userId}`)
     } catch (error: any) {
-      this.logger.error(
-        'Error while removing user from online list',
-        error.stack
-      )
+      this.logger.error('Error while removing user from online list', error.stack)
     }
   }
 }

@@ -2,28 +2,16 @@
 
 import { useSession } from '@js-monorepo/auth/next/client'
 import { EventsReponse, EventsReponseType } from '@js-monorepo/types'
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 interface EventSourceContextType {
   getEvent: <T>(type: EventsReponseType) => EventsReponse<T>
 }
 
-const EventSourceContext = createContext<EventSourceContextType | undefined>(
-  undefined
-)
+const EventSourceContext = createContext<EventSourceContextType | undefined>(undefined)
 
-export const EventSourceProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [event, setEvents] = useState<Partial<Record<EventsReponseType, any>>>(
-    {}
-  )
+export const EventSourceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [event, setEvents] = useState<Partial<Record<EventsReponseType, any>>>({})
   const eventSourceRef = useRef<EventSource | null>(null) // Use a ref to store the EventSource instance
   const { isLoggedIn } = useSession()
 
@@ -41,12 +29,9 @@ export const EventSourceProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     const connectToEventSource = () => {
-      const es = new EventSource(
-        process.env.NEXT_PUBLIC_EVENT_SOURCE_ENDPOINT ?? '',
-        {
-          withCredentials: true,
-        }
-      )
+      const es = new EventSource(process.env.NEXT_PUBLIC_EVENT_SOURCE_ENDPOINT ?? '', {
+        withCredentials: true,
+      })
 
       es.onmessage = (e) => {
         const parsedEvent = JSON.parse(e.data) as EventsReponse
@@ -89,20 +74,14 @@ export const EventSourceProvider: React.FC<{ children: React.ReactNode }> = ({
     return event[type]
   }
 
-  return (
-    <EventSourceContext.Provider value={{ getEvent }}>
-      {children}
-    </EventSourceContext.Provider>
-  )
+  return <EventSourceContext.Provider value={{ getEvent }}>{children}</EventSourceContext.Provider>
 }
 
 // Create a custom hook to use the EventSource context
 export const useEventSourceContext = <T,>(type: EventsReponseType) => {
   const context = useContext(EventSourceContext)
   if (!context) {
-    throw new Error(
-      'useEventSourceContext must be used within an EventSourceProvider'
-    )
+    throw new Error('useEventSourceContext must be used within an EventSourceProvider')
   }
   const event = context.getEvent<T>(type)
   return { event }

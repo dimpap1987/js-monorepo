@@ -1,19 +1,8 @@
 import { DpButton } from '@js-monorepo/button'
 import { cn } from '@js-monorepo/ui/util'
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DoubleArrowLeftIcon,
-  DoubleArrowRightIcon,
-} from '@radix-ui/react-icons'
+import { ChevronLeftIcon, ChevronRightIcon, DoubleArrowLeftIcon, DoubleArrowRightIcon } from '@radix-ui/react-icons'
 import { Table } from '@tanstack/react-table'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
@@ -22,10 +11,7 @@ interface DataTablePaginationProps<TData> {
 
 // Server Page starts from '1' for react's table form '0'
 
-export function DataTablePagination<TData>({
-  table,
-  className,
-}: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table, className }: DataTablePaginationProps<TData>) {
   const currentPageIndex = table.getState().pagination.pageIndex
   const pageCount = table.getPageCount() || 1
 
@@ -41,10 +27,7 @@ export function DataTablePagination<TData>({
               const pageIndex = table.getState().pagination.pageIndex
 
               const adjustedPageIndex =
-                pageIndex >=
-                Math.ceil(table.getRowModel().rows.length / newPageSize)
-                  ? 0
-                  : pageIndex
+                pageIndex >= Math.ceil(table.getRowModel().rows.length / newPageSize) ? 0 : pageIndex
 
               table.setPageSize(newPageSize)
               table.setPageIndex(adjustedPageIndex)

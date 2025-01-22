@@ -1,8 +1,4 @@
-import {
-  ClientResponseType,
-  PaginationType,
-  UserNotificationType,
-} from '@js-monorepo/types'
+import { ClientResponseType, PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { apiClient } from '@js-monorepo/utils/http'
 import moment from 'moment'
 
@@ -41,7 +37,5 @@ export const updateNotificationAsRead = (
   notifications: UserNotificationType[],
   notificationId: number
 ): UserNotificationType[] => {
-  return notifications?.map((item) =>
-    item.notification?.id === notificationId ? { ...item, isRead: true } : item
-  )
+  return notifications?.map((item) => (item.notification?.id === notificationId ? { ...item, isRead: true } : item))
 }

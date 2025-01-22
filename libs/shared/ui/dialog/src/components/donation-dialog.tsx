@@ -1,16 +1,9 @@
 'use client'
 
-import {
-  Dialog,
-  DialogTrigger,
-  DpDialogContent,
-} from '@js-monorepo/components/dialog'
+import { Dialog, DialogTrigger, DpDialogContent } from '@js-monorepo/components/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import { ClientResponseType } from '@js-monorepo/types'
-import {
-  EmbeddedCheckout,
-  EmbeddedCheckoutProvider,
-} from '@stripe/react-stripe-js'
+import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js/pure'
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 
@@ -34,10 +27,7 @@ function DonationDialogComponent({
   } | null>(null)
   const { addNotification } = useNotifications()
 
-  const stripeInstance = useMemo(
-    () => initStripe(stripePublishableKey),
-    [stripePublishableKey]
-  )
+  const stripeInstance = useMemo(() => initStripe(stripePublishableKey), [stripePublishableKey])
 
   useEffect(() => {
     checkOutPromise()

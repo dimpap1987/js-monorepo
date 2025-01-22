@@ -13,11 +13,9 @@ const useNotificationStore = create<NotificationState>((set) => ({
   notificationCount: 0,
   latestReadNotificationId: undefined,
 
-  setNotificationCount: (count) =>
-    set({ notificationCount: Math.max(0, count) }),
+  setNotificationCount: (count) => set({ notificationCount: Math.max(0, count) }),
 
-  incrementNotificationCountByOne: () =>
-    set((state) => ({ notificationCount: state.notificationCount + 1 })),
+  incrementNotificationCountByOne: () => set((state) => ({ notificationCount: state.notificationCount + 1 })),
 
   markNotificationAsRead: (id: number) =>
     set((state) => ({

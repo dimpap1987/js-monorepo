@@ -1,21 +1,6 @@
 import { ZodPipe } from '@js-monorepo/nest/pipes'
-import {
-  RegisterUserSchema,
-  RegisterUserSchemaType,
-} from '@js-monorepo/schemas'
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Inject,
-  Logger,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common'
+import { RegisterUserSchema, RegisterUserSchemaType } from '@js-monorepo/schemas'
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Logger, Post, Req, Res, UseGuards } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthException } from '../../common/exceptions/api-exception'
 import { AuthOpts, SessionConfiguration } from '../../common/types'
@@ -111,11 +96,7 @@ export class AuthSessionController {
     req.logIn({ user }, (err) => {
       if (err) {
         this.logger.error('ERROR after register', err.stack)
-        throw new AuthException(
-          HttpStatus.INTERNAL_SERVER_ERROR,
-          'Login failed',
-          'LOGIN_FAILED_EXCEPTION'
-        )
+        throw new AuthException(HttpStatus.INTERNAL_SERVER_ERROR, 'Login failed', 'LOGIN_FAILED_EXCEPTION')
       } else {
         res.status(HttpStatus.CREATED).send()
       }
@@ -149,9 +130,7 @@ export class AuthSessionController {
       res.redirect(`${this.options.redirectUiUrl}/auth/onboarding`)
     } else {
       // If the user is neither logged in nor has the cookie
-      res.redirect(
-        `${this.options.redirectUiUrl}/auth/login?error=access-denied`
-      )
+      res.redirect(`${this.options.redirectUiUrl}/auth/login?error=access-denied`)
     }
   }
 }

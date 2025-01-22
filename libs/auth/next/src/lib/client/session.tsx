@@ -3,14 +3,7 @@
 import { deepCloneAndUpdate } from '@js-monorepo/utils/common'
 import { apiClientBase, getCookie } from '@js-monorepo/utils/http'
 import { AxiosInstance } from 'axios'
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 export interface SessionContextType {
   session: Record<string, any>
@@ -118,11 +111,7 @@ export const SessionProvider = ({
     }
   }, [session, refreshSession])
 
-  return (
-    <SessionContext.Provider value={contextValue}>
-      {children}
-    </SessionContext.Provider>
-  )
+  return <SessionContext.Provider value={contextValue}>{children}</SessionContext.Provider>
 }
 
 export const useSession = () => {

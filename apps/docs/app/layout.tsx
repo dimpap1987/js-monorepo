@@ -7,11 +7,7 @@ export const metadata = {
   title: 'Welcome to docs',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  readonly children?: React.ReactNode
-}) {
+export default function RootLayout({ children }: { readonly children?: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-100svh bg-slate-50">

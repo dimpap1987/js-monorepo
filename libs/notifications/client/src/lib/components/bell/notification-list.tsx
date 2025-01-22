@@ -11,11 +11,7 @@ interface NotificationListProps {
   showLoader: boolean
 }
 
-function Notifications({
-  notifications,
-  onRead,
-  showLoader,
-}: NotificationListProps) {
+function Notifications({ notifications, onRead, showLoader }: NotificationListProps) {
   return (
     <>
       {notifications?.length > 0 ? (

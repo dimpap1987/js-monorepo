@@ -1,21 +1,13 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { REDIS } from '@js-monorepo/nest/redis'
-import {
-  CreateUserNotificationType,
-  NotificationCreateDto,
-  Pageable,
-  UserNotificationType,
-} from '@js-monorepo/types'
+import { CreateUserNotificationType, NotificationCreateDto, Pageable, UserNotificationType } from '@js-monorepo/types'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
 import sanitizeHtml from 'sanitize-html'
 import { sendNotification, setVapidDetails } from 'web-push'
-import {
-  NotificationRepo,
-  NotificationRepository,
-} from './notification.repository'
+import { NotificationRepo, NotificationRepository } from './notification.repository'
 import { NotificationModuleOptions } from './notifications.module'
 import { ConfigService } from '@nestjs/config'
 
@@ -79,22 +71,16 @@ export class NotificationService {
       await this.redis.expire(redisKey, 3600 * 24 * 3) // Set expiration to 3 days
     } catch (error) {
       console.error('Error saving user subscription:', error)
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        'ERROR_SAVE_USER_SUBSCRIPTION'
-      )
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_SAVE_USER_SUBSCRIPTION')
     }
   }
 
-  async getUserSubscriptions(
-    userId: number
-  ): Promise<UserSubscription[] | null> {
+  async getUserSubscriptions(userId: number): Promise<UserSubscription[] | null> {
     const redisKey = this.redisNamespace + userId
 
     const subscriptionsData = await this.redis.hGetAll(redisKey)
 
-    if (!subscriptionsData || Object.keys(subscriptionsData).length === 0)
-      return null
+    if (!subscriptionsData || Object.keys(subscriptionsData).length === 0) return null
 
     return Object.keys(subscriptionsData).map((endpoint) => ({
       endpoint,
@@ -127,14 +113,12 @@ export class NotificationService {
         return
       }
 
-      const sendNotificationPromises = allSubscriptionsFlattened.map(
-        (subscription) => {
-          if (!subscription?.endpoint) {
-            throw new Error('Subscription is missing endpoint')
-          }
-          return sendNotification(subscription, JSON.stringify(payload))
+      const sendNotificationPromises = allSubscriptionsFlattened.map((subscription) => {
+        if (!subscription?.endpoint) {
+          throw new Error('Subscription is missing endpoint')
         }
-      )
+        return sendNotification(subscription, JSON.stringify(payload))
+      })
 
       await Promise.all(sendNotificationPromises)
       console.log('Notifications sent successfully to all users!')
@@ -145,9 +129,7 @@ export class NotificationService {
 
   @Transactional()
   async createNotification(payload: NotificationCreateDto) {
-    this.logger.debug(
-      `Creating new notification - Sender is : '${payload.senderId}'`
-    )
+    this.logger.debug(`Creating new notification - Sender is : '${payload.senderId}'`)
     const sanitizedMessage = sanitizeHtml(payload.message)
     const not = await this.notificationRepository.createNotification({
       ...payload,
@@ -155,12 +137,9 @@ export class NotificationService {
     })
 
     tryCatch(() => {
-      this.notificationModuleOptions.onNotificationCreation?.(
-        payload.receiverIds,
-        {
-          ...not.notification,
-        }
-      )
+      this.notificationModuleOptions.onNotificationCreation?.(payload.receiverIds, {
+        ...not.notification,
+      })
     })
 
     return not
@@ -190,9 +169,7 @@ export class NotificationService {
     return this.notificationRepository.getTotalUnreadNotifications(userId)
   }
 
-  notificationToPresenceMessage(
-    data: CreateUserNotificationType
-  ): UserNotificationType {
+  notificationToPresenceMessage(data: CreateUserNotificationType): UserNotificationType {
     return {
       notification: {
         id: data?.id,

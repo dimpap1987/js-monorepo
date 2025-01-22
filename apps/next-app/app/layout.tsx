@@ -13,10 +13,7 @@ const poppins = Poppins({
   adjustFontFallback: false,
 })
 
-export default async function RootLayout(props: {
-  readonly children: ReactNode
-  readonly auth: ReactNode
-}) {
+export default async function RootLayout(props: { readonly children: ReactNode; readonly auth: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <BodyTemplate className={poppins.className}>

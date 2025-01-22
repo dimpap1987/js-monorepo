@@ -4,9 +4,7 @@ const glob = require('glob')
 ;(async () => {
   const targetComponentPath = 'apps/docs/public/README.json'
   const readmeObject = transformDocsToJson('libs/**/README.md')
-  const sortedArray = readmeObject.sort((a, b) =>
-    a.module?.localeCompare(b.module)
-  )
+  const sortedArray = readmeObject.sort((a, b) => a.module?.localeCompare(b.module))
   fs.writeFileSync(targetComponentPath, JSON.stringify(sortedArray))
   console.log(`Readme template has been generated at: ${targetComponentPath}`)
 })()

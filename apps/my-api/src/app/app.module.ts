@@ -3,11 +3,7 @@ import { PaymentsModule } from '@js-monorepo/payments-server'
 import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
 import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
-import {
-  AuthSessionMiddleware,
-  AuthSessionModule,
-  getRedisSessionPath,
-} from '@js-monorepo/auth/nest/session'
+import { AuthSessionMiddleware, AuthSessionModule, getRedisSessionPath } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import {
@@ -16,11 +12,7 @@ import {
   NotificationService,
 } from '@js-monorepo/notifications-server'
 import { AuthUserDto } from '@js-monorepo/types'
-import {
-  Events,
-  UserPresenceModule,
-  UserPresenceWebsocketService,
-} from '@js-monorepo/user-presence'
+import { Events, UserPresenceModule, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { ClsPluginTransactional } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { ConfigModule, ConfigService } from '@nestjs/config'
@@ -73,9 +65,7 @@ const ENV = process.env.NODE_ENV
         apiLogger.warn(`Shutdown hook received with signal: ${signal}`)
         app.close()
       },
-      gracefulShutdownTimeout: Number(
-        process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 3000
-      ),
+      gracefulShutdownTimeout: Number(process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 3000),
       keepNodeProcessAlive: true,
     }),
     HealthModule,
@@ -89,9 +79,7 @@ const ENV = process.env.NODE_ENV
     AuthSessionModule.forRootAsync({
       imports: [UserPresenceModule],
       inject: [UserPresenceWebsocketService],
-      useFactory: async (
-        userPresenceWebsocketService: UserPresenceWebsocketService
-      ) => ({
+      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService) => ({
         google: {
           clientId: process.env.GOOGLE_CLIENT_ID,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -104,23 +92,14 @@ const ENV = process.env.NODE_ENV
         },
         csrf: {
           enabled: true,
-          middlewareExclusions: [
-            'exceptions',
-            'admin/(.*)',
-            'health',
-            'payments/webhook',
-          ],
+          middlewareExclusions: ['exceptions', 'admin/(.*)', 'health', 'payments/webhook'],
         },
         redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
         onRegister: async (user: AuthUserDto) => {
-          userPresenceWebsocketService.broadcast(Events.announcements, [
-            `'${user.username}' has joined 🚀`,
-          ])
+          userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' has joined 🚀`])
         },
         onLogin: async (user) => {
-          userPresenceWebsocketService.broadcast(Events.announcements, [
-            `'${user.username}' is online 😎`,
-          ])
+          userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' is online 😎`])
         },
       }),
     }),
@@ -135,25 +114,18 @@ const ENV = process.env.NODE_ENV
           apiLogger.log(
             `Notification created with id: '${notification.id}' and publish it to users : [${receiverIds?.join(', ')}]`
           )
-          userPresenceWebsocketService.sendToUsers(
-            receiverIds,
-            NotificationEvent.notifications,
-            {
-              data: {
-                notification,
-              },
-            }
-          )
+          userPresenceWebsocketService.sendToUsers(receiverIds, NotificationEvent.notifications, {
+            data: {
+              notification,
+            },
+          })
         },
       }),
     }),
     PaymentsModule.forRootAsync({
       imports: [UserPresenceModule, NotificationServerModule],
       inject: [UserPresenceWebsocketService, NotificationService],
-      useFactory: async (
-        userPresenceWebsocketService,
-        notificationService
-      ) => ({
+      useFactory: async (userPresenceWebsocketService, notificationService) => ({
         onSubscriptionCreateSuccess: (userId, subscription) => {
           notificationService.createNotification({
             receiverIds: [userId],
@@ -162,14 +134,8 @@ const ENV = process.env.NODE_ENV
           })
         },
         onSubscriptionEvent: (userId, event) => {
-          apiLogger.log(
-            `Subscription event callback received with event: '${event}' and userId id : ${userId}`
-          )
-          userPresenceWebsocketService.sendToUsers(
-            [userId],
-            Events.refreshSession,
-            true
-          )
+          apiLogger.log(`Subscription event callback received with event: '${event}' and userId id : ${userId}`)
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
         },
       }),
     }),

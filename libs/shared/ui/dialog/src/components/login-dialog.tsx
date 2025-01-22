@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  Dialog,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DpDialogContent,
-} from '@js-monorepo/components/dialog'
+import { Dialog, DialogFooter, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/dialog'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import React, { forwardRef, useState } from 'react'
 import './login-dialog.css'
@@ -39,9 +33,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
       >
         <DpDialogContent>
           <DialogHeader className="font-semibold justify-center">
-            <DialogTitle className="text-center font-bold">
-              Sign in with
-            </DialogTitle>
+            <DialogTitle className="text-center font-bold">Sign in with</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col text-base gap-4 font-medium p-2">
             {socialConfig?.map((social) => (
@@ -85,8 +77,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                         </g>
                       </svg>
                       <span className="google">
-                        <span className="hidden sm:inline">Sign in with </span>{' '}
-                        Google
+                        <span className="hidden sm:inline">Sign in with </span> Google
                       </span>
                     </div>
                   </button>
@@ -120,8 +111,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                         ></path>
                       </svg>
                       <span>
-                        <span className="hidden sm:inline">Sign in with </span>{' '}
-                        Github
+                        <span className="hidden sm:inline">Sign in with </span> Github
                       </span>
                     </div>
                   </button>
@@ -153,8 +143,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                         d="M279.1 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.4 0 225.4 0c-73.22 0-121.1 44.38-121.1 124.7v70.62H22.89V288h81.39v224h100.2V288z"
                       ></path>
                     </svg>
-                    <span className="hidden sm:inline">Sign in with </span>{' '}
-                    <span>Facebook</span>
+                    <span className="hidden sm:inline">Sign in with </span> <span>Facebook</span>
                   </button>
                 )}
               </React.Fragment>
@@ -168,10 +157,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                   Terms of Use
                 </DpNextNavLink>
                 &nbsp; and confirm that you have read our &nbsp;
-                <DpNextNavLink
-                  href="/privacy-cookie-statement"
-                  className="underline"
-                >
+                <DpNextNavLink href="/privacy-cookie-statement" className="underline">
                   Privacy and Cookie Statement.
                 </DpNextNavLink>
               </p>

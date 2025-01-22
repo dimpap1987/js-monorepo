@@ -32,13 +32,8 @@ export function NotificationsPage({
     session: { user },
   } = useSession()
 
-  const [notifications, setNotifications] = useState<
-    Partial<PaginationType<UserNotificationType>> | undefined
-  >()
-  const { searchQuery, setPagination, pagination } = usePaginationWithParams(
-    1,
-    15
-  )
+  const [notifications, setNotifications] = useState<Partial<PaginationType<UserNotificationType>> | undefined>()
+  const { searchQuery, setPagination, pagination } = usePaginationWithParams(1, 15)
 
   const loadingRef = useRef(true)
 
@@ -62,24 +57,17 @@ export function NotificationsPage({
     fetchNotifications()
   }, [user, searchQuery])
 
-  useNotificationWebSocket(
-    websocketOptions,
-    (notification: UserNotificationType) => {
-      if (notification && pagination.page === 1) {
-        setNotifications((prev) => ({
-          ...prev,
-          content: [notification, ...(prev?.content ?? [])],
-        }))
-      }
+  useNotificationWebSocket(websocketOptions, (notification: UserNotificationType) => {
+    if (notification && pagination.page === 1) {
+      setNotifications((prev) => ({
+        ...prev,
+        content: [notification, ...(prev?.content ?? [])],
+      }))
     }
-  )
+  })
 
-  const {
-    markNotificationAsRead,
-    latestReadNotificationId,
-    setNotificationCount,
-    notificationCount,
-  } = useNotificationStore()
+  const { markNotificationAsRead, latestReadNotificationId, setNotificationCount, notificationCount } =
+    useNotificationStore()
 
   useEffect(() => {
     if (latestReadNotificationId) {
@@ -88,10 +76,7 @@ export function NotificationsPage({
 
         return {
           ...prev,
-          content: updateNotificationAsRead(
-            prev.content,
-            latestReadNotificationId
-          ),
+          content: updateNotificationAsRead(prev.content, latestReadNotificationId),
         }
       })
     }
@@ -116,18 +101,10 @@ export function NotificationsPage({
     notifications.totalPages >= pagination?.page
 
   return (
-    <div
-      className={cn(
-        'text-sm sm:text-base select-none sm:p-3',
-        'flex flex-col h-full',
-        className
-      )}
-    >
+    <div className={cn('text-sm sm:text-base select-none sm:p-3', 'flex flex-col h-full', className)}>
       <div className="flex justify-between">
         <BackArrowWithLabel className="flex-1" arrowClassName="sm:hidden">
-          <h2 className="px-2 ml-5 sm:ml-0 text-center sm:text-left">
-            Notifications
-          </h2>
+          <h2 className="px-2 ml-5 sm:ml-0 text-center sm:text-left">Notifications</h2>
         </BackArrowWithLabel>
 
         <NotificationReadAllButton
@@ -164,10 +141,7 @@ export function NotificationsPage({
 
                         setNotifications({
                           ...notifications,
-                          content: updateNotificationAsRead(
-                            notifications?.content,
-                            content.notification.id
-                          ),
+                          content: updateNotificationAsRead(notifications?.content, content.notification.id),
                         })
                         markNotificationAsRead(content.notification.id)
                       }
@@ -184,18 +158,12 @@ export function NotificationsPage({
                         }}
                       ></div>
                       <div className="flex px-2 flex-col sm:gap-1 gap-0 items-end sm:flex-row text-[10px] md:text-sm text-gray-500">
-                        <span>
-                          {humanatizeNotificationDate(
-                            content?.notification?.createdAt || ''
-                          )}
-                        </span>
+                        <span>{humanatizeNotificationDate(content?.notification?.createdAt || '')}</span>
                       </div>
                     </div>
                   </div>
 
-                  {index < (notifications?.content?.length || 0) - 1 && (
-                    <hr className="my-2 border-t border-border" />
-                  )}
+                  {index < (notifications?.content?.length || 0) - 1 && <hr className="my-2 border-t border-border" />}
                 </Fragment>
               ))}
             </ScrollArea>

@@ -34,10 +34,7 @@ export function DpLoader({
           className
         )}
       >
-        <DpLoadingSpinner
-          message={message}
-          styles={spinnerStyle}
-        ></DpLoadingSpinner>
+        <DpLoadingSpinner message={message} styles={spinnerStyle}></DpLoadingSpinner>
         {description && (
           <p>
             <small>{description}</small>

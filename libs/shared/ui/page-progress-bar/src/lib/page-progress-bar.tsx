@@ -1,8 +1,5 @@
 'use client'
-import {
-  AppProgressBar as ProgressBar,
-  ProgressBarProps,
-} from 'next-nprogress-bar'
+import { AppProgressBar as ProgressBar, ProgressBarProps } from 'next-nprogress-bar'
 import { PropsWithChildren, Suspense } from 'react'
 
 export type DpNextPageProgressBarProps = PropsWithChildren & ProgressBarProps
@@ -16,12 +13,7 @@ export function DpNextPageProgressBar({
   return (
     <>
       <Suspense>
-        <ProgressBar
-          height={height}
-          color={color}
-          options={options}
-          shallowRouting
-        />
+        <ProgressBar height={height} color={color} options={options} shallowRouting />
       </Suspense>
       {children}
     </>

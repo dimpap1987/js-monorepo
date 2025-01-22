@@ -13,15 +13,8 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Patch()
-  async editUser(
-    @Body(new ZodPipe(EditUserSchema)) payload: EditUserDto,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async editUser(@Body(new ZodPipe(EditUserSchema)) payload: EditUserDto, @SessionUser() sessionUser: SessionUserType) {
     this.logger.log(`User profile update with user id: ${sessionUser.id}`)
-    return this.userService.handleUserUpdate(
-      payload,
-      sessionUser.id,
-      sessionUser.profile.id
-    )
+    return this.userService.handleUserUpdate(payload, sessionUser.id, sessionUser.profile.id)
   }
 }

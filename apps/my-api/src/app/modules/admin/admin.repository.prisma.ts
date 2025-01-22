@@ -1,9 +1,4 @@
-import {
-  AuthRoleDTO,
-  AuthUserDto,
-  AuthUserUpdateDto,
-  Pageable,
-} from '@js-monorepo/types'
+import { AuthRoleDTO, AuthUserDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
@@ -11,17 +6,13 @@ import { AdminRepository } from './admin.repository'
 
 @Injectable()
 export class AdminRepositoryPrisma implements AdminRepository {
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
-  ) {}
+  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
 
   getRoles(): Promise<AuthRoleDTO[]> {
     return this.txHost.tx.role.findMany()
   }
 
-  async getUsers(
-    pageable: Pageable
-  ): Promise<{ users: any[]; totalCount: number }> {
+  async getUsers(pageable: Pageable): Promise<{ users: any[]; totalCount: number }> {
     const { page, pageSize } = pageable
 
     if (!page && !pageSize) {
@@ -99,17 +90,11 @@ export class AdminRepositoryPrisma implements AdminRepository {
     }
   }
 
-  async updateUser(
-    userId: number,
-    updateUser: AuthUserUpdateDto
-  ): Promise<AuthUserDto> {
+  async updateUser(userId: number, updateUser: AuthUserUpdateDto): Promise<AuthUserDto> {
     const currentRoleIds = await this.getCurrentUserRoleIds(userId)
     const newRoleIds = this.getNewRoleIds(updateUser.roles)
 
-    const { rolesToAdd, rolesToRemove } = this.determineRoles(
-      currentRoleIds,
-      newRoleIds
-    )
+    const { rolesToAdd, rolesToRemove } = this.determineRoles(currentRoleIds, newRoleIds)
 
     return this.txHost.tx.authUser.update({
       where: { id: userId },
@@ -167,12 +152,8 @@ export class AdminRepositoryPrisma implements AdminRepository {
 
   // Function to determine which roles to add and remove
   private determineRoles(currentRoleIds: number[], newRoleIds: number[]) {
-    const rolesToAdd = newRoleIds.filter(
-      (roleId) => !currentRoleIds.includes(roleId)
-    )
-    const rolesToRemove = currentRoleIds.filter(
-      (roleId) => !newRoleIds.includes(roleId)
-    )
+    const rolesToAdd = newRoleIds.filter((roleId) => !currentRoleIds.includes(roleId))
+    const rolesToRemove = currentRoleIds.filter((roleId) => !newRoleIds.includes(roleId))
 
     return { rolesToAdd, rolesToRemove }
   }

@@ -1,8 +1,4 @@
-import {
-  decode as jsonDecode,
-  sign as jsonSign,
-  verify as jsonVerify,
-} from 'jsonwebtoken'
+import { decode as jsonDecode, sign as jsonSign, verify as jsonVerify } from 'jsonwebtoken'
 
 export class JwtError extends Error {
   errorCode: keyof typeof JwtError.CODE
@@ -13,10 +9,7 @@ export class JwtError extends Error {
     INTERNAL: 'INTERNAL' as const,
   })
 
-  constructor(
-    msg?: string,
-    errorCode: keyof typeof JwtError.CODE = JwtError.CODE.INTERNAL
-  ) {
+  constructor(msg?: string, errorCode: keyof typeof JwtError.CODE = JwtError.CODE.INTERNAL) {
     super(msg)
     this.errorCode = errorCode
   }

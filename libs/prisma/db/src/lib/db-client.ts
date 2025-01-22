@@ -1,17 +1,9 @@
-import {
-  Injectable,
-  Logger,
-  OnApplicationShutdown,
-  OnModuleInit,
-} from '@nestjs/common'
+import { Injectable, Logger, OnApplicationShutdown, OnModuleInit } from '@nestjs/common'
 import { Prisma, PrismaClient } from '@prisma/client'
 
 @Injectable()
 export class PrismaService
-  extends PrismaClient<
-    Prisma.PrismaClientOptions,
-    'query' | 'info' | 'warn' | 'error'
-  >
+  extends PrismaClient<Prisma.PrismaClientOptions, 'query' | 'info' | 'warn' | 'error'>
   implements OnModuleInit, OnApplicationShutdown
 {
   private readonly logger = new Logger(PrismaService.name)
@@ -54,24 +46,17 @@ export class PrismaService
         return
       } catch (error) {
         retryCount++
-        this.logger.error(
-          `Error connecting to database (attempt ${retryCount}/${this.maxRetries})`,
-          error.stack
-        )
+        this.logger.error(`Error connecting to database (attempt ${retryCount}/${this.maxRetries})`, error.stack)
 
         if (retryCount < this.maxRetries) {
-          this.logger.log(
-            `Retrying connection in ${this.retryDelay / 1000} seconds...`
-          )
+          this.logger.log(`Retrying connection in ${this.retryDelay / 1000} seconds...`)
           // eslint-disable-next-line @typescript-eslint/no-loop-func
           await new Promise((resolve) => setTimeout(resolve, this.retryDelay))
         }
       }
     }
 
-    this.logger.error(
-      'Maximum number of retries reached. Unable to connect to the database.'
-    )
+    this.logger.error('Maximum number of retries reached. Unable to connect to the database.')
     throw new Error('Failed to connect to the database')
   }
 
@@ -80,9 +65,7 @@ export class PrismaService
 
     if (showSql) {
       this.$on('query', (e: Prisma.QueryEvent) => {
-        this.logger.log(
-          `Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration} ms`
-        )
+        this.logger.log(`Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration} ms`)
       })
       this.$on('info', (e: Prisma.LogEvent) => {
         this.logger.log(`Message: ${e.message}`)

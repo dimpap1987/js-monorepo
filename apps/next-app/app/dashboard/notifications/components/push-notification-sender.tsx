@@ -66,11 +66,7 @@ export const PushNotificationSender = () => {
         className="w-full"
         variant="accent"
         onClick={handleSendMessage}
-        disabled={
-          title.trim().length === 0 ||
-          message.trim().length === 0 ||
-          selectedUserIds.length === 0
-        }
+        disabled={title.trim().length === 0 || message.trim().length === 0 || selectedUserIds.length === 0}
       >
         Send Push Notification
       </DpButton>

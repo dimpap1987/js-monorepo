@@ -25,15 +25,10 @@ const schema = z
     selectedUserIds: z.array(z.number()).optional(),
     isGlobal: z.boolean(),
   })
-  .refine(
-    (data) =>
-      (data.selectedUserIds?.length && data.selectedUserIds?.length > 0) ||
-      data.isGlobal,
-    {
-      message: 'Provide at least one of selectedUserIds or check Global.',
-      path: ['selectedUserIds'], // Adjust where the error shows
-    }
-  )
+  .refine((data) => (data.selectedUserIds?.length && data.selectedUserIds?.length > 0) || data.isGlobal, {
+    message: 'Provide at least one of selectedUserIds or check Global.',
+    path: ['selectedUserIds'], // Adjust where the error shows
+  })
 
 type FormValues = z.infer<typeof schema>
 
@@ -87,11 +82,7 @@ const CreateAnnouncement = () => {
                     rows={4}
                   />
                 </FormControl>
-                <FormErrorDisplay
-                  className="mt-2"
-                  errors={form.formState.errors}
-                  fields={{ message: 'Message' }}
-                />
+                <FormErrorDisplay className="mt-2" errors={form.formState.errors} fields={{ message: 'Message' }} />
               </FormItem>
             )}
           />
@@ -127,9 +118,7 @@ const CreateAnnouncement = () => {
                     <SelectUsersComponent
                       classNameTrigger="text-white bg-gray-900"
                       className="text-white"
-                      onChange={(selected) =>
-                        field.onChange(selected.map((u) => u.id))
-                      }
+                      onChange={(selected) => field.onChange(selected.map((u) => u.id))}
                       selectedUserIds={field.value || []}
                     />
                   </FormControl>
@@ -139,13 +128,7 @@ const CreateAnnouncement = () => {
           )}
 
           {/* Submit Button */}
-          <DpButton
-            type="submit"
-            size="large"
-            className="w-full"
-            variant="accent"
-            disabled={!form.formState.isValid}
-          >
+          <DpButton type="submit" size="large" className="w-full" variant="accent" disabled={!form.formState.isValid}>
             Send Announcement
           </DpButton>
         </form>

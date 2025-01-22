@@ -5,17 +5,9 @@ export interface UserProfileService {
 
   findUserProfilesByUserId(userId: number): Promise<UserProfileDto[]>
 
-  findUserProfilesByUserIdAndProviderName(
-    userId: number,
-    providerName: string
-  ): Promise<UserProfileDto[]>
+  findUserProfilesByUserIdAndProviderName(userId: number, providerName: string): Promise<UserProfileDto[]>
 
-  createUserProfile(
-    userProfileCreateDto: UserProfileCreateDto
-  ): Promise<UserProfileDto>
+  createUserProfile(userProfileCreateDto: UserProfileCreateDto): Promise<UserProfileDto>
 
-  updateUserProfile(
-    id: number,
-    userProfileUpdateDto: Partial<UserProfileCreateDto>
-  ): Promise<UserProfileDto>
+  updateUserProfile(id: number, userProfileUpdateDto: Partial<UserProfileCreateDto>): Promise<UserProfileDto>
 }

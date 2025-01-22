@@ -1,8 +1,4 @@
-import {
-  ProviderName,
-  UnRegisteredUserCreateDto,
-  UnRegisteredUserDto,
-} from '@js-monorepo/types'
+import { ProviderName, UnRegisteredUserCreateDto, UnRegisteredUserDto } from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
@@ -10,16 +6,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { UnregisteredRepository } from '../../unregistered.repository'
 
 @Injectable()
-export class UnRegisteredUserRepositoryPrismaImpl
-  implements UnregisteredRepository
-{
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>
-  ) {}
+export class UnRegisteredUserRepositoryPrismaImpl implements UnregisteredRepository {
+  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
 
-  async createUnRegisteredUser(
-    unRegisteredUser: UnRegisteredUserCreateDto
-  ): Promise<UnRegisteredUserDto> {
+  async createUnRegisteredUser(unRegisteredUser: UnRegisteredUserCreateDto): Promise<UnRegisteredUserDto> {
     const provider = await this.txHost.tx.provider.findUniqueOrThrow({
       where: { name: unRegisteredUser.provider as ProviderName },
     })
@@ -41,9 +31,7 @@ export class UnRegisteredUserRepositoryPrismaImpl
     })
   }
 
-  async findUnRegisteredUserByToken(
-    token: string
-  ): Promise<UnRegisteredUserDto> {
+  async findUnRegisteredUserByToken(token: string): Promise<UnRegisteredUserDto> {
     return this.txHost.tx.unRegisteredUser.findUniqueOrThrow({
       where: { token: token },
       include: {

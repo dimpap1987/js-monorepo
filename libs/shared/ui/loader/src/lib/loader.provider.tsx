@@ -1,12 +1,6 @@
 'use client'
 
-import React, {
-  PropsWithChildren,
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-} from 'react'
+import React, { PropsWithChildren, createContext, useContext, useMemo, useState } from 'react'
 import DpLoader from './loader'
 
 interface LoaderProps {
@@ -39,9 +33,7 @@ export const useLoader = (): {
   }
 }
 
-export const DpLoaderProvider: React.FC<LoaderProviderPros> = ({
-  children,
-}) => {
+export const DpLoaderProvider: React.FC<LoaderProviderPros> = ({ children }) => {
   const [loaderState, setLoaderState] = useState<LoaderProps>({
     show: undefined,
     message: '',
@@ -58,11 +50,7 @@ export const DpLoaderProvider: React.FC<LoaderProviderPros> = ({
   return (
     <LoaderContext.Provider value={contextValue}>
       {loaderState.show && (
-        <DpLoader
-          message={loaderState.message}
-          description={loaderState.description}
-          show={loaderState.show}
-        />
+        <DpLoader message={loaderState.message} description={loaderState.description} show={loaderState.show} />
       )}
       {children}
     </LoaderContext.Provider>

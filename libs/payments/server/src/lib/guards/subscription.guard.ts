@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common'
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { PaymentsService } from '../service/payments.service'
 import { ApiException } from '@js-monorepo/nest/exceptions'
@@ -16,10 +11,7 @@ export class SubscriptionGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredProduct = this.reflector.get<string>(
-      'hasProduct',
-      context.getHandler()
-    )
+    const requiredProduct = this.reflector.get<string>('hasProduct', context.getHandler())
     if (!requiredProduct) {
       return true
     }
@@ -29,11 +21,9 @@ export class SubscriptionGuard implements CanActivate {
 
     if (!user) return false
 
-    const userHighestHierarchy =
-      await this.paymentService.getHighestActivePlanByUser(user.id)
+    const userHighestHierarchy = await this.paymentService.getHighestActivePlanByUser(user.id)
 
-    const requiredProductHierarchy =
-      await this.paymentService.findProductyByName(requiredProduct)
+    const requiredProductHierarchy = await this.paymentService.findProductyByName(requiredProduct)
 
     if (userHighestHierarchy < requiredProductHierarchy.hierarchy) {
       throw new ApiException(
