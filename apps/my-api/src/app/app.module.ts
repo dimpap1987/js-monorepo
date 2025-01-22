@@ -129,13 +129,18 @@ const ENV = process.env.NODE_ENV
         onSubscriptionCreateSuccess: (userId, subscription) => {
           notificationService.createNotification({
             receiverIds: [userId],
-            senderId: 1,
             message: `Your <strong>${capitalize(subscription.name)}</strong> subscription plan has been successfully activated! 🎉`,
           })
         },
         onSubscriptionEvent: (userId, event) => {
           apiLogger.log(`Subscription event callback received with event: '${event}' and userId id : ${userId}`)
           userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+        },
+        onSubscriptionDeleteSuccess(userId, subscription) {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: `Your <strong>${capitalize(subscription.name)}</strong> subscription plan has been canceled!`,
+          })
         },
       }),
     }),

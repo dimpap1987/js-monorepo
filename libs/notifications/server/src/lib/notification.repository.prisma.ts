@@ -70,7 +70,7 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
     notification: CreateUserNotificationType
     total: number
   }> {
-    const { message, type, link, additionalData, senderId, receiverIds } = payload
+    const { message, type, link, additionalData, senderId = 1, receiverIds } = payload
 
     const notification = await this.txHost.tx.notification.create({
       data: {
