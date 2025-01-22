@@ -148,7 +148,7 @@ export function PlanCardContainer({
   return (
     <div
       className={cn(
-        'relative w-full max-w-[340px] sm:w-[340px] shadow-lg flex mx-auto rounded-xl border border-border transform transition-transform duration-300',
+        'relative w-full max-w-[400px] shadow-lg flex mx-auto rounded-xl border border-border transform transition-transform duration-300',
         anySubscribed && !subscribed && 'opacity-55',
         isLoggedIn && isFree && !anySubscribed && 'border-accent',
         subscribed && 'glow',

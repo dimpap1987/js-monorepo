@@ -8,7 +8,7 @@ export function ContainerTemplate({
   return (
     <section
       className={cn(
-        'container max-w-[1200px] mx-auto overflow-x-hidden',
+        'container max-w-[1400px] mx-auto overflow-x-hidden',
         className
       )}
     >
