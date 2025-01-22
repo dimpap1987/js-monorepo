@@ -152,16 +152,17 @@ export class StripeService {
           name: sub.price?.product?.name,
         })
       })
-    } else if (type == 'deleted') {
-      const sub = await this.paymentsService.deleteSubscription(subscriptionData)
-
-      //callback
       tryCatch(() => {
-        this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(paymentCustomer.userId, {
-          id: sub.id,
-          name: sub.price?.product?.name,
-        })
+        if (subscriptionData?.cancel_at) {
+          this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(paymentCustomer.userId, {
+            id: sub.id,
+            name: sub.price?.product?.name,
+            cancelAt: toDate(subscriptionData?.cancel_at),
+          })
+        }
       })
+    } else if (type == 'deleted') {
+      await this.paymentsService.deleteSubscription(subscriptionData)
     }
 
     tryCatch(() => {

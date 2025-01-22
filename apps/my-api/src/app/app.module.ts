@@ -18,6 +18,7 @@ import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-pr
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
+import moment from 'moment'
 import { ClsModule } from 'nestjs-cls'
 import { GracefulShutdownModule } from 'nestjs-graceful-shutdown'
 import passport from 'passport'
@@ -137,9 +138,12 @@ const ENV = process.env.NODE_ENV
           userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
         },
         onSubscriptionDeleteSuccess(userId, subscription) {
+          const dateMessage = `<strong>${moment(subscription.cancelAt).format('YYYY-MM-DD')}</strong>`
+          const timeMessage = `<strong>${moment(subscription.cancelAt).format('hh:mm A')}</strong>`
+
           notificationService.createNotification({
             receiverIds: [userId],
-            message: `Your <strong>${capitalize(subscription.name)}</strong> subscription plan has been canceled!`,
+            message: `Your <strong>${capitalize(subscription.name)}</strong> subscription plan will be canceled at the end of the period ${dateMessage} at ${timeMessage}`,
           })
         },
       }),
