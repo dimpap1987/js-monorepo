@@ -27,10 +27,11 @@ export class StripeService {
     return customers.data.length > 0 ? customers.data[0] : null
   }
 
-  async createCustomer(email: string) {
-    return this.stripe.customers.create({
-      email,
-    })
+  async createCustomer(
+    params?: Stripe.CustomerCreateParams,
+    options?: Stripe.RequestOptions
+  ) {
+    return this.stripe.customers.create(params, options)
   }
 
   async createCustomerIfNotExists(email: string) {
@@ -44,7 +45,7 @@ export class StripeService {
       return existingCustomer
     }
 
-    const newCustomer = await this.createCustomer(email)
+    const newCustomer = await this.createCustomer({ email })
 
     this.logger.log(`New Stripe customer created:`, newCustomer.id)
     return newCustomer
@@ -61,12 +62,17 @@ export class StripeService {
         await this.paymentsService.findPaymentCustomerById(userId)
 
       if (paymentCustomer?.stripeCustomerId) {
-        stripeCustomerId = paymentCustomer?.stripeCustomerId
+        // validate that the stripeId exists in stripe or else create new
+        stripeCustomerId = await this.validateOrCreateCustomer(
+          paymentCustomer?.stripeCustomerId,
+          email,
+          userId
+        )
       } else {
         //create payment customer
         const stripeCustomer = await this.createCustomerIfNotExists(email)
         const createdCustomer =
-          await this.paymentsService.createPaymentCustomer({
+          await this.paymentsService.createOrUpdatePaymentCustomer({
             userId,
             stripeCustomerId: stripeCustomer.id,
           })
@@ -313,8 +319,42 @@ export class StripeService {
         cancel_at_period_end: true,
       })
     } catch (error) {
-      console.error('Error canceling subscription:', error.message)
+      this.logger.error('Error canceling subscription:', error.message)
       throw error
+    }
+  }
+
+  async validateOrCreateCustomer(
+    stripeCustomerId: string,
+    email: string,
+    userId: number
+  ) {
+    try {
+      const existingCustomer =
+        await this.stripe.customers.retrieve(stripeCustomerId)
+
+      if (existingCustomer && !existingCustomer.deleted) {
+        return stripeCustomerId
+      }
+
+      const stripeCustomer = await this.createCustomer({
+        email,
+      })
+
+      const createdCustomer =
+        await this.paymentsService.createOrUpdatePaymentCustomer({
+          userId,
+          stripeCustomerId: stripeCustomer.id,
+        })
+      return createdCustomer.stripeCustomerId
+    } catch (error) {
+      this.logger.error(
+        'An error occured when validation or creating a stripe customer'
+      )
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'ERROR_CREATE_STRIPE_CUSTOMER'
+      )
     }
   }
 }
