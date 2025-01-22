@@ -49,8 +49,6 @@
 }
 
 .notificationContainer {
-  max-width: 300px;
-  width: 300px;
   max-height: 211px;
   min-height: 57px;
   animation: slideRight 300ms linear;

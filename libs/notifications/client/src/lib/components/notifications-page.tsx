@@ -102,7 +102,7 @@ export function NotificationsPage({
 
   return (
     <div className={cn('text-sm sm:text-base select-none sm:p-3', 'flex flex-col h-full', className)}>
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         <BackArrowWithLabel className="flex-1" arrowClassName="sm:hidden">
           <h2 className="px-2 ml-5 sm:ml-0 text-center sm:text-left">Notifications</h2>
         </BackArrowWithLabel>

@@ -39,6 +39,9 @@ module.exports = {
           foreground: 'hsl(var(--destructive-foreground))',
         },
       },
+      margin: {
+        navbar: 'clamp(15.5px, 0.8rem, 16px)',
+      },
       animation: {
         bubble: 'bubble ease-in-out infinite',
       },
