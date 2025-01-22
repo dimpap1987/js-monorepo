@@ -48,12 +48,14 @@ export class PaymentsRepository {
     })
   }
 
-  async createPaymentCustomer(payload: {
+  async createOrUpdatePaymentCustomer(payload: {
     stripeCustomerId: string
     userId: number
   }) {
-    return this.txHost.tx.paymentCustomer.create({
-      data: payload,
+    return this.txHost.tx.paymentCustomer.upsert({
+      where: { userId: payload.userId },
+      create: payload,
+      update: { stripeCustomerId: payload.stripeCustomerId },
     })
   }
 

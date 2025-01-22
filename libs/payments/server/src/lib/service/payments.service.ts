@@ -59,7 +59,7 @@ export class PaymentsService {
     )
   }
 
-  async createPaymentCustomer(payload: {
+  async createOrUpdatePaymentCustomer(payload: {
     stripeCustomerId: string
     userId: number
   }) {
@@ -67,7 +67,7 @@ export class PaymentsService {
       `Create Payment customer for user_id: '${payload.userId}'`
     )
     const { result, error } = await tryCatch(() =>
-      this.paymentsRepository.createPaymentCustomer(payload)
+      this.paymentsRepository.createOrUpdatePaymentCustomer(payload)
     )
     if (error) {
       throw new ApiException(
