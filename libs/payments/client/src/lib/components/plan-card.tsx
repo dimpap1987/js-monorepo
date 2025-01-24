@@ -111,7 +111,7 @@ export function PlanCardContainer({
   return (
     <div
       className={cn(
-        'relative w-full max-w-[400px] shadow-lg flex mx-auto rounded-xl border border-border transform transition-transform duration-300',
+        'relative w-full min-w-[200px] max-w-[360px] shadow-lg flex mx-auto rounded-xl border border-border transform transition-transform duration-300',
         anySubscribed && !subscribed && 'opacity-55',
         isLoggedIn && isFree && !anySubscribed && 'border-accent',
         subscribed && 'glow',
