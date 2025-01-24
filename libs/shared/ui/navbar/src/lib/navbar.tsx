@@ -7,9 +7,9 @@ import React, { ReactNode, forwardRef, useMemo, useRef } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosSettings } from 'react-icons/io'
-import { TbUserFilled } from 'react-icons/tb'
 import { UserMetadata } from './components/user-metadata'
 import { OptionsDropdownRef, UserOptionsDropdown } from './components/user-options.component'
+import './navbar.css'
 
 function SideBarIcon({ onSideBarClick, className }: { onSideBarClick?: () => void; className?: string }) {
   return (
@@ -107,13 +107,16 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
           className="text-foreground border-b border-border navbar-height overflow-hidden flex items-center"
           ref={ref}
         >
-          <div className="px-5 flex gap-2 justify-between w-full items-center">
+          <div className="px-5 flex gap-2 justify-between w-full items-center self-stretch">
             {logo}
-            <ul className="hidden sm:flex font-semibold font-heading items-center space-x-1">
+            <ul className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center space-x-1 self-stretch">
               {menuItems &&
                 menuItems?.length > 0 &&
                 menuItems.map((item, index) => (
-                  <li key={index} className={cn(`text-center text-nowrap`, item.className)}>
+                  <li
+                    key={index}
+                    className={cn(`text-center text-nowrap relative content-center self-stretch`, item.className)}
+                  >
                     {(item?.roles?.includes('PUBLIC') ||
                       item?.roles?.some((role) => user?.roles?.includes(role as AuthRole))) && (
                       <DpNextNavLink className="p-2" activeClassName="underline-offset-8" href={item.href}>
