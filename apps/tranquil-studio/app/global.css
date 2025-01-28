@@ -1,0 +1,26 @@
+@import '@js-monorepo/styles/_base';
+@import '@js-monorepo/styles/_tailwind';
+
+:root {
+  --foreground: 0 0% 15%;
+  --foreground-neutral: 220, 9%, 46%;
+  --background: 43.64 47.83% 95.49%;
+  --background-secondary: 27.27, 18.03%, 23.92%;
+
+  --border: 240 4% 56%;
+
+  --primary: 174.67 83.85% 31.57%;
+  --primary-foreground: 0 0% 98%;
+
+  --secondary: 26 114% 57%;
+  --secondary-foreground: 0 0% 98%;
+
+  --accent: 229 87% 54%;
+  --accent-foreground: 0 0% 98%;
+
+  --danger: -14 98% 47%;
+  --danger-foreground: 0 0% 98%;
+
+  --destructive: 0 0% 78%;
+  --destructive-foreground: 0 0% 98%;
+}

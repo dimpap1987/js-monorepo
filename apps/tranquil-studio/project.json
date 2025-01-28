@@ -1,0 +1,47 @@
+{
+  "name": "tranquil-studio",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/tranquil-studio",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/tranquil-studio"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "apps/tranquil-studio"
+        },
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "tranquil-studio:build",
+        "dev": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "tranquil-studio:build:development",
+          "dev": true
+        },
+        "production": {
+          "buildTarget": "tranquil-studio:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nx/next:export",
+      "options": {
+        "buildTarget": "tranquil-studio:build:production"
+      }
+    }
+  }
+}

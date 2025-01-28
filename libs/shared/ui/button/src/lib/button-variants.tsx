@@ -14,8 +14,8 @@ export const buttonVariants = {
     },
     size: {
       default: 'h-8 px-4 py-2',
-      small: 'h-7 rounded-md px-2 text-xs',
-      large: 'h-10 rounded-md px-8',
+      small: 'h-7 px-2 text-xs py-1',
+      large: 'h-10 px-8 py-2',
     },
   },
   disabled: 'cursor-not-allowed opacity-50',

@@ -1,6 +1,6 @@
+import { cn } from '@js-monorepo/ui/util'
 import * as React from 'react'
 import { buttonVariants, type VariantProps } from './button-variants'
-import { cn } from '@js-monorepo/ui/util'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps {
   loading?: boolean
@@ -32,4 +32,4 @@ const DpButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 DpButton.displayName = 'DpButton'
 
-export { DpButton, buttonVariants }
+export { buttonVariants, DpButton }

@@ -1,0 +1,23 @@
+[
+  {
+    "category": "Nearby",
+    "icon": "MdDirectionsWalk",
+    "locations": [
+      {
+        "name": "Panathenaic Stadium",
+        "latitude": 37.9683342,
+        "longitude": 23.7411118
+      }
+    ]
+  },
+  {
+    "category": "Transit",
+    "icon": "MdDirectionsTransitFilled",
+    "locations": []
+  },
+  {
+    "category": "Top Attractions",
+    "icon": "MdAttractions",
+    "locations": []
+  }
+]
