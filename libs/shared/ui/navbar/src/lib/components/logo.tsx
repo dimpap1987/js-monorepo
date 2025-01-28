@@ -1,10 +1,12 @@
-function DpLogo({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+import React, { forwardRef } from 'react'
+
+const DpLogo = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ children, ...props }, ref) => {
   return (
-    <div {...props} className="hover:cursor-pointer">
+    <div ref={ref} {...props} className="hover:cursor-pointer">
       {children}
     </div>
   )
-}
+})
 
 DpLogo.displayName = 'DpLogo'
 
