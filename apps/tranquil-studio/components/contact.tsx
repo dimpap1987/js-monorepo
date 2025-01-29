@@ -37,7 +37,7 @@ export default function ContactForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-96 sm:w-[40vw] bg-white p-7 rounded-xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-96 sm:w-[50vw] bg-white p-7 rounded-xl">
         <FormField
           control={form.control}
           name="name"
@@ -73,7 +73,7 @@ export default function ContactForm() {
             <FormItem>
               <FormLabel>Message</FormLabel>
               <FormControl>
-                <Textarea placeholder="Your Message" {...field} required />
+                <Textarea placeholder="Your Message" {...field} rows={5} required />
               </FormControl>
               <FormErrorDisplay errors={form.formState.errors} fields={{ message: 'Message' }} />
             </FormItem>
