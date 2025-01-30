@@ -14,7 +14,7 @@
     "generate:docs": "node scripts/build-readme-template.js",
     "dev:next": "nx run next-app:serve:development",
     "dev:tranquil": "nx run tranquil-studio:serve:development",
-    "dev:my-api": "nx run my-api:serve:development --watch=true",
+    "dev:my-api": "nx run my-api:serve:development",
     "dev:docs": "nx serve docs",
     "dev:webhook": "nx serve webhook-server",
     "build:next": "nx build next-app --prod --verbose",
