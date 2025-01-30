@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export interface Location {
   name?: string
+  distanceFromRoom?: number
   latitude: number
   longitude: number
 }
@@ -9,7 +10,7 @@ export interface Location {
 export interface ThingsToDoContentProps extends React.HTMLProps<HTMLDivElement> {
   location: Location
   onClick: () => void
-  distance: string
+  distance?: number
 }
 
 export interface ThingsToDo {

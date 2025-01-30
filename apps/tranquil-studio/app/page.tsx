@@ -5,8 +5,10 @@ import Hero from 'apps/tranquil-studio/components/hero'
 import MapWithIframe from '../components/map'
 import { NearByLocations } from '../components/nearby-locations'
 import { HOME_LOCATION_CORDINATES, ROOM_IMAGES, ROOM_MAP_URL } from '../contants'
-import nearbyThings from '../public/nearby_locations.json'
 import { SectionWrapper } from '../shared/section-wrapper'
+import { getPlacesNearby } from '../shared/utils'
+
+const nearbyThings = getPlacesNearby()
 
 export default function LandingPage() {
   return (

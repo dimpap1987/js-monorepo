@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/card'
 import React from 'react'
 import { LocationListProps, ThingsToDoContentProps } from '../app/types'
-import { calcDistance } from '../shared/utils'
 import DynamicIcon from '../shared/dynamic-icon'
 
 export function ThingsToDoContent({ location, onClick, distance, ...rest }: ThingsToDoContentProps) {
@@ -15,7 +14,7 @@ export function ThingsToDoContent({ location, onClick, distance, ...rest }: Thin
       <span className="hover:font-semibold cursor-pointer" onClick={onClick}>
         {location.name}
       </span>
-      <span className="hidden sm:inline">{distance} km</span>
+      {distance && <span className="hidden sm:inline">{distance} km</span>}
     </div>
   )
 }
@@ -40,17 +39,10 @@ export const NearByLocations: React.FC<LocationListProps> = ({ locationData, roo
             </CardHeader>
             <CardContent>
               {category.locations.map((location, locationIndex) => {
-                const distance = calcDistance(
-                  roomLocation.latitude,
-                  roomLocation.longitude,
-                  location.latitude,
-                  location.longitude
-                ).toFixed(2)
-
                 return (
                   <ThingsToDoContent
                     key={locationIndex}
-                    distance={distance}
+                    distance={location.distanceFromRoom}
                     location={location}
                     onClick={() => openMap(location.latitude, location.longitude)}
                   />
