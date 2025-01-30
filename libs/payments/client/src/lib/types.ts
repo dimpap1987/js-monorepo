@@ -65,7 +65,6 @@ export type PlanCardContainerType = {
   anySubscribed?: boolean
   subscribed?: boolean
   isFree?: boolean
-  isLoggedIn?: boolean
 }
 
 export type PlanCardContentType = {

@@ -106,19 +106,17 @@ export function PlanCardContainer({
   subscribed,
   isFree,
   children,
-  isLoggedIn,
 }: PlanCardContainerType & PropsWithChildren) {
   return (
     <div
       className={cn(
-        'relative w-full min-w-[200px] max-w-[360px] shadow-lg flex mx-auto rounded-xl border border-border transform transition-transform duration-300',
+        'relative w-full min-w-[200px] max-w-[360px] shadow-lg flex mx-auto rounded-3xl border border-border transform transition-transform duration-300',
         anySubscribed && !subscribed && 'opacity-55',
-        isLoggedIn && isFree && !anySubscribed && 'border-accent',
         subscribed && 'glow',
         anySubscribed && !isFree && 'hover:opacity-100'
       )}
     >
-      <div className="content bg-background-card py-10 px-3 sm:px-6 rounded-xl flex flex-col text-center w-full">
+      <div className="content bg-background-card py-10 px-3 sm:px-6 flex flex-col rounded-3xl text-center w-full">
         {children}
       </div>
     </div>
@@ -327,8 +325,8 @@ export const PlanCard = ({
   }
 
   return (
-    <PlanCardContainer anySubscribed={anySubscribed} isFree={isFree} subscribed={subscribed} isLoggedIn={isLoggedIn}>
-      <ActiveSubscriptionLabel subscribed={subscribed} />
+    <PlanCardContainer anySubscribed={anySubscribed} isFree={isFree} subscribed={subscribed}>
+      <ActiveSubscriptionLabel subscribed={subscribed || (!!isLoggedIn && isFree && !anySubscribed)} />
 
       {subscribed && (
         <PlanInfo>
