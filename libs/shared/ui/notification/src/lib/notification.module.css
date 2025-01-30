@@ -49,6 +49,7 @@
 }
 
 .notificationContainer {
+  position: relative;
   max-height: 211px;
   min-height: 57px;
   animation: slideRight 300ms linear;
@@ -56,7 +57,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   word-wrap: break-word;
-  border-image: var(--notifications--border, linear-gradient(rgb(214, 10, 190) 1%, rgba(0, 255, 255, 1)) 30%);
+
+  /* Outer border effect */
+  background: linear-gradient(rgb(214, 10, 190) 1%, rgba(0, 255, 255, 1) 100%);
+  border-radius: 20px;
+  padding: 1px; /* Border thickness */
+  align-self: flex-end;
+}
+
+.notificationContainer > div {
+  border-radius: 20px;
 }
 
 @keyframes slideRight {

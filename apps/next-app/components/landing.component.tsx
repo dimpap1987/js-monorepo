@@ -52,7 +52,7 @@ export default function LandingComponent({ children, className }: MainProps) {
                 message: 'This is a success message',
                 type: 'success',
                 duration: 4000,
-                description: 'Everything went good',
+                description: 'Everything went good bla bla bla bla bla bla bla bla',
               })
             }}
           >
