@@ -13,6 +13,7 @@ import {
 } from '@js-monorepo/components/form'
 import { Textarea } from '@js-monorepo/components/textarea'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { sendEmail } from '../app/actions/send-email'
 import { ContactFormSubmit, ContactSchema } from '../app/types'
 
@@ -25,11 +26,26 @@ export default function ContactForm() {
 
   const onSubmit = async (data: ContactFormSubmit) => {
     try {
-      await sendEmail(data)
+      const response = await sendEmail(data)
 
-      form.clearErrors()
+      if (response.success) {
+        toast(`Thanks ${data.name}, we received your email 😎`, {
+          action: {
+            label: 'Close',
+            onClick: () => {},
+          },
+        })
 
-      alert('Email sent successfully!')
+        form.clearErrors()
+      } else {
+        toast('Something went wrong 😔', {
+          description: 'Please try again later',
+          action: {
+            label: 'Close',
+            onClick: () => {},
+          },
+        })
+      }
     } catch (error) {
       alert('Failed to send email')
     }
