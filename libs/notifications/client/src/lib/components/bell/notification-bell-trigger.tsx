@@ -23,9 +23,9 @@ export const NotificationBellButton = forwardRef<
 
       {/* Bell */}
       {isRinging ? (
-        <MdNotificationsActive className="animate-bell text-xl" />
+        <MdNotificationsActive className="animate-bell h-full text-2xl" />
       ) : (
-        <IoMdNotifications className="text-xl" />
+        <IoMdNotifications className="h-full text-2xl" />
       )}
     </button>
   )

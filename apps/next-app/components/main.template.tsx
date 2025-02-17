@@ -170,7 +170,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
               resetOnClose={true}
             ></DpNotificationBellComponentDynamic>
           )}
-          <ModeToggle className="hidden sm:inline-block"></ModeToggle>
+          <ModeToggle></ModeToggle>
         </NavbarItems>
       </DpNextNavbar>
 

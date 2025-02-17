@@ -40,7 +40,7 @@ module.exports = {
         },
       },
       margin: {
-        navbar: 'clamp(15.5px, 0.8rem, 16px)',
+        navbar: 'clamp(11.5px, 0.6rem, 16px)',
       },
       animation: {
         bubble: 'bubble ease-in-out infinite',

@@ -38,9 +38,6 @@ module.exports = {
           foreground: 'hsl(var(--destructive-foreground))',
         },
       },
-      margin: {
-        navbar: 'clamp(15.5px, 0.8rem, 16px)',
-      },
       boxShadow: {
         primary: '0 0 40px -2px hsl(var(--primary), 0.1), 0 2px 4px -1px hsl(var(--primary), 0.06)',
       },
