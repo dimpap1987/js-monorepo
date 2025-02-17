@@ -2,6 +2,8 @@
 import { DpButton } from '@js-monorepo/button'
 import { useLoader } from '@js-monorepo/loader'
 // import { MapComponent, Marker, Popup } from '@js-monorepo/map'
+import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/card'
+import { Glow, GlowArea } from '@js-monorepo/components/glow'
 import { useNotifications } from '@js-monorepo/notification'
 import { cn } from '@js-monorepo/ui/util'
 import { ReactNode, useState } from 'react'
@@ -101,6 +103,24 @@ export default function LandingComponent({ children, className }: MainProps) {
         </DpButton>
       </div>
 
+      <GlowArea className="flex p-4 gap-4 justify-center flex-wrap">
+        <Glow className="rounded-xl flex-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Glow area 1</CardTitle>
+              <CardContent>Just a card</CardContent>
+            </CardHeader>
+          </Card>
+        </Glow>
+        <Glow className="rounded-xl flex-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Glow area 2</CardTitle>
+              <CardContent>Just a card</CardContent>
+            </CardHeader>
+          </Card>
+        </Glow>
+      </GlowArea>
       {/* {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
         <div className="mt-2">
           <DonationDialogComponent
