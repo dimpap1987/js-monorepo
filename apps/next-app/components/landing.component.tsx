@@ -103,7 +103,7 @@ export default function LandingComponent({ children, className }: MainProps) {
         </DpButton>
       </div>
 
-      <GlowArea className="flex p-4 gap-4 justify-center flex-wrap">
+      <GlowArea className="hidden sm:flex py-4 gap-4 justify-center flex-wrap">
         <Glow className="rounded-xl flex-1">
           <Card>
             <CardHeader>
