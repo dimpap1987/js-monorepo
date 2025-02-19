@@ -14,7 +14,13 @@ export const NotificationBellButton = forwardRef<
   const isRinging = unreadNotificationCount > 0
 
   return (
-    <button className="outline-none" ref={forwardedRef} {...props}>
+    <button
+      className="outline-none py-1 px-2 rounded-md"
+      tabIndex={0}
+      aria-label="toggle user options"
+      ref={forwardedRef}
+      {...props}
+    >
       {isRinging && (
         <div className="absolute z-10 rounded-full border w-[20px] h-[20px] transform translate-x-[0.65rem] -translate-y-[0.5rem] bg-orange-700 border-orange-700 text-white text-[14px]">
           {unreadNotificationCount}

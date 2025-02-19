@@ -48,14 +48,13 @@ function NavUserOptions({
 
         <DpNextNavLink
           href="/settings"
-          className="flex gap-1 justify-start px-4 py-2 rounded-xl w-full select-none group hover:ring-1 hover:ring-primary"
+          className="flex gap-1 justify-start px-4 py-2 rounded-xl w-full select-none group hover:ring-2 hover:ring-primary"
         >
-          <IoIosSettings className="text-2xl transition-transform duration-1000 group-hover:rotate-180" />
+          <IoIosSettings className="text-2xl" />
           <span className="ml-2">Settings</span>
         </DpNextNavLink>
 
         <DpLogoutButton
-          className="hover:ring-1 hover:ring-primary"
           onClick={() => {
             onLogout?.()
           }}
@@ -134,7 +133,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 </DpNextNavLink>
               )}
 
-              <NavUserOptions className="hidden sm:block mt-navbar" user={user} onLogout={onLogout}></NavUserOptions>
+              <NavUserOptions className="hidden sm:block mt-[0.58rem]" user={user} onLogout={onLogout}></NavUserOptions>
 
               <SideBarIcon onSideBarClick={onSideBarClick} className="block sm:hidden"></SideBarIcon>
             </div>
