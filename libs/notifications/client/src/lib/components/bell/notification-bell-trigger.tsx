@@ -23,12 +23,12 @@ export const NotificationBellButton = forwardRef<
 
       {/* Bell */}
       {isRinging ? (
-        <MdNotificationsActive className="animate-bell h-full text-2xl" />
+        <MdNotificationsActive className="animate-bell text-2xl" />
       ) : (
-        <IoMdNotifications className="h-full text-2xl" />
+        <IoMdNotifications className="text-2xl" />
       )}
     </button>
   )
 })
 
-NotificationBellButton.displayName = 'NotificationBellButton' // Set display name for debugging
+NotificationBellButton.displayName = 'NotificationBellButton'
