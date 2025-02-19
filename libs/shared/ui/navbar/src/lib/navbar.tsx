@@ -3,12 +3,11 @@ import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import React, { ReactNode, forwardRef, useMemo, useRef } from 'react'
-import { FaCircleUser } from 'react-icons/fa6'
+import React, { ReactNode, forwardRef, useMemo } from 'react'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosSettings } from 'react-icons/io'
 import { UserMetadata } from './components/user-metadata'
-import { OptionsDropdownRef, UserOptionsDropdown } from './components/user-options.component'
+import { UserOptionsDropdown } from './components/user-options.component'
 import './navbar.css'
 
 function SideBarIcon({ onSideBarClick, className }: { onSideBarClick?: () => void; className?: string }) {
@@ -37,11 +36,9 @@ function NavUserOptions({
   readonly onLogout?: () => void
   readonly className?: string
 }) {
-  const userOptionsDropdownRef = useRef<OptionsDropdownRef>(null)
-
   return (
     user?.isLoggedIn && (
-      <UserOptionsDropdown ref={userOptionsDropdownRef} IconComponent={FaCircleUser} className={className}>
+      <UserOptionsDropdown className={className}>
         <UserMetadata
           profileImage={user.profile?.image}
           username={user.username}
@@ -51,7 +48,6 @@ function NavUserOptions({
 
         <DpNextNavLink
           href="/settings"
-          onClick={() => userOptionsDropdownRef.current?.setVisibility(false)}
           className="flex gap-1 justify-start px-4 py-2 rounded-xl w-full select-none group hover:ring-1 hover:ring-primary"
         >
           <IoIosSettings className="text-2xl transition-transform duration-1000 group-hover:rotate-180" />
@@ -61,7 +57,6 @@ function NavUserOptions({
         <DpLogoutButton
           className="hover:ring-1 hover:ring-primary"
           onClick={() => {
-            userOptionsDropdownRef.current?.setVisibility(false)
             onLogout?.()
           }}
         ></DpLogoutButton>
@@ -139,7 +134,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 </DpNextNavLink>
               )}
 
-              <NavUserOptions className="hidden sm:block" user={user} onLogout={onLogout}></NavUserOptions>
+              <NavUserOptions className="hidden sm:block mt-navbar" user={user} onLogout={onLogout}></NavUserOptions>
 
               <SideBarIcon onSideBarClick={onSideBarClick} className="block sm:hidden"></SideBarIcon>
             </div>

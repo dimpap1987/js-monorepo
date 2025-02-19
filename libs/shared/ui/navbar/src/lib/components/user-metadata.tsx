@@ -15,7 +15,7 @@ export function UserMetadata({
 }) {
   return (
     <>
-      <div className={cn('p-1 flex gap-4 items-center', className)}>
+      <div className={cn('p-1 pb-3 flex gap-4 items-center', className)}>
         <Avatar>
           {profileImage && <AvatarImage src={profileImage} alt={`${username} picture`}></AvatarImage>}
           <AvatarFallback>{username?.slice(0, 2)?.toUpperCase() || 'A'}</AvatarFallback>
