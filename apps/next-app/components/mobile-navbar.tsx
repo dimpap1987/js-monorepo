@@ -41,7 +41,10 @@ export const MobileNavbar = () => {
           <BottomNavbarOptions Icon={Icon} href={href} label={label} key={href}></BottomNavbarOptions>
         ))}
       <BottomNavbarAlert href="/notifications" label="Alerts">
-        <NotificationBellButton unreadNotificationCount={notificationCount} />
+        <NotificationBellButton
+          unreadNotificationCount={notificationCount}
+          className="shrink-0 text-xl hover:ring-0 p-0"
+        />
       </BottomNavbarAlert>
     </BottomNavbar>
   )

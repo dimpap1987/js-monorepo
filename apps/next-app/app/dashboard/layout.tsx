@@ -42,7 +42,7 @@ function SidebarOpts() {
         <DpNextNavLink
           key={href}
           className={cn(
-            'p-2 transition-colors duration-300 grid place-items-center gap-2 items-center border border-border rounded-md hover:ring-1 ring-primary',
+            'p-2 transition-colors duration-300 grid place-items-center gap-2 items-center border border-border rounded-md hover:ring-1 ring-border',
             'grid-cols-[30px_auto]'
           )}
           href={href}

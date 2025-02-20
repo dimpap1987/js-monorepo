@@ -69,7 +69,7 @@ export function ModeToggle() {
 
   return (
     <Button
-      className="py-1 px-2 rounded-md hover:bg-transparent border-0 focus-visible:ring-primary focus-visible:ring-2"
+      className="py-1 px-2 rounded-md hover:bg-transparent border-0 focus-visible:ring-primary focus-visible:ring-2 hover:ring-1 hover:ring-border"
       variant="outline"
       onClick={() => (theme === 'dark' ? setTheme('light') : setTheme('dark'))}
     >

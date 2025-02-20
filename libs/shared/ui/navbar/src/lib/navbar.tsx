@@ -48,7 +48,7 @@ function NavUserOptions({
 
         <DpNextNavLink
           href="/settings"
-          className="flex gap-1 justify-start px-4 py-2 rounded-xl w-full select-none group hover:ring-2 hover:ring-primary"
+          className="flex gap-1 justify-start px-4 py-2 rounded-xl w-full select-none group hover:ring-1 hover:ring-border"
         >
           <IoIosSettings className="text-2xl" />
           <span className="ml-2">Settings</span>
@@ -121,21 +121,21 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 ))}
             </ul>
 
-            <div className="flex items-center gap-4 justify-end text-center">
-              {navbarItems && (
-                <section className="hidden sm:flex justify-center items-center gap-5">{navbarItems}</section>
-              )}
+            <div>
+              <section className="hidden sm:flex items-center gap-2 justify-end text-center">
+                <>
+                  {navbarItems && navbarItems}
 
-              {/* login button */}
-              {!user?.isLoggedIn && (
-                <DpNextNavLink className="hidden sm:flex" href="/auth/login">
-                  <DpLoginButton></DpLoginButton>
-                </DpNextNavLink>
-              )}
+                  {!user?.isLoggedIn && (
+                    <DpNextNavLink href="/auth/login">
+                      <DpLoginButton></DpLoginButton>
+                    </DpNextNavLink>
+                  )}
+                  {user && <NavUserOptions className="mt-[0.58rem]" user={user} onLogout={onLogout} />}
+                </>
+              </section>
 
-              <NavUserOptions className="hidden sm:block mt-[0.58rem]" user={user} onLogout={onLogout}></NavUserOptions>
-
-              <SideBarIcon onSideBarClick={onSideBarClick} className="block sm:hidden"></SideBarIcon>
+              <SideBarIcon className="block sm:hidden" onSideBarClick={onSideBarClick}></SideBarIcon>
             </div>
           </div>
         </nav>
