@@ -1,5 +1,6 @@
 'use client'
 
+import { cn } from '@js-monorepo/ui/util'
 import { forwardRef } from 'react'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdNotificationsActive } from 'react-icons/md'
@@ -9,13 +10,14 @@ export const NotificationBellButton = forwardRef<
   HTMLButtonElement,
   {
     unreadNotificationCount: number
+    className?: string
   }
->(({ unreadNotificationCount = 0, ...props }, forwardedRef) => {
+>(({ unreadNotificationCount = 0, className, ...props }, forwardedRef) => {
   const isRinging = unreadNotificationCount > 0
 
   return (
     <button
-      className="outline-none py-1 px-2 rounded-md"
+      className={cn('outline-none py-1 px-2 rounded-md hover:ring-1 hover:ring-border text-2xl', className)}
       tabIndex={0}
       aria-label="toggle user options"
       ref={forwardedRef}
@@ -28,11 +30,7 @@ export const NotificationBellButton = forwardRef<
       )}
 
       {/* Bell */}
-      {isRinging ? (
-        <MdNotificationsActive className="animate-bell text-2xl" />
-      ) : (
-        <IoMdNotifications className="text-2xl" />
-      )}
+      {isRinging ? <MdNotificationsActive className="animate-bell" /> : <IoMdNotifications />}
     </button>
   )
 })
