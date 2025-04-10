@@ -25,10 +25,9 @@ const AvatarImage = React.forwardRef<React.ElementRef<typeof Image>, React.Compo
     return (
       <Image
         fill={true}
-        style={{ objectFit: 'contain' }}
         ref={ref}
         onError={() => setHasError(true)}
-        className={cn('aspect-square', className)}
+        className={cn('aspect-square object-contain', className)}
         {...props}
       />
     )

@@ -13,9 +13,9 @@ export const buttonVariants = {
       outline: 'border-2 border-primary/80 bg-background text-foreground tracking-[0.04em]',
     },
     size: {
-      default: 'h-8 px-4 py-2',
-      small: 'h-7 px-2 text-xs py-1',
-      large: 'h-10 px-8 py-2',
+      default: 'h-8 px-4 py-4',
+      small: 'h-7 px-2 text-xs py-3',
+      large: 'h-10 px-8 py-5',
     },
   },
   disabled: 'cursor-not-allowed opacity-50',

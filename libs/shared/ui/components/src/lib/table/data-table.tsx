@@ -56,8 +56,7 @@ export function DataTable<TData, TValue>({
                   <TableHead
                     key={header.id}
                     colSpan={header.colSpan}
-                    style={{ width: header.getSize() }}
-                    className="text-xs font-medium text-gray-500 tracking-wider"
+                    className={`text-xs font-medium text-gray-500 tracking-wider w-[${header.getSize()}px]`}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>

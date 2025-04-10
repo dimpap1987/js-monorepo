@@ -108,10 +108,9 @@ export const Carousel = ({ hrefs, className }: { hrefs: string[]; className?: st
             key={index}
             src={href}
             fill={true}
-            style={{ objectFit: 'contain' }}
             alt={`Slide ${index + 1}`}
             onClick={() => openLightbox(index)}
-            className={`absolute top-0 left-0 cursor-pointer transition-opacity duration-300 ease-in-out transform ${
+            className={`absolute object-contain top-0 left-0 cursor-pointer transition-opacity duration-300 ease-in-out transform ${
               index === currentIndex ? 'opacity-100' : 'opacity-0'
             }`}
           />
@@ -134,12 +133,7 @@ export const Carousel = ({ hrefs, className }: { hrefs: string[]; className?: st
             &times;
           </button>
           <div className="relative w-full max-w-6xl h-[90svh] flex items-center justify-center">
-            <Image
-              src={hrefs[currentIndex]}
-              fill={true}
-              style={{ objectFit: 'contain' }}
-              alt={`Slide ${currentIndex + 1}`}
-            />
+            <Image className="object-contain" src={hrefs[currentIndex]} fill={true} alt={`Slide ${currentIndex + 1}`} />
             {/* Lightbox Previous Button */}
             <NavigationButton direction="prev" onClick={() => handleUserInteraction('prev')} />
 

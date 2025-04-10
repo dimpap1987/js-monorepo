@@ -102,9 +102,8 @@ function AiGeneratorImageSuspense({
                   src={prediction}
                   loading="lazy"
                   fill
-                  style={{ objectFit: 'contain' }}
                   alt="Picture of the ai prediction"
-                  className="object-cover w-full h-full rounded-md border-gray-300"
+                  className="w-full h-full rounded-md border-gray-300 object-contain"
                   onLoadingComplete={onImageFinished}
                   onError={onImageFinished}
                 />
