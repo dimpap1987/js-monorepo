@@ -39,7 +39,15 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   async connectToRedis(): Promise<void> {
-    const pubClient = createClient({ url: process.env['REDIS_URL'] })
+    const pubClient = createClient({
+      url: process.env['REDIS_URL'],
+      socket: {
+        reconnectStrategy: (retries) => {
+          this.logger.warn(`Reconnecting to Redis (attempt ${retries})`)
+          return Math.min(retries * 100, 3000) // backoff
+        },
+      },
+    })
     const subClient = pubClient.duplicate()
 
     await Promise.all([pubClient.connect(), subClient.connect()])
