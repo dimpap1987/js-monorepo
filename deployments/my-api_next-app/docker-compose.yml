@@ -3,7 +3,7 @@ version: '3.8'
 services:
   nginx:
     image: nginx:latest
-    container_name: nginx_prod
+    container_name: nginx_container
     ports:
       - '80:80'
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
 
   my-api:
     image: dimpap/my-api:latest
-    container_name: my-api_prod
+    container_name: my-api_container
     env_file:
       - .env
     restart: unless-stopped
@@ -41,7 +41,7 @@ services:
 
   next-app:
     image: dimpap/next-app:latest
-    container_name: next-app_prod
+    container_name: next-app_container
     env_file:
       - .env
     healthcheck:
@@ -55,7 +55,7 @@ services:
 
   postgres:
     image: postgres:16.1-alpine3.19
-    container_name: postgres_container_prod
+    container_name: postgres_container
     env_file:
       - .env
     environment:
@@ -75,7 +75,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: redis_prod
+    container_name: redis_container
     env_file:
       - .env
     restart: unless-stopped
@@ -90,7 +90,7 @@ services:
       - super-network
 
   redis-commander:
-    container_name: redis-commander_prod
+    container_name: redis-commander_container
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     restart: unless-stopped

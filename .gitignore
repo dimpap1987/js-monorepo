@@ -49,3 +49,5 @@ apps/docs/public/README.json
 *.log
 *audit.json
 logs/
+
+deployments/my-api_next-app/data/
