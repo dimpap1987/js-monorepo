@@ -1,12 +1,12 @@
 server:
-  http_listen_port: 9080  # HTTP port to expose Promtail's metrics
-  grpc_listen_port: 0     # Disable gRPC
+  http_listen_port: 9080 # HTTP port to expose Promtail's metrics
+  grpc_listen_port: 0 # Disable gRPC
 
 positions:
-  filename: /tmp/positions.yaml  # File to store file offsets (so logs don't get re-scraped)
+  filename: /tmp/positions.yaml # File to store file offsets (so logs don't get re-scraped)
 
 clients:
-  - url: http://loki:3100/loki/api/v1/push  # Loki endpoint
+  - url: http://loki:3100/loki/api/v1/push # Loki endpoint
 
 scrape_configs:
   - job_name: containers

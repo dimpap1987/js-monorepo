@@ -2,16 +2,16 @@ receivers:
   otlp:
     protocols:
       grpc: # Supports gRPC protocol on default port 4317
-        endpoint: "0.0.0.0:4317"
+        endpoint: '0.0.0.0:4317'
       http: # Supports HTTP protocol on port 4318 (what your app is using)
-        endpoint: "0.0.0.0:4318"
+        endpoint: '0.0.0.0:4318'
 
 processors:
   batch:
     # Batching helps with performance
     send_batch_size: 1000
     timeout: 10s
-  
+
   # Optional: Add attributes processor if you want to add additional tags
   attributes:
     actions:
@@ -25,7 +25,7 @@ processors:
 #     namespace: "otel"
 #     send_timestamps: true
 #     metric_expiration: 180m
-    
+
 #   otlp:
 #     endpoint: tempo:4317
 #     tls:
@@ -49,9 +49,9 @@ processors:
 
 exporters:
   prometheus:
-    endpoint: "0.0.0.0:9464"  # Listen on all interfaces
+    endpoint: '0.0.0.0:9464' # Listen on all interfaces
     send_timestamps: true
-  
+
   # For gRPC protocol to Tempo
   otlp/traces:
     endpoint: tempo:4317
@@ -62,8 +62,8 @@ exporters:
     tls:
       insecure: true
     headers:
-      "X-Scope-OrgID": "tenant1"  # If using multi-tenancy in Loki
-  
+      'X-Scope-OrgID': 'tenant1' # If using multi-tenancy in Loki
+
   debug/metrics:
     verbosity: detailed
   debug/traces:
@@ -76,7 +76,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/traces]  # Updated to match the exporter name
+      exporters: [otlp/traces] # Updated to match the exporter name
       #exporters: [otlp/traces,debug/traces]
     metrics:
       receivers: [otlp]

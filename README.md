@@ -1,9 +1,8 @@
 # 🚀 NX Monorepo Workspace
 
-
 ## 📋 Overview
 
-This project is an educational monorepo that demonstrates how to create and organize reusable components, implement authentication and session management, and establish communication between frontend and backend services. 
+This project is an educational monorepo that demonstrates how to create and organize reusable components, implement authentication and session management, and establish communication between frontend and backend services.
 
 The architecture includes:
 
@@ -77,7 +76,7 @@ npm run dev:my-api
 
 ```
 
-**_ IMPORTANT _**  Check the .env.example in each project to see the required env variables
+**_ IMPORTANT _** Check the .env.example in each project to see the required env variables
 
 ### Building projects
 
@@ -111,23 +110,27 @@ GitHub Actions workflows are configured for:
 ## 📚 Technology Stack
 
 ### Frontend
+
 - **Framework**: Next.js, React
 - **Styling**: TailwindCSS, shadcn UI components
 - **State Management**: React Context API
 
 ### Backend
+
 - **Framework**: Nest.js
 - **Real-time**: WebSockets
 - **Data Storage**: Redis
 - **Payment Processing**: Stripe
 
 ### Infrastructure
+
 - **Build System**: NX Monorepo
 - **Containerization**: Docker, Docker Compose
 - **CI/CD**: GitHub Actions
 - **Authentication**: Cookies, Sessions, Redis
 
 ### Development Tools
+
 - **Linting**: ESLint
 - **Type Safety**: TypeScript
 - **Testing**: Jest

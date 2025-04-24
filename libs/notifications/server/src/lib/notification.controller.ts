@@ -23,13 +23,17 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { NotificationService } from './notification.service'
 
 @Controller('notifications')
 @UseGuards(LoggedInGuard)
 export class NotificationController {
   private logger = new Logger(NotificationController.name)
-  constructor(private notificationService: NotificationService) {}
+  constructor(
+    private notificationService: NotificationService,
+    private readonly configService: ConfigService
+  ) {}
 
   @Post()
   @UseGuards(RolesGuard)
@@ -116,7 +120,7 @@ export class NotificationController {
         title: payload.title,
         message: payload.message,
         data: {
-          url: process.env['AUTH_LOGIN_REDIRECT'],
+          url: this.configService.get('AUTH_LOGIN_REDIRECT'),
         },
       })
     } catch (e: any) {

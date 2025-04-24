@@ -80,12 +80,12 @@ services:
 
   otel-collector:
     image: otel/opentelemetry-collector:latest
-    command: ["--config=/etc/otel-collector-config.yaml"]
+    command: ['--config=/etc/otel-collector-config.yaml']
     volumes:
       - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
     ports:
-      - "4317:4317" # OTLP gRPC
-      - "4318:4318" # OTLP HTTP
+      - '4317:4317' # OTLP gRPC
+      - '4318:4318' # OTLP HTTP
     networks:
       - super-network
     depends_on:
@@ -94,12 +94,12 @@ services:
   tempo:
     image: grafana/tempo:latest
     container_name: tempo
-    command: ["-config.file=/etc/tempo.yaml"]
+    command: ['-config.file=/etc/tempo.yaml']
     volumes:
       - ./config/tempo.yaml:/etc/tempo.yaml
       - tempo-data:/var/tempo
     ports:
-      - "3200:3200"       # Tempo HTTP (query, etc)
+      - '3200:3200' # Tempo HTTP (query, etc)
     networks:
       - super-network
 
@@ -109,7 +109,7 @@ services:
     container_name: loki
     command: -config.file=/etc/loki/config.yaml
     ports:
-      - "3100:3100"  # Loki HTTP endpoint (for queries)
+      - '3100:3100' # Loki HTTP endpoint (for queries)
     volumes:
       - ./config/loki.yaml:/etc/loki/config.yaml
       - loki-data:/loki
@@ -123,15 +123,14 @@ services:
     command: -config.file=/etc/promtail/config.yaml
     volumes:
       - ./config/promtail.yaml:/etc/promtail/config.yaml
-      - /var/log:/var/log  # Logs from host
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro  # Docker logs
-      - /etc/machine-id:/etc/machine-id  # Required for Docker metadata
+      - /var/log:/var/log # Logs from host
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro # Docker logs
+      - /etc/machine-id:/etc/machine-id # Required for Docker metadata
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - loki
     networks:
       - super-network
-
 
 networks:
   super-network:
