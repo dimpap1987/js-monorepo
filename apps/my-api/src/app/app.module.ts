@@ -35,12 +35,11 @@ import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { UserModule } from './modules/user/user.module'
 
-const ENV = process.env.NODE_ENV
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [`.env.${ENV}`, `.env`],
+      envFilePath: [`.env.${process.env.NODE_ENV}`, `.env`],
     }),
     ClsModule.forRoot({
       global: true,
@@ -79,24 +78,24 @@ const ENV = process.env.NODE_ENV
     }),
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
-      imports: [UserPresenceModule],
-      inject: [UserPresenceWebsocketService],
-      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService) => ({
+      imports: [UserPresenceModule, ConfigModule],
+      inject: [UserPresenceWebsocketService, ConfigService],
+      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService, configService: ConfigService) => ({
         google: {
-          clientId: process.env.GOOGLE_CLIENT_ID,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          callBackUrl: process.env.GOOGLE_REDIRECT_URL,
+          clientId: configService.get('GOOGLE_CLIENT_ID'),
+          clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
+          callBackUrl: configService.get('GOOGLE_REDIRECT_URL'),
         },
         github: {
-          clientId: process.env.GITHUB_CLIENT_ID,
-          clientSecret: process.env.GITHUB_CLIENT_SECRET,
-          callBackUrl: process.env.GITHUB_REDIRECT_URL,
+          clientId: configService.get('GITHUB_CLIENT_ID'),
+          clientSecret: configService.get('GITHUB_CLIENT_SECRET'),
+          callBackUrl: configService.get('GITHUB_REDIRECT_URL'),
         },
         csrf: {
           enabled: true,
           middlewareExclusions: ['exceptions', 'admin/(.*)', 'health', 'payments/webhook'],
         },
-        redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
+        redirectUiUrl: configService.get('AUTH_LOGIN_REDIRECT'),
         onRegister: async (user: AuthUserDto) => {
           userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' has joined 🚀`])
         },
