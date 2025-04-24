@@ -2,8 +2,9 @@ import { capitalize } from '@js-monorepo/auth/nest/common/utils'
 import { PaymentsModule } from '@js-monorepo/payments-server'
 import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
+import { RedisSessionKey } from '@js-monorepo/auth/nest/common/types'
 import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
-import { AuthSessionMiddleware, AuthSessionModule, getRedisSessionPath } from '@js-monorepo/auth/nest/session'
+import { AuthSessionMiddleware, AuthSessionModule } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import {
@@ -153,7 +154,11 @@ const ENV = process.env.NODE_ENV
   providers: [LoggerMiddleware],
 })
 export class AppModule implements NestModule {
-  constructor(@Inject(REDIS) private readonly redis: RedisClientType) {}
+  constructor(
+    @Inject(REDIS) private readonly redis: RedisClientType,
+    @Inject(RedisSessionKey) private redisSessionPath: string,
+    private readonly configService: ConfigService
+  ) {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer
@@ -161,11 +166,11 @@ export class AppModule implements NestModule {
         session({
           store: new RedisStore({
             client: this.redis,
-            prefix: getRedisSessionPath(),
+            prefix: this.redisSessionPath,
           }),
           genid: () => uuidv4(),
           saveUninitialized: false,
-          secret: process.env['SESSION_SECRET'],
+          secret: this.configService.get('SESSION_SECRET'),
           resave: false,
           rolling: true, // Reset the expiration on every request
           name: 'JSESSIONID',

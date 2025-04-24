@@ -1,4 +1,6 @@
+import { RedisOnlineUsersKey, RedisSocketUserKey } from '@js-monorepo/auth/nest/common/types'
 import { Global, Module } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { RedisIoAdapter } from './adapters/redis-adapter'
 import { UserPresenceGateway } from './gateway/user-presence.gateway'
 import { WsLoginGuard } from './guards/ws-login.guard'
@@ -17,6 +19,24 @@ import { UserSocketService } from './services/user-socket.service'
     RedisIoAdapter,
     WsRolesGuard,
     UserPresenceWebsocketService,
+    {
+      provide: RedisSocketUserKey,
+      useFactory: (configService: ConfigService) => {
+        return configService.get<string>('REDIS_NAMESPACE')
+          ? `${configService.get<string>('REDIS_NAMESPACE')}:online:socket-user:`
+          : 'online:socket-user:'
+      },
+      inject: [ConfigService],
+    },
+    {
+      provide: RedisOnlineUsersKey,
+      useFactory: (configService: ConfigService) => {
+        return configService.get<string>('REDIS_NAMESPACE')
+          ? `${configService.get<string>('REDIS_NAMESPACE')}:online:online-users-list`
+          : 'online:online-users-list'
+      },
+      inject: [ConfigService],
+    },
   ],
   exports: [
     UserPresenceGateway,
@@ -25,6 +45,8 @@ import { UserSocketService } from './services/user-socket.service'
     RedisIoAdapter,
     WsRolesGuard,
     UserPresenceWebsocketService,
+    RedisSocketUserKey,
+    RedisOnlineUsersKey,
   ],
 })
 export class UserPresenceModule {}

@@ -1,31 +1,25 @@
+import { RedisOnlineUsersKey } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { RedisClientType } from '@redis/client'
 
 @Injectable()
 export class OnlineUsersService {
   private logger = new Logger(OnlineUsersService.name)
-  private readonly redisNamespace: string
 
   constructor(
     @Inject(REDIS) private readonly redisClient: RedisClientType,
-    private readonly authSessionUserCacheService: AuthSessionUserCacheService,
-    private readonly configService: ConfigService
-  ) {
-    const onlineUsersList = 'online:online-users-list'
-    this.redisNamespace = this.configService.get<string>('REDIS_NAMESPACE')
-      ? `${this.configService.get<string>('REDIS_NAMESPACE')}:${onlineUsersList}`
-      : onlineUsersList
-  }
+    @Inject(RedisOnlineUsersKey) private readonly onlineUsersKey: string,
+    private readonly authSessionUserCacheService: AuthSessionUserCacheService
+  ) {}
 
   async getList(page = 1, limit = 100) {
     try {
       const start = (page - 1) * limit
       const end = start + limit - 1
 
-      const onlineUsers = await this.redisClient.zRange(this.redisNamespace, start, end)
+      const onlineUsers = await this.redisClient.zRange(this.onlineUsersKey, start, end)
       const userPromises = onlineUsers.map(async (value) => {
         const [userId, socketId] = value.split(':')
         const userCache = await this.authSessionUserCacheService.findOrSaveAuthUserById(Number(userId))
@@ -47,7 +41,7 @@ export class OnlineUsersService {
   async add(value: string): Promise<any> {
     if (value === undefined || value === null) return
 
-    return this.redisClient.zAdd(this.redisNamespace, {
+    return this.redisClient.zAdd(this.onlineUsersKey, {
       score: Date.now(),
       value: value,
     })
@@ -55,11 +49,11 @@ export class OnlineUsersService {
 
   async remove(value: string): Promise<any> {
     if (value === undefined || value === null) return
-    return this.redisClient.zRem(this.redisNamespace, `${value}`)
+    return this.redisClient.zRem(this.onlineUsersKey, `${value}`)
   }
 
   async clear() {
-    return this.redisClient.del(this.redisNamespace)
+    return this.redisClient.del(this.onlineUsersKey)
   }
 
   async removeByUserId(userId: number) {
@@ -67,7 +61,7 @@ export class OnlineUsersService {
     let cursor = 0
     try {
       do {
-        const { cursor: newCursor, members } = await this.redisClient.zScan(this.redisNamespace, cursor, {
+        const { cursor: newCursor, members } = await this.redisClient.zScan(this.onlineUsersKey, cursor, {
           MATCH: userKeyPattern,
           COUNT: 100,
         })
@@ -75,7 +69,7 @@ export class OnlineUsersService {
 
         if (members.length > 0) {
           const deletePromises = members.map(async (member) => {
-            await this.redisClient.zRem(this.redisNamespace, member.value)
+            await this.redisClient.zRem(this.onlineUsersKey, member.value)
             this.logger.debug(`Deleted session with member: ${member.value}`)
           })
           await Promise.all(deletePromises)

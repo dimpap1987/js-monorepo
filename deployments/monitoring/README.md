@@ -19,17 +19,18 @@
                  └─────────────┘
 
 ┌──────────────┐
-│  Promtail    │ ◄──── Reads logs from stdout
+│ Promtail │ ◄──── Reads logs from stdout
 └────┬─────────┘
-     ▼
- ┌────────┐
- │  Loki  │ ◄───────── Stores logs
- └────────┘
+▼
+┌────────┐
+│ Loki │ ◄───────── Stores logs
+└────────┘
 
        ▼
+
 ┌───────────────────┐
-│     Grafana       │ ◄── Dashboards for:
-│  - Metrics (Prom) │
-│  - Traces (Tempo) │
-│  - Logs (Loki)    │
+│ Grafana │ ◄── Dashboards for:
+│ - Metrics (Prom) │
+│ - Traces (Tempo) │
+│ - Logs (Loki) │
 └───────────────────┘
