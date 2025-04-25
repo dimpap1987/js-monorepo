@@ -64,7 +64,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', "pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}']
       interval: 10s
       timeout: 3s
       retries: 3
@@ -75,7 +75,7 @@ services:
     command: postgres -c shared_preload_libraries=pg_stat_statements
 
   redis:
-    image: redis:latest
+    image: bitnami/redis:7.0
     container_name: redis_container
     env_file:
       - .env
@@ -85,10 +85,16 @@ services:
       interval: 1s
       timeout: 3s
       retries: 5
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
     volumes:
       - redis-data:/data
     networks:
       - super-network
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 500mb
 
   redis-commander:
     container_name: redis-commander_container
