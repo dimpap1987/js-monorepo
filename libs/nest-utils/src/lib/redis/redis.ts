@@ -2,7 +2,7 @@ import { DynamicModule, Global, Logger, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { createClient, RedisClientOptions } from 'redis'
 
-export const REDIS = Symbol('AUTH:REDIS')
+export const REDIS = Symbol('REDIS')
 
 const logger = new Logger('RedisProvider')
 

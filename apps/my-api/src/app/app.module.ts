@@ -1,5 +1,6 @@
 import { capitalize } from '@js-monorepo/auth/nest/common/utils'
 import { PaymentsModule } from '@js-monorepo/payments-server'
+import KeyvRedis, { Keyv } from '@keyv/redis'
 import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
 import { RedisSessionKey } from '@js-monorepo/auth/nest/common/types'
@@ -16,6 +17,7 @@ import { AuthUserDto } from '@js-monorepo/types'
 import { Events, UserPresenceModule, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { ClsPluginTransactional } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
+import { CacheModule } from '@nestjs/cache-manager'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
@@ -147,6 +149,23 @@ import { UserModule } from './modules/user/user.module'
           })
         },
       }),
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      inject: [REDIS, ConfigService],
+      useFactory: async (redisClient: RedisClientType, configService: ConfigService) => {
+        const redisStore = new Keyv({
+          store: new KeyvRedis(redisClient, {
+            keyPrefixSeparator: ':caches:',
+          }),
+          ttl: 5000,
+          useKeyPrefix: false,
+          namespace: configService.get('REDIS_NAMESPACE'),
+        })
+        return {
+          stores: redisStore,
+        }
+      },
     }),
   ],
   controllers: [ExceptionController, AnnouncementsController, AppController],
