@@ -1,5 +1,7 @@
+import { RedisPushSubscriptionsKey } from '@js-monorepo/auth/nest/common/types'
 import { CreateUserNotificationType } from '@js-monorepo/types'
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { NotificationController } from './notification.controller'
 import { NotificationRepo } from './notification.repository'
 import { NotificationRepositoryPrisma } from './notification.repository.prisma'
@@ -15,6 +17,15 @@ const providers: Provider[] = [
     useClass: NotificationRepositoryPrisma,
   },
   NotificationService,
+  {
+    provide: RedisPushSubscriptionsKey,
+    useFactory: (configService: ConfigService) => {
+      return configService.get<string>('REDIS_NAMESPACE')
+        ? `${configService.get<string>('REDIS_NAMESPACE')}:push_subscription:user:`
+        : 'push_subscription:user:'
+    },
+    inject: [ConfigService],
+  },
 ]
 
 @Global()

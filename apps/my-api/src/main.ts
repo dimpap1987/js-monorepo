@@ -1,3 +1,4 @@
+import './otel'
 import { LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
@@ -45,7 +46,12 @@ async function bootstrap() {
   })
   app.use(
     helmet({
-      contentSecurityPolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'", process.env.CORS_ORIGIN_DOMAINS],
+          connectSrc: ["'self'", process.env.CORS_ORIGIN_DOMAINS],
+        },
+      },
     })
   )
   app.use(rawBodyMiddleware())

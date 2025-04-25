@@ -29,7 +29,7 @@ export default async function RootProviders({ children }: { readonly children: R
     >
       <DynamicWebsocketProvider>
         <DpNextPageProgressBar>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <ThemeProvider attribute="class" defaultTheme="system">
             <DpLoaderProvider>
               <DpNotificationProvider>
                 <WebNotificationProvider>

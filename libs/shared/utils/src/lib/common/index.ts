@@ -19,23 +19,8 @@ export function isObjectDefinedOrEmpty(obj: object) {
   return Object.keys(obj)?.length === 0
 }
 
-export function getCurrentDateFormatted() {
-  const date = new Date()
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are zero-based
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
 export function isPromise(pro: any) {
   return pro != null && (pro instanceof Promise || typeof pro.then === 'function')
-}
-
-export function getColorizedText(text: number | string, ansiC0de = '\x1b[33m'): string {
-  // ANSI escape codes for colorization
-  const reset = '\x1b[0m'
-
-  return `${ansiC0de}${text}${reset}`
 }
 
 export function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
@@ -149,17 +134,17 @@ export async function tryCatch<T>(
   }
 }
 
-export function deepCloneAndUpdate<T>(prevState: T, updates: Partial<T>): T {
-  return {
-    ...prevState,
-    ...updates,
-    // Recursively deep clone nested objects (if any)
-    // Ensure you're not accidentally modifying nested structures directly
-    ...Object.fromEntries(
-      Object.entries(updates).map(([key, value]) => [
-        key,
-        value && typeof value === 'object' ? structuredClone(value) : value,
-      ])
-    ),
-  }
+export function generateNonce(): string {
+  const array = new Uint8Array(16)
+  crypto.getRandomValues(array)
+  return Buffer.from(array).toString('base64')
+}
+
+export function removePathNameFromUrl(url: string) {
+  // Create a new URL object
+  const parsedUrl = new URL(url) // Remove the pathname
+
+  parsedUrl.pathname = ''
+
+  return parsedUrl?.toString()
 }

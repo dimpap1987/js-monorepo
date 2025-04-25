@@ -1,4 +1,4 @@
-import { getRedisSessionPath } from '@js-monorepo/auth/nest/session'
+import { RedisSessionKey, RedisSocketUserKey } from '@js-monorepo/auth/nest/common/types'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { SocketUser } from '@js-monorepo/types'
 import { Inject, Injectable, Logger } from '@nestjs/common'
@@ -11,21 +11,17 @@ import { Socket } from 'socket.io'
 @Injectable()
 export class UserSocketService {
   private logger = new Logger(UserSocketService.name)
-  private readonly redisNamespace: string
 
   constructor(
     @Inject(REDIS) private readonly redisClient: RedisClientType,
+    @Inject(RedisSessionKey) private redisSessionPath: string,
+    @Inject(RedisSocketUserKey) private readonly redisSocketUser: string,
     private readonly configService: ConfigService
-  ) {
-    const onlineSocketUser = 'online:socket-user'
-    this.redisNamespace = this.configService.get<string>('REDIS_NAMESPACE')
-      ? `${this.configService.get<string>('REDIS_NAMESPACE')}:${onlineSocketUser}`
-      : onlineSocketUser
-  }
+  ) {}
 
   async addSocketUser({ userId, socket, pid, session }: SocketUser, ttl?: number) {
     return this.redisClient.set(
-      `${this.redisNamespace}:${socket}`,
+      `${this.redisSocketUser}${socket}`,
       JSON.stringify({
         userId: userId,
         socket: socket,
@@ -37,7 +33,7 @@ export class UserSocketService {
   }
 
   async removeSocketUserBySocketId(socketId: number | string) {
-    return this.redisClient.del(`${this.redisNamespace}:${socketId}`)
+    return this.redisClient.del(`${this.redisSocketUser}${socketId}`)
   }
 
   async retrieveUserSessionFromSocket(socket: Socket) {
@@ -49,7 +45,7 @@ export class UserSocketService {
         this.configService.get('SESSION_SECRET') ?? ''
       )
 
-      const sessionData = await this.redisClient.get(`${getRedisSessionPath()}${decodedSession}`)
+      const sessionData = await this.redisClient.get(`${this.redisSessionPath}${decodedSession}`)
 
       if (!sessionData) return undefined
 
@@ -65,14 +61,13 @@ export class UserSocketService {
   }
 
   async findSocketsByUserId(userId: string | number): Promise<string[]> {
-    const userKeyPattern = `${this.redisNamespace}:*`
     let cursor = 0
     const matchingSockets: string[] = []
 
     try {
       do {
         const { cursor: newCursor, keys } = await this.redisClient.scan(cursor, {
-          MATCH: userKeyPattern,
+          MATCH: `${this.redisSocketUser}*`,
           COUNT: 100,
         })
         cursor = newCursor
@@ -88,7 +83,7 @@ export class UserSocketService {
             }
           }
         } else {
-          this.logger.warn(`No keys found for pattern: ${userKeyPattern}`)
+          this.logger.warn(`No keys found for pattern: ${`${this.redisSocketUser}*`}`)
         }
       } while (cursor !== 0) // Continue until the cursor is back to zero
 
