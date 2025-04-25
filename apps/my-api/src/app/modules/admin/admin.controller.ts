@@ -3,6 +3,7 @@ import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { RolesGuard } from '@js-monorepo/auth/nest/session'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
 import { OnlineUsersService } from '@js-monorepo/user-presence'
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import {
   Body,
   Controller,
@@ -15,6 +16,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
 import { AdminService } from './admin.service'
@@ -31,6 +33,7 @@ export class AdminController {
   ) {}
 
   @Get('users')
+  @UseInterceptors(CacheInterceptor)
   async getUsers(
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
@@ -42,6 +45,9 @@ export class AdminController {
   }
 
   @Get('roles')
+  @CacheKey('admin-controller:user_roles')
+  @CacheTTL(10 * 60 * 1000) // Cache for 10 minutes (600,000 milliseconds)
+  @UseInterceptors(CacheInterceptor)
   async getRoles() {
     return this.adminService.getRoles()
   }

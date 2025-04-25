@@ -3,7 +3,7 @@ version: '3.8'
 services:
   nginx:
     image: nginx:latest
-    container_name: nginx_prod
+    container_name: nginx_container
     ports:
       - '80:80'
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
 
   my-api:
     image: dimpap/my-api:latest
-    container_name: my-api_prod
+    container_name: my-api_container
     env_file:
       - .env
     restart: unless-stopped
@@ -41,7 +41,7 @@ services:
 
   next-app:
     image: dimpap/next-app:latest
-    container_name: next-app_prod
+    container_name: next-app_container
     env_file:
       - .env
     healthcheck:
@@ -55,7 +55,7 @@ services:
 
   postgres:
     image: postgres:16.1-alpine3.19
-    container_name: postgres_container_prod
+    container_name: postgres_container
     env_file:
       - .env
     environment:
@@ -64,7 +64,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}']
       interval: 10s
       timeout: 3s
       retries: 3
@@ -72,10 +72,11 @@ services:
       - super-network
     volumes:
       - ${POSTGRES_VOLUME_PATH}:/var/lib/postgresql/data
+    command: postgres -c shared_preload_libraries=pg_stat_statements
 
   redis:
-    image: redis:latest
-    container_name: redis_prod
+    image: bitnami/redis:7.0
+    container_name: redis_container
     env_file:
       - .env
     restart: unless-stopped
@@ -84,13 +85,19 @@ services:
       interval: 1s
       timeout: 3s
       retries: 5
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
     volumes:
       - redis-data:/data
     networks:
       - super-network
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 500mb
 
   redis-commander:
-    container_name: redis-commander_prod
+    container_name: redis-commander_container
     hostname: redis-commander
     image: rediscommander/redis-commander:latest
     restart: unless-stopped

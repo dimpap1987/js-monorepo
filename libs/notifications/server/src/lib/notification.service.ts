@@ -1,15 +1,16 @@
+import { RedisPushSubscriptionsKey } from '@js-monorepo/auth/nest/common/types'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { REDIS } from '@js-monorepo/nest/redis'
 import { CreateUserNotificationType, NotificationCreateDto, Pageable, UserNotificationType } from '@js-monorepo/types'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { RedisClientType } from '@redis/client'
 import sanitizeHtml from 'sanitize-html'
 import { sendNotification, setVapidDetails } from 'web-push'
 import { NotificationRepo, NotificationRepository } from './notification.repository'
 import { NotificationModuleOptions } from './notifications.module'
-import { ConfigService } from '@nestjs/config'
 
 export interface Subscription {
   endpoint: string
@@ -29,12 +30,12 @@ export interface UserSubscription {
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name)
-  private readonly redisNamespace: string
 
   constructor(
     @Inject(NotificationRepo)
     private notificationRepository: NotificationRepository,
     @Inject(REDIS) private readonly redis: RedisClientType,
+    @Inject(RedisPushSubscriptionsKey) private readonly pushSubscriptionsKey: string,
     @Inject('NOTIFICATION_OPTIONS')
     private readonly notificationModuleOptions: NotificationModuleOptions,
     private readonly configService: ConfigService
@@ -44,14 +45,10 @@ export class NotificationService {
       this.configService.get<string>('VAPID_PUBLIC_KEY'),
       this.configService.get<string>('VAPID_PRIVATE_KEY')
     )
-
-    this.redisNamespace = this.configService.get<string>('REDIS_NAMESPACE')
-      ? `${this.configService.get<string>('REDIS_NAMESPACE')}:push_subscription:user:`
-      : 'push_subscription:user:'
   }
 
   async saveUserSubscription(userId: number, subscription: any): Promise<void> {
-    const redisKey = this.redisNamespace + userId
+    const redisKey = this.pushSubscriptionsKey + userId
 
     // Validate subscription object
     if (!subscription || !subscription.endpoint || !subscription.keys) {
@@ -70,13 +67,13 @@ export class NotificationService {
       await this.redis.hSet(redisKey, subscription.endpoint, value)
       await this.redis.expire(redisKey, 3600 * 24 * 3) // Set expiration to 3 days
     } catch (error) {
-      console.error('Error saving user subscription:', error)
+      this.logger.error('Error saving user subscription:', error)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_SAVE_USER_SUBSCRIPTION')
     }
   }
 
   async getUserSubscriptions(userId: number): Promise<UserSubscription[] | null> {
-    const redisKey = this.redisNamespace + userId
+    const redisKey = this.pushSubscriptionsKey + userId
 
     const subscriptionsData = await this.redis.hGetAll(redisKey)
 
@@ -97,7 +94,7 @@ export class NotificationService {
         const subscriptions = await this.getUserSubscriptions(userId)
 
         if (!subscriptions) {
-          console.log(`No subscriptions found for user ${userId}`)
+          this.logger.log(`No subscriptions found for user ${userId}`)
           return []
         }
 
@@ -109,7 +106,7 @@ export class NotificationService {
       const allSubscriptionsFlattened = allSubscriptions.flat()
 
       if (allSubscriptionsFlattened.length === 0) {
-        console.log('No subscriptions to send notifications to.')
+        this.logger.log('No subscriptions to send notifications to.')
         return
       }
 
@@ -121,9 +118,9 @@ export class NotificationService {
       })
 
       await Promise.all(sendNotificationPromises)
-      console.log('Notifications sent successfully to all users!')
+      this.logger.log('Notifications sent successfully to all users!')
     } catch (error) {
-      console.error('Error sending notifications:', error)
+      this.logger.error('Error sending notifications:', error)
     }
   }
 

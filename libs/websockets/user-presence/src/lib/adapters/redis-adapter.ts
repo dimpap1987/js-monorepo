@@ -1,7 +1,7 @@
+import { ExtendedRedisClient, REDIS } from '@js-monorepo/nest/redis'
 import { ForbiddenException, INestApplicationContext, Logger } from '@nestjs/common'
 import { IoAdapter } from '@nestjs/platform-socket.io'
 import { createAdapter } from '@socket.io/redis-adapter'
-import { createClient } from 'redis'
 import { ServerOptions, Socket } from 'socket.io'
 import { UserSocketService } from '../services/user-socket.service'
 
@@ -39,10 +39,9 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   async connectToRedis(): Promise<void> {
-    const pubClient = createClient({ url: process.env['REDIS_URL'] })
-    const subClient = pubClient.duplicate()
-
-    await Promise.all([pubClient.connect(), subClient.connect()])
+    const redisClient = this.app.get<ExtendedRedisClient>(REDIS)
+    const pubClient = redisClient
+    const subClient = await redisClient.duplicateClient()
 
     this.adapterConstructor = createAdapter(pubClient, subClient)
   }
@@ -53,9 +52,8 @@ export class RedisIoAdapter extends IoAdapter {
     const userSocketService = this.app.get(UserSocketService)
     const authMiddleware = createAuthMiddleware(userSocketService, this.logger)
 
-    // Use the middleware
-    this._namespaces?.forEach((namespace) => {
-      server.of(namespace).use(authMiddleware)
+    this._namespaces.forEach((ns) => {
+      server.of(ns).use(authMiddleware)
     })
 
     server.adapter(this.adapterConstructor)

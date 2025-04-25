@@ -1,9 +1,11 @@
 import { capitalize } from '@js-monorepo/auth/nest/common/utils'
 import { PaymentsModule } from '@js-monorepo/payments-server'
+import KeyvRedis, { Keyv } from '@keyv/redis'
 import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
+import { RedisSessionKey } from '@js-monorepo/auth/nest/common/types'
 import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
-import { AuthSessionMiddleware, AuthSessionModule, getRedisSessionPath } from '@js-monorepo/auth/nest/session'
+import { AuthSessionMiddleware, AuthSessionModule } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import {
@@ -15,6 +17,7 @@ import { AuthUserDto } from '@js-monorepo/types'
 import { Events, UserPresenceModule, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { ClsPluginTransactional } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
+import { CacheModule } from '@nestjs/cache-manager'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
@@ -34,12 +37,11 @@ import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { UserModule } from './modules/user/user.module'
 
-const ENV = process.env.NODE_ENV
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [`.env.${ENV}`, `.env`],
+      envFilePath: [`.env.${process.env.NODE_ENV}`, `.env`],
     }),
     ClsModule.forRoot({
       global: true,
@@ -78,24 +80,24 @@ const ENV = process.env.NODE_ENV
     }),
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
-      imports: [UserPresenceModule],
-      inject: [UserPresenceWebsocketService],
-      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService) => ({
+      imports: [UserPresenceModule, ConfigModule],
+      inject: [UserPresenceWebsocketService, ConfigService],
+      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService, configService: ConfigService) => ({
         google: {
-          clientId: process.env.GOOGLE_CLIENT_ID,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-          callBackUrl: process.env.GOOGLE_REDIRECT_URL,
+          clientId: configService.get('GOOGLE_CLIENT_ID'),
+          clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
+          callBackUrl: configService.get('GOOGLE_REDIRECT_URL'),
         },
         github: {
-          clientId: process.env.GITHUB_CLIENT_ID,
-          clientSecret: process.env.GITHUB_CLIENT_SECRET,
-          callBackUrl: process.env.GITHUB_REDIRECT_URL,
+          clientId: configService.get('GITHUB_CLIENT_ID'),
+          clientSecret: configService.get('GITHUB_CLIENT_SECRET'),
+          callBackUrl: configService.get('GITHUB_REDIRECT_URL'),
         },
         csrf: {
           enabled: true,
           middlewareExclusions: ['exceptions', 'admin/(.*)', 'health', 'payments/webhook'],
         },
-        redirectUiUrl: process.env.AUTH_LOGIN_REDIRECT,
+        redirectUiUrl: configService.get('AUTH_LOGIN_REDIRECT'),
         onRegister: async (user: AuthUserDto) => {
           userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' has joined 🚀`])
         },
@@ -148,12 +150,33 @@ const ENV = process.env.NODE_ENV
         },
       }),
     }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      inject: [REDIS, ConfigService],
+      useFactory: async (redisClient: RedisClientType, configService: ConfigService) => {
+        const redisStore = new Keyv({
+          store: new KeyvRedis(redisClient, {
+            keyPrefixSeparator: ':caches:',
+          }),
+          ttl: 5000,
+          useKeyPrefix: false,
+          namespace: configService.get('REDIS_NAMESPACE'),
+        })
+        return {
+          stores: redisStore,
+        }
+      },
+    }),
   ],
   controllers: [ExceptionController, AnnouncementsController, AppController],
   providers: [LoggerMiddleware],
 })
 export class AppModule implements NestModule {
-  constructor(@Inject(REDIS) private readonly redis: RedisClientType) {}
+  constructor(
+    @Inject(REDIS) private readonly redis: RedisClientType,
+    @Inject(RedisSessionKey) private redisSessionPath: string,
+    private readonly configService: ConfigService
+  ) {}
 
   configure(consumer: MiddlewareConsumer) {
     consumer
@@ -161,11 +184,11 @@ export class AppModule implements NestModule {
         session({
           store: new RedisStore({
             client: this.redis,
-            prefix: getRedisSessionPath(),
+            prefix: this.redisSessionPath,
           }),
           genid: () => uuidv4(),
           saveUninitialized: false,
-          secret: process.env['SESSION_SECRET'],
+          secret: this.configService.get('SESSION_SECRET'),
           resave: false,
           rolling: true, // Reset the expiration on every request
           name: 'JSESSIONID',

@@ -1,12 +1,10 @@
 import { REDIS } from '@js-monorepo/nest/redis'
 import { SessionObject, SessionUserType } from '@js-monorepo/types'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { RedisClientType } from 'redis'
 import { AuthException } from '../../common/exceptions/api-exception'
 import { AuthService } from '../../common/services/interfaces/auth.service'
-import { ServiceAuth } from '../../common/types'
-import { getRedisSessionPath } from '../auth-session.module'
+import { RedisSessionKey, RedisUserSessionKey, ServiceAuth } from '../../common/types'
 
 interface UserSession {
   key: string
@@ -16,19 +14,13 @@ interface UserSession {
 @Injectable()
 export class AuthSessionUserCacheService {
   private logger = new Logger(AuthSessionUserCacheService.name)
-  private readonly redisNamespace: string
 
   constructor(
     @Inject(ServiceAuth) private authService: AuthService,
     @Inject(REDIS) private readonly redis: RedisClientType,
-    private readonly configService: ConfigService
-  ) {
-    const USER_SESSION = 'user-session'
-
-    this.redisNamespace = this.configService.get<string>('REDIS_NAMESPACE')
-      ? `${this.configService.get<string>('REDIS_NAMESPACE')}:${USER_SESSION}`
-      : USER_SESSION
-  }
+    @Inject(RedisSessionKey) private readonly redisSessionKey: string,
+    @Inject(RedisUserSessionKey) private readonly redisUserSessionKey: string
+  ) {}
 
   async findOrSaveAuthUserById(id: number, ttl = 60): Promise<SessionUserType | undefined> {
     try {
@@ -44,7 +36,7 @@ export class AuthSessionUserCacheService {
   }
 
   async findAuthUserById(id: number): Promise<SessionUserType | undefined> {
-    const cacheUser = await this.redis.get(`${this.redisNamespace}:${id}`)
+    const cacheUser = await this.redis.get(`${this.redisUserSessionKey}${id}`)
     return cacheUser ? JSON.parse(cacheUser) : undefined
   }
 
@@ -75,7 +67,7 @@ export class AuthSessionUserCacheService {
         } satisfies SessionUserType
       }
 
-      await this.redis.set(`${this.redisNamespace}:${userCache.id}`, JSON.stringify(userCache), {
+      await this.redis.set(`${this.redisUserSessionKey}${userCache.id}`, JSON.stringify(userCache), {
         EX: ttl, // Set expiration time
       })
       return userCache
@@ -86,13 +78,12 @@ export class AuthSessionUserCacheService {
   }
 
   async fetchUserSessionsByUserId(userId: number): Promise<UserSession[]> {
-    const sessionKeyPattern = `${getRedisSessionPath()}*`
     let cursor = 0
     const userSessions: UserSession[] = []
 
     do {
       const { cursor: newCursor, keys } = await this.redis.scan(cursor, {
-        MATCH: sessionKeyPattern,
+        MATCH: `${this.redisSessionKey}*`,
         COUNT: 100, // Optional count for performance
       })
 
@@ -138,7 +129,8 @@ export class AuthSessionUserCacheService {
       throw new AuthException(HttpStatus.BAD_REQUEST, 'ERROR_USER_SESSION_DELETION')
     }
   }
+
   async invalidateAuthUserInCache(userId: number) {
-    return this.redis.del(`${this.redisNamespace}:${userId}`)
+    return this.redis.del(`${this.redisSessionKey}${userId}`)
   }
 }

@@ -38,34 +38,34 @@ export class LoggerService implements LS {
           ),
         }),
 
-        new winston.transports.DailyRotateFile({
-          filename: `logs/error-%DATE%.log`,
-          level: 'error',
-          format: combine(
-            prettyPrint({
-              depth: 10,
-            }),
-            json()
-          ),
-          datePattern: 'YYYY-MM-DD',
-          json: true,
-          zippedArchive: false, // don't want to zip our logs
-          maxFiles: '30d', // will keep log until they are older than 30 days
-        }),
-        new winston.transports.DailyRotateFile({
-          filename: `logs/info-%DATE%.log`,
-          level: 'info',
-          format: combine(
-            prettyPrint({
-              depth: 10,
-            }),
-            json()
-          ),
-          datePattern: 'YYYY-MM-DD',
-          json: true,
-          zippedArchive: false,
-          maxFiles: '30d',
-        }),
+        // new winston.transports.DailyRotateFile({
+        //   filename: `logs/error-%DATE%.log`,
+        //   level: 'error',
+        //   format: combine(
+        //     prettyPrint({
+        //       depth: 10,
+        //     }),
+        //     json()
+        //   ),
+        //   datePattern: 'YYYY-MM-DD',
+        //   json: true,
+        //   zippedArchive: false, // don't want to zip our logs
+        //   maxFiles: '30d', // will keep log until they are older than 30 days
+        // }),
+        // new winston.transports.DailyRotateFile({
+        //   filename: `logs/info-%DATE%.log`,
+        //   level: 'info',
+        //   format: combine(
+        //     prettyPrint({
+        //       depth: 10,
+        //     }),
+        //     json()
+        //   ),
+        //   datePattern: 'YYYY-MM-DD',
+        //   json: true,
+        //   zippedArchive: false,
+        //   maxFiles: '30d',
+        // }),
       ],
     })
   }

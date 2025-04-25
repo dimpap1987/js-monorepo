@@ -7,6 +7,7 @@ import Stripe from 'stripe'
 import { CreateProductWithPricesRequest, PaymentsModuleOptions } from '../../'
 import { StripeClient } from '../stripe.module'
 import { PaymentsService } from './payments.service'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class StripeService {
@@ -16,7 +17,8 @@ export class StripeService {
     @Inject(StripeClient) private readonly stripe: Stripe,
     private readonly paymentsService: PaymentsService,
     @Inject('PAYMENTS_OPTIONS')
-    private readonly paymentsModuleOptions: PaymentsModuleOptions
+    private readonly paymentsModuleOptions: PaymentsModuleOptions,
+    private readonly configService: ConfigService
   ) {}
 
   async findCustomerByEmail(email: string) {
@@ -72,8 +74,8 @@ export class StripeService {
         customer: stripeCustomerId,
         line_items: [{ price: price.stripeId, quantity: 1 }],
         mode: 'subscription',
-        success_url: `${process.env.AUTH_LOGIN_REDIRECT}/pricing?success=true`,
-        cancel_url: `${process.env.AUTH_LOGIN_REDIRECT}/pricing?success=false`,
+        success_url: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=true`,
+        cancel_url: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=false`,
       })
       return { session: session }
     } catch (e) {
@@ -83,7 +85,7 @@ export class StripeService {
   }
 
   async constructEventFromPayload(signature: string, payload: Buffer) {
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+    const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET')
 
     if (!signature) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_SIGNATURE')
