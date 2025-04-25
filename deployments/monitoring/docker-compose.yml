@@ -43,6 +43,14 @@ services:
     networks:
       - super-network
 
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter_container
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    networks:
+      - super-network
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
     container_name: cadvisor_prod
