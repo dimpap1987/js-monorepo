@@ -4,8 +4,8 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus_prod
-    ports:
-      - 9090:9090
+    # ports:
+    #   - 9090:9090
     command:
       - '--config.file=/etc/prometheus/prometheus.yaml'
     volumes:
@@ -91,9 +91,9 @@ services:
     command: ['--config=/etc/otel-collector-config.yaml']
     volumes:
       - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    ports:
-      - '4317:4317' # OTLP gRPC
-      - '4318:4318' # OTLP HTTP
+    # ports:
+    #   - '4317:4317' # OTLP gRPC
+    #   - '4318:4318' # OTLP HTTP
     networks:
       - super-network
     depends_on:
@@ -106,8 +106,8 @@ services:
     volumes:
       - ./config/tempo.yaml:/etc/tempo.yaml
       - tempo-data:/var/tempo
-    ports:
-      - '3200:3200' # Tempo HTTP (query, etc)
+    # ports:
+    #   - '3200:3200' # Tempo HTTP (query, etc)
     networks:
       - super-network
 
@@ -116,8 +116,8 @@ services:
     image: grafana/loki:2.9.3
     container_name: loki
     command: -config.file=/etc/loki/config.yaml
-    ports:
-      - '3100:3100' # Loki HTTP endpoint (for queries)
+    # ports:
+    #   - '3100:3100' # Loki HTTP endpoint (for queries)
     volumes:
       - ./config/loki.yaml:/etc/loki/config.yaml
       - loki-data:/loki

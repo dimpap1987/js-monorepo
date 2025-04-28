@@ -56,6 +56,8 @@ services:
   postgres:
     image: postgres:16.1-alpine3.19
     container_name: postgres_container
+    # ports:
+    #   - '5432:5432'
     env_file:
       - .env
     environment:
@@ -77,6 +79,8 @@ services:
   redis:
     image: bitnami/redis:7.0
     container_name: redis_container
+    # ports:
+    #   - '6379:6379'
     env_file:
       - .env
     restart: unless-stopped
@@ -88,8 +92,6 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
-    ports:
-      - '6379:6379'
     volumes:
       - redis-data:/data
     networks:
@@ -103,8 +105,8 @@ services:
     restart: unless-stopped
     environment:
       - REDIS_HOSTS=local:redis:6379
-    ports:
-      - '8081:8081'
+    # ports:
+    #   - '8081:8081'
     networks:
       - super-network
     depends_on:
