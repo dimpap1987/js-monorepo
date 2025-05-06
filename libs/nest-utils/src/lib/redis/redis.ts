@@ -12,8 +12,9 @@ export interface ExtendedRedisClient extends RedisClient {
   duplicateClient: () => Promise<RedisClient>
 }
 
-interface RedisModuleOptions {
-  useFactory: (configService: ConfigService) => Promise<RedisClientOptions>
+export interface RedisModuleOptions {
+  useFactory: (...args: any[]) => Promise<RedisClientOptions>
+  inject?: any[]
   isGlobal?: boolean
 }
 
@@ -27,11 +28,9 @@ export class RedisModule {
       providers: [
         {
           provide: REDIS,
-          useFactory: async (configService: ConfigService) => {
-            const redisOptions = await options.useFactory(configService)
+          useFactory: async (...args: any[]) => {
+            const redisOptions = await options.useFactory(...args)
             const client = createClient(redisOptions) as ExtendedRedisClient
-
-            logger.log(`Creating connection for Redis...`)
 
             client.on('error', (err) => logger.error(`Redis error [${redisOptions.url}]:`, err.stack))
 
@@ -39,7 +38,6 @@ export class RedisModule {
 
             await client.connect()
 
-            // Attach helper to duplicate client if needed
             client.duplicateClient = async () => {
               const sub = client.duplicate()
               await sub.connect()
@@ -48,7 +46,7 @@ export class RedisModule {
 
             return client
           },
-          inject: [ConfigService],
+          inject: [...(options.inject ?? []), ConfigService],
         },
       ],
       exports: [REDIS],

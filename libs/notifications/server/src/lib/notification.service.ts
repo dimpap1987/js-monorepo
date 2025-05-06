@@ -5,7 +5,6 @@ import { CreateUserNotificationType, NotificationCreateDto, Pageable, UserNotifi
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { RedisClientType } from '@redis/client'
 import sanitizeHtml from 'sanitize-html'
 import { sendNotification, setVapidDetails } from 'web-push'
@@ -37,13 +36,12 @@ export class NotificationService {
     @Inject(REDIS) private readonly redis: RedisClientType,
     @Inject(RedisPushSubscriptionsKey) private readonly pushSubscriptionsKey: string,
     @Inject('NOTIFICATION_OPTIONS')
-    private readonly notificationModuleOptions: NotificationModuleOptions,
-    private readonly configService: ConfigService
+    private readonly notificationModuleOptions: NotificationModuleOptions
   ) {
     setVapidDetails(
-      `mailto:${this.configService.get<string>('ADMIN_EMAIL')}`,
-      this.configService.get<string>('VAPID_PUBLIC_KEY'),
-      this.configService.get<string>('VAPID_PRIVATE_KEY')
+      `mailto:${this.notificationModuleOptions.adminEmail}`,
+      this.notificationModuleOptions.vapidPublicKey,
+      this.notificationModuleOptions.vapidPrivateKey
     )
   }
 
