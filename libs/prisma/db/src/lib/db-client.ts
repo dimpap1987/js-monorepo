@@ -1,5 +1,6 @@
-import { Injectable, Logger, OnApplicationShutdown, OnModuleInit } from '@nestjs/common'
+import { Inject, Injectable, Logger, OnApplicationShutdown, OnModuleInit } from '@nestjs/common'
 import { Prisma, PrismaClient } from '@prisma/client'
+import { PrismaModuleOptions } from './prisma.module'
 
 @Injectable()
 export class PrismaService
@@ -12,9 +13,9 @@ export class PrismaService
 
   private readonly retryDelay = 10000 // 10 seconds
 
-  constructor() {
+  constructor(@Inject('PRISMA_MODULE_OPTIONS') private readonly options: PrismaModuleOptions) {
     super({
-      datasourceUrl: process.env.DATABASE_URL,
+      datasourceUrl: options.databaseUrl,
       errorFormat: 'pretty',
       log: [
         { level: 'query', emit: 'event' },

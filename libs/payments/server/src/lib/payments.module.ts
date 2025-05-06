@@ -5,6 +5,7 @@ import { PaymentsRepository } from './repository/payments.repository'
 import { PaymentsService } from './service/payments.service'
 import { StripeService } from './service/stripe.service'
 import { StripeModule } from './stripe.module'
+import { ConfigService } from '@nestjs/config'
 
 export interface SubscriptionCallback {
   id: number
@@ -34,10 +35,13 @@ export class PaymentsModule {
       module: PaymentsModule,
       imports: [
         ...(options.imports || []),
-        StripeModule.forRoot({
-          apiKey: process.env.STRIPE_SECRET_KEY || '',
-          apiVersion: '2023-10-16',
-          webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+        StripeModule.forRootAsync({
+          useFactory: (configService: ConfigService) => ({
+            apiKey: configService.get<string>('STRIPE_SECRET_KEY') || '',
+            apiVersion: '2023-10-16',
+            webhookSecret: configService.get<string>('STRIPE_WEBHOOK_SECRET'),
+          }),
+          inject: [ConfigService],
         }),
       ],
       providers: [
