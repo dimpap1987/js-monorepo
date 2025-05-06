@@ -9,6 +9,9 @@ import { NotificationService } from './notification.service'
 
 export interface NotificationModuleOptions {
   onNotificationCreation?: (receiverIds: number[], notification: CreateUserNotificationType) => void
+  adminEmail: string
+  vapidPublicKey: string
+  vapidPrivateKey: string
 }
 
 const providers: Provider[] = [
@@ -49,7 +52,7 @@ export class NotificationServerModule {
         {
           provide: 'NOTIFICATION_OPTIONS',
           useFactory: options.useFactory,
-          inject: options.inject || [],
+          inject: [...(options.inject ?? []), ConfigService],
         },
         ...providers,
       ],

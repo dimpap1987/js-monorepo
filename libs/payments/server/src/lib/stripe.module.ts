@@ -31,4 +31,32 @@ export class StripeModule {
       exports: [paymentsClientProvider],
     }
   }
+
+  static forRootAsync(options: {
+    useFactory: (...args: any[]) => StripeModuleOptions | Promise<StripeModuleOptions>
+    inject?: any[]
+  }): DynamicModule {
+    const paymentsClientProvider = {
+      provide: PaymentsClientToken,
+      useFactory: async (...args: any[]) => {
+        const config = await options.useFactory(...args)
+        if (!config.apiKey) {
+          throw new Error('Stripe API key is required')
+        }
+        const stripeProvider = new StripeProvider({
+          apiKey: config.apiKey,
+          apiVersion: config.apiVersion as any,
+          webhookSecret: config.webhookSecret,
+        })
+        return new PaymentsClient(stripeProvider)
+      },
+      inject: options.inject || [],
+    }
+
+    return {
+      module: StripeModule,
+      providers: [paymentsClientProvider],
+      exports: [paymentsClientProvider],
+    }
+  }
 }

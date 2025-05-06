@@ -1,4 +1,5 @@
 import { capitalize } from '@js-monorepo/auth/nest/common/utils'
+import { VaultModule } from '@js-monorepo/nest/vault'
 import { PaymentsModule } from '@js-monorepo/payments-server'
 import KeyvRedis, { Keyv } from '@keyv/redis'
 import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
@@ -18,7 +19,7 @@ import { Events, UserPresenceModule, UserPresenceWebsocketService } from '@js-mo
 import { ClsPluginTransactional } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { CacheModule } from '@nestjs/cache-manager'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
 import moment from 'moment'
@@ -39,9 +40,12 @@ import { UserModule } from './modules/user/user.module'
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: [`.env.${process.env.NODE_ENV}`, `.env`],
+    VaultModule.register({
+      path: 'secret/data/data/my-api/env',
+      endpoint: process.env.VAULT_ADDR || '',
+      roleId: process.env.VAULT_ROLE_ID || '',
+      secretId: process.env.VAULT_SECRET_ID || '',
+      apiVersion: 'v1',
     }),
     ClsModule.forRoot({
       global: true,
@@ -62,7 +66,11 @@ import { UserModule } from './modules/user/user.module'
         }),
       ],
     }),
-    PrismaModule,
+    PrismaModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        databaseUrl: configService.get('DATABASE_URL'),
+      }),
+    }),
     GracefulShutdownModule.forRoot({
       cleanup: async (app, signal) => {
         apiLogger.warn(`Shutdown hook received with signal: ${signal}`)
@@ -80,8 +88,8 @@ import { UserModule } from './modules/user/user.module'
     }),
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
-      imports: [UserPresenceModule, ConfigModule],
-      inject: [UserPresenceWebsocketService, ConfigService],
+      imports: [UserPresenceModule],
+      inject: [UserPresenceWebsocketService],
       useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService, configService: ConfigService) => ({
         google: {
           clientId: configService.get('GOOGLE_CLIENT_ID'),
@@ -112,7 +120,10 @@ import { UserModule } from './modules/user/user.module'
     NotificationServerModule.forRootAsync({
       imports: [UserPresenceModule],
       inject: [UserPresenceWebsocketService],
-      useFactory: async (userPresenceWebsocketService) => ({
+      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService, configService: ConfigService) => ({
+        adminEmail: configService.get('ADMIN_EMAIL'),
+        vapidPrivateKey: configService.get('VAPID_PRIVATE_KEY'),
+        vapidPublicKey: configService.get('VAPID_PUBLIC_KEY'),
         onNotificationCreation(receiverIds, notification) {
           apiLogger.log(
             `Notification created with id: '${notification.id}' and publish it to users : [${receiverIds?.join(', ')}]`

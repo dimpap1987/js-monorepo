@@ -95,7 +95,7 @@ export class AuthSessionModule implements NestModule {
         {
           provide: AuthConfig,
           useFactory: options.useFactory,
-          inject: options.inject || [],
+          inject: [...(options.inject ?? []), ConfigService],
         },
         {
           provide: AuthOpts,
