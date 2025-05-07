@@ -41,9 +41,7 @@ RUN npm install --omit=dev --ignore-scripts
 COPY --chown=nestjs:nodejs --from=builder /usr/src/app/prisma ./prisma
 RUN npx prisma generate --schema=./prisma/schema
 
-RUN mkdir -p /usr/src/app/logs && \
-    chown -R nestjs:nodejs /usr/src/app/logs && \
-    chown -R nestjs:nodejs ./node_modules/@prisma && \
+RUN chown -R nestjs:nodejs ./node_modules/@prisma && \
     chown -R nestjs:nodejs ./node_modules/.prisma
 
 USER nestjs

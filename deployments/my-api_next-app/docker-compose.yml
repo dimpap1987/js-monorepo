@@ -1,31 +1,12 @@
 version: '3.8'
 
 services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx_container
-    ports:
-      - '80:80'
-    restart: unless-stopped
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost/']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - super-network
-
   my-api:
     image: dimpap/my-api:latest
     container_name: my-api_container
     env_file:
       - .env
     restart: unless-stopped
-    volumes:
-      - logs-data:/usr/src/app/logs
     networks:
       - super-network
     healthcheck:
@@ -52,70 +33,6 @@ services:
     restart: unless-stopped
     networks:
       - super-network
-
-  postgres:
-    image: postgres:16.1-alpine3.19
-    container_name: postgres_container
-    # ports:
-    #   - '5432:5432'
-    env_file:
-      - .env
-    environment:
-      POSTGRES_DB: ${DATABASE_DB}
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-    restart: unless-stopped
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}']
-      interval: 10s
-      timeout: 3s
-      retries: 3
-    networks:
-      - super-network
-    volumes:
-      - ${POSTGRES_VOLUME_PATH}:/var/lib/postgresql/data
-    command: postgres -c shared_preload_libraries=pg_stat_statements
-
-  redis:
-    image: bitnami/redis:7.0
-    container_name: redis_container
-    # ports:
-    #   - '6379:6379'
-    env_file:
-      - .env
-    restart: unless-stopped
-    healthcheck:
-      test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
-      interval: 1s
-      timeout: 3s
-      retries: 5
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
-    volumes:
-      - redis-data:/data
-    networks:
-      - super-network
-    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 500mb
-
-  redis-commander:
-    container_name: redis-commander_container
-    hostname: redis-commander
-    image: rediscommander/redis-commander:latest
-    restart: unless-stopped
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    # ports:
-    #   - '8081:8081'
-    networks:
-      - super-network
-    depends_on:
-      - redis
-
-volumes:
-  dumpnew:
-  redis-data:
-  logs-data:
 
 networks:
   super-network:

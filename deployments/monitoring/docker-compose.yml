@@ -25,7 +25,7 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     env_file:
-      - ./grafana/config.monitoring
+      - .env
     networks:
       - super-network
     restart: unless-stopped

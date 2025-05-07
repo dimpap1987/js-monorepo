@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  redis:
+    image: bitnami/redis:7.0
+    container_name: redis_container
+    # ports:
+    #   - '6379:6379'
+    # env_file:
+    #   - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
+      interval: 1s
+      timeout: 3s
+      retries: 5
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    volumes:
+      - redis-data:/data
+    networks:
+      - super-network
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 500mb
+
+  redis-commander:
+    container_name: redis-commander_container
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: unless-stopped
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    # ports:
+    #   - '8081:8081'
+    networks:
+      - super-network
+    depends_on:
+      - redis
+
+volumes:
+  redis-data:
+
+networks:
+  super-network:
+    external: true
