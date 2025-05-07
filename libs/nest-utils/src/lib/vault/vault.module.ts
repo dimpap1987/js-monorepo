@@ -52,8 +52,9 @@ export class VaultModule {
       // Return the merged configuration, where Vault secrets take priority over process.env
       return { ...process.env, ...config }
     } catch (error: any) {
-      this.logger.error(`Failed to load secrets from Vault at path: ${path}`, error.stack)
-      throw new Error(`Vault loading error: ${error.message}`)
+      this.logger.warn(`Failed to load secrets from Vault at path: ${path}`, error.stack)
+      // throw new Error(`Vault loading error: ${error.message}`)
+      return process.env
     }
   }
 }

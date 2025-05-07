@@ -3,6 +3,7 @@
 ## 📋 Overview
 
 This project is an educational monorepo that demonstrates how to create and organize reusable components, implement authentication and session management, and establish communication between frontend and backend services.
+It includes advanced security with HashiCorp Vault integration and comprehensive monitoring with Prometheus, Grafana, and related tools.
 
 The architecture includes:
 
@@ -10,6 +11,8 @@ The architecture includes:
 - **Backend**: Nest.js API for business logic and authentication
 - **Libraries**: Reusable UI components and backend services, including shadcn components
 - **Infrastructure**: Docker configuration and GitHub Actions pipelines
+- **Security**: HashiCorp Vault for secrets management
+- **Monitoring**: Full observability stack with Prometheus, Grafana, Loki, Tempo, and more
 
 ## 🏗️ Architecture
 
@@ -20,6 +23,8 @@ The architecture includes:
 │   └── my-api/             # Nest.js backend API
 ├── libs/                   # Libraries - Reusable libraries
 ├── deployments/            # Include all the Docker-composes
+│   ├── monitoring/         # Monitoring stack Docker Compose files
+│   └── vault/              # Vault configuration and Docker Compose files
 └── .github/                # GitHub Actions workflows
 ```
 
@@ -50,6 +55,24 @@ The architecture includes:
 - Real-time notifications and updates
 - User presence indicators
 
+### 🔒 Secrets Management with HashiCorp Vault
+
+- Centralized secrets management
+- Dynamic database credentials
+- API key rotation
+- Encrypted configuration values
+- Secure environment variable injection
+
+### 📊 Comprehensive Monitoring & Observability
+
+- **Metrics**: Prometheus for time-series data collection
+- **Visualization**: Grafana dashboards for metrics and logs
+- **Logs**: Loki for log aggregation with Promtail agents
+- **Traces**: Tempo for distributed tracing
+- **OpenTelemetry**: Collector for standardized telemetry data
+- **Application Performance**: Node exporter and cAdvisor for host and container metrics
+- **Database Insights**: Postgres & Redis exporter for database metrics
+
 ### 🛠️ Development Experience
 
 - Shared ESLint and TypeScript configurations
@@ -74,9 +97,14 @@ npm run dev:next
 # Start backend only
 npm run dev:my-api
 
+# Start monitoring stack
+docker-compose -f deployments/monitoring/docker-compose.yml up -d
+
+# Start Vault
+docker-compose -f deployments/vault/docker-compose.yml up -d
 ```
 
-**_ IMPORTANT _** Check the .env.example in each project to see the required env variables
+**_IMPORTANT_** Check the .env.example in each project to see the required env variables. These env variables will be overriden if you provide them on the Vault
 
 ### Building projects
 
@@ -85,7 +113,7 @@ npm run dev:my-api
 1. npm run build:next
 2. docker build -t dimpap/next-app:1.0.100 -f apps/next-app/Dockerfile .
 
-**_ IMPORTANT _**
+**_IMPORTANT_**
 Before you build the image you need to set .env in `apps/next-app/.env`
 
 ```.env
@@ -113,7 +141,7 @@ GitHub Actions workflows are configured for:
 
 - **Framework**: Next.js, React
 - **Styling**: TailwindCSS, shadcn UI components
-- **State Management**: React Context API
+- **State Management**: React Context API & Zustang
 
 ### Backend
 
@@ -121,6 +149,8 @@ GitHub Actions workflows are configured for:
 - **Real-time**: WebSockets
 - **Data Storage**: Redis
 - **Payment Processing**: Stripe
+- **Secrets Management**: HashiCorp Vault
+- **Observability**: OpenTelemetry instrumentation
 
 ### Infrastructure
 
@@ -128,6 +158,8 @@ GitHub Actions workflows are configured for:
 - **Containerization**: Docker, Docker Compose
 - **CI/CD**: GitHub Actions
 - **Authentication**: Cookies, Sessions, Redis
+- **Monitoring**: Prometheus, Grafana, Loki, Tempo
+- **Secrets**: HashiCorp Vault
 
 ### Development Tools
 

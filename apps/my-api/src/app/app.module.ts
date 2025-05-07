@@ -41,10 +41,10 @@ import { UserModule } from './modules/user/user.module'
 @Module({
   imports: [
     VaultModule.register({
-      path: 'secret/data/data/my-api/env',
-      endpoint: process.env.VAULT_ADDR || '',
-      roleId: process.env.VAULT_ROLE_ID || '',
-      secretId: process.env.VAULT_SECRET_ID || '',
+      path: process.env.VAULT_PATH,
+      endpoint: process.env.VAULT_ADDR,
+      roleId: process.env.VAULT_ROLE_ID,
+      secretId: process.env.VAULT_SECRET_ID,
       apiVersion: 'v1',
     }),
     ClsModule.forRoot({
