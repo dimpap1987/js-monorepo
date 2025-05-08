@@ -17,13 +17,17 @@ services:
   grafana:
     image: grafana/grafana-oss:latest
     container_name: grafana_prod
-    ports:
-      - '8000:3000'
+    # ports:
+    #   - '8000:3000'
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     env_file:
       - .env
+    environment:
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_PROTOCOL=http
     networks:
       - super-network
     restart: unless-stopped
