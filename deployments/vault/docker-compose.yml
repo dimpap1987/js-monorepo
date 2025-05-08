@@ -7,11 +7,17 @@ services:
     restart: unless-stopped
     cap_add:
       - IPC_LOCK
-    ports:
-      - '8200:8200'
+    # ports:
+    #   - '8200:8200'
     environment:
       VAULT_ADDR: 'http://0.0.0.0:8200'
     volumes:
       - ./config:/vault/config
       - ./data:/vault/file
     command: vault server -config=/vault/config/vault.hcl
+    networks:
+      - super-network
+
+networks:
+  super-network:
+    external: true
