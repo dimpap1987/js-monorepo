@@ -6,6 +6,7 @@ services:
     container_name: nginx_container
     ports:
       - '80:80'
+      - '443:443'
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost/']
@@ -15,6 +16,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/proxy_params.conf:/etc/nginx/proxy_params.conf:ro
     networks:
       - super-network
 
