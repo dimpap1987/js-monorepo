@@ -131,6 +131,6 @@ export class AuthSessionUserCacheService {
   }
 
   async invalidateAuthUserInCache(userId: number) {
-    return this.redis.del(`${this.redisSessionKey}${userId}`)
+    return this.redis.del(`${this.redisUserSessionKey}${userId}`)
   }
 }

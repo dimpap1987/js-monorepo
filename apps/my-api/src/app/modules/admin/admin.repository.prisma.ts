@@ -147,7 +147,7 @@ export class AdminRepositoryPrisma implements AdminRepository {
 
   // Function to extract new role IDs or default to 'USER'
   private getNewRoleIds(roles?: { id: number }[]): number[] {
-    return roles?.map((role) => role.id) || [1]
+    return roles?.map((role) => role.id) || [2]
   }
 
   // Function to determine which roles to add and remove
