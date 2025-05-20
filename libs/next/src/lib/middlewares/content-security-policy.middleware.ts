@@ -16,7 +16,7 @@ export function withCSP(
     style-src 'self' 'unsafe-inline';
     connect-src 'self' ${websocketUrl} ${apiUrl};
     frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
-    img-src 'self' blob: data:;
+    img-src 'self' blob: data: *.stadiamaps.com *.tile.stadiamaps.com;
     font-src 'self';
     object-src 'none';
     base-uri 'self';

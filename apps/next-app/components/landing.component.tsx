@@ -1,13 +1,14 @@
 'use client'
 import { DpButton } from '@js-monorepo/button'
-import { useLoader } from '@js-monorepo/loader'
-// import { MapComponent, Marker, Popup } from '@js-monorepo/map'
 import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/card'
 import { Glow, GlowArea } from '@js-monorepo/components/glow'
+import { useLoader } from '@js-monorepo/loader'
+import { Map, MapComponent, MapRef } from '@js-monorepo/map'
 import { useNotifications } from '@js-monorepo/notification'
 import { cn } from '@js-monorepo/ui/util'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useRef, useState } from 'react'
 import BannerSVG from './banner-svg'
+
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
@@ -17,8 +18,7 @@ export default function LandingComponent({ children, className }: MainProps) {
   const { setLoaderState } = useLoader()
   const { addNotification } = useNotifications()
   const [loading, setLoading] = useState(false)
-  // const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
-  // const { user } = useSession()
+  const mapRef = useRef<MapRef | null>(null)
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -121,51 +121,20 @@ export default function LandingComponent({ children, className }: MainProps) {
           </Card>
         </Glow>
       </GlowArea>
-      {/* {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
-        <div className="mt-2">
-          <DonationDialogComponent
-            stripePublishableKey={
-              process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''
-            }
-            checkOutPromise={() =>
-              checkoutSessionClient({
-                username: user.username as string,
-                url: '/next-api/checkout_sessions',
-                customSubmitMessage: 'Thank you for your support',
-                isDonate: true,
-                price: 600,
-              })
-            }
-          >
-            <DpButton
-              variant="secondary"
-              loading={isOpenCheckoutDialog}
-              className="w-full"
-            >
-              Donate 6 &euro;
-            </DpButton>
-          </DonationDialogComponent>
-        </div>
-      )} */}
 
       {/* Map component */}
-      {/* <div className="mt-2 h-[300px]">
-        <MapComponent
-          mapContainerProps={{
-            center: { lat: 37.98381, lng: 23.727539 },
-            zoom: 10,
-          }}
-        >
-          <Marker
+      <div className="mt-2 h-[500px] py-4">
+        <MapComponent center={{ lat: 37.98381, lng: 23.727539 }} zoom={10} ref={mapRef}>
+          <Map.Marker
             position={{
               lat: 37.98381,
               lng: 23.727539,
             }}
           >
-            <Popup>You are here</Popup>
-          </Marker>
+            <Map.Popup>You are here</Map.Popup>
+          </Map.Marker>
         </MapComponent>
-      </div> */}
+      </div>
     </section>
   )
 }

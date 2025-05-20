@@ -9,7 +9,7 @@ interface DpNotificationListProps {
 export default function DpNotificationList({ notifications, className }: DpNotificationListProps) {
   return (
     notifications?.length > 0 && (
-      <section className={cn(`fixed top-navbar-offset right-2 p-2 z-40 flex flex-col-reverse gap-2 w-0`, className)}>
+      <section className={cn(`fixed top-navbar-offset right-2 p-2 z-30 flex flex-col-reverse gap-2 w-0`, className)}>
         {notifications.map((notification, index) => (
           <NotificationItem
             key={notification.id || index}

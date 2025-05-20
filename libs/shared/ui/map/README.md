@@ -3,25 +3,22 @@
 ## Example
 
 ```jsx
-import { DpNextMap, DpMarker, DpPopup } from '@js-monorepo/map'
+import { Map, MapComponent, MapRef } from '@js-monorepo/map'
 
 export function Example() {
+  const mapRef = (useRef < MapRef) | (null > null)
+
   return (
-    <DpNextMap
-      mapContainerProps={{
-        center: { lat: 37.98381, lng: 23.727539 },
-        zoom: 10,
-      }}
-    >
-      <DpMarker
+    <MapComponent center={{ lat: 37.98381, lng: 23.727539 }} zoom={10} ref={mapRef}>
+      <Map.Marker
         position={{
           lat: 37.98381,
           lng: 23.727539,
         }}
       >
-        <DpPopup>You are here</DpPopup>
-      </DpMarker>
-    </DpNextMap>
+        <Map.Popup>You are here</Map.Popup>
+      </Map.Marker>
+    </MapComponent>
   )
 }
 ```
