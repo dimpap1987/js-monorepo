@@ -1,9 +1,9 @@
-import './otel'
 import { LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import { NestExpressApplication } from '@nestjs/platform-express'
 import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
 import { expand } from 'dotenv-expand'
@@ -11,6 +11,7 @@ import helmet from 'helmet'
 import { ClsService } from 'nestjs-cls'
 import { setupGracefulShutdown } from 'nestjs-graceful-shutdown'
 import { AppModule } from './app/app.module'
+import './otel'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
@@ -30,7 +31,7 @@ function logServerMetadata() {
 
 async function bootstrap() {
   apiLogger.log('Starting application...')
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
     forceCloseConnections: true,
   })
@@ -54,6 +55,9 @@ async function bootstrap() {
       },
     })
   )
+
+  // Trust first proxy (Nginx)
+  app.set('trust proxy', 1)
   app.use(rawBodyMiddleware())
   app.useGlobalPipes(
     new ValidationPipe({

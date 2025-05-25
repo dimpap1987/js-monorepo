@@ -3,10 +3,11 @@ import { DpButton } from '@js-monorepo/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/card'
 import { Glow, GlowArea } from '@js-monorepo/components/glow'
 import { useLoader } from '@js-monorepo/loader'
-import { Map, MapComponent, MapRef } from '@js-monorepo/map'
+import { MapComponent, MapRef } from '@js-monorepo/map'
+import { useUserLocation } from '@js-monorepo/next/hooks/useUserLocation'
 import { useNotifications } from '@js-monorepo/notification'
 import { cn } from '@js-monorepo/ui/util'
-import { ReactNode, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import BannerSVG from './banner-svg'
 
 interface MainProps {
@@ -19,6 +20,7 @@ export default function LandingComponent({ children, className }: MainProps) {
   const { addNotification } = useNotifications()
   const [loading, setLoading] = useState(false)
   const mapRef = useRef<MapRef | null>(null)
+  const userLocation = useUserLocation()
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -33,6 +35,12 @@ export default function LandingComponent({ children, className }: MainProps) {
       }, 4000)
     })
   }
+
+  useEffect(() => {
+    if (userLocation && mapRef.current) {
+      mapRef.current.setView([userLocation.latitude, userLocation.longitude], 10)
+    }
+  }, [userLocation, mapRef.current])
 
   return (
     <section className={cn('overflow-hidden', className)}>
@@ -124,15 +132,19 @@ export default function LandingComponent({ children, className }: MainProps) {
 
       {/* Map component */}
       <div className="mt-2 h-[500px] py-4">
-        <MapComponent center={{ lat: 37.98381, lng: 23.727539 }} zoom={10} ref={mapRef}>
-          <Map.Marker
-            position={{
-              lat: 37.98381,
-              lng: 23.727539,
-            }}
-          >
-            <Map.Popup>You are here</Map.Popup>
-          </Map.Marker>
+        <MapComponent
+          center={{ lat: 0, lng: 0 }} // default
+          zoom={10}
+          ref={mapRef}
+        >
+          {/* <Map.Marker
+              position={{
+                lat: 37.9842,
+                lng: 23.7353,
+              }}
+            >
+              <Map.Popup>You are here</Map.Popup>
+            </Map.Marker> */}
         </MapComponent>
       </div>
     </section>

@@ -69,13 +69,21 @@ async function handleAxiosResponse<T>(response: AxiosResponse): Promise<ClientRe
   } as ErrorResponse
 }
 
-export function getIPAddress(req: Request): string | undefined {
+export function getIPAddressFromHeaders(req: Request): string | undefined {
   if (!req) return undefined
-  // Check for forwarded IP addresses (e.g., behind a proxy)
+
+  // Cloudflare-specific header (most reliable when using Cloudflare)
+  const cfConnectingIp = req.headers['cf-connecting-ip']
+  if (cfConnectingIp) {
+    return Array.isArray(cfConnectingIp) ? cfConnectingIp[0] : cfConnectingIp
+  }
+
+  // Check for forwarded IP addresses (e.g., behind other proxies)
   const xForwardedFor = req.headers['x-forwarded-for']
   if (xForwardedFor) {
     const ips = Array.isArray(xForwardedFor) ? xForwardedFor[0] : xForwardedFor
-    return ips
+    // Take the first IP from the comma-separated list
+    return ips.split(',')[0].trim()
   }
 
   const xRealIp = req.headers['x-real-ip']
@@ -83,7 +91,8 @@ export function getIPAddress(req: Request): string | undefined {
     return Array.isArray(xRealIp) ? xRealIp[0] : xRealIp
   }
 
-  return req.ip || undefined
+  // Fallback to connection IP
+  return req.ip || req.socket?.remoteAddress || undefined
 }
 
 export function getBrowserInfo(req: Request): string | undefined {
@@ -127,6 +136,15 @@ const createApiClient = (handle401Error = false) => {
   )
 
   return instance
+}
+
+export async function fetchUserIp() {
+  try {
+    const response = await fetch(`https://ipapi.co/json/`)
+    return await response.json()
+  } catch (e) {
+    console.error(`Error while fetching user's ip`, e)
+  }
 }
 
 // Instance with 401 error handling (redirect to login)

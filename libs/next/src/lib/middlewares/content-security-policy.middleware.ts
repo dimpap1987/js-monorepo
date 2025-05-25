@@ -14,7 +14,7 @@ export function withCSP(
     default-src 'self';
     script-src 'self' https://js.stripe.com ${isDev ? "'unsafe-eval' 'unsafe-inline'" : `'nonce-${nonce}'`};
     style-src 'self' 'unsafe-inline';
-    connect-src 'self' ${websocketUrl} ${apiUrl};
+    connect-src 'self' https://ipapi.co ${websocketUrl} ${apiUrl};
     frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
     img-src 'self' blob: data: *.stadiamaps.com *.tile.stadiamaps.com;
     font-src 'self';
