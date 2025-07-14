@@ -2,7 +2,7 @@ html,
 body,
 main {
   scroll-behavior: smooth;
-  font-size: clamp(15px, 1.2vw, 18px);
+  font-size: clamp(15px, 1.2vw, 17px);
 }
 
 .min-h-100svh {

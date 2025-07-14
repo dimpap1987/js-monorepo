@@ -103,7 +103,7 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
                 <FormLabel>Email</FormLabel>
                 <FormControl className="relative flex items-center">
                   <HiLockClosed className="absolute left-2 text-foreground" />
-                  <Input {...field} readOnly className="pl-7 ring ring-primary text-center" />
+                  <Input {...field} readOnly className="pl-7 border-primary text-center" />
                 </FormControl>
               </FormItem>
             )}

@@ -3,18 +3,22 @@
 import { decodeJwt, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 
+function getHeaders() {
+  const headers = new Headers()
+  cookies()
+    .getAll()
+    .forEach((cookie) => {
+      headers.append('Cookie', `${cookie.name}=${cookie.value}`)
+    })
+
+  return headers
+}
+
 export async function getCurrentSession() {
   try {
-    const headers = new Headers()
-    cookies()
-      .getAll()
-      .forEach((cookie) => {
-        headers.append('Cookie', `${cookie.name}=${cookie.value}`)
-      })
-
     const response = await fetch(`${process.env.API_URL}/api/session`, {
       method: 'GET',
-      headers: headers,
+      headers: getHeaders(),
     })
     if (response.ok) {
       const session = await response.json()
@@ -26,11 +30,11 @@ export async function getCurrentSession() {
   return null
 }
 
-export async function findUnregisteredUser(headers?: Headers) {
+export async function findUnregisteredUser() {
   try {
     const response = await fetch(`${process.env.API_URL}/api/auth/unregistered-user`, {
       method: 'GET',
-      headers: headers,
+      headers: getHeaders(),
     })
     if (response.ok) {
       const unRegisteredUser = await response.json()

@@ -3,10 +3,7 @@
 import { DpButton } from '@js-monorepo/button'
 import { ErrorComponent } from '@js-monorepo/error'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
-import { isObjectDefinedOrEmpty } from '@js-monorepo/utils/common'
-import { submitErrors } from '@next-app/actions/submit-error'
 import { Poppins } from 'next/font/google'
-import { useEffect } from 'react'
 import './global.css'
 
 const poppins = Poppins({
@@ -18,17 +15,6 @@ const poppins = Poppins({
 })
 
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  useEffect(() => {
-    submitErrors(
-      JSON.parse(
-        JSON.stringify({
-          ...(!isObjectDefinedOrEmpty(error) && { error }),
-          type: 'Global_Error',
-        })
-      )
-    )
-  }, [])
-
   return (
     <html lang="en">
       <ThemeProvider attribute="class" defaultTheme="system">

@@ -1,6 +1,5 @@
 import { findUnregisteredUser } from '@js-monorepo/auth/next/server'
 import { Metadata } from 'next'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { RegisterDialog } from './register-dialog'
 
@@ -9,14 +8,7 @@ export const metadata: Metadata = {
 }
 
 export default async function OnBoardingPage() {
-  const headers = new Headers()
-  cookies()
-    .getAll()
-    .forEach((cookie) => {
-      headers.append('Cookie', `${cookie.name}=${cookie.value}`)
-    })
-
-  const unRegisteredUser = await findUnregisteredUser(headers)
+  const unRegisteredUser = await findUnregisteredUser()
 
   if (!unRegisteredUser?.email) {
     redirect('/')
