@@ -10,7 +10,7 @@ export const csrfProtection = csurf({
 function handleCsrfTokenGeneration(req: any, res: any) {
   const token = req.csrfToken?.()
   if (token) {
-    res.cookie('XSRF-TOKEN', token)
+    res.cookie('XSRF-TOKEN', token, { ...authCookiesOptions, httpOnly: false })
     res.locals._csrf = token
   }
 }

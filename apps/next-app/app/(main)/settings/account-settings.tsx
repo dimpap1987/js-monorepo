@@ -78,7 +78,7 @@ export function AccountSettings() {
       {/* Profile Section */}
       <Form {...form}>
         <SettingsItem label="Profile">
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 px-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr,auto] gap-6 place-items-center sm:place-items-start">
               {/* Profile Image */}
               <div className="relative flex justify-center self-center">
@@ -158,14 +158,14 @@ export function AccountSettings() {
               <div className="self-center sm:self-end sm:justify-self-end w-full">
                 {isEditing ? (
                   <div className="flex gap-3 flex-col-reverse sm:flex-row flex-wrap justify-center sm:flex-nowrap sm:justify-end">
-                    <DpButton onClick={handleCancel} variant="outline" className="flex-1 sm:w-24">
+                    <DpButton onClick={handleCancel} variant="outline" className="flex-1 sm:w-24 p-1 sm:p-4">
                       Cancel
                     </DpButton>
                     <DpButton
                       disabled={!form.formState.isValid || !form.formState.isDirty}
                       variant="primary"
                       type="submit"
-                      className="flex-1 sm:w-24"
+                      className="flex-1 sm:w-24 p-1 sm:p-4"
                     >
                       Save
                     </DpButton>
@@ -173,7 +173,7 @@ export function AccountSettings() {
                 ) : (
                   <div className="flex justify-end flex-col sm:flex-row">
                     <DpButton
-                      className="flex-1"
+                      className="flex-1 p-1 sm:p-4"
                       type="button"
                       onClick={(e) => {
                         e.preventDefault()

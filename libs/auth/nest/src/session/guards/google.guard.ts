@@ -1,6 +1,7 @@
 import { ExecutionContext, Logger } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { Request, Response } from 'express'
+import { authCookiesOptions } from '../../common/utils'
 
 export class AuthGoogle extends AuthGuard('google') {
   private readonly logger = new Logger(AuthGoogle.name)
@@ -30,9 +31,10 @@ export class AuthGoogle extends AuthGuard('google') {
   private async handleLogin(req: Request, res: Response): Promise<boolean> {
     const user = req.user
 
+    this.logger.log(JSON.stringify(authCookiesOptions))
     if (user?.unRegisteredUser) {
       res.cookie('UNREGISTERED-USER', user.unRegisteredUser.token, {
-        httpOnly: false,
+        ...authCookiesOptions,
       })
       return false
     } else {

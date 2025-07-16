@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { findUnregisteredUser } from '@js-monorepo/auth/next/server'
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'

@@ -75,6 +75,7 @@ export default function LandingComponent({ children, className }: MainProps) {
             onClick={() => {
               addNotification({
                 message: 'This is an error message',
+                description: 'Something went wrong',
                 type: 'error',
                 duration: 4000,
               })

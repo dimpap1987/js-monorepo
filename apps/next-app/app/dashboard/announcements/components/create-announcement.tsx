@@ -128,7 +128,14 @@ const CreateAnnouncement = () => {
           )}
 
           {/* Submit Button */}
-          <DpButton type="submit" size="large" className="w-full" variant="accent" disabled={!form.formState.isValid}>
+          <DpButton
+            type="submit"
+            size="large"
+            className="w-full"
+            variant="accent"
+            disabled={!form.formState.isValid}
+            loading={form.formState.isSubmitting}
+          >
             Send Announcement
           </DpButton>
         </form>

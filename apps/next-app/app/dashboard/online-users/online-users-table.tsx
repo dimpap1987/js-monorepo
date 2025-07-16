@@ -35,9 +35,7 @@ export default function OnlineUsersTableComponent() {
     socket.on('connect', handleConnect)
     socket.on('events:online-users', handleOnlineUsersEvent)
 
-    if (socket.connected) {
-      handleConnect()
-    }
+    socket.emit('subscribe:online-users', {})
 
     return () => {
       socket.off('connect', handleConnect)

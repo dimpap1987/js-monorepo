@@ -10,6 +10,7 @@ export const authCookiesOptions: CookieOptions = {
   domain: process.env.AUTH_COOKIES_DOMAIN,
   sameSite: sameSite,
   secure: process.env.AUTH_COOKIES_SECURE === 'true',
+  path: '/',
 }
 
 export const toDate = (timestamp?: number): Date | undefined => (timestamp ? new Date(timestamp * 1000) : undefined)
