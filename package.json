@@ -150,7 +150,7 @@
     "replicate": "^0.29.1",
     "rxjs": "^7.8.0",
     "sanitize-html": "^2.14.0",
-    "sharp": "^0.33.3",
+    "sharp": "^0.33.5",
     "socket.io": "^4.8.0",
     "socket.io-client": "^4.7.5",
     "sonner": "^1.7.3",

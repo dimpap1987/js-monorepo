@@ -2,9 +2,9 @@
 
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Marquee } from '@js-monorepo/components/marquee'
-import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
+import { useSocketChannel, useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { cn } from '@js-monorepo/ui/util'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export function AnnouncementsComponent({
   className,
@@ -20,27 +20,11 @@ export function AnnouncementsComponent({
 
   const { socket } = useWebSocket(websocketOptions, isLoggedIn)
 
-  useEffect(() => {
-    if (!socket || !eventName) return
-
-    const handleEvent = (messages: string[]) => {
-      if (messages) {
-        setAnnouncements((prev) => [...prev, ...messages])
-      }
+  useSocketChannel<string[]>(socket, eventName, (messages) => {
+    if (messages) {
+      setAnnouncements((prev) => [...prev, ...messages])
     }
-
-    const subscribe = () => {
-      socket.on(eventName, handleEvent)
-    }
-
-    subscribe()
-    socket.on('connect', subscribe)
-
-    return () => {
-      socket.off('connect', subscribe)
-      socket.off(eventName, handleEvent)
-    }
-  }, [socket, eventName])
+  })
 
   return (
     <Marquee className={cn(`w-full`, className)} duration={15} onAnimationComplete={() => setAnnouncements([])}>

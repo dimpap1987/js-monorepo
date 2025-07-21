@@ -3,9 +3,9 @@
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Badge } from '@js-monorepo/components/badge'
 import { Skeleton } from '@js-monorepo/components/skeleton'
-import { useWebSocket } from '@js-monorepo/next/providers'
+import { useSocketChannel, useWebSocket } from '@js-monorepo/next/providers'
 import { websocketOptions } from '@next-app/utils/websocket.config'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FaCircle } from 'react-icons/fa6'
 import { DisconnectUserComponent } from './components/disconnect-user'
 
@@ -22,30 +22,15 @@ export default function OnlineUsersTableComponent() {
   const { isLoggedIn } = useSession()
   const { socket } = useWebSocket(websocketOptions, isLoggedIn)
 
-  useEffect(() => {
-    if (!socket) return
-
-    const handleOnlineUsersEvent = (users: any) => {
+  useSocketChannel(
+    socket,
+    'events:online-users',
+    (users: any) => {
       setOnlineUsers(users)
       setLoading(false)
-    }
-
-    const subscribe = () => {
-      socket.emit('subscribe:online-users', {})
-      socket.on('events:online-users', handleOnlineUsersEvent)
-    }
-
-    socket.on('connect', subscribe)
-
-    if (socket.connected) {
-      subscribe()
-    }
-
-    return () => {
-      socket.off('connect', subscribe)
-      socket.off('events:online-users', handleOnlineUsersEvent)
-    }
-  }, [socket])
+    },
+    'subscribe:online-users'
+  )
 
   const groupedUsers = onlineUsers?.reduce(
     (acc, user) => {

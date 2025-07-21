@@ -1,8 +1,8 @@
 'use client'
 
-import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
+import { useSocketChannel, useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 export function useNotificationWebSocket(
   websocketOptions: WebSocketOptionsType,
@@ -10,25 +10,9 @@ export function useNotificationWebSocket(
 ) {
   const { socket } = useWebSocket(websocketOptions, true)
 
-  useEffect(() => {
-    if (!socket) return
-
-    const handleNotificationEvent = (event: any) => {
-      if (event.data) onReceive(event.data)
-    }
-
-    const subscribe = () => {
-      socket.on('events:notifications', handleNotificationEvent)
-    }
-
-    subscribe()
-    socket.on('connect', subscribe)
-
-    return () => {
-      socket.off('connect', subscribe)
-      socket.off('events:notifications', handleNotificationEvent)
-    }
-  }, [socket, onReceive])
+  useSocketChannel(socket, 'events:notifications', (event: any) => {
+    if (event?.data) onReceive(event.data)
+  })
 
   return socket
 }

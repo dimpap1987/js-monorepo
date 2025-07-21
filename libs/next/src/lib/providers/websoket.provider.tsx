@@ -136,3 +136,33 @@ export const useWebSocket = (
     },
   }
 }
+
+export function useSocketChannel<T>(
+  socket: Socket | null,
+  event: string,
+  handler: (data: T) => void,
+  subscribeEvent?: string,
+  subscribePayload?: object
+) {
+  useEffect(() => {
+    if (!socket) return
+
+    const subscribe = () => {
+      if (subscribeEvent) {
+        socket.emit(subscribeEvent, subscribePayload ?? {})
+      }
+      socket.on(event, handler)
+    }
+
+    if (socket.connected) {
+      subscribe()
+    }
+
+    socket.on('connect', subscribe)
+
+    return () => {
+      socket.off('connect', subscribe)
+      socket.off(event, handler)
+    }
+  }, [socket, event])
+}

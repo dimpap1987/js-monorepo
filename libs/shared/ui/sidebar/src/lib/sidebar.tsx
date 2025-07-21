@@ -1,8 +1,8 @@
 'use client'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { UserMetadata } from '@js-monorepo/navbar'
 import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { AnimatePresence, motion } from 'framer-motion'
-import { UserMetadata } from '@js-monorepo/navbar'
 import { ReactNode, RefObject, forwardRef, useEffect, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
 import { useClickAway } from 'react-use'
@@ -45,6 +45,24 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
         localRef.current.focus()
       }
     }, [isOpen, localRef])
+
+    useEffect(() => {
+      if (isOpen) {
+        // Disable background scroll
+        document.body.style.overflow = 'hidden'
+        document.body.style.touchAction = 'none' // optional
+      } else {
+        // Enable background scroll
+        document.body.style.overflow = ''
+        document.body.style.touchAction = ''
+      }
+
+      // Cleanup when component unmounts or sidebar closes
+      return () => {
+        document.body.style.overflow = ''
+        document.body.style.touchAction = ''
+      }
+    }, [isOpen])
 
     return (
       <AnimatePresence mode="wait" initial={false}>

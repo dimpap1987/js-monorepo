@@ -1,34 +1,20 @@
 'use client'
 
-import { useWebSocket } from '@js-monorepo/next/providers'
+import { useSocketChannel, useWebSocket } from '@js-monorepo/next/providers'
 import { websocketOptions } from '@next-app/utils/websocket.config'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 
 export const useWebSocketConfig = (isLoggedIn: boolean, isAdmin: boolean, refreshSession: () => void) => {
   const { socket, disconnect } = useWebSocket(websocketOptions, isLoggedIn)
 
-  useEffect(() => {
-    if (!socket) return
+  const handleRefresh = useCallback(() => {
+    setTimeout(refreshSession, 1000)
+  }, [refreshSession])
 
-    const handleConnect = () => {
-      socket.emit('subscribe:announcements', {})
-      socket.on('events:refresh-session', () => {
-        setTimeout(() => {
-          refreshSession()
-        }, 1000)
-      })
-    }
+  // Use the reusable hook for announcements subscription and refresh-session event handling
+  useSocketChannel(socket, 'events:refresh-session', handleRefresh, 'subscribe:announcements', {})
 
-    handleConnect()
-    socket.on('connect', handleConnect)
-
-    return () => {
-      socket.off('connect', handleConnect)
-      socket.off('events:refresh-session')
-      disconnect()
-    }
-  }, [socket])
-
+  // Admin room subscription, which is just a one-off emit with no listening:
   useEffect(() => {
     if (!socket || !isAdmin) return
 
@@ -39,5 +25,5 @@ export const useWebSocketConfig = (isLoggedIn: boolean, isAdmin: boolean, refres
     }
   }, [socket, isAdmin])
 
-  return { socket }
+  return { socket, disconnect }
 }
