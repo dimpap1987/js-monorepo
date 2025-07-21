@@ -33,7 +33,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
       >
         <DpDialogContent>
           <DialogHeader className="font-semibold justify-center">
-            <DialogTitle className="text-center font-bold">Sign in with</DialogTitle>
+            <DialogTitle className="text-center semi-bold text-gray-700">Sign in with</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col text-base gap-4 font-medium p-2">
             {socialConfig?.map((social) => (
@@ -42,8 +42,9 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'google' && (
                   <button
                     type="button"
+                    tabIndex={-1}
                     className="flex justify-center bg-zinc-200 w-full rounded-lg px-5 py-2.5 text-center text-black items-center
-                     mr-2 shadow-effect transition-transform duration-300 hover:scale-105"
+                     mr-2 shadow-effect transition-transform duration-300 hover:scale-105 border-1 border-zinc-400"
                     onClick={() => {
                       social.onLogin()
                       sethasOpen(false)
@@ -87,6 +88,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'github' && (
                   <button
                     type="button"
+                    tabIndex={-1}
                     className="flex justify-center bg-[#24292F] shadow-effect w-full text-white rounded-lg px-5 py-2.5 text-center 
                     items-center mr-2 transition-transform duration-300 hover:scale-105"
                     onClick={() => {
@@ -121,6 +123,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'facebook' && (
                   <button
                     type="button"
+                    tabIndex={-1}
                     className="flex justify-center bg-[#3b5998] w-full shadow-effect text-white rounded-lg px-5 py-2.5 text-center 
                     items-center mr-2 transition-transform duration-300 hover:scale-105"
                     onClick={() => {

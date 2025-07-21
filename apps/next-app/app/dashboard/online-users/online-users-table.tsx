@@ -1,5 +1,6 @@
 'use client'
 
+import { useSession } from '@js-monorepo/auth/next/client'
 import { Badge } from '@js-monorepo/components/badge'
 import { Skeleton } from '@js-monorepo/components/skeleton'
 import { useWebSocket } from '@js-monorepo/next/providers'
@@ -18,27 +19,30 @@ export type OnlineUsersType = {
 export default function OnlineUsersTableComponent() {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUsersType[] | []>([])
   const [loading, setLoading] = useState(true)
-  const { socket } = useWebSocket(websocketOptions, true)
+  const { isLoggedIn } = useSession()
+  const { socket } = useWebSocket(websocketOptions, isLoggedIn)
 
   useEffect(() => {
     if (!socket) return
 
-    const handleConnect = () => {
-      socket.emit('subscribe:online-users', {})
-    }
-
-    const handleOnlineUsersEvent = async (users: any) => {
+    const handleOnlineUsersEvent = (users: any) => {
       setOnlineUsers(users)
       setLoading(false)
     }
 
-    socket.on('connect', handleConnect)
-    socket.on('events:online-users', handleOnlineUsersEvent)
+    const subscribe = () => {
+      socket.emit('subscribe:online-users', {})
+      socket.on('events:online-users', handleOnlineUsersEvent)
+    }
 
-    socket.emit('subscribe:online-users', {})
+    socket.on('connect', subscribe)
+
+    if (socket.connected) {
+      subscribe()
+    }
 
     return () => {
-      socket.off('connect', handleConnect)
+      socket.off('connect', subscribe)
       socket.off('events:online-users', handleOnlineUsersEvent)
     }
   }, [socket])

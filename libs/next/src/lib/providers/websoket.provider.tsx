@@ -81,36 +81,56 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   return <WebSocketContext.Provider value={{ connectSocket, unsubscribe }}>{children}</WebSocketContext.Provider>
 }
 
-// Create a custom hook to use the WebSocket context
 export const useWebSocket = (
   opts: WebSocketOptionsType,
   connect: boolean
 ): {
   socket: Socket | null
+  isConnected: boolean
   disconnect: () => void
 } => {
   const context = useContext(WebSocketContext) as WebSocketContextType
   const [socket, setSocket] = useState<Socket | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
 
   if (!context) {
     throw new Error('useWebSocket must be used within a WebSocketProvider')
   }
 
   useEffect(() => {
-    if (connect) {
-      const newSocket = context.connectSocket(opts) as Socket
-      setSocket(newSocket)
-    } else {
+    if (!connect) {
       context.unsubscribe()
+      setIsConnected(false)
       setSocket(null)
+      return
+    }
+
+    const newSocket = context.connectSocket(opts) as Socket
+    setSocket(newSocket)
+
+    const onConnect = () => setIsConnected(true)
+
+    const onDisconnect = () => setIsConnected(false)
+
+    newSocket.on('connect', onConnect)
+    newSocket.on('disconnect', onDisconnect)
+
+    // Immediately set connection state based on current socket status:
+    setIsConnected(newSocket.connected)
+
+    return () => {
+      newSocket.off('connect', onConnect)
+      newSocket.off('disconnect', onDisconnect)
     }
   }, [opts.url, connect])
 
   return {
     socket,
+    isConnected,
     disconnect: () => {
       if (socket && socket.connected) {
         context.unsubscribe()
+        setIsConnected(false)
         setSocket(null)
       }
     },

@@ -21,17 +21,26 @@ export function AnnouncementsComponent({
   const { socket } = useWebSocket(websocketOptions, isLoggedIn)
 
   useEffect(() => {
-    if (socket?.active) {
-      socket.on(eventName, (messages: string[]) => {
-        if (messages) {
-          setAnnouncements((prev) => [...prev, ...messages])
-        }
-      })
+    if (!socket || !eventName) return
+
+    const handleEvent = (messages: string[]) => {
+      if (messages) {
+        setAnnouncements((prev) => [...prev, ...messages])
+      }
     }
+
+    const subscribe = () => {
+      socket.on(eventName, handleEvent)
+    }
+
+    subscribe()
+    socket.on('connect', subscribe)
+
     return () => {
-      socket?.off(eventName)
+      socket.off('connect', subscribe)
+      socket.off(eventName, handleEvent)
     }
-  }, [socket])
+  }, [socket, eventName])
 
   return (
     <Marquee className={cn(`w-full`, className)} duration={15} onAnimationComplete={() => setAnnouncements([])}>

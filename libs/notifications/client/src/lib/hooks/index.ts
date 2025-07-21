@@ -12,12 +12,20 @@ export function useNotificationWebSocket(
 
   useEffect(() => {
     if (!socket) return
+
     const handleNotificationEvent = (event: any) => {
       if (event.data) onReceive(event.data)
     }
-    socket.on('events:notifications', handleNotificationEvent)
+
+    const subscribe = () => {
+      socket.on('events:notifications', handleNotificationEvent)
+    }
+
+    subscribe()
+    socket.on('connect', subscribe)
 
     return () => {
+      socket.off('connect', subscribe)
       socket.off('events:notifications', handleNotificationEvent)
     }
   }, [socket, onReceive])

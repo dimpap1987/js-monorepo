@@ -10,16 +10,21 @@ export const useWebSocketConfig = (isLoggedIn: boolean, isAdmin: boolean, refres
   useEffect(() => {
     if (!socket) return
 
-    socket.on('connect', () => {
+    const handleConnect = () => {
       socket.emit('subscribe:announcements', {})
       socket.on('events:refresh-session', () => {
         setTimeout(() => {
           refreshSession()
         }, 1000)
       })
-    })
+    }
+
+    handleConnect()
+    socket.on('connect', handleConnect)
 
     return () => {
+      socket.off('connect', handleConnect)
+      socket.off('events:refresh-session')
       disconnect()
     }
   }, [socket])
