@@ -14,15 +14,14 @@ const WebNotificationContext = createContext<WebNotificationContextType | undefi
 
 const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
   const [permission, setPermission] = useState<NotificationPermission>(Notification.permission)
-  const {
-    session: { user },
-  } = useSession()
+  const { session } = useSession()
+  const user = session?.user
 
   useEffect(() => {
     registerServiceWorker().then(async () => {
       if (Notification.permission === 'granted' && user?.id) {
         await navigator.serviceWorker.ready
-        await subscribeNotifactionToServer(user.id)
+        await subscribeNotifactionToServer(user?.id)
       }
     })
   }, [user])

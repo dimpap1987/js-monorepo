@@ -22,13 +22,10 @@ import { Controller, useForm } from 'react-hook-form'
 import { SettingsItem } from './settings-items'
 
 export function AccountSettings() {
-  const {
-    session: { user },
-    refreshSession,
-    isAdmin,
-  } = useSession()
+  const { session, refreshSession, isAdmin } = useSession()
   const [isEditing, setIsEditing] = useState(false)
   const { addNotification } = useNotifications()
+  const user = session?.user
 
   const initUser = {
     username: user?.username || '',

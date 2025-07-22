@@ -5,14 +5,14 @@ import { AxiosInstance } from 'axios'
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 export interface SessionContextType {
-  session: Record<string, any>
+  session: Record<string, any> | null
   isLoggedIn: boolean
   isAdmin: boolean
   refreshSession: () => void
 }
 
 const SessionContext = createContext<SessionContextType>({
-  session: {},
+  session: null,
   isLoggedIn: false,
   isAdmin: false,
   refreshSession: () => {},
@@ -49,16 +49,16 @@ const fetchSession = async (
 
 export const SessionProvider = ({
   children,
-  value = {},
+  value = null,
   clientBuilder,
   endpoint = '/auth/session',
 }: {
   readonly children?: React.ReactNode
-  readonly value: Record<string, any> // No longer optional, will default to empty object
+  readonly value: Record<string, any> | null // No longer optional, will default to empty object
   clientBuilder?: AxiosInstance
   endpoint?: string
 }) => {
-  const [session, setSession] = useState<Record<string, any>>(value)
+  const [session, setSession] = useState<Record<string, any> | null>(value)
 
   const refreshSession = useCallback(() => {
     fetchSession(

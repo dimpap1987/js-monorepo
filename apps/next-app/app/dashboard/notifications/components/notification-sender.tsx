@@ -9,12 +9,11 @@ import { useState } from 'react'
 import { submitNotification } from '../utils'
 
 export const NotificationSender = () => {
-  const {
-    session: { user },
-  } = useSession()
+  const { session } = useSession()
   const [message, setMessage] = useState<string>('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const { addNotification } = useNotifications()
+  const user = session?.user
 
   const handleSendMessage = async () => {
     if (user && message.trim() && selectedUserIds.length > 0) {
