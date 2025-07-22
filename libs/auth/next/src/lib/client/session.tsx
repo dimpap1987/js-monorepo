@@ -1,6 +1,6 @@
 'use client'
 
-import { apiClientBase, getCookie } from '@js-monorepo/utils/http'
+import { apiClientBase } from '@js-monorepo/utils/http'
 import { AxiosInstance } from 'axios'
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
@@ -58,7 +58,7 @@ export const SessionProvider = ({
   clientBuilder?: AxiosInstance
   endpoint?: string
 }) => {
-  const [session, setSession] = useState<Record<string, any>>(value)
+  const [session, setSession] = useState<Record<string, any>>(value.session)
 
   const refreshSession = useCallback(() => {
     fetchSession(
@@ -75,7 +75,7 @@ export const SessionProvider = ({
   }, [clientBuilder, endpoint])
 
   useEffect(() => {
-    if (!!session?.user || getCookie('UNREGISTERED-USER')) return
+    if (session?.user) return
     fetchSession(
       (userResponse) => {
         setSession({ ...userResponse })
