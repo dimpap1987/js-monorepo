@@ -58,7 +58,7 @@ export const SessionProvider = ({
   clientBuilder?: AxiosInstance
   endpoint?: string
 }) => {
-  const [session, setSession] = useState<Record<string, any>>(value.session)
+  const [session, setSession] = useState<Record<string, any>>(value)
 
   const refreshSession = useCallback(() => {
     fetchSession(
