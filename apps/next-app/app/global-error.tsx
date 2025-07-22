@@ -17,7 +17,7 @@ const poppins = Poppins({
 export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <html lang="en">
-      <ThemeProvider attribute="class" defaultTheme="system">
+      <ThemeProvider attribute="class" defaultTheme="dark">
         <body
           className={`${poppins.className} flex justify-center container items-center min-h-100svh 
                     bg-background text-foreground overflow-x-hidden`}

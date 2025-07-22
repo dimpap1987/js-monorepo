@@ -8,6 +8,7 @@ import {
   apiFetchUserNotifications,
   apiReadAllNotifications,
   apiReadNotification,
+  DpNotificationBellComponent,
   useNotificationStore,
   useNotificationWebSocket,
 } from '@js-monorepo/notifications-ui'
@@ -64,11 +65,6 @@ const menuItems: MenuItem[] = [
 
 const initialPage = 1
 const initialPageSize = 10
-
-const DpNotificationBellComponentDynamic = dynamic(
-  () => import('@js-monorepo/notifications-ui').then((module) => module.DpNotificationBellComponent),
-  { ssr: false }
-)
 
 export default function MainTemplate({ children }: Readonly<PropsWithChildren>) {
   const { session, isLoggedIn, isAdmin, refreshSession } = useSession()
@@ -130,7 +126,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
         </DpLogo>
         <NavbarItems>
           {isLoggedIn && (
-            <DpNotificationBellComponentDynamic
+            <DpNotificationBellComponent
               className="mt-[0.58rem]"
               pagebale={{
                 page: notifications?.page ?? initialPage,
@@ -165,7 +161,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
                 })
               }}
               resetOnClose={true}
-            ></DpNotificationBellComponentDynamic>
+            ></DpNotificationBellComponent>
           )}
           <ModeToggle></ModeToggle>
         </NavbarItems>

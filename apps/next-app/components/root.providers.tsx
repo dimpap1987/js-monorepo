@@ -20,9 +20,9 @@ export default async function RootProviders({ children }: { readonly children: R
   const session = await getCurrentSession()
   return (
     <SessionProvider value={session} endpoint="/session">
-      <DynamicWebsocketProvider>
-        <DpNextPageProgressBar>
-          <ThemeProvider attribute="class" defaultTheme="system">
+      <ThemeProvider attribute="class" defaultTheme="dark">
+        <DynamicWebsocketProvider>
+          <DpNextPageProgressBar>
             <DpLoaderProvider>
               <DpNotificationProvider>
                 <WebNotificationProvider>
@@ -30,9 +30,9 @@ export default async function RootProviders({ children }: { readonly children: R
                 </WebNotificationProvider>
               </DpNotificationProvider>
             </DpLoaderProvider>
-          </ThemeProvider>
-        </DpNextPageProgressBar>
-      </DynamicWebsocketProvider>
+          </DpNextPageProgressBar>
+        </DynamicWebsocketProvider>
+      </ThemeProvider>
     </SessionProvider>
   )
 }
