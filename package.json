@@ -253,5 +253,8 @@
     "@nx/nx-linux-x64-musl": "16.10.0",
     "@nx/nx-win32-arm64-msvc": "16.10.0",
     "@nx/nx-win32-x64-msvc": "16.10.0"
+  },
+  "overrides": {
+    "stylus": "0.64.0"
   }
 }
