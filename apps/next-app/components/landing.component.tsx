@@ -91,7 +91,7 @@ export default function LandingComponent({ children, className }: MainProps) {
               addNotification({
                 message: 'This is a spinner',
                 type: 'spinner',
-                duration: 4000,
+                duration: 433000,
               })
             }}
           >

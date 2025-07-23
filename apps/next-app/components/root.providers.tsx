@@ -19,7 +19,13 @@ const DynamicWebsocketProvider = dynamic(
 export default async function RootProviders({ children }: { readonly children: ReactNode }) {
   const session = await getCurrentSession()
   return (
-    <SessionProvider value={session} endpoint="/session">
+    <SessionProvider
+      value={{
+        isLoggedIn: !!session?.user,
+        ...session,
+      }}
+      endpoint="/session"
+    >
       <ThemeProvider attribute="class" defaultTheme="dark">
         <DynamicWebsocketProvider>
           <DpNextPageProgressBar>

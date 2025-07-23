@@ -18,7 +18,6 @@ import { MenuItem, PaginationType, UserNotificationType } from '@js-monorepo/typ
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
-import dynamic from 'next/dynamic'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'

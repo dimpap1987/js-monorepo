@@ -28,10 +28,7 @@ export function NotificationItem({
   if (!message) return null
 
   return (
-    <div
-      className={cn('flex relative sm:w-max self-end max-w-96 w-[95vw] m-2', styles.notificationContainer)}
-      {...rest}
-    >
+    <div className={cn('flex relative w-max max-w-[95vw] self-end m-2', styles.notificationContainer)} {...rest}>
       <div className="w-full py-1 px-3 text-sm text-white bg-background-secondary grid grid-cols-[max-content_1fr] items-center gap-2">
         {/* Icon */}
         <div className="self-center p-1">

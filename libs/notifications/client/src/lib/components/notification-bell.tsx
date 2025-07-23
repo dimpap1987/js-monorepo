@@ -13,10 +13,10 @@ import { cn } from '@js-monorepo/ui/util'
 import { debounce } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePagination } from '../hooks'
-import { NotificationBellButton } from './bell/notification-bell-trigger'
-import { NotificationReadAllButton } from './bell/notification-read-all'
-import { NotificationList } from './bell/notification-list'
 import { updateNotificationAsRead } from '../utils/notifications'
+import { NotificationBellButton } from './bell/notification-bell-trigger'
+import { NotificationList } from './bell/notification-list'
+import { NotificationReadAllButton } from './bell/notification-read-all'
 
 interface DpNotificationBellComponentProps {
   notificationList: UserNotificationType[]
@@ -53,6 +53,27 @@ export function DpNotificationBellComponent({
 
   const notificationContainerRef = useRef<HTMLDivElement>(null)
 
+  const handleScroll = useCallback(
+    debounce(() => {
+      if (!notificationContainerRef?.current) return
+
+      const { scrollTop, scrollHeight, clientHeight } = notificationContainerRef.current
+
+      if (scrollTop + clientHeight >= scrollHeight - 5) {
+        loadMore()
+      }
+    }, 200),
+    [loadMore]
+  )
+
+  const handleRead = useCallback(
+    (id: number) => {
+      onRead?.(id)
+      setNotifications((prev) => updateNotificationAsRead(prev, id))
+    },
+    [onRead]
+  )
+
   useEffect(() => {
     setNotifications((prev) => {
       const existingIds = new Set(prev.map((content) => content.notification.id))
@@ -78,48 +99,28 @@ export function DpNotificationBellComponent({
     }
   }, [unreadNotificationCount])
 
-  const handleRead = useCallback(
-    (id: number) => {
-      onRead?.(id)
-      setNotifications((prev) => updateNotificationAsRead(prev, id))
-    },
-    [onRead]
-  )
+  useEffect(() => {
+    const container = notificationContainerRef.current
 
-  const handleScroll = useCallback(
-    debounce(() => {
-      if (!notificationContainerRef?.current) return
-
-      const { scrollTop, scrollHeight, clientHeight } = notificationContainerRef.current
-
-      if (scrollTop + clientHeight >= scrollHeight - 5) {
-        loadMore()
+    if (isDropdownOpen && container) {
+      container.addEventListener('scroll', handleScroll)
+      return () => {
+        container.removeEventListener('scroll', handleScroll)
       }
-    }, 200),
-    [loadMore]
-  )
+    }
+
+    if (!isDropdownOpen && resetOnClose) {
+      setPaginator(1, pagebale.pageSize)
+      setNotifications((prev) => prev.slice(0, 10))
+    }
+  }, [isDropdownOpen])
 
   return (
     <>
       {/* Backdrop */}
       {isDropdownOpen && <div className="fixed inset-0 top-navbar-offset bg-black bg-opacity-50 z-10" />}
 
-      <DropdownMenu
-        onOpenChange={(open) => {
-          setIsDropdownOpen(open)
-          setTimeout(() => {
-            if (open) {
-              notificationContainerRef?.current?.addEventListener('scroll', handleScroll)
-            } else {
-              notificationContainerRef?.current?.removeEventListener('scroll', handleScroll)
-              if (resetOnClose) {
-                setPaginator(1, pagebale.pageSize)
-                setNotifications(notifications.slice(0, 10))
-              }
-            }
-          })
-        }}
-      >
+      <DropdownMenu onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <NotificationBellButton unreadNotificationCount={unreadNotificationCount} />
         </DropdownMenuTrigger>
