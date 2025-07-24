@@ -4,6 +4,8 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
+import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
+import useTapEffect from '@js-monorepo/next/hooks/tap-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
@@ -80,6 +82,8 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
     })
 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
+  useOfflineIndicator()
+  useTapEffect()
 
   return (
     <>
