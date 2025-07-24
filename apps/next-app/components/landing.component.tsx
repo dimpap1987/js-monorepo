@@ -92,6 +92,7 @@ export default function LandingComponent({ children, className }: MainProps) {
                 message: 'This is a spinner',
                 type: 'spinner',
                 duration: 4000,
+                canClose: true,
               })
             }}
           >

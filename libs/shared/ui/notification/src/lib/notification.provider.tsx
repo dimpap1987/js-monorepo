@@ -16,20 +16,20 @@ import DpNotificationList from './notificationList'
 // create context
 const NotificationsContext = createContext<
   | {
-      addNotification: (notification: DpNotificationProps) => number
+      addNotification: (notification: DpNotificationProps) => DpNotificationProps['id']
       notifications: DpNotificationProps[]
       setNotifications: React.Dispatch<React.SetStateAction<DpNotificationProps[]>>
-      removeNotification: (notificationId: number) => void
+      removeNotification: (notificationId: DpNotificationProps['id']) => void
     }
   | undefined
 >(undefined)
 
 // useNotifications hook
 export const useNotifications = (): {
-  addNotification: (notification: DpNotificationProps) => number
+  addNotification: (notification: DpNotificationProps) => DpNotificationProps['id']
   notifications: DpNotificationProps[]
   setNotifications: React.Dispatch<React.SetStateAction<DpNotificationProps[]>>
-  removeNotification: (notificationId: number) => void
+  removeNotification: (notificationId: DpNotificationProps['id']) => void
 } => {
   const context = useContext(NotificationsContext)
   if (!context) {
@@ -49,12 +49,12 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }
 
   //useCallback hook which will ensure that the addNotification function itself is memoized and not recreated on every render
   const addNotification = useCallback((notification: DpNotificationProps) => {
-    const { id = Math.floor(Math.random() * 1000000) } = notification
+    const { id = `${Math.floor(Math.random() * 1000000)}` } = notification
     setNotifications((prev) => [...prev, { ...notification, id }])
     return id
   }, [])
 
-  const removeNotification = useCallback((notificationId: number) => {
+  const removeNotification = useCallback((notificationId: DpNotificationProps['id']) => {
     setNotifications((prev) => [...prev.filter((not) => not.id !== notificationId)])
   }, [])
 
@@ -65,7 +65,7 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }
 
     // For any timeouts not in the current notifications, clear them
     Object.keys(timeoutsRef.current).forEach((id) => {
-      if (!currentNotificationsIds.includes(Number(id))) {
+      if (!currentNotificationsIds.includes(id)) {
         clearTimeout(timeoutsRef.current[id])
         delete timeoutsRef.current[id]
       }
@@ -94,7 +94,7 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }
 
   return (
     <NotificationsContext.Provider value={contextValue}>
-      <DpNotificationList notifications={notifications} />
+      <DpNotificationList notifications={notifications} removeNotification={removeNotification} />
       {children}
     </NotificationsContext.Provider>
   )

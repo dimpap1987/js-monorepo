@@ -1,4 +1,3 @@
-import { Toaster } from '@js-monorepo/components/sonner'
 import { BodyTemplate } from '@js-monorepo/templates'
 import { Montserrat } from 'next/font/google'
 import MainTemplate from '../components/main-template'
@@ -20,7 +19,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning={true}>
       <BodyTemplate className={montserrat.className}>
         <MainTemplate>{children}</MainTemplate>
-        <Toaster />
       </BodyTemplate>
     </html>
   )
