@@ -80,13 +80,29 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
     setConnectionState('connecting')
 
     try {
+      // Check if socket exists and is connected (reconnection fix from develop)
+      if (socketRef.current) {
+        if (socketRef.current.connected) {
+          setConnectionState('connected')
+          setIsConnected(true)
+          return // Use existing connected socket
+        } else {
+          console.warn(`Existing socket is not connected. Attempting to reconnect...`)
+          socketRef.current.connect() // Attempt to reconnect
+          setConnectionState('reconnecting')
+          return // Use existing socket
+        }
+      }
+
+      // Create a new socket if none exists
       const socket = io(optionsRef.current.url, {
         path: optionsRef.current.path ?? '/ws',
         secure: true,
         withCredentials: true,
         reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 10,
+        reconnectionDelay: 5000,
+        forceNew: true,
+        reconnectionAttempts: 60,
         transports: ['websocket'],
       })
 
@@ -203,6 +219,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
   return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>
 }
 
+<<<<<<< HEAD
 /**
  * Hook to access WebSocket context
  */
