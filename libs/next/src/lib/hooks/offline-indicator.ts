@@ -1,8 +1,10 @@
+'use effect'
+
 import { useNotifications } from '@js-monorepo/notification'
 import { useEffect, useRef } from 'react'
 import useInternetStatus from './internet-status'
 
-export default function useOfflineNotification() {
+export default function useOfflineIndicator() {
   const { addNotification, removeNotification } = useNotifications()
   const isOnline = useInternetStatus()
 
