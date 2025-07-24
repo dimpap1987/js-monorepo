@@ -4,6 +4,7 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
+import useOfflineNotification from '@js-monorepo/next/hooks/offline-Indicator'
 import {
   apiFetchUserNotifications,
   apiReadAllNotifications,
@@ -71,6 +72,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   const fetchNotificationsRef = useRef(false)
   const router = useRouter()
   const [notifications, setNotifications] = useState<Partial<PaginationType> | undefined>()
+  useOfflineNotification()
   const user = session?.user
 
   const {
