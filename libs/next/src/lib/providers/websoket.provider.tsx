@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 
 export type WebSocketOptionsType = {
@@ -44,23 +44,24 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       // Create a new socket if none exists
       const socket = io(opts.url, {
-        path: opts.path ? opts.path : '/ws',
+        path: opts.path ?? '/ws',
         secure: true,
         withCredentials: true,
         reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 10,
+        reconnectionDelay: 5000,
+        forceNew: true,
+        reconnectionAttempts: 60,
         transports: ['websocket'],
       })
 
       socketRef.current = socket
 
       socket.on('connect', () => {
-        console.log(`Connected to url: ${opts.url}`)
+        console.log(`Connected to url: ${opts.url} with socket id: ${socket.id}`)
       })
 
-      socket.on('disconnect', () => {
-        console.log(`Disconnected from url: ${opts.url}`)
+      socket.on('disconnect', (reason) => {
+        console.log(`Disconnected from url: ${opts.url} socket id: ${socket.id}, reason: ${reason}`)
       })
 
       return socket
@@ -105,24 +106,27 @@ export const useWebSocket = (
       return
     }
 
-    const newSocket = context.connectSocket(opts) as Socket
-    setSocket(newSocket)
+    const existingSocket = context.connectSocket(opts)
+    if (!existingSocket) return
 
-    const onConnect = () => setIsConnected(true)
+    if (!socket || socket !== existingSocket) {
+      setSocket(existingSocket)
+    }
 
-    const onDisconnect = () => setIsConnected(false)
+    const handleConnect = () => setIsConnected(true)
+    const handleDisconnect = () => setIsConnected(false)
 
-    newSocket.on('connect', onConnect)
-    newSocket.on('disconnect', onDisconnect)
+    existingSocket.on('connect', handleConnect)
+    existingSocket.on('disconnect', handleDisconnect)
 
-    // Immediately set connection state based on current socket status:
-    setIsConnected(newSocket.connected)
+    // Set initial state
+    setIsConnected(existingSocket.connected)
 
     return () => {
-      newSocket.off('connect', onConnect)
-      newSocket.off('disconnect', onDisconnect)
+      existingSocket.off('connect', handleConnect)
+      existingSocket.off('disconnect', handleDisconnect)
     }
-  }, [opts.url, connect])
+  }, [connect, opts.url])
 
   return {
     socket,
@@ -144,6 +148,9 @@ export function useSocketChannel<T>(
   subscribeEvent?: string,
   subscribePayload?: object
 ) {
+  // Memoize the handler to avoid duplicate listeners
+  const stableHandler = useCallback(handler, [handler])
+
   useEffect(() => {
     if (!socket) return
 
@@ -151,7 +158,7 @@ export function useSocketChannel<T>(
       if (subscribeEvent) {
         socket.emit(subscribeEvent, subscribePayload ?? {})
       }
-      socket.on(event, handler)
+      socket.on(event, stableHandler)
     }
 
     if (socket.connected) {
@@ -160,9 +167,10 @@ export function useSocketChannel<T>(
 
     socket.on('connect', subscribe)
 
+    // Cleanup to prevent duplicate handlers
     return () => {
       socket.off('connect', subscribe)
-      socket.off(event, handler)
+      socket.off(event, stableHandler)
     }
-  }, [socket, event])
+  }, [socket, event, subscribeEvent, JSON.stringify(subscribePayload), stableHandler])
 }
