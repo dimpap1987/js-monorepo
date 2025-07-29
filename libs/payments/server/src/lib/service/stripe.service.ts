@@ -286,7 +286,7 @@ export class StripeService {
       })
       return createdCustomer.stripeCustomerId
     } catch (error) {
-      this.logger.error('An error occured when validation or creating a stripe customer')
+      this.logger.error('An error occured when validation or creating a stripe customer', error.stack)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATE_STRIPE_CUSTOMER')
     }
   }

@@ -15,13 +15,13 @@ export class PaymentsService {
   constructor(private readonly paymentsRepository: PaymentsRepository) {}
 
   async createSubscription(payload: CreateSubscriptionDto) {
-    this.logger.debug(
-      `Create Subscription for price Id: '${payload.priceId}' and paymentCustomer_id : '${payload.paymentCustomerId}'`
+    this.logger.log(
+      `Create Subscription for price Id: '${payload?.priceId}' and paymentCustomer_id : '${payload?.paymentCustomerId}'`
     )
     const { result, error } = await tryCatch(() => this.paymentsRepository.createSubscription(payload))
 
     if (error) {
-      this.logger.error(`Failed to create subscription: ${error.message}`)
+      this.logger.error(`Failed to create subscription: ${error.message}`, error.stack)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_SUBSCRIPTION_CREATION_ERROR')
     }
 
@@ -30,7 +30,7 @@ export class PaymentsService {
   }
 
   async createProduct(product: CreateProductType) {
-    this.logger.debug(`Create Product with name: ${product.name}`)
+    this.logger.log(`Create Product with name: ${product?.name}`)
     const { result, error } = await tryCatch(() => this.paymentsRepository.createProduct(product))
     if (error) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATE_PAYMENT_CUSTOMER')
@@ -39,14 +39,15 @@ export class PaymentsService {
   }
 
   async createStripeWebhookEvent(event: CreateStripeWebhookEventDto) {
-    this.logger.debug(`Create Stripe Event with id: '${event.eventId}' and type: '${event.eventType}'`)
+    this.logger.log(`Create Stripe Event with id: '${event?.eventId}' and type: '${event?.eventType}'`)
     return tryCatch(() => this.paymentsRepository.createStripeWebhookEvent(event))
   }
 
   async createOrUpdatePaymentCustomer(payload: { stripeCustomerId: string; userId: number }) {
-    this.logger.debug(`Create Payment customer for user_id: '${payload.userId}'`)
+    this.logger.log(`Create Payment customer for user_id: '${payload?.userId}'`)
     const { result, error } = await tryCatch(() => this.paymentsRepository.createOrUpdatePaymentCustomer(payload))
     if (error) {
+      this.logger.error(`Failed to create Payment customer for user_id: ${payload?.userId}`, error.stack)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATE_PAYMENT_CUSTOMER')
     }
     return result
@@ -54,47 +55,52 @@ export class PaymentsService {
 
   @Transactional()
   async updateSubscription(subscriptionData: Stripe.Subscription) {
+    this.logger.log(`Update Subscription for with price id: '${subscriptionData?.items?.data[0]?.price?.id}'`)
     const price = await this.findPriceByStripeId(subscriptionData.items.data[0]?.price.id)
 
     const { result, error } = await tryCatch(() =>
-      this.paymentsRepository.handleSubscriptionUpdated(subscriptionData, price.id)
+      this.paymentsRepository.handleSubscriptionUpdated(subscriptionData, price?.id)
     )
 
     if (error) {
-      this.logger.error(`Error UPDATING subscription with id: ${subscriptionData.id}`)
+      this.logger.error(`Error UPDATING subscription with id: ${subscriptionData?.id}`, error.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_UPDATE_SUBSCRIPTION')
     }
     return result
   }
 
   async deleteSubscription(subscriptionData: Stripe.Subscription) {
+    this.logger.log(`Delete Subscription with id: '${subscriptionData?.id}'`)
     const { result, error } = await tryCatch(() => this.paymentsRepository.handleSubscriptionDeleted(subscriptionData))
 
     if (error) {
-      this.logger.error(`Error DELETING subscription with id: ${subscriptionData.id}`)
+      this.logger.error(`Error DELETING subscription with id: ${subscriptionData?.id}`, error.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_DELETE_SUBSCRIPTION')
     }
     return result
   }
 
   async findStripeWebhookEvent(eventId: string) {
-    this.logger.debug(`Search for Stripe Event with id: '${eventId}'`)
+    this.logger.log(`Search for Stripe Event with id: '${eventId}'`)
     return tryCatch(() => this.paymentsRepository.findStripeEventById(eventId))
   }
 
   async findPaymentCustomerById(userId: number) {
-    this.logger.debug(`Search for Payment Customer with id: '${userId}'`)
+    this.logger.log(`Search for Payment Customer with id: '${userId}'`)
     const { result, error } = await tryCatch(() => this.paymentsRepository.findPaymentCustomerById(userId))
     if (error) {
-      this.logger.log(`Payment Customer with id: '${userId}' not found`)
+      this.logger.warn(`Payment Customer with id: '${userId}' not found`)
     }
     return result
   }
 
   async findPaymentCustomerByStripeId(stripeCustomerId: string) {
-    this.logger.debug(`Search for Payment Customer by stripeCustomerId: '${stripeCustomerId}'`)
+    this.logger.log(`Search for Payment Customer by stripeCustomerId: '${stripeCustomerId}'`)
     const { result, error } = await tryCatch(() =>
       this.paymentsRepository.findPaymentCustomerByStripeId(stripeCustomerId)
     )
     if (error) {
+      this.logger.error(`Error Payment Customer NOT FOUND with stripeCustomerId: ${stripeCustomerId}`, error.stack)
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_PAYMENT_CUSTOMER_NOT_FOUND')
     }
     return result
@@ -139,8 +145,10 @@ export class PaymentsService {
   }
 
   async findPriceByStripeId(stripeId: string) {
+    this.logger.log(`Search Price by stripeId: '${stripeId}'`)
     const { result, error } = await tryCatch(() => this.paymentsRepository.findPriceByStripeId(stripeId))
     if (error) {
+      this.logger.error(`Error in Searching Price by stripeId: '${stripeId}'`, error.stack)
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_PRICE_BY_STIPE_ID')
     }
 
@@ -148,8 +156,10 @@ export class PaymentsService {
   }
 
   async findPriceById(priceId: number) {
+    this.logger.log(`Find Price by priceId: '${priceId}'`)
     const { result, error } = await tryCatch(() => this.paymentsRepository.findPriceById(priceId))
     if (error) {
+      this.logger.error(`Error in Finding Price by priceId: '${priceId}'`, error.stack)
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_PRICE_BY_ID')
     }
 
@@ -157,10 +167,12 @@ export class PaymentsService {
   }
 
   async findSubscriptionByPriceIdAndUserId(priceId: number, userId: number) {
+    this.logger.log(`Find Subscription by priceId: '${priceId}' and userId: ${userId}`)
     const { result, error } = await tryCatch(() =>
       this.paymentsRepository.findSubscriptionByPriceIdAndUserId(priceId, userId)
     )
     if (error) {
+      this.logger.error(`Error in finding Subscription by priceId: '${priceId}' and userId: ${userId}`, error.stack)
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_SUBSCRIPTION_BY_ID_USER_ID')
     }
 
@@ -170,6 +182,7 @@ export class PaymentsService {
   async findSubscriptionByid(id: number) {
     const { result, error } = await tryCatch(() => this.paymentsRepository.findSubscriptionByid(id))
     if (error) {
+      this.logger.error(`Error in finding Subscription by id: '${id}'`, error.stack)
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_SUBSCRIPTION_BY_ID_USER_ID')
     }
 
@@ -182,7 +195,8 @@ export class PaymentsService {
     )
     if (error) {
       this.logger.error(
-        `Failed to find active subscription for user with id: ${userId} and product name: ${productName}`
+        `Failed to find active subscription for user with id: ${userId} and product name: ${productName}`,
+        error.stack
       )
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_FETCH_ACTIVE_SUBSCRIPTION')
     }
@@ -199,7 +213,7 @@ export class PaymentsService {
     const { result, error } = await tryCatch(() => this.paymentsRepository.getHighestActivePlanByUser(userId))
 
     if (error) {
-      this.logger.error(`Error getting highest active plan for user: '${userId}'`)
+      this.logger.error(`Error getting highest active plan for user: '${userId}'`, error.stack)
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_HIGHEST_ACTIVE_USER_PLAN')
     }
 
@@ -210,7 +224,7 @@ export class PaymentsService {
     const { result, error } = await tryCatch(() => this.paymentsRepository.findProductyByName(name))
 
     if (error) {
-      this.logger.error(`Error getting product with name: '${name}'`)
+      this.logger.error(`Error getting product with name: '${name}'`, error.stack)
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_PRODUCT_BY_NAME')
     }
 

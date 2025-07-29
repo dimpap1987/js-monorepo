@@ -1,12 +1,11 @@
 import { AuthException } from '@js-monorepo/auth/nest/common/exceptions/api-exception'
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import { UserUpdateUserSchema } from '@js-monorepo/schemas'
-import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
+import { AuthUserDto, AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { AuthUser } from '@prisma/client'
 import { AdminRepo, AdminRepository } from './admin.repository'
-import { ApiException } from '@js-monorepo/nest/exceptions'
 
 @Injectable()
 export class AdminService {
@@ -38,7 +37,7 @@ export class AdminService {
     throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_FETCHING_USERS')
   }
 
-  async updateUser(userId: number, updateUser: Omit<AuthUser, 'id' | 'email' | 'createdAt'>): Promise<AuthUserDto> {
+  async updateUser(userId: number, updateUser: AuthUserUpdateDto): Promise<AuthUserDto> {
     this.logger.debug(`Updating User with id: '${userId}'`)
     UserUpdateUserSchema.parse(updateUser)
     try {
@@ -69,7 +68,7 @@ export class AdminService {
       await this.authSessionUserCacheService.deleteAuthUserSessions(userId)
       await this.userPresenceWebsocketService.disconnectUser(userId)
     } catch (e: any) {
-      this.logger.error(`Error while handling user disconnection with user id : ${userId}`)
+      this.logger.error(`Error while handling user disconnection with user id : ${userId}`, e.stack)
       if (e instanceof AuthException) {
         return e
       }
