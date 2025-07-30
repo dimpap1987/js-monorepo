@@ -2,7 +2,7 @@
 
 import { apiClientBase } from '@js-monorepo/utils/http'
 import { AxiosInstance } from 'axios'
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 export interface SessionContextType {
   session: Record<string, any> | null
@@ -52,21 +52,27 @@ export const SessionProvider = ({
   value = null,
   clientBuilder,
   endpoint = '/auth/session',
+  fallback = null,
 }: {
   readonly children?: React.ReactNode
-  readonly value: Record<string, any> | null // No longer optional, will default to empty object
+  readonly value?: Record<string, any> | null // No longer optional, will default to empty object
   clientBuilder?: AxiosInstance
   endpoint?: string
+  fallback?: ReactNode
 }) => {
   const [session, setSession] = useState<Record<string, any> | null>(value)
+  const [loading, setLoading] = useState(!value)
 
   const refreshSession = useCallback(() => {
+    setLoading(true)
     fetchSession(
       (userResponse) => {
         setSession({ ...userResponse })
+        setLoading(false)
       },
       () => {
         setSession({}) // Reset to empty if an error occurs
+        setLoading(false)
         window.location.reload() // Redirect after error
       },
       clientBuilder,
@@ -75,12 +81,20 @@ export const SessionProvider = ({
   }, [clientBuilder, endpoint])
 
   useEffect(() => {
-    if (session?.user) return
+    if (session?.user) {
+      setLoading(false)
+      return
+    }
+    setLoading(true)
     fetchSession(
       (userResponse) => {
         setSession({ ...userResponse })
+        setLoading(false)
       },
-      undefined,
+      () => {
+        setSession({})
+        setLoading(false)
+      },
       clientBuilder,
       endpoint
     )
@@ -109,6 +123,10 @@ export const SessionProvider = ({
       refreshSession,
     }
   }, [session, refreshSession])
+
+  if (loading && fallback) {
+    return <>{fallback}</>
+  }
 
   return <SessionContext.Provider value={contextValue}>{children}</SessionContext.Provider>
 }

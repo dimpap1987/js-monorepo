@@ -16,7 +16,7 @@ export interface DpLoaderProps {
 export function DpLoader({
   message = 'Loading...',
   description,
-  show,
+  show = true,
   className,
   spinnerStyle,
   overlayClassName,

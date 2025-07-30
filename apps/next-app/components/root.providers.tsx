@@ -1,6 +1,5 @@
 import { SessionProvider } from '@js-monorepo/auth/next/client'
-import { getCurrentSession } from '@js-monorepo/auth/next/server'
-import { DpLoaderProvider } from '@js-monorepo/loader'
+import { DpLoader, DpLoaderProvider } from '@js-monorepo/loader'
 import { QClientProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
@@ -17,18 +16,19 @@ const DynamicWebsocketProvider = dynamic(
 )
 
 export default async function RootProviders({ children }: { readonly children: ReactNode }) {
-  const session = await getCurrentSession()
   return (
-    <SessionProvider
-      value={{
-        isLoggedIn: !!session?.user,
-        ...session,
-      }}
-      endpoint="/session"
-    >
-      <ThemeProvider attribute="class" defaultTheme="dark">
-        <DynamicWebsocketProvider>
-          <DpNextPageProgressBar>
+    <ThemeProvider attribute="class" defaultTheme="dark">
+      <DpNextPageProgressBar>
+        <SessionProvider
+          endpoint="/session"
+          fallback={
+            <DpLoader
+              message="Grabbing your session..."
+              description="This will take exactly as long as your coffee break."
+            />
+          }
+        >
+          <DynamicWebsocketProvider>
             <DpLoaderProvider>
               <DpNotificationProvider>
                 <WebNotificationProvider>
@@ -36,9 +36,9 @@ export default async function RootProviders({ children }: { readonly children: R
                 </WebNotificationProvider>
               </DpNotificationProvider>
             </DpLoaderProvider>
-          </DpNextPageProgressBar>
-        </DynamicWebsocketProvider>
-      </ThemeProvider>
-    </SessionProvider>
+          </DynamicWebsocketProvider>
+        </SessionProvider>
+      </DpNextPageProgressBar>
+    </ThemeProvider>
   )
 }
