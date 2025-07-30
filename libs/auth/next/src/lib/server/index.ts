@@ -15,18 +15,31 @@ function getHeaders() {
 }
 
 export async function getCurrentSession() {
+  const apiUrl = process.env.API_URL ?? 'undefined'
+
   try {
-    const response = await fetch(`${process.env.API_URL}/api/session`, {
+    const response = await fetch(`${apiUrl}/api/session`, {
       method: 'GET',
       headers: getHeaders(),
     })
+
     if (response.ok) {
       const session = await response.json()
       return session
+    } else {
+      console.warn('[getCurrentSession] Non-OK response', {
+        status: response.status,
+        statusText: response.statusText,
+        url: `${apiUrl}/api/session`,
+      })
     }
-  } catch (e) {
-    console.log('ERROR in getCurrentSession')
+  } catch (error) {
+    console.error('[getCurrentSession] Fetch failed', {
+      url: `${apiUrl}/api/session`,
+      error: error instanceof Error ? error.message : String(error),
+    })
   }
+
   return null
 }
 

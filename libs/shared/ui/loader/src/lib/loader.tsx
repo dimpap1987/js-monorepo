@@ -1,5 +1,7 @@
+'use client'
+
 import { cn } from '@js-monorepo/ui/util'
-import { CSSProperties } from 'react'
+import { CSSProperties, useEffect } from 'react'
 import DpLoadingSpinner from './loading-spinner'
 
 export interface DpLoaderProps {
@@ -19,6 +21,20 @@ export function DpLoader({
   spinnerStyle,
   overlayClassName,
 }: DpLoaderProps) {
+  useEffect(() => {
+    if (show) {
+      // Prevent scrolling
+      document.body.style.overflow = 'hidden'
+    } else {
+      // Re-enable scrolling
+      document.body.style.overflow = ''
+    }
+    // Cleanup on unmount just in case
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [show])
+
   return (
     <div
       className={cn(
