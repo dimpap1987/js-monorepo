@@ -16,7 +16,7 @@ export interface DpLoaderProps {
 export function DpLoader({
   message = 'Loading...',
   description,
-  show = true,
+  show,
   className,
   spinnerStyle,
   overlayClassName,
@@ -35,12 +35,14 @@ export function DpLoader({
     }
   }, [show])
 
+  if (!show) return null // Do not render loader if show is false
+
   return (
     <div
       className={cn(
         `fixed inset-0 flex items-center justify-center bg-black 
-      bg-opacity-80 transform transition-transform
-      duration-200 ${show ? 'scale-100' : 'scale-0'} z-40 select-none`,
+        bg-opacity-80 transform transition-transform
+        duration-200 ${show ? 'scale-100' : 'scale-0'} z-40 select-none`,
         overlayClassName
       )}
     >
@@ -60,5 +62,3 @@ export function DpLoader({
     </div>
   )
 }
-
-export default DpLoader

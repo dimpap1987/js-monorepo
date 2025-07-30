@@ -1,7 +1,7 @@
 'use client'
 
 import React, { PropsWithChildren, createContext, useContext, useMemo, useState } from 'react'
-import DpLoader from './loader'
+import { DpLoader } from './loader'
 
 interface LoaderProps {
   readonly message?: string
@@ -35,7 +35,7 @@ export const useLoader = (): {
 
 export const DpLoaderProvider: React.FC<LoaderProviderPros> = ({ children }) => {
   const [loaderState, setLoaderState] = useState<LoaderProps>({
-    show: undefined,
+    show: false,
     message: '',
     description: '',
   })

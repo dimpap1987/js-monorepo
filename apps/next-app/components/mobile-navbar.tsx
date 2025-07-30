@@ -27,11 +27,11 @@ export const navLinksOpts: NavLinkOpts[] = [
 ] as const
 
 export const MobileNavbar = () => {
-  const { isAdmin } = useSession()
+  const { isAdmin, isLoggedIn } = useSession()
   const { notificationCount } = useNotificationStore()
   const { deviceType } = useDeviceType()
 
-  if (deviceType !== 'mobile') return null
+  if (deviceType !== 'mobile' && !isLoggedIn) return null
 
   return (
     <BottomNavbar className="sm:hidden">

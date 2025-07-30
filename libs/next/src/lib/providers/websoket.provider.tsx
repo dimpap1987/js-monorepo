@@ -72,11 +72,11 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }
 
   const unsubscribe = () => {
-    if (socketRef.current) {
+    if (socketRef.current?.connected) {
       socketRef.current.disconnect()
       console.log('WebSocket unsubscribed and disconnected')
-      socketRef.current = null
     }
+    socketRef.current = null
   }
 
   return <WebSocketContext.Provider value={{ connectSocket, unsubscribe }}>{children}</WebSocketContext.Provider>

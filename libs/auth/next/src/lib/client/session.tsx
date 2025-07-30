@@ -2,12 +2,13 @@
 
 import { apiClientBase } from '@js-monorepo/utils/http'
 import { AxiosInstance } from 'axios'
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 export interface SessionContextType {
   session: Record<string, any> | null
   isLoggedIn: boolean
   isAdmin: boolean
+  isLoading: boolean // Expose loading state
   refreshSession: () => void
 }
 
@@ -15,6 +16,7 @@ const SessionContext = createContext<SessionContextType>({
   session: null,
   isLoggedIn: false,
   isAdmin: false,
+  isLoading: false,
   refreshSession: () => {},
 })
 
@@ -32,7 +34,7 @@ const fetchSession = async (
         Expires: '0',
       },
       params: {
-        _: new Date().getTime(), // Add a unique timestamp as a query parameter
+        _: new Date().getTime(),
       },
     })
 
@@ -52,16 +54,14 @@ export const SessionProvider = ({
   value = null,
   clientBuilder,
   endpoint = '/auth/session',
-  fallback = null,
 }: {
   readonly children?: React.ReactNode
-  readonly value?: Record<string, any> | null // No longer optional, will default to empty object
+  readonly value?: Record<string, any> | null
   clientBuilder?: AxiosInstance
   endpoint?: string
-  fallback?: ReactNode
 }) => {
   const [session, setSession] = useState<Record<string, any> | null>(value)
-  const [loading, setLoading] = useState(!value)
+  const [loading, setLoading] = useState<boolean>(value === null)
 
   const refreshSession = useCallback(() => {
     setLoading(true)
@@ -71,9 +71,9 @@ export const SessionProvider = ({
         setLoading(false)
       },
       () => {
-        setSession({}) // Reset to empty if an error occurs
+        setSession(null)
         setLoading(false)
-        window.location.reload() // Redirect after error
+        window.location.reload()
       },
       clientBuilder,
       endpoint
@@ -81,18 +81,19 @@ export const SessionProvider = ({
   }, [clientBuilder, endpoint])
 
   useEffect(() => {
+    // If we already have a session with user, don't fetch
     if (session?.user) {
       setLoading(false)
       return
     }
-    setLoading(true)
+
     fetchSession(
       (userResponse) => {
         setSession({ ...userResponse })
         setLoading(false)
       },
       () => {
-        setSession({})
+        setSession(null)
         setLoading(false)
       },
       clientBuilder,
@@ -100,17 +101,18 @@ export const SessionProvider = ({
     )
   }, [clientBuilder, endpoint])
 
+  // Session refresh interval - only runs when we have a valid session
   useEffect(() => {
     if (!session?.user) return
 
     const intervalId = setInterval(() => {
-      refreshSession() // Refresh session every 30 minutes
-    }, 60000 * 30)
+      refreshSession()
+    }, 60000 * 30) // 30 minutes
 
     return () => {
       clearInterval(intervalId)
     }
-  }, [refreshSession, session])
+  }, [refreshSession, session?.user])
 
   const contextValue = useMemo(() => {
     const isLoggedIn = !!session?.user
@@ -120,13 +122,10 @@ export const SessionProvider = ({
       session,
       isLoggedIn,
       isAdmin,
+      isLoading: loading,
       refreshSession,
     }
-  }, [session, refreshSession])
-
-  if (loading && fallback) {
-    return <>{fallback}</>
-  }
+  }, [session, loading, refreshSession])
 
   return <SessionContext.Provider value={contextValue}>{children}</SessionContext.Provider>
 }

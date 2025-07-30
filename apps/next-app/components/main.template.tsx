@@ -2,6 +2,7 @@
 import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
+import { DpLoader } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
@@ -68,7 +69,7 @@ const initialPage = 1
 const initialPageSize = 10
 
 export default function MainTemplate({ children }: Readonly<PropsWithChildren>) {
-  const { session, isLoggedIn, isAdmin, refreshSession } = useSession()
+  const { session, isLoggedIn, isAdmin, refreshSession, isLoading } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const fetchNotificationsRef = useRef(false)
   const router = useRouter()
@@ -76,6 +77,9 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   useOfflineIndicator()
   const user = session?.user
   useTapEffect()
+  const startTime = useRef(Date.now())
+  const [showInitialLoader, setShowInitialLoader] = useState(true)
+  const hasCompletedInitialLoad = useRef(false)
 
   const {
     notificationCount,
@@ -109,13 +113,30 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
     })
   }, [user])
 
+  useEffect(() => {
+    if (!isLoading && !hasCompletedInitialLoad.current) {
+      hasCompletedInitialLoad.current = true
+
+      const minDuration = 1000
+      const elapsed = Date.now() - startTime.current
+      const remaining = Math.max(minDuration - elapsed, 0)
+
+      const timeout = setTimeout(() => {
+        setShowInitialLoader(false)
+      }, remaining)
+
+      return () => clearTimeout(timeout)
+    }
+  }, [isLoading])
+
+  if (showInitialLoader) {
+    return <DpLoader message="Starting things up..." description="Just a moment... " show={showInitialLoader} />
+  }
+
   return (
     <>
       <DpNextNavbar
-        user={{
-          isLoggedIn: isLoggedIn,
-          ...user,
-        }}
+        user={user}
         menuItems={menuItems}
         onSideBarClick={() => {
           setOpenSideBar((prev) => !prev)
@@ -204,7 +225,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
 
       <main className="mt-5">{children}</main>
 
-      {isLoggedIn && <MobileNavbar></MobileNavbar>}
+      <MobileNavbar></MobileNavbar>
     </>
   )
 }
