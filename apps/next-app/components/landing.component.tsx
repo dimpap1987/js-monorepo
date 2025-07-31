@@ -40,7 +40,7 @@ export default function LandingComponent({ children, className }: MainProps) {
     if (userLocation && mapRef.current) {
       mapRef.current.setView([userLocation.latitude, userLocation.longitude], 10)
     }
-  }, [userLocation, mapRef.current])
+  }, [userLocation])
 
   return (
     <section className={cn('overflow-hidden', className)}>

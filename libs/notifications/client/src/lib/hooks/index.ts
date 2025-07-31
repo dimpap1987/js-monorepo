@@ -5,10 +5,11 @@ import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { useCallback, useRef, useState } from 'react'
 
 export function useNotificationWebSocket(
+  connect: boolean,
   websocketOptions: WebSocketOptionsType,
   onReceive: (notification: UserNotificationType) => void
 ) {
-  const { socket } = useWebSocket(websocketOptions, true)
+  const { socket } = useWebSocket(websocketOptions, connect)
 
   useSocketChannel(socket, 'events:notifications', (event: any) => {
     if (event?.data) onReceive(event.data)

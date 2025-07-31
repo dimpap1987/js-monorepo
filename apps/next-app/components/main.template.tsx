@@ -1,8 +1,9 @@
 'use client'
+
 import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
-import { DpLoader } from '@js-monorepo/loader'
+import { InitialLoader } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
@@ -77,9 +78,6 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   useOfflineIndicator()
   const user = session?.user
   useTapEffect()
-  const startTime = useRef(Date.now())
-  const [showInitialLoader, setShowInitialLoader] = useState(true)
-  const hasCompletedInitialLoad = useRef(false)
 
   const {
     notificationCount,
@@ -90,7 +88,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   } = useNotificationStore()
 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
-  useNotificationWebSocket(websocketOptions, (notification: UserNotificationType) => {
+  useNotificationWebSocket(isLoggedIn, websocketOptions, (notification: UserNotificationType) => {
     if (notification) {
       setNotifications((prev) => {
         return {
@@ -113,28 +111,8 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
     })
   }, [user])
 
-  useEffect(() => {
-    if (!isLoading && !hasCompletedInitialLoad.current) {
-      hasCompletedInitialLoad.current = true
-
-      const minDuration = 1000
-      const elapsed = Date.now() - startTime.current
-      const remaining = Math.max(minDuration - elapsed, 0)
-
-      const timeout = setTimeout(() => {
-        setShowInitialLoader(false)
-      }, remaining)
-
-      return () => clearTimeout(timeout)
-    }
-  }, [isLoading])
-
-  if (showInitialLoader) {
-    return <DpLoader message="Starting things up... 🤞" description="Just a moment... " show={showInitialLoader} />
-  }
-
   return (
-    <>
+    <InitialLoader isLoading={isLoading}>
       <DpNextNavbar
         user={user}
         menuItems={menuItems}
@@ -201,24 +179,21 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
         onClose={() => setOpenSideBar(false)}
         position="right"
         items={menuItems}
-        user={{
-          ...user,
-        }}
+        user={user}
       >
         <div className="p-3">
-          {!user && (
-            <DpNextNavLink href="/auth/login">
-              <DpLoginButton size="large"></DpLoginButton>
-            </DpNextNavLink>
-          )}
-          {!!user && (
+          {user ? (
             <DpLogoutButton
               className="p-3 mb-6 justify-center"
               size="large"
               onClick={async () => {
-                authClient.logout()
+                await authClient.logout()
               }}
-            ></DpLogoutButton>
+            />
+          ) : (
+            <DpNextNavLink href="/auth/login">
+              <DpLoginButton size="large" />
+            </DpNextNavLink>
           )}
         </div>
       </DpNextSidebar>
@@ -226,6 +201,6 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
       <main className="mt-5">{children}</main>
 
       <MobileNavbar></MobileNavbar>
-    </>
+    </InitialLoader>
   )
 }

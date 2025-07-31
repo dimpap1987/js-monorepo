@@ -30,7 +30,7 @@ export interface IpApiResponse {
   country_population: number
 }
 
-export function useUserLocation() {
+export function useUserLocation(): IpApiResponse | null {
   const [data, setData] = useState<IpApiResponse | null>(null)
 
   useEffect(() => {
@@ -40,13 +40,13 @@ export function useUserLocation() {
         if (!response.ok) throw new Error('Failed to fetch IP data')
         const json = await response.json()
         setData(json)
-      } catch (err: any) {
-        console.error(err)
+      } catch (err) {
+        console.error('Error fetching IP location:', err)
       }
     }
 
     fetchUserIp()
   }, [])
 
-  return data as IpApiResponse
+  return data
 }

@@ -28,7 +28,7 @@ export function NotificationsPage({
   className?: string
   websocketOptions: WebSocketOptionsType
 }) {
-  const { session } = useSession()
+  const { session, isLoggedIn } = useSession()
   const user = session?.user
   const [notifications, setNotifications] = useState<Partial<PaginationType<UserNotificationType>> | undefined>()
   const { searchQuery, setPagination, pagination } = usePaginationWithParams(1, 15)
@@ -55,7 +55,7 @@ export function NotificationsPage({
     fetchNotifications()
   }, [user, searchQuery])
 
-  useNotificationWebSocket(websocketOptions, (notification: UserNotificationType) => {
+  useNotificationWebSocket(isLoggedIn, websocketOptions, (notification: UserNotificationType) => {
     if (notification && pagination.page === 1) {
       setNotifications((prev) => ({
         ...prev,

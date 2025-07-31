@@ -31,7 +31,7 @@ export const MobileNavbar = () => {
   const { notificationCount } = useNotificationStore()
   const { deviceType } = useDeviceType()
 
-  if (deviceType !== 'mobile' && !isLoggedIn) return null
+  if (deviceType !== 'mobile' || !isLoggedIn) return null
 
   return (
     <BottomNavbar className="sm:hidden">
