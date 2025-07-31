@@ -126,12 +126,13 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 <>
                   {navbarItems && navbarItems}
 
-                  {!user && (
+                  {user ? (
+                    <NavUserOptions className="mt-[0.58rem]" user={user} onLogout={onLogout} />
+                  ) : (
                     <DpNextNavLink href="/auth/login">
-                      <DpLoginButton></DpLoginButton>
+                      <DpLoginButton />
                     </DpNextNavLink>
                   )}
-                  {user && <NavUserOptions className="mt-[0.58rem]" user={user} onLogout={onLogout} />}
                 </>
               </section>
 

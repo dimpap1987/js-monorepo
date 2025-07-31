@@ -130,7 +130,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   }, [isLoading])
 
   if (showInitialLoader) {
-    return <DpLoader message="Starting things up..." description="Just a moment... " show={showInitialLoader} />
+    return <DpLoader message="Starting things up... 🤞" description="Just a moment... " show={showInitialLoader} />
   }
 
   return (
