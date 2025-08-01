@@ -34,7 +34,7 @@ export function NotificationItem({
   if (!message) return null
 
   return (
-    <div className={cn('flex relative w-max max-w-[95vw] self-end m-2', styles.notificationContainer)} {...rest}>
+    <div className={cn('flex relative w-max max-w-[95vw] self-end m-1', styles.notificationContainer)} {...rest}>
       {/* Close Button */}
       {canClose && (
         <button
