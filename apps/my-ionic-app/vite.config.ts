@@ -1,7 +1,24 @@
 /// <reference types='vitest' />
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
+import react from '@vitejs/plugin-react'
+import * as fs from 'fs'
+import * as path from 'path'
+import { defineConfig } from 'vite'
+
+function getAliasesFromTsConfigPaths(tsconfigPath: string) {
+  const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, 'utf-8'))
+  const paths = tsconfig.compilerOptions.paths || {}
+  const aliases = {}
+
+  for (const alias in paths) {
+    // Remove trailing /* in alias key if present
+    const key = alias.replace(/\/\*$/, '')
+    // Take the first path and remove trailing /* if present
+    const target = paths[alias][0].replace(/\/\*$/, '')
+    aliases[key] = path.resolve(__dirname, '../../', target)
+  }
+  return aliases
+}
 
 export default defineConfig({
   root: __dirname,
@@ -31,5 +48,8 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+  },
+  resolve: {
+    alias: getAliasesFromTsConfigPaths(path.resolve(__dirname, '../../tsconfig.base.json')),
   },
 })
