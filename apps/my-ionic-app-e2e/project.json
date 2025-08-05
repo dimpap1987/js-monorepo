@@ -1,0 +1,26 @@
+{
+  "name": "my-ionic-app-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/my-ionic-app-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["my-ionic-app"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/my-ionic-app-e2e/cypress.config.ts",
+        "testingType": "e2e",
+        "devServerTarget": "my-ionic-app:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "my-ionic-app:serve:production"
+        },
+        "ci": {
+          "devServerTarget": "my-ionic-app:serve-static"
+        }
+      }
+    }
+  }
+}

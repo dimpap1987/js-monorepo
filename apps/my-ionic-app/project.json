@@ -1,0 +1,66 @@
+{
+  "name": "my-ionic-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/my-ionic-app/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": { "outputPath": "dist/apps/my-ionic-app" },
+      "configurations": { "development": { "mode": "development" }, "production": { "mode": "production" } }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": { "buildTarget": "my-ionic-app:build" },
+      "configurations": {
+        "development": { "buildTarget": "my-ionic-app:build:development", "hmr": true },
+        "production": { "buildTarget": "my-ionic-app:build:production", "hmr": false }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": { "buildTarget": "my-ionic-app:build" },
+      "configurations": {
+        "development": { "buildTarget": "my-ionic-app:build:development" },
+        "production": { "buildTarget": "my-ionic-app:build:production" }
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": { "buildTarget": "my-ionic-app:build", "spa": true }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": { "jestConfig": "apps/my-ionic-app/jest.config.ts" }
+    }
+  },
+  "cap-sync": {
+    "executor": "nx:run-commands",
+    "options": { "command": "npx cap sync", "cwd": "apps/my-ionic-app" },
+    "dependsOn": ["build"]
+  },
+  "cap-run-ios": {
+    "executor": "nx:run-commands",
+    "options": { "command": "npx cap run ios", "cwd": "apps/my-ionic-app" },
+    "dependsOn": ["cap-sync"]
+  },
+  "cap-run-android": {
+    "executor": "nx:run-commands",
+    "options": { "command": "npx cap run android", "cwd": "apps/my-ionic-app" },
+    "dependsOn": ["cap-sync"]
+  },
+  "cap-open-ios": {
+    "executor": "nx:run-commands",
+    "options": { "command": "npx cap open ios", "cwd": "apps/my-ionic-app" }
+  },
+  "cap-open-android": {
+    "executor": "nx:run-commands",
+    "options": { "command": "npx cap open android", "cwd": "apps/my-ionic-app" }
+  }
+}
