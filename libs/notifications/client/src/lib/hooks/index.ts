@@ -1,28 +1,22 @@
 'use client'
 
-import { useWebSocket, WebSocketOptionsType } from '@js-monorepo/next/providers'
+import { useWebSocketEvent } from '@js-monorepo/next/providers'
 import { Pageable, UserNotificationType } from '@js-monorepo/types'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { NOTIFICATIONS_EVENT, type NotificationWebSocketEventMap } from '../types/websocket-events'
 
-export function useNotificationWebSocket(
-  websocketOptions: WebSocketOptionsType,
-  onReceive: (notification: UserNotificationType) => void
-) {
-  const { socket } = useWebSocket(websocketOptions, true)
+export function useNotificationWebSocket(onReceive: (notification: UserNotificationType) => void): void {
+  const handlerRef = useRef(onReceive)
 
   useEffect(() => {
-    if (!socket) return
-    const handleNotificationEvent = (event: any) => {
-      if (event.data) onReceive(event.data)
-    }
-    socket.on('events:notifications', handleNotificationEvent)
+    handlerRef.current = onReceive
+  }, [onReceive])
 
-    return () => {
-      socket.off('events:notifications', handleNotificationEvent)
+  useWebSocketEvent<NotificationWebSocketEventMap, typeof NOTIFICATIONS_EVENT>(NOTIFICATIONS_EVENT, (data) => {
+    if (data && typeof data === 'object' && 'data' in data) {
+      handlerRef.current(data.data)
     }
-  }, [socket, onReceive])
-
-  return socket
+  })
 }
 
 export function usePagination({
