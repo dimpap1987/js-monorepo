@@ -4,7 +4,6 @@ import { useSession } from '@js-monorepo/auth/next/client'
 import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 import { ScrollArea } from '@js-monorepo/components/scroll'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
-import { WebSocketOptionsType } from '@js-monorepo/next/providers'
 import { PaginationComponent } from '@js-monorepo/pagination'
 import { PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
@@ -21,13 +20,7 @@ import {
 } from '../utils/notifications'
 import { NotificationReadAllButton } from './bell/notification-read-all'
 
-export function NotificationsPage({
-  className,
-  websocketOptions,
-}: {
-  className?: string
-  websocketOptions: WebSocketOptionsType
-}) {
+export function NotificationsPage() {
   const {
     session: { user },
   } = useSession()
@@ -57,8 +50,8 @@ export function NotificationsPage({
     fetchNotifications()
   }, [user, searchQuery])
 
-  useNotificationWebSocket(websocketOptions, (notification: UserNotificationType) => {
-    if (notification && pagination.page === 1) {
+  useNotificationWebSocket((notification: UserNotificationType) => {
+    if (notification) {
       setNotifications((prev) => ({
         ...prev,
         content: [notification, ...(prev?.content ?? [])],
@@ -101,7 +94,7 @@ export function NotificationsPage({
     notifications.totalPages >= pagination?.page
 
   return (
-    <div className={cn('text-sm sm:text-base select-none sm:p-3', 'flex flex-col h-full', className)}>
+    <div className={cn('text-sm sm:text-base select-none sm:p-3', 'flex flex-col h-full')}>
       <div className="flex justify-between items-center">
         <BackArrowWithLabel className="flex-1" arrowClassName="sm:hidden">
           <h2 className="px-2 ml-5 sm:ml-0 text-center sm:text-left">Notifications</h2>
