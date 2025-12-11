@@ -41,12 +41,7 @@ import { UserModule } from './modules/user/user.module'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [
-        `${process.cwd()}/.env.${process.env.NODE_ENV}`,
-        `${process.cwd()}/.env`,
-        `.env.${process.env.NODE_ENV}`,
-        `.env`,
-      ],
+      envFilePath: [`.env.${process.env.NODE_ENV}`, `.env`],
     }),
     ClsModule.forRoot({
       global: true,
