@@ -17,7 +17,7 @@ import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
 import dynamic from 'next/dynamic'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
 import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'
 import { RiAdminFill } from 'react-icons/ri'
@@ -92,24 +92,62 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   } = useNotificationStore()
 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
-  useNotificationWebSocket(websocketOptions, (notification: UserNotificationType) => {
-    if (notification) {
+
+  const updateNotificationsContent = useCallback(
+    (updater: (prev: UserNotificationType[]) => UserNotificationType[]) => {
       setNotifications((prev) => {
-        const existingIds = new Set(prev?.content?.map((n) => n.notification.id) ?? [])
-        // Only add if not already present
-        if (!existingIds.has(notification.notification.id)) {
-          const updatedContent = [notification, ...(prev?.content ?? [])]
-          accumulatedNotificationsRef.current = updatedContent
-          return {
-            ...prev,
-            content: updatedContent,
-          }
+        const currentContent = prev?.content ?? []
+        const updatedContent = updater(currentContent)
+        accumulatedNotificationsRef.current = updatedContent
+        return {
+          ...prev,
+          content: updatedContent,
         }
-        return prev
       })
-      incrementNotificationCountByOne()
+    },
+    []
+  )
+
+  const addOrUpdateNotification = useCallback(
+    (notification: UserNotificationType) => {
+      const existing = accumulatedNotificationsRef.current.find(
+        (n) => n.notification.id === notification.notification.id
+      )
+
+      if (existing) {
+        updateNotificationsContent((prev) => {
+          const index = prev.findIndex((n) => n.notification.id === notification.notification.id)
+          if (index >= 0) {
+            const updated = [...prev]
+            updated[index] = { ...notification, isRead: existing.isRead }
+            return updated
+          }
+          return prev
+        })
+      } else {
+        if (!notification.isRead) {
+          incrementNotificationCountByOne()
+        }
+        updateNotificationsContent((prev) => [notification, ...prev])
+      }
+    },
+    [updateNotificationsContent, incrementNotificationCountByOne]
+  )
+
+  const [pendingNotification, setPendingNotification] = useState<UserNotificationType | null>(null)
+
+  useNotificationWebSocket((notification: UserNotificationType) => {
+    if (notification) {
+      setPendingNotification(notification)
     }
   })
+
+  useEffect(() => {
+    if (pendingNotification) {
+      addOrUpdateNotification(pendingNotification)
+      setPendingNotification(null)
+    }
+  }, [pendingNotification, addOrUpdateNotification])
 
   useEffect(() => {
     if (!user?.id || fetchNotificationsRef.current) return
@@ -154,9 +192,15 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
               unreadNotificationCount={notificationCount}
               latestReadNotificationId={latestReadNotificationId}
               notificationList={notifications?.content ?? []}
-              onRead={(id) => {
+              onRead={async (id) => {
                 markNotificationAsRead(id)
-                return apiReadNotification(id)
+                const response = await apiReadNotification(id)
+                if (response.ok) {
+                  updateNotificationsContent((prev) =>
+                    prev.map((item) => (item.notification.id === id ? { ...item, isRead: true } : item))
+                  )
+                }
+                return response
               }}
               onReadAll={async () => {
                 if (notificationCount === 0) return false
@@ -164,6 +208,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
                 const response = await apiReadAllNotifications()
                 if (response.ok) {
                   setNotificationCount(0)
+                  updateNotificationsContent((prev) => prev.map((item) => ({ ...item, isRead: true })))
                   return true
                 }
                 return false
@@ -177,7 +222,6 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
                   if (response.ok) {
                     const newPageContent = response.data?.content ?? []
                     const existingIds = new Set(accumulatedNotificationsRef.current.map((n) => n.notification.id))
-                    // Merge new page notifications with accumulated ones
                     const newNotifications = newPageContent.filter((n) => !existingIds.has(n.notification.id))
                     const mergedContent = [...newNotifications, ...accumulatedNotificationsRef.current].sort(
                       (a, b) => b.notification.id - a.notification.id
@@ -196,10 +240,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
         </NavbarItems>
       </DpNextNavbar>
 
-      <AnnouncementsComponent
-        className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-50"
-        websocketOptions={websocketOptions}
-      ></AnnouncementsComponent>
+      <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-50"></AnnouncementsComponent>
 
       <DpNextSidebar
         isOpen={openSideBar}
