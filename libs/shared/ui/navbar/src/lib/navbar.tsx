@@ -122,7 +122,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
             </ul>
 
             <div>
-              <section className="hidden sm:flex items-center gap-2 justify-end text-center">
+              <section className="hidden sm:flex items-center gap-3 justify-end text-center">
                 <>
                   {navbarItems && navbarItems}
 
