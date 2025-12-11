@@ -47,8 +47,8 @@ function expandEnvVars(envContent) {
       continue;
     }
     
-    // Match KEY=VALUE pattern
-    const match = trimmed.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+    // Match KEY=VALUE pattern (case-insensitive to handle edge cases)
+    const match = trimmed.match(/^([a-zA-Z_][a-zA-Z0-9_]*)=(.*)$/i);
     if (match) {
       const key = match[1];
       const originalValue = match[2];
