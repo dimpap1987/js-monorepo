@@ -60,6 +60,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
   useEffect(() => {
     if (!shouldConnect || !optionsRef.current?.url) {
       if (socketRef.current) {
+        socketRef.current.removeAllListeners()
         socketRef.current.disconnect()
         socketRef.current = null
       }
@@ -68,76 +69,77 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
       return
     }
 
-    // Reuse existing socket if already connected
-    if (socketRef.current?.connected) {
-      setConnectionState('connected')
-      setIsConnected(true)
-      return
+    // Disconnect existing socket first
+    if (socketRef.current) {
+      socketRef.current.removeAllListeners()
+      socketRef.current.disconnect()
+      socketRef.current = null
     }
 
-    // Create new socket if needed
-    if (!socketRef.current) {
-      setConnectionState('connecting')
+    // Create new socket connection
+    setConnectionState('connecting')
 
-      try {
-        const socket = io(optionsRef.current.url, {
-          path: optionsRef.current.path ?? '/ws',
-          secure: true,
-          withCredentials: true,
-          reconnection: true,
-          reconnectionDelay: 1000,
-          reconnectionAttempts: 10,
-          transports: ['websocket'],
-        })
+    try {
+      const socket = io(optionsRef.current.url, {
+        path: optionsRef.current.path ?? '/ws',
+        secure: true,
+        withCredentials: true,
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: 10,
+        transports: ['websocket'],
+      })
 
-        socketRef.current = socket
+      socketRef.current = socket
 
-        // Setup connection event handlers
-        socket.on('connect', () => {
-          console.log(`WebSocket connected to: ${optionsRef.current.url}`)
-          setConnectionState('connected')
-          setIsConnected(true)
+      // Setup connection event handlers
+      socket.on('connect', () => {
+        console.log(`WebSocket connected to: ${optionsRef.current.url}`)
+        setConnectionState('connected')
+        setIsConnected(true)
 
-          // Re-register all subscriptions on reconnect
-          subscriptionsRef.current.forEach((sub) => {
+        // Re-register all subscriptions on reconnect
+        subscriptionsRef.current.forEach((sub) => {
+          if (!socket.hasListeners(sub.event)) {
             socket.on(sub.event, sub.handler)
-          })
-        })
-
-        socket.on('disconnect', (reason) => {
-          console.log(`WebSocket disconnected: ${reason}`)
-          setIsConnected(false)
-
-          if (reason === 'io server disconnect') {
-            // Server disconnected, client will reconnect
-            setConnectionState('reconnecting')
-          } else {
-            setConnectionState('disconnected')
           }
         })
+      })
 
-        socket.on('connect_error', (error) => {
-          console.error('WebSocket connection error:', error)
-          setConnectionState('error')
-          setIsConnected(false)
-        })
+      socket.on('disconnect', (reason) => {
+        console.log(`WebSocket disconnected: ${reason}`)
+        setIsConnected(false)
 
-        // Re-register existing subscriptions if socket was recreated
-        subscriptionsRef.current.forEach((sub) => {
-          socket.on(sub.event, sub.handler)
-        })
-      } catch (error) {
-        console.error('Error creating WebSocket connection', error)
+        if (reason === 'io server disconnect') {
+          // Server disconnected, client will reconnect
+          setConnectionState('reconnecting')
+        } else {
+          setConnectionState('disconnected')
+        }
+      })
+
+      socket.on('connect_error', (error) => {
+        console.error('WebSocket connection error:', error)
         setConnectionState('error')
         setIsConnected(false)
-      }
+      })
+    } catch (error) {
+      console.error('Error creating WebSocket connection', error)
+      setConnectionState('error')
+      setIsConnected(false)
     }
 
-    // Cleanup on unmount
+    // Cleanup on unmount or hot reload
     return () => {
-      // Don't disconnect here - let it be managed at app level
-      // Only cleanup subscriptions
+      if (socketRef.current) {
+        // Remove all event listeners before disconnecting
+        socketRef.current.removeAllListeners()
+        socketRef.current.disconnect()
+        socketRef.current = null
+      }
       subscriptionsRef.current = []
+      setConnectionState('disconnected')
+      setIsConnected(false)
     }
   }, [shouldConnect])
 
