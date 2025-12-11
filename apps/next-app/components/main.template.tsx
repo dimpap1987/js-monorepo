@@ -12,7 +12,6 @@ import {
   useNotificationWebSocket,
 } from '@js-monorepo/notifications-ui'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
-import { ModeToggle } from '@js-monorepo/theme-provider'
 import { MenuItem, PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import { websocketOptions } from '@next-app/utils/websocket.config'
@@ -171,7 +170,6 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
               resetOnClose={true}
             ></DpNotificationBellComponentDynamic>
           )}
-          <ModeToggle></ModeToggle>
         </NavbarItems>
       </DpNextNavbar>
 
