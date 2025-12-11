@@ -65,6 +65,102 @@ The architecture includes:
 
 ## 🔧 Development
 
+### Environment Variables
+
+This monorepo uses **centralized environment variable management** with **configurable base variables**. All environment variables are defined in a single root `.env` file using variable interpolation.
+
+#### Setup
+
+1. **Create root `.env` file**:
+   ```bash
+   # Copy from template
+   cp .env.example .env
+   ```
+
+2. **Configure base variables** (edit `.env`):
+   ```bash
+   # For local development:
+   HOSTNAME=localhost
+   API_PORT=3333
+   FRONTEND_PORT=3000
+   DATABASE_PORT=5432
+   REDIS_PORT=6379
+   
+   # For production, just change HOSTNAME:
+   # HOSTNAME=yourdomain.com
+   # API_PORT=3333
+   # FRONTEND_PORT=3000
+   ```
+
+3. **Sync to all apps**:
+   ```bash
+   npm run sync:env
+   ```
+   This syncs and expands variables from root `.env` to:
+   - `apps/my-api/.env`
+   - `apps/next-app/.env`
+   - `libs/prisma/run_migrations/.env`
+
+#### How It Works
+
+The `.env` file uses **variable interpolation** (via `dotenv-expand`). Base variables are defined at the top, and all URLs are constructed from them:
+
+```bash
+# Base configuration
+HOSTNAME=localhost
+API_PORT=3333
+FRONTEND_PORT=3000
+
+# Auto-constructed URLs
+HOSTNAME_API=${HOSTNAME}:${API_PORT}           # → localhost:3333
+HOSTNAME_FRONTEND=${HOSTNAME}:${FRONTEND_PORT} # → localhost:3000
+AUTH_LOGIN_REDIRECT=http://${HOSTNAME_FRONTEND} # → http://localhost:3000
+GOOGLE_REDIRECT_URL=http://${HOSTNAME_API}/api/auth/google/redirect
+```
+
+#### Workflow
+
+- **Edit base variables**: Change `HOSTNAME`, `*_PORT` in root `.env`
+- **Sync changes**: Run `npm run sync:env` (expands variables automatically)
+- **Restart services**: Restart dev servers to load new values
+
+> **Note**: Run `npm run sync:env` whenever you change the root `.env` file. Variables are automatically expanded for Next.js compatibility.
+
+#### Environment-Specific Configuration
+
+**Local Development:**
+```bash
+HOSTNAME=localhost
+API_PORT=3333
+FRONTEND_PORT=3000
+```
+
+**Staging/Production:**
+```bash
+HOSTNAME=staging.yourdomain.com  # or yourdomain.com
+API_PORT=3333
+FRONTEND_PORT=3000
+# All URLs automatically update!
+```
+
+#### Key Variables
+
+**Base Variables** (change these for different environments):
+- `HOSTNAME` - Base hostname (localhost, staging.example.com, etc.)
+- `API_PORT` - Backend API port (default: 3333)
+- `FRONTEND_PORT` - Frontend port (default: 3000)
+- `DATABASE_PORT` - PostgreSQL port (default: 5432)
+- `REDIS_PORT` - Redis port (default: 6379)
+
+**Auto-constructed** (don't edit directly):
+- `HOSTNAME_API`, `HOSTNAME_FRONTEND`, `HOSTNAME_DATABASE`, `HOSTNAME_REDIS`
+- `DATABASE_URL`, `REDIS_URL`
+- `AUTH_LOGIN_REDIRECT`, `GOOGLE_REDIRECT_URL`, `GITHUB_REDIRECT_URL`
+- `NEXT_PUBLIC_AUTH_URL`, `NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL`
+- `CORS_ORIGIN_DOMAINS`, `API_URL`
+
+See `.env.example` for the complete template.
+
 ### Running specific apps
 
 ```bash
@@ -76,8 +172,6 @@ npm run dev:my-api
 
 ```
 
-**_ IMPORTANT _** Check the .env.example in each project to see the required env variables
-
 ### Building projects
 
 #### Next-app
@@ -86,13 +180,12 @@ npm run dev:my-api
 2. docker build -t dimpap/next-app:1.0.100 -f apps/next-app/Dockerfile .
 
 **_ IMPORTANT _**
-Before you build the image you need to set .env in `apps/next-app/.env`
-
-```.env
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-NEXT_PUBLIC_AUTH_URL=http://localhost:80                         ##  Replace with your domain
-NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL=ws://localhost:80/presence    ## Replace with your domain
+Before building, ensure your root `.env` file is configured and synced:
+```bash
+npm run sync:env
 ```
+
+The build process will use environment variables from the root `.env` file.
 
 #### My-api
 
