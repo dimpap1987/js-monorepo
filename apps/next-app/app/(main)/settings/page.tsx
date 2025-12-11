@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@js-monorepo/component
 import { Separator } from '@js-monorepo/components/separator'
 import { AccountSettings } from './account-settings'
 import { NotificationPermissionComponent } from './notification-settings'
+import { ThemeSettings } from './theme-settings'
 
 export default function SettingsPage() {
   return (
@@ -18,12 +19,17 @@ export default function SettingsPage() {
         <Separator />
         <TabsList className="py-1 my-1">
           <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
         <Separator />
 
         <TabsContent value="account" className="p-2">
           <AccountSettings></AccountSettings>
+        </TabsContent>
+
+        <TabsContent value="appearance" className="p-2">
+          <ThemeSettings></ThemeSettings>
         </TabsContent>
 
         <TabsContent value="notifications" className="p-2">
