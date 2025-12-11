@@ -70,12 +70,14 @@ services:
       retries: 3
     networks:
       - super-network
+    # ports:
+    #   - '5432:5432'
     volumes:
       - ${POSTGRES_VOLUME_PATH}:/var/lib/postgresql/data
     command: postgres -c shared_preload_libraries=pg_stat_statements
 
   redis:
-    image: bitnami/redis:7.0
+    image: bitnami/redis:latest
     container_name: redis_container
     env_file:
       - .env
