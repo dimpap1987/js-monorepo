@@ -1,38 +1,50 @@
 'use client'
 
-import { useWebSocket } from '@js-monorepo/next/providers'
-import { websocketOptions } from '@next-app/utils/websocket.config'
+import {
+  useWebSocketEvent,
+  useWebSocketEmit,
+  useWebSocketStatus,
+  type BaseWebSocketEventMap,
+} from '@js-monorepo/next/providers'
 import { useEffect } from 'react'
 
+type WebSocketConfigEventMap = BaseWebSocketEventMap & {
+  'events:refresh-session': boolean
+}
+
 export const useWebSocketConfig = (isLoggedIn: boolean, isAdmin: boolean, refreshSession: () => void) => {
-  const { socket, disconnect } = useWebSocket(websocketOptions, isLoggedIn)
+  const { isConnected } = useWebSocketStatus()
+  const emit = useWebSocketEmit()
 
+  // Subscribe to refresh session event
+  useWebSocketEvent<WebSocketConfigEventMap, 'events:refresh-session'>('events:refresh-session', () => {
+    setTimeout(() => {
+      refreshSession()
+    }, 1000)
+  })
+
+  // Subscribe to connect event and emit announcements subscription
+  useWebSocketEvent<WebSocketConfigEventMap, 'connect'>('connect', () => {
+    emit('subscribe:announcements', {})
+  })
+
+  // Emit announcements subscription when connected
   useEffect(() => {
-    if (!socket) return
+    if (isConnected) {
+      emit('subscribe:announcements', {})
+    }
+  }, [isConnected, emit])
 
-    socket.on('connect', () => {
-      socket.emit('subscribe:announcements', {})
-      socket.on('events:refresh-session', () => {
-        setTimeout(() => {
-          refreshSession()
-        }, 1000)
-      })
-    })
+  // Handle admin room subscription
+  useEffect(() => {
+    if (!isConnected || !isAdmin) return
+
+    emit('subscribe:join-admin-room', {})
 
     return () => {
-      disconnect()
+      emit('unsubscribe:leave-admin-room', {})
     }
-  }, [socket])
+  }, [isConnected, isAdmin, emit])
 
-  useEffect(() => {
-    if (!socket || !isAdmin) return
-
-    socket.emit('subscribe:join-admin-room', {})
-
-    return () => {
-      socket.emit('unsubscribe:leave-admin-room', {})
-    }
-  }, [socket, isAdmin])
-
-  return { socket }
+  return {}
 }

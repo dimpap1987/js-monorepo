@@ -2,8 +2,12 @@
 
 import { Badge } from '@js-monorepo/components/badge'
 import { Skeleton } from '@js-monorepo/components/skeleton'
-import { useWebSocket } from '@js-monorepo/next/providers'
-import { websocketOptions } from '@next-app/utils/websocket.config'
+import {
+  useWebSocketEvent,
+  useWebSocketEmit,
+  useWebSocketStatus,
+  type BaseWebSocketEventMap,
+} from '@js-monorepo/next/providers'
 import { useEffect, useState } from 'react'
 import { FaCircle } from 'react-icons/fa6'
 import { DisconnectUserComponent } from './components/disconnect-user'
@@ -15,35 +19,35 @@ export type OnlineUsersType = {
   roles: string[]
 }
 
+type OnlineUsersEventMap = BaseWebSocketEventMap & {
+  'events:online-users': OnlineUsersType[]
+}
+
 export default function OnlineUsersTableComponent() {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUsersType[] | []>([])
   const [loading, setLoading] = useState(true)
-  const { socket } = useWebSocket(websocketOptions, true)
+  const { isConnected } = useWebSocketStatus()
+  const emit = useWebSocketEmit()
 
-  useEffect(() => {
-    if (!socket) return
-
-    const handleConnect = () => {
-      socket.emit('subscribe:online-users', {})
-    }
-
-    const handleOnlineUsersEvent = async (users: any) => {
+  // Subscribe to online users events
+  useWebSocketEvent<OnlineUsersEventMap, 'events:online-users'>('events:online-users', (users) => {
+    if (users) {
       setOnlineUsers(users)
       setLoading(false)
     }
+  })
 
-    socket.on('connect', handleConnect)
-    socket.on('events:online-users', handleOnlineUsersEvent)
+  // Subscribe to connect event and emit subscription
+  useWebSocketEvent<OnlineUsersEventMap, 'connect'>('connect', () => {
+    emit('subscribe:online-users', {})
+  })
 
-    if (socket.connected) {
-      handleConnect()
+  // Emit subscription when connected
+  useEffect(() => {
+    if (isConnected) {
+      emit('subscribe:online-users', {})
     }
-
-    return () => {
-      socket.off('connect', handleConnect)
-      socket.off('events:online-users', handleOnlineUsersEvent)
-    }
-  }, [socket])
+  }, [isConnected, emit])
 
   const groupedUsers = onlineUsers?.reduce(
     (acc, user) => {
