@@ -44,7 +44,7 @@ export function DpNotificationBellComponent({
   onPaginationChange,
   resetOnClose = false,
 }: DpNotificationBellComponentProps) {
-  // Initialize notifications from prop
+  // Use notificationList directly from parent - parent now handles accumulation
   const [notifications, setNotifications] = useState<UserNotificationType[]>(() =>
     [...notificationList].sort((a, b) => b.notification.id - a.notification.id)
   )
@@ -60,23 +60,17 @@ export function DpNotificationBellComponent({
     onPaginationChange,
   })
 
-  // Update initial notifications ref when notificationList changes (first load)
+  // Update initial notifications ref when notificationList changes (for resetOnClose)
   useEffect(() => {
-    if (notificationList.length > 0 && notifications.length === 0) {
-      initialNotificationsRef.current = notificationList
+    if (notificationList.length > 0) {
+      initialNotificationsRef.current = [...notificationList]
     }
-  }, [notificationList, notifications.length])
+  }, [notificationList])
 
-  // Merge new notifications from prop, avoiding duplicates
+  // Sync notifications with parent's notificationList
+  // Parent now handles accumulation, so we just sync here
   useEffect(() => {
-    setNotifications((prev) => {
-      const existingIds = new Set(prev.map((content) => content.notification.id))
-      const newNotifications = notificationList.filter((content) => !existingIds.has(content.notification.id))
-
-      if (newNotifications.length === 0) return prev
-
-      return [...prev, ...newNotifications].sort((a, b) => b.notification.id - a.notification.id)
-    })
+    setNotifications([...notificationList].sort((a, b) => b.notification.id - a.notification.id))
   }, [notificationList])
 
   // Update notification read status when latestReadNotificationId changes
@@ -120,11 +114,21 @@ export function DpNotificationBellComponent({
 
   // Create debounced scroll handler with proper cleanup
   useEffect(() => {
-    debouncedScrollHandlerRef.current = debounce(() => {
-      const container = notificationContainerRef.current
-      if (!container) return
+    const oldHandler = debouncedScrollHandlerRef.current
+    const container = notificationContainerRef.current
 
-      const { scrollTop, scrollHeight, clientHeight } = container
+    // Remove old handler if it exists and dropdown is open
+    if (oldHandler && container && isDropdownOpen) {
+      container.removeEventListener('scroll', oldHandler)
+      oldHandler.cancel()
+    }
+
+    // Create new handler
+    debouncedScrollHandlerRef.current = debounce(() => {
+      const currentContainer = notificationContainerRef.current
+      if (!currentContainer) return
+
+      const { scrollTop, scrollHeight, clientHeight } = currentContainer
       const distanceFromBottom = scrollHeight - (scrollTop + clientHeight)
 
       // Trigger load more when near bottom and not already loading
@@ -133,10 +137,15 @@ export function DpNotificationBellComponent({
       }
     }, DEBOUNCE_DELAY)
 
+    // Attach new handler if dropdown is open
+    if (debouncedScrollHandlerRef.current && container && isDropdownOpen) {
+      container.addEventListener('scroll', debouncedScrollHandlerRef.current, { passive: true })
+    }
+
     return () => {
       debouncedScrollHandlerRef.current?.cancel()
     }
-  }, [loadMore, isLoading])
+  }, [loadMore, isLoading, isDropdownOpen])
 
   // Handle dropdown open/close with proper event listener management
   const handleOpenChange = useCallback(
@@ -149,6 +158,13 @@ export function DpNotificationBellComponent({
         if (!container) return
 
         if (open) {
+          requestAnimationFrame(() => {
+            const currentContainer = notificationContainerRef.current
+            if (currentContainer) {
+              currentContainer.scrollTop = 0
+            }
+          })
+
           // Add scroll listener when dropdown opens
           if (debouncedScrollHandlerRef.current) {
             container.addEventListener('scroll', debouncedScrollHandlerRef.current, { passive: true })
@@ -159,9 +175,10 @@ export function DpNotificationBellComponent({
             container.removeEventListener('scroll', debouncedScrollHandlerRef.current)
           }
 
-          // Reset state if needed
+          // Reset pagination if needed
           if (resetOnClose) {
             setPaginator(1, pageable.pageSize)
+            // Reset to initial notifications (parent will handle re-fetching if needed)
             setNotifications([...initialNotificationsRef.current].sort((a, b) => b.notification.id - a.notification.id))
           }
         }
@@ -172,13 +189,17 @@ export function DpNotificationBellComponent({
 
   // Cleanup event listeners on unmount
   useEffect(() => {
-    const container = notificationContainerRef.current
-    const scrollHandler = debouncedScrollHandlerRef.current
+    // Capture refs at mount time for cleanup (refs are stable, so this is safe)
+    const containerRef = notificationContainerRef
+    const handlerRef = debouncedScrollHandlerRef
 
     return () => {
+      const container = containerRef.current
+      const scrollHandler = handlerRef.current
       if (container && scrollHandler) {
         container.removeEventListener('scroll', scrollHandler)
       }
+      // Cancel the debounced function to prevent stale calls
       scrollHandler?.cancel()
     }
   }, [])
@@ -218,7 +239,7 @@ export function DpNotificationBellComponent({
               {unreadNotificationCount > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-foreground-neutral font-medium">
-                    {unreadNotificationCount} {unreadNotificationCount === 1 ? 'unread' : 'unread'}
+                    {unreadNotificationCount} {unreadNotificationCount === 1 ? 'unread' : 'unreads'}
                   </span>
                   <NotificationReadAllButton onReadAll={handleReadAll} />
                 </div>
