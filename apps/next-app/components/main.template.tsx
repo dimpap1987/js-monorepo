@@ -136,7 +136,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
           {isLoggedIn && (
             <DpNotificationBellComponentDynamic
               className="mt-[0.58rem]"
-              pagebale={{
+              pageable={{
                 page: notifications?.page ?? initialPage,
                 pageSize: notifications?.pageSize ?? initialPageSize,
                 totalPages: notifications?.totalPages ?? 0,
