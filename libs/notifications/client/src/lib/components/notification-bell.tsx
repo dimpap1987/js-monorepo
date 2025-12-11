@@ -206,7 +206,7 @@ export function DpNotificationBellComponent({
 
   // Memoize scroll area height calculation
   const scrollAreaHeight = useMemo(
-    () => (pageable?.totalPages > 1 ? 'h-[28rem] max-h-[28rem]' : 'max-h-[28rem]'),
+    () => (pageable?.totalPages > 1 ? 'h-[32rem] max-h-[32rem]' : 'max-h-[32rem]'),
     [pageable?.totalPages]
   )
 

@@ -13,10 +13,9 @@ function Notifications({ notifications, onRead, showLoader }: NotificationListPr
   if (notifications?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-        <span className="text-5xl mb-3 opacity-60" role="img" aria-label="Bell icon indicating no notifications">
+        <span className="text-3xl mb-3 opacity-60" role="img" aria-label="Bell icon indicating no notifications">
           🔔
         </span>
-        <div className="text-sm font-medium text-foreground-neutral">All caught up!</div>
         <div className="text-xs text-foreground-neutral/60 mt-1">No new notifications</div>
       </div>
     )
