@@ -51,7 +51,7 @@ export function NotificationsPage() {
   }, [user, searchQuery])
 
   useNotificationWebSocket((notification: UserNotificationType) => {
-    if (notification) {
+    if (notification && pagination.page === 1) {
       setNotifications((prev) => ({
         ...prev,
         content: [notification, ...(prev?.content ?? [])],
