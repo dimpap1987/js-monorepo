@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react'
 import { io, Socket } from 'socket.io-client'
 
 export type WebSocketOptionsType = {
@@ -8,111 +8,263 @@ export type WebSocketOptionsType = {
   path?: string
 }
 
-type WebSocketContextType = {
-  connectSocket: (opts: WebSocketOptionsType) => Socket | undefined
-  unsubscribe: () => void
+// Base event map - clients should extend this
+export type BaseWebSocketEventMap = {
+  connect: void
+  disconnect: string
 }
 
-const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined)
+// Default event map that can be extended by clients
+export type WebSocketEventMap = BaseWebSocketEventMap & {
+  [key: string]: any
+}
 
-export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const socketRef = useRef<Socket | null>(null) // Single socket reference
+type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error'
 
+type EventSubscription = {
+  event: string
+  handler: (...args: any[]) => void
+  id: symbol
+}
+
+type WebSocketContextValue<TEventMap extends WebSocketEventMap = WebSocketEventMap> = {
+  socket: Socket | null
+  isConnected: boolean
+  connectionState: ConnectionState
+  subscribe: <K extends keyof TEventMap & string>(event: K, handler: (data: TEventMap[K]) => void) => () => void
+  emit: <T = any>(event: string, data?: T) => void
+  getConnectionState: () => ConnectionState
+}
+
+const WebSocketContext = createContext<WebSocketContextValue<any> | undefined>(undefined)
+
+interface WebSocketProviderProps {
+  children: React.ReactNode
+  options: WebSocketOptionsType
+  shouldConnect?: boolean
+}
+
+export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, options, shouldConnect = true }) => {
+  const socketRef = useRef<Socket | null>(null)
+  const subscriptionsRef = useRef<EventSubscription[]>([])
+  const [isConnected, setIsConnected] = useState(false)
+  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected')
+  const optionsRef = useRef(options)
+
+  // Update options ref when they change
   useEffect(() => {
-    // Cleanup the socket on unmount
-    return () => {
+    optionsRef.current = options
+  }, [options])
+
+  // Connection management
+  useEffect(() => {
+    if (!shouldConnect || !optionsRef.current?.url) {
       if (socketRef.current) {
         socketRef.current.disconnect()
-        console.log('WebSocket disconnected on cleanup')
+        socketRef.current = null
+      }
+      setConnectionState('disconnected')
+      setIsConnected(false)
+      return
+    }
+
+    // Reuse existing socket if already connected
+    if (socketRef.current?.connected) {
+      setConnectionState('connected')
+      setIsConnected(true)
+      return
+    }
+
+    // Create new socket if needed
+    if (!socketRef.current) {
+      setConnectionState('connecting')
+
+      try {
+        const socket = io(optionsRef.current.url, {
+          path: optionsRef.current.path ?? '/ws',
+          secure: true,
+          withCredentials: true,
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionAttempts: 10,
+          transports: ['websocket'],
+        })
+
+        socketRef.current = socket
+
+        // Setup connection event handlers
+        socket.on('connect', () => {
+          console.log(`WebSocket connected to: ${optionsRef.current.url}`)
+          setConnectionState('connected')
+          setIsConnected(true)
+
+          // Re-register all subscriptions on reconnect
+          subscriptionsRef.current.forEach((sub) => {
+            socket.on(sub.event, sub.handler)
+          })
+        })
+
+        socket.on('disconnect', (reason) => {
+          console.log(`WebSocket disconnected: ${reason}`)
+          setIsConnected(false)
+
+          if (reason === 'io server disconnect') {
+            // Server disconnected, client will reconnect
+            setConnectionState('reconnecting')
+          } else {
+            setConnectionState('disconnected')
+          }
+        })
+
+        socket.on('connect_error', (error) => {
+          console.error('WebSocket connection error:', error)
+          setConnectionState('error')
+          setIsConnected(false)
+        })
+
+        // Re-register existing subscriptions if socket was recreated
+        subscriptionsRef.current.forEach((sub) => {
+          socket.on(sub.event, sub.handler)
+        })
+      } catch (error) {
+        console.error('Error creating WebSocket connection', error)
+        setConnectionState('error')
+        setIsConnected(false)
       }
     }
-  }, [])
 
-  const connectSocket = (opts: WebSocketOptionsType) => {
-    if (!opts?.url) return undefined
+    // Cleanup on unmount
+    return () => {
+      // Don't disconnect here - let it be managed at app level
+      // Only cleanup subscriptions
+      subscriptionsRef.current = []
+    }
+  }, [shouldConnect])
 
-    try {
-      if (socketRef.current) {
-        if (socketRef.current.connected) {
-          return socketRef.current // Return existing connected socket
-        } else {
-          console.warn(`Existing socket is not connected. Attempting to reconnect...`)
-          socketRef.current.connect() // Attempt to reconnect
-          return socketRef.current // Return the existing socket regardless
+  // Subscribe to an event with automatic cleanup
+  const subscribe = useCallback(
+    <K extends keyof WebSocketEventMap & string>(
+      event: K,
+      handler: (data: WebSocketEventMap[K]) => void
+    ): (() => void) => {
+      const subscriptionId = Symbol(`subscription-${event}`)
+      const wrappedHandler = handler as (...args: any[]) => void
+
+      // Add to subscriptions tracking
+      subscriptionsRef.current.push({
+        event: event as string,
+        handler: wrappedHandler,
+        id: subscriptionId,
+      })
+
+      // Register with socket if connected
+      if (socketRef.current?.connected) {
+        socketRef.current.on(event as string, wrappedHandler)
+      }
+
+      // Return unsubscribe function
+      return () => {
+        // Remove from tracking
+        subscriptionsRef.current = subscriptionsRef.current.filter((sub) => sub.id !== subscriptionId)
+
+        // Remove from socket
+        if (socketRef.current) {
+          socketRef.current.off(event as string, wrappedHandler)
         }
       }
+    },
+    []
+  )
 
-      // Create a new socket if none exists
-      const socket = io(opts.url, {
-        path: opts.path ? opts.path : '/ws',
-        secure: true,
-        withCredentials: true,
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 10,
-        transports: ['websocket'],
-      })
-
-      socketRef.current = socket
-
-      socket.on('connect', () => {
-        console.log(`Connected to url: ${opts.url}`)
-      })
-
-      socket.on('disconnect', () => {
-        console.log(`Disconnected from url: ${opts.url}`)
-      })
-
-      return socket
-    } catch (e) {
-      console.error('Error while creating websocket connection', e)
-      return undefined
+  // Emit event to server
+  const emit = useCallback(<T = any,>(event: string, data?: T): void => {
+    if (!socketRef.current?.connected) {
+      console.warn(`Cannot emit ${event}: WebSocket not connected`)
+      return
     }
+    socketRef.current.emit(event, data)
+  }, [])
+
+  const getConnectionState = useCallback((): ConnectionState => {
+    return connectionState
+  }, [connectionState])
+
+  const value: WebSocketContextValue<any> = {
+    socket: socketRef.current,
+    isConnected,
+    connectionState,
+    subscribe,
+    emit,
+    getConnectionState,
   }
 
-  const unsubscribe = () => {
-    if (socketRef.current) {
-      socketRef.current.disconnect()
-      console.log('WebSocket unsubscribed and disconnected')
-      socketRef.current = null
-    }
-  }
-
-  return <WebSocketContext.Provider value={{ connectSocket, unsubscribe }}>{children}</WebSocketContext.Provider>
+  return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>
 }
 
-// Create a custom hook to use the WebSocket context
-export const useWebSocket = (
-  opts: WebSocketOptionsType,
-  connect: boolean
-): {
-  socket: Socket | null
-  disconnect: () => void
-} => {
-  const context = useContext(WebSocketContext) as WebSocketContextType
-  const [socket, setSocket] = useState<Socket | null>(null)
-
+/**
+ * Hook to access WebSocket context
+ */
+export const useWebSocketEnhanced = <
+  TEventMap extends WebSocketEventMap = WebSocketEventMap,
+>(): WebSocketContextValue<TEventMap> => {
+  const context = useContext(WebSocketContext)
   if (!context) {
-    throw new Error('useWebSocket must be used within a WebSocketProvider')
+    throw new Error('useWebSocketEnhanced must be used within WebSocketProvider')
   }
+  return context as WebSocketContextValue<TEventMap>
+}
+
+/**
+ * Hook to subscribe to a specific WebSocket event
+ * Handles cleanup automatically and prevents handler recreation issues
+ */
+export const useWebSocketEvent = <
+  TEventMap extends WebSocketEventMap = WebSocketEventMap,
+  K extends keyof TEventMap & string = keyof TEventMap & string,
+>(
+  event: K & string,
+  handler: (data: TEventMap[K]) => void,
+  deps: React.DependencyList = []
+): void => {
+  const { subscribe } = useWebSocketEnhanced<TEventMap>()
+  const handlerRef = useRef(handler)
+
+  // Update handler ref when it changes (prevents re-subscription)
+  useEffect(() => {
+    handlerRef.current = handler
+  }, [handler])
 
   useEffect(() => {
-    if (connect) {
-      const newSocket = context.connectSocket(opts) as Socket
-      setSocket(newSocket)
-    } else {
-      context.unsubscribe()
-      setSocket(null)
-    }
-  }, [opts.url, connect])
+    // Create stable wrapper that uses ref
+    const stableHandler = ((...args: any[]) => {
+      handlerRef.current(args[0] as TEventMap[K])
+    }) as (data: TEventMap[K]) => void
 
-  return {
-    socket,
-    disconnect: () => {
-      if (socket && socket.connected) {
-        context.unsubscribe()
-        setSocket(null)
-      }
-    },
-  }
+    const unsubscribe = subscribe(event as K & string, stableHandler as (data: TEventMap[K & string]) => void)
+    return unsubscribe
+    // Only re-subscribe if event name changes, not handler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event, subscribe, ...deps])
 }
+
+/**
+ * Hook to get connection status
+ */
+export const useWebSocketStatus = (): {
+  isConnected: boolean
+  connectionState: ConnectionState
+} => {
+  const { isConnected, connectionState } = useWebSocketEnhanced()
+  return { isConnected, connectionState }
+}
+
+/**
+ * Hook to emit events to server
+ */
+export const useWebSocketEmit = () => {
+  const { emit } = useWebSocketEnhanced()
+  return emit
+}
+
+// Export ConnectionState for client use
+export type { ConnectionState }
