@@ -3,9 +3,19 @@
 import { Button } from '@js-monorepo/components/button'
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 
 export function ModeToggle() {
-  const { setTheme, theme } = useTheme()
+  const { setTheme, theme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  // Handle hydration: theme is undefined on initial render
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Use resolvedTheme if available, otherwise fallback to theme, otherwise default to 'light'
+  const currentTheme = mounted ? resolvedTheme || theme || 'light' : 'light'
 
   const raysVariants = {
     hidden: {
@@ -71,7 +81,7 @@ export function ModeToggle() {
     <Button
       className="py-1 px-2 rounded-md hover:bg-transparent border-0 focus-visible:ring-primary focus-visible:ring-2 hover:ring-1 hover:ring-border"
       variant="outline"
-      onClick={() => (theme === 'dark' ? setTheme('light') : setTheme('dark'))}
+      onClick={() => (currentTheme === 'dark' ? setTheme('light') : setTheme('dark'))}
     >
       <motion.svg
         strokeWidth="4"
@@ -88,13 +98,13 @@ export function ModeToggle() {
           d={moonPath}
           className={'absolute top-0 left-0 stroke-blue-100 '}
           initial="hidden"
-          animate={theme === 'dark' ? 'visible' : 'hidden'}
+          animate={currentTheme === 'dark' ? 'visible' : 'hidden'}
         />
 
         <motion.g
           variants={raysVariants}
           initial="hidden"
-          animate={theme === 'light' ? 'visible' : 'hidden'}
+          animate={currentTheme === 'light' ? 'visible' : 'hidden'}
           className="stroke-6 stroke-yellow-600"
           style={{ strokeLinecap: 'round' }}
         >
@@ -114,7 +124,7 @@ export function ModeToggle() {
           transition={{ duration: 1, type: 'spring' }}
           initial={{ fillOpacity: 0, strokeOpacity: 0 }}
           animate={
-            theme === 'dark'
+            currentTheme === 'dark'
               ? {
                   d: moonPath,
                   rotate: -360,
