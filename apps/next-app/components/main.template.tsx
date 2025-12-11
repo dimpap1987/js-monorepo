@@ -80,6 +80,8 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   const fetchNotificationsRef = useRef(false)
   const router = useRouter()
   const [notifications, setNotifications] = useState<Partial<PaginationType> | undefined>()
+  // Track accumulated notifications across pagination
+  const accumulatedNotificationsRef = useRef<UserNotificationType[]>([])
 
   const {
     notificationCount,
@@ -93,10 +95,17 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   useNotificationWebSocket(websocketOptions, (notification: UserNotificationType) => {
     if (notification) {
       setNotifications((prev) => {
-        return {
-          ...prev,
-          content: [notification, ...(prev?.content ?? [])],
+        const existingIds = new Set(prev?.content?.map((n) => n.notification.id) ?? [])
+        // Only add if not already present
+        if (!existingIds.has(notification.notification.id)) {
+          const updatedContent = [notification, ...(prev?.content ?? [])]
+          accumulatedNotificationsRef.current = updatedContent
+          return {
+            ...prev,
+            content: updatedContent,
+          }
         }
+        return prev
       })
       incrementNotificationCountByOne()
     }
@@ -107,11 +116,13 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
     apiFetchUserNotifications(user.id, `?page=${initialPage}&pageSize=${initialPageSize}`).then((response) => {
       if (response.ok) {
         fetchNotificationsRef.current = true
+        const initialContent = response.data?.content ?? []
+        accumulatedNotificationsRef.current = initialContent
         setNotifications(response.data)
         setNotificationCount(response.data?.unReadTotal ?? 0)
       }
     })
-  }, [user])
+  }, [user, setNotificationCount])
 
   return (
     <>
@@ -158,12 +169,24 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
                 return false
               }}
               onPaginationChange={async (pagination) => {
+                if (!user?.id) return Promise.resolve()
                 return apiFetchUserNotifications(
-                  user!.id,
+                  user.id,
                   `?page=${pagination.page}&pageSize=${pagination.pageSize}`
                 ).then((response) => {
                   if (response.ok) {
-                    setNotifications(response.data)
+                    const newPageContent = response.data?.content ?? []
+                    const existingIds = new Set(accumulatedNotificationsRef.current.map((n) => n.notification.id))
+                    // Merge new page notifications with accumulated ones
+                    const newNotifications = newPageContent.filter((n) => !existingIds.has(n.notification.id))
+                    const mergedContent = [...newNotifications, ...accumulatedNotificationsRef.current].sort(
+                      (a, b) => b.notification.id - a.notification.id
+                    )
+                    accumulatedNotificationsRef.current = mergedContent
+                    setNotifications({
+                      ...response.data,
+                      content: mergedContent,
+                    })
                   }
                 })
               }}

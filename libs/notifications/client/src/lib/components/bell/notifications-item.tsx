@@ -22,8 +22,9 @@ const NotificationItem = React.memo(({ content, onRead }: NotificationItemProps)
         'outline-none',
         'border transition-all duration-200',
         'animate-in fade-in slide-in-from-top-1',
-        isUnread ? 'border-primary/70 hover:rounded-xl' : 'border-border hover:rounded-xl',
-        'group'
+        isUnread
+          ? 'border-l-4 border-l-primary bg-primary/5 hover:bg-primary/10 border-r border-t border-b border-border'
+          : 'border-border bg-transparent hover:bg-background-secondary/30 opacity-75'
       )}
       onSelect={(e) => {
         e.preventDefault()
@@ -32,13 +33,9 @@ const NotificationItem = React.memo(({ content, onRead }: NotificationItemProps)
       }}
     >
       <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 w-full">
-        {/* Unread indicator dot */}
+        {/* Unread indicator - left border handles this now, but keep spacing */}
         <div className="row-span-2 flex items-start pt-1.5 shrink-0">
-          {isUnread ? (
-            <div className="w-2.5 h-2.5 rounded-full bg-primary mt-0.5 shrink-0" />
-          ) : (
-            <div className="w-2.5 shrink-0" />
-          )}
+          {isUnread && <div className="w-1 h-1 rounded-full bg-primary mt-1.5 shrink-0" />}
         </div>
 
         {/* Message content - takes full width of second column */}
@@ -46,7 +43,7 @@ const NotificationItem = React.memo(({ content, onRead }: NotificationItemProps)
           className={cn(
             'text-sm break-words select-text leading-relaxed min-w-0',
             'max-line--height',
-            isUnread ? 'text-foreground font-medium' : 'text-foreground-neutral',
+            isUnread ? 'text-foreground font-semibold' : 'text-foreground-neutral font-normal',
             'overflow-wrap-anywhere word-break break-word'
           )}
           style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
