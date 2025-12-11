@@ -14,7 +14,6 @@ import {
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem, PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
-import { websocketOptions } from '@next-app/utils/websocket.config'
 import { useRouter } from 'next-nprogress-bar'
 import dynamic from 'next/dynamic'
 import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
