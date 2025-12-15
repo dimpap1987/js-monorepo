@@ -2,10 +2,10 @@ import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
-import Stripe from 'stripe'
 import { CreateProductType } from '../../'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
+import { SubscriptionUpdateData, SubscriptionDeleteData } from '../dto/subscription-webhook.dto'
 
 @Injectable()
 export class PaymentsRepository {
@@ -63,7 +63,7 @@ export class PaymentsRepository {
     })
   }
 
-  async handleSubscriptionUpdated(subscriptionData: Stripe.Subscription, priceId: number) {
+  async handleSubscriptionUpdated(subscriptionData: SubscriptionUpdateData, priceId: number) {
     return this.txHost.tx.subscription.update({
       where: { stripeSubscriptionId: subscriptionData.id },
       data: {
@@ -71,10 +71,10 @@ export class PaymentsRepository {
         status: subscriptionData.status,
         currentPeriodStart: toDate(subscriptionData.current_period_start),
         currentPeriodEnd: toDate(subscriptionData.current_period_end),
-        trialStart: toDate(subscriptionData.trial_start),
-        trialEnd: toDate(subscriptionData.trial_end),
-        cancelAt: toDate(subscriptionData.cancel_at),
-        canceledAt: toDate(subscriptionData.canceled_at),
+        trialStart: subscriptionData.trial_start ? toDate(subscriptionData.trial_start) : undefined,
+        trialEnd: subscriptionData.trial_end ? toDate(subscriptionData.trial_end) : undefined,
+        cancelAt: subscriptionData.cancel_at ? toDate(subscriptionData.cancel_at) : undefined,
+        canceledAt: subscriptionData.canceled_at ? toDate(subscriptionData.canceled_at) : undefined,
       },
       include: {
         price: {
@@ -86,12 +86,12 @@ export class PaymentsRepository {
     })
   }
 
-  async handleSubscriptionDeleted(subscriptionData: Stripe.Subscription) {
+  async handleSubscriptionDeleted(subscriptionData: SubscriptionDeleteData) {
     return this.txHost.tx.subscription.update({
       where: { stripeSubscriptionId: subscriptionData.id },
       data: {
         status: subscriptionData.status,
-        canceledAt: toDate(subscriptionData.cancel_at),
+        canceledAt: subscriptionData.cancel_at ? toDate(subscriptionData.cancel_at) : undefined,
       },
       include: {
         price: {

@@ -3,9 +3,9 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import Stripe from 'stripe'
+import { PaymentsClient, type WebhookEvent, type Subscription } from '@super-dp/payments-server'
 import { CreateProductWithPricesRequest, PaymentsModuleOptions } from '../../'
-import { StripeClient } from '../stripe.module'
+import { PaymentsClientToken } from '../stripe.module'
 import { PaymentsService } from './payments.service'
 import { ConfigService } from '@nestjs/config'
 
@@ -14,7 +14,7 @@ export class StripeService {
   private logger = new Logger(StripeService.name)
 
   constructor(
-    @Inject(StripeClient) private readonly stripe: Stripe,
+    @Inject(PaymentsClientToken) private readonly paymentsClient: PaymentsClient,
     private readonly paymentsService: PaymentsService,
     @Inject('PAYMENTS_OPTIONS')
     private readonly paymentsModuleOptions: PaymentsModuleOptions,
@@ -22,15 +22,15 @@ export class StripeService {
   ) {}
 
   async findCustomerByEmail(email: string) {
-    const customers = await this.stripe.customers.list({
-      email,
-    })
-
-    return customers.data.length > 0 ? customers.data[0] : null
+    return this.paymentsClient.findCustomerByEmail(email)
   }
 
-  async createCustomer(params?: Stripe.CustomerCreateParams, options?: Stripe.RequestOptions) {
-    return this.stripe.customers.create(params, options)
+  async createCustomer(params?: { email: string; name?: string; metadata?: Record<string, string> }) {
+    return this.paymentsClient.createCustomer({
+      email: params?.email || '',
+      name: params?.name,
+      metadata: params?.metadata,
+    })
   }
 
   async createCustomerIfNotExists(email: string) {
@@ -70,12 +70,11 @@ export class StripeService {
       }
 
       // checkout
-      const session = await this.stripe.checkout.sessions.create({
-        customer: stripeCustomerId,
-        line_items: [{ price: price.stripeId, quantity: 1 }],
-        mode: 'subscription',
-        success_url: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=true`,
-        cancel_url: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=false`,
+      const session = await this.paymentsClient.createCheckoutSession({
+        customerId: stripeCustomerId,
+        priceId: price.stripeId,
+        successUrl: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=true`,
+        cancelUrl: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=false`,
       })
       return { session: session }
     } catch (e) {
@@ -85,69 +84,116 @@ export class StripeService {
   }
 
   async constructEventFromPayload(signature: string, payload: Buffer) {
-    const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET')
-
     if (!signature) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_SIGNATURE')
     }
 
-    if (!webhookSecret) {
+    try {
+      return this.paymentsClient.constructWebhookEvent(payload, signature)
+    } catch (error) {
+      this.logger.error('Error constructing webhook event:', error)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_STRIPE_WEBHOOK_SECRET')
     }
-
-    return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret)
   }
 
   async handleWebhookEvent(sig: string, payload: Buffer) {
-    const event = await this.constructEventFromPayload(sig, payload)
+    if (!sig) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_SIGNATURE')
+    }
 
-    await this.handleEvent(event)
+    const event = this.paymentsClient.constructWebhookEvent(payload, sig)
+    const storedEvent = await this.paymentsService.findStripeWebhookEvent(event.id)
+
+    if (storedEvent?.result?.id) {
+      this.logger.warn(`Duplicate stripe event occurred. - Stripe - id: ${event.id} type: ${event.type}`)
+      return { received: true }
+    }
+
+    await this.paymentsService.createStripeWebhookEvent({
+      eventId: event.id,
+      eventType: event.type,
+    })
+
+    try {
+      await this.paymentsClient.handleWebhookEvent(payload, sig, {
+        onSubscriptionCreated: (evt) => this.handleSubscriptionEvent(evt, 'created'),
+        onSubscriptionUpdated: (evt) => this.handleSubscriptionEvent(evt, 'updated'),
+        onSubscriptionDeleted: (evt) => this.handleSubscriptionEvent(evt, 'deleted'),
+        onInvoicePaymentSucceeded: (evt) => this.handleInvoiceEvent(evt, 'succeeded'),
+        onInvoicePaymentFailed: (evt) => this.handleInvoiceEvent(evt, 'failed'),
+        onCheckoutSessionCompleted: (evt) => this.handleCheckoutSessionCompleted(evt),
+        onOther: (evt) => {
+          this.logger.warn(`Stripe - unhandled event received: ${evt.type}`)
+        },
+      })
+    } catch (e) {
+      this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`, e)
+    }
+
     return { received: true }
   }
 
-  private async handleSubscriptionEvent(event: Stripe.Event, type: 'created' | 'updated' | 'deleted') {
-    const subscriptionData = event.data.object as Stripe.Subscription
+  private async handleSubscriptionEvent(event: WebhookEvent, type: 'created' | 'updated' | 'deleted') {
+    const subscriptionData = event.data.object as Record<string, unknown>
+
+    const subscriptionId = subscriptionData.id as string
+    const customerId = subscriptionData.customer as string
+    const status = subscriptionData.status as string
+    const items = subscriptionData.items as { data: Array<{ price: { id: string } }> }
 
     this.logger.debug(
-      `Stripe - RECEIVED Subscription Event with type: ${type}, from stripe user: ${subscriptionData.customer} and price_id: '${subscriptionData.items.data[0]?.price.id}'`
+      `Payments - RECEIVED Subscription Event with type: ${type}, customer: ${customerId} and price_id: '${items?.data?.[0]?.price?.id}'`
     )
 
-    const paymentCustomer = await this.paymentsService.findPaymentCustomerByStripeId(
-      subscriptionData.customer as string
-    )
+    const paymentCustomer = await this.paymentsService.findPaymentCustomerByStripeId(customerId)
 
     if (!paymentCustomer?.id) {
-      this.logger.debug(`Payment customer not found for stripe customer: ${subscriptionData.customer}`)
-      throw new Error(`Payment customer not found for stripe customer: ${subscriptionData.customer}`)
+      this.logger.debug(`Payment customer not found for customer: ${customerId}`)
+      throw new Error(`Payment customer not found for customer: ${customerId}`)
     }
 
-    const price = await this.paymentsService.findPriceByStripeId(subscriptionData.items.data[0]?.price.id)
+    const priceId = items?.data?.[0]?.price?.id
+    if (!priceId) {
+      throw new Error(`No price found in subscription event: ${subscriptionId}`)
+    }
+
+    const price = await this.paymentsService.findPriceByStripeId(priceId)
 
     if (type === 'created') {
       const sub = await this.paymentsService.createSubscription({
-        paymentCustomerId: paymentCustomer?.id,
-        stripeSubscriptionId: subscriptionData.id,
+        paymentCustomerId: paymentCustomer.id,
+        stripeSubscriptionId: subscriptionId,
         priceId: price.id,
-        status: subscriptionData.status,
-        currentPeriodStart: toDate(subscriptionData.current_period_start),
-        currentPeriodEnd: toDate(subscriptionData.current_period_end),
-        trialStart: toDate(subscriptionData.trial_start),
-        trialEnd: toDate(subscriptionData.trial_end),
-        cancelAt: toDate(subscriptionData.cancel_at),
-        canceledAt: toDate(subscriptionData.canceled_at),
+        status,
+        currentPeriodStart: toDate(subscriptionData.current_period_start as number),
+        currentPeriodEnd: toDate(subscriptionData.current_period_end as number),
+        trialStart: subscriptionData.trial_start ? toDate(subscriptionData.trial_start as number) : undefined,
+        trialEnd: subscriptionData.trial_end ? toDate(subscriptionData.trial_end as number) : undefined,
+        cancelAt: subscriptionData.cancel_at ? toDate(subscriptionData.cancel_at as number) : undefined,
+        canceledAt: subscriptionData.canceled_at ? toDate(subscriptionData.canceled_at as number) : undefined,
       })
 
-      //callback
       tryCatch(() => {
         this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(paymentCustomer.userId, {
           id: sub.id,
           name: sub.price?.product?.name,
         })
       })
-    } else if (type == 'updated') {
-      const sub = await this.paymentsService.updateSubscription(subscriptionData)
+    } else if (type === 'updated') {
+      const sub = await this.paymentsService.updateSubscription({
+        id: subscriptionId,
+        status,
+        current_period_start: subscriptionData.current_period_start as number,
+        current_period_end: subscriptionData.current_period_end as number,
+        trial_start: subscriptionData.trial_start as number | null,
+        trial_end: subscriptionData.trial_end as number | null,
+        cancel_at: subscriptionData.cancel_at as number | null,
+        canceled_at: subscriptionData.canceled_at as number | null,
+        items: {
+          data: items.data,
+        },
+      })
 
-      //callback
       tryCatch(() => {
         this.paymentsModuleOptions.onSubscriptionUpdateSuccess?.(paymentCustomer.userId, {
           id: sub.id,
@@ -155,16 +201,20 @@ export class StripeService {
         })
       })
       tryCatch(() => {
-        if (subscriptionData?.cancel_at) {
+        if (subscriptionData.cancel_at) {
           this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(paymentCustomer.userId, {
             id: sub.id,
             name: sub.price?.product?.name,
-            cancelAt: toDate(subscriptionData?.cancel_at),
+            cancelAt: toDate(subscriptionData.cancel_at as number),
           })
         }
       })
-    } else if (type == 'deleted') {
-      await this.paymentsService.deleteSubscription(subscriptionData)
+    } else if (type === 'deleted') {
+      await this.paymentsService.deleteSubscription({
+        id: subscriptionId,
+        status,
+        cancel_at: subscriptionData.cancel_at as number | null,
+      })
     }
 
     tryCatch(() => {
@@ -172,95 +222,31 @@ export class StripeService {
     })
   }
 
-  private async handleInvoiceEvent(event: Stripe.Event, status: 'succeeded' | 'failed') {
+  private async handleInvoiceEvent(event: WebhookEvent, status: 'succeeded' | 'failed') {
     this.logger.log(`Stripe - RECEIVED Invoice Event: ${JSON.stringify(event)} with type: ${status}`)
   }
 
-  private async handleCheckoutSessionCompleted(event: Stripe.Event) {
+  private async handleCheckoutSessionCompleted(event: WebhookEvent) {
     this.logger.log(`Stripe - RECEIVED Checkout Session event: ${JSON.stringify(event)}`)
   }
 
-  private async handleEvent(event: Stripe.Event) {
-    const storedEvent = await this.paymentsService.findStripeWebhookEvent(event.id)
-
-    if (storedEvent?.result?.id) {
-      this.logger.warn(`Duplicate stripe event occured. - Stripe - id: ${event.id} type: ${event.type}`)
-      return
-    }
-
-    const newEvent = await this.paymentsService.createStripeWebhookEvent({
-      eventId: event.id,
-      eventType: event.type,
-    })
-
-    if (newEvent.error) {
-      this.logger.error('Error while storing stripe event')
-    }
-
-    try {
-      switch (event.type) {
-        case 'customer.subscription.created':
-          return await this.handleSubscriptionEvent(event, 'created')
-        case 'customer.subscription.updated':
-          return await this.handleSubscriptionEvent(event, 'updated')
-        case 'customer.subscription.deleted':
-          return await this.handleSubscriptionEvent(event, 'deleted')
-        case 'invoice.payment_succeeded':
-          return await this.handleInvoiceEvent(event, 'succeeded')
-        case 'invoice.payment_failed':
-          return await this.handleInvoiceEvent(event, 'failed')
-        case 'checkout.session.completed':
-          return await this.handleCheckoutSessionCompleted(event)
-        default:
-          this.logger.warn(`Stripe - unhandled event received: ${event.type}`)
-          break
-      }
-    } catch (e) {
-      this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`)
-    }
-  }
-
   async createProductWithPrices(data: CreateProductWithPricesRequest) {
-    const stripeProduct = await this.stripe.products.create({
+    return this.paymentsClient.createProductWithPrices({
       name: data.name,
       description: data.description,
+      prices: data.prices.map((price) => ({
+        unitAmount: price.unitAmount,
+        currency: price.currency,
+        interval: price.interval,
+      })),
     })
-
-    // Create Prices in Stripe
-    const stripePrices = await Promise.all(
-      data.prices.map((price) =>
-        this.stripe.prices.create({
-          product: stripeProduct.id,
-          unit_amount: price.unitAmount,
-          currency: price.currency,
-          recurring: {
-            interval: price.interval,
-          },
-        })
-      )
-    )
-
-    return {
-      product: stripeProduct,
-      prices: stripePrices,
-    }
   }
 
   async cancelSubscription(stripeSubscriptionId: string) {
     try {
-      const subscription = await this.stripe.subscriptions.retrieve(stripeSubscriptionId)
-
-      // Check if the subscription is already canceled
-      if (subscription.status === 'canceled') {
-        this.logger.warn(
-          `Cannot cancel a subscription that is already canceled. with subscriptionId: '${subscription.id}' and stripe_subscription_id: '${stripeSubscriptionId}'`
-        )
-        throw new Error('Cannot cancel a subscription that is already canceled.')
-      }
-
-      // Update the subscription to cancel at the end of the period
-      return await this.stripe.subscriptions.update(stripeSubscriptionId, {
-        cancel_at_period_end: true,
+      return await this.paymentsClient.cancelSubscription({
+        subscriptionId: stripeSubscriptionId,
+        cancelImmediately: false,
       })
     } catch (error) {
       this.logger.error('Error canceling subscription:', error.message)
@@ -270,12 +256,9 @@ export class StripeService {
 
   async validateOrCreateCustomer(stripeCustomerId: string, email: string, userId: number) {
     try {
-      const existingCustomer = await this.stripe.customers.retrieve(stripeCustomerId)
-
-      if (existingCustomer && !existingCustomer.deleted) {
-        return stripeCustomerId
-      }
-
+      await this.paymentsClient.getCustomer(stripeCustomerId)
+      return stripeCustomerId
+    } catch (error) {
       const stripeCustomer = await this.createCustomer({
         email,
       })
@@ -285,9 +268,6 @@ export class StripeService {
         stripeCustomerId: stripeCustomer.id,
       })
       return createdCustomer.stripeCustomerId
-    } catch (error) {
-      this.logger.error('An error occured when validation or creating a stripe customer')
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATE_STRIPE_CUSTOMER')
     }
   }
 }

@@ -35,8 +35,9 @@ export class PaymentsModule {
       imports: [
         ...(options.imports || []),
         StripeModule.forRoot({
-          apiKey: process.env.STRIPE_SECRET_KEY,
+          apiKey: process.env.STRIPE_SECRET_KEY || '',
           apiVersion: '2023-10-16',
+          webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
         }),
       ],
       providers: [
