@@ -1,27 +1,34 @@
 import { DynamicModule, Module } from '@nestjs/common'
-import Stripe from 'stripe'
+import { PaymentsClient, StripeProvider } from '@super-dp/payments-server'
 
 export interface StripeModuleOptions {
   apiKey: string
-  apiVersion?: '2023-10-16'
+  apiVersion?: string
+  webhookSecret?: string
 }
 
-export const StripeClient = Symbol('STRIPE_CLIENT')
+export const PaymentsClientToken = Symbol('PAYMENTS_CLIENT')
 
 @Module({})
 export class StripeModule {
   static forRoot(options: StripeModuleOptions): DynamicModule {
-    const stripeProvider = {
-      provide: StripeClient,
-      useValue: new Stripe(options.apiKey, {
-        apiVersion: options.apiVersion,
-      }),
+    const stripeProvider = new StripeProvider({
+      apiKey: options.apiKey,
+      apiVersion: options.apiVersion as any,
+      webhookSecret: options.webhookSecret,
+    })
+
+    const paymentsClient = new PaymentsClient(stripeProvider)
+
+    const paymentsClientProvider = {
+      provide: PaymentsClientToken,
+      useValue: paymentsClient,
     }
 
     return {
       module: StripeModule,
-      providers: [stripeProvider],
-      exports: [stripeProvider],
+      providers: [paymentsClientProvider],
+      exports: [paymentsClientProvider],
     }
   }
 }

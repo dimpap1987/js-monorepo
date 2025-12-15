@@ -2,10 +2,10 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
-import Stripe from 'stripe'
 import { CreateProductType } from '../../'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
+import { SubscriptionUpdateData, SubscriptionDeleteData } from '../dto/subscription-webhook.dto'
 import { PaymentsRepository } from '../repository/payments.repository'
 
 @Injectable()
@@ -53,7 +53,7 @@ export class PaymentsService {
   }
 
   @Transactional()
-  async updateSubscription(subscriptionData: Stripe.Subscription) {
+  async updateSubscription(subscriptionData: SubscriptionUpdateData) {
     const price = await this.findPriceByStripeId(subscriptionData.items.data[0]?.price.id)
 
     const { result, error } = await tryCatch(() =>
@@ -66,7 +66,7 @@ export class PaymentsService {
     return result
   }
 
-  async deleteSubscription(subscriptionData: Stripe.Subscription) {
+  async deleteSubscription(subscriptionData: SubscriptionDeleteData) {
     const { result, error } = await tryCatch(() => this.paymentsRepository.handleSubscriptionDeleted(subscriptionData))
 
     if (error) {
