@@ -38,7 +38,7 @@ export function NotificationItem({
   const { id: divId, ...divProps } = rest as HTMLAttributes<HTMLDivElement>
   return (
     <div className={cn('flex relative self-end w-max max-w-96', styles.notificationContainer)} {...divProps}>
-      <div className="w-full py-1 px-3 text-sm text-white bg-background-secondary grid grid-cols-[max-content_1fr_max-content] items-center gap-2">
+      <div className="w-full py-3 px-5 text-sm text-white bg-background-secondary grid grid-cols-[max-content_1fr_max-content] items-center gap-2">
         {/* Icon */}
         <div className="self-center p-1">
           {type === 'spinner' ? (
@@ -58,7 +58,7 @@ export function NotificationItem({
         {!closable && onClose && (
           <button
             onClick={() => onClose?.(id)}
-            className="self-center p-1 hover:bg-background-secondary/50 rounded transition-colors"
+            className="self-center p-1 hover:bg-background-secondary/50 rounded transition-colors pointer-cursor"
             aria-label="Close notification"
           >
             <MdClose className="text-lg" />
