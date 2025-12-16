@@ -6,18 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ava
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
 import { useNotifications } from '@js-monorepo/notification'
 import { AuthUserFullDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
-import { apiClient } from '@js-monorepo/utils/http'
 import { ColumnDef } from '@tanstack/react-table'
 import moment from 'moment'
-import { Dispatch, SetStateAction, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, Suspense, useCallback, useMemo, useState } from 'react'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
 import RolesTableInput from './roles-input'
 import { UsernameTableInput } from './username-input'
-interface UsersReponse {
-  users: AuthUserFullDto[] | []
-  totalCount: number
-}
+import { useUsers, useUpdateUser } from './queries'
 
 declare module '@tanstack/table-core' {
   interface Row<TData> {
@@ -25,21 +21,12 @@ declare module '@tanstack/table-core' {
   }
 }
 
-const findUsers = async (searchParams?: string) => {
-  const response = await apiClient.get(`/admin/users${searchParams}`)
-
-  if (response.ok) return response.data as UsersReponse
-
-  return {
-    users: [],
-    totalCount: 0,
-  }
-}
-
 const DashboardUsersTableSuspense = () => {
-  const [data, setData] = useState<UsersReponse>({ users: [], totalCount: 0 })
-  const [loading, setLoading] = useState(true)
   const { addNotification } = useNotifications()
+  const { pagination, searchQuery, setPagination } = usePaginationWithParams()
+
+  const { data, isLoading, refetch } = useUsers(searchQuery)
+  const updateUserMutation = useUpdateUser()
 
   const [update, setUpdate] = useState<{
     index?: number
@@ -47,20 +34,7 @@ const DashboardUsersTableSuspense = () => {
     user?: AuthUserFullDto
   }>()
 
-  const { pagination, searchQuery, setPagination } = usePaginationWithParams()
-  const pageCount = Math.round(data?.totalCount / pagination.pageSize)
-
-  const loadUsers = useCallback(() => {
-    setLoading(true)
-    findUsers(searchQuery).then((response) => {
-      setData(response)
-      setLoading(false)
-    })
-  }, [searchQuery])
-
-  useEffect(() => {
-    loadUsers()
-  }, [loadUsers])
+  const pageCount = Math.round((data?.totalCount || 0) / pagination.pageSize)
 
   const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
     () => [
@@ -148,7 +122,8 @@ const DashboardUsersTableSuspense = () => {
                   <div className="flex items-center gap-3 bg-background-secondary">
                     <button
                       title="Submit"
-                      className="h-9 w-9 p-0 rounded-md bg-status-success text-status-success-foreground hover:bg-status-success/90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-success/50 flex items-center justify-center"
+                      className="h-9 w-9 p-0 rounded-md bg-status-success text-status-success-foreground hover:bg-status-success/90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-success/50 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={updateUserMutation.isPending}
                       onClick={async () => {
                         const updateData = row.updatedUser
 
@@ -160,22 +135,27 @@ const DashboardUsersTableSuspense = () => {
                           return
                         }
 
-                        const response = await apiClient.put(`/admin/users/${row.original.id}`, { ...updateData })
+                        try {
+                          await updateUserMutation.mutateAsync({
+                            userId: row.original.id,
+                            data: { ...updateData },
+                          })
 
-                        if (response.ok) {
                           addNotification({
                             message: 'User updated successfully',
                             type: 'success',
                           })
 
-                          loadUsers()
+                          await refetch()
 
                           setUpdate({
                             inProgress: false,
                           })
-                        } else {
+                        } catch (err: any) {
                           addNotification({
-                            message: response.errors?.join(', ') || 'Failed to update user',
+                            message:
+                              err?.errors?.map((error: { message: string }) => error.message).join(', ') ||
+                              'Failed to update user',
                             type: 'error',
                           })
                         }
@@ -217,7 +197,7 @@ const DashboardUsersTableSuspense = () => {
         },
       },
     ],
-    [update, loadUsers, addNotification]
+    [update, addNotification, updateUserMutation, refetch]
   )
 
   const onPaginationChange = useCallback<Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>>(
@@ -225,7 +205,7 @@ const DashboardUsersTableSuspense = () => {
       setPagination((prevPagination: Pageable) => {
         const currentState = {
           pageSize: prevPagination.pageSize,
-          pageIndex: prevPagination.page, // Zero-based
+          pageIndex: prevPagination.page,
         }
 
         const updated =
@@ -244,11 +224,11 @@ const DashboardUsersTableSuspense = () => {
     <div>
       <DataTable
         columns={memoizedColumns}
-        data={data?.users}
+        data={data?.users || []}
         onPaginationChange={onPaginationChange}
         totalCount={pageCount}
         pagination={pagination}
-        loading={loading}
+        loading={isLoading}
       ></DataTable>
     </div>
   )
