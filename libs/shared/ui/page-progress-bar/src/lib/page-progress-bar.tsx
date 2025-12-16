@@ -7,7 +7,7 @@ export type DpNextPageProgressBarProps = PropsWithChildren & ProgressBarProps
 export function DpNextPageProgressBar({
   children,
   height = '2px',
-  color = '#fffd00',
+  color = 'var(--primary)',
   options = { showSpinner: false },
 }: DpNextPageProgressBarProps) {
   return (

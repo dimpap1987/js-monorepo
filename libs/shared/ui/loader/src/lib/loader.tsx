@@ -23,7 +23,7 @@ export function DpLoader({
     <div
       className={cn(
         `fixed inset-0 flex items-center justify-center bg-black 
-      bg-opacity-80 transform transition-transform
+      bg-opacity-90 transform transition-transform
       duration-200 ${show ? 'scale-100' : 'scale-0'} z-40 select-none`,
         overlayClassName
       )}

@@ -30,7 +30,24 @@ export default async function RootProviders({ children }: { readonly children: R
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
-            themes={['light', 'dark', 'blue', 'green', 'dark-blue']}
+            themes={[
+              'light',
+              'dark',
+              'blue',
+              'green',
+              'dark-blue',
+              'retro',
+              'dracula',
+              'nord',
+              'monokai',
+              'tokyonight',
+              'solarized',
+              'gruvbox',
+              'catppuccin',
+              'onedark',
+              'synthwave',
+              'red',
+            ]}
             enableSystem
           >
             <DpLoaderProvider>

@@ -7,8 +7,8 @@ function CardList({ className }: { className: string }) {
   return (
     <div className={className}>
       <Card
-        className="bg-slate-100 text-base font-light
-         text-black p-3 flex flex-col justify-between"
+        className="bg-background-secondary text-base font-light
+         text-foreground p-3 flex flex-col justify-between"
       >
         <CardHeader>
           <CardTitle>🐛 Report a bug</CardTitle>
@@ -29,8 +29,8 @@ function CardList({ className }: { className: string }) {
       </Card>
 
       <Card
-        className="bg-slate-100 text-base font-light
-         text-black p-3 flex flex-col justify-between"
+        className="bg-background-secondary text-base font-light
+         text-foreground p-3 flex flex-col justify-between"
       >
         <CardHeader>
           <CardTitle>💡 Feature request</CardTitle>
