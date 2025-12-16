@@ -23,27 +23,30 @@ const opts = [
 
 export default function DashboardController() {
   return (
-    <>
-      <h2 className="text-foreground text-center">Weclome to Dashboard</h2>
+    <div className="space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">Welcome to Dashboard</h1>
+        <p className="text-sm text-foreground-muted">Manage your application from here</p>
+      </div>
 
-      <div className="my-3 flex justify-center">
-        <DpVersion className="text-base"></DpVersion>
+      <div className="flex justify-center">
+        <DpVersion className="text-sm text-foreground-neutral"></DpVersion>
       </div>
 
       <div className="p-2 flex justify-center font-semibold sm:hidden">
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-3 w-full max-w-md">
           {opts?.map((opt) => (
             <Card
               key={opt.href}
-              className="text-center transition-transform transform hover:scale-105 cursor-pointer bg-white text-black grid"
+              className="text-center transition-all duration-200 ease-in-out hover:scale-[1.02] hover:shadow-md cursor-pointer border border-border hover:border-primary/50 bg-card"
             >
-              <DpNextNavLink className="p-6" href={opt.href}>
+              <DpNextNavLink className="p-6 block text-foreground hover:text-primary transition-colors" href={opt.href}>
                 {opt.label}
               </DpNextNavLink>
             </Card>
           ))}
         </div>
       </div>
-    </>
+    </div>
   )
 }
