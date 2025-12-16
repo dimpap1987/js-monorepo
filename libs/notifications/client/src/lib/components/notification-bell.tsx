@@ -227,13 +227,13 @@ export function DpNotificationBellComponent({
         <DropdownMenuContent
           className={cn(
             'hidden z-30 sm:block p-0 bg-background-secondary text-foreground w-[98svw] sm:w-[650px] xl:w-[850px]',
-            'border border-border/50 shadow-2xl backdrop-blur-sm',
+            'border border-border-glass shadow-2xl backdrop-blur-sm',
             'rounded-lg overflow-hidden',
             className
           )}
           aria-label="Notifications dropdown"
         >
-          <div className="sticky top-0 z-10 bg-background-secondary/95 backdrop-blur-sm border-b border-border/30 px-4 py-3">
+          <div className="sticky top-0 z-10 bg-background-secondary/95 backdrop-blur-sm border-b border-border-glass px-4 py-3">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-semibold text-foreground tracking-tight">Notifications</h3>
               {unreadNotificationCount > 0 && (
