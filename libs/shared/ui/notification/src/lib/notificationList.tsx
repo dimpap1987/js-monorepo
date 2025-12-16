@@ -4,9 +4,10 @@ import { DpNotificationProps, NotificationItem } from './notification'
 interface DpNotificationListProps {
   notifications: DpNotificationProps[]
   readonly className?: string
+  readonly onRemove: (id?: number) => void
 }
 
-export default function DpNotificationList({ notifications, className }: DpNotificationListProps) {
+export default function DpNotificationList({ notifications, className, onRemove }: DpNotificationListProps) {
   return (
     notifications?.length > 0 && (
       <section className={cn(`fixed top-navbar-offset right-2 p-2 z-40 flex flex-col-reverse gap-2 w-0`, className)}>
@@ -16,6 +17,9 @@ export default function DpNotificationList({ notifications, className }: DpNotif
             message={notification.message}
             type={notification.type}
             description={notification.description}
+            closable={notification.closable}
+            id={notification.id}
+            onClose={onRemove ? (id) => onRemove(id) : undefined}
           />
         ))}
       </section>
