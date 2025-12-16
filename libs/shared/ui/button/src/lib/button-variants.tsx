@@ -1,21 +1,24 @@
 export const buttonVariants = {
-  base: 'relative text-base rounded-lg font-semibold flex items-center justify-center whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-500 ease-in-out',
+  base: 'relative inline-flex items-center justify-center whitespace-nowrap rounded-lg font-medium text-sm transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&>*]:text-inherit',
   variants: {
     variant: {
       primary:
-        'bg-primary border-2 border-primary/80 text-primary-foreground hover:bg-primary/85 focus:bg-primary/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md focus-visible:ring-primary/50 active:bg-primary/95 [&>*]:text-primary-foreground',
       accent:
-        'bg-accent border-2 border-accent/80 text-accent-foreground hover:bg-accent/85 focus:bg-accent/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 hover:shadow-md focus-visible:ring-accent/50 active:bg-accent/95 [&>*]:text-accent-foreground',
       secondary:
-        'bg-secondary border-2 border-secondary/80 text-secondary-foreground hover:bg-secondary/85 focus:bg-secondary/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
+        'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md focus-visible:ring-secondary/50 active:bg-secondary/90 [&>*]:text-secondary-foreground',
       danger:
-        'bg-danger border-2 border-danger/80 text-danger-foreground hover:bg-danger/85 focus:bg-danger/85 [text-shadow:1px_0px_1px_hsl(var(--tw-shadow-color))]',
-      outline: 'border-2 border-primary/80 bg-background text-foreground tracking-[0.04em]',
+        'bg-danger text-danger-foreground shadow-sm hover:bg-danger/90 hover:shadow-md focus-visible:ring-danger/50 active:bg-danger/95 [&>*]:text-danger-foreground',
+      outline:
+        'border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-accent focus-visible:ring-accent/50 active:bg-accent/80 [&>*]:text-inherit',
+      ghost:
+        'text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-accent/50 active:bg-accent/80 [&>*]:text-inherit',
     },
     size: {
-      default: 'h-8 px-4 py-4',
-      small: 'h-7 px-2 text-xs py-3',
-      large: 'h-10 px-8 py-5',
+      default: 'h-9 px-4 py-2',
+      small: 'h-8 px-3 py-1.5 text-xs',
+      large: 'h-11 px-8 py-2.5 text-base',
     },
   },
   disabled: 'cursor-not-allowed opacity-50',
