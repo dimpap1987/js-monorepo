@@ -258,7 +258,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
           )}
           {!!user && (
             <DpLogoutButton
-              className="p-3 mb-6 justify-center"
+              className="mb-6 justify-center"
               size="large"
               onClick={async () => {
                 authClient.logout()
