@@ -82,7 +82,7 @@ export function CancelActionButton({
               </div>
             </DpButton>
           </TooltipTrigger>
-          <TooltipContent className="text-white">Cancel Subscription</TooltipContent>
+          <TooltipContent className="text-popover-foreground">Cancel Subscription</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       {/* Confirmation Dialog */}
@@ -127,8 +127,8 @@ export function ActiveSubscriptionLabel({ subscribed }: { subscribed: boolean })
   return (
     subscribed && (
       <div
-        className="bg-green-50 text-green-600 absolute top-0 
-                -translate-y-1/2 right-5 p-1.5 px-3 border border-green-400 
+        className="bg-status-success-bg text-status-success absolute top-0 
+                -translate-y-1/2 right-5 p-1.5 px-3 border border-status-success/50 
                 rounded-full shadow-md font-medium"
       >
         Active
@@ -140,7 +140,7 @@ export function ActiveSubscriptionLabel({ subscribed }: { subscribed: boolean })
 const CheckItem = ({ text }: { text: string }) => (
   <>
     <svg
-      className="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400"
+      className="flex-shrink-0 w-5 h-5 text-status-success"
       fill="currentColor"
       viewBox="0 0 20 20"
       xmlns="http://www.w3.org/2000/svg"
@@ -151,7 +151,7 @@ const CheckItem = ({ text }: { text: string }) => (
         clipRule="evenodd"
       ></path>
     </svg>
-    <span>{text}</span>
+    <span className="text-foreground">{text}</span>
   </>
 )
 
@@ -204,14 +204,14 @@ const renderSubscribedActions = (
 export function PlanCardContent({ title, description, price, interval, features }: PlanCardContentType) {
   return (
     <>
-      <h1 className="mb-4 capitalize">{title}</h1>
+      <h1 className="mb-4 capitalize text-card-foreground">{title}</h1>
       <p className="font-light text-foreground-neutral sm:text-lg">{description}</p>
       <div className="flex justify-center items-baseline my-6">
-        <h1 className="mr-1 font-extrabold text-gray-900 dark:text-white inline-block">{`€${price}`}</h1>
+        <h1 className="mr-1 font-extrabold text-foreground inline-block">{`€${price}`}</h1>
 
-        <h2 className="text-gray-500 dark:text-gray-400 ">{interval && `/${interval}`}</h2>
+        <h2 className="text-foreground-neutral">{interval && `/${interval}`}</h2>
       </div>
-      <ul role="list" className="mb-8 space-y-2 text-left mt-2 text-sm">
+      <ul className="mb-8 space-y-2 text-left mt-2 text-sm">
         {Object.entries(features).map(([key, value]) => (
           <li key={key} className="flex items-center space-x-3">
             <CheckItem text={value as string} />
@@ -282,14 +282,22 @@ export const PlanInfo = ({ children }: PropsWithChildren) => {
   return (
     <div>
       <div className="absolute right-4 top-7">
-        <button ref={buttonRef} onClick={toggleInfo} aria-label="Toggle subscription info">
+        <button
+          ref={buttonRef}
+          onClick={toggleInfo}
+          aria-label="Toggle subscription info"
+          className="text-foreground-muted hover:text-foreground transition-colors"
+        >
           <HiOutlineDotsVertical size={26} />
         </button>
       </div>
       {/* Info dropdown */}
       {isOpen && (
-        <div ref={infoContentRef} className="absolute right top-20 w-[90%] rounded-lg bg-white shadow-xl p-4">
-          <div className="text-sm text-gray-600 space-y-1">{children}</div>
+        <div
+          ref={infoContentRef}
+          className="absolute right top-20 w-[90%] rounded-lg bg-popover border border-border shadow-xl p-4"
+        >
+          <div className="text-sm text-popover-foreground space-y-1">{children}</div>
         </div>
       )}
     </div>

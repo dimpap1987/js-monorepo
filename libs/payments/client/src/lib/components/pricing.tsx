@@ -135,7 +135,7 @@ export function Pricing() {
         })
       }
     },
-    [stripePromise, isLoggedIn]
+    [isLoggedIn, router, stripePromise, addNotification]
   )
 
   const handleCancelSubscription = useCallback(async (priceId: number) => {
