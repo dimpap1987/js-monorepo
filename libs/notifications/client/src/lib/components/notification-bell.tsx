@@ -206,7 +206,7 @@ export function DpNotificationBellComponent({
 
   // Memoize scroll area height calculation
   const scrollAreaHeight = useMemo(
-    () => (pageable?.totalPages > 1 ? 'h-[32rem] max-h-[32rem]' : 'max-h-[32rem]'),
+    () => (pageable?.totalPages > 1 ? 'h-[33rem] max-h-[33rem]' : 'max-h-[33rem]'),
     [pageable?.totalPages]
   )
 
@@ -233,12 +233,12 @@ export function DpNotificationBellComponent({
           )}
           aria-label="Notifications dropdown"
         >
-          <div className="sticky top-0 z-10 bg-background-secondary/95 backdrop-blur-sm border-b border-border-glass px-4 py-3">
+          <div className="sticky top-0 z-10 bg-background-secondary/95 backdrop-blur-sm border-b border-border-glass px-4 py-3.5">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-semibold text-foreground tracking-tight">Notifications</h3>
               {unreadNotificationCount > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-foreground-neutral font-medium">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
                     {unreadNotificationCount} {unreadNotificationCount === 1 ? 'unread' : 'unreads'}
                   </span>
                   <NotificationReadAllButton onReadAll={handleReadAll} />

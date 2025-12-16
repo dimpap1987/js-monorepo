@@ -17,14 +17,14 @@ const NotificationItem = React.memo(({ content, onRead }: NotificationItemProps)
     <DropdownMenuItem
       className={cn(
         'relative cursor-pointer',
-        'px-4 py-3.5 rounded-lg',
+        'px-4 py-3.5 rounded-lg mx-1',
         'focus:bg-transparent focus:text-foreground',
         'outline-none',
-        'border transition-all duration-200',
+        'transition-all duration-300 ease-in-out',
         'animate-in fade-in slide-in-from-top-1',
-        isUnread
-          ? 'border-l-4 border-l-primary bg-primary/5 hover:bg-primary/10 border-r border-t border-b border-border'
-          : 'border-border bg-transparent hover:bg-background-secondary/30 opacity-75'
+        'hover:shadow-md hover:scale-[1.01] hover:-translate-y-0.5',
+        'active:scale-[0.99] active:translate-y-0 border border-border-glass',
+        isUnread ? 'border-l-4 border-l-primary bg-primary/5 hover:bg-primary/80 hover:border-l-primary' : 'opacity-75'
       )}
       onSelect={(e) => {
         e.preventDefault()
@@ -35,7 +35,9 @@ const NotificationItem = React.memo(({ content, onRead }: NotificationItemProps)
       <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 w-full">
         {/* Unread indicator - left border handles this now, but keep spacing */}
         <div className="row-span-2 flex items-start pt-1.5 shrink-0">
-          {isUnread && <div className="w-1 h-1 rounded-full bg-primary mt-1.5 shrink-0" />}
+          {isUnread && (
+            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0 shadow-sm shadow-primary/50 animate-pulse" />
+          )}
         </div>
 
         {/* Message content - takes full width of second column */}
