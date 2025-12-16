@@ -19,7 +19,7 @@ const NotificationsContext = createContext<
       addNotification: (notification: DpNotificationProps) => number
       notifications: DpNotificationProps[]
       setNotifications: React.Dispatch<React.SetStateAction<DpNotificationProps[]>>
-      removeNotification: (notificationId: number) => void
+      removeNotification: (notificationId?: number) => void
     }
   | undefined
 >(undefined)
@@ -29,7 +29,7 @@ export const useNotifications = (): {
   addNotification: (notification: DpNotificationProps) => number
   notifications: DpNotificationProps[]
   setNotifications: React.Dispatch<React.SetStateAction<DpNotificationProps[]>>
-  removeNotification: (notificationId: number) => void
+  removeNotification: (notificationId?: number) => void
 } => {
   const context = useContext(NotificationsContext)
   if (!context) {
@@ -54,8 +54,9 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }
     return id
   }, [])
 
-  const removeNotification = useCallback((notificationId: number) => {
-    setNotifications((prev) => [...prev.filter((not) => not.id !== notificationId)])
+  const removeNotification = useCallback((notificationId?: number) => {
+    if (notificationId === undefined) return
+    setNotifications((prev) => prev.filter((not) => not.id !== notificationId))
   }, [])
 
   const timeoutsRef = useRef<Record<number | string, NodeJS.Timeout>>({})
@@ -74,6 +75,10 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }
     notifications.forEach((notification) => {
       // If we already have a timeout for this notification, skip setting another
       if (!notification.id || timeoutsRef.current[notification.id]) return
+
+      // Only set timeout if notification is closable (defaults to true)
+      const isClosable = notification.closable !== false
+      if (!isClosable && !notification.duration) return
 
       const timeoutId = setTimeout(() => {
         setNotifications((prev) => prev.filter((p) => p.id !== notification.id))
@@ -94,7 +99,7 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }
 
   return (
     <NotificationsContext.Provider value={contextValue}>
-      <DpNotificationList notifications={notifications} />
+      <DpNotificationList notifications={notifications} onRemove={removeNotification} />
       {children}
     </NotificationsContext.Provider>
   )
