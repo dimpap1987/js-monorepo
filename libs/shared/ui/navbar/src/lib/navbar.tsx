@@ -16,11 +16,11 @@ function SideBarIcon({ onSideBarClick, className }: { onSideBarClick?: () => voi
       <div className={cn(`navbar-burger self-center cursor-pointer select-none`, className)} aria-label="user-options">
         <button
           onClick={onSideBarClick}
-          className="p-2 border-2 border-border rounded-xl"
+          className="p-2.5 border border-border rounded-lg hover:bg-accent hover:border-accent transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label="toggle sidebar"
           tabIndex={0}
         >
-          <GiHamburgerMenu />
+          <GiHamburgerMenu className="text-lg" />
         </button>
       </div>
     )
@@ -48,13 +48,14 @@ function NavUserOptions({
 
         <DpNextNavLink
           href="/settings"
-          className="flex gap-1 justify-start px-4 py-2 rounded-xl w-full select-none group hover:ring-1 hover:ring-border"
+          className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-accent/50 hover:text-accent-foreground"
         >
-          <IoIosSettings className="text-2xl" />
-          <span className="ml-2">Settings</span>
+          <IoIosSettings className="text-xl flex-shrink-0" />
+          <span className="text-sm">Settings</span>
         </DpNextNavLink>
 
         <DpLogoutButton
+          className="text-sm"
           onClick={() => {
             onLogout?.()
           }}
@@ -98,12 +99,12 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     return (
       <header>
         <nav
-          className="text-foreground border-b border-border navbar-height overflow-hidden flex items-center"
+          className="text-foreground border-b border-border-glass bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 navbar-height overflow-hidden flex items-center shadow-sm"
           ref={ref}
         >
-          <div className="px-5 flex gap-2 justify-between w-full items-center self-stretch">
+          <div className="px-4 sm:px-6 flex gap-3 justify-between w-full items-center self-stretch">
             {logo}
-            <ul className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center space-x-1 self-stretch">
+            <ul className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center gap-1 self-stretch">
               {menuItems &&
                 menuItems?.length > 0 &&
                 menuItems.map((item, index) => (
@@ -121,8 +122,8 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 ))}
             </ul>
 
-            <div>
-              <section className="hidden sm:flex items-center gap-3 justify-end text-center">
+            <div className="flex items-center">
+              <section className="hidden sm:flex items-center gap-3 justify-end">
                 <>
                   {navbarItems && navbarItems}
 
@@ -131,7 +132,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       <DpLoginButton></DpLoginButton>
                     </DpNextNavLink>
                   )}
-                  {user && <NavUserOptions className="mt-[0.58rem]" user={user} onLogout={onLogout} />}
+                  {user && <NavUserOptions className="hidden sm:block mt-[0.58rem]" user={user} onLogout={onLogout} />}
                 </>
               </section>
 

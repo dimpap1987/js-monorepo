@@ -14,27 +14,25 @@ export function UserMetadata({
   className?: string | null
 }) {
   return (
-    <>
-      <div className={cn('p-1 pb-3 flex gap-4 items-center', className)}>
-        <Avatar>
-          {profileImage && <AvatarImage src={profileImage} alt={`${username} picture`}></AvatarImage>}
-          <AvatarFallback>{username?.slice(0, 2)?.toUpperCase() || 'A'}</AvatarFallback>
-        </Avatar>
+    <div className={cn('px-2 py-3 flex gap-3 items-center', className)}>
+      <Avatar className="h-10 w-10">
+        {profileImage && <AvatarImage src={profileImage} alt={`${username} picture`}></AvatarImage>}
+        <AvatarFallback className="text-sm font-semibold">{username?.slice(0, 2)?.toUpperCase() || 'A'}</AvatarFallback>
+      </Avatar>
 
-        {createdAt && (
-          <div>
-            <div className="font-semibold flex items-center">
-              <FaAt className="text-foreground" />
-              <span className="ml-1">{username}</span>
-            </div>
-            {createdAt && (
-              <div className="text-xs italic hidden sm:block mt-1">
-                created at &#x2022; {new Date(createdAt).toLocaleDateString()}
-              </div>
-            )}
+      {createdAt && (
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold flex items-center gap-1.5 text-sm">
+            <FaAt className="text-foreground-muted flex-shrink-0" />
+            <span className="truncate">{username}</span>
           </div>
-        )}
-      </div>
-    </>
+          {createdAt && (
+            <div className="text-xs text-foreground-muted mt-1 hidden sm:block">
+              Member since {new Date(createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
