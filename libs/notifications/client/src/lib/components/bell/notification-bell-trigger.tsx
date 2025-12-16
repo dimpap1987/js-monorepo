@@ -45,13 +45,14 @@ export const NotificationBellButton = forwardRef<
       {isRinging && (
         <div
           className={cn(
-            'absolute -top-2 -right-3 min-w-[18px] h-[18px]',
+            'absolute -top-2 -right-3 min-w-[20px] h-[20px]',
             'flex items-center justify-center',
-            'rounded-full text-[10px] font-semibold',
-            'bg-gradient-to-br from-primary to-primary/90',
-            'text-primary-foreground shadow-lg',
-            'border-2 border-background-secondary',
-            'animate-pulse'
+            'rounded-full text-[11px] font-bold tracking-tight',
+            'bg-primary text-primary-foreground',
+            'shadow-md shadow-primary/30',
+            'border-2 border-background',
+            'ring-2 ring-primary/20',
+            'hover:scale-110 hover:shadow-lg hover:shadow-primary/40'
           )}
           aria-label={`${unreadNotificationCount} unread notifications`}
         >

@@ -12,17 +12,18 @@ interface NotificationListProps {
 function Notifications({ notifications, onRead, showLoader }: NotificationListProps) {
   if (notifications?.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-        <span className="text-3xl mb-3 opacity-60" role="img" aria-label="Bell icon indicating no notifications">
+      <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+        <span className="text-4xl mb-4 opacity-50" role="img" aria-label="Bell icon indicating no notifications">
           🔔
         </span>
-        <div className="text-xs text-foreground-neutral/60 mt-1">No new notifications</div>
+        <div className="text-sm text-foreground-muted font-medium">No new notifications</div>
+        <div className="text-xs text-foreground-neutral/50 mt-1">You're all caught up!</div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-2 px-1 py-1">
+    <div className="space-y-2.5 px-2 py-2">
       {notifications.map((content, index) => (
         <div key={content.notification.id}>
           <NotificationItem content={content} onRead={onRead} />
