@@ -46,9 +46,9 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div className="overflow-auto rounded-t-lg rounded-b-lg border">
-      <Table className="table-fixed divide-y divide-gray-200 flex-1 overscroll-none">
-        <TableHeader className="bg-gray-50">
+    <div className="overflow-auto rounded-t-lg rounded-b-lg border border-border bg-card">
+      <Table className="table-fixed divide-y divide-border flex-1 overscroll-none">
+        <TableHeader className="bg-muted/30">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
@@ -56,7 +56,7 @@ export function DataTable<TData, TValue>({
                   <TableHead
                     key={header.id}
                     colSpan={header.colSpan}
-                    className={`text-xs font-medium text-gray-500 tracking-wider w-[${header.getSize()}px]`}
+                    className={`text-xs font-bold text-foreground tracking-wider w-[${header.getSize()}px]`}
                   >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
@@ -65,13 +65,13 @@ export function DataTable<TData, TValue>({
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody className="bg-white divide-y divide-gray-200">
+        <TableBody className="bg-card divide-y divide-border">
           {loading ? (
             // Render skeletons if loading
             Array.from({ length: 5 }).map((_, rowIndex) => (
               <TableRow key={`skeleton-${rowIndex}`}>
                 {columns.map((__, colIndex) => (
-                  <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`} className="text-sm text-gray-900">
+                  <TableCell key={`skeleton-cell-${rowIndex}-${colIndex}`} className="text-sm text-foreground">
                     <Skeleton className="h-4" />
                   </TableCell>
                 ))}
@@ -81,7 +81,7 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="text-sm text-gray-900">
+                  <TableCell key={cell.id} className="text-sm text-foreground">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -89,14 +89,14 @@ export function DataTable<TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns?.length} className="h-24 text-center">
+              <TableCell colSpan={columns?.length} className="h-24 text-center text-foreground-muted">
                 No results.
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-      {!loading && <DataTablePagination table={table} className="bg-white text-sm text-gray-900" />}
+      {!loading && <DataTablePagination table={table} className="bg-card text-sm text-foreground border-t border-border" />}
     </div>
   )
 }

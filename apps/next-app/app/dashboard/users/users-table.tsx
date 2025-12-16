@@ -4,6 +4,7 @@ import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
+import { useNotifications } from '@js-monorepo/notification'
 import { AuthUserFullDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
 import { apiClient } from '@js-monorepo/utils/http'
 import { ColumnDef } from '@tanstack/react-table'
@@ -38,6 +39,7 @@ const findUsers = async (searchParams?: string) => {
 const DashboardUsersTableSuspense = () => {
   const [data, setData] = useState<UsersReponse>({ users: [], totalCount: 0 })
   const [loading, setLoading] = useState(true)
+  const { addNotification } = useNotifications()
 
   const [update, setUpdate] = useState<{
     index?: number
@@ -48,17 +50,17 @@ const DashboardUsersTableSuspense = () => {
   const { pagination, searchQuery, setPagination } = usePaginationWithParams()
   const pageCount = Math.round(data?.totalCount / pagination.pageSize)
 
-  function loadUsers() {
+  const loadUsers = useCallback(() => {
     setLoading(true)
     findUsers(searchQuery).then((response) => {
       setData(response)
       setLoading(false)
     })
-  }
+  }, [searchQuery])
 
   useEffect(() => {
     loadUsers()
-  }, [searchQuery])
+  }, [loadUsers])
 
   const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
     () => [
@@ -143,46 +145,71 @@ const DashboardUsersTableSuspense = () => {
             <div className="flex gap-2 p-4 justify-center items-center select-none">
               <div id="update-user">
                 {update?.inProgress && update.index === row.index ? (
-                  <div className="flex border-zinc-600 border-2 rounded-lg items-center p-1 px-2 gap-2">
-                    <TiTick
+                  <div className="flex items-center gap-3 bg-background-secondary">
+                    <button
                       title="Submit"
-                      className="shrink-0 text-2xl cursor-pointer transform hover:scale-125 transition duration-300 border rounded-lg"
+                      className="h-9 w-9 p-0 rounded-md bg-status-success text-status-success-foreground hover:bg-status-success/90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-success/50 flex items-center justify-center"
                       onClick={async () => {
-                        const response = await apiClient.put(`/admin/users/${row.original.id}`, { ...row.updatedUser })
+                        const updateData = row.updatedUser
 
-                        if (response.ok) {
-                          loadUsers()
+                        // Check if there's actually something to update
+                        if (!updateData || (!updateData.username && !updateData.roles)) {
                           setUpdate({
                             inProgress: false,
                           })
+                          return
+                        }
+
+                        const response = await apiClient.put(`/admin/users/${row.original.id}`, { ...updateData })
+
+                        if (response.ok) {
+                          addNotification({
+                            message: 'User updated successfully',
+                            type: 'success',
+                          })
+
+                          loadUsers()
+
+                          setUpdate({
+                            inProgress: false,
+                          })
+                        } else {
+                          addNotification({
+                            message: response.errors?.join(', ') || 'Failed to update user',
+                            type: 'error',
+                          })
                         }
                       }}
-                    />
-                    <TiCancelOutline
+                    >
+                      <TiTick className="text-xl" />
+                    </button>
+                    <button
                       title="Cancel"
-                      className="shrink-0 text-2xl cursor-pointer transform hover:scale-125 transition duration-300 border rounded-lg"
+                      className="h-9 w-9 p-0 rounded-md bg-status-error text-status-error-foreground hover:bg-status-error/90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-error/50 flex items-center justify-center"
                       onClick={async () => {
                         row.updatedUser = undefined
                         setUpdate({
                           inProgress: false,
                         })
                       }}
-                    />
+                    >
+                      <TiCancelOutline className="text-xl" />
+                    </button>
                   </div>
                 ) : (
-                  <div className="flex justify-center items-center border-2 rounded-lg p-1">
-                    <MdOutlineModeEditOutline
-                      title="Edit User"
-                      className="shrink-0 text-2xl cursor-pointer "
-                      onClick={() => {
-                        row.updatedUser = undefined
-                        setUpdate({
-                          index: row.index,
-                          inProgress: true,
-                        })
-                      }}
-                    />
-                  </div>
+                  <button
+                    title="Edit User"
+                    className="h-9 w-9 p-0 rounded-md border border-border bg-background hover:bg-accent hover:border-accent text-foreground transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 flex items-center justify-center"
+                    onClick={() => {
+                      row.updatedUser = undefined
+                      setUpdate({
+                        index: row.index,
+                        inProgress: true,
+                      })
+                    }}
+                  >
+                    <MdOutlineModeEditOutline className="text-xl" />
+                  </button>
                 )}
               </div>
             </div>
@@ -190,7 +217,7 @@ const DashboardUsersTableSuspense = () => {
         },
       },
     ],
-    [update, pagination]
+    [update, loadUsers, addNotification]
   )
 
   const onPaginationChange = useCallback<Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>>(

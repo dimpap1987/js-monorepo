@@ -75,55 +75,57 @@ export default function OnlineUsersTableComponent() {
   )
 
   return (
-    <div className="flex flex-col p-2 bg-white border-b rounded-lg shadow overflow-hidden text-sm">
-      <div className="overflow-auto whitespace-nowrap">
+    <div className="flex flex-col border border-border rounded-lg bg-card shadow-sm overflow-hidden">
+      <div className="overflow-auto">
         <table className="w-full">
           {!loading && (
             <thead>
-              <tr className="border-b border-blue-100 text-gray-800 font-semibold text-xs">
-                <th className="p-1 pl-4 px-2 text-left"></th>
-                <th className="p-1 px-2 text-left">Username</th>
-                <th className="p-1 px-2 text-center">WebSockets</th>
-                <th className="p-1 px-2 text-center">Actions</th>
+              <tr className="border-b border-border bg-muted/30">
+                <th className="p-3 pl-4 text-left"></th>
+                <th className="p-3 text-left text-sm font-semibold text-foreground">Username</th>
+                <th className="p-3 text-center text-sm font-semibold text-foreground">WebSockets</th>
+                <th className="p-3 text-center text-sm font-semibold text-foreground">Actions</th>
               </tr>
             </thead>
           )}
           <tbody>
             {loading
               ? Array.from({ length: 5 }).map((_, index) => (
-                  <tr key={`skeleton-${index}`} className="relative border-t border-blue-100 cursor-default">
-                    <td className="p-2 pl-2 px-2">
-                      <Skeleton className="h-3 rounded-full" />
+                  <tr key={`skeleton-${index}`} className="border-b border-border/50">
+                    <td className="p-3 pl-4">
+                      <Skeleton className="h-4 w-4 rounded-full" />
                     </td>
-                    <td className="p-2 px-2">
-                      <Skeleton className="h-3" />
+                    <td className="p-3">
+                      <Skeleton className="h-4 w-24" />
                     </td>
-                    <td className="p-2 px-2">
-                      <Skeleton className="h-3" />
+                    <td className="p-3">
+                      <Skeleton className="h-4 w-12 mx-auto" />
                     </td>
-                    <td className="p-2 px-2">
-                      <Skeleton className="h-3" />
+                    <td className="p-3">
+                      <Skeleton className="h-8 w-20 mx-auto" />
                     </td>
                   </tr>
                 ))
               : Object.entries(groupedUsers).map(([userId, user]) => (
-                  <tr key={userId} className="relative border-t border-blue-100 cursor-default">
-                    <td className="p-3 pl-4 px-3">
-                      <FaCircle className="text-green-500 animate-pulse" />
+                  <tr
+                    key={userId}
+                    className="border-b border-border/50 hover:bg-accent/30 transition-colors duration-150"
+                  >
+                    <td className="p-3 pl-4">
+                      <FaCircle className="text-status-success animate-pulse" />
                     </td>
-
-                    <td className="p-3 px-3">
-                      <div className="leading-5 text-gray-500 font-medium">
-                        <span>{user.username}</span>
+                    <td className="p-3">
+                      <div className="text-sm font-medium text-foreground">{user.username}</div>
+                    </td>
+                    <td className="p-3">
+                      <div className="flex justify-center">
+                        <Badge variant="secondary">{user.count}</Badge>
                       </div>
                     </td>
-                    <td className="p-3 px-3">
-                      <div className="leading-5 text-gray-500 font-medium text-center">
-                        <Badge>{user.count}</Badge>
+                    <td className="p-3">
+                      <div className="flex justify-center">
+                        <DisconnectUserComponent user={{ id: Number(userId), ...user }}></DisconnectUserComponent>
                       </div>
-                    </td>
-                    <td className="p-3 px-3 flex justify-center">
-                      <DisconnectUserComponent user={{ id: Number(userId), ...user }}></DisconnectUserComponent>
                     </td>
                   </tr>
                 ))}

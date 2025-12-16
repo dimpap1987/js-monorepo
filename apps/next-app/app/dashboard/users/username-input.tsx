@@ -16,9 +16,21 @@ function UsernameTableInput<T>({ row }: { row: Row<T> }) {
       className="py-1 px-4 bg-background text-foreground text-center"
       value={value}
       onChange={(e) => {
-        setValue(e.target.value)
-        row.updatedUser = {
-          username: e.target.value,
+        const newValue = e.target.value
+        setValue(newValue)
+        
+        // Only update if the value actually changed from the original
+        if (newValue !== initialValue) {
+          row.updatedUser = {
+            ...row.updatedUser,
+            username: newValue,
+          }
+        } else {
+          // If value is back to original, remove username from update
+          if (row.updatedUser) {
+            const { username, ...rest } = row.updatedUser
+            row.updatedUser = Object.keys(rest).length > 0 ? rest : undefined
+          }
         }
       }}
     />
