@@ -1,5 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common'
-import { PaymentsClient, StripeProvider } from '@super-dp/payments-server'
+import { PaymentsClient, StripeProvider } from '@super-dp/payments-core'
 
 export interface StripeModuleOptions {
   apiKey: string
