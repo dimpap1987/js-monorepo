@@ -63,6 +63,7 @@ export const SessionProvider = ({
   const refreshSession = useCallback(() => {
     fetchSession(
       (userResponse) => {
+        console.log({ userResponse, session })
         setSession({ ...userResponse })
       },
       () => {
@@ -72,7 +73,7 @@ export const SessionProvider = ({
       clientBuilder,
       endpoint
     )
-  }, [clientBuilder, endpoint])
+  }, [clientBuilder, endpoint, session])
 
   useEffect(() => {
     if (!!session?.user || getCookie('UNREGISTERED-USER')) return
@@ -84,7 +85,7 @@ export const SessionProvider = ({
       clientBuilder,
       endpoint
     )
-  }, [clientBuilder, endpoint])
+  }, [clientBuilder, endpoint, session])
 
   useEffect(() => {
     if (!session?.user) return
