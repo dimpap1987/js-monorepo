@@ -186,18 +186,18 @@ export function ThemeSettings() {
 
   if (!mounted) {
     return (
-      <section className="p-2 space-y-6 text-white">
+      <section className="p-2 space-y-6 text-foreground">
         <SettingsItem label="Appearance">
-          <div className="text-sm text-gray-400">Loading themes...</div>
+          <div className="text-sm text-foreground-muted">Loading themes...</div>
         </SettingsItem>
       </section>
     )
   }
 
   return (
-    <section className="p-2 space-y-6 text-white">
+    <section className="p-2 space-y-6 text-foreground">
       <SettingsItem label="Appearance">
-        <p className="text-xs font-semibold sm:text-sm mt-1 mb-4 text-gray-300">
+        <p className="text-xs font-semibold sm:text-sm mt-1 mb-4 text-foreground-neutral">
           Choose how the app looks to you. You can select a theme or match your system settings.
         </p>
 
@@ -276,8 +276,8 @@ export function ThemeSettings() {
 
                 {/* Theme Name */}
                 <div className="text-left w-full">
-                  <div className="font-semibold text-sm mb-1">{themeOption.name}</div>
-                  <div className="text-xs text-gray-400">{themeOption.description}</div>
+                  <div className="font-semibold text-sm mb-1 text-foreground">{themeOption.name}</div>
+                  <div className="text-xs text-foreground-muted">{themeOption.description}</div>
                 </div>
               </button>
             )
@@ -286,13 +286,13 @@ export function ThemeSettings() {
 
         {/* Current Theme Info */}
         <div className="mt-6 pt-4 border-t border-border">
-          <div className="text-sm text-gray-300">
+          <div className="text-sm text-foreground">
             <span className="font-medium">Current theme:</span>{' '}
             <span className="text-primary">
               {themes.find((t) => t.id === (theme === 'system' ? 'system' : currentTheme))?.name || 'Light'}
             </span>
             {theme === 'system' && (
-              <span className="text-gray-400 ml-2">
+              <span className="text-foreground-muted ml-2">
                 (resolved to {themes.find((t) => t.id === currentTheme)?.name || 'Light'})
               </span>
             )}
