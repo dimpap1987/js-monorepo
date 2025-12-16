@@ -22,10 +22,10 @@ function RegisterDialogComponent({ children, open }: Readonly<PropsWithChildren 
           e.preventDefault()
         }}
       >
-        <DialogHeader className="font-semibold justify-center">
-          <DialogTitle className="text-center font-bold">Sign Up</DialogTitle>
+        <DialogHeader className="justify-center mb-4">
+          <DialogTitle className="text-center text-xl font-semibold tracking-tight">Complete Your Profile</DialogTitle>
         </DialogHeader>
-        <section className="overflow-x-hidden">{children}</section>
+        <section className="overflow-x-hidden space-y-4">{children}</section>
       </DpDialogContent>
     </Dialog>
   )

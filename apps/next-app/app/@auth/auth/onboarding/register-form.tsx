@@ -5,6 +5,7 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, Input } from '@js-monorepo/components/form'
 import { useNotifications } from '@js-monorepo/notification'
+import { cn } from '@js-monorepo/ui/util'
 import { RegisterUserSchema } from '@js-monorepo/schemas'
 import { useRouter } from 'next-nprogress-bar'
 import { useEffect, useState } from 'react'
@@ -20,19 +21,34 @@ import { handleValidation, handleValidationErrros, initialRegisterValidations } 
 const RegisterDialogErrorComponent = ({ validations }: { validations: RegisterDialogErrorComponentType[] }) => {
   return (
     validations && (
-      <div className="p-3 rounded-md text-sm">
+      <div className="mt-4 p-4 rounded-lg bg-muted/30 border border-border space-y-2">
         {validations?.map((validation) => (
-          <div key={validation.type} className="flex items-center gap-2 py-1">
+          <div key={validation.type} className="flex items-start gap-3">
             {/* Render IoMdInformationCircle when status is 'untouched' */}
-            {validation.status === 'untouched' && <IoMdInformationCircle className="text-xl shrink-0" />}
+            {validation.status === 'untouched' && (
+              <IoMdInformationCircle className="text-lg shrink-0 mt-0.5 text-foreground-muted" />
+            )}
 
             {/* Render BsCheck2Circle when status is 'valid' */}
-            {validation.status === 'valid' && <BsCheck2Circle className="text-green-600 text-xl shrink-0" />}
+            {validation.status === 'valid' && (
+              <BsCheck2Circle className="text-lg shrink-0 mt-0.5 text-status-success" />
+            )}
 
             {/* Render FaRegTimesCircle when status is 'invalid' */}
-            {validation.status === 'invalid' && <FaRegTimesCircle className="text-red-600 text-xl shrink-0" />}
+            {validation.status === 'invalid' && (
+              <FaRegTimesCircle className="text-lg shrink-0 mt-0.5 text-status-error" />
+            )}
 
-            <p className="font-semibold">{validation.message}</p>
+            <p
+              className={cn(
+                'text-sm leading-relaxed',
+                validation.status === 'valid' && 'text-status-success',
+                validation.status === 'invalid' && 'text-status-error',
+                validation.status === 'untouched' && 'text-foreground-muted'
+              )}
+            >
+              {validation.message}
+            </p>
           </div>
         ))}
       </div>
@@ -72,7 +88,7 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
     })
     if (response.ok) {
       addNotification({
-        message: `Welcome,    ${formData.username} 👋`,
+        message: `Welcome, ${formData.username} 👋`,
         duration: 5000,
       })
       refreshSession()
@@ -94,41 +110,48 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
             handleValidationErrros(errors, setValidations)
           })}
         >
-          {/* email */}
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl className="relative flex items-center">
-                  <HiLockClosed className="absolute left-2 text-foreground" />
-                  <Input {...field} readOnly className="pl-7 ring ring-primary text-center" />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          {/* username */}
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl className="relative flex items-center">
-                  <FaAt className="absolute left-2 text-foreground" />
-                  <Input placeholder="Type your username" className="pl-7 text-center" autoFocus {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <div className="mt-7">
+          <div className="space-y-4">
+            {/* email */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Email</FormLabel>
+                  <FormControl className="relative flex items-center">
+                    <HiLockClosed className="absolute left-3 text-foreground-muted z-10" />
+                    <Input
+                      {...field}
+                      readOnly
+                      className="pl-10 pr-4 h-11 bg-muted/50 text-foreground-muted cursor-not-allowed border-border"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            {/* username */}
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Username</FormLabel>
+                  <FormControl className="relative flex items-center">
+                    <FaAt className="absolute left-3 text-foreground-muted z-10" />
+                    <Input placeholder="Choose a username" className="pl-10 pr-4 h-11" autoFocus {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="mt-6">
             <DpButton
               disabled={!form.formState.isValid || form.formState.isSubmitting || form.formState.isSubmitSuccessful}
               loading={form.formState.isSubmitting}
               className="w-full"
+              size="large"
             >
-              Sign Up
+              Complete Sign Up
             </DpButton>
           </div>
         </form>
