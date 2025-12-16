@@ -1,7 +1,7 @@
 'use client'
 
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
-import { AuthRoleDTO, AuthUserDto } from '@js-monorepo/types'
+import { AuthRoleDTO, AuthUserDto, AuthUserUpdateDto } from '@js-monorepo/types'
 import { apiClient } from '@js-monorepo/utils/http'
 import { Row } from '@tanstack/react-table'
 import React, { useEffect, useState } from 'react'
@@ -32,10 +32,14 @@ function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
   }, [row])
 
   const originalRoleIds = React.useMemo(() => {
-    return row?.original.userRole?.map(({ role }) => {
-      const foundRole = roles.find((r) => r.name === role.name)
-      return foundRole?.id
-    }).filter(Boolean) as number[] || []
+    return (
+      (row?.original.userRole
+        ?.map(({ role }) => {
+          const foundRole = roles.find((r) => r.name === role.name)
+          return foundRole?.id
+        })
+        .filter(Boolean) as number[]) || []
+    )
   }, [row, roles])
 
   return (
@@ -45,10 +49,10 @@ function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
         onChange={(localRoles) => {
           const newRoleIds = localRoles.map((role) => role.id).sort()
           const originalIds = originalRoleIds.sort()
-          
+
           // Only update if roles actually changed
           const rolesChanged = JSON.stringify(newRoleIds) !== JSON.stringify(originalIds)
-          
+
           if (rolesChanged) {
             row.updatedUser = {
               ...row.updatedUser,
@@ -57,10 +61,11 @@ function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
               })),
             }
           } else {
-            // If roles are back to original, remove roles from update
             if (row.updatedUser) {
-              const { roles: _, ...rest } = row.updatedUser
-              row.updatedUser = Object.keys(rest).length > 0 ? rest : undefined
+              const { roles: unusedRoles, ...rest } = row.updatedUser
+              if (Object.keys(rest).length > 0) {
+                row.updatedUser = rest as AuthUserUpdateDto
+              }
             }
           }
         }}

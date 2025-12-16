@@ -96,7 +96,9 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      {!loading && <DataTablePagination table={table} className="bg-card text-sm text-foreground border-t border-border" />}
+      {!loading && (
+        <DataTablePagination table={table} className="bg-card text-sm text-foreground border-t border-border" />
+      )}
     </div>
   )
 }

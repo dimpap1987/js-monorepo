@@ -18,7 +18,7 @@ function UsernameTableInput<T>({ row }: { row: Row<T> }) {
       onChange={(e) => {
         const newValue = e.target.value
         setValue(newValue)
-        
+
         // Only update if the value actually changed from the original
         if (newValue !== initialValue) {
           row.updatedUser = {

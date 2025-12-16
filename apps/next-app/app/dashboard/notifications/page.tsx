@@ -13,13 +13,17 @@ export default async function NotificationsController() {
       <div className="p-4">
         <Accordion type="multiple" className="w-full space-y-2">
           <AccordionItem value="item-1" className="border border-border rounded-lg px-4">
-            <AccordionTrigger className="text-base font-semibold hover:no-underline">Send User Notification</AccordionTrigger>
+            <AccordionTrigger className="text-base font-semibold hover:no-underline">
+              Send User Notification
+            </AccordionTrigger>
             <AccordionContent className="pb-4">
               <NotificationSender></NotificationSender>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2" className="border border-border rounded-lg px-4">
-            <AccordionTrigger className="text-base font-semibold hover:no-underline">Send Push Notification</AccordionTrigger>
+            <AccordionTrigger className="text-base font-semibold hover:no-underline">
+              Send Push Notification
+            </AccordionTrigger>
             <AccordionContent className="pb-4">
               <PushNotificationSender></PushNotificationSender>
             </AccordionContent>

@@ -25,7 +25,6 @@ import { AdminService } from './admin.service'
 @UseGuards(RolesGuard)
 @HasRoles(RolesEnum.ADMIN)
 export class AdminController {
-
   constructor(
     private readonly adminService: AdminService,
     private readonly οnlineUsersService: OnlineUsersService
