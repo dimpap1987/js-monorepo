@@ -37,7 +37,10 @@ export function NotificationItem({
 
   const { id: divId, ...divProps } = rest as HTMLAttributes<HTMLDivElement>
   return (
-    <div className={cn('flex relative self-end w-max max-w-96', styles.notificationContainer)} {...divProps}>
+    <div
+      className={cn('flex relative self-end w-max max-w-96 z-[55 pointer-events-auto', styles.notificationContainer)}
+      {...divProps}
+    >
       <div className="w-full py-3 px-5 text-sm text-white bg-background-secondary grid grid-cols-[max-content_1fr_max-content] items-center gap-2">
         {/* Icon */}
         <div className="self-center p-1">
