@@ -1,37 +1,26 @@
 'use client'
 
 import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
-import { AuthRoleDTO, AuthUserDto, AuthUserUpdateDto } from '@js-monorepo/types'
-import { apiClient } from '@js-monorepo/utils/http'
+import { AuthUserDto, AuthUserUpdateDto } from '@js-monorepo/types'
 import { Row } from '@tanstack/react-table'
-import React, { useEffect, useState } from 'react'
-
-const getRoles = async () => {
-  const response = await apiClient.get(`/admin/roles`)
-
-  if (response.ok) return response.data as AuthRoleDTO[]
-
-  return [] as AuthRoleDTO[]
-}
+import React, { useEffect, useMemo, useState } from 'react'
+import { useRoles } from './roles-queries'
 
 function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
-  const [roles, setRoles] = useState<AuthRoleDTO[]>([])
+  const { data: roles = [], isLoading } = useRoles()
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([])
 
   useEffect(() => {
-    getRoles().then((fetchedRoles) => {
-      setRoles(fetchedRoles)
+    if (roles.length > 0) {
       const userRoleNames = row?.original.userRole?.map(({ role }) => role.name) || []
 
-      const initialSelectedRoles = fetchedRoles
-        .filter((role) => userRoleNames.includes(role.name))
-        .map((role) => role.id) // Store only the IDs
+      const initialSelectedRoles = roles.filter((role) => userRoleNames.includes(role.name)).map((role) => role.id) // Store only the IDs
 
       setSelectedRoleIds(initialSelectedRoles)
-    })
-  }, [row])
+    }
+  }, [roles, row])
 
-  const originalRoleIds = React.useMemo(() => {
+  const originalRoleIds = useMemo(() => {
     return (
       (row?.original.userRole
         ?.map(({ role }) => {
@@ -42,8 +31,12 @@ function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
     )
   }, [row, roles])
 
+  if (isLoading) {
+    return <div className="text-foreground-muted">Loading...</div>
+  }
+
   return (
-    roles && (
+    roles.length > 0 && (
       <MultiSelectDropdown
         classNameTrigger="bg-background text-foreground"
         onChange={(localRoles) => {
