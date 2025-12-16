@@ -69,16 +69,11 @@ img {
 }
 
 *::selection {
-  background: hsl(var(--primary));
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 *::-moz-selection {
-  background: hsl(var(--primary));
-  color: white;
-}
-
-*::-webkit-selection {
-  background: hsl(var(--primary));
-  color: white;
+  background: var(--primary);
+  color: var(--primary-foreground);
 }

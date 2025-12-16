@@ -20,11 +20,14 @@ export function RegisterDialog({ formInput, userProfileImage }: RegisterDialogTy
 
   return (
     <RegisterDialogComponent open={mounted}>
-      <div className="p-2 flex justify-center">
-        <Avatar className="h-20 w-20">
+      <div className="flex flex-col items-center gap-3 mb-2">
+        <Avatar className="h-24 w-24 border-4 border-primary/20 shadow-lg">
           {userProfileImage && <AvatarImage src={userProfileImage} alt={`user's picture`}></AvatarImage>}
-          <AvatarFallback>{formInput?.email?.slice(0, 2)?.toUpperCase() || 'A'}</AvatarFallback>
+          <AvatarFallback className="text-lg font-semibold">
+            {formInput?.email?.slice(0, 2)?.toUpperCase() || 'A'}
+          </AvatarFallback>
         </Avatar>
+        <p className="text-sm text-foreground-muted text-center max-w-xs">Welcome! Let's set up your account</p>
       </div>
 
       <RegisterForm formInput={formInput}></RegisterForm>
