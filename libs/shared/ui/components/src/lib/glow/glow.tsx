@@ -52,10 +52,11 @@ export const GlowArea = (props: GlowAreaProps) => {
   }
 
   useEffect(() => {
-    window.addEventListener('resize', updateGlow)
+    const handleResize = () => updateGlow()
+    window.addEventListener('resize', handleResize)
 
     return () => {
-      window.removeEventListener('resize', updateGlow)
+      window.removeEventListener('resize', handleResize)
     }
   }, [])
 
@@ -84,7 +85,7 @@ interface GlowProps extends ComponentPropsWithoutRef<'div'> {
 }
 
 export const Glow = (props: GlowProps) => {
-  const { className, color = 'hsl(var(--primary))', children, ...rest } = props
+  const { className, color = 'var(--primary)', children, ...rest } = props
   const element = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
