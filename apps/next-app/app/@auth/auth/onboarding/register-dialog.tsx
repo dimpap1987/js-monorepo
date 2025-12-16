@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
