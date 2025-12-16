@@ -10,10 +10,10 @@ const UserOptionsDropdown = ({ className, children }: { className?: string; chil
 
   return (
     <DropdownMenu open={isVisible} onOpenChange={setIsVisible}>
-      <DropdownMenuTrigger className="py-1 px-2 rounded-md hover:ring-1 hover:ring-border">
-        <FaCircleUser className="text-2xl hover:cursor-pointer" />
+      <DropdownMenuTrigger className="p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+        <FaCircleUser className="text-xl" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className={cn('w-80 p-2 px-3 rounded-xl z-30 bg-background space-y-2', className)}>
+      <DropdownMenuContent className={cn('w-80 p-3 rounded-xl z-30 bg-popover border border-border shadow-lg space-y-1', className)}>
         {React.Children.map(children, (child) => {
           const reactChild = child as ReactElement
           return React.cloneElement(reactChild, {
