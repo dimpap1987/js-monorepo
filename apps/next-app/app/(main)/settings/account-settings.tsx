@@ -136,7 +136,7 @@ export function AccountSettings() {
                       {isEditing ? (
                         <Input id="username" className="h-10 w-full" {...field} />
                       ) : (
-                        <p className="w-full h-10 px-6 py-2 bg-background text-secondary rounded-xl border border-border font-semibold flex items-center shadow-md">
+                        <p className="w-full h-10 px-6 py-2 bg-background text-primary rounded-xl border border-border font-semibold flex items-center shadow-md">
                           {field.value}
                         </p>
                       )}

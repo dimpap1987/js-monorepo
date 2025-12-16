@@ -39,7 +39,7 @@ const bubbleConfig = {
   minDelay: 1,
   maxDelay: 4,
   speed: 0.2,
-  colors: ['#40A0C0', '#C08040', '#40C040', '#C040A0'],
+  colors: ['var(--chart-2)', 'var(--chart-4)', 'var(--chart-3)', 'var(--chart-1)'],
   width: 400,
   height: 100,
 }
@@ -91,9 +91,9 @@ export default function BannerSVG() {
             cx={item.cx}
             cy={item.cy}
             r={item.radius}
-            fill={item.fill}
             className="origin-[50%_50%] animate-bubble"
             style={{
+              fill: item.fill,
               animationDelay: item.animationDelay,
               animationDuration: item.animationDuration,
             }}

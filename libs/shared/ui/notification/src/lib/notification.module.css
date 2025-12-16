@@ -12,8 +12,8 @@
   height: 0;
   margin: 2px;
   box-sizing: border-box;
-  border: 9px solid #fff;
-  border-color: #fff transparent #fff transparent;
+  border: 9px solid var(--background);
+  border-color: var(--background) transparent var(--background) transparent;
   animation: spinnerAnimation 1.2s infinite;
 }
 
@@ -44,7 +44,7 @@
   word-wrap: break-word;
 
   /* Outer border effect */
-  background: linear-gradient(rgb(214, 10, 190) 1%, rgba(0, 255, 255, 1) 100%);
+  background: linear-gradient(var(--primary) 1%, var(--accent) 100%);
   border-radius: 20px;
   padding: 1px; /* Border thickness */
   align-self: flex-end;

@@ -138,8 +138,8 @@ export function ModeToggle() {
               : {
                   d: sunPath,
                   rotate: 0,
-                  stroke: '#FFD700',
-                  fill: '#FFD700',
+                  stroke: 'var(--status-warning)',
+                  fill: 'var(--status-warning)',
                   fillOpacity: 0.35,
                   strokeOpacity: 1,
                 }
