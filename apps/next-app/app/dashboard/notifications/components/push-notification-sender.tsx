@@ -5,28 +5,29 @@ import { Card } from '@js-monorepo/components/card'
 import { useNotifications } from '@js-monorepo/notification'
 import { SelectUsersComponent } from '@next-app/components/select-users'
 import { useState } from 'react'
-import { submitPushNotification } from '../utils'
+import { useSubmitPushNotification } from '../queries'
 
 export const PushNotificationSender = () => {
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const { addNotification } = useNotifications()
+  const submitPushNotificationMutation = useSubmitPushNotification()
 
   const handleSendMessage = async () => {
-    const response = await submitPushNotification({
-      message,
-      title,
-      receiverIds: selectedUserIds,
-    })
-    if (response.ok) {
+    try {
+      await submitPushNotificationMutation.mutateAsync({
+        message,
+        title,
+        receiverIds: selectedUserIds,
+      })
       addNotification({
         message: 'Push Notification send successfully!',
         type: 'success',
       })
       setTitle('')
       setMessage('')
-    } else {
+    } catch (error) {
       addNotification({
         message: 'Error sending Push Notification',
         type: 'error',

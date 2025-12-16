@@ -5,19 +5,16 @@ import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 import { ScrollArea } from '@js-monorepo/components/scroll'
 import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
 import { PaginationComponent } from '@js-monorepo/pagination'
-import { PaginationType, UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Fragment, useEffect } from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { useNotificationWebSocket } from '../hooks/index'
 import { useNotificationStore } from '../state'
-import {
-  apiFetchUserNotifications,
-  apiReadAllNotifications,
-  apiReadNotification,
-  humanatizeNotificationDate,
-  updateNotificationAsRead,
-} from '../utils/notifications'
+import { useReadAllNotifications, useReadNotification, useUserNotifications } from '../queries/notifications-queries'
+import { humanatizeNotificationDate, updateNotificationAsRead } from '../utils/notifications'
+import { queryKeys } from '@js-monorepo/utils/http/queries'
 import { NotificationReadAllButton } from './bell/notification-read-all'
 
 export function NotificationsPage() {
@@ -25,67 +22,56 @@ export function NotificationsPage() {
     session: { user },
   } = useSession()
 
-  const [notifications, setNotifications] = useState<Partial<PaginationType<UserNotificationType>> | undefined>()
   const { searchQuery, setPagination, pagination } = usePaginationWithParams(1, 15)
+  const queryClient = useQueryClient()
 
-  const loadingRef = useRef(true)
+  const { data: notifications, isLoading } = useUserNotifications(user?.id, searchQuery)
+  const readNotificationMutation = useReadNotification()
+  const readAllNotificationsMutation = useReadAllNotifications()
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      if (!user?.id) return
-
-      try {
-        loadingRef.current = true
-        const response = await apiFetchUserNotifications(user.id, searchQuery)
-        if (response.ok) {
-          setNotifications(response.data)
-        }
-      } catch (error) {
-        console.error('Failed to fetch notifications:', error)
-      } finally {
-        loadingRef.current = false
-      }
-    }
-
-    fetchNotifications()
-  }, [user, searchQuery])
-
+  // Handle WebSocket notifications - update query cache
   useNotificationWebSocket((notification: UserNotificationType) => {
-    if (notification && pagination.page === 1) {
-      setNotifications((prev) => ({
-        ...prev,
-        content: [notification, ...(prev?.content ?? [])],
-      }))
+    if (notification && pagination.page === 1 && user?.id) {
+      queryClient.setQueryData(queryKeys.notifications.user(user.id, searchQuery), (oldData: typeof notifications) => {
+        if (!oldData?.content) return oldData
+        return {
+          ...oldData,
+          content: [notification, ...oldData.content],
+        }
+      })
     }
   })
 
   const { markNotificationAsRead, latestReadNotificationId, setNotificationCount, notificationCount } =
     useNotificationStore()
 
+  // Update query cache when notification is marked as read via store
   useEffect(() => {
-    if (latestReadNotificationId) {
-      setNotifications((prev) => {
-        if (!prev || !prev.content) return prev
-
+    if (latestReadNotificationId && user?.id) {
+      queryClient.setQueryData(queryKeys.notifications.user(user.id, searchQuery), (oldData: typeof notifications) => {
+        if (!oldData?.content) return oldData
         return {
-          ...prev,
-          content: updateNotificationAsRead(prev.content, latestReadNotificationId),
+          ...oldData,
+          content: updateNotificationAsRead(oldData.content, latestReadNotificationId),
         }
       })
     }
-  }, [latestReadNotificationId])
+  }, [latestReadNotificationId, user?.id, searchQuery, queryClient])
 
   useEffect(() => {
-    if (notificationCount === 0) {
-      setNotifications((prev) => ({
-        ...prev,
-        content: prev?.content?.map((content) => ({
-          ...content,
-          isRead: true,
-        })),
-      }))
+    if (notificationCount === 0 && user?.id) {
+      queryClient.setQueryData(queryKeys.notifications.user(user.id, searchQuery), (oldData: typeof notifications) => {
+        if (!oldData?.content) return oldData
+        return {
+          ...oldData,
+          content: oldData.content.map((content) => ({
+            ...content,
+            isRead: true,
+          })),
+        }
+      })
     }
-  }, [notificationCount])
+  }, [notificationCount, user?.id, searchQuery, queryClient])
 
   const hasPagination: boolean =
     notifications !== undefined &&
@@ -103,17 +89,8 @@ export function NotificationsPage() {
         <NotificationReadAllButton
           onReadAll={async () => {
             if (notifications?.content?.some((content) => !content.isRead)) {
-              const response = await apiReadAllNotifications()
-              if (response.ok) {
-                setNotifications({
-                  ...notifications,
-                  content: notifications?.content?.map((content) => ({
-                    ...content,
-                    isRead: true,
-                  })),
-                })
-                setNotificationCount(0)
-              }
+              await readAllNotificationsMutation.mutateAsync()
+              setNotificationCount(0)
             }
           }}
         ></NotificationReadAllButton>
@@ -121,7 +98,7 @@ export function NotificationsPage() {
 
       {/* Render Notifications */}
       <section className="flex-1 overflow-hidden text-white bg-background-secondary rounded-md p-1 py-2">
-        {loadingRef.current === false ? (
+        {!isLoading ? (
           notifications?.content && notifications.content.length > 0 ? (
             <ScrollArea className="h-full">
               {notifications.content.map((content, index) => (
@@ -130,12 +107,7 @@ export function NotificationsPage() {
                     className={`cursor-pointer p-1 sm:py-2 rounded transition-all duration-200 ${content.isRead ? 'opacity-50' : ''} hover:opacity-90 hover:bg-primary/20`}
                     onClick={async () => {
                       if (!content.isRead && notifications?.content) {
-                        await apiReadNotification(content.notification.id)
-
-                        setNotifications({
-                          ...notifications,
-                          content: updateNotificationAsRead(notifications?.content, content.notification.id),
-                        })
+                        await readNotificationMutation.mutateAsync(content.notification.id)
                         markNotificationAsRead(content.notification.id)
                       }
                     }}
