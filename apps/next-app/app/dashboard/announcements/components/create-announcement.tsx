@@ -12,7 +12,7 @@ import {
   Input,
 } from '@js-monorepo/components/form'
 import { useNotifications } from '@js-monorepo/notification'
-import { apiClient } from '@js-monorepo/utils/http'
+import { useCreateAnnouncement } from '../queries'
 import { SelectUsersComponent } from '@next-app/components/select-users'
 import { useForm } from 'react-hook-form'
 
@@ -43,17 +43,24 @@ const CreateAnnouncement = () => {
   })
 
   const { addNotification } = useNotifications()
+  const createAnnouncementMutation = useCreateAnnouncement()
 
   const isGlobal = form.watch('isGlobal')
 
   const onSubmit = async (data: FormValues) => {
-    const submitResponse = await apiClient.post('/announcements', {
-      announcement: data.message.trim(),
-      userIds: data.isGlobal ? [] : data.selectedUserIds,
-      isGlobal: data.isGlobal,
-    })
-
-    if (!submitResponse.ok) {
+    if (!data.selectedUserIds) return
+    try {
+      await createAnnouncementMutation.mutateAsync({
+        announcement: data.message.trim(),
+        userIds: data.isGlobal ? [] : data.selectedUserIds,
+        isGlobal: data.isGlobal,
+      })
+      addNotification({
+        message: 'Announcement sent successfully',
+        type: 'success',
+      })
+      form.reset()
+    } catch (error) {
       addNotification({
         message: 'Error sending Announcement',
         type: 'error',

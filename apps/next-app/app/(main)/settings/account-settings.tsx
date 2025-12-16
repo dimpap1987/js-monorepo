@@ -16,10 +16,10 @@ import {
 import { useNotifications } from '@js-monorepo/notification'
 import { EditUserSchema } from '@js-monorepo/schemas'
 import { compressAvatar } from '@js-monorepo/utils/common'
-import { apiClient } from '@js-monorepo/utils/http'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { SettingsItem } from './settings-items'
+import { useUpdateUserAccount } from './queries'
 
 export function AccountSettings() {
   const {
@@ -29,11 +29,15 @@ export function AccountSettings() {
   } = useSession()
   const [isEditing, setIsEditing] = useState(false)
   const { addNotification } = useNotifications()
+  const updateUserAccountMutation = useUpdateUserAccount()
 
-  const initUser = {
-    username: user?.username || '',
-    profileImage: user?.profile?.image || '',
-  }
+  const initUser = useMemo(
+    () => ({
+      username: user?.username || '',
+      profileImage: user?.profile?.image || '',
+    }),
+    [user?.username, user?.profile?.image]
+  )
 
   const form = useForm({
     defaultValues: initUser,
@@ -45,20 +49,20 @@ export function AccountSettings() {
     if (user) {
       form.reset(initUser)
     }
-  }, [user, form])
+  }, [user, form, initUser])
 
   const onSubmit = async (data: { username: string; profileImage: string }) => {
     setIsEditing(false)
     form.clearErrors()
 
-    const response = await apiClient.patch('/users', data)
-    if (response.ok) {
+    try {
+      await updateUserAccountMutation.mutateAsync(data)
       refreshSession()
       addNotification({
         message: 'Account successfully updated!',
         type: 'success',
       })
-    } else {
+    } catch (error) {
       form.reset(initUser)
       addNotification({
         message: 'Something went wrong...',

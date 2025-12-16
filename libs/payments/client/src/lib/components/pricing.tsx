@@ -7,10 +7,11 @@ import { loadStripe } from '@stripe/stripe-js'
 import { useRouter } from 'next-nprogress-bar'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { SessionSubscription, Subscription, SubscriptionPlan } from '../types'
-import { apiCancelSubscription, apiCheckoutPlan, apiGetPlans, apiGetSubscription } from '../utils/api'
+import { apiCancelSubscription, apiCheckoutPlan, apiGetSubscription } from '../utils/api'
 import { PlanCard } from './plan-card'
 import { useSearchParams } from 'next/navigation'
 import { ErrorDialog } from '@js-monorepo/dialog'
+import { usePlans } from '../queries/payments-queries'
 
 const PricingHeader = ({ title }: { title: string }) => (
   <section className="text-center">
@@ -47,29 +48,14 @@ function useSubscriptionMap() {
   return { subscriptionMap, fetchSubscriptions }
 }
 
-function usePlans() {
-  const [plans, setPlans] = useState<PricingPlanResponse[]>([])
-
-  const fetchPlans = useCallback(async () => {
-    try {
-      const response = await apiGetPlans()
-      if (response.ok) setPlans(response.data)
-    } catch (error) {
-      console.error('Error fetching plans:', error)
-    }
-  }, [])
-
-  return { plans, fetchPlans }
-}
-
 export function Pricing() {
   const { session, isLoggedIn } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const { addNotification } = useNotifications()
-  const stripePromise = useMemo(() => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!), [])
+  const stripePromise = useMemo(() => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''), [])
   const [hasErrors, setHasErrors] = useState(false)
-  const { plans, fetchPlans } = usePlans()
+  const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
   const { subscriptionMap, fetchSubscriptions } = useSubscriptionMap()
 
   const sessionSubscription = session?.subscription as SessionSubscription
@@ -98,10 +84,6 @@ export function Pricing() {
       setHasErrors(true)
     }
   }, [searchParams])
-
-  useEffect(() => {
-    fetchPlans()
-  }, [fetchPlans])
 
   useEffect(() => {
     if (sessionSubscription?.plans?.length) {
@@ -139,27 +121,30 @@ export function Pricing() {
     [isLoggedIn, router, stripePromise, addNotification]
   )
 
-  const handleCancelSubscription = useCallback(async (priceId: number) => {
-    try {
-      const response = await apiCancelSubscription(priceId)
-      if (response.ok) {
-        addNotification({
-          message: 'Cancelling Subscription',
-          duration: 4000,
-          description: 'Please wait...',
-          type: 'spinner',
-        })
-      } else {
-        addNotification({
-          message: 'Something went wrong',
-          description: 'Please try again later',
-          type: 'error',
-        })
+  const handleCancelSubscription = useCallback(
+    async (priceId: number) => {
+      try {
+        const response = await apiCancelSubscription(priceId)
+        if (response.ok) {
+          addNotification({
+            message: 'Cancelling Subscription',
+            duration: 4000,
+            description: 'Please wait...',
+            type: 'spinner',
+          })
+        } else {
+          addNotification({
+            message: 'Something went wrong',
+            description: 'Please try again later',
+            type: 'error',
+          })
+        }
+      } catch (error) {
+        console.error('Checkout Error:', error)
       }
-    } catch (error) {
-      console.error('Checkout Error:', error)
-    }
-  }, [])
+    },
+    [addNotification]
+  )
 
   const handleErrorDialogClose = () => {
     const newSearchParams = new URLSearchParams(searchParams.toString())

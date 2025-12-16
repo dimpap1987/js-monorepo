@@ -6,7 +6,7 @@ import { Card } from '@js-monorepo/components/card'
 import { useNotifications } from '@js-monorepo/notification'
 import { SelectUsersComponent } from '@next-app/components/select-users'
 import { useState } from 'react'
-import { submitNotification } from '../utils'
+import { useSubmitNotification } from '../queries'
 
 export const NotificationSender = () => {
   const {
@@ -15,21 +15,22 @@ export const NotificationSender = () => {
   const [message, setMessage] = useState<string>('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const { addNotification } = useNotifications()
+  const submitNotificationMutation = useSubmitNotification()
 
   const handleSendMessage = async () => {
     if (user && message.trim() && selectedUserIds.length > 0) {
-      const submitResponse = await submitNotification({
-        message: message.trim(),
-        receiverIds: selectedUserIds,
-        senderId: user.id,
-      })
-      if (submitResponse.ok) {
+      try {
+        await submitNotificationMutation.mutateAsync({
+          message: message.trim(),
+          receiverIds: selectedUserIds,
+          senderId: user.id,
+        })
         setMessage('')
         addNotification({
           message: 'Notification send successfully!',
           type: 'success',
         })
-      } else {
+      } catch (error) {
         addNotification({
           message: 'Error sending Notification',
           type: 'error',
