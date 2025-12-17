@@ -3,7 +3,7 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { UserMetadata } from '@js-monorepo/navbar'
-import { ReactNode, RefObject, forwardRef, useCallback, useEffect, useMemo, useRef } from 'react'
+import { ReactNode, RefObject, forwardRef, useCallback, useEffect, useMemo, useRef, memo } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
 import { useClickAway } from 'react-use'
 
@@ -36,10 +36,9 @@ const framerText = (position: SidebarPositionType) => {
   }
 }
 
-const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
+const DpNextSidebarBase = forwardRef<HTMLDivElement, DpNextSidebarProps>(
   ({ children, isOpen, onClose, user, items = [], position = 'left', header }) => {
     const localRef = useRef<HTMLDivElement | null>(null)
-
     const handleClickAway = useCallback(() => {
       onClose()
     }, [onClose])
@@ -142,5 +141,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
   }
 )
 
-DpNextSidebar.displayName = 'DpNextSidebar'
+DpNextSidebarBase.displayName = 'DpNextSidebar'
+
+const DpNextSidebar = memo(DpNextSidebarBase)
 export { DpNextSidebar }
