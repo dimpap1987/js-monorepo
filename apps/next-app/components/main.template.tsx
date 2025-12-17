@@ -65,14 +65,10 @@ const DpNotificationBellComponentDynamic = dynamic(
 )
 
 export default function MainTemplate({ children }: Readonly<PropsWithChildren>) {
-  const {
-    session: { user },
-    isLoggedIn,
-    isAdmin,
-    refreshSession,
-  } = useSession()
+  const { session, isLoggedIn, isAdmin, refreshSession } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const router = useRouter()
+  const user = session?.user
 
   const { accumulatedNotifications, notifications, handlePaginationChange, handleRead, handleReadAll } =
     useNotificationAccumulation({

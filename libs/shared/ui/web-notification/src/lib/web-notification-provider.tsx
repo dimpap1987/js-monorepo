@@ -14,9 +14,8 @@ const WebNotificationContext = createContext<WebNotificationContextType | undefi
 
 const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
   const [permission, setPermission] = useState<NotificationPermission>(Notification.permission)
-  const {
-    session: { user },
-  } = useSession()
+  const { session } = useSession()
+  const user = session?.user
 
   useEffect(() => {
     registerServiceWorker().then(async () => {
@@ -31,10 +30,10 @@ const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
     requestPushPermission().then(async (perm) => {
       setPermission(perm)
       if (perm === 'granted' && user?.id) {
-        subscribeNotifactionToServer(user?.id)
+        subscribeNotifactionToServer(user.id)
       }
     })
-  }, [permission, user])
+  }, [user])
 
   const createNotification = useCallback(
     (title: string, options: NotificationOptions) => {

@@ -9,12 +9,11 @@ import { useState } from 'react'
 import { useSubmitNotification } from '../queries'
 
 export const NotificationSender = () => {
-  const {
-    session: { user },
-  } = useSession()
+  const { session } = useSession()
   const [message, setMessage] = useState<string>('')
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
   const { addNotification } = useNotifications()
+  const user = session?.user
   const submitNotificationMutation = useSubmitNotification()
 
   const handleSendMessage = async () => {

@@ -1,29 +1,24 @@
 'use client'
 
-import { apiClientBase, getCookie } from '@js-monorepo/utils/http'
+import { apiClientBase } from '@js-monorepo/utils/http'
 import { AxiosInstance } from 'axios'
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 export interface SessionContextType {
-  session: Record<string, any>
+  session: Record<string, any> | null
   isLoggedIn: boolean
   isAdmin: boolean
   refreshSession: () => void
 }
 
 const SessionContext = createContext<SessionContextType>({
-  session: {},
+  session: null,
   isLoggedIn: false,
   isAdmin: false,
   refreshSession: () => {},
 })
 
-const fetchSession = async (
-  successCallback: (user: any) => void,
-  errorCallback?: (error?: any) => void,
-  clientBuilder = apiClientBase,
-  endpoint = '/auth/session'
-) => {
+const fetchSession = async (clientBuilder: AxiosInstance, endpoint: string) => {
   try {
     const response = await clientBuilder.get(endpoint, {
       headers: {
@@ -32,84 +27,93 @@ const fetchSession = async (
         Expires: '0',
       },
       params: {
-        _: new Date().getTime(), // Add a unique timestamp as a query parameter
+        _: Date.now(),
       },
     })
 
     if (response.status >= 200 && response.status < 300) {
-      successCallback(response.data)
-    } else {
-      errorCallback?.()
+      return { data: response.data, error: null }
     }
-  } catch (error) {
+
+    return {
+      data: null,
+      error: {
+        response: {
+          status: response.status,
+          statusText: response.statusText,
+        },
+      },
+    }
+  } catch (error: any) {
     console.error('Error fetching session:', error)
-    errorCallback?.(error)
+    return { data: null, error }
   }
 }
 
 export const SessionProvider = ({
   children,
-  value = {},
-  clientBuilder,
+  value = null,
+  clientBuilder = apiClientBase,
   endpoint = '/auth/session',
 }: {
   readonly children?: React.ReactNode
-  readonly value: Record<string, any> // No longer optional, will default to empty object
+  readonly value?: Record<string, any> | null
   clientBuilder?: AxiosInstance
   endpoint?: string
 }) => {
-  const [session, setSession] = useState<Record<string, any>>(value)
+  const [session, setSession] = useState<Record<string, any> | null>(value)
+  const cancelledRef = useRef(false)
 
-  const refreshSession = useCallback(() => {
-    fetchSession(
-      (userResponse) => {
-        console.log({ userResponse, session })
-        setSession({ ...userResponse })
-      },
-      () => {
-        setSession({}) // Reset to empty if an error occurs
-        window.location.reload() // Redirect after error
-      },
-      clientBuilder,
-      endpoint
-    )
-  }, [clientBuilder, endpoint, session])
+  const refreshSession = useCallback(async () => {
+    const { data, error } = await fetchSession(clientBuilder, endpoint)
+
+    if (data) {
+      setSession(data)
+    } else {
+      setSession(null)
+      const isAuthError = error?.response?.status === 401 || error?.response?.status === 403
+      if (isAuthError) {
+        window.location.reload()
+      }
+    }
+  }, [clientBuilder, endpoint])
 
   useEffect(() => {
-    if (!!session?.user || getCookie('UNREGISTERED-USER')) return
-    fetchSession(
-      (userResponse) => {
-        setSession({ ...userResponse })
-      },
-      undefined,
-      clientBuilder,
-      endpoint
-    )
-  }, [clientBuilder, endpoint, session])
+    if (value !== undefined) return
+
+    cancelledRef.current = false
+
+    fetchSession(clientBuilder, endpoint).then(({ data, error }) => {
+      if (cancelledRef.current) return
+
+      if (data) {
+        setSession(data)
+      } else {
+        setSession(null)
+      }
+    })
+
+    return () => {
+      cancelledRef.current = true
+    }
+  }, [clientBuilder, endpoint, value])
 
   useEffect(() => {
     if (!session?.user) return
 
-    const intervalId = setInterval(() => {
-      refreshSession() // Refresh session every 30 minutes
-    }, 60000 * 30)
+    const intervalId = setInterval(refreshSession, 60000 * 30)
+    return () => clearInterval(intervalId)
+  }, [refreshSession, session?.user])
 
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [refreshSession, session])
-
-  const contextValue = useMemo(() => {
-    const isLoggedIn = !!session?.user
-    const isAdmin = session?.user?.roles?.includes('ADMIN') ?? false
-
-    return {
+  const contextValue = useMemo(
+    () => ({
       session,
-      isLoggedIn,
-      isAdmin,
+      isLoggedIn: !!session?.user,
+      isAdmin: session?.user?.roles?.includes('ADMIN') ?? false,
       refreshSession,
-    }
-  }, [session, refreshSession])
+    }),
+    [session, refreshSession]
+  )
 
   return <SessionContext.Provider value={contextValue}>{children}</SessionContext.Provider>
 }

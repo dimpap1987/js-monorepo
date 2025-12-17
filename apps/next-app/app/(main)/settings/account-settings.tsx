@@ -22,13 +22,10 @@ import { SettingsItem } from './settings-items'
 import { useUpdateUserAccount } from './queries'
 
 export function AccountSettings() {
-  const {
-    session: { user },
-    refreshSession,
-    isAdmin,
-  } = useSession()
+  const { session, refreshSession, isAdmin } = useSession()
   const [isEditing, setIsEditing] = useState(false)
   const { addNotification } = useNotifications()
+  const user = session?.user
   const updateUserAccountMutation = useUpdateUserAccount()
 
   const initUser = useMemo(

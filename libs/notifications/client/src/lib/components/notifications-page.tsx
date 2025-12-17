@@ -16,9 +16,8 @@ import { queryKeys } from '@js-monorepo/utils/http/queries'
 import { NotificationReadAllButton } from './bell/notification-read-all'
 
 export function NotificationsPage() {
-  const {
-    session: { user },
-  } = useSession()
+  const { session } = useSession()
+  const user = session?.user
 
   const { searchQuery, setPagination, pagination } = usePaginationWithParams(1, 15)
   const queryClient = useQueryClient()
