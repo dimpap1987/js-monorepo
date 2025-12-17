@@ -1,4 +1,4 @@
-'use effect'
+'use client'
 
 import { useEffect, useRef } from 'react'
 import useInternetStatus from './internet-status'

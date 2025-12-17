@@ -58,9 +58,9 @@ export function NotificationItem({
         </div>
 
         {/* Close Button */}
-        {!closable && onClose && (
+        {closable && onClose && (
           <button
-            onClick={() => onClose?.(id)}
+            onClick={() => onClose(id)}
             className="self-center p-1 rounded transition-colors pointer-cursor hover:bg-muted"
             aria-label="Close notification"
           >

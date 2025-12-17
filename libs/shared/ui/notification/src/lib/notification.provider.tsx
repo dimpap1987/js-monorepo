@@ -76,10 +76,11 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }
       // If we already have a timeout for this notification, skip setting another
       if (!notification.id || timeoutsRef.current[notification.id]) return
 
-      // Only set timeout if notification is closable (defaults to true)
+      // If notification is not closable, never auto-dismiss (regardless of duration)
       const isClosable = notification.closable !== false
-      if (!isClosable && !notification.duration) return
+      if (!isClosable) return
 
+      // Only set timeout if notification has a duration or defaults to 3000ms
       const timeoutId = setTimeout(() => {
         setNotifications((prev) => prev.filter((p) => p.id !== notification.id))
       }, notification?.duration ?? 3000)
