@@ -1,68 +1,104 @@
 'use server'
 
-import { decodeJwt, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 
-export async function getCurrentSession() {
-  try {
-    const headers = new Headers()
-    cookies()
-      .getAll()
-      .forEach((cookie) => {
-        headers.append('Cookie', `${cookie.name}=${cookie.value}`)
-      })
+const API_URL = process.env.API_URL
 
-    const response = await fetch(`${process.env.API_URL}/api/session`, {
+if (!API_URL) {
+  console.warn('[auth/next/server] API_URL environment variable is not set')
+}
+
+function createCookieHeaders(): Headers {
+  const headers = new Headers()
+  const cookieStore = cookies()
+
+  cookieStore.getAll().forEach((cookie) => {
+    headers.append('Cookie', `${cookie.name}=${cookie.value}`)
+  })
+
+  return headers
+}
+
+export async function getCurrentSession() {
+  if (!API_URL) {
+    console.error('[getCurrentSession] API_URL is not configured')
+    return null
+  }
+
+  try {
+    const headers = createCookieHeaders()
+    const url = `${API_URL}/api/session`
+
+    const response = await fetch(url, {
       method: 'GET',
-      headers: headers,
+      headers,
+      cache: 'no-store', // Ensure fresh session data
     })
+
     if (response.ok) {
       const session = await response.json()
       return session
     }
-  } catch (e) {
-    console.log('ERROR in getCurrentSession')
+
+    // Only log non-401/403 errors (authentication errors are expected)
+    if (response.status !== 401 && response.status !== 403) {
+      console.warn('[getCurrentSession] Non-OK response', {
+        status: response.status,
+        statusText: response.statusText,
+        url,
+      })
+    }
+  } catch (error) {
+    console.error('[getCurrentSession] Fetch failed', {
+      url: `${API_URL}/api/session`,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    })
   }
+
   return null
 }
 
+/**
+ * Finds an unregistered user by checking cookies
+ * @param headers Optional headers to use (if not provided, creates from cookies)
+ * @returns Unregistered user object or null if not found or error occurred
+ */
 export async function findUnregisteredUser(headers?: Headers) {
+  if (!API_URL) {
+    console.error('[findUnregisteredUser] API_URL is not configured')
+    return null
+  }
+
   try {
-    const response = await fetch(`${process.env.API_URL}/api/auth/unregistered-user`, {
+    const requestHeaders = headers ?? createCookieHeaders()
+    const url = `${API_URL}/api/auth/unregistered-user`
+
+    const response = await fetch(url, {
       method: 'GET',
-      headers: headers,
+      headers: requestHeaders,
+      cache: 'no-store',
     })
+
     if (response.ok) {
       const unRegisteredUser = await response.json()
       return unRegisteredUser
     }
-  } catch (e) {
-    console.error('Error in findUnregisteredUser', e)
-    return null
+
+    if (response.status !== 404) {
+      console.warn('[findUnregisteredUser] Non-OK response', {
+        status: response.status,
+        statusText: response.statusText,
+        url,
+      })
+    }
+  } catch (error) {
+    console.error('[findUnregisteredUser] Fetch failed', {
+      url: `${API_URL}/api/auth/unregistered-user`,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    })
   }
-}
 
-export async function validateAuthToken(secret: string): Promise<any> {
-  const token = cookies().get('accessToken')?.value
-  if (!token || token === '') return null
-  try {
-    return (await jwtVerify(token, new TextEncoder().encode(secret))).payload
-  } catch (e) {
-    return null
-  }
-}
-
-export async function decodeAuthToken(): Promise<any> {
-  try {
-    const accessToken = cookies().get('accessToken')?.value
-    if (!accessToken || accessToken === '') return null
-
-    const payload = decodeJwt(accessToken)
-
-    if (!payload) return null
-
-    return payload
-  } catch (e) {
-    return null
-  }
+  return null
 }

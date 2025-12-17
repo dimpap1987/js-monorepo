@@ -1,11 +1,11 @@
+import { getCurrentSession } from '@js-monorepo/auth/next/server'
 import { SessionProvider } from '@js-monorepo/auth/next/client'
-import { DpLoaderProvider } from '@js-monorepo/loader'
+import { DpLoader, DpLoaderProvider } from '@js-monorepo/loader'
 import { QClientProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
 import { WebNotificationProvider } from '@js-monorepo/web-notification'
-import { getCurrentUser } from '@next-app/actions/session'
 import dynamic from 'next/dynamic'
 import { ReactNode } from 'react'
 import { WebSocketProviderWrapper } from './websocket-provider-wrapper'
@@ -15,41 +15,35 @@ const DynamicWebsocketProvider = dynamic(() => Promise.resolve({ default: WebSoc
 })
 
 export default async function RootProviders({ children }: { readonly children: ReactNode }) {
-  const session = await getCurrentUser()
+  const session = await getCurrentSession()
 
   return (
-    <SessionProvider
-      value={{
-        session: session ? { ...session } : null,
-        isLoggedIn: !!session?.user,
-      }}
-      endpoint="/session"
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      themes={[
+        'light',
+        'dark',
+        'blue',
+        'green',
+        'dark-blue',
+        'retro',
+        'dracula',
+        'nord',
+        'monokai',
+        'tokyonight',
+        'solarized',
+        'gruvbox',
+        'catppuccin',
+        'onedark',
+        'synthwave',
+        'red',
+      ]}
+      enableSystem
     >
-      <DynamicWebsocketProvider>
-        <DpNextPageProgressBar>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            themes={[
-              'light',
-              'dark',
-              'blue',
-              'green',
-              'dark-blue',
-              'retro',
-              'dracula',
-              'nord',
-              'monokai',
-              'tokyonight',
-              'solarized',
-              'gruvbox',
-              'catppuccin',
-              'onedark',
-              'synthwave',
-              'red',
-            ]}
-            enableSystem
-          >
+      <DpNextPageProgressBar>
+        <SessionProvider value={session} endpoint="/session">
+          <DynamicWebsocketProvider>
             <DpLoaderProvider>
               <DpNotificationProvider>
                 <WebNotificationProvider>
@@ -57,9 +51,9 @@ export default async function RootProviders({ children }: { readonly children: R
                 </WebNotificationProvider>
               </DpNotificationProvider>
             </DpLoaderProvider>
-          </ThemeProvider>
-        </DpNextPageProgressBar>
-      </DynamicWebsocketProvider>
-    </SessionProvider>
+          </DynamicWebsocketProvider>
+        </SessionProvider>
+      </DpNextPageProgressBar>
+    </ThemeProvider>
   )
 }

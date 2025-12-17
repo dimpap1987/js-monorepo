@@ -30,7 +30,12 @@ export class VaultModule {
   }
 
   private static async loadVaultSecrets(options: VaultClientOptions) {
-    const { path } = options
+    const { path, endpoint } = options
+
+    if (!endpoint) {
+      this.logger.warn('Vault endpoint not configured, using environment variables only')
+      return process.env
+    }
 
     try {
       // Fetch secrets from Vault
@@ -38,22 +43,33 @@ export class VaultModule {
       const secrets = await vaultService.getSecrets(path)
 
       if (!secrets || Object.keys(secrets).length === 0) {
-        this.logger.warn(`No secrets found at path: ${path}`)
+        this.logger.warn(`No secrets found at path: ${path}, using environment variables only`)
         return process.env
       }
 
       const config: Record<string, string | undefined> = {}
 
       for (const [key, value] of Object.entries(secrets)) {
-        config[key] = value ?? process.env[key]
+        if (value !== undefined && value !== null && value !== '') {
+          config[key] = value
+        } else {
+          config[key] = process.env[key]
+        }
       }
-      this.logger.log(`Vault secrets successfully loaded from path: ${path} 👌`)
 
-      // Return the merged configuration, where Vault secrets take priority over process.env
+      this.logger.log(
+        `✅ Vault secrets successfully loaded from path: ${path} (${Object.keys(secrets).length} secrets)`
+      )
+
       return { ...process.env, ...config }
     } catch (error: any) {
-      this.logger.error(`Failed to load secrets from Vault at path: ${path}`, error.stack)
-      throw new Error(`Vault loading error: ${error.message}`)
+      this.logger.warn(
+        `⚠️  Failed to load secrets from Vault at path: ${path}. Continuing with environment variables only.`,
+        error.stack
+      )
+      this.logger.debug(`Vault error details: ${error.message}`)
+
+      return process.env
     }
   }
 }
