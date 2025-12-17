@@ -150,7 +150,9 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
 
       <main className="mt-5">{children}</main>
 
-      {isLoggedIn && <MobileNavbar unreadNotificationCount={notifications?.unReadTotal ?? 0} />}
+      {isLoggedIn && (
+        <MobileNavbar unreadNotificationCount={notifications?.unReadTotal ?? 0} isSidebarOpen={openSideBar} />
+      )}
     </>
   )
 }
