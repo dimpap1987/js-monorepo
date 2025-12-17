@@ -16,8 +16,8 @@ const createAuthMiddleware =
       socket.user = { id: data.userId } // Attach user data to socket
       socket.session = data.session
       next()
-    } catch (err) {
-      logger.error('Authentication failed', err)
+    } catch (err: any) {
+      logger.error('Authentication failed', err.stack)
       next(new Error('FORBIDDEN'))
     }
   }

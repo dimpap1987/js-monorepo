@@ -69,7 +69,7 @@ export class AdminService {
       await this.authSessionUserCacheService.deleteAuthUserSessions(userId)
       await this.userPresenceWebsocketService.disconnectUser(userId)
     } catch (e: any) {
-      this.logger.error(`Error while handling user disconnection with user id : ${userId}`)
+      this.logger.error(`Error while handling user disconnection with user id : ${userId}`, e.stack)
       if (e instanceof AuthException) {
         return e
       }

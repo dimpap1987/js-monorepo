@@ -67,7 +67,7 @@ export class NotificationService {
       await this.redis.hSet(redisKey, subscription.endpoint, value)
       await this.redis.expire(redisKey, 3600 * 24 * 3) // Set expiration to 3 days
     } catch (error) {
-      this.logger.error('Error saving user subscription:', error)
+      this.logger.error('Error saving user subscription:', error.stack)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_SAVE_USER_SUBSCRIPTION')
     }
   }
@@ -120,7 +120,7 @@ export class NotificationService {
       await Promise.all(sendNotificationPromises)
       this.logger.log('Notifications sent successfully to all users!')
     } catch (error) {
-      this.logger.error('Error sending notifications:', error)
+      this.logger.error('Error sending notifications:', error.stack)
     }
   }
 

@@ -55,7 +55,7 @@ export class UserSocketService {
         session: decodedSession,
       }
     } catch (e: any) {
-      Logger.error('Error while getting user from websocket', e)
+      Logger.error('Error while getting user from websocket', e.stack)
       return undefined
     }
   }

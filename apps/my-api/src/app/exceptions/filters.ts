@@ -131,7 +131,7 @@ export class ZodExceptionFilter<T extends ZodError> implements ExceptionFilter {
   catch(exception: T, host: ArgumentsHost) {
     Logger.error(
       `Exception of type: 'ZodError' - message: '${exception.message}'`,
-      exception.name,
+      exception.stack,
       ZodExceptionFilter.name
     )
     const ctx = host.switchToHttp()

@@ -71,7 +71,7 @@ export class RedisEventPubSubModule extends ConfigurableModuleClass {
             const client = createClient({
               url: options.url,
             })
-            client.on('error', (err: any) => logger.error('Redis Client Error', err))
+            client.on('error', (err: any) => logger.error('Redis Client Error', err.stack))
             await client.connect()
             for (const eventPublishableName of eventsPublishableNames) {
               await client.subscribe(eventPublishableName, (response) => {

@@ -21,8 +21,8 @@ export class AuthGithub extends AuthGuard('github') {
       if (result && exists) {
         await super.logIn(request)
       }
-    } catch (error) {
-      this.logger.error(null, error)
+    } catch (error: any) {
+      this.logger.error('Error in GitHub authentication', error.stack)
     }
 
     return true

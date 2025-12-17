@@ -91,7 +91,7 @@ export class StripeService {
     try {
       return this.paymentsClient.constructWebhookEvent(payload, signature)
     } catch (error) {
-      this.logger.error('Error constructing webhook event:', error)
+      this.logger.error('Error constructing webhook event:', error.stack)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_INVALID_STRIPE_WEBHOOK_SECRET')
     }
   }
@@ -127,7 +127,7 @@ export class StripeService {
         },
       })
     } catch (e) {
-      this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`, e)
+      this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`, e.stack)
     }
 
     return { received: true }
@@ -249,7 +249,7 @@ export class StripeService {
         cancelImmediately: false,
       })
     } catch (error) {
-      this.logger.error('Error canceling subscription:', error.message)
+      this.logger.error('Error canceling subscription:', error.stack)
       throw error
     }
   }
