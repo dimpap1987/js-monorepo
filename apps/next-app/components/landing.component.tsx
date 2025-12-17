@@ -8,6 +8,9 @@ import { useNotifications } from '@js-monorepo/notification'
 import { cn } from '@js-monorepo/ui/util'
 import { ReactNode, useState } from 'react'
 import BannerSVG from './banner-svg'
+import { Badge } from '@js-monorepo/components/badge'
+import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { AiFillRocket } from 'react-icons/ai'
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
@@ -37,8 +40,34 @@ export default function LandingComponent({ children, className }: MainProps) {
   return (
     <section className={cn('overflow-hidden', className)}>
       {children}
-      <div className="relative min-h-[200px] w-full mb-4 md:mb-0 before:content[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
+      {/* Hero Section */}
+      <div className="relative min-h-[400px] md:min-h-[500px] w-full mb-12 md:mb-16 flex flex-col items-center justify-center before:content-[''] before:w-full before:h-full before:absolute before:top-1/2 before:left-0 before:-translate-y-1/2 before:bg-gradient-to-r before:from-background before:via-transparent before:to-background">
         <BannerSVG />
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <Badge variant="accent" className="mb-4 text-sm px-3 py-1">
+            <AiFillRocket className="inline mr-1" />
+            Welcome to My Super App
+          </Badge>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Build Something Amazing
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Experience the power of modern technology with our feature-rich platform. Fast, secure, and designed for
+            scale.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <DpNextNavLink href="/auth/login">
+              <DpButton size="large" variant="primary" className="w-full sm:w-auto">
+                Get Started
+              </DpButton>
+            </DpNextNavLink>
+            <DpNextNavLink href="/pricing">
+              <DpButton size="large" variant="outline" className="w-full sm:w-auto">
+                View Pricing
+              </DpButton>
+            </DpNextNavLink>
+          </div>
+        </div>
       </div>
       <div className="flex flex-col justify-center align-items gap-2">
         <DpButton variant="accent" onClick={loadForTwoSecond}>
