@@ -4,19 +4,13 @@ import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
-import {
-  apiFetchUserNotifications,
-  apiReadAllNotifications,
-  apiReadNotification,
-  useNotificationStore,
-  useNotificationWebSocket,
-} from '@js-monorepo/notifications-ui'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
-import { MenuItem, PaginationType, UserNotificationType } from '@js-monorepo/types'
+import { MenuItem } from '@js-monorepo/types'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
+import { useNotificationAccumulation } from '@next-app/hooks/useNotificationAccumulation'
 import { useRouter } from 'next-nprogress-bar'
 import dynamic from 'next/dynamic'
-import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useState } from 'react'
 import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'
 import { RiAdminFill } from 'react-icons/ri'
@@ -61,7 +55,7 @@ const menuItems: MenuItem[] = [
 ]
 
 const initialPage = 1
-const initialPageSize = 10
+const initialPageSize = 25
 
 const DpNotificationBellComponentDynamic = dynamic(
   () => import('@js-monorepo/notifications-ui').then((module) => module.DpNotificationBellComponent),
@@ -76,90 +70,16 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
     refreshSession,
   } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
-  const fetchNotificationsRef = useRef(false)
   const router = useRouter()
-  const [notifications, setNotifications] = useState<Partial<PaginationType> | undefined>()
-  // Track accumulated notifications across pagination
-  const accumulatedNotificationsRef = useRef<UserNotificationType[]>([])
 
-  const {
-    notificationCount,
-    markNotificationAsRead,
-    latestReadNotificationId,
-    setNotificationCount,
-    incrementNotificationCountByOne,
-  } = useNotificationStore()
+  const { accumulatedNotifications, notifications, handlePaginationChange, handleRead, handleReadAll } =
+    useNotificationAccumulation({
+      userId: user?.id,
+      initialPage,
+      initialPageSize,
+    })
 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
-
-  const updateNotificationsContent = useCallback(
-    (updater: (prev: UserNotificationType[]) => UserNotificationType[]) => {
-      setNotifications((prev) => {
-        const currentContent = prev?.content ?? []
-        const updatedContent = updater(currentContent)
-        accumulatedNotificationsRef.current = updatedContent
-        return {
-          ...prev,
-          content: updatedContent,
-        }
-      })
-    },
-    []
-  )
-
-  const addOrUpdateNotification = useCallback(
-    (notification: UserNotificationType) => {
-      const existing = accumulatedNotificationsRef.current.find(
-        (n) => n.notification.id === notification.notification.id
-      )
-
-      if (existing) {
-        updateNotificationsContent((prev) => {
-          const index = prev.findIndex((n) => n.notification.id === notification.notification.id)
-          if (index >= 0) {
-            const updated = [...prev]
-            updated[index] = { ...notification, isRead: existing.isRead }
-            return updated
-          }
-          return prev
-        })
-      } else {
-        if (!notification.isRead) {
-          incrementNotificationCountByOne()
-        }
-        updateNotificationsContent((prev) => [notification, ...prev])
-      }
-    },
-    [updateNotificationsContent, incrementNotificationCountByOne]
-  )
-
-  const [pendingNotification, setPendingNotification] = useState<UserNotificationType | null>(null)
-
-  useNotificationWebSocket((notification: UserNotificationType) => {
-    if (notification) {
-      setPendingNotification(notification)
-    }
-  })
-
-  useEffect(() => {
-    if (pendingNotification) {
-      addOrUpdateNotification(pendingNotification)
-      setPendingNotification(null)
-    }
-  }, [pendingNotification, addOrUpdateNotification])
-
-  useEffect(() => {
-    if (!user?.id || fetchNotificationsRef.current) return
-    apiFetchUserNotifications(user.id, `?page=${initialPage}&pageSize=${initialPageSize}`).then((response) => {
-      if (response.ok) {
-        fetchNotificationsRef.current = true
-        const initialContent = response.data?.content ?? []
-        accumulatedNotificationsRef.current = initialContent
-        setNotifications(response.data)
-        setNotificationCount(response.data?.unReadTotal ?? 0)
-      }
-    })
-  }, [user, setNotificationCount])
 
   return (
     <>
@@ -188,51 +108,11 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
                 pageSize: notifications?.pageSize ?? initialPageSize,
                 totalPages: notifications?.totalPages ?? 0,
               }}
-              unreadNotificationCount={notificationCount}
-              latestReadNotificationId={latestReadNotificationId}
-              notificationList={notifications?.content ?? []}
-              onRead={async (id) => {
-                markNotificationAsRead(id)
-                const response = await apiReadNotification(id)
-                if (response.ok) {
-                  updateNotificationsContent((prev) =>
-                    prev.map((item) => (item.notification.id === id ? { ...item, isRead: true } : item))
-                  )
-                }
-                return response
-              }}
-              onReadAll={async () => {
-                if (notificationCount === 0) return false
-
-                const response = await apiReadAllNotifications()
-                if (response.ok) {
-                  setNotificationCount(0)
-                  updateNotificationsContent((prev) => prev.map((item) => ({ ...item, isRead: true })))
-                  return true
-                }
-                return false
-              }}
-              onPaginationChange={async (pagination) => {
-                if (!user?.id) return Promise.resolve()
-                return apiFetchUserNotifications(
-                  user.id,
-                  `?page=${pagination.page}&pageSize=${pagination.pageSize}`
-                ).then((response) => {
-                  if (response.ok) {
-                    const newPageContent = response.data?.content ?? []
-                    const existingIds = new Set(accumulatedNotificationsRef.current.map((n) => n.notification.id))
-                    const newNotifications = newPageContent.filter((n) => !existingIds.has(n.notification.id))
-                    const mergedContent = [...newNotifications, ...accumulatedNotificationsRef.current].sort(
-                      (a, b) => b.notification.id - a.notification.id
-                    )
-                    accumulatedNotificationsRef.current = mergedContent
-                    setNotifications({
-                      ...response.data,
-                      content: mergedContent,
-                    })
-                  }
-                })
-              }}
+              unreadNotificationCount={notifications?.unReadTotal ?? 0}
+              notificationList={accumulatedNotifications}
+              onRead={handleRead}
+              onReadAll={handleReadAll}
+              onPaginationChange={handlePaginationChange}
               resetOnClose={true}
             ></DpNotificationBellComponentDynamic>
           )}
