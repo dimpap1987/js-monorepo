@@ -72,7 +72,7 @@ export class AuthSessionUserCacheService {
       })
       return userCache
     } catch (e: any) {
-      this.logger.error('Error while saving Cache Auth user', e.stacκ)
+      this.logger.error('Error while saving Cache Auth user', e.stack)
       return undefined
     }
   }

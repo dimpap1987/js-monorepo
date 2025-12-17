@@ -21,7 +21,7 @@ export class UserService {
       await this.userRepo.editUser(payload, userId, profileId)
       await this.authSessionUserCacheService.invalidateAuthUserInCache(userId)
     } catch (e: any) {
-      this.logger.error(`Error while editing user with id: ${userId} and profile id :${profileId}`)
+      this.logger.error(`Error while editing user with id: ${userId} and profile id :${profileId}`, e.stack)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_UPDATE_USER')
     }
   }

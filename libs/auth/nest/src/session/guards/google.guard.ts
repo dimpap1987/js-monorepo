@@ -21,8 +21,8 @@ export class AuthGoogle extends AuthGuard('google') {
       if (result && exists) {
         await super.logIn(request)
       }
-    } catch (error) {
-      this.logger.error(null, error)
+    } catch (error: any) {
+      this.logger.error('Error in Google authentication', error.stack)
     }
     return true
   }
