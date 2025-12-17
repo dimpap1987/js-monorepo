@@ -1,6 +1,6 @@
 'use client'
 import { DpButton } from '@js-monorepo/button'
-import { FormErrorMessage, Input } from '@js-monorepo/components/form'
+import { Input } from '@js-monorepo/components/form'
 import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -86,12 +86,6 @@ function AiGeneratorImageSuspense({
           </DpButton>
         </form>
       </div>
-
-      {error && (
-        <section className="mt-8 flex justify-center">
-          <FormErrorMessage errors={[error]}></FormErrorMessage>
-        </section>
-      )}
 
       {predictions && predictions?.length > 0 && (
         <section className="mt-4">

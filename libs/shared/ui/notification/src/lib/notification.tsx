@@ -15,9 +15,9 @@ export type DpNotificationProps = {
 }
 
 const ICONS = {
-  success: <MdCheckCircle className="text-green-600 text-xl" />,
-  error: <MdError className="text-red-600 text-xl" />,
-  information: <IoMdInformationCircle className="text-xl text-gray-200" />,
+  success: <MdCheckCircle className="text-status-success text-xl" />,
+  error: <MdError className="text-status-error text-xl" />,
+  information: <IoMdInformationCircle className="text-xl text-status-info" />,
 }
 
 export interface NotificationItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>, DpNotificationProps {
@@ -41,7 +41,7 @@ export function NotificationItem({
       className={cn('flex relative self-end w-max max-w-96 z-[55 pointer-events-auto', styles.notificationContainer)}
       {...divProps}
     >
-      <div className="w-full py-3 px-5 text-sm text-white bg-background-secondary grid grid-cols-[max-content_1fr_max-content] items-center gap-2">
+      <div className="w-full py-3 px-5 text-sm bg-card border border-border shadow-lg grid grid-cols-[max-content_1fr_max-content] items-center gap-2">
         {/* Icon */}
         <div className="self-center p-1">
           {type === 'spinner' ? (
@@ -53,18 +53,18 @@ export function NotificationItem({
 
         {/* Message & Description */}
         <div className="self-center overflow-hidden text-ellipsis">
-          <div className="p-0.5 text-sm">{message}</div>
-          {description && <small className="block p-0.5 text-xs">{description}</small>}
+          <div className="p-0.5 text-sm text-card-foreground">{message}</div>
+          {description && <small className="block p-0.5 text-xs text-card-foreground opacity-80">{description}</small>}
         </div>
 
         {/* Close Button */}
         {!closable && onClose && (
           <button
             onClick={() => onClose?.(id)}
-            className="self-center p-1 hover:bg-background-secondary/50 rounded transition-colors pointer-cursor"
+            className="self-center p-1 rounded transition-colors pointer-cursor hover:bg-muted"
             aria-label="Close notification"
           >
-            <MdClose className="text-lg" />
+            <MdClose className="text-lg text-foreground-muted" />
           </button>
         )}
       </div>

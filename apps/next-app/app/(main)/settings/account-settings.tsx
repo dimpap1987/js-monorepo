@@ -78,7 +78,7 @@ export function AccountSettings() {
   const profileImageWatch = form.watch('profileImage')
 
   return (
-    <section className="p-2 space-y-6 text-white min-w-[200px]">
+    <section className="p-2 space-y-6 min-w-[200px]">
       {/* Profile Section */}
       <Form {...form}>
         <SettingsItem label="Profile">
@@ -133,14 +133,14 @@ export function AccountSettings() {
                 name="username"
                 render={({ field }) => (
                   <FormItem className="sm:max-w-[300px] w-full">
-                    <FormLabel className="text-sm font-medium text-gray-300 mb-2 uppercase tracking-wide">
+                    <FormLabel className="text-sm font-medium text-foreground-muted mb-2 uppercase tracking-wide">
                       Username
                     </FormLabel>
                     <FormControl>
                       {isEditing ? (
                         <Input id="username" className="h-10 w-full" {...field} />
                       ) : (
-                        <p className="w-full h-10 px-6 py-2 bg-background text-primary rounded-xl border border-border font-semibold flex items-center shadow-md">
+                        <p className="w-full h-10 px-6 py-2 bg-background text-foreground rounded-xl border border-border font-semibold flex items-center shadow-md">
                           {field.value}
                         </p>
                       )}
@@ -198,7 +198,7 @@ export function AccountSettings() {
       <SettingsItem label="Account details">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <dt className="text-sm font-medium text-gray-300 uppercase tracking-wide">Account Created</dt>
+            <dt className="text-sm font-medium text-foreground-muted uppercase tracking-wide">Account Created</dt>
             <dd className="mt-1 font-semibold">
               {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
             </dd>
@@ -206,7 +206,7 @@ export function AccountSettings() {
 
           {isAdmin && (
             <div>
-              <dt className="text-sm font-medium text-gray-300 uppercase tracking-wide">Roles</dt>
+              <dt className="text-sm font-medium text-foreground-muted uppercase tracking-wide">Roles</dt>
               <dd className="mt-1 font-semibold">{user?.roles.join(', ') || 'None'}</dd>
             </div>
           )}
