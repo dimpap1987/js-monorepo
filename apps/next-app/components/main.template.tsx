@@ -9,38 +9,22 @@ import useTapEffect from '@js-monorepo/next/hooks/tap-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
-import { useNotificationAccumulation } from '@next-app/hooks/useNotificationAccumulation'
 import { useRouter } from 'next-nprogress-bar'
-import dynamic from 'next/dynamic'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'
 import { RiAdminFill } from 'react-icons/ri'
 import SVGLogo from './logo-svg'
-import { MobileNavbar } from './mobile-navbar'
+import { MobileNavbarWithNotifications } from './mobile-navbar-with-notifications'
+import { NotificationBellContainer } from './notification-bell-container'
 
 const menuItems: MenuItem[] = [
-  // {
-  //   href: '/ai-image-generator',
-  //   name: 'AI Image Generator',
-  //   roles: ['PUBLIC'],
-  // },
-  // {
-  //   href: '/about',
-  //   name: 'About',
-  //   roles: ['PUBLIC'],
-  // },
   {
     href: '/pricing',
     name: 'Pricing',
     Icon: ImPriceTags,
     roles: ['PUBLIC'],
   },
-  // {
-  //   href: '/feedback',
-  //   name: 'Feedback',
-  //   roles: ['PUBLIC'],
-  // },
   {
     href: '/settings',
     name: 'Settings',
@@ -56,103 +40,70 @@ const menuItems: MenuItem[] = [
   },
 ]
 
-const initialPage = 1
-const initialPageSize = 25
-
-const DpNotificationBellComponentDynamic = dynamic(
-  () => import('@js-monorepo/notifications-ui').then((module) => module.DpNotificationBellComponent),
-  { ssr: false }
-)
-
 export default function MainTemplate({ children }: Readonly<PropsWithChildren>) {
   const { session, isLoggedIn, isAdmin, refreshSession } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const router = useRouter()
   const user = session?.user
 
-  const { accumulatedNotifications, notifications, handlePaginationChange, handleRead, handleReadAll } =
-    useNotificationAccumulation({
-      userId: user?.id,
-      initialPage,
-      initialPageSize,
-    })
-
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
   useOfflineIndicator()
   useTapEffect()
+
+  // Memoize callbacks to prevent sidebar re-renders
+  const handleSidebarClose = useCallback(() => {
+    setOpenSideBar(false)
+  }, [])
+
+  // Memoize sidebar children to prevent re-renders
+  const sidebarChildren = useMemo(
+    () => (
+      <div className="p-3">
+        {!user && (
+          <DpNextNavLink href="/auth/login">
+            <DpLoginButton size="large"></DpLoginButton>
+          </DpNextNavLink>
+        )}
+        {!!user && (
+          <DpLogoutButton
+            className="mb-6 justify-center"
+            size="large"
+            onClick={() => authClient.logout()}
+          ></DpLogoutButton>
+        )}
+      </div>
+    ),
+    [user]
+  )
 
   return (
     <>
       <DpNextNavbar
         user={{
-          isLoggedIn: isLoggedIn,
+          isLoggedIn,
           ...user,
         }}
         menuItems={menuItems}
-        onSideBarClick={() => {
-          setOpenSideBar((prev) => !prev)
-        }}
-        onLogout={async () => {
-          authClient.logout()
-        }}
+        onSideBarClick={() => setOpenSideBar(true)}
+        onLogout={() => authClient.logout()}
       >
         <DpLogo onClick={() => router.push('/')}>
           <SVGLogo></SVGLogo>
         </DpLogo>
         <NavbarItems>
-          {isLoggedIn && (
-            <DpNotificationBellComponentDynamic
-              className="mt-[0.58rem]"
-              pageable={{
-                page: notifications?.page ?? initialPage,
-                pageSize: notifications?.pageSize ?? initialPageSize,
-                totalPages: notifications?.totalPages ?? 0,
-              }}
-              unreadNotificationCount={notifications?.unReadTotal ?? 0}
-              notificationList={accumulatedNotifications}
-              onRead={handleRead}
-              onReadAll={handleReadAll}
-              onPaginationChange={handlePaginationChange}
-              resetOnClose={true}
-            ></DpNotificationBellComponentDynamic>
-          )}
+          <NotificationBellContainer userId={user?.id} isLoggedIn={isLoggedIn} />
         </NavbarItems>
       </DpNextNavbar>
 
       <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-50"></AnnouncementsComponent>
 
-      <DpNextSidebar
-        isOpen={openSideBar}
-        onClose={() => setOpenSideBar(false)}
-        position="right"
-        items={menuItems}
-        user={{
-          ...user,
-        }}
-      >
-        <div className="p-3">
-          {!user && (
-            <DpNextNavLink href="/auth/login">
-              <DpLoginButton size="large"></DpLoginButton>
-            </DpNextNavLink>
-          )}
-          {!!user && (
-            <DpLogoutButton
-              className="mb-6 justify-center"
-              size="large"
-              onClick={async () => {
-                authClient.logout()
-              }}
-            ></DpLogoutButton>
-          )}
-        </div>
+      <DpNextSidebar isOpen={openSideBar} onClose={handleSidebarClose} position="right" items={menuItems} user={user}>
+        {sidebarChildren}
       </DpNextSidebar>
 
       <main className="mt-5">{children}</main>
 
-      {isLoggedIn && (
-        <MobileNavbar unreadNotificationCount={notifications?.unReadTotal ?? 0} isSidebarOpen={openSideBar} />
-      )}
+      <MobileNavbarWithNotifications userId={user?.id} isLoggedIn={isLoggedIn} isSidebarOpen={openSideBar} />
     </>
   )
 }

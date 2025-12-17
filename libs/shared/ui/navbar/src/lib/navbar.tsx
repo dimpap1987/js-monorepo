@@ -84,15 +84,27 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     const { logo, navbarItems } = useMemo(() => {
       let logoElement: ReactNode | null = null
       let navbarItemsElement: ReactNode | null = null
-      React.Children.forEach(children, (child) => {
-        if (React.isValidElement(child) && typeof child.type !== 'string') {
-          if ((child.type as React.ComponentType).displayName === 'DpLogo') {
+
+      const visit = (node: ReactNode) => {
+        React.Children.forEach(node, (child) => {
+          if (!React.isValidElement(child)) return
+          if (child.type === React.Fragment) {
+            visit(child.props.children)
+            return
+          }
+
+          if (typeof child.type === 'string') return
+
+          const displayName = (child.type as React.ComponentType).displayName
+          if (displayName === 'DpLogo') {
             logoElement = child
-          } else if ((child.type as React.ComponentType).displayName === 'NavbarItems') {
+          } else if (displayName === 'NavbarItems') {
             navbarItemsElement = child
           }
-        }
-      })
+        })
+      }
+
+      visit(children)
       return { logo: logoElement, navbarItems: navbarItemsElement }
     }, [children])
 
@@ -122,7 +134,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 ))}
             </ul>
 
-            <div className="flex items-center">
+            <div className="flex items-center min-w-[5rem]">
               <section className="hidden sm:flex items-center gap-4 justify-end">
                 <>
                   {navbarItems && navbarItems}
