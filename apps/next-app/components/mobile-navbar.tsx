@@ -1,47 +1,24 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
 import { BottomNavbar, BottomNavbarAlert, BottomNavbarOptions } from '@js-monorepo/bottom-navbar'
 import { useDeviceType } from '@js-monorepo/next/hooks'
-import { NotificationBellButton, useNotificationCount } from '@js-monorepo/notifications-ui'
-import { AuthRole } from '@js-monorepo/types'
+import { NotificationBellButton } from '@js-monorepo/notifications-ui'
 import { AiFillHome } from 'react-icons/ai'
-import { IconType } from 'react-icons/lib'
 
-type NavLinkOpts = {
-  href: string
-  icon: IconType
-  label: string
-  activeClassName: string
-  roles: AuthRole[]
+interface MobileNavbarProps {
+  unreadNotificationCount: number
 }
 
-export const navLinksOpts: NavLinkOpts[] = [
-  {
-    href: '/',
-    icon: AiFillHome,
-    label: 'Home',
-    activeClassName: 'bg-accent text-accent-foreground',
-    roles: ['USER', 'ADMIN'],
-  },
-] as const
-
-export const MobileNavbar = () => {
-  const { isAdmin } = useSession()
-  const notificationCount = useNotificationCount()
+export const MobileNavbar = ({ unreadNotificationCount }: MobileNavbarProps) => {
   const { deviceType } = useDeviceType()
 
   if (deviceType !== 'mobile') return null
 
   return (
-    <BottomNavbar className="sm:hidden">
-      {navLinksOpts
-        .filter(({ roles }) => (roles.includes('ADMIN') && isAdmin) || roles.includes('USER'))
-        .map(({ href, icon: Icon, label }) => (
-          <BottomNavbarOptions Icon={Icon} href={href} label={label} key={href}></BottomNavbarOptions>
-        ))}
+    <BottomNavbar>
+      <BottomNavbarOptions Icon={AiFillHome} href="/" label="Home" />
       <BottomNavbarAlert href="/notifications" label="Alerts">
-        <NotificationBellButton unreadNotificationCount={notificationCount} className="shrink-0 text-xl" />
+        <NotificationBellButton unreadNotificationCount={unreadNotificationCount} className="shrink-0 text-xl" />
       </BottomNavbarAlert>
     </BottomNavbar>
   )
