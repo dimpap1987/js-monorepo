@@ -3,7 +3,7 @@
 import { useSession } from '@js-monorepo/auth/next/client'
 import { BottomNavbar, BottomNavbarAlert, BottomNavbarOptions } from '@js-monorepo/bottom-navbar'
 import { useDeviceType } from '@js-monorepo/next/hooks'
-import { NotificationBellButton, useNotificationStore } from '@js-monorepo/notifications-ui'
+import { NotificationBellButton, useNotificationCount } from '@js-monorepo/notifications-ui'
 import { AuthRole } from '@js-monorepo/types'
 import { AiFillHome } from 'react-icons/ai'
 import { IconType } from 'react-icons/lib'
@@ -28,7 +28,7 @@ export const navLinksOpts: NavLinkOpts[] = [
 
 export const MobileNavbar = () => {
   const { isAdmin } = useSession()
-  const { notificationCount } = useNotificationStore()
+  const notificationCount = useNotificationCount()
   const { deviceType } = useDeviceType()
 
   if (deviceType !== 'mobile') return null

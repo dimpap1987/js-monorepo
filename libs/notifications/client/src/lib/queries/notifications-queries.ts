@@ -40,16 +40,17 @@ export function useReadNotification() {
       return handleQueryResponse(response)
     },
     onSuccess: (_, notificationId) => {
-      // Optimistically update all notification queries
       queryClient.setQueriesData(
         { queryKey: ['notifications', 'user'] },
         (oldData: NotificationsResponse | undefined) => {
           if (!oldData?.content) return oldData
+          const wasUnread = oldData.content.find((item) => item.notification?.id === notificationId && !item.isRead)
           return {
             ...oldData,
             content: oldData.content.map((item) =>
               item.notification?.id === notificationId ? { ...item, isRead: true } : item
             ),
+            unReadTotal: wasUnread ? Math.max(0, (oldData.unReadTotal ?? 0) - 1) : oldData.unReadTotal,
           }
         }
       )
@@ -69,7 +70,6 @@ export function useReadAllNotifications() {
       return handleQueryResponse(response)
     },
     onSuccess: () => {
-      // Optimistically update all notification queries
       queryClient.setQueriesData(
         { queryKey: ['notifications', 'user'] },
         (oldData: NotificationsResponse | undefined) => {

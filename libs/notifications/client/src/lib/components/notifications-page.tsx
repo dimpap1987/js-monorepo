@@ -11,9 +11,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Fragment, useEffect } from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { useNotificationWebSocket } from '../hooks/index'
-import { useNotificationStore } from '../state'
 import { useReadAllNotifications, useReadNotification, useUserNotifications } from '../queries/notifications-queries'
-import { humanatizeNotificationDate, updateNotificationAsRead } from '../utils/notifications'
+import { humanatizeNotificationDate } from '../utils/notifications'
 import { queryKeys } from '@js-monorepo/utils/http/queries'
 import { NotificationReadAllButton } from './bell/notification-read-all'
 
@@ -42,37 +41,6 @@ export function NotificationsPage() {
     }
   })
 
-  const { markNotificationAsRead, latestReadNotificationId, setNotificationCount, notificationCount } =
-    useNotificationStore()
-
-  // Update query cache when notification is marked as read via store
-  useEffect(() => {
-    if (latestReadNotificationId && user?.id) {
-      queryClient.setQueryData(queryKeys.notifications.user(user.id, searchQuery), (oldData: typeof notifications) => {
-        if (!oldData?.content) return oldData
-        return {
-          ...oldData,
-          content: updateNotificationAsRead(oldData.content, latestReadNotificationId),
-        }
-      })
-    }
-  }, [latestReadNotificationId, user?.id, searchQuery, queryClient])
-
-  useEffect(() => {
-    if (notificationCount === 0 && user?.id) {
-      queryClient.setQueryData(queryKeys.notifications.user(user.id, searchQuery), (oldData: typeof notifications) => {
-        if (!oldData?.content) return oldData
-        return {
-          ...oldData,
-          content: oldData.content.map((content) => ({
-            ...content,
-            isRead: true,
-          })),
-        }
-      })
-    }
-  }, [notificationCount, user?.id, searchQuery, queryClient])
-
   const hasPagination: boolean =
     notifications !== undefined &&
     notifications.totalPages !== undefined &&
@@ -90,7 +58,6 @@ export function NotificationsPage() {
           onReadAll={async () => {
             if (notifications?.content?.some((content) => !content.isRead)) {
               await readAllNotificationsMutation.mutateAsync()
-              setNotificationCount(0)
             }
           }}
         ></NotificationReadAllButton>
@@ -108,7 +75,6 @@ export function NotificationsPage() {
                     onClick={async () => {
                       if (!content.isRead && notifications?.content) {
                         await readNotificationMutation.mutateAsync(content.notification.id)
-                        markNotificationAsRead(content.notification.id)
                       }
                     }}
                   >
