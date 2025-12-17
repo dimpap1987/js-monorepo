@@ -111,7 +111,6 @@ export function Pricing() {
       } catch (error) {
         console.error('Checkout Error:', error)
         addNotification({
-          closable: false,
           message: 'Something went wrong',
           description: 'Please try again later',
           type: 'error',

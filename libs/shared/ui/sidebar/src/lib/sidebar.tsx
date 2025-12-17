@@ -3,7 +3,7 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { UserMetadata } from '@js-monorepo/navbar'
-import { ReactNode, RefObject, forwardRef, useEffect, useRef } from 'react'
+import { ReactNode, RefObject, forwardRef, useCallback, useEffect, useMemo, useRef } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
 import { useClickAway } from 'react-use'
 
@@ -26,7 +26,7 @@ const framerSidebarPanel = (position: SidebarPositionType) => ({
   transition: { duration: 0.3 },
 })
 
-const framerText = (position: SidebarPositionType, delay?: number) => {
+const framerText = (position: SidebarPositionType) => {
   return {
     initial: { opacity: 0, x: position === 'left' ? -50 : 50 },
     animate: { opacity: 1, x: 0 },
@@ -37,14 +37,41 @@ const framerText = (position: SidebarPositionType, delay?: number) => {
 }
 
 const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
-  ({ children, isOpen, onClose, user, items = [], position = 'left', header }, forwardedRef) => {
+  ({ children, isOpen, onClose, user, items = [], position = 'left', header }) => {
     const localRef = useRef<HTMLDivElement | null>(null)
-    useClickAway(localRef as RefObject<HTMLElement | null>, () => onClose())
+
+    const handleClickAway = useCallback(() => {
+      onClose()
+    }, [onClose])
+
+    useClickAway(localRef as RefObject<HTMLElement | null>, handleClickAway)
+
+    useEffect(() => {
+      if (isOpen) {
+        const originalOverflow = document.body.style.overflow || ''
+        document.body.style.overflow = 'hidden'
+
+        return () => {
+          document.body.style.overflow = originalOverflow || ''
+        }
+      }
+    }, [isOpen])
+
     useEffect(() => {
       if (isOpen && localRef?.current) {
         localRef.current.focus()
       }
-    }, [isOpen, localRef])
+    }, [isOpen])
+
+    const handleClose = useCallback(() => {
+      onClose()
+    }, [onClose])
+
+    const filteredItems = useMemo(() => {
+      return items.filter(
+        (item) => item.roles?.includes('PUBLIC') || item.roles?.some((role) => user?.roles?.includes(role as AuthRole))
+      )
+    }, [items, user?.roles])
 
     return (
       <AnimatePresence mode="wait" initial={false}>
@@ -77,7 +104,7 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
                 )}
                 <span>{header}</span>
                 <button
-                  onClick={() => onClose()}
+                  onClick={handleClose}
                   className="p-3 border-2 border-border rounded-xl hover:bg-zinc-800"
                   aria-label="close sidebar"
                 >
@@ -85,30 +112,22 @@ const DpNextSidebar = forwardRef<HTMLDivElement, DpNextSidebarProps>(
                 </button>
               </div>
               <ul>
-                {items?.map((item, idx) => {
-                  const shouldRenderNavLink =
-                    item.roles?.includes('PUBLIC') || // Always render if PUBLIC role is present
-                    item.roles?.some((role) => user?.roles?.includes(role as AuthRole)) // Render if user has any of the required roles
-
-                  return (
-                    shouldRenderNavLink && (
-                      <li key={item.name}>
-                        <DpNextNavLink
-                          className={`flex text-sm sm:text-base items-center w-full ${
-                            position === 'right' ? 'flex-row-reverse' : ''
-                          } justify-between gap-5 p-5 transition-all border-b-2 hover:bg-zinc-800 border-border`}
-                          href={item.href}
-                          onClick={() => onClose()}
-                        >
-                          <motion.div {...framerText(position)} className="grid grid-cols-[max-content_25px] gap-2">
-                            <div>{item.name}</div>
-                            <div>{item.Icon && <item.Icon className="text-xl" />}</div>
-                          </motion.div>
-                        </DpNextNavLink>
-                      </li>
-                    )
-                  )
-                })}
+                {filteredItems.map((item) => (
+                  <li key={item.name}>
+                    <DpNextNavLink
+                      className={`flex text-sm sm:text-base items-center w-full ${
+                        position === 'right' ? 'flex-row-reverse' : ''
+                      } justify-between gap-5 p-5 transition-all border-b-2 hover:bg-zinc-800 border-border`}
+                      href={item.href}
+                      onClick={handleClose}
+                    >
+                      <motion.div {...framerText(position)} className="grid grid-cols-[max-content_25px] gap-2">
+                        <div>{item.name}</div>
+                        <div>{item.Icon && <item.Icon className="text-xl" />}</div>
+                      </motion.div>
+                    </DpNextNavLink>
+                  </li>
+                ))}
               </ul>
               {children && (
                 <div className="mt-auto w-full text-center p-3 pb-[calc(1rem_+_env(safe-area-inset-bottom))]">
