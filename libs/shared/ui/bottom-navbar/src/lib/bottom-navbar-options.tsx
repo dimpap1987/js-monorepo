@@ -1,38 +1,92 @@
+'use client'
+
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { cn } from '@js-monorepo/ui/util'
+import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
 import { IconType } from 'react-icons/lib'
 
 const BottomNavbarOptions = ({ href, Icon, label }: { href: string; Icon: IconType; label: string }) => {
+  const pathname = usePathname()
+  const isActive = pathname === href
+
   return (
-    <div className="flex flex-col gap-1 justify-center items-center flex-1 h-full">
-      <DpNextNavLink
-        className="p-2 transition-colors w-full duration-300 grid grid-cols-1 place-items-center gap-2 items-center border-t-2 border-transparent 
-                   whitespace-nowrap overflow-hidden h-full"
-        href={href}
-        activeClassName="border-t-2 border-primary"
+    <DpNextNavLink
+      href={href}
+      className={cn(
+        'flex flex-col items-center justify-center gap-1',
+        'flex-1 h-full min-w-0',
+        'px-3 py-2',
+        'transition-all duration-200 ease-in-out',
+        'text-muted-foreground hover:text-foreground',
+        'active:scale-95',
+        'rounded-lg',
+        'relative group'
+      )}
+      activeClassName="text-primary"
+    >
+      <div className="relative flex items-center justify-center">
+        <Icon
+          className={cn(
+            'shrink-0 text-xl transition-all duration-200',
+            'group-active:scale-110',
+            isActive && 'text-primary scale-110'
+          )}
+        />
+        {/* Active indicator dot */}
+        {isActive && (
+          <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200" />
+        )}
+      </div>
+      <span
+        className={cn(
+          'text-[10px] font-medium leading-tight truncate w-full text-center',
+          'transition-colors duration-200',
+          isActive && 'text-primary font-semibold'
+        )}
       >
-        <div className="flex justify-end">
-          <Icon className="shrink-0 text-xl" />
-        </div>
-        <div className="text-xs">{label}</div>
-      </DpNextNavLink>
-    </div>
+        {label}
+      </span>
+    </DpNextNavLink>
   )
 }
 
 const BottomNavbarAlert = ({ href, label, children }: { label: string; href: string; children: ReactNode }) => {
+  const pathname = usePathname()
+  const isActive = pathname === href || pathname?.startsWith('/notifications')
+
   return (
-    <div className="flex flex-col gap-1 justify-center items-center flex-1 h-full">
-      <DpNextNavLink
-        className="p-2 transition-colors w-full duration-300 grid grid-cols-1 place-items-center gap-2 items-center border-t-2 border-transparent
-                   whitespace-nowrap overflow-hidden h-full"
-        href={href}
-        activeClassName="border-t-2 border-primary"
+    <DpNextNavLink
+      href={href}
+      className={cn(
+        'flex flex-col items-center justify-center gap-1',
+        'flex-1 h-full min-w-0',
+        'px-3 py-2',
+        'transition-all duration-200 ease-in-out',
+        'text-muted-foreground hover:text-foreground',
+        'active:scale-95',
+        'rounded-lg',
+        'relative group'
+      )}
+      activeClassName="text-primary"
+    >
+      <div className="relative flex items-center justify-center">
+        <div className={cn('transition-all duration-200', isActive && 'text-primary scale-110')}>{children}</div>
+        {/* Active indicator dot */}
+        {isActive && (
+          <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200" />
+        )}
+      </div>
+      <span
+        className={cn(
+          'text-[10px] font-medium leading-tight truncate w-full text-center',
+          'transition-colors duration-200',
+          isActive && 'text-primary font-semibold'
+        )}
       >
-        {children}
-        <div className="text-xs">{label}</div>
-      </DpNextNavLink>
-    </div>
+        {label}
+      </span>
+    </DpNextNavLink>
   )
 }
 

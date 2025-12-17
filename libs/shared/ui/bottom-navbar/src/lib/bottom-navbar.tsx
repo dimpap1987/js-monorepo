@@ -10,11 +10,11 @@ export function BottomNavbar({ children, className }: PropsWithChildren & { clas
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      setIsVisible(currentScrollY < lastScrollY.current)
+      setIsVisible(currentScrollY < lastScrollY.current || currentScrollY < 10)
       lastScrollY.current = currentScrollY
     }
 
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
@@ -23,13 +23,19 @@ export function BottomNavbar({ children, className }: PropsWithChildren & { clas
   return (
     <div
       className={cn(
-        'fixed bottom-0 h-[var(--bottom-navbar-height)] w-[100vw] transition-transform duration-300 overflow-hidden',
-        isVisible ? 'translate-y-0' : 'translate-y-full', // slide in/out
-        'dark:bg-zinc-900 dark:text-gray-300 bg-background border-t border-border',
+        'fixed bottom-0 left-0 right-0 z-50',
+        'h-[var(--bottom-navbar-height)]',
+        'transition-transform duration-300 ease-in-out',
+        'backdrop-blur-lg bg-background/80 dark:bg-background/90',
+        'border-t border-border/50',
+        'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]',
+        'dark:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3),0_-2px_4px_-1px_rgba(0,0,0,0.2)]',
+        'pb-[env(safe-area-inset-bottom)]',
+        isVisible ? 'translate-y-0' : 'translate-y-full',
         className
       )}
     >
-      <div className="flex gap-2 justify-around h-full">{children}</div>
+      <div className="flex items-center justify-around h-full px-2 max-w-screen-sm mx-auto">{children}</div>
     </div>
   )
 }
