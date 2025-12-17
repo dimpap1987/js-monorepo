@@ -42,7 +42,7 @@ const NotificationPermissionComponent = () => {
   }
 
   return (
-    <section className="p-2 space-y-6 text-white">
+    <section className="p-2 space-y-6">
       <SettingsItem label="Push Notifications">
         <p className="text-xs font-semibold sm:text-sm mt-1 flex gap-1 flex-wrap">
           <span>Control how you receive </span> <span>push notifications.</span>
@@ -55,7 +55,7 @@ const NotificationPermissionComponent = () => {
               aria-label={label}
               {...checkboxProps}
             />
-            <span className="ml-3 text-gray-200 text-sm">{label}</span>
+            <span className="ml-3 text-foreground text-sm">{label}</span>
           </label>
         </div>
       </SettingsItem>

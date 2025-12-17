@@ -14,7 +14,7 @@ export default function SettingsPage() {
 
       <Tabs
         defaultValue="account"
-        className="p-4 bg-background-secondary text-foreground-secondary rounded-md overflow-hidden text-white"
+        className="p-4 bg-background-secondary text-foreground-secondary rounded-md overflow-hidden"
       >
         <Separator />
         <TabsList className="py-1 my-1">
