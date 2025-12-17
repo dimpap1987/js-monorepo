@@ -1,9 +1,13 @@
 import { Metadata } from 'next'
 import { CardList } from './card-list'
+import { generateMetadata as generateSEOMetadata } from '../../../lib/seo'
 
-export const metadata: Metadata = {
-  title: 'FeedBack',
-}
+export const metadata: Metadata = generateSEOMetadata({
+  title: 'Feedback',
+  description: 'Share your feedback and help us improve. We value your input and suggestions to make the app better.',
+  keywords: ['feedback', 'suggestions', 'improvements', 'contact'],
+  type: 'website',
+})
 
 function FeedBack() {
   return (
