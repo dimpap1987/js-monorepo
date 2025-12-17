@@ -58,6 +58,8 @@ function RolesTableInput({ row }: { row: Row<AuthUserDto> }) {
               const { roles: unusedRoles, ...rest } = row.updatedUser
               if (Object.keys(rest).length > 0) {
                 row.updatedUser = rest as AuthUserUpdateDto
+              } else {
+                row.updatedUser = undefined
               }
             }
           }
