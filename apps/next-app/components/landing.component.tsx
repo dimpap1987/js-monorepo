@@ -11,6 +11,7 @@ import BannerSVG from './banner-svg'
 import { Badge } from '@js-monorepo/components/badge'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AiFillRocket } from 'react-icons/ai'
+import { SITE_NAME } from '../lib/site-config'
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
@@ -46,7 +47,7 @@ export default function LandingComponent({ children, className }: MainProps) {
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <Badge variant="accent" className="mb-4 text-sm px-3 py-1">
             <AiFillRocket className="inline mr-1" />
-            Welcome to My Super App
+            Welcome to {SITE_NAME}
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Build Something Amazing
