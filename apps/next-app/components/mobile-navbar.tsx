@@ -7,12 +7,14 @@ import { AiFillHome } from 'react-icons/ai'
 
 interface MobileNavbarProps {
   unreadNotificationCount: number
+  isSidebarOpen?: boolean
 }
 
-export const MobileNavbar = ({ unreadNotificationCount }: MobileNavbarProps) => {
+export const MobileNavbar = ({ unreadNotificationCount, isSidebarOpen = false }: MobileNavbarProps) => {
   const { deviceType } = useDeviceType()
 
-  if (deviceType !== 'mobile') return null
+  // Hide bottom navbar on mobile when sidebar is open (standard UX pattern)
+  if (deviceType !== 'mobile' || isSidebarOpen) return null
 
   return (
     <BottomNavbar>
