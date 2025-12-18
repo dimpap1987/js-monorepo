@@ -41,11 +41,11 @@ console.log(`📍 Path: ${fullPath}\n`)
 
 // 1. Create jest.config.ts
 const prefixPath = '../'.repeat(relativeDepth)
+const helperPath = '../'.repeat(relativeDepth) + 'jest.config.helper'
 const jestConfig = `/* eslint-disable */
-const { pathsToModuleNameMapper } = require('ts-jest')
-const { compilerOptions } = require('./tsconfig.json')
+import { getModuleNameMapper } from '${helperPath}'
 
-module.exports = {
+export default {
   displayName: '${libraryName}',
   preset: '${presetPath}',
   testEnvironment: 'jsdom',
@@ -57,9 +57,7 @@ module.exports = {
   coverageDirectory: '${coveragePath}',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   moduleNameMapper: {
-    ...pathsToModuleNameMapper(compilerOptions.paths || {}, {
-      prefix: '<rootDir>/${prefixPath}',
-    }),
+    ...getModuleNameMapper('<rootDir>/${prefixPath}'),
   },
   testMatch: ['**/+(*.)+(spec|test).+(ts|js)?(x)'],
   collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*.d.ts', '!**/*.stories.{ts,tsx}', '!**/index.{ts,tsx}'],
