@@ -40,11 +40,10 @@ console.log(`📦 Setting up Jest for library: ${libraryName}`)
 console.log(`📍 Path: ${fullPath}\n`)
 
 // 1. Create jest.config.ts
-const tsconfigBasePath = '../'.repeat(relativeDepth) + 'tsconfig.base.json'
 const prefixPath = '../'.repeat(relativeDepth)
 const jestConfig = `/* eslint-disable */
 const { pathsToModuleNameMapper } = require('ts-jest')
-const { compilerOptions } = require('${tsconfigBasePath}')
+const { compilerOptions } = require('./tsconfig.json')
 
 module.exports = {
   displayName: '${libraryName}',
@@ -79,13 +78,13 @@ const tsconfigSpec = {
     types: ['jest', 'node', '@testing-library/jest-dom'],
   },
   include: [
-    'jest.config.ts',
-    'src/**/*.test.ts',
-    'src/**/*.test.tsx',
-    'src/**/*.spec.ts',
-    'src/**/*.spec.tsx',
-    'src/**/*.d.ts',
+    '**/*.spec.ts',
+    '**/*.spec.tsx',
+    '**/*.spec.js',
+    '**/*.spec.jsx',
+    '**/*.d.ts',
     'src/test-setup.d.ts',
+    'jest.config.ts',
   ],
 }
 
@@ -125,6 +124,26 @@ if (!projectJson.targets.test) {
   console.log('✅ Added test target to project.json')
 } else {
   console.log('ℹ️  Test target already exists in project.json')
+}
+
+// 6. Update .eslintrc.json to ignore .d.ts files
+const eslintrcPath = path.join(fullPath, '.eslintrc.json')
+let eslintrc = {}
+if (fs.existsSync(eslintrcPath)) {
+  eslintrc = JSON.parse(fs.readFileSync(eslintrcPath, 'utf8'))
+
+  // Add **/*.d.ts to ignorePatterns if not already present
+  if (!eslintrc.ignorePatterns) {
+    eslintrc.ignorePatterns = ['!**/*']
+  }
+  if (!eslintrc.ignorePatterns.includes('**/*.d.ts')) {
+    eslintrc.ignorePatterns.push('**/*.d.ts')
+  }
+
+  fs.writeFileSync(eslintrcPath, JSON.stringify(eslintrc, null, 2) + '\n')
+  console.log('✅ Updated .eslintrc.json to ignore .d.ts files')
+} else {
+  console.log('ℹ️  .eslintrc.json not found, skipping ESLint update')
 }
 
 // Write files
