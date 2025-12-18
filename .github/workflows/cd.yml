@@ -58,18 +58,33 @@ jobs:
           VERSION_CHANGED="false"
           
           # Check if package.json version changed
-          if git diff --name-only HEAD~1 HEAD | grep -q "^package.json$" || git diff --name-only origin/main...HEAD 2>/dev/null | grep -q "^package.json$"; then
-            # Get old version from previous commit or origin/main
+          # First check if package.json was modified in this commit
+          if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q "^package.json$" || git diff --name-only origin/main...HEAD 2>/dev/null | grep -q "^package.json$"; then
+            # Get old version from previous commit
             OLD_VERSION=""
-            if [ "${{ github.ref_name }}" == "main" ]; then
-              OLD_VERSION=$(git show HEAD~1:package.json 2>/dev/null | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).version)" 2>/dev/null || echo "")
-            else
-              OLD_VERSION=$(git show origin/main:package.json 2>/dev/null | node -e "console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).version)" 2>/dev/null || echo "")
+            # Try HEAD~1 first (previous commit)
+            if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+              OLD_VERSION=$(git show HEAD~1:package.json 2>/dev/null | node -e "try { console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).version); } catch(e) { console.log(''); }" 2>/dev/null || echo "")
             fi
-            NEW_VERSION=$(node -e "console.log(require('./package.json').version)" 2>/dev/null || echo "")
-            if [ "$OLD_VERSION" != "$NEW_VERSION" ] && [ -n "$OLD_VERSION" ] && [ -n "$NEW_VERSION" ]; then
-              VERSION_CHANGED="true"
-              echo "⚠️  Version changed from $OLD_VERSION to $NEW_VERSION - will trigger build"
+            # If that didn't work and we're not on main, try origin/main
+            if [ -z "$OLD_VERSION" ] && [ "${{ github.ref_name }}" != "main" ]; then
+              OLD_VERSION=$(git show origin/main:package.json 2>/dev/null | node -e "try { console.log(JSON.parse(require('fs').readFileSync(0, 'utf-8')).version); } catch(e) { console.log(''); }" 2>/dev/null || echo "")
+            fi
+            # Get new version from current package.json
+            NEW_VERSION=$(node -e "try { console.log(require('./package.json').version); } catch(e) { console.log(''); }" 2>/dev/null || echo "")
+            
+            echo "Old version: '$OLD_VERSION'"
+            echo "New version: '$NEW_VERSION'"
+            
+            if [ -n "$NEW_VERSION" ]; then
+              if [ -z "$OLD_VERSION" ] || [ "$OLD_VERSION" != "$NEW_VERSION" ]; then
+                VERSION_CHANGED="true"
+                if [ -n "$OLD_VERSION" ]; then
+                  echo "⚠️  Version changed from $OLD_VERSION to $NEW_VERSION - will trigger build"
+                else
+                  echo "⚠️  Version detected: $NEW_VERSION - will trigger build"
+                fi
+              fi
             fi
           fi
           
@@ -86,13 +101,17 @@ jobs:
           
           # Detect lib changes
           if git diff --name-only origin/main...HEAD | grep -q "^libs/"; then
-            LIBS=$(git diff --name-only origin/main...HEAD | grep "^libs/" | cut -d'/' -f2 | sort -u | tr '\n' ' ')
+            LIBS=$(git diff --name-only origin/main...HEAD | grep "^libs/" | cut -d'/' -f2 | sort -u | tr '\n' ' ' | xargs)
           fi
           
           # Detect migrations
           if git diff --name-only origin/main...HEAD | grep -q "libs/prisma/db/src/lib/prisma/migrations/"; then
             MIGRATIONS="true"
           fi
+          
+          # Trim whitespace and set outputs
+          APPS=$(echo "$APPS" | xargs)
+          LIBS=$(echo "$LIBS" | xargs)
           
           echo "apps=$APPS" >> $GITHUB_OUTPUT
           echo "libs=$LIBS" >> $GITHUB_OUTPUT
@@ -138,8 +157,10 @@ jobs:
   build-and-push:
     name: Build and Push Docker Images
     runs-on: ubuntu-latest
-    needs: [determine-changes, run-migrations]
-    if: needs.determine-changes.outputs.apps != '' || needs.determine-changes.outputs.version-changed == 'true'
+    needs: [determine-changes]
+    if: |
+      needs.determine-changes.outputs.apps != '' || 
+      needs.determine-changes.outputs.version-changed == 'true'
     strategy:
       fail-fast: false
       matrix:
