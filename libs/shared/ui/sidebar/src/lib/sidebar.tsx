@@ -37,8 +37,22 @@ const framerText = (position: SidebarPositionType) => {
 }
 
 const DpNextSidebarBase = forwardRef<HTMLDivElement, DpNextSidebarProps>(
-  ({ children, isOpen, onClose, user, items = [], position = 'left', header }) => {
+  ({ children, isOpen, onClose, user, items = [], position = 'left', header }, ref) => {
     const localRef = useRef<HTMLDivElement | null>(null)
+
+    // Merge forwarded ref with local ref
+    const mergedRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        localRef.current = node
+        if (typeof ref === 'function') {
+          ref(node)
+        } else if (ref) {
+          ref.current = node
+        }
+      },
+      [ref]
+    )
+
     const handleClickAway = useCallback(() => {
       onClose()
     }, [onClose])
@@ -87,7 +101,7 @@ const DpNextSidebarBase = forwardRef<HTMLDivElement, DpNextSidebarProps>(
               className={`fixed top-0 bottom-0 z-[70] focus:z-[70] dark p-2 ${
                 position === 'left' ? 'left-0' : 'right-0'
               } w-full h-[100svh] max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
-              ref={localRef}
+              ref={mergedRef}
               aria-label="Sidebar"
               tabIndex={-1}
             >
