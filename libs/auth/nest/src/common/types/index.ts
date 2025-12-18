@@ -1,3 +1,5 @@
+/// <reference types="express-session" />
+
 import { AuthUserDto, SessionUserType } from '@js-monorepo/types'
 import { RouteInfo } from '@nestjs/common/interfaces'
 

@@ -1,3 +1,2 @@
-export * from './lib/notification'
-export * from './lib/notification.provider'
-export * from './lib/notificationList'
+export { type DpNotificationProps } from './lib/notification'
+export { DpNotificationProvider, useNotifications } from './lib/notification.provider'

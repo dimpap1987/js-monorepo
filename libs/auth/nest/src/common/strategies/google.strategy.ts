@@ -46,7 +46,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           unRegisteredUser: unRegisteredUser,
         })
       } catch (e: any) {
-        done(e, null)
+        done(e, undefined)
       }
     }
   }

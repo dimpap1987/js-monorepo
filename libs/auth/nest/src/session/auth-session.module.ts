@@ -128,7 +128,7 @@ export class AuthSessionModule implements NestModule {
             authService: AuthService,
             unRegisteredUserService: UnregisteredService
           ) => {
-            if (config.github) new GithubOauthStrategy(config, authService, unRegisteredUserService)
+            if (config.github) return new GithubOauthStrategy(config, authService, unRegisteredUserService)
             return null
           },
           inject: [AuthOpts, ServiceAuth, ServiceUnRegisteredUser],
