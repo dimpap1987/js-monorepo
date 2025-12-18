@@ -4,6 +4,7 @@
     "outDir": "../../../dist/out-tsc",
     "declaration": true,
     "types": ["node"],
+    "typeRoots": ["../../../node_modules/@types"],
     "target": "es2021",
     "strictNullChecks": true,
     "noImplicitAny": true,
