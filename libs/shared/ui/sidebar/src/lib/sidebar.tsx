@@ -3,7 +3,7 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { UserMetadata } from '@js-monorepo/navbar'
-import { ReactNode, RefObject, forwardRef, useCallback, useEffect, useMemo, useRef, memo } from 'react'
+import { ReactNode, RefObject, useCallback, useEffect, useMemo, useRef, memo } from 'react'
 import { AiOutlineRollback } from 'react-icons/ai'
 import { useClickAway } from 'react-use'
 
@@ -36,124 +36,117 @@ const framerText = (position: SidebarPositionType) => {
   }
 }
 
-const DpNextSidebarBase = forwardRef<HTMLDivElement, DpNextSidebarProps>(
-  ({ children, isOpen, onClose, user, items = [], position = 'left', header }, ref) => {
-    const localRef = useRef<HTMLDivElement | null>(null)
+const DpNextSidebarBase = ({
+  children,
+  isOpen,
+  onClose,
+  user,
+  items = [],
+  position = 'left',
+  header,
+}: DpNextSidebarProps) => {
+  const localRef = useRef<HTMLDivElement | null>(null)
 
-    // Merge forwarded ref with local ref
-    const mergedRef = useCallback(
-      (node: HTMLDivElement | null) => {
-        localRef.current = node
-        if (typeof ref === 'function') {
-          ref(node)
-        } else if (ref) {
-          ref.current = node
-        }
-      },
-      [ref]
+  const handleClickAway = useCallback(() => {
+    onClose()
+  }, [onClose])
+
+  useClickAway(localRef as RefObject<HTMLElement | null>, handleClickAway)
+
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow || ''
+      document.body.style.overflow = 'hidden'
+
+      return () => {
+        document.body.style.overflow = originalOverflow || ''
+      }
+    }
+  }, [isOpen])
+
+  useEffect(() => {
+    if (isOpen && localRef?.current) {
+      localRef.current.focus()
+    }
+  }, [isOpen])
+
+  const handleClose = useCallback(() => {
+    onClose()
+  }, [onClose])
+
+  const filteredItems = useMemo(() => {
+    return items.filter(
+      (item) => item.roles?.includes('PUBLIC') || item.roles?.some((role) => user?.roles?.includes(role as AuthRole))
     )
+  }, [items, user?.roles])
 
-    const handleClickAway = useCallback(() => {
-      onClose()
-    }, [onClose])
-
-    useClickAway(localRef as RefObject<HTMLElement | null>, handleClickAway)
-
-    useEffect(() => {
-      if (isOpen) {
-        const originalOverflow = document.body.style.overflow || ''
-        document.body.style.overflow = 'hidden'
-
-        return () => {
-          document.body.style.overflow = originalOverflow || ''
-        }
-      }
-    }, [isOpen])
-
-    useEffect(() => {
-      if (isOpen && localRef?.current) {
-        localRef.current.focus()
-      }
-    }, [isOpen])
-
-    const handleClose = useCallback(() => {
-      onClose()
-    }, [onClose])
-
-    const filteredItems = useMemo(() => {
-      return items.filter(
-        (item) => item.roles?.includes('PUBLIC') || item.roles?.some((role) => user?.roles?.includes(role as AuthRole))
-      )
-    }, [items, user?.roles])
-
-    return (
-      <AnimatePresence mode="wait" initial={false}>
-        {isOpen && (
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 bg-black bg-opacity-50 z-[60] text-gray-300"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 z-[60] text-gray-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            {...framerSidebarPanel(position)}
+            className={`fixed top-0 bottom-0 z-[70] focus:z-[70] dark p-2 ${
+              position === 'left' ? 'left-0' : 'right-0'
+            } w-full h-[100svh] max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
+            ref={localRef}
+            aria-label="Sidebar"
+            tabIndex={-1}
           >
-            <motion.div
-              {...framerSidebarPanel(position)}
-              className={`fixed top-0 bottom-0 z-[70] focus:z-[70] dark p-2 ${
-                position === 'left' ? 'left-0' : 'right-0'
-              } w-full h-[100svh] max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
-              ref={mergedRef}
-              aria-label="Sidebar"
-              tabIndex={-1}
-            >
-              <div className="flex items-center justify-between p-5 border-b-2 border-border">
-                {/* <ModeToggle></ModeToggle> */}
-                {user?.username && (
-                  <UserMetadata
-                    profileImage={user.profile?.image}
-                    username={user.username}
-                    createdAt={user.createdAt}
-                    className="select-none text-sm"
-                  ></UserMetadata>
-                )}
-                <span>{header}</span>
-                <button
-                  onClick={handleClose}
-                  className="p-3 border-2 border-border rounded-xl hover:bg-zinc-800"
-                  aria-label="close sidebar"
-                >
-                  <AiOutlineRollback />
-                </button>
-              </div>
-              <ul>
-                {filteredItems.map((item) => (
-                  <li key={item.name}>
-                    <DpNextNavLink
-                      className={`flex text-sm sm:text-base items-center w-full ${
-                        position === 'right' ? 'flex-row-reverse' : ''
-                      } justify-between gap-5 p-5 transition-all border-b-2 hover:bg-zinc-800 border-border`}
-                      href={item.href}
-                      onClick={handleClose}
-                    >
-                      <motion.div {...framerText(position)} className="grid grid-cols-[max-content_25px] gap-2">
-                        <div>{item.name}</div>
-                        <div>{item.Icon && <item.Icon className="text-xl" />}</div>
-                      </motion.div>
-                    </DpNextNavLink>
-                  </li>
-                ))}
-              </ul>
-              {children && (
-                <div className="mt-auto w-full text-center p-3 pb-[calc(1rem_+_env(safe-area-inset-bottom))]">
-                  {children}
-                </div>
+            <div className="flex items-center justify-between p-5 border-b-2 border-border">
+              {/* <ModeToggle></ModeToggle> */}
+              {user?.username && (
+                <UserMetadata
+                  profileImage={user.profile?.image}
+                  username={user.username}
+                  createdAt={user.createdAt}
+                  className="select-none text-sm"
+                ></UserMetadata>
               )}
-            </motion.div>
+              <span>{header}</span>
+              <button
+                onClick={handleClose}
+                className="p-3 border-2 border-border rounded-xl hover:bg-zinc-800"
+                aria-label="close sidebar"
+              >
+                <AiOutlineRollback />
+              </button>
+            </div>
+            <ul>
+              {filteredItems.map((item) => (
+                <li key={item.name}>
+                  <DpNextNavLink
+                    className={`flex text-sm sm:text-base items-center w-full ${
+                      position === 'right' ? 'flex-row-reverse' : ''
+                    } justify-between gap-5 p-5 transition-all border-b-2 hover:bg-zinc-800 border-border`}
+                    href={item.href}
+                    onClick={handleClose}
+                  >
+                    <motion.div {...framerText(position)} className="grid grid-cols-[max-content_25px] gap-2">
+                      <div>{item.name}</div>
+                      <div>{item.Icon && <item.Icon className="text-xl" />}</div>
+                    </motion.div>
+                  </DpNextNavLink>
+                </li>
+              ))}
+            </ul>
+            {children && (
+              <div className="mt-auto w-full text-center p-3 pb-[calc(1rem_+_env(safe-area-inset-bottom))]">
+                {children}
+              </div>
+            )}
           </motion.div>
-        )}
-      </AnimatePresence>
-    )
-  }
-)
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
 
 DpNextSidebarBase.displayName = 'DpNextSidebar'
 
