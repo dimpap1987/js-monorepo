@@ -9,8 +9,6 @@ on:
 
 env:
   NODE_VERSION: '20'
-  NPM_CACHE_KEY: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-  NX_CACHE_KEY: ${{ runner.os }}-nx-${{ hashFiles('**/nx.json', '**/.nx/cache/**') }}
 
 jobs:
   # ============================================
@@ -102,7 +100,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .nx/cache
-          key: ${{ env.NX_CACHE_KEY }}
+          key: ${{ runner.os }}-nx-${{ hashFiles('**/nx.json', '**/.nx/cache/**') }}
           restore-keys: |
             ${{ runner.os }}-nx-
 
@@ -175,7 +173,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .nx/cache
-          key: ${{ env.NX_CACHE_KEY }}
+          key: ${{ runner.os }}-nx-${{ hashFiles('**/nx.json', '**/.nx/cache/**') }}
           restore-keys: |
             ${{ runner.os }}-nx-
 
@@ -272,7 +270,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .nx/cache
-          key: ${{ env.NX_CACHE_KEY }}
+          key: ${{ runner.os }}-nx-${{ hashFiles('**/nx.json', '**/.nx/cache/**') }}
           restore-keys: |
             ${{ runner.os }}-nx-
 
