@@ -51,7 +51,22 @@ export default {
   testEnvironment: 'jsdom',
   transform: {
     '^(?!.*\\\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
-    '^.+\\\\.[tj]sx?$': ['babel-jest', { presets: [['@babel/preset-react', { runtime: 'automatic' }]] }],
+    '^.+\\.tsx$': [
+      'babel-jest',
+      {
+        presets: [
+          ['@babel/preset-react', { runtime: 'automatic' }],
+          ['@babel/preset-typescript', { isTSX: true, allExtensions: true }],
+        ],
+      },
+    ],
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: '<rootDir>/tsconfig.spec.json',
+        isolatedModules: true,
+      },
+    ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '${coveragePath}',
@@ -59,6 +74,7 @@ export default {
   moduleNameMapper: {
     ...getModuleNameMapper('<rootDir>/${prefixPath}'),
   },
+  transformIgnorePatterns: ['node_modules/(?!(@js-monorepo|@nx)/)'],
   testMatch: ['**/+(*.)+(spec|test).+(ts|js)?(x)'],
   collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*.d.ts', '!**/*.stories.{ts,tsx}', '!**/index.{ts,tsx}'],
   clearMocks: true,
@@ -73,6 +89,8 @@ const tsconfigSpec = {
   compilerOptions: {
     outDir: outDirPath,
     module: 'commonjs',
+    esModuleInterop: true,
+    allowSyntheticDefaultImports: true,
     types: ['jest', 'node', '@testing-library/jest-dom'],
   },
   include: [

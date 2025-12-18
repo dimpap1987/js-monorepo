@@ -1,13 +1,13 @@
 /* eslint-disable */
-import { getModuleNameMapper } from '../../../../jest.config.helper'
+import { getModuleNameMapper } from '../../../jest.config.helper'
 
 export default {
-  displayName: 'navbar',
-  preset: '../../../../jest.preset.js',
+  displayName: 'client',
+  preset: '../../../jest.preset.js',
   testEnvironment: 'jsdom',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
-    '^.+\\.[tj]sx?$': [
+    '^.+\\.tsx$': [
       'babel-jest',
       {
         presets: [
@@ -16,14 +16,21 @@ export default {
         ],
       },
     ],
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: '<rootDir>/tsconfig.spec.json',
+        isolatedModules: true,
+      },
+    ],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../../coverage/libs/shared/ui/navbar',
+  coverageDirectory: '../../../coverage/libs/notifications/client',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   moduleNameMapper: {
-    ...getModuleNameMapper('<rootDir>/../../../../'),
+    ...getModuleNameMapper('<rootDir>/../../../'),
   },
-  transformIgnorePatterns: ['node_modules/(?!(@js-monorepo|@nx)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(@js-monorepo|@nx)/)', 'node_modules/moment'],
   testMatch: ['**/+(*.)+(spec|test).+(ts|js)?(x)'],
   collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*.d.ts', '!**/*.stories.{ts,tsx}', '!**/index.{ts,tsx}'],
   clearMocks: true,
