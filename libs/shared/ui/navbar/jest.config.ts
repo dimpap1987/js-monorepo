@@ -1,8 +1,7 @@
 /* eslint-disable */
-const { pathsToModuleNameMapper } = require('ts-jest')
-const { compilerOptions } = require('./tsconfig.json')
+import { getModuleNameMapper } from '../../../../jest.config.helper'
 
-module.exports = {
+export default {
   displayName: 'navbar',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'jsdom',
@@ -14,9 +13,7 @@ module.exports = {
   coverageDirectory: '../../../../coverage/libs/shared/ui/navbar',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   moduleNameMapper: {
-    ...pathsToModuleNameMapper(compilerOptions.paths || {}, {
-      prefix: '<rootDir>/../../../../',
-    }),
+    ...getModuleNameMapper('<rootDir>/../../../../'),
   },
   testMatch: ['**/+(*.)+(spec|test).+(ts|js)?(x)'],
   collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*.d.ts', '!**/*.stories.{ts,tsx}', '!**/index.{ts,tsx}'],
