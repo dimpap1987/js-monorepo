@@ -1,0 +1,213 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main, develop]
+
+jobs:
+  # ============================================
+  # PR Validation
+  # ============================================
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Nx
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check PR title format
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .+ ]]; then
+            echo "❌ PR title must follow conventional commits format: type(scope): description"
+            echo "Current title: $TITLE"
+            echo "Examples:"
+            echo "  feat(auth): add OAuth login"
+            echo "  fix(api): resolve memory leak"
+            echo "  test(notifications): add comprehensive test suite"
+            exit 1
+          fi
+          echo "✅ PR title format is valid"
+
+      - name: Check for large files
+        run: |
+          MAX_SIZE=10485760  # 10MB
+          LARGE_FILES=$(find . -type f -size +${MAX_SIZE}c ! -path './node_modules/*' ! -path './.git/*' ! -path './dist/*' ! -path './.nx/*' || true)
+          if [ -n "$LARGE_FILES" ]; then
+            echo "❌ Found large files (>10MB):"
+            echo "$LARGE_FILES"
+            exit 1
+          fi
+          echo "✅ No large files detected"
+
+      - name: Check for secrets
+        run: |
+          if git diff origin/${{ github.base_ref }}...HEAD | grep -iE "(password|secret|api_key|token|private_key)" | grep -vE "(test|example|mock|placeholder)" | grep -v "\.env.example"; then
+            echo "⚠️  Warning: Potential secrets detected in diff"
+            echo "Please ensure no secrets are committed to the repository"
+          fi
+
+  # ============================================
+  # Code Quality Gate
+  # ============================================
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Nx
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npx nx affected:lint --base=origin/${{ github.base_ref }} --head=${{ github.event.pull_request.head.sha }} --parallel=3
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Run tests
+        run: |
+          npx nx affected:test \
+            --base=origin/${{ github.base_ref }} \
+            --head=${{ github.event.pull_request.head.sha }} \
+            --configuration=ci \
+            --parallel=3
+
+      - name: Type check
+        run: |
+          npx nx affected --target=typecheck \
+            --base=origin/${{ github.base_ref }} \
+            --head=${{ github.event.pull_request.head.sha }} \
+            --parallel=3 || true
+
+  # ============================================
+  # Build Verification
+  # ============================================
+  build-verification:
+    name: Build Verification
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    strategy:
+      matrix:
+        app: [my-api, next-app]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Nx
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        if: matrix.app == 'my-api'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL_PROD }}
+        run: |
+          npx prisma generate --schema=libs/prisma/db/src/lib/prisma/schema
+
+      - name: Build ${{ matrix.app }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL_PROD }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }}
+          NEXT_PUBLIC_AUTH_URL: ${{ secrets.NEXT_PUBLIC_AUTH_URL_PROD }}
+          NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL: ${{ secrets.NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL_PROD }}
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD }}
+        run: |
+          if [ "${{ matrix.app }}" == "my-api" ]; then
+            npm run build:my-api
+          else
+            npm run build:next
+          fi
+
+  # ============================================
+  # PR Comment with Results
+  # ============================================
+  pr-comment:
+    name: PR Comment
+    runs-on: ubuntu-latest
+    needs: [pr-validation, quality-gate, build-verification]
+    if: always()
+    steps:
+      - name: Create PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('## PR Checks Summary')
+            );
+            
+            const body = `## PR Checks Summary
+            
+            | Check | Status |
+            |-------|--------|
+            | PR Validation | ${{ needs.pr-validation.result == 'success' && '✅' || '❌' }} |
+            | Quality Gate | ${{ needs.quality-gate.result == 'success' && '✅' || '❌' }} |
+            | Build Verification | ${{ needs.build-verification.result == 'success' && '✅' || '❌' }} |
+            
+            **Commit:** \`${{ github.event.pull_request.head.sha }}\`
+            **Branch:** \`${{ github.event.pull_request.head.ref }}\`
+            `;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
