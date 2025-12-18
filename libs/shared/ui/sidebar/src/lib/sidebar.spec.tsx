@@ -3,9 +3,7 @@ import userEvent from '@testing-library/user-event'
 import * as React from 'react'
 import { DpNextSidebar, type DpNextSidebarProps } from './sidebar'
 // @ts-expect-error - Jest resolves this path alias correctly at runtime
-
 import { MenuItem } from '@js-monorepo/types'
-
 import { useClickAway } from 'react-use'
 
 // Mock dependencies

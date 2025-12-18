@@ -3,7 +3,7 @@ const { pathsToModuleNameMapper } = require('ts-jest')
 const { compilerOptions } = require('./tsconfig.json')
 
 module.exports = {
-  displayName: 'sidebar',
+  displayName: 'navbar',
   preset: '../../../../jest.preset.js',
   testEnvironment: 'jsdom',
   transform: {
@@ -11,7 +11,7 @@ module.exports = {
     '^.+\\.[tj]sx?$': ['babel-jest', { presets: [['@babel/preset-react', { runtime: 'automatic' }]] }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../../coverage/libs/shared/ui/sidebar',
+  coverageDirectory: '../../../../coverage/libs/shared/ui/navbar',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   moduleNameMapper: {
     ...pathsToModuleNameMapper(compilerOptions.paths || {}, {
