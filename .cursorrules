@@ -1,0 +1,170 @@
+# Cursor AI Context Rules
+
+This file provides essential context for AI agents working on this codebase.
+
+## Project Overview
+
+This is an **NX monorepo** containing:
+
+- **Frontend**: Next.js 14 applications (next-app)
+- **Backend**: NestJS API (my-api)
+- **Libraries**: Shared UI components, auth, notifications, payments, websockets, etc.
+- **Infrastructure**: Docker configs, deployment scripts
+
+## Architecture Principles
+
+1. **Monorepo Structure**: NX workspace with apps and libs
+2. **Type Safety**: TypeScript throughout, shared types in `libs/shared/types`
+3. **Module Pattern**: Feature-based modules in NestJS
+4. **Repository Pattern**: Interface-based repositories with Prisma implementations
+5. **Session-Based Auth**: Redis-backed sessions (not JWT)
+6. **Real-time**: WebSocket via Socket.IO with Redis adapter
+
+## Key Technologies
+
+- **Backend**: NestJS, Prisma, Redis, Socket.IO, Passport, Stripe
+- **Frontend**: Next.js 14 (App Router), React 18, Tailwind CSS, React Query, Zustand
+- **Shared**: TypeScript, Zod, Prisma Client
+
+## Important Conventions
+
+### Code Organization
+
+- Apps in `apps/` directory
+- Shared libraries in `libs/` directory
+- Each library has its own `project.json` for NX configuration
+- Use NX generators for creating new components/modules
+
+### Authentication
+
+- Session-based (not JWT)
+- Redis-backed sessions
+- OAuth providers: Google, GitHub
+- Roles: USER, ADMIN
+- Guards: `LoggedInGuard`, `RolesGuard`, `WsLoginGuard`, `WsRolesGuard`
+
+## Common Patterns
+
+### NestJS Modules
+
+- Use dependency injection
+- Global modules for shared services (UserModule, PrismaModule)
+- Feature modules for business logic
+
+### Next.js
+
+- App Router (not Pages Router)
+- Server Components by default
+- Client Components marked with `'use client'`
+- Server Actions in `actions/` directory
+- Middleware in `middleware.ts` for auth/routing
+
+### UI Components
+
+- Located in `libs/shared/ui/`
+- Uses shadcn/ui components
+- Tailwind CSS for styling
+- Radix UI primitives
+
+## Development Workflow
+
+1. **Start Services**: `npm run dev:my-api` and `npm run dev:next`
+2. **Build**: Use NX commands (`nx build <project>`)
+3. **Migrations**: `npm run db:migrate`
+4. **Sync Env**: `npm run sync:env` after changing root `.env`
+
+## When Making Changes
+
+- **New Features**: Create in appropriate app or library
+- **Shared Code**: Add to `libs/shared/` if reusable
+- **Types**: Add to `libs/shared/types/`
+- **Schemas**: Add to `libs/shared/schemas/` (Zod)
+- **UI Components**: Add to `libs/shared/ui/`
+- **Tests**: Follow Jest setup in `jest.config.ts`
+
+## Important Paths
+
+- Backend entry: `apps/my-api/src/main.ts`
+- Frontend entry: `apps/next-app/app/layout.tsx`
+- Prisma schema: `libs/prisma/db/src/lib/prisma/schema.prisma`
+- Shared types: `libs/shared/types/src/index.ts`
+- Auth library: `libs/auth/`
+
+## Code Quality Standards
+
+**CRITICAL: Only senior-level code and best practices are acceptable.**
+
+### Code Quality
+
+- Follow ESLint rules strictly
+- Use Zod for runtime validation and type inference
+- Clean up event listeners and timeouts in useEffect
+- Include all dependencies in useEffect dependency arrays
+- Use transactions for database operations when needed
+- Avoid code duplication - extract reusable logic
+- Prefer composition over inheritance
+- Use meaningful variable and function names
+
+### Best Practices
+
+#### React/Next.js
+
+- **Performance**: Use `React.memo`, `useMemo`, `useCallback` appropriately
+- **Server Components**: Default to Server Components, use Client Components only when needed
+- **Data Fetching**: Use React Query for server state, avoid prop drilling
+- **Error Boundaries**: Implement proper error handling and boundaries
+- **Accessibility**: Follow WCAG guidelines, use semantic HTML, proper ARIA attributes
+- **SEO**: Optimize metadata, use proper heading hierarchy, semantic markup
+
+#### NestJS/Backend
+
+- **Dependency Injection**: Use constructor injection, avoid service locator pattern
+- **Error Handling**: Use custom exceptions, proper HTTP status codes
+- **Validation**: Validate all inputs with DTOs and Zod schemas
+- **Transactions**: Use transactions for multi-step operations
+- **Logging**: Use structured logging with appropriate levels
+- **Security**: Sanitize inputs, use parameterized queries, implement rate limiting
+
+#### Architecture & Design
+
+- **SOLID Principles**: Follow Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
+- **DRY**: Don't Repeat Yourself - extract common patterns
+- **Separation of Concerns**: Clear boundaries between layers (UI, business logic, data access)
+- **Design Patterns**: Use appropriate patterns (Repository, Factory, Strategy, Observer, etc.)
+- **API Design**: RESTful conventions, proper HTTP methods, meaningful status codes
+- **Error Handling**: Consistent error responses, proper error types
+
+### Code Review Standards
+
+**Always consider:**
+
+- Is this the most maintainable solution?
+- Is this performant and scalable?
+- Are edge cases handled?
+- Is error handling comprehensive?
+- Is the code testable?
+- Is it accessible and user-friendly?
+- Does it follow established patterns in the codebase?
+- Is documentation/comments needed for complex logic?
+
+### Anti-Patterns to Avoid
+
+- ❌ Magic numbers/strings (use constants/enums)
+- ❌ Deeply nested conditionals (use early returns, guard clauses)
+- ❌ God objects/functions (break into smaller, focused pieces)
+- ❌ Premature optimization (optimize when needed, measure first)
+- ❌ Over-engineering (keep it simple, but not simpler)
+- ❌ Ignoring TypeScript errors (fix or properly type)
+- ❌ Side effects in render functions
+- ❌ Mutating props or state directly
+- ❌ Missing error handling
+- ❌ Hardcoded values (use configuration)
+
+### Design Principles
+
+- **User Experience**: Prioritize user needs, intuitive interfaces, clear feedback
+- **Performance**: Optimize for speed, minimize bundle size, lazy load when appropriate
+- **Accessibility**: Ensure all users can access and use the application
+- **Responsive Design**: Mobile-first approach, test on multiple screen sizes
+- **Consistency**: Follow design system patterns, consistent spacing, typography, colors
+- **Maintainability**: Code should be easy to understand and modify by other developers
