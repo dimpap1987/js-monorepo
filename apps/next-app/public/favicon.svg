@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="superGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#superGradient)"/>
+  
+  <!-- Connection lines showing integration (animated with dash offset) -->
+  <line x1="32" y1="32" x2="18" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,5" opacity="0.6">
+    <animate attributeName="stroke-dashoffset" values="0;-20;0" dur="3s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" repeatCount="indefinite" />
+  </line>
+  <line x1="32" y1="32" x2="46" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,5" opacity="0.6">
+    <animate attributeName="stroke-dashoffset" values="0;-20;0" dur="3s" begin="0.75s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" begin="0.75s" repeatCount="indefinite" />
+  </line>
+  <line x1="32" y1="32" x2="18" y2="46" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,5" opacity="0.6">
+    <animate attributeName="stroke-dashoffset" values="0;-20;0" dur="3s" begin="1.5s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" begin="1.5s" repeatCount="indefinite" />
+  </line>
+  <line x1="32" y1="32" x2="46" y2="46" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5,5" opacity="0.6">
+    <animate attributeName="stroke-dashoffset" values="0;-20;0" dur="3s" begin="2.25s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" begin="2.25s" repeatCount="indefinite" />
+  </line>
+  
+  <!-- Central hub - represents the core (pulsing) -->
+  <circle cx="32" cy="32" r="10" fill="white" opacity="0.95">
+    <animate attributeName="r" values="10;10.5;10" dur="2s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.95;1;0.95" dur="2s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Four connected service nodes (pulsing with staggered delays) -->
+  <circle cx="18" cy="18" r="6" fill="white" opacity="0.9">
+    <animate attributeName="r" values="6;6.5;6" dur="2s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="46" cy="18" r="6" fill="white" opacity="0.9">
+    <animate attributeName="r" values="6;6.5;6" dur="2s" begin="0.5s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" begin="0.5s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="18" cy="46" r="6" fill="white" opacity="0.9">
+    <animate attributeName="r" values="6;6.5;6" dur="2s" begin="1s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" begin="1s" repeatCount="indefinite" />
+  </circle>
+  <circle cx="46" cy="46" r="6" fill="white" opacity="0.9">
+    <animate attributeName="r" values="6;6.5;6" dur="2s" begin="1.5s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" begin="1.5s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- Inner accent dot (rotating) -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate" values="0 32 32;360 32 32" dur="8s" repeatCount="indefinite" />
+    <circle cx="32" cy="32" r="4" fill="url(#superGradient)"/>
+  </g>
+</svg>
+
