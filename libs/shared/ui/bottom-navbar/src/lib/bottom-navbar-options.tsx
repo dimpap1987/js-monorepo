@@ -14,35 +14,26 @@ const BottomNavbarOptions = ({ href, Icon, label }: { href: string; Icon: IconTy
     <DpNextNavLink
       href={href}
       className={cn(
-        'flex flex-col items-center justify-center gap-1',
+        'flex flex-col items-center justify-center gap-2',
         'flex-1 h-full min-w-0',
         'px-3 py-2',
         'transition-all duration-200 ease-in-out',
-        'text-muted-foreground hover:text-foreground',
         'active:scale-95',
         'rounded-lg',
         'relative group'
       )}
-      activeClassName="text-primary"
     >
       <div className="relative flex items-center justify-center">
-        <Icon
-          className={cn(
-            'shrink-0 text-xl transition-all duration-200',
-            'group-active:scale-110',
-            isActive && 'text-primary scale-110'
-          )}
-        />
+        <Icon className={cn('shrink-0 text-xl transition-all duration-200', 'group-active:scale-110')} />
         {/* Active indicator dot */}
         {isActive && (
-          <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200" />
+          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200 shadow-sm shadow-primary/50" />
         )}
       </div>
       <span
         className={cn(
           'text-[10px] font-medium leading-tight truncate w-full text-center',
-          'transition-colors duration-200',
-          isActive && 'text-primary font-semibold'
+          'transition-colors duration-200'
         )}
       >
         {label}
@@ -63,15 +54,14 @@ const BottomNavbarAlert = ({ href, label, children }: { label: string; href: str
         'flex-1 h-full min-w-0',
         'px-3 py-2',
         'transition-all duration-200 ease-in-out',
-        'text-muted-foreground hover:text-foreground',
+        'text-foreground',
         'active:scale-95',
         'rounded-lg',
         'relative group'
       )}
-      activeClassName="text-primary"
     >
       <div className="relative flex items-center justify-center">
-        <div className={cn('transition-all duration-200', isActive && 'text-primary scale-110')}>{children}</div>
+        <div className={cn('transition-all duration-200', isActive && 'scale-110')}>{children}</div>
         {/* Active indicator dot */}
         {isActive && (
           <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200" />
@@ -80,8 +70,7 @@ const BottomNavbarAlert = ({ href, label, children }: { label: string; href: str
       <span
         className={cn(
           'text-[10px] font-medium leading-tight truncate w-full text-center',
-          'transition-colors duration-200',
-          isActive && 'text-primary font-semibold'
+          'transition-colors duration-200'
         )}
       >
         {label}

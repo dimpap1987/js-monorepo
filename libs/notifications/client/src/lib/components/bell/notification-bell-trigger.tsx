@@ -20,7 +20,7 @@ export const NotificationBellButton = forwardRef<
     <button
       className={cn(
         'relative outline-none rounded-lg',
-        'text-2xl text-foreground-neutral hover:text-foreground',
+        'text-2xl text-foreground',
         'transition-all duration-200 ease-in-out',
         'hover:bg-background-secondary/50 active:bg-background-secondary/70',
         'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -34,11 +34,7 @@ export const NotificationBellButton = forwardRef<
     >
       {/* Bell icon */}
       <div className="relative">
-        {isRinging ? (
-          <MdNotificationsActive className="text-foreground animate-notification-pulse" />
-        ) : (
-          <IoMdNotifications className="text-foreground-neutral" />
-        )}
+        {isRinging ? <MdNotificationsActive className="animate-notification-pulse" /> : <IoMdNotifications />}
       </div>
 
       {/* Badge */}

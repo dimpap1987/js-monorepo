@@ -134,7 +134,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 ))}
             </ul>
 
-            <div className="flex items-center min-w-[5rem]">
+            <div className="flex items-center">
               <section className="hidden sm:flex items-center gap-4 justify-end">
                 <>
                   {navbarItems && navbarItems}

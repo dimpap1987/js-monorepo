@@ -92,7 +92,7 @@ const DpNextSidebarBase = ({
         >
           <motion.div
             {...framerSidebarPanel(position)}
-            className={`fixed top-0 bottom-0 z-[70] focus:z-[70] dark p-2 ${
+            className={`fixed top-0 bottom-0 z-[70] focus:z-[70] p-2 ${
               position === 'left' ? 'left-0' : 'right-0'
             } w-full h-[100svh] max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
             ref={localRef}

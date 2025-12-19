@@ -12,7 +12,7 @@ const DpLoginButton = forwardRef<HTMLButtonElement, DpLoginButtonProps>(({ class
     <DpButton
       {...props}
       title="Sign in"
-      variant="accent"
+      variant="primary"
       className={cn('gap-1 py-2 px-4 w-full flex justify-center border rounded-xl', className)}
       ref={ref}
     >
