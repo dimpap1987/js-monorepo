@@ -1,7 +1,7 @@
 'use client'
 import { cn } from '@js-monorepo/ui/util'
 import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export const NavigationButton = ({ direction, onClick }: { direction: 'prev' | 'next'; onClick: () => void }) => {
   const isPrev = direction === 'prev'
@@ -54,25 +54,25 @@ export const Carousel = ({ hrefs, className }: { hrefs: string[]; className?: st
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const startAutoSlide = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current) // Clear any existing interval
-    intervalRef.current = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex === hrefs.length - 1 ? 0 : prevIndex + 1))
-    }, 10000)
-  }
-
-  const stopAutoSlide = () => {
+  const stopAutoSlide = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
     }
-  }
+  }, [])
+
+  const startAutoSlide = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current) // Clear any existing interval
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex === hrefs.length - 1 ? 0 : prevIndex + 1))
+    }, 10000)
+  }, [hrefs])
 
   useEffect(() => {
     startAutoSlide()
 
     return () => stopAutoSlide()
-  }, [hrefs.length])
+  }, [startAutoSlide, stopAutoSlide])
 
   const handleUserInteraction = (action: 'next' | 'prev') => {
     if (action === 'next') {
