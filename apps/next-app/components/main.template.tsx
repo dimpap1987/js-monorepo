@@ -101,7 +101,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
         {sidebarChildren}
       </DpNextSidebar>
 
-      <main className="mt-5">{children}</main>
+      <main className="mt-6">{children}</main>
 
       <MobileNavbarWithNotifications userId={user?.id} isLoggedIn={isLoggedIn} isSidebarOpen={openSideBar} />
     </>

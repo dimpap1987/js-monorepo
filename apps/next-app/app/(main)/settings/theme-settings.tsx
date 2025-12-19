@@ -186,8 +186,12 @@ export function ThemeSettings() {
 
   if (!mounted) {
     return (
-      <section className="p-2 space-y-6 text-foreground">
-        <SettingsItem label="Appearance">
+      <section className="space-y-6 text-foreground">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Appearance</h1>
+          <p className="text-sm text-foreground-muted">Customize how the app looks and feels</p>
+        </div>
+        <SettingsItem label="Theme">
           <div className="text-sm text-foreground-muted">Loading themes...</div>
         </SettingsItem>
       </section>
@@ -195,8 +199,14 @@ export function ThemeSettings() {
   }
 
   return (
-    <section className="p-2 space-y-6 text-foreground">
-      <SettingsItem label="Appearance">
+    <section className="space-y-6 text-foreground">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-foreground mb-2">Appearance</h1>
+        <p className="text-sm text-foreground-muted">Customize how the app looks and feels</p>
+      </div>
+
+      <SettingsItem label="Theme">
         <p className="text-xs font-semibold sm:text-sm mt-1 mb-4 text-foreground-neutral">
           Choose how the app looks to you. You can select a theme or match your system settings.
         </p>

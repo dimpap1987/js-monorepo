@@ -1,3 +1,4 @@
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { AiGeneratorImage } from '@js-monorepo/ai-image-generator'
 import { predict } from '@next-app/actions/predict'
 
@@ -6,5 +7,9 @@ export const metadata = {
 }
 
 export default function PageAiImageGenerator() {
-  return <AiGeneratorImage generateMethod={predict}></AiGeneratorImage>
+  return (
+    <ContainerTemplate>
+      <AiGeneratorImage generateMethod={predict}></AiGeneratorImage>
+    </ContainerTemplate>
+  )
 }

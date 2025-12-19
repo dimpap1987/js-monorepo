@@ -1,3 +1,4 @@
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -5,5 +6,9 @@ export const metadata: Metadata = {
 }
 
 export default function Profile() {
-  return <div>My profile</div>
+  return (
+    <ContainerTemplate>
+      <div>My profile</div>
+    </ContainerTemplate>
+  )
 }
