@@ -172,17 +172,17 @@ export function AccountSettings() {
                 />
 
                 {/* Edit/Save Buttons */}
-                <div className="flex gap-3 justify-end">
+                <div className="flex gap-3 justify-center sm:justify-end">
                   {isEditing ? (
                     <>
-                      <DpButton onClick={handleCancel} variant="outline" className="min-w-[100px]">
+                      <DpButton onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
                         Cancel
                       </DpButton>
                       <DpButton
                         disabled={!form.formState.isValid || !form.formState.isDirty}
                         variant="primary"
                         type="submit"
-                        className="min-w-[100px]"
+                        className="w-full sm:w-auto"
                       >
                         Save Changes
                       </DpButton>
@@ -194,7 +194,7 @@ export function AccountSettings() {
                         e.preventDefault()
                         setIsEditing(true)
                       }}
-                      className="min-w-[120px]"
+                      className="w-full sm:w-auto "
                     >
                       Edit Profile
                     </DpButton>

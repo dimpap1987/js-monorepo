@@ -111,7 +111,7 @@ export function MultiSelectDropdown({
         {/* Select All Checkbox */}
         <DropdownMenuCheckboxItem
           className={`flex items-center p-2 rounded-lg cursor-pointer transition-colors duration-200 
-                ${selectedOptions.length === options.length ? 'bg-inherit text-white' : 'text-gray-700'}`}
+                ${selectedOptions.length === options.length ? 'bg-inherit text-foreground' : 'text-foreground-muted'}`}
           checked={selectedOptions.length === options.length}
           onCheckedChange={handleSelectAll}
         >
@@ -123,12 +123,12 @@ export function MultiSelectDropdown({
           />
           <span
             className={`w-4 h-4 border-2 rounded-md flex items-center justify-center mr-2 
-                     ${selectedOptions.length === options.length ? 'border-blue-600 bg-blue-600' : 'bg-white'}`}
+                     ${selectedOptions.length === options.length ? 'border-primary bg-primary' : 'bg-foreground-muted'}`}
           >
             {selectedOptions.length === options.length && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-3 h-3 text-white"
+                className="w-3 h-3 text-foreground-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
