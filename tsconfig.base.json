@@ -34,6 +34,8 @@
       "@js-monorepo/nav-link": ["libs/shared/ui/nav-link/src/index.ts"],
       "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
       "@js-monorepo/nest/*": ["libs/nest-utils/src/lib/*"],
+      "@js-monorepo/bull-mq-transport": ["libs/nest/bull-mq-transport/src/index.ts"],
+      "@js-monorepo/bull-mq-transport/*": ["libs/nest/bull-mq-transport/src/lib/*"],
       "@js-monorepo/next/*": ["libs/next/src/lib/*"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
       "@js-monorepo/notifications-server": ["libs/notifications/server/src/index.ts"],
