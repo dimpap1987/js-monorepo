@@ -172,7 +172,7 @@ export function AccountSettings() {
                 />
 
                 {/* Edit/Save Buttons */}
-                <div className="flex gap-3 justify-center sm:justify-end">
+                <div className="flex gap-3 justify-center sm:justify-end flex-wrap">
                   {isEditing ? (
                     <>
                       <DpButton onClick={handleCancel} variant="outline" className="w-full sm:w-auto">

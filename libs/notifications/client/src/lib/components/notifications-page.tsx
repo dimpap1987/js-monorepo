@@ -46,9 +46,7 @@ export function NotificationsPage() {
       {/* Header */}
       <div className="flex justify-between items-center mb-4 sm:mb-6">
         <BackArrowWithLabel className="flex-1" arrowClassName="sm:hidden">
-          <h2 className="px-2 ml-5 sm:ml-0 text-center sm:text-left text-xl sm:text-2xl font-semibold tracking-tight">
-            Notifications
-          </h2>
+          <h3>Notifications</h3>
         </BackArrowWithLabel>
 
         <NotificationReadAllButton
