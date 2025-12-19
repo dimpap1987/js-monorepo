@@ -105,12 +105,6 @@ module.exports = {
           waiting: 'var(--status-waiting)',
         },
       },
-      borderRadius: {
-        sm: 'var(--radius-sm)',
-        md: 'var(--radius-md)',
-        lg: 'var(--radius-lg)',
-        xl: 'var(--radius-xl)',
-      },
       animation: {
         bubble: 'bubble ease-in-out infinite',
       },

@@ -8,7 +8,7 @@ export function SettingsItem({
   return (
     <div className={className}>
       <h2 className="text-lg font-semibold mb-4">{label}</h2>
-      <div className="border rounded-md p-4 shadow-sm border-border overflow-x-hidden">
+      <div className="border rounded-lg p-4 shadow-md border-border overflow-x-hidden">
         <div className="px-3">{children}</div>
       </div>
     </div>
