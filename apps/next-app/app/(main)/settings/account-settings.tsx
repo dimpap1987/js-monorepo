@@ -78,7 +78,7 @@ export function AccountSettings() {
     <section className="space-y-8">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Account Settings</h1>
+        <h2 className="mb-2">Account Settings</h2>
         <p className="text-sm text-foreground-muted">Manage your profile information and account details</p>
       </div>
 

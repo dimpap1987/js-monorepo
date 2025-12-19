@@ -188,7 +188,7 @@ export function ThemeSettings() {
     return (
       <section className="space-y-6 text-foreground">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Appearance</h1>
+          <h2 className="mb-2">Appearance</h2>
           <p className="text-sm text-foreground-muted">Customize how the app looks and feels</p>
         </div>
         <SettingsItem label="Theme">
@@ -202,7 +202,7 @@ export function ThemeSettings() {
     <section className="space-y-6 text-foreground">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Appearance</h1>
+        <h2 className="mb-2">Appearance</h2>
         <p className="text-sm text-foreground-muted">Customize how the app looks and feels</p>
       </div>
 
