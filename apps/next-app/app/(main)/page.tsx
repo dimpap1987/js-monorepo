@@ -1,3 +1,4 @@
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { Metadata } from 'next'
 import LandingComponent from '../../components/landing.component'
 import { generateMetadata as generateSEOMetadata } from '../../lib/seo'
@@ -11,5 +12,9 @@ export const metadata: Metadata = generateSEOMetadata({
 })
 
 export default function LandingPage() {
-  return <LandingComponent></LandingComponent>
+  return (
+    <ContainerTemplate>
+      <LandingComponent></LandingComponent>
+    </ContainerTemplate>
+  )
 }

@@ -1,3 +1,4 @@
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { Metadata } from 'next'
 import { generateMetadata as generateSEOMetadata } from '../../../lib/seo'
 
@@ -12,9 +13,11 @@ export const metadata: Metadata = generateSEOMetadata({
 
 function PrivacyCookieStatementPage() {
   return (
-    <div className="mt-4">
-      <h1>Privacy and Cookie Statement</h1>
-    </div>
+    <ContainerTemplate>
+      <div className="mt-4">
+        <h1>Privacy and Cookie Statement</h1>
+      </div>
+    </ContainerTemplate>
   )
 }
 

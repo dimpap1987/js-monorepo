@@ -1,3 +1,4 @@
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { Pricing } from '@js-monorepo/payments-ui'
 import { Metadata } from 'next'
 import { generateMetadata as generateSEOMetadata } from '../../../lib/seo'
@@ -12,9 +13,11 @@ export const metadata: Metadata = generateSEOMetadata({
 
 function PricingPage() {
   return (
-    <div className="px-2">
-      <Pricing></Pricing>
-    </div>
+    <ContainerTemplate>
+      <div className="px-2">
+        <Pricing></Pricing>
+      </div>
+    </ContainerTemplate>
   )
 }
 

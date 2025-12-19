@@ -42,7 +42,13 @@ const NotificationPermissionComponent = () => {
   }
 
   return (
-    <section className="p-2 space-y-6">
+    <section className="space-y-6">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-foreground mb-2">Notification Settings</h1>
+        <p className="text-sm text-foreground-muted">Control how you receive notifications and alerts</p>
+      </div>
+
       <SettingsItem label="Push Notifications">
         <p className="text-xs font-semibold sm:text-sm mt-1 flex gap-1 flex-wrap">
           <span>Control how you receive </span> <span>push notifications.</span>

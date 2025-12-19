@@ -75,7 +75,13 @@ export function AccountSettings() {
   const profileImageWatch = form.watch('profileImage')
 
   return (
-    <section className="p-2 space-y-6 min-w-[200px]">
+    <section className="space-y-6">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-foreground mb-2">Account Settings</h1>
+        <p className="text-sm text-foreground-muted">Manage your profile information and account details</p>
+      </div>
+
       {/* Profile Section */}
       <Form {...form}>
         <SettingsItem label="Profile">
@@ -196,9 +202,7 @@ export function AccountSettings() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <dt className="text-sm font-medium text-foreground-muted uppercase tracking-wide">Account Created</dt>
-            <dd className="mt-1 font-semibold">
-              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
-            </dd>
+            <dd className="mt-1">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</dd>
           </div>
 
           {isAdmin && (
