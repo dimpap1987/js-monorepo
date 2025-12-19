@@ -75,34 +75,45 @@ export function AccountSettings() {
   const profileImageWatch = form.watch('profileImage')
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8">
       {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Account Settings</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">Account Settings</h1>
         <p className="text-sm text-foreground-muted">Manage your profile information and account details</p>
       </div>
 
       {/* Profile Section */}
       <Form {...form}>
         <SettingsItem label="Profile">
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr,auto] gap-6 place-items-center sm:place-items-start">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && isEditing && form.formState.isValid && form.formState.isDirty) {
+                e.preventDefault()
+                form.handleSubmit(onSubmit)()
+              }
+            }}
+          >
+            <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start">
               {/* Profile Image */}
-              <div className="relative flex justify-center self-center">
+              <div className="flex-shrink-0">
                 <Controller
                   control={form.control}
                   name="profileImage"
                   render={({ field }) => (
-                    <div className="relative flex justify-center self-center">
-                      <Avatar className="h-24 w-24">
+                    <div className="relative">
+                      <Avatar className="h-28 w-28 ring-2 ring-border ring-offset-2 ring-offset-background">
                         {profileImageWatch && <AvatarImage src={profileImageWatch} alt="user's picture" />}
-                        <AvatarFallback className="bg-background">NA</AvatarFallback>
+                        <AvatarFallback className="bg-background-secondary text-lg font-semibold">
+                          {user?.username?.charAt(0).toUpperCase() || 'NA'}
+                        </AvatarFallback>
                       </Avatar>
 
                       {isEditing && (
                         <label
                           htmlFor="profileImage"
-                          className="absolute bottom-0 right-0 bg-background rounded-full cursor-pointer flex items-center justify-center h-8 w-8 text-sm font-medium border border-border text-foreground"
+                          className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full cursor-pointer flex items-center justify-center h-9 w-9 text-sm font-medium border-2 border-background shadow-lg hover:bg-primary/90 transition-colors"
                         >
                           <input
                             {...form.register('profileImage')}
@@ -130,67 +141,65 @@ export function AccountSettings() {
                 />
               </div>
 
-              {/* Username Field */}
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem className="sm:max-w-[300px] w-full">
-                    <FormLabel className="text-sm font-medium text-foreground-muted mb-2 uppercase tracking-wide">
-                      Username
-                    </FormLabel>
-                    <FormControl>
-                      {isEditing ? (
-                        <Input id="username" className="h-10 w-full" {...field} />
-                      ) : (
-                        <p className="w-full h-10 px-6 py-2 bg-background text-foreground rounded-xl border border-border font-semibold flex items-center shadow-md">
-                          {field.value}
-                        </p>
-                      )}
+              {/* Username Field and Actions */}
+              <div className="flex-1 w-full space-y-4">
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel className="text-sm font-medium text-foreground mb-2">Username</FormLabel>
+                      <FormControl>
+                        {isEditing ? (
+                          <Input id="username" className="h-11" {...field} />
+                        ) : (
+                          <div className="h-11 px-4 py-2 bg-background-secondary text-foreground rounded-lg border border-border font-medium flex items-center shadow-sm">
+                            {field.value || 'Not set'}
+                          </div>
+                        )}
 
-                      <FormErrorDisplay
-                        className="mt-4 sm:min-h-10"
-                        errors={form.formState.errors}
-                        fields={{
-                          username: 'Username',
-                          profileImage: 'Profile Image',
-                        }}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+                        <FormErrorDisplay
+                          className="mt-2"
+                          errors={form.formState.errors}
+                          fields={{
+                            username: 'Username',
+                            profileImage: 'Profile Image',
+                          }}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
 
-              {/* Edit/Save Buttons */}
-              <div className="self-center sm:self-end sm:justify-self-end w-full">
-                {isEditing ? (
-                  <div className="flex gap-3 flex-col-reverse sm:flex-row flex-wrap justify-center sm:flex-nowrap sm:justify-end">
-                    <DpButton onClick={handleCancel} variant="outline" className="flex-1 sm:w-24">
-                      Cancel
-                    </DpButton>
+                {/* Edit/Save Buttons */}
+                <div className="flex gap-3 justify-end">
+                  {isEditing ? (
+                    <>
+                      <DpButton onClick={handleCancel} variant="outline" className="min-w-[100px]">
+                        Cancel
+                      </DpButton>
+                      <DpButton
+                        disabled={!form.formState.isValid || !form.formState.isDirty}
+                        variant="primary"
+                        type="submit"
+                        className="min-w-[100px]"
+                      >
+                        Save Changes
+                      </DpButton>
+                    </>
+                  ) : (
                     <DpButton
-                      disabled={!form.formState.isValid || !form.formState.isDirty}
-                      variant="primary"
-                      type="submit"
-                      className="flex-1 sm:w-24"
-                    >
-                      Save
-                    </DpButton>
-                  </div>
-                ) : (
-                  <div className="flex justify-end flex-col sm:flex-row">
-                    <DpButton
-                      className="flex-1"
                       type="button"
                       onClick={(e) => {
                         e.preventDefault()
                         setIsEditing(true)
                       }}
+                      className="min-w-[120px]"
                     >
                       Edit Profile
                     </DpButton>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </form>
@@ -198,17 +207,40 @@ export function AccountSettings() {
       </Form>
 
       {/* Account Metadata Section */}
-      <SettingsItem label="Account details">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <dt className="text-sm font-medium text-foreground-muted uppercase tracking-wide">Account Created</dt>
-            <dd className="mt-1">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</dd>
+      <SettingsItem label="Account Details">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="space-y-1">
+            <dt className="text-sm font-medium text-foreground-muted mb-1">Account Created</dt>
+            <dd className="text-foreground font-medium">
+              {user?.createdAt
+                ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
+                : 'N/A'}
+            </dd>
           </div>
 
           {isAdmin && (
-            <div>
-              <dt className="text-sm font-medium text-foreground-muted uppercase tracking-wide">Roles</dt>
-              <dd className="mt-1 font-semibold">{user?.roles.join(', ') || 'None'}</dd>
+            <div className="space-y-1">
+              <dt className="text-sm font-medium text-foreground-muted mb-1">Roles</dt>
+              <dd className="text-foreground font-medium">
+                {user?.roles && user.roles.length > 0 ? (
+                  <span className="inline-flex items-center gap-2">
+                    {user.roles.map((role: string) => (
+                      <span
+                        key={role}
+                        className="px-2.5 py-1 bg-primary/10 text-primary rounded-md text-xs font-semibold"
+                      >
+                        {role}
+                      </span>
+                    ))}
+                  </span>
+                ) : (
+                  'None'
+                )}
+              </dd>
             </div>
           )}
         </div>
