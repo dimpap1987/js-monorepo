@@ -45,7 +45,7 @@ const NotificationPermissionComponent = () => {
     <section className="space-y-6">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Notification Settings</h1>
+        <h2 className="mb-2">Notification Settings</h2>
         <p className="text-sm text-foreground-muted">Control how you receive notifications and alerts</p>
       </div>
 

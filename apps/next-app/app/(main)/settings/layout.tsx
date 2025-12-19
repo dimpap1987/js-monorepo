@@ -139,7 +139,9 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
       <div
         className={cn(
           'flex flex-col justify-between p-2 border-r border-border rounded-md',
-          'transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden',
+          // Disable transition on mobile to prevent shrinking animation
+          isMobile ? '' : 'transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+          'overflow-hidden',
           isMobile || isCollapsed ? 'w-16' : 'w-64'
         )}
       >
