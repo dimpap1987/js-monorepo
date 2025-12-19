@@ -97,7 +97,7 @@ jobs:
         uses: nrwl/nx-set-shas@v4
 
       - name: Restore Nx cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .nx/cache
           key: ${{ runner.os }}-nx-${{ hashFiles('**/nx.json', '**/.nx/cache/**') }}
@@ -170,7 +170,7 @@ jobs:
         uses: nrwl/nx-set-shas@v4
 
       - name: Restore Nx cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .nx/cache
           key: ${{ runner.os }}-nx-${{ hashFiles('**/nx.json', '**/.nx/cache/**') }}
@@ -268,7 +268,7 @@ jobs:
         uses: nrwl/nx-set-shas@v4
 
       - name: Restore Nx cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .nx/cache
           key: ${{ runner.os }}-nx-${{ hashFiles('**/nx.json', '**/.nx/cache/**') }}
