@@ -1,7 +1,8 @@
-import { ExtendedRedisClient, REDIS } from '@js-monorepo/nest/redis'
+import { REDIS } from '@js-monorepo/nest/redis'
 import { ForbiddenException, INestApplicationContext, Logger } from '@nestjs/common'
 import { IoAdapter } from '@nestjs/platform-socket.io'
 import { createAdapter } from '@socket.io/redis-adapter'
+import { RedisClientType } from 'redis'
 import { ServerOptions, Socket } from 'socket.io'
 import { UserSocketService } from '../services/user-socket.service'
 
@@ -39,9 +40,9 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   async connectToRedis(): Promise<void> {
-    const redisClient = this.app.get<ExtendedRedisClient>(REDIS)
-    const pubClient = redisClient
-    const subClient = await redisClient.duplicateClient()
+    const pubClient = this.app.get<RedisClientType>(REDIS)
+    const subClient = pubClient.duplicate()
+    await subClient.connect()
 
     this.adapterConstructor = createAdapter(pubClient, subClient)
   }
