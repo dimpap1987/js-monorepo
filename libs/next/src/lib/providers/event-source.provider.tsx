@@ -13,16 +13,16 @@ const EventSourceContext = createContext<EventSourceContextType | undefined>(und
 export const EventSourceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [event, setEvents] = useState<Partial<Record<EventsReponseType, any>>>({})
   const eventSourceRef = useRef<EventSource | null>(null) // Use a ref to store the EventSource instance
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null) // Use a ref to store the reconnect timeout
   const { isLoggedIn } = useSession()
 
   useEffect(() => {
-    let reconnectTimeout: ReturnType<typeof setTimeout> | null = null
-
     const reconnect = () => {
-      if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout)
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+        reconnectTimeoutRef.current = null
       }
-      reconnectTimeout = setTimeout(() => {
+      reconnectTimeoutRef.current = setTimeout(() => {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         connectToEventSource()
       }, 5000) // Reconnect after 5 seconds
@@ -64,8 +64,9 @@ export const EventSourceProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     return () => {
       eventSourceRef.current?.close() // Clean up the EventSource on component unmount or when isLoggedIn changes
-      if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout)
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current)
+        reconnectTimeoutRef.current = null
       }
     }
   }, [isLoggedIn])

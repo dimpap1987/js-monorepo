@@ -142,7 +142,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
       setConnectionState('disconnected')
       setIsConnected(false)
     }
-  }, [shouldConnect])
+  }, [shouldConnect, options.url, options.path])
 
   // Subscribe to an event with automatic cleanup
   const subscribe = useCallback(

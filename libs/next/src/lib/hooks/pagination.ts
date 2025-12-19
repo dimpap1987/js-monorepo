@@ -31,7 +31,7 @@ export function usePaginationWithParams(pageInit = 1, pageSizeInit = 10): UsePag
 
   useEffect(() => {
     updateUrlParams(paginationInner, replace, searchParams)
-  }, [paginationInner])
+  }, [paginationInner, replace, searchParams])
 
   const setPagination = useCallback<Dispatch<SetStateAction<Pageable>>>(
     (newPaginationOrUpdater) => {
