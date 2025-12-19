@@ -24,10 +24,7 @@ export function AnnouncementsComponent({ className }: { className: string }) {
   return (
     <Marquee className={cn(`w-full`, className)} duration={15} onAnimationComplete={() => setAnnouncements([])}>
       {announcements.map((message, index) => (
-        <span
-          className="text-lime-600 dark:text-lime-300 font-semibold tracking-wider font-mono select-none"
-          key={index}
-        >
+        <span className="text-primary font-semibold text-sm tracking-wide select-none whitespace-nowrap" key={index}>
           {message}
         </span>
       ))}
