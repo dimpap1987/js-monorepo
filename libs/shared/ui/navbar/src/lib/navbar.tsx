@@ -36,8 +36,10 @@ function NavUserOptions({
   readonly onLogout?: () => void
   readonly className?: string
 }) {
+  const isLoggedIn = !!user
+
   return (
-    user?.isLoggedIn && (
+    isLoggedIn && (
       <UserOptionsDropdown className={className}>
         <UserMetadata
           profileImage={user.profile?.image}
@@ -72,7 +74,7 @@ export interface DpNextNavbarProps {
   readonly onLogout?: () => void
   readonly onSideBarClick?: () => void
 }
-export type UserNavProps = Partial<SessionUserType> & { isLoggedIn: boolean }
+export type UserNavProps = Partial<SessionUserType>
 
 export type UserNavSocial = {
   type: 'google' | 'github' | 'facebook'
@@ -81,6 +83,8 @@ export type UserNavSocial = {
 
 const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
   ({ children, menuItems = [], user, onLogout, onSideBarClick }, ref) => {
+    const isLoggedIn = !!user
+
     const { logo, navbarItems } = useMemo(() => {
       let logoElement: ReactNode | null = null
       let navbarItemsElement: ReactNode | null = null
@@ -139,7 +143,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                 <>
                   {navbarItems && navbarItems}
 
-                  {!user?.isLoggedIn && (
+                  {!isLoggedIn && (
                     <DpNextNavLink href="/auth/login">
                       <DpLoginButton></DpLoginButton>
                     </DpNextNavLink>

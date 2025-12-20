@@ -14,13 +14,12 @@ const initialPageSize = 25
 
 interface NotificationBellContainerProps {
   userId: number | undefined
-  isLoggedIn: boolean
 }
 
 /**
  * Isolated component that handles all notification logic.
  */
-export function NotificationBellContainer({ userId, isLoggedIn }: NotificationBellContainerProps) {
+export function NotificationBellContainer({ userId }: NotificationBellContainerProps) {
   const { accumulatedNotifications, notifications, handlePaginationChange, handleRead, handleReadAll } =
     useNotificationAccumulation({
       userId,
@@ -37,9 +36,7 @@ export function NotificationBellContainer({ userId, isLoggedIn }: NotificationBe
     [notifications?.page, notifications?.pageSize, notifications?.totalPages]
   )
 
-  if (!isLoggedIn) {
-    return null
-  }
+  if (!userId) return null
 
   return (
     <DpNotificationBellComponentDynamic
