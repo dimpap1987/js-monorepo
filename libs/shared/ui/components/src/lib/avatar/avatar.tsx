@@ -17,7 +17,7 @@ const Avatar = React.forwardRef<
 Avatar.displayName = AvatarPrimitive.Root.displayName
 
 const AvatarImage = React.forwardRef<React.ElementRef<typeof Image>, React.ComponentPropsWithoutRef<typeof Image>>(
-  ({ className, ...props }, ref) => {
+  ({ className, sizes = '40px', ...props }, ref) => {
     const [hasError, setHasError] = React.useState(false)
 
     if (hasError) return null
@@ -25,6 +25,7 @@ const AvatarImage = React.forwardRef<React.ElementRef<typeof Image>, React.Compo
     return (
       <Image
         fill={true}
+        sizes={sizes}
         ref={ref}
         onError={() => setHasError(true)}
         className={cn('aspect-square object-contain', className)}

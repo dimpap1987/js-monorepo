@@ -5,7 +5,7 @@ import { useDeviceType } from '@js-monorepo/next/hooks'
 import { ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
-import { IoIosSettings, IoMdNotifications } from 'react-icons/io'
+import { IoMdNotifications } from 'react-icons/io'
 import { MdAccountCircle, MdChevronLeft, MdPalette } from 'react-icons/md'
 
 interface SettingsNavItem {
@@ -47,11 +47,10 @@ function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
       {/* Header with Collapse Button */}
       <div className="mb-6 hidden sm:block">
         <div className={cn('flex items-center justify-between gap-2 mb-1', isCollapsed && 'justify-center')}>
-          {!isCollapsed && <IoIosSettings className="text-xl text-foreground-muted shrink-0" />}
           <div
             className={cn('overflow-hidden transition-all duration-500 ease-in-out', isCollapsed ? 'hidden' : 'block')}
           >
-            <h2 className="text-lg font-semibold text-foreground whitespace-nowrap">Settings</h2>
+            <h2 className="text-lg ml-4 font-semibold text-foreground whitespace-nowrap">Settings</h2>
           </div>
           <button
             onClick={onToggle}

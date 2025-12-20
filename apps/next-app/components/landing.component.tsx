@@ -2,7 +2,7 @@
 import { DpButton } from '@js-monorepo/button'
 import { useLoader } from '@js-monorepo/loader'
 // import { MapComponent, Marker, Popup } from '@js-monorepo/map'
-import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@js-monorepo/components/card'
 import { Glow, GlowArea } from '@js-monorepo/components/glow'
 import { useNotifications } from '@js-monorepo/notification'
 import { cn } from '@js-monorepo/ui/util'
@@ -12,6 +12,9 @@ import { Badge } from '@js-monorepo/components/badge'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AiFillRocket } from 'react-icons/ai'
 import { SITE_NAME } from '../lib/site-config'
+import { SearchBar } from '@js-monorepo/components/search'
+import { PermissionGate } from '@js-monorepo/components/permission'
+import { FileUpload } from '@js-monorepo/components/file-upload'
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
@@ -21,8 +24,38 @@ export default function LandingComponent({ children, className }: MainProps) {
   const { setLoaderState } = useLoader()
   const { addNotification } = useNotifications()
   const [loading, setLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   // const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)
   // const { user } = useSession()
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (query) {
+      console.log(`Searching for: ${query}`)
+    }
+  }
+
+  const handleFileUpload = async (files: File[], onProgress?: (fileIndex: number, progress: number) => void) => {
+    addNotification({
+      message: `Uploading ${files.length} file(s)...`,
+      type: 'information',
+      duration: 2000,
+    })
+
+    // Simulate upload with progress (for demo purposes only)
+    // In production, this would be your actual upload API call
+    for (let i = 0; i <= 100; i += 10) {
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      // If you have file IDs, you'd call onProgress for each file
+      // For demo, we'll just simulate progress
+    }
+
+    addNotification({
+      message: `Successfully uploaded ${files.length} file(s)!`,
+      type: 'success',
+      duration: 3000,
+    })
+  }
 
   async function loadForTwoSecond() {
     setLoaderState({
@@ -133,24 +166,84 @@ export default function LandingComponent({ children, className }: MainProps) {
         </DpButton>
       </div>
 
-      <GlowArea className="hidden sm:flex py-4 gap-4 justify-center flex-wrap">
-        <Glow className="rounded-xl flex-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Glow area 1</CardTitle>
-              <CardContent>Just a card</CardContent>
-            </CardHeader>
-          </Card>
-        </Glow>
-        <Glow className="rounded-xl flex-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Glow area 2</CardTitle>
-              <CardContent>Just a card</CardContent>
-            </CardHeader>
-          </Card>
-        </Glow>
-      </GlowArea>
+      {/* Component Showcase Section */}
+      <div className="my-12 space-y-8">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold mb-2">Component Showcase</h2>
+          <p className="text-muted-foreground">Explore our reusable components</p>
+        </div>
+
+        {/* SearchBar Component */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Search Bar</CardTitle>
+            <CardDescription>Debounced search with suggestions and recent searches</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <SearchBar
+              placeholder="Search users, posts, products..."
+              onSearch={handleSearch}
+              suggestions={['React', 'Next.js', 'TypeScript', 'Tailwind CSS']}
+              recentSearches={['JavaScript', 'Node.js']}
+              debounceMs={500}
+            />
+            {searchQuery && (
+              <p className="text-sm text-muted-foreground">
+                Current search: <span className="font-medium">{searchQuery}</span>
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Permission Gate Component */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Permission Gate</CardTitle>
+            <CardDescription>Conditionally render content based on user permissions</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <PermissionGate
+              permission="ADMIN"
+              fallback={
+                <div className="p-4 border border-border rounded-lg bg-muted/50">
+                  <p className="text-sm text-muted-foreground">You don&apos;t have permission to see this content</p>
+                </div>
+              }
+            >
+              <div className="p-4 border border-primary/20 rounded-lg bg-primary/5">
+                <p className="text-sm font-medium">Admin Content</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  This content is only visible to users with admin permissions
+                </p>
+              </div>
+            </PermissionGate>
+            <div className="p-4 border border-border rounded-lg bg-muted/50">
+              <p className="text-sm text-muted-foreground">Public content is always visible</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* File Upload Component */}
+        <Card>
+          <CardHeader>
+            <CardTitle>File Upload</CardTitle>
+            <CardDescription>Drag & drop file upload with progress tracking</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <FileUpload
+              onUpload={handleFileUpload}
+              accept={{
+                'image/*': ['.png', '.jpg', '.jpeg', '.gif'],
+                'application/pdf': ['.pdf'],
+              }}
+              maxSize={5 * 1024 * 1024} // 5MB
+              multiple
+              maxFiles={3}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
       {/* {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
         <div className="mt-2">
           <DonationDialogComponent
