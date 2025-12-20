@@ -84,7 +84,7 @@ const DpNextSidebarBase = ({
     <AnimatePresence mode="wait" initial={false}>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 z-[30] text-gray-300"
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 text-gray-300"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
