@@ -49,10 +49,7 @@ function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
         <div className={cn('flex items-center justify-between gap-2 mb-1', isCollapsed && 'justify-center')}>
           {!isCollapsed && <IoIosSettings className="text-xl text-foreground-muted shrink-0" />}
           <div
-            className={cn(
-              'overflow-hidden transition-all duration-500 ease-in-out',
-              isCollapsed ? 'hidden' : 'block'
-            )}
+            className={cn('overflow-hidden transition-all duration-500 ease-in-out', isCollapsed ? 'hidden' : 'block')}
           >
             <h2 className="text-lg font-semibold text-foreground whitespace-nowrap">Settings</h2>
           </div>
@@ -69,10 +66,7 @@ function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <MdChevronLeft
-              className={cn(
-                'text-xl transition-transform duration-500 ease-in-out',
-                isCollapsed && 'rotate-180'
-              )}
+              className={cn('text-xl transition-transform duration-500 ease-in-out', isCollapsed && 'rotate-180')}
             />
           </button>
         </div>
