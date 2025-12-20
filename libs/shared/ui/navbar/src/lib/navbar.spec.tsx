@@ -175,7 +175,6 @@ describe('DpNextNavbar', () => {
 
     it('should render items matching user roles', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
         roles: ['USER'],
       }
@@ -187,7 +186,6 @@ describe('DpNextNavbar', () => {
 
     it('should render ADMIN items when user has ADMIN role', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'admin',
         roles: ['ADMIN'],
       }
@@ -226,17 +224,13 @@ describe('DpNextNavbar', () => {
 
   describe('User authentication state', () => {
     it('should show login button when user is not logged in', () => {
-      const user: UserNavProps = {
-        isLoggedIn: false,
-      }
-      render(<DpNextNavbar {...defaultProps} user={user} />)
+      render(<DpNextNavbar {...defaultProps} />)
       expect(screen.getByTestId('login-button')).toBeInTheDocument()
       expect(screen.queryByTestId('logout-button')).not.toBeInTheDocument()
     })
 
     it('should show user options when user is logged in', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
         roles: ['USER'],
       }
@@ -247,18 +241,7 @@ describe('DpNextNavbar', () => {
 
     it('should show login button when user prop is not provided (defaults to not logged in)', () => {
       render(<DpNextNavbar {...defaultProps} />)
-      // When user is undefined, !user?.isLoggedIn evaluates to true, so login button shows
-      expect(screen.getByTestId('login-button')).toBeInTheDocument()
-      expect(screen.queryByTestId('user-options-dropdown')).not.toBeInTheDocument()
-    })
-
-    it('should not show user options when user exists but isLoggedIn is false', () => {
-      const user: UserNavProps = {
-        isLoggedIn: false,
-        username: 'testuser',
-        roles: ['USER'],
-      }
-      render(<DpNextNavbar {...defaultProps} user={user} />)
+      // When user is undefined, user is not logged in, so login button shows
       expect(screen.getByTestId('login-button')).toBeInTheDocument()
       expect(screen.queryByTestId('user-options-dropdown')).not.toBeInTheDocument()
     })
@@ -267,7 +250,6 @@ describe('DpNextNavbar', () => {
   describe('User options dropdown', () => {
     it('should render UserMetadata in dropdown when user is logged in', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
         profile: { image: 'https://example.com/avatar.jpg' },
         createdAt: new Date('2024-01-01'),
@@ -279,7 +261,6 @@ describe('DpNextNavbar', () => {
 
     it('should render settings link in dropdown', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
       }
       render(<DpNextNavbar {...defaultProps} user={user} />)
@@ -289,7 +270,6 @@ describe('DpNextNavbar', () => {
 
     it('should render logout button in dropdown', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
       }
       render(<DpNextNavbar {...defaultProps} user={user} onLogout={mockOnLogout} />)
@@ -300,7 +280,6 @@ describe('DpNextNavbar', () => {
     it('should call onLogout when logout button is clicked', async () => {
       const user = userEvent.setup()
       const userData: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
       }
       render(<DpNextNavbar {...defaultProps} user={userData} onLogout={mockOnLogout} />)
@@ -363,7 +342,6 @@ describe('DpNextNavbar', () => {
 
     it('should hide user options section on small screens (hidden sm:flex)', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
       }
       const { container } = render(<DpNextNavbar {...defaultProps} user={user} />)
@@ -380,7 +358,6 @@ describe('DpNextNavbar', () => {
 
     it('should handle user with empty roles array', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
         roles: [],
       }
@@ -392,7 +369,6 @@ describe('DpNextNavbar', () => {
 
     it('should handle user with partial data', () => {
       const user: UserNavProps = {
-        isLoggedIn: true,
         username: 'testuser',
         // No roles, profile, or createdAt
       }

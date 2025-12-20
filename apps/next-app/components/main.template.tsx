@@ -51,10 +51,11 @@ const cookieCategories: CookieCategory[] = [
 ]
 
 export default function MainTemplate({ children }: Readonly<PropsWithChildren>) {
-  const { session, isLoggedIn, isAdmin, refreshSession } = useSession()
+  const { session, isAdmin, refreshSession } = useSession()
   const [openSideBar, setOpenSideBar] = useState(false)
   const router = useRouter()
   const user = session?.user
+  const isLoggedIn = !!user
 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
   useOfflineIndicator()
@@ -89,10 +90,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   return (
     <>
       <DpNextNavbar
-        user={{
-          isLoggedIn,
-          ...user,
-        }}
+        user={user}
         menuItems={menuItems}
         onSideBarClick={() => setOpenSideBar(true)}
         onLogout={() => authClient.logout()}
@@ -100,9 +98,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
         <DpLogo onClick={() => router.push('/')}>
           <SVGLogo></SVGLogo>
         </DpLogo>
-        <NavbarItems>
-          <NotificationBellContainer userId={user?.id} isLoggedIn={isLoggedIn} />
-        </NavbarItems>
+        <NavbarItems>{user && <NotificationBellContainer userId={user.id} />}</NavbarItems>
       </DpNextNavbar>
 
       <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20"></AnnouncementsComponent>
@@ -113,7 +109,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
 
       <main className="mt-6">{children}</main>
 
-      <MobileNavbarWithNotifications userId={user?.id} isLoggedIn={isLoggedIn} isSidebarOpen={openSideBar} />
+      {user && <MobileNavbarWithNotifications userId={user.id} isSidebarOpen={openSideBar} />}
 
       <CookieBanner optionalCategories={cookieCategories} />
     </>
