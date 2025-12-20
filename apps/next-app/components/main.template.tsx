@@ -2,6 +2,7 @@
 import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
+import { CookieBanner, COOKIE_CATEGORY_IDS, type CookieCategory } from '@js-monorepo/components/cookie-banner'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
@@ -37,6 +38,15 @@ const menuItems: MenuItem[] = [
     name: 'Dashboard',
     roles: ['ADMIN'],
     Icon: RiAdminFill,
+  },
+]
+
+const cookieCategories: CookieCategory[] = [
+  {
+    id: COOKIE_CATEGORY_IDS.METRICS,
+    name: 'Metrics & Analytics',
+    description:
+      'Help us understand how visitors interact with our website by collecting and reporting information anonymously.',
   },
 ]
 
@@ -104,6 +114,8 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
       <main className="mt-6">{children}</main>
 
       <MobileNavbarWithNotifications userId={user?.id} isLoggedIn={isLoggedIn} isSidebarOpen={openSideBar} />
+
+      <CookieBanner optionalCategories={cookieCategories} />
     </>
   )
 }
