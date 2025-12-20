@@ -50,7 +50,7 @@ function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
           {!isCollapsed && <IoIosSettings className="text-xl text-foreground-muted shrink-0" />}
           <div
             className={cn(
-              'overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]',
+              'overflow-hidden transition-all duration-500 ease-in-out',
               isCollapsed ? 'hidden' : 'block'
             )}
           >
@@ -70,7 +70,7 @@ function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
           >
             <MdChevronLeft
               className={cn(
-                'text-xl transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]',
+                'text-xl transition-transform duration-500 ease-in-out',
                 isCollapsed && 'rotate-180'
               )}
             />
@@ -140,7 +140,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         className={cn(
           'flex flex-col justify-between p-2 border-r border-border rounded-md',
           // Disable transition on mobile to prevent shrinking animation
-          isMobile ? '' : 'transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+          isMobile ? '' : 'transition-[width] duration-300 ease-in-out',
           'overflow-hidden',
           isMobile || isCollapsed ? 'w-16' : 'w-64'
         )}

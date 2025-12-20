@@ -95,7 +95,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
         </NavbarItems>
       </DpNextNavbar>
 
-      <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-50"></AnnouncementsComponent>
+      <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20"></AnnouncementsComponent>
 
       <DpNextSidebar isOpen={openSideBar} onClose={handleSidebarClose} position="right" items={menuItems} user={user}>
         {sidebarChildren}
