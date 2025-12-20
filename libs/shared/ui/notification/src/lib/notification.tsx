@@ -38,7 +38,7 @@ export function NotificationItem({
   const { id: divId, ...divProps } = rest as HTMLAttributes<HTMLDivElement>
   return (
     <div
-      className={cn('flex relative self-end w-max max-w-96 z-[55 pointer-events-auto', styles.notificationContainer)}
+      className={cn('flex relative self-end w-max max-w-96 pointer-events-auto', styles.notificationContainer)}
       {...divProps}
     >
       <div className="w-full py-3 px-5 text-sm bg-card border border-border shadow-lg grid grid-cols-[max-content_1fr_max-content] items-center gap-2">
