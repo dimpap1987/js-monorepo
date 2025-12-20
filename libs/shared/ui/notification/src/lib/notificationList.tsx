@@ -60,7 +60,7 @@ export default function DpNotificationList({ notifications, className, onRemove,
         ...style,
       }}
       className={cn(
-        `fixed right-2 p-2 z-[55] flex flex-col-reverse gap-2 w-0 pointer-events-none transition-[top] duration-300 ease-in-out`,
+        `fixed right-2 p-2 z-[30] flex flex-col-reverse gap-2 w-0 pointer-events-none transition-[top] duration-300 ease-in-out`,
         className
       )}
     >
