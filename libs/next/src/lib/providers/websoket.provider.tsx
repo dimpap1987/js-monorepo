@@ -19,8 +19,6 @@ export type WebSocketEventMap = BaseWebSocketEventMap & {
   [key: string]: any
 }
 
-type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error'
-
 type EventSubscription = {
   event: string
   handler: (...args: any[]) => void
@@ -30,10 +28,8 @@ type EventSubscription = {
 type WebSocketContextValue<TEventMap extends WebSocketEventMap = WebSocketEventMap> = {
   socket: Socket | null
   isConnected: boolean
-  connectionState: ConnectionState
   subscribe: <K extends keyof TEventMap & string>(event: K, handler: (data: TEventMap[K]) => void) => () => void
   emit: <T = any>(event: string, data?: T) => void
-  getConnectionState: () => ConnectionState
 }
 
 const WebSocketContext = createContext<WebSocketContextValue<any> | undefined>(undefined)
@@ -48,13 +44,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
   const socketRef = useRef<Socket | null>(null)
   const subscriptionsRef = useRef<EventSubscription[]>([])
   const [isConnected, setIsConnected] = useState(false)
-  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected')
   const optionsRef = useRef(options)
+  const shouldConnectRef = useRef(shouldConnect)
 
-  // Update options ref when they change
   useEffect(() => {
     optionsRef.current = options
-  }, [options])
+    shouldConnectRef.current = shouldConnect
+  }, [options, shouldConnect])
 
   // Connection management
   useEffect(() => {
@@ -64,7 +60,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
         socketRef.current.disconnect()
         socketRef.current = null
       }
-      setConnectionState('disconnected')
       setIsConnected(false)
       return
     }
@@ -77,7 +72,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
     }
 
     // Create new socket connection
-    setConnectionState('connecting')
 
     try {
       const socket = io(optionsRef.current.url, {
@@ -85,9 +79,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
         secure: true,
         withCredentials: true,
         reconnection: true,
-        reconnectionDelay: 5000,
+        reconnectionDelay: 1000, // Start with 1 second delay
+        reconnectionDelayMax: 5000, // Max 5 seconds between attempts
+        randomizationFactor: 0.5, // Add randomness to prevent thundering herd
+        reconnectionAttempts: Infinity, // Keep trying indefinitely
+        timeout: 20000, // Connection timeout (20 seconds)
         forceNew: true,
-        reconnectionAttempts: 60,
         transports: ['websocket'],
       })
 
@@ -96,7 +93,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
       // Setup connection event handlers
       socket.on('connect', () => {
         console.log(`WebSocket connected to: ${optionsRef.current.url}`)
-        setConnectionState('connected')
         setIsConnected(true)
 
         // Re-register all subscriptions on reconnect
@@ -111,22 +107,31 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
         console.log(`WebSocket disconnected: ${reason}`)
         setIsConnected(false)
 
-        if (reason === 'io server disconnect') {
-          // Server disconnected, client will reconnect
-          setConnectionState('reconnecting')
-        } else {
-          setConnectionState('disconnected')
+        if (reason === 'io server disconnect' && shouldConnectRef.current) {
+          setTimeout(() => {
+            if (socketRef.current && !socketRef.current.connected && shouldConnectRef.current) {
+              socketRef.current.connect()
+            }
+          }, 5000)
         }
+      })
+
+      socket.on('reconnect', (attemptNumber) => {
+        console.log(`WebSocket reconnected after ${attemptNumber} attempts`)
+        setIsConnected(true)
       })
 
       socket.on('connect_error', (error) => {
         console.error('WebSocket connection error:', error)
-        setConnectionState('error')
+        setIsConnected(false)
+      })
+
+      socket.on('reconnect_failed', () => {
+        console.error('WebSocket reconnection failed after all attempts')
         setIsConnected(false)
       })
     } catch (error) {
       console.error('Error creating WebSocket connection', error)
-      setConnectionState('error')
       setIsConnected(false)
     }
 
@@ -139,7 +144,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
         socketRef.current = null
       }
       subscriptionsRef.current = []
-      setConnectionState('disconnected')
       setIsConnected(false)
     }
   }, [shouldConnect, options.url, options.path])
@@ -188,17 +192,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
     socketRef.current.emit(event, data)
   }, [])
 
-  const getConnectionState = useCallback((): ConnectionState => {
-    return connectionState
-  }, [connectionState])
-
   const value: WebSocketContextValue<any> = {
     socket: socketRef.current,
     isConnected,
-    connectionState,
     subscribe,
     emit,
-    getConnectionState,
   }
 
   return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>
@@ -252,10 +250,9 @@ export const useWebSocketEvent = <
  */
 export const useWebSocketStatus = (): {
   isConnected: boolean
-  connectionState: ConnectionState
 } => {
-  const { isConnected, connectionState } = useWebSocketEnhanced()
-  return { isConnected, connectionState }
+  const { isConnected } = useWebSocketEnhanced()
+  return { isConnected }
 }
 
 /**
@@ -265,6 +262,3 @@ export const useWebSocketEmit = () => {
   const { emit } = useWebSocketEnhanced()
   return emit
 }
-
-// Export ConnectionState for client use
-export type { ConnectionState }
