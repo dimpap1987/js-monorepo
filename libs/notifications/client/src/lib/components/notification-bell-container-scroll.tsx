@@ -1,116 +1,90 @@
 'use client'
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@js-monorepo/components/dropdown'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@js-monorepo/components/dropdown'
 import { ScrollArea } from '@js-monorepo/components/scroll'
-import { Pageable, UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import { debounce } from 'lodash'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { usePagination } from '../hooks'
+import { useNotificationCursor } from '../hooks/use-notification-cursor'
 import { NotificationBellButton } from './bell/notification-bell-trigger'
 import { NotificationReadAllButton } from './bell/notification-read-all'
 import { NotificationList } from './bell/notification-list'
 import { updateNotificationAsRead } from '../utils/notifications'
+import { DpLoadingSpinner } from '@js-monorepo/loader'
+import { NotificationEmptyState } from './notification-empty-state'
 
-interface DpNotificationBellComponentProps {
-  notificationList: UserNotificationType[]
-  unreadNotificationCount: number
-  latestReadNotificationId?: number
-  pageable: Pageable & { totalPages: number }
+interface NotificationBellContainerScrollProps {
+  userId: number | undefined
+  initialLimit?: number
   className?: string
-  onRead?: (notificationId: number) => Promise<any>
-  onReadAll?: () => Promise<boolean>
-  onPaginationChange: (pagination: Pageable) => Promise<void>
   resetOnClose?: boolean
 }
 
 const SCROLL_THRESHOLD = 10 // pixels from bottom to trigger load more
 const DEBOUNCE_DELAY = 150 // milliseconds
 
-export function DpNotificationBellComponent({
-  notificationList,
-  unreadNotificationCount,
-  latestReadNotificationId,
-  pageable,
+export function NotificationBellContainerScroll({
+  userId,
+  initialLimit = 15,
   className,
-  onRead,
-  onReadAll,
-  onPaginationChange,
-  resetOnClose = false,
-}: DpNotificationBellComponentProps) {
-  // Use notificationList directly from parent - parent now handles accumulation
-  const [notifications, setNotifications] = useState<UserNotificationType[]>(() =>
-    [...notificationList].sort((a, b) => b.notification.id - a.notification.id)
+  resetOnClose = true,
+}: NotificationBellContainerScrollProps) {
+  const { accumulatedNotifications, notifications, loadMore, hasMore, isLoading, handleRead, handleReadAll } =
+    useNotificationCursor({
+      userId,
+      initialLimit,
+    })
+
+  const [localNotifications, setLocalNotifications] = useState<UserNotificationType[]>(() =>
+    [...accumulatedNotifications].sort((a, b) => b.notification.id - a.notification.id)
   )
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const notificationContainerRef = useRef<HTMLDivElement>(null)
   const debouncedScrollHandlerRef = useRef<ReturnType<typeof debounce> | null>(null)
-  const initialNotificationsRef = useRef<UserNotificationType[]>(notificationList)
+  const initialNotificationsRef = useRef<UserNotificationType[]>(accumulatedNotifications)
 
-  const { isLoading, loadMore, setPaginator } = usePagination({
-    page: pageable.page,
-    pageSize: pageable.pageSize,
-    totalPages: pageable.totalPages,
-    onPaginationChange,
-  })
-
-  // Update initial notifications ref when notificationList changes (for resetOnClose)
+  // Update initial notifications ref when accumulatedNotifications changes (for resetOnClose)
   useEffect(() => {
-    if (notificationList.length > 0) {
-      initialNotificationsRef.current = [...notificationList]
+    if (accumulatedNotifications.length > 0) {
+      initialNotificationsRef.current = [...accumulatedNotifications]
     }
-  }, [notificationList])
+  }, [accumulatedNotifications])
 
-  // Sync notifications with parent's notificationList
-  // Parent now handles accumulation, so we just sync here
+  // Sync local notifications with accumulatedNotifications
   useEffect(() => {
-    setNotifications([...notificationList].sort((a, b) => b.notification.id - a.notification.id))
-  }, [notificationList])
-
-  // Update notification read status when latestReadNotificationId changes
-  useEffect(() => {
-    if (latestReadNotificationId) {
-      setNotifications((prev) => updateNotificationAsRead(prev, latestReadNotificationId))
-    }
-  }, [latestReadNotificationId])
+    setLocalNotifications([...accumulatedNotifications].sort((a, b) => b.notification.id - a.notification.id))
+  }, [accumulatedNotifications])
 
   // Mark all as read when unread count reaches zero
   useEffect(() => {
-    if (unreadNotificationCount === 0) {
-      setNotifications((prev) => prev.map((content) => ({ ...content, isRead: true })))
+    if (notifications?.unReadTotal === 0) {
+      setLocalNotifications((prev) => prev.map((content) => ({ ...content, isRead: true })))
     }
-  }, [unreadNotificationCount])
+  }, [notifications?.unReadTotal])
 
   // Handle individual notification read
-  const handleRead = useCallback(
+  const handleReadLocal = useCallback(
     async (id: number) => {
       try {
-        await onRead?.(id)
-        setNotifications((prev) => updateNotificationAsRead(prev, id))
+        await handleRead(id)
+        setLocalNotifications((prev) => updateNotificationAsRead(prev, id))
       } catch (error) {
         console.error('Failed to mark notification as read:', error)
       }
     },
-    [onRead]
+    [handleRead]
   )
 
   // Handle read all notifications
-  const handleReadAll = useCallback(async () => {
+  const handleReadAllLocal = useCallback(async () => {
     try {
-      const success = await onReadAll?.()
-      if (success) {
-        setNotifications((prev) => prev.map((content) => ({ ...content, isRead: true })))
-      }
+      await handleReadAll()
+      setLocalNotifications((prev) => prev.map((content) => ({ ...content, isRead: true })))
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error)
     }
-  }, [onReadAll])
+  }, [handleReadAll])
 
   // Create debounced scroll handler with proper cleanup
   useEffect(() => {
@@ -132,8 +106,11 @@ export function DpNotificationBellComponent({
       const distanceFromBottom = scrollHeight - (scrollTop + clientHeight)
 
       // Trigger load more when near bottom and not already loading
-      if (distanceFromBottom <= SCROLL_THRESHOLD && !isLoading) {
-        loadMore()
+      if (distanceFromBottom <= SCROLL_THRESHOLD && !isLoading && hasMore) {
+        const lastNotification = accumulatedNotifications[accumulatedNotifications.length - 1]
+        if (lastNotification) {
+          loadMore(lastNotification.notification.id)
+        }
       }
     }, DEBOUNCE_DELAY)
 
@@ -145,7 +122,7 @@ export function DpNotificationBellComponent({
     return () => {
       debouncedScrollHandlerRef.current?.cancel()
     }
-  }, [loadMore, isLoading, isDropdownOpen])
+  }, [loadMore, isLoading, hasMore, isDropdownOpen, accumulatedNotifications])
 
   // Handle dropdown open/close with proper event listener management
   const handleOpenChange = useCallback(
@@ -175,16 +152,16 @@ export function DpNotificationBellComponent({
             container.removeEventListener('scroll', debouncedScrollHandlerRef.current)
           }
 
-          // Reset pagination if needed
+          // Reset to initial notifications if needed
           if (resetOnClose) {
-            setPaginator(1, pageable.pageSize)
-            // Reset to initial notifications (parent will handle re-fetching if needed)
-            setNotifications([...initialNotificationsRef.current].sort((a, b) => b.notification.id - a.notification.id))
+            setLocalNotifications(
+              [...initialNotificationsRef.current].sort((a, b) => b.notification.id - a.notification.id)
+            )
           }
         }
       })
     },
-    [resetOnClose, setPaginator, pageable.pageSize]
+    [resetOnClose]
   )
 
   // Cleanup event listeners on unmount
@@ -205,10 +182,9 @@ export function DpNotificationBellComponent({
   }, [])
 
   // Memoize scroll area height calculation
-  const scrollAreaHeight = useMemo(
-    () => (pageable?.totalPages > 1 ? 'h-[33rem] max-h-[33rem]' : 'max-h-[33rem]'),
-    [pageable?.totalPages]
-  )
+  const scrollAreaHeight = useMemo(() => 'h-[37.5rem] max-h-[37.5rem]', [])
+
+  if (!userId) return null
 
   return (
     <>
@@ -222,7 +198,7 @@ export function DpNotificationBellComponent({
 
       <DropdownMenu onOpenChange={handleOpenChange}>
         <DropdownMenuTrigger asChild>
-          <NotificationBellButton unreadNotificationCount={unreadNotificationCount} />
+          <NotificationBellButton unreadNotificationCount={notifications?.unReadTotal ?? 0} />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           className={cn(
@@ -236,19 +212,30 @@ export function DpNotificationBellComponent({
           <div className="sticky top-0 z-10 bg-background-secondary/95 backdrop-blur-sm border-b border-border-glass px-4 py-3.5">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-semibold text-foreground tracking-tight">Notifications</h3>
-              {unreadNotificationCount > 0 && (
+              {(notifications?.unReadTotal ?? 0) > 0 && (
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                    {unreadNotificationCount} {unreadNotificationCount === 1 ? 'unread' : 'unreads'}
+                    {notifications?.unReadTotal} {(notifications?.unReadTotal ?? 0) === 1 ? 'unread' : 'unreads'}
                   </span>
-                  <NotificationReadAllButton onReadAll={handleReadAll} />
+                  <NotificationReadAllButton onReadAll={handleReadAllLocal} />
                 </div>
               )}
             </div>
           </div>
           <ScrollArea className={cn('rounded-md', scrollAreaHeight)} viewPortRef={notificationContainerRef}>
             <div className="py-1">
-              <NotificationList notifications={notifications} onRead={handleRead} showLoader={isLoading} />
+              {localNotifications.length === 0 ? (
+                <NotificationEmptyState title="No notifications yet" message="You're all caught up!" />
+              ) : (
+                <>
+                  <NotificationList notifications={localNotifications} onRead={handleReadLocal} showLoader={false} />
+                  {isLoading && hasMore && (
+                    <div className="flex items-center justify-center py-4">
+                      <DpLoadingSpinner message="Loading more..." className="text-sm text-foreground-neutral" />
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </ScrollArea>
         </DropdownMenuContent>
