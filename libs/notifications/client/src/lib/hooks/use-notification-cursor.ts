@@ -1,13 +1,13 @@
 'use client'
 
 import {
-  useNotificationWebSocket,
   useUserNotificationsByCursor,
   useReadNotification,
   useReadAllNotifications,
-} from '@js-monorepo/notifications-ui'
+} from '../queries/notifications-queries'
+import { useNotificationWebSocket } from './index'
 import { UserNotificationType } from '@js-monorepo/types'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, startTransition } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@js-monorepo/utils/http/queries'
 import { apiClient } from '@js-monorepo/utils/http'
@@ -137,39 +137,41 @@ export function useNotificationCursor({
         return
       }
 
-      queryClient.setQueriesData(
-        { queryKey: ['notifications', 'user', userId] },
-        (oldData: typeof notifications | undefined) => {
-          if (!oldData) {
+      startTransition(() => {
+        queryClient.setQueriesData(
+          { queryKey: ['notifications', 'user', userId] },
+          (oldData: typeof notifications | undefined) => {
+            if (!oldData) {
+              return {
+                content: [notification],
+                nextCursor: null,
+                hasMore: false,
+                limit: initialLimit,
+                unReadTotal: notification.isRead ? 0 : 1,
+              }
+            }
+
+            const existsInContent = oldData.content?.some(
+              (n: UserNotificationType) => n.notification.id === notification.notification.id
+            )
+
+            if (existsInContent) {
+              return oldData
+            }
+
             return {
-              content: [notification],
-              nextCursor: null,
-              hasMore: false,
-              limit: initialLimit,
-              unReadTotal: notification.isRead ? 0 : 1,
+              ...oldData,
+              content: [notification, ...(oldData.content || [])],
+              unReadTotal: notification.isRead ? oldData.unReadTotal : (oldData.unReadTotal ?? 0) + 1,
             }
           }
+        )
 
-          const existsInContent = oldData.content?.some(
-            (n: UserNotificationType) => n.notification.id === notification.notification.id
-          )
-
-          if (existsInContent) {
-            return oldData
-          }
-
-          return {
-            ...oldData,
-            content: [notification, ...(oldData.content || [])],
-            unReadTotal: notification.isRead ? oldData.unReadTotal : (oldData.unReadTotal ?? 0) + 1,
-          }
-        }
-      )
-
-      accumulatedNotificationsRef.current = [notification, ...accumulatedNotificationsRef.current].sort(
-        (a, b) => b.notification.id - a.notification.id
-      )
-      setAccumulatedNotifications([...accumulatedNotificationsRef.current])
+        accumulatedNotificationsRef.current = [notification, ...accumulatedNotificationsRef.current].sort(
+          (a, b) => b.notification.id - a.notification.id
+        )
+        setAccumulatedNotifications([...accumulatedNotificationsRef.current])
+      })
     },
     [userId, queryClient, initialLimit]
   )
