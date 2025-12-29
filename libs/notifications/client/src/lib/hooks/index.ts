@@ -18,5 +18,3 @@ export function useNotificationWebSocket(onReceive: (notification: UserNotificat
     }
   })
 }
-
-export * from './use-notification-cursor'

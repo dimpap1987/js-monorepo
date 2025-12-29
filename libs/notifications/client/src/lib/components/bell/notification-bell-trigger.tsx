@@ -5,14 +5,15 @@ import { forwardRef } from 'react'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdNotificationsActive } from 'react-icons/md'
 import './bell.css'
+import { useNotificationContext } from '../../context/notification-context'
 
 export const NotificationBellButton = forwardRef<
   HTMLButtonElement,
   {
-    unreadNotificationCount: number
     className?: string
   }
->(({ unreadNotificationCount = 0, className, ...props }, forwardedRef) => {
+>(({ className, ...props }, forwardedRef) => {
+  const { unreadCount: unreadNotificationCount } = useNotificationContext()
   const isRinging = unreadNotificationCount > 0
   const badgeCount = unreadNotificationCount > 99 ? '99+' : unreadNotificationCount
 

@@ -211,7 +211,7 @@ export function FileUpload({
   const getStatusIcon = (status: FileUploadFile['status']) => {
     switch (status) {
       case 'success':
-        return <CheckCircle2 size={16} className="text-green-600 dark:text-green-400" />
+        return <CheckCircle2 size={16} className="text-status-success" />
       case 'error':
         return <AlertCircle size={16} className="text-destructive" />
       default:
@@ -227,9 +227,7 @@ export function FileUpload({
         onDrop={handleDrop}
         className={cn(
           'p-8 border-2 border-dashed rounded-lg cursor-pointer transition-colors',
-          isDragActive && !disabled
-            ? 'border-primary bg-primary/5 dark:bg-primary/10'
-            : 'border-border hover:border-primary/50',
+          isDragActive && !disabled ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50',
           disabled && 'opacity-50 cursor-not-allowed'
         )}
         onClick={() => !disabled && fileInputRef.current?.click()}

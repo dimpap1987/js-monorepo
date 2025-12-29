@@ -4,13 +4,13 @@ import { memo } from 'react'
 import { NotificationEmptyState } from '../notification-empty-state'
 import { NotificationDropdownItem } from './notification-dropdown-item'
 
-interface NotificationListProps {
+interface NotificationDropdownListProps {
   notifications: UserNotificationType[]
   onRead: (id: number) => void
   showLoader: boolean
 }
 
-function Notifications({ notifications, onRead, showLoader }: NotificationListProps) {
+function Notifications({ notifications, onRead, showLoader }: NotificationDropdownListProps) {
   if (notifications?.length === 0) {
     return <NotificationEmptyState />
   }
@@ -20,7 +20,6 @@ function Notifications({ notifications, onRead, showLoader }: NotificationListPr
       {notifications.map((content, index) => (
         <div key={content.notification.id}>
           <NotificationDropdownItem content={content} onRead={onRead} />
-          {/* Show loader at the end of the list */}
           {index === notifications.length - 1 && showLoader && (
             <div className="flex items-center justify-center py-4">
               <DpLoadingSpinner message="Loading more..." className="text-sm text-foreground-neutral" />
@@ -32,4 +31,4 @@ function Notifications({ notifications, onRead, showLoader }: NotificationListPr
   )
 }
 
-export const NotificationList = memo(Notifications)
+export const NotificationDropdownList = memo(Notifications)
