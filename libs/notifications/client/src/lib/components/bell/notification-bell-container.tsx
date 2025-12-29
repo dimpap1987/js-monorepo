@@ -2,17 +2,17 @@
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@js-monorepo/components/dropdown'
 import { ScrollArea } from '@js-monorepo/components/scroll'
+import { DpLoadingSpinner } from '@js-monorepo/loader'
 import { UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import { debounce } from 'lodash'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNotificationCursor } from '../hooks/use-notification-cursor'
-import { NotificationBellButton } from './bell/notification-bell-trigger'
-import { NotificationReadAllButton } from './bell/notification-read-all'
-import { NotificationList } from './bell/notification-list'
-import { updateNotificationAsRead } from '../utils/notifications'
-import { DpLoadingSpinner } from '@js-monorepo/loader'
-import { NotificationEmptyState } from './notification-empty-state'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useNotificationCursor } from '../../hooks/use-notification-cursor'
+import { updateNotificationAsRead } from '../../utils/notifications'
+import { NotificationEmptyState } from '../notification-empty-state'
+import { NotificationBellButton } from './notification-bell-trigger'
+import { NotificationList } from './notification-list'
+import { NotificationReadAllButton } from './notification-read-all'
 
 interface NotificationBellContainerScrollProps {
   userId: number | undefined
@@ -23,6 +23,7 @@ interface NotificationBellContainerScrollProps {
 
 const SCROLL_THRESHOLD = 10 // pixels from bottom to trigger load more
 const DEBOUNCE_DELAY = 150 // milliseconds
+const LOAD_MORE_DELAY = 500 // delay before subsequent load more requests
 
 export function NotificationBellContainerScroll({
   userId,
@@ -30,38 +31,43 @@ export function NotificationBellContainerScroll({
   className,
   resetOnClose = true,
 }: NotificationBellContainerScrollProps) {
-  const { accumulatedNotifications, notifications, loadMore, hasMore, isLoading, handleRead, handleReadAll } =
-    useNotificationCursor({
+  const { notifications, unReadTotal, loadMore, hasMore, isLoading, handleRead, handleReadAll } = useNotificationCursor(
+    {
       userId,
       initialLimit,
-    })
+    }
+  )
 
   const [localNotifications, setLocalNotifications] = useState<UserNotificationType[]>(() =>
-    [...accumulatedNotifications].sort((a, b) => b.notification.id - a.notification.id)
+    [...notifications].sort((a, b) => b.notification.id - a.notification.id)
   )
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const notificationContainerRef = useRef<HTMLDivElement>(null)
   const debouncedScrollHandlerRef = useRef<ReturnType<typeof debounce> | null>(null)
-  const initialNotificationsRef = useRef<UserNotificationType[]>(accumulatedNotifications)
+  const initialNotificationsRef = useRef<UserNotificationType[]>(notifications)
+  const isFirstLoadMoreRef = useRef(true)
+  const isLoadingMoreRef = useRef(false)
+  const loadMoreTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Update initial notifications ref when accumulatedNotifications changes (for resetOnClose)
+  // Update initial notifications ref when notifications changes (for resetOnClose)
   useEffect(() => {
-    if (accumulatedNotifications.length > 0) {
-      initialNotificationsRef.current = [...accumulatedNotifications]
+    if (notifications.length > 0) {
+      initialNotificationsRef.current = [...notifications]
     }
-  }, [accumulatedNotifications])
+  }, [notifications])
 
-  // Sync local notifications with accumulatedNotifications
+  // Sync local notifications with notifications
   useEffect(() => {
-    setLocalNotifications([...accumulatedNotifications].sort((a, b) => b.notification.id - a.notification.id))
-  }, [accumulatedNotifications])
+    setLocalNotifications([...notifications].sort((a, b) => b.notification.id - a.notification.id))
+  }, [notifications])
 
   // Mark all as read when unread count reaches zero
   useEffect(() => {
-    if (notifications?.unReadTotal === 0) {
+    if (unReadTotal === 0) {
       setLocalNotifications((prev) => prev.map((content) => ({ ...content, isRead: true })))
     }
-  }, [notifications?.unReadTotal])
+  }, [unReadTotal])
 
   // Handle individual notification read
   const handleReadLocal = useCallback(
@@ -86,6 +92,14 @@ export function NotificationBellContainerScroll({
     }
   }, [handleReadAll])
 
+  // Reset loading state when isLoading changes to false
+  useEffect(() => {
+    if (!isLoading) {
+      isLoadingMoreRef.current = false
+      setIsLoadingMore(false)
+    }
+  }, [isLoading])
+
   // Create debounced scroll handler with proper cleanup
   useEffect(() => {
     const oldHandler = debouncedScrollHandlerRef.current
@@ -106,10 +120,19 @@ export function NotificationBellContainerScroll({
       const distanceFromBottom = scrollHeight - (scrollTop + clientHeight)
 
       // Trigger load more when near bottom and not already loading
-      if (distanceFromBottom <= SCROLL_THRESHOLD && !isLoading && hasMore) {
-        const lastNotification = accumulatedNotifications[accumulatedNotifications.length - 1]
-        if (lastNotification) {
-          loadMore(lastNotification.notification.id)
+      if (distanceFromBottom <= SCROLL_THRESHOLD && !isLoading && hasMore && !isLoadingMoreRef.current) {
+        isLoadingMoreRef.current = true
+
+        if (isFirstLoadMoreRef.current) {
+          // First load more - no delay
+          isFirstLoadMoreRef.current = false
+          loadMore()
+        } else {
+          // Subsequent loads - add delay
+          setIsLoadingMore(true)
+          loadMoreTimeoutRef.current = setTimeout(() => {
+            loadMore()
+          }, LOAD_MORE_DELAY)
         }
       }
     }, DEBOUNCE_DELAY)
@@ -121,8 +144,11 @@ export function NotificationBellContainerScroll({
 
     return () => {
       debouncedScrollHandlerRef.current?.cancel()
+      if (loadMoreTimeoutRef.current) {
+        clearTimeout(loadMoreTimeoutRef.current)
+      }
     }
-  }, [loadMore, isLoading, hasMore, isDropdownOpen, accumulatedNotifications])
+  }, [loadMore, isLoading, hasMore, isDropdownOpen])
 
   // Handle dropdown open/close with proper event listener management
   const handleOpenChange = useCallback(
@@ -152,6 +178,17 @@ export function NotificationBellContainerScroll({
             container.removeEventListener('scroll', debouncedScrollHandlerRef.current)
           }
 
+          // Clear any pending timeout
+          if (loadMoreTimeoutRef.current) {
+            clearTimeout(loadMoreTimeoutRef.current)
+            loadMoreTimeoutRef.current = null
+          }
+
+          // Reset loading states
+          isFirstLoadMoreRef.current = true
+          isLoadingMoreRef.current = false
+          setIsLoadingMore(false)
+
           // Reset to initial notifications if needed
           if (resetOnClose) {
             setLocalNotifications(
@@ -169,6 +206,7 @@ export function NotificationBellContainerScroll({
     // Capture refs at mount time for cleanup (refs are stable, so this is safe)
     const containerRef = notificationContainerRef
     const handlerRef = debouncedScrollHandlerRef
+    const timeoutRef = loadMoreTimeoutRef
 
     return () => {
       const container = containerRef.current
@@ -178,11 +216,15 @@ export function NotificationBellContainerScroll({
       }
       // Cancel the debounced function to prevent stale calls
       scrollHandler?.cancel()
+      // Clear any pending timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
     }
   }, [])
 
-  // Memoize scroll area height calculation
-  const scrollAreaHeight = useMemo(() => 'h-[37.5rem] max-h-[37.5rem]', [])
+  // Only apply fixed height when there are notifications
+  const scrollAreaHeight = localNotifications.length > 0 ? 'h-[37.5rem] max-h-[37.5rem]' : ''
 
   if (!userId) return null
 
@@ -198,7 +240,7 @@ export function NotificationBellContainerScroll({
 
       <DropdownMenu onOpenChange={handleOpenChange}>
         <DropdownMenuTrigger asChild>
-          <NotificationBellButton unreadNotificationCount={notifications?.unReadTotal ?? 0} />
+          <NotificationBellButton unreadNotificationCount={unReadTotal} />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           className={cn(
@@ -212,10 +254,10 @@ export function NotificationBellContainerScroll({
           <div className="sticky top-0 z-10 bg-background-secondary/95 backdrop-blur-sm border-b border-border-glass px-4 py-3.5">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-semibold text-foreground tracking-tight">Notifications</h3>
-              {(notifications?.unReadTotal ?? 0) > 0 && (
+              {unReadTotal > 0 && (
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                    {notifications?.unReadTotal} {(notifications?.unReadTotal ?? 0) === 1 ? 'unread' : 'unreads'}
+                    {unReadTotal} {unReadTotal === 1 ? 'unread' : 'unreads'}
                   </span>
                   <NotificationReadAllButton onReadAll={handleReadAllLocal} />
                 </div>
@@ -225,11 +267,11 @@ export function NotificationBellContainerScroll({
           <ScrollArea className={cn('rounded-md', scrollAreaHeight)} viewPortRef={notificationContainerRef}>
             <div className="py-1">
               {localNotifications.length === 0 ? (
-                <NotificationEmptyState title="No notifications yet" message="You're all caught up!" />
+                <NotificationEmptyState />
               ) : (
                 <>
                   <NotificationList notifications={localNotifications} onRead={handleReadLocal} showLoader={false} />
-                  {isLoading && hasMore && (
+                  {(isLoading || isLoadingMore) && hasMore && (
                     <div className="flex items-center justify-center py-4">
                       <DpLoadingSpinner message="Loading more..." className="text-sm text-foreground-neutral" />
                     </div>

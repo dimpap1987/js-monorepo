@@ -1,12 +1,8 @@
 'use client'
 
-import {
-  useUserNotificationsByCursor,
-  useReadNotification,
-  useReadAllNotifications,
-} from '../queries/notifications-queries'
+import { useReadNotification, useReadAllNotifications } from '../queries/notifications-queries'
 import { useNotificationWebSocket } from './index'
-import { UserNotificationType } from '@js-monorepo/types'
+import { CursorPaginationType, UserNotificationType } from '@js-monorepo/types'
 import { useCallback, useEffect, useRef, useState, startTransition } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@js-monorepo/utils/http/queries'
@@ -18,12 +14,14 @@ interface UseNotificationCursorOptions {
   initialLimit?: number
 }
 
+interface CursorNotificationsResponse extends CursorPaginationType<UserNotificationType> {
+  unReadTotal?: number
+}
+
 interface UseNotificationCursorReturn {
-  accumulatedNotifications: UserNotificationType[]
-  notifications: ReturnType<typeof useUserNotificationsByCursor>['data']
-  readNotificationMutation: ReturnType<typeof useReadNotification>
-  readAllNotificationsMutation: ReturnType<typeof useReadAllNotifications>
-  loadMore: (cursor: number | null) => Promise<void>
+  notifications: UserNotificationType[]
+  unReadTotal: number
+  loadMore: () => void
   hasMore: boolean
   isLoading: boolean
   handleRead: (id: number) => Promise<boolean>
@@ -37,174 +35,162 @@ export function useNotificationCursor({
   initialLimit = DEFAULT_LIMIT,
 }: UseNotificationCursorOptions): UseNotificationCursorReturn {
   const queryClient = useQueryClient()
-  const [cursor, setCursor] = useState<number | null>(null)
-  const [accumulatedNotifications, setAccumulatedNotifications] = useState<UserNotificationType[]>([])
-  const loadedCursorsRef = useRef<Set<number | null>>(new Set())
 
-  const { data: notifications, isLoading } = useUserNotificationsByCursor(userId, cursor, initialLimit)
+  const [notifications, setNotifications] = useState<UserNotificationType[]>([])
+  const [hasMore, setHasMore] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [unReadTotal, setUnReadTotal] = useState(0)
+
+  const notificationsRef = useRef<UserNotificationType[]>([])
+  const initialLoadDoneRef = useRef(false)
+
   const readNotificationMutation = useReadNotification()
   const readAllNotificationsMutation = useReadAllNotifications()
 
-  const accumulatedNotificationsRef = useRef<UserNotificationType[]>([])
-
+  // Initial load
   useEffect(() => {
-    if (!userId || !notifications?.content) return
+    if (!userId || initialLoadDoneRef.current) return
 
-    const currentCursor = cursor
-
-    if (currentCursor === null && loadedCursorsRef.current.size > 1) {
-      const sorted = [...notifications.content].sort((a, b) => b.notification.id - a.notification.id)
-      accumulatedNotificationsRef.current = sorted
-      loadedCursorsRef.current.clear()
-      loadedCursorsRef.current.add(null)
-      setAccumulatedNotifications([...accumulatedNotificationsRef.current])
-      return
-    }
-
-    if (!loadedCursorsRef.current.has(currentCursor)) {
-      loadedCursorsRef.current.add(currentCursor)
-      const existingIds = new Set(accumulatedNotificationsRef.current.map((n) => n.notification.id))
-      const newNotifications = notifications.content.filter((n) => !existingIds.has(n.notification.id))
-      accumulatedNotificationsRef.current = [...accumulatedNotificationsRef.current, ...newNotifications].sort(
-        (a, b) => b.notification.id - a.notification.id
-      )
-      setAccumulatedNotifications([...accumulatedNotificationsRef.current])
-    } else {
-      const updatedNotifications = accumulatedNotificationsRef.current.map((acc) => {
-        const found = notifications.content.find((n) => n.notification.id === acc.notification.id)
-        return found || acc
-      })
-      accumulatedNotificationsRef.current = updatedNotifications
-      setAccumulatedNotifications([...updatedNotifications])
-    }
-  }, [userId, notifications?.content, cursor])
-
-  useEffect(() => {
-    accumulatedNotificationsRef.current = accumulatedNotifications
-  }, [accumulatedNotifications])
-
-  const loadMore = useCallback(
-    async (nextCursor: number | null) => {
-      if (!userId || isLoading || loadedCursorsRef.current.has(nextCursor)) return
-
+    const fetchInitial = async () => {
+      setIsLoading(true)
       try {
-        const queryKey = queryKeys.notifications.user(userId, `cursor=${nextCursor}&limit=${initialLimit}`)
-        const newPageData = await queryClient.fetchQuery({
+        const queryKey = queryKeys.notifications.user(userId, `cursor=null&limit=${initialLimit}`)
+        const data = await queryClient.fetchQuery<CursorNotificationsResponse>({
           queryKey,
           queryFn: async () => {
             const params = new URLSearchParams()
-            if (nextCursor !== null) {
-              params.set('cursor', nextCursor.toString())
-            }
             params.set('limit', initialLimit.toString())
-            const queryString = params.toString()
-            const response = await apiClient.get(`/notifications/users/${userId}?${queryString}`)
+            const response = await apiClient.get(`/notifications/users/${userId}?${params.toString()}`)
             return handleQueryResponse(response)
           },
         })
 
-        if (newPageData?.content) {
-          loadedCursorsRef.current.add(nextCursor)
-          const existingIds = new Set(
-            accumulatedNotificationsRef.current.map((n: UserNotificationType) => n.notification.id)
-          )
-          const newNotifications = newPageData.content.filter(
-            (n: UserNotificationType) => !existingIds.has(n.notification.id)
-          )
-          accumulatedNotificationsRef.current = [...accumulatedNotificationsRef.current, ...newNotifications].sort(
-            (a, b) => b.notification.id - a.notification.id
-          )
-          setAccumulatedNotifications([...accumulatedNotificationsRef.current])
-          setCursor(nextCursor)
+        if (data?.content) {
+          const sorted = [...data.content].sort((a, b) => b.notification.id - a.notification.id)
+          notificationsRef.current = sorted
+          setNotifications(sorted)
+          setHasMore(data.hasMore ?? false)
+          setUnReadTotal(data.unReadTotal ?? 0)
+          initialLoadDoneRef.current = true
         }
       } catch (error) {
-        console.error('Failed to load more notifications:', error)
-        throw error
+        console.error('Failed to fetch initial notifications:', error)
+      } finally {
+        setIsLoading(false)
       }
-    },
-    [userId, queryClient, initialLimit, isLoading]
-  )
+    }
 
+    fetchInitial()
+  }, [userId, queryClient, initialLimit])
+
+  // Load more function - uses last notification ID as cursor
+  const loadMore = useCallback(async () => {
+    if (!userId || isLoading || !hasMore) return
+
+    // Get cursor from last notification in the list
+    const lastNotification = notificationsRef.current[notificationsRef.current.length - 1]
+    if (!lastNotification) return
+
+    const cursor = lastNotification.notification.id
+
+    setIsLoading(true)
+    try {
+      const params = new URLSearchParams()
+      params.set('cursor', cursor.toString())
+      params.set('limit', initialLimit.toString())
+
+      const response = await apiClient.get<CursorNotificationsResponse>(
+        `/notifications/users/${userId}?${params.toString()}`
+      )
+      const data = (await handleQueryResponse(response)) as CursorNotificationsResponse
+
+      if (data?.content && data.content.length > 0) {
+        const existingIds = new Set(notificationsRef.current.map((n) => n.notification.id))
+        const newNotifications = data.content.filter((n: UserNotificationType) => !existingIds.has(n.notification.id))
+
+        if (newNotifications.length > 0) {
+          const merged = [...notificationsRef.current, ...newNotifications].sort(
+            (a, b) => b.notification.id - a.notification.id
+          )
+          notificationsRef.current = merged
+          setNotifications(merged)
+        }
+
+        setHasMore(data.hasMore ?? false)
+      } else {
+        setHasMore(false)
+      }
+    } catch (error) {
+      console.error('Failed to load more notifications:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [userId, isLoading, hasMore, initialLimit])
+
+  // WebSocket handler
   const handleWebSocketNotification = useCallback(
     (notification: UserNotificationType) => {
       if (!notification || !userId) return
 
-      const alreadyExists = accumulatedNotificationsRef.current.some(
-        (n) => n.notification.id === notification.notification.id
-      )
+      const alreadyExists = notificationsRef.current.some((n) => n.notification.id === notification.notification.id)
 
-      if (alreadyExists) {
-        return
-      }
+      if (alreadyExists) return
 
       startTransition(() => {
-        queryClient.setQueriesData(
-          { queryKey: ['notifications', 'user', userId] },
-          (oldData: typeof notifications | undefined) => {
-            if (!oldData) {
-              return {
-                content: [notification],
-                nextCursor: null,
-                hasMore: false,
-                limit: initialLimit,
-                unReadTotal: notification.isRead ? 0 : 1,
-              }
-            }
-
-            const existsInContent = oldData.content?.some(
-              (n: UserNotificationType) => n.notification.id === notification.notification.id
-            )
-
-            if (existsInContent) {
-              return oldData
-            }
-
-            return {
-              ...oldData,
-              content: [notification, ...(oldData.content || [])],
-              unReadTotal: notification.isRead ? oldData.unReadTotal : (oldData.unReadTotal ?? 0) + 1,
-            }
-          }
-        )
-
-        accumulatedNotificationsRef.current = [notification, ...accumulatedNotificationsRef.current].sort(
+        const updated = [notification, ...notificationsRef.current].sort(
           (a, b) => b.notification.id - a.notification.id
         )
-        setAccumulatedNotifications([...accumulatedNotificationsRef.current])
+        notificationsRef.current = updated
+        setNotifications(updated)
+
+        if (!notification.isRead) {
+          setUnReadTotal((prev) => prev + 1)
+        }
       })
     },
-    [userId, queryClient, initialLimit]
+    [userId]
   )
 
   useNotificationWebSocket(userId ? handleWebSocketNotification : () => {})
 
+  // Handle read single notification
   const handleRead = useCallback(
     async (id: number) => {
       if (!userId) return false
+
       await readNotificationMutation.mutateAsync(id)
+
+      // Update local state
+      const updated = notificationsRef.current.map((n) => (n.notification.id === id ? { ...n, isRead: true } : n))
+      notificationsRef.current = updated
+      setNotifications(updated)
+      setUnReadTotal((prev) => Math.max(0, prev - 1))
+
       return true
     },
     [userId, readNotificationMutation]
   )
 
+  // Handle read all notifications
   const handleReadAll = useCallback(async () => {
-    if (!userId || (notifications?.unReadTotal ?? 0) === 0) return false
+    if (!userId || unReadTotal === 0) return false
+
     await readAllNotificationsMutation.mutateAsync()
-    accumulatedNotificationsRef.current = accumulatedNotificationsRef.current.map((content) => ({
-      ...content,
-      isRead: true,
-    }))
-    setAccumulatedNotifications([...accumulatedNotificationsRef.current])
+
+    // Update local state
+    const updated = notificationsRef.current.map((n) => ({ ...n, isRead: true }))
+    notificationsRef.current = updated
+    setNotifications(updated)
+    setUnReadTotal(0)
+
     return true
-  }, [userId, notifications?.unReadTotal, readAllNotificationsMutation])
+  }, [userId, unReadTotal, readAllNotificationsMutation])
 
   return {
-    accumulatedNotifications,
     notifications,
-    readNotificationMutation,
-    readAllNotificationsMutation,
+    unReadTotal,
     loadMore,
-    hasMore: notifications?.hasMore ?? false,
+    hasMore,
     isLoading,
     handleRead,
     handleReadAll,
