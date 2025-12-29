@@ -47,6 +47,8 @@ const createWrapper = () => {
 describe('notifications-queries', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    ;(apiClient.get as jest.Mock).mockReset()
+    ;(apiClient.patch as jest.Mock).mockReset()
   })
 
   describe('useUserNotifications', () => {

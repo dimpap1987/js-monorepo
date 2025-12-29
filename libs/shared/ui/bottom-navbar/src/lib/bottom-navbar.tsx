@@ -26,10 +26,9 @@ export function BottomNavbar({ children, className }: PropsWithChildren & { clas
         'fixed bottom-0 left-0 right-0 z-50',
         'h-[var(--bottom-navbar-height)]',
         'transition-transform duration-300 ease-in-out',
-        'backdrop-blur-xl bg-background/95 dark:bg-background/95',
+        'backdrop-blur-xl bg-background/95',
         'border-t border-border/50',
         'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]',
-        'dark:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3),0_-2px_4px_-1px_rgba(0,0,0,0.2)]',
         'pb-[env(safe-area-inset-bottom)]',
         isVisible ? 'translate-y-0' : 'translate-y-full',
         className

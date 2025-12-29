@@ -6,11 +6,10 @@ import { NotificationBellButton } from '@js-monorepo/notifications-ui'
 import { AiFillHome } from 'react-icons/ai'
 
 interface MobileNavbarProps {
-  unreadNotificationCount: number
   isSidebarOpen?: boolean
 }
 
-export const MobileNavbar = ({ unreadNotificationCount, isSidebarOpen = false }: MobileNavbarProps) => {
+export const MobileNavbar = ({ isSidebarOpen = false }: MobileNavbarProps) => {
   const { deviceType } = useDeviceType()
 
   // Hide bottom navbar on mobile when sidebar is open (standard UX pattern)
@@ -20,7 +19,7 @@ export const MobileNavbar = ({ unreadNotificationCount, isSidebarOpen = false }:
     <BottomNavbar>
       <BottomNavbarOptions Icon={AiFillHome} href="/" label="Home" />
       <BottomNavbarAlert href="/notifications" label="Alerts">
-        <NotificationBellButton unreadNotificationCount={unreadNotificationCount} className="shrink-0 text-xl" />
+        <NotificationBellButton className="shrink-0 text-xl" />
       </BottomNavbarAlert>
     </BottomNavbar>
   )

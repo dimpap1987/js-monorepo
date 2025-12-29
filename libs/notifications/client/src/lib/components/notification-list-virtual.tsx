@@ -7,7 +7,7 @@ import { DpLoadingSpinner } from '@js-monorepo/loader'
 import { NotificationEmptyState } from './notification-empty-state'
 import { NotificationItem } from './notification-item'
 
-interface NotificationListVirtualProps {
+interface NotificationListProps {
   notifications: UserNotificationType[]
   onRead: (id: number) => Promise<void>
   onLoadMore?: () => void
@@ -16,16 +16,16 @@ interface NotificationListVirtualProps {
   className?: string
 }
 
-export type { NotificationListVirtualProps }
+export type { NotificationListProps }
 
-export function NotificationListVirtual({
+export function NotificationList({
   notifications,
   onRead,
   onLoadMore,
   hasMore = false,
   isLoading = false,
   className,
-}: NotificationListVirtualProps) {
+}: NotificationListProps) {
   const sentinelRef = useRef<HTMLDivElement>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const isLoadingMoreRef = useRef(false)
@@ -43,11 +43,9 @@ export function NotificationListVirtual({
           isLoadingMoreRef.current = true
 
           if (isFirstLoadMoreRef.current) {
-            // First load more - no delay
             isFirstLoadMoreRef.current = false
             onLoadMore()
           } else {
-            // Subsequent loads - add delay
             setIsLoadingMore(true)
             timeoutId = setTimeout(() => {
               onLoadMore()
@@ -62,7 +60,6 @@ export function NotificationListVirtual({
     return () => {
       observer.disconnect()
       clearTimeout(timeoutId)
-      // Reset loading state on cleanup to handle edge cases
       isLoadingMoreRef.current = false
       setIsLoadingMore(false)
     }
@@ -84,7 +81,6 @@ export function NotificationListVirtual({
         ))}
       </div>
 
-      {/* Sentinel - when visible, triggers load more */}
       {hasMore && <div ref={sentinelRef} className="h-px" />}
 
       {(isLoading || isLoadingMore) && (

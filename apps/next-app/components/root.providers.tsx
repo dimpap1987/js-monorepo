@@ -9,6 +9,7 @@ import { WebNotificationProvider } from '@js-monorepo/web-notification'
 import dynamic from 'next/dynamic'
 import { ReactNode } from 'react'
 import { WebSocketProviderWrapper } from './websocket-provider-wrapper'
+import { NotificationProvider } from '@js-monorepo/notifications-ui'
 
 const DynamicWebsocketProvider = dynamic(() => Promise.resolve({ default: WebSocketProviderWrapper }), {
   ssr: false,
@@ -46,9 +47,11 @@ export default async function RootProviders({ children }: { readonly children: R
           <DynamicWebsocketProvider>
             <DpLoaderProvider>
               <DpNotificationProvider>
-                <WebNotificationProvider>
-                  <QClientProvider>{children}</QClientProvider>
-                </WebNotificationProvider>
+                <QClientProvider>
+                  <NotificationProvider userId={session?.user?.id}>
+                    <WebNotificationProvider>{children}</WebNotificationProvider>
+                  </NotificationProvider>
+                </QClientProvider>
               </DpNotificationProvider>
             </DpLoaderProvider>
           </DynamicWebsocketProvider>

@@ -1,6 +1,6 @@
 @import '@js-monorepo/styles/_base';
 @import '@js-monorepo/styles/_tailwind';
-@import './themes.css';
+@import '@js-monorepo/styles/_themes';
 
 /* Base variables (not theme-specific) */
 :root {
