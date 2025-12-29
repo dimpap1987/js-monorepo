@@ -1,4 +1,4 @@
-import { CreateUserNotificationType, NotificationCreateDto, Pageable } from '@js-monorepo/types'
+import { CreateUserNotificationType, CursorPagination, NotificationCreateDto, Pageable } from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
@@ -62,6 +62,80 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
       page: page,
       pageSize,
       totalPages: Math.ceil(totalNotifications / pageSize),
+      unReadTotal: unreadTotal,
+    }
+  }
+
+  async getNotificationsByCursor(userId: number, cursorPagination: CursorPagination) {
+    const { cursor, limit } = cursorPagination
+    const unreadTotal = await this.getTotalUnreadNotifications(userId)
+
+    // Build where clause - order by notification.id desc (latest/highest IDs first)
+    // When cursor is provided, get notifications with ID less than cursor
+    const whereClause: any = {
+      receiverId: userId,
+      notification: {
+        isArchived: false, // Exclude archived notifications
+        // Add cursor filter if provided (get older notifications with lower IDs)
+        ...(cursor !== null && cursor !== undefined
+          ? {
+              id: {
+                lt: cursor, // Less than cursor (since we order desc, this gets older items)
+              },
+            }
+          : {}),
+      },
+    }
+
+    // Fetch limit + 1 to determine if there are more items
+    const notifications = await this.txHost.tx.userNotification.findMany({
+      where: whereClause,
+      select: {
+        notification: {
+          select: {
+            id: true,
+            isArchived: true,
+            createdAt: true,
+            message: true,
+          },
+        },
+        isRead: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        sender: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        notification: {
+          id: 'desc', // Latest notifications first (highest IDs first, since IDs are sequential)
+        },
+      },
+      take: limit + 1, // Fetch one extra to check if there's more
+    })
+
+    // Determine if there's more data
+    // If we got more than limit items, there are more available
+    const hasMore = notifications.length > limit
+    // Return only the requested limit items
+    const content = hasMore ? notifications.slice(0, limit) : notifications
+
+    // Calculate nextCursor - use the last item's ID as the cursor for the next page
+    // Only set nextCursor if hasMore is true (meaning there are more items available)
+    const nextCursor = hasMore && content.length > 0 ? content[content.length - 1].notification.id : null
+
+    return {
+      content,
+      nextCursor,
+      hasMore,
+      limit,
       unReadTotal: unreadTotal,
     }
   }

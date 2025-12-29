@@ -1,7 +1,12 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
-import { useReadAllNotifications, useReadNotification, useUserNotifications } from './notifications-queries'
+import {
+  useReadAllNotifications,
+  useReadNotification,
+  useUserNotifications,
+  useUserNotificationsByCursor,
+} from './notifications-queries'
 // @ts-expect-error - Jest resolves this path alias correctly at runtime
 import { apiClient } from '@js-monorepo/utils/http'
 // @ts-expect-error - Jest resolves this path alias correctly at runtime
@@ -475,6 +480,102 @@ describe('notifications-queries', () => {
       const updatedData = queryClient.getQueryData(['notifications', 'user']) as any
       expect(updatedData.content).toEqual([])
       expect(updatedData.unReadTotal).toBe(0)
+    })
+  })
+
+  describe('useUserNotificationsByCursor', () => {
+    it('should fetch user notifications with cursor successfully', async () => {
+      const userId = 123
+      const cursor = 100
+      const limit = 15
+      const mockResponse = {
+        content: [
+          {
+            notification: { id: 1, message: 'Test 1', createdAt: new Date() },
+            isRead: false,
+          },
+        ],
+        nextCursor: 85,
+        hasMore: true,
+        limit: 15,
+        unReadTotal: 1,
+      }
+
+      ;(apiClient.get as jest.Mock).mockResolvedValue(mockResponse)
+
+      const { result } = renderHook(() => useUserNotificationsByCursor(userId, cursor, limit), {
+        wrapper: createWrapper(),
+      })
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true)
+      })
+
+      expect(result.current.data).toEqual(mockResponse)
+      expect(apiClient.get).toHaveBeenCalledWith(`/notifications/users/${userId}?cursor=100&limit=15`)
+    })
+
+    it('should fetch with null cursor', async () => {
+      const userId = 123
+      const cursor = null
+      const limit = 15
+      const mockResponse = {
+        content: [],
+        nextCursor: 85,
+        hasMore: true,
+        limit: 15,
+        unReadTotal: 0,
+      }
+
+      ;(apiClient.get as jest.Mock).mockResolvedValue(mockResponse)
+
+      const { result } = renderHook(() => useUserNotificationsByCursor(userId, cursor, limit), {
+        wrapper: createWrapper(),
+      })
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true)
+      })
+
+      expect(apiClient.get).toHaveBeenCalledWith(`/notifications/users/${userId}?limit=15`)
+    })
+
+    it('should not fetch when userId is undefined', () => {
+      const { result } = renderHook(() => useUserNotificationsByCursor(undefined, null, 15), {
+        wrapper: createWrapper(),
+      })
+
+      expect(result.current.isFetching).toBe(false)
+      expect(apiClient.get).not.toHaveBeenCalled()
+    })
+
+    it('should handle API errors', async () => {
+      const userId = 123
+      const error = new Error('API Error')
+
+      ;(apiClient.get as jest.Mock).mockRejectedValue(error)
+
+      const { result } = renderHook(() => useUserNotificationsByCursor(userId, null, 15), {
+        wrapper: createWrapper(),
+      })
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true)
+      })
+
+      expect(result.current.error).toEqual(error)
+    })
+
+    it('should use correct query key', () => {
+      const userId = 123
+      const cursor = 100
+      const limit = 15
+
+      renderHook(() => useUserNotificationsByCursor(userId, cursor, limit), {
+        wrapper: createWrapper(),
+      })
+
+      expect(queryKeys.notifications.user).toHaveBeenCalledWith(userId, 'cursor=100&limit=15')
     })
   })
 })

@@ -17,7 +17,7 @@ import { IoIosSettings } from 'react-icons/io'
 import { RiAdminFill } from 'react-icons/ri'
 import SVGLogo from './logo-svg'
 import { MobileNavbarWithNotifications } from './mobile-navbar-with-notifications'
-import { NotificationBellContainer } from './notification-bell-container'
+import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
 
 const menuItems: MenuItem[] = [
   {
@@ -98,7 +98,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
         <DpLogo onClick={() => router.push('/')}>
           <SVGLogo></SVGLogo>
         </DpLogo>
-        <NavbarItems>{user && <NotificationBellContainer userId={user.id} />}</NavbarItems>
+        <NavbarItems>{user && <NotificationBellContainerVirtual userId={user.id} />}</NavbarItems>
       </DpNextNavbar>
 
       <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20"></AnnouncementsComponent>

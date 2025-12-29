@@ -38,6 +38,7 @@ describe('NotificationService', () => {
     mockRepository = {
       createNotification: jest.fn(),
       getNotifications: jest.fn(),
+      getNotificationsByCursor: jest.fn(),
       markAsRead: jest.fn(),
       markAllAsRead: jest.fn(),
       archiveNotification: jest.fn(),
@@ -338,6 +339,46 @@ describe('NotificationService', () => {
       const result = await service.getNotifications(userId, pageable)
 
       expect(mockRepository.getNotifications).toHaveBeenCalledWith(userId, pageable)
+      expect(result).toEqual(mockResult)
+    })
+  })
+
+  describe('getNotificationsByCursor', () => {
+    it('should get notifications with cursor-based pagination', async () => {
+      const userId = 1
+      const cursorPagination = { cursor: 100, limit: 15 }
+      const mockResult = {
+        content: [],
+        nextCursor: 85,
+        hasMore: true,
+        limit: 15,
+        unReadTotal: 2,
+      }
+
+      mockRepository.getNotificationsByCursor.mockResolvedValue(mockResult as any)
+
+      const result = await service.getNotificationsByCursor(userId, cursorPagination)
+
+      expect(mockRepository.getNotificationsByCursor).toHaveBeenCalledWith(userId, cursorPagination)
+      expect(result).toEqual(mockResult)
+    })
+
+    it('should handle null cursor', async () => {
+      const userId = 1
+      const cursorPagination = { cursor: null, limit: 15 }
+      const mockResult = {
+        content: [],
+        nextCursor: 85,
+        hasMore: true,
+        limit: 15,
+        unReadTotal: 2,
+      }
+
+      mockRepository.getNotificationsByCursor.mockResolvedValue(mockResult as any)
+
+      const result = await service.getNotificationsByCursor(userId, cursorPagination)
+
+      expect(mockRepository.getNotificationsByCursor).toHaveBeenCalledWith(userId, cursorPagination)
       expect(result).toEqual(mockResult)
     })
   })

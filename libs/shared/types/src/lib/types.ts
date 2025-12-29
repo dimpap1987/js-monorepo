@@ -86,6 +86,18 @@ export type PaginationType<T = any> = {
   totalPages: number
 }
 
+export type CursorPagination = {
+  cursor: number | null
+  limit: number
+}
+
+export type CursorPaginationType<T = any> = {
+  content: T[]
+  nextCursor: number | null
+  hasMore: boolean
+  limit: number
+}
+
 export type AuthUserUpdateDto =
   | { username: string; roles?: { id: number }[] }
   | { username?: string; roles: { id: number }[] }

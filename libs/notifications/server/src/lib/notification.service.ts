@@ -1,7 +1,13 @@
 import { RedisPushSubscriptionsKey } from '@js-monorepo/auth/nest/common/types'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { REDIS } from '@js-monorepo/nest/redis'
-import { CreateUserNotificationType, NotificationCreateDto, Pageable, UserNotificationType } from '@js-monorepo/types'
+import {
+  CreateUserNotificationType,
+  CursorPagination,
+  NotificationCreateDto,
+  Pageable,
+  UserNotificationType,
+} from '@js-monorepo/types'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
@@ -158,6 +164,11 @@ export class NotificationService {
   @Transactional()
   async getNotifications(userId: number, pageable: Pageable) {
     return this.notificationRepository.getNotifications(userId, pageable)
+  }
+
+  @Transactional()
+  async getNotificationsByCursor(userId: number, cursorPagination: CursorPagination) {
+    return this.notificationRepository.getNotificationsByCursor(userId, cursorPagination)
   }
 
   async getTotalUnreadNotifications(userId: number): Promise<number> {

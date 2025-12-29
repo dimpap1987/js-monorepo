@@ -17,6 +17,7 @@ describe('NotificationController', () => {
     const mockService = {
       createNotification: jest.fn(),
       getNotifications: jest.fn(),
+      getNotificationsByCursor: jest.fn(),
       markAsRead: jest.fn(),
       markAllAsRead: jest.fn(),
       archiveNotification: jest.fn(),
@@ -90,11 +91,15 @@ describe('NotificationController', () => {
   })
 
   describe('getNotifications', () => {
-    it('should get notifications for user', async () => {
+    beforeEach(() => {
+      service.getNotificationsByCursor = jest.fn()
+    })
+
+    it('should get notifications with page-based pagination', async () => {
       const sessionUser = { id: 1, isAdmin: false }
       const userId = 1
-      const page = 1
-      const pageSize = 10
+      const page = '1'
+      const pageSize = '10'
 
       const mockResult = {
         totalCount: 5,
@@ -109,15 +114,59 @@ describe('NotificationController', () => {
 
       const result = await controller.getNotifications(sessionUser as any, userId, page, pageSize)
 
-      expect(service.getNotifications).toHaveBeenCalledWith(userId, { page, pageSize })
+      expect(service.getNotifications).toHaveBeenCalledWith(userId, { page: 1, pageSize: 10 })
+      expect(result).toEqual(mockResult)
+    })
+
+    it('should get notifications with cursor-based pagination', async () => {
+      const sessionUser = { id: 1, isAdmin: false }
+      const userId = 1
+      const cursor = '100'
+      const limit = '15'
+
+      const mockResult = {
+        content: [],
+        nextCursor: 85,
+        hasMore: true,
+        limit: 15,
+        unReadTotal: 2,
+      }
+
+      service.getNotificationsByCursor.mockResolvedValue(mockResult as any)
+
+      const result = await controller.getNotifications(sessionUser as any, userId, undefined, undefined, cursor, limit)
+
+      expect(service.getNotificationsByCursor).toHaveBeenCalledWith(userId, { cursor: 100, limit: 15 })
+      expect(result).toEqual(mockResult)
+    })
+
+    it('should handle null cursor for cursor-based pagination', async () => {
+      const sessionUser = { id: 1, isAdmin: false }
+      const userId = 1
+      const cursor = 'null'
+      const limit = '15'
+
+      const mockResult = {
+        content: [],
+        nextCursor: 85,
+        hasMore: true,
+        limit: 15,
+        unReadTotal: 2,
+      }
+
+      service.getNotificationsByCursor.mockResolvedValue(mockResult as any)
+
+      const result = await controller.getNotifications(sessionUser as any, userId, undefined, undefined, cursor, limit)
+
+      expect(service.getNotificationsByCursor).toHaveBeenCalledWith(userId, { cursor: null, limit: 15 })
       expect(result).toEqual(mockResult)
     })
 
     it('should allow admin to get notifications for any user', async () => {
       const sessionUser = { id: 1, isAdmin: true }
       const userId = 2
-      const page = 1
-      const pageSize = 10
+      const page = '1'
+      const pageSize = '10'
 
       const mockResult = {
         totalCount: 3,
@@ -132,7 +181,7 @@ describe('NotificationController', () => {
 
       const result = await controller.getNotifications(sessionUser as any, userId, page, pageSize)
 
-      expect(service.getNotifications).toHaveBeenCalledWith(userId, { page, pageSize })
+      expect(service.getNotifications).toHaveBeenCalledWith(userId, { page: 1, pageSize: 10 })
       expect(result).toEqual(mockResult)
     })
 
@@ -140,7 +189,7 @@ describe('NotificationController', () => {
       const sessionUser = { id: 1, isAdmin: false }
       const userId = 2
 
-      await expect(controller.getNotifications(sessionUser as any, userId, 1, 10)).rejects.toThrow(ApiException)
+      await expect(controller.getNotifications(sessionUser as any, userId, '1', '10')).rejects.toThrow(ApiException)
     })
   })
 
