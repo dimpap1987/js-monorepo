@@ -1,16 +1,16 @@
-import { DropdownMenuItem, DropdownMenuShortcut } from '@js-monorepo/components/dropdown'
+import { DropdownMenuItem } from '@js-monorepo/components/dropdown'
 import { UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import React from 'react'
 import { humanatizeNotificationDate } from '../../utils/notifications'
 import './bell.css'
 
-interface NotificationItemProps {
+interface NotificationDropdownItemProps {
   content: UserNotificationType
   onRead: (id: number) => void
 }
 
-const NotificationItem = React.memo(({ content, onRead }: NotificationItemProps) => {
+const NotificationDropdownItem = React.memo(({ content, onRead }: NotificationDropdownItemProps) => {
   const isUnread = !content.isRead
 
   return (
@@ -63,6 +63,6 @@ const NotificationItem = React.memo(({ content, onRead }: NotificationItemProps)
   )
 })
 
-NotificationItem.displayName = 'NotificationItem'
+NotificationDropdownItem.displayName = 'NotificationDropdownItem'
 
-export { NotificationItem }
+export { NotificationDropdownItem }
