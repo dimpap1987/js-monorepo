@@ -4,6 +4,7 @@ import { LoggedInGuard, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/s
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import {
   CreatePushNotificationType,
+  CursorPaginationType,
   NotificationCreateDto,
   PaginationType,
   SessionUserType,
@@ -17,7 +18,6 @@ import {
   HttpStatus,
   Logger,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -53,16 +53,57 @@ export class NotificationController {
   async getNotifications(
     @SessionUser() sessionUser: SessionUserType,
     @Param('userId') userId: number,
-    @Query('page', new ParseIntPipe({ optional: true })) page = 1,
-    @Query('pageSize', new ParseIntPipe({ optional: true }))
-    pageSize = 10
-  ): Promise<PaginationType<UserNotificationType> & { unReadTotal?: number }> {
+    @Query('page') pageParam?: string,
+    @Query('pageSize') pageSizeParam?: string,
+    @Query('cursor') cursorParam?: string,
+    @Query('limit') limitParam?: string
+  ): Promise<
+    | (PaginationType<UserNotificationType> & { unReadTotal?: number })
+    | (CursorPaginationType<UserNotificationType> & { unReadTotal?: number })
+  > {
     if (!sessionUser.isAdmin && userId !== sessionUser.id) {
       throw new ApiException(HttpStatus.FORBIDDEN, 'ERROR_FORBIDDEN')
     }
+
+    // Check if cursor-based pagination is requested
+    const hasCursorParams = cursorParam !== undefined || limitParam !== undefined
+
+    // If cursor params are provided, use cursor-based pagination
+    if (hasCursorParams) {
+      // Parse cursor - handle null, undefined, or numeric string
+      let cursor: number | null | undefined = undefined
+      if (cursorParam !== undefined && cursorParam !== null && cursorParam !== 'null' && cursorParam !== '') {
+        const parsedCursor = parseInt(cursorParam, 10)
+        if (!isNaN(parsedCursor)) {
+          cursor = parsedCursor
+        }
+      } else if (cursorParam === 'null' || cursorParam === '') {
+        cursor = null
+      }
+
+      // Parse limit - handle undefined or numeric string
+      let limit: number | undefined = undefined
+      if (limitParam !== undefined && limitParam !== null && limitParam !== '') {
+        const parsedLimit = parseInt(limitParam, 10)
+        if (!isNaN(parsedLimit)) {
+          limit = parsedLimit
+        }
+      }
+
+      // Use cursor-based pagination
+      return this.notificationService.getNotificationsByCursor(userId, {
+        cursor: cursor ?? null,
+        limit: limit ?? 15,
+      })
+    }
+
+    // Fallback to page-based pagination for backward compatibility (e.g., mobile navbar)
+    const page = pageParam ? parseInt(pageParam, 10) : 1
+    const pageSize = pageSizeParam ? parseInt(pageSizeParam, 10) : 10
+
     return this.notificationService.getNotifications(userId, {
-      page,
-      pageSize,
+      page: isNaN(page) ? 1 : page,
+      pageSize: isNaN(pageSize) ? 10 : pageSize,
     })
   }
 

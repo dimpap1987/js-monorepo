@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { PaginationType, UserNotificationType } from '@js-monorepo/types'
+import { CursorPaginationType, PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
 
@@ -7,8 +7,32 @@ interface NotificationsResponse extends PaginationType<UserNotificationType> {
   unReadTotal?: number
 }
 
+interface CursorNotificationsResponse extends CursorPaginationType<UserNotificationType> {
+  unReadTotal?: number
+}
+
 /**
- * Fetch user notifications
+ * Fetch user notifications (cursor-based)
+ */
+const fetchUserNotificationsByCursor = async (
+  userId: number,
+  cursor: number | null,
+  limit: number
+): Promise<CursorNotificationsResponse> => {
+  const params = new URLSearchParams()
+  if (cursor !== null) {
+    params.set('cursor', cursor.toString())
+  }
+  params.set('limit', limit.toString())
+  const queryString = params.toString()
+  const response = await apiClient.get<CursorNotificationsResponse>(
+    `/notifications/users/${userId}${queryString ? `?${queryString}` : ''}`
+  )
+  return handleQueryResponse(response)
+}
+
+/**
+ * Fetch user notifications (legacy - for backward compatibility)
  */
 const fetchUserNotifications = async (userId: number, searchParams?: string): Promise<NotificationsResponse> => {
   const queryString = searchParams ? `${searchParams}` : ''
@@ -16,15 +40,26 @@ const fetchUserNotifications = async (userId: number, searchParams?: string): Pr
   return handleQueryResponse(response)
 }
 
-/**
- * Hook to fetch user notifications
- */
-export function useUserNotifications(userId: number | undefined, searchParams?: string) {
+export function useUserNotificationsByCursor(userId: number | undefined, cursor: number | null, limit = 15) {
+  return useQuery({
+    queryKey: queryKeys.notifications.user(userId || 0, `cursor=${cursor}&limit=${limit}`),
+    queryFn: () => fetchUserNotificationsByCursor(userId as number, cursor, limit),
+    enabled: !!userId,
+    placeholderData: (previousData) => previousData,
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000,
+  })
+}
+
+export function useUserNotifications(userId: number | undefined, searchParams?: string, enabled = true) {
   return useQuery({
     queryKey: queryKeys.notifications.user(userId || 0, searchParams),
     queryFn: () => fetchUserNotifications(userId as number, searchParams),
-    enabled: !!userId, // Only fetch if userId exists
-    placeholderData: (previousData) => previousData, // Keep previous data while loading
+    enabled: !!userId && enabled,
+    placeholderData: (previousData) => previousData,
+    staleTime: 30000,
+    gcTime: 5 * 60 * 1000,
+    refetchOnMount: false,
   })
 }
 
@@ -72,7 +107,7 @@ export function useReadAllNotifications() {
     onSuccess: () => {
       queryClient.setQueriesData(
         { queryKey: ['notifications', 'user'] },
-        (oldData: NotificationsResponse | undefined) => {
+        (oldData: NotificationsResponse | CursorNotificationsResponse | undefined) => {
           if (!oldData?.content) return oldData
           return {
             ...oldData,
