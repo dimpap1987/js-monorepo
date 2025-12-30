@@ -1,3 +1,5 @@
+import { CancelReasonType } from '../constants'
+
 export interface SubscriptionUpdateData {
   id: string
   status: string
@@ -7,6 +9,7 @@ export interface SubscriptionUpdateData {
   trial_end: number | null
   cancel_at: number | null
   canceled_at: number | null
+  cancelReason?: CancelReasonType
   items: {
     data: Array<{
       price: {
@@ -20,4 +23,5 @@ export interface SubscriptionDeleteData {
   id: string
   status: string
   cancel_at: number | null
+  cancelReason?: CancelReasonType
 }

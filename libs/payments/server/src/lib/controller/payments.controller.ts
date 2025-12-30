@@ -1,5 +1,6 @@
 import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
 import { SessionUserType } from '@js-monorepo/types'
 import { tryCatch } from '@js-monorepo/utils/common'
 import {
@@ -14,6 +15,7 @@ import {
   Post,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
 import { RequestWithRawBody } from '../rawBody.middleware'
 import { PaymentsService } from '../service/payments.service'
@@ -45,6 +47,7 @@ export class PaymentsController {
 
   @Post('checkout')
   @UseGuards(LoggedInGuard)
+  @UseInterceptors(IdempotencyInterceptor)
   async createCheckoutSession(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
     const { session } = await this.stripeService.createCheckoutSession(priceId, sessionUser.id, sessionUser.email)
     return { sessionId: session.id }
@@ -53,6 +56,7 @@ export class PaymentsController {
   @Post('cancel')
   @HttpCode(204)
   @UseGuards(LoggedInGuard)
+  @UseInterceptors(IdempotencyInterceptor)
   async cancelSubscription(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
     const subscription = await this.paymentsService.findSubscriptionByPriceIdAndUserId(priceId, sessionUser.id)
 

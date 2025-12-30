@@ -1,13 +1,14 @@
-import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { PaymentsClient, type WebhookEvent } from '@super-dp/payments-core'
 import { CreateProductWithPricesRequest, PaymentsModuleOptions } from '../../'
+import { CancelReason } from '../constants'
 import { PaymentsClientToken } from '../stripe.module'
+import { timestampToDate, timestampToDateRequired, withRetry } from '../utils'
 import { PaymentsService } from './payments.service'
-import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class StripeService {
@@ -50,37 +51,39 @@ export class StripeService {
   @Transactional()
   async createCheckoutSession(priceId: number, userId: number, email: string) {
     try {
-      let stripeCustomerId: string
-
       const price = await this.paymentsService.findPriceById(priceId)
+      const stripeCustomerId = await this.getOrCreateStripeCustomer(userId, email)
 
-      const paymentCustomer = await this.paymentsService.findPaymentCustomerById(userId)
-
-      if (paymentCustomer?.stripeCustomerId) {
-        // validate that the stripeId exists in stripe or else create new
-        stripeCustomerId = await this.validateOrCreateCustomer(paymentCustomer?.stripeCustomerId, email, userId)
-      } else {
-        //create payment customer
-        const stripeCustomer = await this.createCustomerIfNotExists(email)
-        const createdCustomer = await this.paymentsService.createOrUpdatePaymentCustomer({
-          userId,
-          stripeCustomerId: stripeCustomer.id,
+      const session = await withRetry(() =>
+        this.paymentsClient.createCheckoutSession({
+          customerId: stripeCustomerId,
+          priceId: price.stripeId,
+          successUrl: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=true`,
+          cancelUrl: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=false`,
         })
-        stripeCustomerId = createdCustomer.stripeCustomerId
-      }
+      )
 
-      // checkout
-      const session = await this.paymentsClient.createCheckoutSession({
-        customerId: stripeCustomerId,
-        priceId: price.stripeId,
-        successUrl: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=true`,
-        cancelUrl: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=false`,
-      })
-      return { session: session }
+      return { session }
     } catch (e) {
       this.logger.error('Error while checking out', e.stack)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_STRIPE_CHECKOUT')
     }
+  }
+
+  private async getOrCreateStripeCustomer(userId: number, email: string): Promise<string> {
+    const paymentCustomer = await this.paymentsService.findPaymentCustomerById(userId)
+
+    if (paymentCustomer?.stripeCustomerId) {
+      return this.validateOrCreateCustomer(paymentCustomer.stripeCustomerId, email, userId)
+    }
+
+    const stripeCustomer = await this.createCustomerIfNotExists(email)
+    const createdCustomer = await this.paymentsService.createOrUpdatePaymentCustomer({
+      userId,
+      stripeCustomerId: stripeCustomer.id,
+    })
+
+    return createdCustomer.stripeCustomerId
   }
 
   async constructEventFromPayload(signature: string, payload: Buffer) {
@@ -141,7 +144,7 @@ export class StripeService {
     const status = subscriptionData.status as string
     const items = subscriptionData.items as { data: Array<{ price: { id: string } }> }
 
-    this.logger.debug(
+    this.logger.log(
       `Payments - RECEIVED Subscription Event with type: ${type}, customer: ${customerId} and price_id: '${items?.data?.[0]?.price?.id}'`
     )
 
@@ -165,21 +168,23 @@ export class StripeService {
         stripeSubscriptionId: subscriptionId,
         priceId: price.id,
         status,
-        currentPeriodStart: toDate(subscriptionData.current_period_start as number),
-        currentPeriodEnd: toDate(subscriptionData.current_period_end as number),
-        trialStart: subscriptionData.trial_start ? toDate(subscriptionData.trial_start as number) : undefined,
-        trialEnd: subscriptionData.trial_end ? toDate(subscriptionData.trial_end as number) : undefined,
-        cancelAt: subscriptionData.cancel_at ? toDate(subscriptionData.cancel_at as number) : undefined,
-        canceledAt: subscriptionData.canceled_at ? toDate(subscriptionData.canceled_at as number) : undefined,
+        currentPeriodStart: timestampToDateRequired(subscriptionData.current_period_start as number),
+        currentPeriodEnd: timestampToDateRequired(subscriptionData.current_period_end as number),
+        trialStart: timestampToDate(subscriptionData.trial_start as number | null),
+        trialEnd: timestampToDate(subscriptionData.trial_end as number | null),
+        cancelAt: timestampToDate(subscriptionData.cancel_at as number | null),
+        canceledAt: timestampToDate(subscriptionData.canceled_at as number | null),
       })
 
       tryCatch(() => {
         this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(paymentCustomer.userId, {
           id: sub.id,
-          name: sub.price?.product?.name,
+          name: price.product?.name,
         })
       })
     } else if (type === 'updated') {
+      const cancelReason = subscriptionData.cancel_at ? CancelReason.USER_REQUESTED : undefined
+
       const sub = await this.paymentsService.updateSubscription({
         id: subscriptionId,
         status,
@@ -189,6 +194,7 @@ export class StripeService {
         trial_end: subscriptionData.trial_end as number | null,
         cancel_at: subscriptionData.cancel_at as number | null,
         canceled_at: subscriptionData.canceled_at as number | null,
+        cancelReason,
         items: {
           data: items.data,
         },
@@ -197,23 +203,25 @@ export class StripeService {
       tryCatch(() => {
         this.paymentsModuleOptions.onSubscriptionUpdateSuccess?.(paymentCustomer.userId, {
           id: sub.id,
-          name: sub.price?.product?.name,
+          name: price.product?.name,
         })
       })
-      tryCatch(() => {
-        if (subscriptionData.cancel_at) {
+
+      if (subscriptionData.cancel_at) {
+        tryCatch(() => {
           this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(paymentCustomer.userId, {
             id: sub.id,
-            name: sub.price?.product?.name,
-            cancelAt: toDate(subscriptionData.cancel_at as number),
+            name: price.product?.name,
+            cancelAt: timestampToDate(subscriptionData.cancel_at as number),
           })
-        }
-      })
+        })
+      }
     } else if (type === 'deleted') {
       await this.paymentsService.deleteSubscription({
         id: subscriptionId,
         status,
         cancel_at: subscriptionData.cancel_at as number | null,
+        cancelReason: CancelReason.EXPIRED,
       })
     }
 

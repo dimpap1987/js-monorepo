@@ -63,21 +63,18 @@ export function PricingCard({
         subscribed && 'border-status-success'
       )}
     >
-      {/* Most Popular Badge */}
-      {isPopular && (
+      {/* Badge - Priority: Active > Popular (Active state is more relevant than marketing nudge) */}
+      {(isCurrentPlan || isPopular) && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-            Most Popular
-          </span>
-        </div>
-      )}
-
-      {/* Active Badge */}
-      {isCurrentPlan && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="bg-status-success-bg text-status-success text-xs font-semibold px-3 py-1 rounded-full border border-status-success/50">
-            Active
-          </span>
+          {isCurrentPlan ? (
+            <span className="bg-status-success-bg text-status-success text-xs font-semibold px-3 py-1 rounded-full border border-status-success/50">
+              Active
+            </span>
+          ) : (
+            <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
+              Most Popular
+            </span>
+          )}
         </div>
       )}
 
