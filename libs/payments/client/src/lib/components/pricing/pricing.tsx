@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
+import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
 import { ErrorDialog } from '@js-monorepo/dialog'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
@@ -84,11 +84,12 @@ export function Pricing() {
 
   const handleSelectPlan = useCallback(
     (priceId: number) => {
+      const checkoutUrl = `/checkout?planId=${priceId}`
       if (!isLoggedIn) {
-        router.push('/auth/login')
+        router.push(buildLoginUrl(checkoutUrl))
         return
       }
-      router.push(`/checkout?planId=${priceId}`)
+      router.push(checkoutUrl)
     },
     [isLoggedIn, router]
   )

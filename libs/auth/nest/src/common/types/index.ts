@@ -47,6 +47,7 @@ export interface SessionConfiguration {
 declare module 'express-session' {
   export interface SessionData {
     user: SessionUserType
+    callbackUrl?: string
   }
 }
 

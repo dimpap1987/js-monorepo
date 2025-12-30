@@ -4,7 +4,7 @@ import { DpLoginDialogComponent } from '@js-monorepo/dialog'
 import { useLoader } from '@js-monorepo/loader'
 import { UserNavSocial } from '@js-monorepo/navbar'
 import { useRouter } from 'next-nprogress-bar'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
 const LOGIN_PATH_NAME = '/auth/login'
@@ -12,8 +12,12 @@ const LOGIN_PATH_NAME = '/auth/login'
 function LoginDialog() {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const pathnameRef = useRef('/') // Create a ref to store the latest pathname
   const { state, setLoaderState } = useLoader()
+
+  // Get callbackUrl from query params (e.g., /auth/login?callbackUrl=/pricing)
+  const callbackUrl = searchParams?.get('callbackUrl') || undefined
 
   const isDialogOpen = pathname === LOGIN_PATH_NAME
 
@@ -45,14 +49,14 @@ function LoginDialog() {
       type: 'github',
       onLogin: async () => {
         triggerLoading()
-        authClient.login('github')
+        authClient.login('github', callbackUrl)
       },
     },
     {
       type: 'google',
       onLogin: async () => {
         triggerLoading()
-        authClient.login('google')
+        authClient.login('google', callbackUrl)
       },
     },
   ]
