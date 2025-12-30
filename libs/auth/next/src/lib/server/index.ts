@@ -49,11 +49,15 @@ export async function getCurrentSession() {
       })
     }
   } catch (error) {
-    console.error('[getCurrentSession] Fetch failed', {
-      url: `${API_URL}/api/session`,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    })
+    // Don't log during Next.js static generation (expected behavior for dynamic routes)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (!errorMessage.includes('Dynamic server usage')) {
+      console.error('[getCurrentSession] Fetch failed', {
+        url: `${API_URL}/api/session`,
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      })
+    }
   }
 
   return null
@@ -93,11 +97,15 @@ export async function findUnregisteredUser(headers?: Headers) {
       })
     }
   } catch (error) {
-    console.error('[findUnregisteredUser] Fetch failed', {
-      url: `${API_URL}/api/auth/unregistered-user`,
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    })
+    // Don't log during Next.js static generation (expected behavior for dynamic routes)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (!errorMessage.includes('Dynamic server usage')) {
+      console.error('[findUnregisteredUser] Fetch failed', {
+        url: `${API_URL}/api/auth/unregistered-user`,
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      })
+    }
   }
 
   return null
