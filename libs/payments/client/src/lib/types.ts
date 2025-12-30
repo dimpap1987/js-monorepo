@@ -1,5 +1,8 @@
 import Stripe from 'stripe'
 
+// Configuration: which plan to highlight as "Most Popular"
+export const POPULAR_PLAN_NAME = 'basic'
+
 export interface Subscription {
   id: number
   paymentCustomerId: number
@@ -73,4 +76,28 @@ export type PlanCardContentType = {
   price: number
   interval: string
   features: Record<string, string>
+}
+
+// FAQ types for pricing page
+export interface FAQItem {
+  question: string
+  answer: string
+}
+
+// Pricing card data for the refactored pricing page
+export interface PricingCardData {
+  id: number
+  name: string
+  description: string
+  price: number
+  interval: string
+  features: Record<string, string>
+  isPopular?: boolean
+  subscribed?: boolean
+}
+
+// Trust signal for pricing page
+export interface TrustSignal {
+  icon: React.ReactNode
+  text: string
 }
