@@ -15,3 +15,19 @@ export const authCookiesOptions: CookieOptions = {
 export const toDate = (timestamp?: number): Date | undefined => (timestamp ? new Date(timestamp * 1000) : undefined)
 
 export const capitalize = (s: string) => s && String(s[0]).toUpperCase() + String(s).slice(1)
+
+interface OAuthState {
+  callbackUrl?: string
+}
+
+export function encodeOAuthState(data: OAuthState): string {
+  return Buffer.from(JSON.stringify(data)).toString('base64')
+}
+
+export function decodeOAuthState(state: string): OAuthState | undefined {
+  try {
+    return JSON.parse(Buffer.from(state, 'base64').toString('utf-8'))
+  } catch {
+    return undefined
+  }
+}

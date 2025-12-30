@@ -1,14 +1,20 @@
 import { ExecutionContext, Logger } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { Request, Response } from 'express'
+import { encodeOAuthState } from '../../common/utils'
 
 export class AuthGithub extends AuthGuard('github') {
   private readonly logger = new Logger(AuthGithub.name)
 
-  constructor() {
-    super({
-      prompt: 'select_account',
-    })
+  override getAuthenticateOptions(context: ExecutionContext) {
+    const request = context.switchToHttp().getRequest<Request>()
+    const callbackUrl = request.query['callbackUrl'] as string
+
+    if (callbackUrl) {
+      return { prompt: 'select_account', state: encodeOAuthState({ callbackUrl }) }
+    }
+
+    return { prompt: 'select_account' }
   }
 
   override async canActivate(context: ExecutionContext): Promise<boolean> {
