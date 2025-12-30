@@ -2,14 +2,26 @@
   "name": "@js-monorepo/source",
   "version": "0.0.44",
   "license": "MIT",
+  "packageManager": "pnpm@10.25.0",
   "engines": {
-    "node": ">=20.0.0 <21.0.0"
+    "node": ">=20.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "@swc/core",
+      "nx",
+      "sharp",
+      "cypress"
+    ]
   },
   "scripts": {
-    "ci:local": "npm run format:check && nx run-many --target=lint,test --all --skip-nx-cache && nx run-many --target=build --projects=my-api,next-app --skip-nx-cache --configuration=production",
+    "ci:local": "pnpm format:check && nx run-many --target=lint,test --all --skip-nx-cache && nx run-many --target=build --projects=my-api,next-app --skip-nx-cache --configuration=production",
     "lint": "nx affected:lint --all",
-    "lint:all": "npx nx run-many --all --target=lint",
-    "format": "npx prettier --write .",
+    "lint:all": "nx run-many --all --target=lint",
+    "format": "prettier --write .",
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
     "test:all": "nx run-many --target=test --all --skip-nx-cache",
@@ -27,17 +39,19 @@
     "build:tranquil": "nx build tranquil-studio --prod --verbose",
     "build:my-api": "nx build my-api --prod",
     "build:webhook": "nx build webhook-server --prod",
-    "build:docs": "npm run generate:docs && nx build docs --prod",
-    "start:next": "cd dist/apps/next-app && npx next start",
-    "start:tranquil": "cd dist/apps/tranquil-studio && npx next start",
+    "build:docs": "pnpm generate:docs && nx build docs --prod",
+    "start:next": "cd dist/apps/next-app && pnpm start",
+    "start:tranquil": "cd dist/apps/tranquil-studio && next start",
     "start:webhook": "cd dist/apps/webhook-server && node main.js",
     "start:my-api": "cd dist/apps/my-api && node main.js",
-    "start:docs": "cd dist/apps/docs && npx next start",
-    "db:migrate": "env-cmd --no-override -f .env npx prisma migrate dev --schema=libs/prisma/db/src/lib/prisma/schema",
-    "db:deploy": "env-cmd --no-override -f .env npx prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema",
-    "db:create": "env-cmd --no-override -f .env npx prisma migrate dev --create-only --schema=libs/prisma/db/src/lib/prisma/schema",
+    "start:docs": "cd dist/apps/docs && next start",
+    "db:migrate": "env-cmd --no-override -f .env prisma migrate dev --schema=libs/prisma/db/src/lib/prisma/schema",
+    "db:deploy": "env-cmd --no-override -f .env prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema",
+    "db:create": "env-cmd --no-override -f .env prisma migrate dev --create-only --schema=libs/prisma/db/src/lib/prisma/schema",
     "db:generate": "env-cmd --no-override -f .env prisma generate --schema=libs/prisma/db/src/lib/prisma/schema",
-    "db:studio": "env-cmd --no-override -f .env prisma studio --schema=libs/prisma/db/src/lib/prisma/schema"
+    "db:studio": "env-cmd --no-override -f .env prisma studio --schema=libs/prisma/db/src/lib/prisma/schema",
+    "docker:my-api": "BRANCH=$(git rev-parse --abbrev-ref HEAD) && TAG=$([ \"$BRANCH\" = \"main\" ] && echo 'latest' || echo \"$BRANCH\") && docker build -f apps/my-api/Dockerfile -t my-api:$TAG .",
+    "docker:next-app": "BRANCH=$(git rev-parse --abbrev-ref HEAD) && TAG=$([ \"$BRANCH\" = \"main\" ] && echo 'latest' || echo \"$BRANCH\") && docker build -f apps/next-app/Dockerfile -t next-app:$TAG ."
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

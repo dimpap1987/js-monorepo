@@ -1,6 +1,6 @@
-# Cursor AI Context Rules
+# CLAUDE.md
 
-This file provides essential context for AI agents working on this codebase.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
