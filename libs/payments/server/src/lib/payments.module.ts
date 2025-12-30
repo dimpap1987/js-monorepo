@@ -1,11 +1,12 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
 import { PaymentsController } from './controller/payments.controller'
 import { SubscriptionGuard } from './guards/subscription.guard'
 import { PaymentsRepository } from './repository/payments.repository'
 import { PaymentsService } from './service/payments.service'
 import { StripeService } from './service/stripe.service'
 import { StripeModule } from './stripe.module'
-import { ConfigService } from '@nestjs/config'
 
 export interface SubscriptionCallback {
   id: number
@@ -20,7 +21,13 @@ export interface PaymentsModuleOptions {
   onSubscriptionEvent?: (userId: number, event: 'created' | 'updated' | 'deleted') => void
 }
 
-const providers: Provider[] = [StripeService, PaymentsRepository, PaymentsService, SubscriptionGuard]
+const providers: Provider[] = [
+  StripeService,
+  PaymentsRepository,
+  PaymentsService,
+  SubscriptionGuard,
+  IdempotencyInterceptor,
+]
 
 @Global()
 @Module({})

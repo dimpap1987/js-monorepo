@@ -7,10 +7,10 @@ import { ArrowLeft, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePlans } from '../../queries/payments-queries'
 import { POPULAR_PLAN_NAME, PricingCardData } from '../../types'
-import { apiCheckoutPlan } from '../../utils/api'
+import { apiCheckoutPlan, generateIdempotencyKey } from '../../utils/api'
 import { CheckoutOrderSummary } from './checkout-order-summary'
 import { CheckoutPlanComparison } from './checkout-plan-comparison'
 
@@ -25,6 +25,7 @@ export function Checkout() {
 
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(initialPlanId)
   const [isProcessing, setIsProcessing] = useState(false)
+  const idempotencyKeyRef = useRef<string>(generateIdempotencyKey())
 
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
 
@@ -70,6 +71,8 @@ export function Checkout() {
 
   const handlePlanChange = useCallback((planId: number) => {
     setSelectedPlanId(planId)
+    // Generate new idempotency key when plan changes
+    idempotencyKeyRef.current = generateIdempotencyKey()
   }, [])
 
   const handleCheckout = useCallback(async () => {
@@ -77,7 +80,7 @@ export function Checkout() {
 
     setIsProcessing(true)
     try {
-      const response = await apiCheckoutPlan(selectedPlanId)
+      const response = await apiCheckoutPlan(selectedPlanId, idempotencyKeyRef.current)
       if (response.ok) {
         const stripe = await stripePromise
         const stripeResponse = await stripe?.redirectToCheckout({
