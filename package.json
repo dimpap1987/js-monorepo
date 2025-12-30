@@ -2,8 +2,11 @@
   "name": "@js-monorepo/source",
   "version": "0.0.44",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0 <21.0.0"
+  },
   "scripts": {
-    "ci:local": "nx run-many --target=lint,test --projects=my-api,next-app --skip-nx-cache && nx run-many --target=build --projects=my-api,next-app --skip-nx-cache --configuration=production",
+    "ci:local": "npm run format:check && nx run-many --target=lint,test --all --skip-nx-cache && nx run-many --target=build --projects=my-api,next-app --skip-nx-cache --configuration=production",
     "lint": "nx affected:lint --all",
     "lint:all": "npx nx run-many --all --target=lint",
     "format": "npx prettier --write .",

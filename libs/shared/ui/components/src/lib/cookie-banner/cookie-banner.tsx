@@ -106,7 +106,7 @@ function CookieBannerComponent({
       className={cn(
         'fixed bottom-0 left-0 right-0 z-50',
         'bg-card border-t-2 border-border',
-        'shadow-2xl shadow-black/20 shadow-black/40',
+        'shadow-2xl shadow-black/40',
         'transition-all duration-300 ease-in-out',
         isClosing ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100',
         className
