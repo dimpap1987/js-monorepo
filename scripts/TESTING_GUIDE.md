@@ -5,7 +5,6 @@
 **Libraries**: Use unit tests with Jest + React Testing Library  
 **Applications**: Use unit tests + E2E tests (Cypress/Playwright)
 
-
 ## Commands
 
 ### Run Tests

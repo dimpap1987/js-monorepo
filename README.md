@@ -72,12 +72,14 @@ This monorepo uses **centralized environment variable management** with **config
 #### Setup
 
 1. **Create root `.env` file**:
+
    ```bash
    # Copy from template
    cp .env.example .env
    ```
 
 2. **Configure base variables** (edit `.env`):
+
    ```bash
    # For local development:
    HOSTNAME=localhost
@@ -85,7 +87,7 @@ This monorepo uses **centralized environment variable management** with **config
    FRONTEND_PORT=3000
    DATABASE_PORT=5432
    REDIS_PORT=6379
-   
+
    # For production, just change HOSTNAME:
    # HOSTNAME=yourdomain.com
    # API_PORT=3333
@@ -129,6 +131,7 @@ GOOGLE_REDIRECT_URL=http://${HOSTNAME_API}/api/auth/google/redirect
 #### Environment-Specific Configuration
 
 **Local Development:**
+
 ```bash
 HOSTNAME=localhost
 API_PORT=3333
@@ -136,6 +139,7 @@ FRONTEND_PORT=3000
 ```
 
 **Staging/Production:**
+
 ```bash
 HOSTNAME=staging.yourdomain.com  # or yourdomain.com
 API_PORT=3333
@@ -146,6 +150,7 @@ FRONTEND_PORT=3000
 #### Key Variables
 
 **Base Variables** (change these for different environments):
+
 - `HOSTNAME` - Base hostname (localhost, staging.example.com, etc.)
 - `API_PORT` - Backend API port (default: 3333)
 - `FRONTEND_PORT` - Frontend port (default: 3000)
@@ -153,6 +158,7 @@ FRONTEND_PORT=3000
 - `REDIS_PORT` - Redis port (default: 6379)
 
 **Auto-constructed** (don't edit directly):
+
 - `HOSTNAME_API`, `HOSTNAME_FRONTEND`, `HOSTNAME_DATABASE`, `HOSTNAME_REDIS`
 - `DATABASE_URL`, `REDIS_URL`
 - `AUTH_LOGIN_REDIRECT`, `GOOGLE_REDIRECT_URL`, `GITHUB_REDIRECT_URL`
@@ -181,6 +187,7 @@ npm run dev:my-api
 
 **_ IMPORTANT _**
 Before building, ensure your root `.env` file is configured and synced:
+
 ```bash
 npm run sync:env
 ```
