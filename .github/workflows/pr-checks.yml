@@ -19,17 +19,22 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Nx
         uses: nrwl/nx-set-shas@v4
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Check PR title format
         run: |
@@ -76,27 +81,32 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Nx
         uses: nrwl/nx-set-shas@v4
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run linting
-        run: npx nx affected:lint --base=origin/${{ github.base_ref }} --head=${{ github.event.pull_request.head.sha }} --parallel=3
+        run: pnpm nx affected:lint --base=origin/${{ github.base_ref }} --head=${{ github.event.pull_request.head.sha }} --parallel=3
 
       - name: Check formatting
-        run: npm run format:check
+        run: pnpm format:check
 
       - name: Run tests
         run: |
-          npx nx affected:test \
+          pnpm nx affected:test \
             --base=origin/${{ github.base_ref }} \
             --head=${{ github.event.pull_request.head.sha }} \
             --configuration=ci \
@@ -104,7 +114,7 @@ jobs:
 
       - name: Type check
         run: |
-          npx nx affected --target=typecheck \
+          pnpm nx affected --target=typecheck \
             --base=origin/${{ github.base_ref }} \
             --head=${{ github.event.pull_request.head.sha }} \
             --parallel=3 || true
@@ -125,17 +135,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Nx
         uses: nrwl/nx-set-shas@v4
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
         if: matrix.app == 'my-api'
@@ -143,7 +158,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
           DIRECT_URL: ${{ secrets.DIRECT_URL_PROD }}
         run: |
-          npx prisma generate --schema=libs/prisma/db/src/lib/prisma/schema
+          pnpm prisma generate --schema=libs/prisma/db/src/lib/prisma/schema
 
       - name: Build ${{ matrix.app }}
         env:
@@ -155,9 +170,9 @@ jobs:
           NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD }}
         run: |
           if [ "${{ matrix.app }}" == "my-api" ]; then
-            npm run build:my-api
+            pnpm build:my-api
           else
-            npm run build:next
+            pnpm build:next
           fi
 
   # ============================================
@@ -178,24 +193,24 @@ jobs:
               repo: context.repo.repo,
               issue_number: context.issue.number,
             });
-            
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && 
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
               comment.body.includes('## PR Checks Summary')
             );
-            
+
             const body = `## PR Checks Summary
-            
+
             | Check | Status |
             |-------|--------|
             | PR Validation | ${{ needs.pr-validation.result == 'success' && '✅' || '❌' }} |
             | Quality Gate | ${{ needs.quality-gate.result == 'success' && '✅' || '❌' }} |
             | Build Verification | ${{ needs.build-verification.result == 'success' && '✅' || '❌' }} |
-            
+
             **Commit:** \`${{ github.event.pull_request.head.sha }}\`
             **Branch:** \`${{ github.event.pull_request.head.ref }}\`
             `;
-            
+
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
@@ -211,4 +226,3 @@ jobs:
                 body: body
               });
             }
-
