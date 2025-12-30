@@ -52,7 +52,7 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
         },
         select: this.authUserSelectStatement(),
       })
-      .catch((e) => {
+      .catch((e: unknown) => {
         if (e instanceof PrismaClientKnownRequestError) {
           if (e.code === 'P2002') {
             throw new ConstraintViolationException(ConstraintCode.USERNAME_EXISTS)

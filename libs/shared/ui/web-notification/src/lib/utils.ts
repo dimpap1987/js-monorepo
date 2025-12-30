@@ -65,7 +65,7 @@ const requestPushPermission = (): Promise<any> => {
         .then((permission) => {
           resolve(permission)
         })
-        .catch((error) => {
+        .catch((error: unknown) => {
           console.error('Error requesting push notification permission:', error)
           reject(error) // Reject with the error if something goes wrong
         })

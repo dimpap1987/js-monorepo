@@ -37,7 +37,7 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
           profileImage: userProfileCreateDto.profileImage,
         },
       })
-      .catch((e) => {
+      .catch((e: unknown) => {
         if (e instanceof PrismaClientKnownRequestError) {
           if (e.code === 'P2002') {
             throw new ConstraintViolationException(ConstraintCode.PROFILE_EXISTS)

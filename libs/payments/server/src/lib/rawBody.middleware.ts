@@ -9,7 +9,7 @@ function rawBodyMiddleware() {
   return json({
     verify: (request: RequestWithRawBody, response: Response, buffer: Buffer) => {
       if (request.url?.endsWith('/payments/webhook') && Buffer.isBuffer(buffer)) {
-        request.rawBody = Buffer.from(buffer)
+        request.rawBody = buffer
       }
       return true
     },

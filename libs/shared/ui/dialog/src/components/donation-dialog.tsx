@@ -40,7 +40,7 @@ function DonationDialogComponent({
       .then((data) => {
         setResponse({ ...data })
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.error('Error fetching client secret:', error)
         addNotification({
           message: 'Something went wrong',
