@@ -2,6 +2,7 @@
 
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Skeleton } from '@js-monorepo/components/skeleton'
+import { useWebSocketEvent } from '@js-monorepo/next/providers'
 import {
   apiGetSubscription,
   SessionSubscription,
@@ -9,7 +10,7 @@ import {
   SubscriptionManagement,
   usePlans,
 } from '@js-monorepo/payments-ui'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SettingsItem } from '../settings-items'
 
 export function SubscriptionSettings() {
@@ -17,11 +18,28 @@ export function SubscriptionSettings() {
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)
+  const subscriptionIdRef = useRef<number | null>(null)
 
   const sessionSubscription = session?.subscription as SessionSubscription | undefined
   const subscriptionPlan = sessionSubscription?.plans?.[0]
 
-  // Fetch full subscription details
+  // Keep track of subscription ID for WebSocket refetch
+  useEffect(() => {
+    subscriptionIdRef.current = subscriptionPlan?.subscriptionId ?? null
+  }, [subscriptionPlan?.subscriptionId])
+
+  // Refetch subscription when WebSocket refresh event fires (after webhook processes)
+  useWebSocketEvent('events:refresh-session', () => {
+    if (subscriptionIdRef.current) {
+      apiGetSubscription(subscriptionIdRef.current).then((response) => {
+        if (response.ok) {
+          setSubscription(response.data as Subscription)
+        }
+      })
+    }
+  })
+
+  // Fetch full subscription details on mount and when subscriptionId changes
   useEffect(() => {
     async function fetchSubscription() {
       if (!subscriptionPlan?.subscriptionId) {
