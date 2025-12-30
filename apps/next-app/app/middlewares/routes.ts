@@ -38,6 +38,10 @@ export const routes: {
     path: '/feedback',
     roles: ['PUBLIC'],
   },
+  {
+    path: '/checkout',
+    roles: ['USER', 'ADMIN'],
+  },
 ]
 
 export const authRoutes = ['/auth/login', '/auth/register', '/auth/onboarding']
