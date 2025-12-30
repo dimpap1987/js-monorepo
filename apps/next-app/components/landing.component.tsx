@@ -1,20 +1,28 @@
 'use client'
 import { DpButton } from '@js-monorepo/button'
+import { Badge } from '@js-monorepo/components/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/card'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@js-monorepo/components/drawer'
+import { FileUpload } from '@js-monorepo/components/file-upload'
+import { PermissionGate } from '@js-monorepo/components/permission'
+import { SearchBar } from '@js-monorepo/components/search'
 import { useLoader } from '@js-monorepo/loader'
-// import { MapComponent, Marker, Popup } from '@js-monorepo/map'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@js-monorepo/components/card'
-import { Glow, GlowArea } from '@js-monorepo/components/glow'
+import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
 import { cn } from '@js-monorepo/ui/util'
 import { ReactNode, useState } from 'react'
-import BannerSVG from './banner-svg'
-import { Badge } from '@js-monorepo/components/badge'
-import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AiFillRocket } from 'react-icons/ai'
 import { SITE_NAME } from '../lib/site-config'
-import { SearchBar } from '@js-monorepo/components/search'
-import { PermissionGate } from '@js-monorepo/components/permission'
-import { FileUpload } from '@js-monorepo/components/file-upload'
+import BannerSVG from './banner-svg'
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
@@ -240,6 +248,51 @@ export default function LandingComponent({ children, className }: MainProps) {
               multiple
               maxFiles={3}
             />
+          </CardContent>
+        </Card>
+
+        {/* Drawer Component */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Drawer</CardTitle>
+            <CardDescription>A slide-up drawer component for mobile-friendly interactions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Drawer>
+              <DrawerTrigger asChild>
+                <DpButton variant="outline">Open Drawer</DpButton>
+              </DrawerTrigger>
+              <DrawerContent>
+                <div className="mx-auto w-full max-w-sm">
+                  <DrawerHeader>
+                    <DrawerTitle>Settings</DrawerTitle>
+                    <DrawerDescription>Configure your preferences below.</DrawerDescription>
+                  </DrawerHeader>
+                  <div className="p-4 pb-0">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Dark Mode</span>
+                        <Badge variant="secondary">Enabled</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Notifications</span>
+                        <Badge variant="accent">On</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">Language</span>
+                        <Badge>English</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <DrawerFooter>
+                    <DpButton>Save Changes</DpButton>
+                    <DrawerClose asChild>
+                      <DpButton variant="outline">Cancel</DpButton>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </div>
+              </DrawerContent>
+            </Drawer>
           </CardContent>
         </Card>
       </div>
