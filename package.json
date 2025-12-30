@@ -3,11 +3,13 @@
   "version": "0.0.44",
   "license": "MIT",
   "scripts": {
+    "ci:local": "nx run-many --target=lint,test --projects=my-api,next-app --skip-nx-cache && nx run-many --target=build --projects=my-api,next-app --skip-nx-cache --configuration=production",
     "lint": "nx affected:lint --all",
     "lint:all": "npx nx run-many --all --target=lint",
     "format": "npx prettier --write .",
     "format:check": "nx format:check --all",
     "test": "nx affected:test --all",
+    "test:all": "nx run-many --target=test --all --skip-nx-cache",
     "prepare": "husky install",
     "sync:env": "node scripts/sync-env.js",
     "graph": "nx graph --affected",
