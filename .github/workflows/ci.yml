@@ -24,11 +24,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Nx
         uses: nrwl/nx-set-shas@v4
@@ -52,12 +57,12 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Get affected projects
         id: affected
         run: |
-          AFFECTED=$(npx nx show projects --affected --base=${{ steps.set-base.outputs.base }} --head=${{ steps.set-head.outputs.head }} 2>/dev/null | tr '\n' ',' | sed 's/,$//' || echo "")
+          AFFECTED=$(pnpm nx show projects --affected --base=${{ steps.set-base.outputs.base }} --head=${{ steps.set-head.outputs.head }} 2>/dev/null | tr '\n' ',' | sed 's/,$//' || echo "")
           echo "projects=$AFFECTED" >> $GITHUB_OUTPUT
           echo "Affected projects: $AFFECTED"
 
@@ -84,11 +89,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Nx
         uses: nrwl/nx-set-shas@v4
@@ -102,10 +112,10 @@ jobs:
             ${{ runner.os }}-nx-
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run linting
-        run: npx nx affected:lint --base=${{ needs.setup.outputs.base-sha }} --head=${{ needs.setup.outputs.head-sha }} --parallel=3
+        run: pnpm nx affected:lint --base=${{ needs.setup.outputs.base-sha }} --head=${{ needs.setup.outputs.head-sha }} --parallel=3
 
       - name: Upload lint results
         if: always()
@@ -127,17 +137,22 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Check formatting
-        run: npm run format:check
+        run: pnpm format:check
 
   # ============================================
   # Testing
@@ -157,11 +172,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Nx
         uses: nrwl/nx-set-shas@v4
@@ -175,11 +195,11 @@ jobs:
             ${{ runner.os }}-nx-
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run tests with coverage
         run: |
-          npx nx affected:test \
+          pnpm nx affected:test \
             --base=${{ needs.setup.outputs.base-sha }} \
             --head=${{ needs.setup.outputs.head-sha }} \
             --configuration=ci \
@@ -221,22 +241,27 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Nx
         uses: nrwl/nx-set-shas@v4
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Type check affected projects
         run: |
-          npx nx affected --target=typecheck --base=${{ needs.setup.outputs.base-sha }} --head=${{ needs.setup.outputs.head-sha }} --parallel=3 || \
-          npx nx run-many --target=typecheck --all --parallel=3 || true
+          pnpm nx affected --target=typecheck --base=${{ needs.setup.outputs.base-sha }} --head=${{ needs.setup.outputs.head-sha }} --parallel=3 || \
+          pnpm nx run-many --target=typecheck --all --parallel=3 || true
 
   # ============================================
   # Build
@@ -255,11 +280,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Setup Nx
         uses: nrwl/nx-set-shas@v4
@@ -273,7 +303,7 @@ jobs:
             ${{ runner.os }}-nx-
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
         if: matrix.app == 'my-api'
@@ -281,7 +311,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
           DIRECT_URL: ${{ secrets.DIRECT_URL_PROD }}
         run: |
-          npx prisma generate --schema=libs/prisma/db/src/lib/prisma/schema
+          pnpm prisma generate --schema=libs/prisma/db/src/lib/prisma/schema
 
       - name: Build ${{ matrix.app }}
         env:
@@ -294,10 +324,10 @@ jobs:
         run: |
           case "${{ matrix.app }}" in
             my-api)
-              npm run build:my-api
+              pnpm build:my-api
               ;;
             next-app)
-              npm run build:next
+              pnpm build:next
               ;;
           esac
 
@@ -322,8 +352,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run npm audit
-        run: npm audit --audit-level=moderate || true
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm audit
+        run: pnpm audit --audit-level=moderate || true
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -369,4 +407,3 @@ jobs:
           if [ "${{ needs.build.result }}" != "success" ] && [ "${{ needs.build.result }}" != "skipped" ]; then
             exit 1
           fi
-

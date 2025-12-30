@@ -135,21 +135,26 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Deploy migrations
         env:
           DATABASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.DATABASE_URL_PROD || (secrets.TEST_DATABASE_URL || secrets.DATABASE_URL_PROD) }}
           DIRECT_URL: ${{ github.ref == 'refs/heads/main' && secrets.DIRECT_URL_PROD || (secrets.TEST_DIRECT_URL || secrets.DIRECT_URL_PROD) }}
         run: |
-          npx prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema
+          pnpm prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema
 
   # ============================================
   # Check CI Status
