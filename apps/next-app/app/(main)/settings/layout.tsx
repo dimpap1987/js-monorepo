@@ -6,7 +6,7 @@ import { ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { IoMdNotifications } from 'react-icons/io'
-import { MdAccountCircle, MdChevronLeft, MdPalette } from 'react-icons/md'
+import { MdAccountCircle, MdChevronLeft, MdPalette, MdCreditCard } from 'react-icons/md'
 
 interface SettingsNavItem {
   href: string
@@ -21,6 +21,12 @@ const settingsNavItems: SettingsNavItem[] = [
     label: 'Account',
     icon: MdAccountCircle,
     description: 'Account information',
+  },
+  {
+    href: '/settings/subscription',
+    label: 'Subscription',
+    icon: MdCreditCard,
+    description: 'Manage your plan',
   },
   {
     href: '/settings/appearance',
