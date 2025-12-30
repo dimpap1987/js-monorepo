@@ -21,7 +21,9 @@
 }
 
 .animate-notification-pulse {
-  animation: notification-pulse 1.5s ease-in-out infinite, notification-shine 2s ease-in-out infinite;
+  animation:
+    notification-pulse 1.5s ease-in-out infinite,
+    notification-shine 2s ease-in-out infinite;
 }
 
 .max-line--height {
