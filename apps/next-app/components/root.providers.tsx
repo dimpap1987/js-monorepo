@@ -4,7 +4,7 @@ import { DpLoader, DpLoaderProvider } from '@js-monorepo/loader'
 import { QClientProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
-import { ThemeProvider } from '@js-monorepo/theme-provider'
+import { getEnabledThemeIds, ThemeProvider } from '@js-monorepo/theme-provider'
 import { WebNotificationProvider } from '@js-monorepo/web-notification'
 import dynamic from 'next/dynamic'
 import { ReactNode } from 'react'
@@ -19,29 +19,7 @@ export default async function RootProviders({ children }: { readonly children: R
   const session = await getCurrentSession()
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      themes={[
-        'light',
-        'dark',
-        'blue',
-        'green',
-        'dark-blue',
-        'retro',
-        'dracula',
-        'nord',
-        'monokai',
-        'tokyonight',
-        'solarized',
-        'gruvbox',
-        'catppuccin',
-        'onedark',
-        'synthwave',
-        'red',
-      ]}
-      enableSystem
-    >
+    <ThemeProvider attribute="class" defaultTheme="system" themes={getEnabledThemeIds()} enableSystem>
       <DpNextPageProgressBar>
         <SessionProvider value={session} endpoint="/session">
           <DynamicWebsocketProvider>
