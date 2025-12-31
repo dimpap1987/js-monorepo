@@ -270,12 +270,12 @@ export function SubscriptionManagement({
       <div className="flex flex-wrap gap-3 pt-2 justify-end">
         <DpButton variant="outline" onClick={handleManageSubscription} loading={isPortalLoading}>
           <Settings className="h-4 w-4 mr-2" />
-          Manage Subscription
+          Manage
         </DpButton>
         {status === 'canceling' && (
           <DpButton variant="primary" onClick={handleRenewClick}>
             <RefreshCw className="h-4 w-4 mr-2" />
-            Renew Subscription
+            Renew
           </DpButton>
         )}
         {status === 'active' && (

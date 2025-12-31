@@ -1,13 +1,15 @@
 'use client'
 
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { AdminTemplateContent, AdminTemplateSideBar } from '@js-monorepo/templates'
+import { AdminTemplateContent, AdminTemplateSideBar, ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren } from 'react'
 import { GrAnnounce } from 'react-icons/gr'
 import { HiMiniUsers } from 'react-icons/hi2'
 import { IoMdNotifications } from 'react-icons/io'
 import { RiUserSettingsFill } from 'react-icons/ri'
+import { MdOutlineSubscriptions } from 'react-icons/md'
+
 const navLinksOpts = [
   {
     href: '/dashboard/users',
@@ -19,6 +21,12 @@ const navLinksOpts = [
     href: '/dashboard/online-users',
     icon: HiMiniUsers,
     label: 'Online',
+    activeClassName: 'bg-primary text-primary-foreground',
+  },
+  {
+    href: '/dashboard/subscriptions',
+    icon: MdOutlineSubscriptions,
+    label: 'Subscriptions',
     activeClassName: 'bg-primary text-primary-foreground',
   },
   {
@@ -64,7 +72,9 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
       <AdminTemplateSideBar>
         <SidebarOpts />
       </AdminTemplateSideBar>
-      <AdminTemplateContent>{children}</AdminTemplateContent>
+      <AdminTemplateContent>
+        <ContainerTemplate>{children}</ContainerTemplate>
+      </AdminTemplateContent>
     </section>
   )
 }

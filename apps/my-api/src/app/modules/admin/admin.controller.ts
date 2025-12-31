@@ -10,7 +10,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  Logger,
   Param,
   ParseIntPipe,
   Put,
@@ -19,6 +18,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
+import { AdminPaymentsService } from './admin-payments.service'
 import { AdminService } from './admin.service'
 
 @Controller('admin')
@@ -27,7 +27,8 @@ import { AdminService } from './admin.service'
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
-    private readonly οnlineUsersService: OnlineUsersService
+    private readonly οnlineUsersService: OnlineUsersService,
+    private readonly adminPaymentsService: AdminPaymentsService
   ) {}
 
   @Get('users')
@@ -56,6 +57,14 @@ export class AdminController {
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
   ) {
     return this.οnlineUsersService.getList(page, pageSize)
+  }
+
+  @Get('subscriptions')
+  async getAllSubscriptions(
+    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
+  ) {
+    return this.adminPaymentsService.getAllSubscriptions(page, pageSize)
   }
 
   @Put('users/:id')
