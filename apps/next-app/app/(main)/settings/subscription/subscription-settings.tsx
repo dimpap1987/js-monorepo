@@ -22,12 +22,11 @@ export function SubscriptionSettings() {
   const subscriptionIdRef = useRef<number | null>(null)
 
   const sessionSubscription = session?.subscription as SessionSubscription | undefined
-  const subscriptionPlan = sessionSubscription?.plans?.[0]
 
   // Keep track of subscription ID for WebSocket refetch
   useEffect(() => {
-    subscriptionIdRef.current = subscriptionPlan?.subscriptionId ?? null
-  }, [subscriptionPlan?.subscriptionId])
+    subscriptionIdRef.current = sessionSubscription?.subscriptionId ?? null
+  }, [sessionSubscription?.subscriptionId])
 
   // Refetch subscription when WebSocket refresh event fires (after webhook processes)
   useWebSocketEvent('events:refresh-session', () => {
@@ -43,13 +42,13 @@ export function SubscriptionSettings() {
   // Fetch full subscription details on mount and when subscriptionId changes
   useEffect(() => {
     async function fetchSubscription() {
-      if (!subscriptionPlan?.subscriptionId) {
+      if (!sessionSubscription?.subscriptionId) {
         setIsLoadingSubscription(false)
         return
       }
 
       try {
-        const response = await apiGetSubscription(subscriptionPlan.subscriptionId)
+        const response = await apiGetSubscription(sessionSubscription.subscriptionId)
         if (response.ok) {
           setSubscription(response.data as Subscription)
         }
@@ -61,7 +60,7 @@ export function SubscriptionSettings() {
     }
 
     fetchSubscription()
-  }, [subscriptionPlan?.subscriptionId])
+  }, [sessionSubscription?.subscriptionId])
 
   // Get plan details from the plans list
   const planDetails = useMemo(() => {
@@ -84,14 +83,14 @@ export function SubscriptionSettings() {
 
   const refetchSubscription = useCallback(() => {
     refreshSession()
-    if (subscriptionPlan?.subscriptionId) {
-      apiGetSubscription(subscriptionPlan.subscriptionId).then((response) => {
+    if (sessionSubscription?.subscriptionId) {
+      apiGetSubscription(sessionSubscription.subscriptionId).then((response) => {
         if (response.ok) {
           setSubscription(response.data as Subscription)
         }
       })
     }
-  }, [refreshSession, subscriptionPlan?.subscriptionId])
+  }, [refreshSession, sessionSubscription?.subscriptionId])
 
   const handleCancelSuccess = refetchSubscription
   const handleRenewSuccess = refetchSubscription
