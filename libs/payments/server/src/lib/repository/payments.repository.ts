@@ -1,11 +1,12 @@
-import { toDate } from '@js-monorepo/auth/nest/common/utils'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { CreateProductType } from '../../'
+import { ACTIVE_SUBSCRIPTION_STATUSES } from '../constants'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
-import { SubscriptionUpdateData, SubscriptionDeleteData } from '../dto/subscription-webhook.dto'
+import { SubscriptionDeleteData, SubscriptionUpdateData } from '../dto/subscription-webhook.dto'
+import { timestampToDate } from '../utils'
 
 @Injectable()
 export class PaymentsRepository {
@@ -69,12 +70,13 @@ export class PaymentsRepository {
       data: {
         priceId: priceId,
         status: subscriptionData.status,
-        currentPeriodStart: toDate(subscriptionData.current_period_start),
-        currentPeriodEnd: toDate(subscriptionData.current_period_end),
-        trialStart: subscriptionData.trial_start ? toDate(subscriptionData.trial_start) : undefined,
-        trialEnd: subscriptionData.trial_end ? toDate(subscriptionData.trial_end) : undefined,
-        cancelAt: subscriptionData.cancel_at ? toDate(subscriptionData.cancel_at) : undefined,
-        canceledAt: subscriptionData.canceled_at ? toDate(subscriptionData.canceled_at) : undefined,
+        currentPeriodStart: timestampToDate(subscriptionData.current_period_start),
+        currentPeriodEnd: timestampToDate(subscriptionData.current_period_end),
+        trialStart: timestampToDate(subscriptionData.trial_start),
+        trialEnd: timestampToDate(subscriptionData.trial_end),
+        cancelAt: timestampToDate(subscriptionData.cancel_at),
+        canceledAt: timestampToDate(subscriptionData.canceled_at),
+        cancelReason: subscriptionData.cancelReason,
       },
       include: {
         price: {
@@ -91,7 +93,8 @@ export class PaymentsRepository {
       where: { stripeSubscriptionId: subscriptionData.id },
       data: {
         status: subscriptionData.status,
-        canceledAt: subscriptionData.cancel_at ? toDate(subscriptionData.cancel_at) : undefined,
+        canceledAt: timestampToDate(subscriptionData.cancel_at),
+        cancelReason: subscriptionData.cancelReason,
       },
       include: {
         price: {
@@ -140,7 +143,7 @@ export class PaymentsRepository {
     })
   }
 
-  async findUserSubscriptions(userId: number, statuses = ['active', 'trialing']) {
+  async findUserSubscriptions(userId: number, statuses: string[] = ACTIVE_SUBSCRIPTION_STATUSES) {
     return this.txHost.tx.subscription.findMany({
       where: {
         paymentCustomer: {
@@ -185,6 +188,9 @@ export class PaymentsRepository {
       where: {
         stripeId: stripeId,
       },
+      include: {
+        product: true,
+      },
     })
   }
 
@@ -192,6 +198,9 @@ export class PaymentsRepository {
     return this.txHost.tx.price.findUniqueOrThrow({
       where: {
         id: id,
+      },
+      include: {
+        product: true,
       },
     })
   }
@@ -214,6 +223,18 @@ export class PaymentsRepository {
     return this.txHost.tx.subscription.findFirstOrThrow({
       where: {
         id: id,
+      },
+    })
+  }
+
+  async findSubscriptionByStripeId(stripeSubscriptionId: string) {
+    return this.txHost.tx.subscription.findFirst({
+      where: {
+        stripeSubscriptionId,
+      },
+      select: {
+        id: true,
+        cancelAt: true,
       },
     })
   }

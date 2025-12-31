@@ -22,7 +22,7 @@ import { UserSocketService } from '../services/user-socket.service'
   path: '/ws',
   namespace: 'presence',
   cors: {
-    origin: process.env['CORS_ORIGIN_DOMAINS'],
+    origin: process.env['APP_URL'],
   },
   transports: ['websocket'],
 })

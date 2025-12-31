@@ -185,6 +185,11 @@ export class PaymentsService {
     return result
   }
 
+  async findSubscriptionByStripeId(stripeSubscriptionId: string) {
+    const { result } = await tryCatch(() => this.paymentsRepository.findSubscriptionByStripeId(stripeSubscriptionId))
+    return result
+  }
+
   async getActiveSubscriptionByProductAndUserId(userId: number, productName: string) {
     const { result, error } = await tryCatch(() =>
       this.paymentsRepository.getActiveSubscriptionByProductAndUserId(userId, productName)

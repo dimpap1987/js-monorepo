@@ -1,8 +1,9 @@
 import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import { CancelReasonType } from '../constants'
 
 export class CreateSubscriptionDto {
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   paymentCustomerId: number
 
   @IsNotEmpty()
@@ -40,4 +41,8 @@ export class CreateSubscriptionDto {
   @IsOptional()
   @IsDate()
   canceledAt?: Date
+
+  @IsOptional()
+  @IsString()
+  cancelReason?: CancelReasonType
 }

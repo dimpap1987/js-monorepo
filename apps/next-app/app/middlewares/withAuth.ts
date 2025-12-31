@@ -1,3 +1,4 @@
+import { buildLoginUrl } from '@js-monorepo/auth/next/client'
 import { getCurrentUser } from '@next-app/actions/session'
 import { NextRequest, NextResponse } from 'next/server'
 import { apiAuthPrefix, authRoutes, isPublicRoute, routes } from './routes'
@@ -33,7 +34,8 @@ export function withAuth(
     }
 
     if (!isLoggedIn && !isPublicRoute && routeExists) {
-      return NextResponse.redirect(new URL(`/auth/login`, nextUrl))
+      const callbackPath = nextUrl.pathname + nextUrl.search
+      return NextResponse.redirect(new URL(buildLoginUrl(callbackPath), nextUrl))
     }
 
     const hasRequiredRole = routes

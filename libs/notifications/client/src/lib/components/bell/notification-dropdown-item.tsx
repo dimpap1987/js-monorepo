@@ -1,7 +1,8 @@
 import { DropdownMenuItem } from '@js-monorepo/components/dropdown'
 import { UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
-import React from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useCallback } from 'react'
 import { humanatizeNotificationDate } from '../../utils/notifications'
 import './bell.css'
 
@@ -12,6 +13,29 @@ interface NotificationDropdownItemProps {
 
 const NotificationDropdownItem = React.memo(({ content, onRead }: NotificationDropdownItemProps) => {
   const isUnread = !content.isRead
+  const router = useRouter()
+
+  // Handle clicks on links inside notification content for client-side navigation
+  const handleContentClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'A') {
+        e.preventDefault()
+        e.stopPropagation()
+        const href = target.getAttribute('href')
+        if (href) {
+          // Check if it's an internal link (starts with / or is relative)
+          if (href.startsWith('/') || !href.startsWith('http')) {
+            router.push(href)
+          } else {
+            // External link - open in new tab
+            window.open(href, '_blank', 'noopener,noreferrer')
+          }
+        }
+      }
+    },
+    [router]
+  )
 
   return (
     <DropdownMenuItem
@@ -43,12 +67,14 @@ const NotificationDropdownItem = React.memo(({ content, onRead }: NotificationDr
         {/* Message content - takes full width of second column */}
         <div
           className={cn(
+            'notification-content',
             'text-sm break-words select-text leading-relaxed min-w-0',
             'max-line--height',
             isUnread ? 'text-foreground font-semibold' : 'text-foreground-neutral font-normal',
             'overflow-wrap-anywhere word-break break-word'
           )}
           style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+          onClick={handleContentClick}
           dangerouslySetInnerHTML={{ __html: content.notification?.message }}
         />
 
