@@ -2,12 +2,13 @@
 
 import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
 import { ErrorDialog } from '@js-monorepo/dialog'
+import { useNotifications } from '@js-monorepo/notification'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePlans } from '../../queries/payments-queries'
 import { POPULAR_PLAN_NAME, SessionSubscription, Subscription } from '../../types'
-import { apiGetSubscription } from '../../utils/api'
+import { apiCreatePortalSession, apiGetSubscription } from '../../utils/api'
 import { PricingCard } from './pricing-card'
 import { PricingFAQ } from './pricing-faq'
 import { PricingHero } from './pricing-hero'
@@ -19,7 +20,9 @@ export function Pricing() {
   const searchParams = useSearchParams()
   const [hasErrors, setHasErrors] = useState(false)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [isPortalLoading, setIsPortalLoading] = useState(false)
   const { data: plans = [] } = usePlans()
+  const { addNotification } = useNotifications()
 
   const sessionSubscription = session?.subscription as SessionSubscription | undefined
 
@@ -59,6 +62,32 @@ export function Pricing() {
     }
   }, [sessionSubscription?.subscriptionId])
 
+  const handleManageSubscription = useCallback(async () => {
+    setIsPortalLoading(true)
+    try {
+      const returnUrl = window.location.href
+      const response = await apiCreatePortalSession(returnUrl)
+
+      if (response.ok && response.data?.url) {
+        window.location.href = response.data.url
+      } else {
+        addNotification({
+          message: 'Failed to open subscription portal',
+          description: 'Please try again or contact support',
+          type: 'error',
+        })
+        setIsPortalLoading(false)
+      }
+    } catch (error) {
+      addNotification({
+        message: 'Something went wrong',
+        description: 'Please try again later',
+        type: 'error',
+      })
+      setIsPortalLoading(false)
+    }
+  }, [addNotification])
+
   const handleSelectPlan = useCallback(
     (priceId: number) => {
       const checkoutUrl = `/checkout?planId=${priceId}`
@@ -66,9 +95,14 @@ export function Pricing() {
         router.push(buildLoginUrl(checkoutUrl))
         return
       }
+      // If user has subscription and clicks a different plan, open portal to switch
+      if (sessionSubscription?.isSubscribed && sessionSubscription?.priceId !== priceId) {
+        handleManageSubscription()
+        return
+      }
       router.push(checkoutUrl)
     },
-    [isLoggedIn, router]
+    [isLoggedIn, router, sessionSubscription?.isSubscribed, sessionSubscription?.priceId, handleManageSubscription]
   )
 
   const handleErrorDialogClose = () => {
@@ -106,6 +140,7 @@ export function Pricing() {
             isLoggedIn={isLoggedIn}
             subscription={card.subscribed ? subscription ?? undefined : undefined}
             onSelect={handleSelectPlan}
+            isLoading={isPortalLoading}
           />
         ))}
       </section>

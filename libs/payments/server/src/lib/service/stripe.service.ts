@@ -297,6 +297,20 @@ export class StripeService {
     }
   }
 
+  async createPortalSession(stripeCustomerId: string, returnUrl: string) {
+    try {
+      const stripe = this.stripeProvider.getStripeClient()
+      const session = await stripe.billingPortal.sessions.create({
+        customer: stripeCustomerId,
+        return_url: returnUrl,
+      })
+      return { url: session.url }
+    } catch (error) {
+      this.logger.error('Error creating portal session:', error.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATING_PORTAL_SESSION')
+    }
+  }
+
   async validateOrCreateCustomer(stripeCustomerId: string, email: string, userId: number) {
     try {
       await this.paymentsClient.getCustomer(stripeCustomerId)

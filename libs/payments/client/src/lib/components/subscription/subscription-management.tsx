@@ -2,11 +2,16 @@
 
 import { DpButton } from '@js-monorepo/button'
 import { useNotifications } from '@js-monorepo/notification'
-import { Calendar, CheckCircle, CreditCard, RefreshCw, XCircle } from 'lucide-react'
+import { Calendar, CheckCircle, CreditCard, RefreshCw, Settings, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { Subscription } from '../../types'
-import { apiCancelSubscription, apiRenewSubscription, generateIdempotencyKey } from '../../utils/api'
+import {
+  apiCancelSubscription,
+  apiCreatePortalSession,
+  apiRenewSubscription,
+  generateIdempotencyKey,
+} from '../../utils/api'
 import { CancelSubscriptionDialog } from './cancel-subscription-dialog'
 import { RenewSubscriptionDialog } from './renew-subscription-dialog'
 
@@ -79,6 +84,7 @@ export function SubscriptionManagement({
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
   const [isRenewDialogOpen, setIsRenewDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isPortalLoading, setIsPortalLoading] = useState(false)
   const { addNotification } = useNotifications()
 
   const status = getSubscriptionStatus(subscription)
@@ -171,6 +177,32 @@ export function SubscriptionManagement({
     }
   }, [priceId, addNotification, onRenewSuccess])
 
+  const handleManageSubscription = useCallback(async () => {
+    setIsPortalLoading(true)
+    try {
+      const returnUrl = window.location.href
+      const response = await apiCreatePortalSession(returnUrl)
+
+      if (response.ok && response.data?.url) {
+        window.location.href = response.data.url
+      } else {
+        addNotification({
+          message: 'Failed to open subscription portal',
+          description: 'Please try again or contact support',
+          type: 'error',
+        })
+        setIsPortalLoading(false)
+      }
+    } catch (error) {
+      addNotification({
+        message: 'Something went wrong',
+        description: 'Please try again later',
+        type: 'error',
+      })
+      setIsPortalLoading(false)
+    }
+  }, [addNotification])
+
   // No subscription state
   if (status === 'none' || status === 'canceled') {
     return (
@@ -236,9 +268,10 @@ export function SubscriptionManagement({
 
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-2 justify-end">
-        <Link href="/pricing">
-          <DpButton variant="outline">Change Plan</DpButton>
-        </Link>
+        <DpButton variant="outline" onClick={handleManageSubscription} loading={isPortalLoading}>
+          <Settings className="h-4 w-4 mr-2" />
+          Manage Subscription
+        </DpButton>
         {status === 'canceling' && (
           <DpButton variant="primary" onClick={handleRenewClick}>
             <RefreshCw className="h-4 w-4 mr-2" />

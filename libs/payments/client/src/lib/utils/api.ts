@@ -41,3 +41,7 @@ export async function apiGetInvoices(
 
   return apiClient.get(url)
 }
+
+export async function apiCreatePortalSession(returnUrl: string): Promise<ClientResponseType<{ url: string }>> {
+  return apiClient.post('/payments/portal', { returnUrl })
+}

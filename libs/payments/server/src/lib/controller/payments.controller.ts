@@ -80,4 +80,16 @@ export class PaymentsController {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_SUBSCRIPTION_STRIPE_RENEW')
     }
   }
+
+  @Post('portal')
+  @UseGuards(LoggedInGuard)
+  async createPortalSession(@Body() { returnUrl }: { returnUrl: string }, @SessionUser() sessionUser: SessionUserType) {
+    const paymentCustomer = await this.paymentsService.findPaymentCustomerById(sessionUser.id)
+
+    if (!paymentCustomer?.stripeCustomerId) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_NO_PAYMENT_CUSTOMER')
+    }
+
+    return this.stripeService.createPortalSession(paymentCustomer.stripeCustomerId, returnUrl)
+  }
 }
