@@ -59,11 +59,12 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions =
 
 /**
  * Converts Unix timestamp (seconds) to Date object.
- * Returns undefined if timestamp is null/undefined.
+ * Returns null if timestamp is null/undefined.
+ * Note: Returns null (not undefined) so Prisma will clear the field rather than skip it.
  */
-export function timestampToDate(timestamp: number | null | undefined): Date | undefined {
+export function timestampToDate(timestamp: number | null | undefined): Date | null {
   if (timestamp == null) {
-    return undefined
+    return null
   }
   return new Date(timestamp * 1000)
 }

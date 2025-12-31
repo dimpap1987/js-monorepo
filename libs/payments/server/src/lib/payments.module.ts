@@ -18,6 +18,8 @@ export interface PaymentsModuleOptions {
   onSubscriptionCreateSuccess?: (userId: number, subscription: SubscriptionCallback) => void
   onSubscriptionUpdateSuccess?: (userId: number, subscription: SubscriptionCallback) => void
   onSubscriptionDeleteSuccess?: (userId: number, subscription: SubscriptionCallback) => void
+  onSubscriptionRenewSuccess?: (userId: number, subscription: SubscriptionCallback) => void
+  onSubscriptionExpiredSuccess?: (userId: number, subscription: SubscriptionCallback) => void
   onSubscriptionEvent?: (userId: number, event: 'created' | 'updated' | 'deleted') => void
 }
 

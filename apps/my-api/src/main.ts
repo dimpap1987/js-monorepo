@@ -41,15 +41,15 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix)
   app.use(cookieParser())
   app.enableCors({
-    origin: process.env.CORS_ORIGIN_DOMAINS,
+    origin: process.env.APP_URL,
     credentials: true,
   })
   app.use(
     helmet({
       contentSecurityPolicy: {
         directives: {
-          defaultSrc: ["'self'", process.env.CORS_ORIGIN_DOMAINS],
-          connectSrc: ["'self'", process.env.CORS_ORIGIN_DOMAINS],
+          defaultSrc: ["'self'", process.env.APP_URL],
+          connectSrc: ["'self'", process.env.APP_URL],
         },
       },
     })

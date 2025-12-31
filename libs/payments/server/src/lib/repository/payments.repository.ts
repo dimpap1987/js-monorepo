@@ -227,6 +227,18 @@ export class PaymentsRepository {
     })
   }
 
+  async findSubscriptionByStripeId(stripeSubscriptionId: string) {
+    return this.txHost.tx.subscription.findFirst({
+      where: {
+        stripeSubscriptionId,
+      },
+      select: {
+        id: true,
+        cancelAt: true,
+      },
+    })
+  }
+
   async getActiveSubscriptionByProductAndUserId(userId: number, productName: string) {
     return this.txHost.tx.subscription.findFirst({
       where: {

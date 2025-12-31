@@ -22,3 +22,8 @@ export async function apiCancelSubscription(priceId: number, idempotencyKey?: st
   const key = idempotencyKey ?? generateIdempotencyKey()
   return apiClient.post('/payments/cancel', { priceId }, { headers: { [IDEMPOTENCY_HEADER]: key } })
 }
+
+export async function apiRenewSubscription(priceId: number, idempotencyKey?: string) {
+  const key = idempotencyKey ?? generateIdempotencyKey()
+  return apiClient.post('/payments/renew', { priceId }, { headers: { [IDEMPOTENCY_HEADER]: key } })
+}

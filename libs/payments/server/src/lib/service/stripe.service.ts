@@ -183,7 +183,12 @@ export class StripeService {
         })
       })
     } else if (type === 'updated') {
-      const cancelReason = subscriptionData.cancel_at ? CancelReason.USER_REQUESTED : undefined
+      // Fetch existing subscription to detect renewals (cancelAt was set, now cleared)
+      const existingSubscription = await this.paymentsService.findSubscriptionByStripeId(subscriptionId)
+      const isRenewal = existingSubscription?.cancelAt && !subscriptionData.cancel_at
+
+      // When cancel_at is null (subscription renewed), explicitly pass null to clear cancelReason in DB
+      const cancelReason = subscriptionData.cancel_at ? CancelReason.USER_REQUESTED : null
 
       const sub = await this.paymentsService.updateSubscription({
         id: subscriptionId,
@@ -204,9 +209,21 @@ export class StripeService {
         this.paymentsModuleOptions.onSubscriptionUpdateSuccess?.(paymentCustomer.userId, {
           id: sub.id,
           name: price.product?.name,
+          cancelAt: timestampToDate(subscriptionData.cancel_at as number | null) ?? undefined,
         })
       })
 
+      // Renewal: subscription was scheduled to cancel but user renewed it
+      if (isRenewal) {
+        tryCatch(() => {
+          this.paymentsModuleOptions.onSubscriptionRenewSuccess?.(paymentCustomer.userId, {
+            id: sub.id,
+            name: price.product?.name,
+          })
+        })
+      }
+
+      // Cancellation scheduled
       if (subscriptionData.cancel_at) {
         tryCatch(() => {
           this.paymentsModuleOptions.onSubscriptionDeleteSuccess?.(paymentCustomer.userId, {
@@ -217,11 +234,18 @@ export class StripeService {
         })
       }
     } else if (type === 'deleted') {
-      await this.paymentsService.deleteSubscription({
+      const sub = await this.paymentsService.deleteSubscription({
         id: subscriptionId,
         status,
         cancel_at: subscriptionData.cancel_at as number | null,
         cancelReason: CancelReason.EXPIRED,
+      })
+
+      tryCatch(() => {
+        this.paymentsModuleOptions.onSubscriptionExpiredSuccess?.(paymentCustomer.userId, {
+          id: sub.id,
+          name: price.product?.name,
+        })
       })
     }
 
@@ -258,6 +282,15 @@ export class StripeService {
       })
     } catch (error) {
       this.logger.error('Error canceling subscription:', error.stack)
+      throw error
+    }
+  }
+
+  async renewSubscription(stripeSubscriptionId: string) {
+    try {
+      return await this.paymentsClient.reactivateSubscription(stripeSubscriptionId)
+    } catch (error) {
+      this.logger.error('Error renewing subscription:', error.stack)
       throw error
     }
   }
