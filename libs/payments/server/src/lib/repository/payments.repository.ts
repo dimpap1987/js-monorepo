@@ -164,6 +164,7 @@ export class PaymentsRepository {
             product: {
               select: {
                 id: true,
+                name: true,
               },
             },
           },

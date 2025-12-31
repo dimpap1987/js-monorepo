@@ -20,21 +20,10 @@ export interface Subscription {
 }
 
 export interface SessionSubscription {
-  plans?: SubscriptionPlan[]
-}
-
-export interface SubscriptionPlan {
-  subscriptionId: number
-  price: PriceDetails
-}
-
-export interface PriceDetails {
-  id: number
-  product: ProductDetails
-}
-
-export interface ProductDetails {
-  id: number
+  isSubscribed: boolean
+  plan: string | null
+  subscriptionId: number | null
+  priceId: number | null
 }
 
 // FAQ types for pricing page

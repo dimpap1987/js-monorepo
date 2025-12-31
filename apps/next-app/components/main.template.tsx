@@ -55,6 +55,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   const [openSideBar, setOpenSideBar] = useState(false)
   const router = useRouter()
   const user = session?.user
+  const plan = (session?.subscription as { plan?: string } | undefined)?.plan
   const isLoggedIn = !!user
 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
@@ -91,6 +92,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
     <>
       <DpNextNavbar
         user={user}
+        plan={plan}
         menuItems={menuItems}
         onSideBarClick={() => setOpenSideBar(true)}
         onLogout={() => authClient.logout()}
@@ -103,7 +105,14 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
 
       <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20"></AnnouncementsComponent>
 
-      <DpNextSidebar isOpen={openSideBar} onClose={handleSidebarClose} position="right" items={menuItems} user={user}>
+      <DpNextSidebar
+        isOpen={openSideBar}
+        onClose={handleSidebarClose}
+        position="right"
+        items={menuItems}
+        user={user}
+        plan={plan}
+      >
         {sidebarChildren}
       </DpNextSidebar>
 

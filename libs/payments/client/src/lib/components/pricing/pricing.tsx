@@ -6,50 +6,22 @@ import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePlans } from '../../queries/payments-queries'
-import { POPULAR_PLAN_NAME, SessionSubscription, Subscription, SubscriptionPlan } from '../../types'
+import { POPULAR_PLAN_NAME, SessionSubscription, Subscription } from '../../types'
 import { apiGetSubscription } from '../../utils/api'
 import { PricingCard } from './pricing-card'
 import { PricingFAQ } from './pricing-faq'
 import { PricingHero } from './pricing-hero'
 import { PricingTrustSignals } from './pricing-trust-signals'
 
-function useSubscriptionMap() {
-  const [subscriptionMap, setSubscriptionMap] = useState<Map<number, Subscription>>(new Map())
-
-  const fetchSubscriptions = useCallback(async (plans: SubscriptionPlan[]) => {
-    try {
-      const promises = plans.map((plan) =>
-        plan.subscriptionId
-          ? apiGetSubscription(plan.subscriptionId).then((res) => {
-              if (res.ok) {
-                const sub = res.data as Subscription
-                setSubscriptionMap((prev) => {
-                  const updatedMap = new Map(prev)
-                  updatedMap.set(sub?.priceId, sub)
-                  return updatedMap
-                })
-              }
-            })
-          : Promise.resolve()
-      )
-      await Promise.all(promises)
-    } catch (error) {
-      console.error('Error fetching subscriptions:', error)
-    }
-  }, [])
-
-  return { subscriptionMap, fetchSubscriptions }
-}
-
 export function Pricing() {
   const { session, isLoggedIn } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [hasErrors, setHasErrors] = useState(false)
-  const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
-  const { subscriptionMap, fetchSubscriptions } = useSubscriptionMap()
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const { data: plans = [] } = usePlans()
 
-  const sessionSubscription = session?.subscription as SessionSubscription
+  const sessionSubscription = session?.subscription as SessionSubscription | undefined
 
   const pricingCards = useMemo(() => {
     return plans
@@ -64,11 +36,11 @@ export function Pricing() {
             interval: price.interval,
             features: plan.features,
             isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
-            subscribed: !!subscriptionMap.get(price.id),
+            subscribed: sessionSubscription?.priceId === price.id,
           }))
       )
       .sort((a, b) => a.price - b.price)
-  }, [plans, subscriptionMap])
+  }, [plans, sessionSubscription?.priceId])
 
   useEffect(() => {
     if (searchParams?.get('success') === 'false') {
@@ -76,11 +48,16 @@ export function Pricing() {
     }
   }, [searchParams])
 
+  // Fetch full subscription details when user has an active subscription
   useEffect(() => {
-    if (sessionSubscription?.plans?.length) {
-      fetchSubscriptions(sessionSubscription.plans)
+    if (sessionSubscription?.subscriptionId) {
+      apiGetSubscription(sessionSubscription.subscriptionId).then((res) => {
+        if (res.ok) {
+          setSubscription(res.data as Subscription)
+        }
+      })
     }
-  }, [sessionSubscription, fetchSubscriptions])
+  }, [sessionSubscription?.subscriptionId])
 
   const handleSelectPlan = useCallback(
     (priceId: number) => {
@@ -125,9 +102,9 @@ export function Pricing() {
             features={card.features}
             isPopular={card.isPopular}
             subscribed={card.subscribed}
-            anySubscribed={!!sessionSubscription?.plans?.length}
+            anySubscribed={!!sessionSubscription?.isSubscribed}
             isLoggedIn={isLoggedIn}
-            subscription={subscriptionMap.get(card.id)}
+            subscription={card.subscribed ? subscription ?? undefined : undefined}
             onSelect={handleSelectPlan}
           />
         ))}

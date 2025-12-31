@@ -111,15 +111,20 @@ export class PaymentsService {
     if (!subscriptions || subscriptions.length === 0) {
       return {
         isSubscribed: false,
+        plan: null,
+        subscriptionId: null,
+        priceId: null,
       }
     }
 
+    // Get the most recent active subscription
+    const activePlan = subscriptions[0]
+
     return {
       isSubscribed: true,
-      plans: subscriptions.map((subscription) => ({
-        subscriptionId: subscription.id,
-        price: { ...subscription.price },
-      })),
+      plan: activePlan.price?.product?.name || null,
+      subscriptionId: activePlan.id,
+      priceId: activePlan.price?.id || null,
     }
   }
 
