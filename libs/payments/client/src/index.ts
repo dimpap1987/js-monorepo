@@ -7,6 +7,7 @@ export * from './lib/queries/payments-queries'
 export * from './lib/types'
 export {
   apiCancelSubscription,
+  apiCreatePortalSession,
   apiGetInvoices,
   apiGetSubscription,
   apiRenewSubscription,

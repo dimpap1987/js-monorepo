@@ -42,29 +42,35 @@ export function PricingCard({
     if (!isLoggedIn) {
       return 'Get Started'
     }
-    if (isFree && !anySubscribed) {
+    if (subscribed) {
       return 'Current Plan'
     }
-    if (subscribed) {
+    if (isFree && anySubscribed) {
+      return 'Included'
+    }
+    if (isFree && !anySubscribed) {
       return 'Current Plan'
     }
     return 'Get Started'
   }
 
   const isCurrentPlan = subscribed || (isLoggedIn && isFree && !anySubscribed)
-  const isDisabled = isCurrentPlan
+  const isFreeWithSubscription = isFree && anySubscribed
+  const isDisabled = isCurrentPlan || isFreeWithSubscription
 
   return (
     <Card
       className={cn(
         'relative flex flex-col transition-all duration-300',
-        isPopular && 'border-primary shadow-lg scale-[1.02]',
-        anySubscribed && !subscribed && !isFree && 'opacity-60 hover:opacity-100',
-        subscribed && 'border-status-success'
+        // Active plan gets prominence, otherwise popular gets it (but not if user has any subscription)
+        isCurrentPlan && 'border-status-success shadow-lg scale-[1.02]',
+        !isCurrentPlan && isPopular && !anySubscribed && 'border-primary shadow-lg scale-[1.02]',
+        // Dim non-active plans when user has a subscription (including free)
+        anySubscribed && !subscribed && 'opacity-60 hover:opacity-100'
       )}
     >
-      {/* Badge - Priority: Active > Popular (Active state is more relevant than marketing nudge) */}
-      {(isCurrentPlan || isPopular) && (
+      {/* Badge - Priority: Active > Popular (only show Popular if no subscription) */}
+      {(isCurrentPlan || (isPopular && !anySubscribed)) && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           {isCurrentPlan ? (
             <span className="bg-status-success-bg text-status-success text-xs font-semibold px-3 py-1 rounded-full border border-status-success/50">
@@ -107,9 +113,9 @@ export function PricingCard({
         <DpButton
           className="w-full"
           size="large"
-          variant={isPopular ? 'primary' : 'outline'}
-          disabled={isDisabled}
-          loading={isLoading}
+          variant={isCurrentPlan ? 'outline' : isPopular && !anySubscribed ? 'primary' : 'outline'}
+          disabled={isDisabled || isLoading}
+          loading={isLoading && !isCurrentPlan && !isFree && anySubscribed}
           onClick={() => onSelect(id)}
         >
           {getButtonContent()}
