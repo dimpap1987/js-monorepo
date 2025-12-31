@@ -142,62 +142,47 @@ import {
     }),
     PaymentsModule.forRootAsync({
       imports: [UserPresenceModule, NotificationServerModule],
-      inject: [UserPresenceWebsocketService, NotificationService, ConfigService],
+      inject: [UserPresenceWebsocketService, NotificationService],
       useFactory: async (
         userPresenceWebsocketService: UserPresenceWebsocketService,
-        notificationService: NotificationService,
-        configService: ConfigService
-      ) => {
-        const appUrl = configService.get<string>('APP_URL') || ''
-
-        return {
-          onSubscriptionCreateSuccess: (userId, subscription) => {
-            notificationService.createNotification({
-              receiverIds: [userId],
-              message: getSubscriptionActivatedMessage({
-                planName: subscription.name,
-                appUrl,
-              }),
-            })
-          },
-          onSubscriptionEvent: (userId, event) => {
-            apiLogger.log(`Subscription event callback received with event: '${event}' and userId: ${userId}`)
-            userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
-          },
-          onSubscriptionUpdateSuccess: () => {
-            // Updates without specific context are handled via webhooks for UI refresh
-            // Specific actions like renewals have their own callbacks
-          },
-          onSubscriptionRenewSuccess: (userId, subscription) => {
-            notificationService.createNotification({
-              receiverIds: [userId],
-              message: getSubscriptionRenewedMessage({
-                planName: subscription.name,
-                appUrl,
-              }),
-            })
-          },
-          onSubscriptionDeleteSuccess: (userId, subscription) => {
-            notificationService.createNotification({
-              receiverIds: [userId],
-              message: getSubscriptionCanceledMessage({
-                planName: subscription.name,
-                appUrl,
-                cancelAt: subscription.cancelAt,
-              }),
-            })
-          },
-          onSubscriptionExpiredSuccess: (userId, subscription) => {
-            notificationService.createNotification({
-              receiverIds: [userId],
-              message: getSubscriptionExpiredMessage({
-                planName: subscription.name,
-                appUrl,
-              }),
-            })
-          },
-        }
-      },
+        notificationService: NotificationService
+      ) => ({
+        onSubscriptionCreateSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getSubscriptionActivatedMessage({ planName: subscription.name }),
+          })
+        },
+        onSubscriptionEvent: (userId, event) => {
+          apiLogger.log(`Subscription event callback received with event: '${event}' and userId: ${userId}`)
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+        },
+        onSubscriptionUpdateSuccess: () => {
+          // Updates without specific context are handled via webhooks for UI refresh
+          // Specific actions like renewals have their own callbacks
+        },
+        onSubscriptionRenewSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getSubscriptionRenewedMessage({ planName: subscription.name }),
+          })
+        },
+        onSubscriptionDeleteSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getSubscriptionCanceledMessage({
+              planName: subscription.name,
+              cancelAt: subscription.cancelAt,
+            }),
+          })
+        },
+        onSubscriptionExpiredSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getSubscriptionExpiredMessage({ planName: subscription.name }),
+          })
+        },
+      }),
     }),
     CacheModule.registerAsync({
       isGlobal: true,

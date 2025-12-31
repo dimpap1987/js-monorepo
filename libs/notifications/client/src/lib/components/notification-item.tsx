@@ -2,8 +2,11 @@
 
 import { UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
+import { useRouter } from 'next/navigation'
+import { useCallback } from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { humanatizeNotificationDate } from '../utils/notifications'
+import './bell/bell.css'
 
 interface NotificationItemProps {
   notification: UserNotificationType
@@ -13,6 +16,29 @@ interface NotificationItemProps {
 
 export function NotificationItem({ notification, onRead, className }: NotificationItemProps) {
   const isUnread = !notification.isRead
+  const router = useRouter()
+
+  // Handle clicks on links inside notification content for client-side navigation
+  const handleContentClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'A') {
+        e.preventDefault()
+        e.stopPropagation()
+        const href = target.getAttribute('href')
+        if (href) {
+          // Check if it's an internal link (starts with / or is relative)
+          if (href.startsWith('/') || !href.startsWith('http')) {
+            router.push(href)
+          } else {
+            // External link - open in new tab
+            window.open(href, '_blank', 'noopener,noreferrer')
+          }
+        }
+      }
+    },
+    [router]
+  )
 
   return (
     <div
@@ -46,11 +72,13 @@ export function NotificationItem({ notification, onRead, className }: Notificati
         <div className="flex-1 min-w-0">
           <div
             className={cn(
+              'notification-content',
               'text-sm sm:text-base break-words select-text leading-relaxed',
               'overflow-wrap-anywhere word-break break-word',
               isUnread ? 'text-foreground font-semibold' : 'text-foreground-muted font-normal'
             )}
             style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+            onClick={handleContentClick}
             dangerouslySetInnerHTML={{
               __html: notification.notification?.message,
             }}
