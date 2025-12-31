@@ -298,4 +298,58 @@ export class PaymentsRepository {
       select: { hierarchy: true, id: true, name: true },
     })
   }
+
+  async findAllSubscriptions(page = 1, pageSize = 10) {
+    const skip = (page - 1) * pageSize
+
+    const [subscriptions, totalCount] = await Promise.all([
+      this.txHost.tx.subscription.findMany({
+        skip,
+        take: pageSize,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id: true,
+          stripeSubscriptionId: true,
+          status: true,
+          currentPeriodStart: true,
+          currentPeriodEnd: true,
+          cancelAt: true,
+          canceledAt: true,
+          cancelReason: true,
+          createdAt: true,
+          price: {
+            select: {
+              id: true,
+              unitAmount: true,
+              currency: true,
+              interval: true,
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          paymentCustomer: {
+            select: {
+              stripeCustomerId: true,
+              authUser: {
+                select: {
+                  id: true,
+                  username: true,
+                  email: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      this.txHost.tx.subscription.count(),
+    ])
+
+    return { subscriptions, totalCount }
+  }
 }

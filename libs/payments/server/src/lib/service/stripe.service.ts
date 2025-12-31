@@ -328,11 +328,7 @@ export class StripeService {
     }
   }
 
-  async listInvoices(
-    stripeCustomerId: string,
-    limit: number = 10,
-    startingAfter?: string
-  ): Promise<InvoiceListResponse> {
+  async listInvoices(stripeCustomerId: string, limit = 10, startingAfter?: string): Promise<InvoiceListResponse> {
     try {
       const stripe = this.stripeProvider.getStripeClient()
 

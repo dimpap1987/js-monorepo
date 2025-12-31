@@ -236,4 +236,8 @@ export class PaymentsService {
 
     return result
   }
+
+  async findAllSubscriptions(page = 1, pageSize = 10) {
+    return this.paymentsRepository.findAllSubscriptions(page, pageSize)
+  }
 }
