@@ -1,6 +1,7 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
+import { InvoiceController } from './controller/invoice.controller'
 import { PaymentsController } from './controller/payments.controller'
 import { SubscriptionGuard } from './guards/subscription.guard'
 import { PaymentsRepository } from './repository/payments.repository'
@@ -61,7 +62,7 @@ export class PaymentsModule {
         },
         ...providers,
       ],
-      controllers: [PaymentsController],
+      controllers: [PaymentsController, InvoiceController],
       exports: [...providers, 'PAYMENTS_OPTIONS'],
     }
   }

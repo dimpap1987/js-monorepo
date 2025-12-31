@@ -3,10 +3,11 @@ import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { PaymentsClient, type WebhookEvent } from '@super-dp/payments-core'
+import { PaymentsClient, StripeProvider, type WebhookEvent } from '@super-dp/payments-core'
 import { CreateProductWithPricesRequest, PaymentsModuleOptions } from '../../'
 import { CancelReason } from '../constants'
-import { PaymentsClientToken } from '../stripe.module'
+import { InvoiceDto, InvoiceListResponse, InvoiceStatus } from '../dto/invoice.dto'
+import { PaymentsClientToken, StripeProviderToken } from '../stripe.module'
 import { timestampToDate, timestampToDateRequired, withRetry } from '../utils'
 import { PaymentsService } from './payments.service'
 
@@ -16,6 +17,7 @@ export class StripeService {
 
   constructor(
     @Inject(PaymentsClientToken) private readonly paymentsClient: PaymentsClient,
+    @Inject(StripeProviderToken) private readonly stripeProvider: StripeProvider,
     private readonly paymentsService: PaymentsService,
     @Inject('PAYMENTS_OPTIONS')
     private readonly paymentsModuleOptions: PaymentsModuleOptions,
@@ -309,6 +311,53 @@ export class StripeService {
         stripeCustomerId: stripeCustomer.id,
       })
       return createdCustomer.stripeCustomerId
+    }
+  }
+
+  async listInvoices(
+    stripeCustomerId: string,
+    limit: number = 10,
+    startingAfter?: string
+  ): Promise<InvoiceListResponse> {
+    try {
+      const stripe = this.stripeProvider.getStripeClient()
+
+      const invoices = await stripe.invoices.list({
+        customer: stripeCustomerId,
+        limit,
+        starting_after: startingAfter,
+        expand: ['data.subscription'],
+      })
+
+      return {
+        invoices: invoices.data.map((invoice) => this.toInvoiceDto(invoice)),
+        hasMore: invoices.has_more,
+      }
+    } catch (error) {
+      this.logger.error('Error listing invoices:', error.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_LISTING_INVOICES')
+    }
+  }
+
+  private toInvoiceDto(invoice: {
+    id: string
+    number: string | null
+    amount_paid: number
+    currency: string
+    status: string | null
+    created: number
+    invoice_pdf?: string | null
+    hosted_invoice_url?: string | null
+  }): InvoiceDto {
+    return {
+      id: invoice.id,
+      number: invoice.number,
+      amount: invoice.amount_paid,
+      currency: invoice.currency,
+      status: (invoice.status || 'draft') as InvoiceStatus,
+      createdAt: new Date(invoice.created * 1000),
+      pdfUrl: invoice.invoice_pdf ?? null,
+      hostedInvoiceUrl: invoice.hosted_invoice_url ?? null,
     }
   }
 }

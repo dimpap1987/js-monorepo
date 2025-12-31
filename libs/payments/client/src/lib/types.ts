@@ -60,3 +60,22 @@ export interface TrustSignal {
   icon: React.ReactNode
   text: string
 }
+
+// Invoice types
+export type InvoiceStatus = 'paid' | 'open' | 'void' | 'uncollectible' | 'draft'
+
+export interface Invoice {
+  id: string
+  number: string | null
+  amount: number
+  currency: string
+  status: InvoiceStatus
+  createdAt: string
+  pdfUrl: string | null
+  hostedInvoiceUrl: string | null
+}
+
+export interface InvoiceListResponse {
+  invoices: Invoice[]
+  hasMore: boolean
+}

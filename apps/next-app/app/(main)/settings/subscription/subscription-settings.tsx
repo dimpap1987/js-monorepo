@@ -5,6 +5,7 @@ import { Skeleton } from '@js-monorepo/components/skeleton'
 import { useWebSocketEvent } from '@js-monorepo/next/providers'
 import {
   apiGetSubscription,
+  InvoiceHistory,
   SessionSubscription,
   Subscription,
   SubscriptionManagement,
@@ -135,6 +136,11 @@ export function SubscriptionSettings() {
             onRenewSuccess={handleRenewSuccess}
           />
         )}
+      </SettingsItem>
+
+      {/* Invoice History */}
+      <SettingsItem label="Invoice History">
+        <InvoiceHistory />
       </SettingsItem>
     </section>
   )
