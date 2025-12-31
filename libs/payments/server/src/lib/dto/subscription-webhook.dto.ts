@@ -9,7 +9,7 @@ export interface SubscriptionUpdateData {
   trial_end: number | null
   cancel_at: number | null
   canceled_at: number | null
-  cancelReason?: CancelReasonType
+  cancelReason?: CancelReasonType | null
   items: {
     data: Array<{
       price: {

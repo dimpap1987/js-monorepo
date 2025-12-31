@@ -66,4 +66,18 @@ export class PaymentsController {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_SUBSCRIPTION_STRIPE_CANCEL')
     }
   }
+
+  @Post('renew')
+  @HttpCode(204)
+  @UseGuards(LoggedInGuard)
+  @UseInterceptors(IdempotencyInterceptor)
+  async renewSubscription(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
+    const subscription = await this.paymentsService.findSubscriptionByPriceIdAndUserId(priceId, sessionUser.id)
+
+    const { error } = await tryCatch(() => this.stripeService.renewSubscription(subscription.stripeSubscriptionId))
+
+    if (error) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_SUBSCRIPTION_STRIPE_RENEW')
+    }
+  }
 }

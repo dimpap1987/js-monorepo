@@ -2,12 +2,13 @@
 
 import { DpButton } from '@js-monorepo/button'
 import { useNotifications } from '@js-monorepo/notification'
-import { Calendar, CheckCircle, CreditCard, XCircle } from 'lucide-react'
+import { Calendar, CheckCircle, CreditCard, RefreshCw, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { Subscription } from '../../types'
-import { apiCancelSubscription, generateIdempotencyKey } from '../../utils/api'
+import { apiCancelSubscription, apiRenewSubscription, generateIdempotencyKey } from '../../utils/api'
 import { CancelSubscriptionDialog } from './cancel-subscription-dialog'
+import { RenewSubscriptionDialog } from './renew-subscription-dialog'
 
 interface SubscriptionManagementProps {
   subscription: Subscription | null
@@ -17,14 +18,17 @@ interface SubscriptionManagementProps {
   planFeatures: Record<string, string>
   priceId: number
   onCancelSuccess?: () => void
+  onRenewSuccess?: () => void
 }
 
 type SubscriptionStatus = 'active' | 'canceling' | 'canceled' | 'none'
 
 function getSubscriptionStatus(subscription: Subscription | null): SubscriptionStatus {
   if (!subscription) return 'none'
-  if (subscription.cancelAt || subscription.canceledAt) return 'canceling'
+  // Check canceled status first - cancelAt may still have a value after expiration
   if (subscription.status === 'canceled') return 'canceled'
+  // Subscription is scheduled to cancel but still active
+  if (subscription.cancelAt || subscription.canceledAt) return 'canceling'
   return 'active'
 }
 
@@ -70,8 +74,10 @@ export function SubscriptionManagement({
   planFeatures,
   priceId,
   onCancelSuccess,
+  onRenewSuccess,
 }: SubscriptionManagementProps) {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
+  const [isRenewDialogOpen, setIsRenewDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const { addNotification } = useNotifications()
 
@@ -128,6 +134,42 @@ export function SubscriptionManagement({
       setIsLoading(false)
     }
   }, [priceId, periodEnd, addNotification, onCancelSuccess])
+
+  const handleRenewClick = useCallback(() => {
+    setIsRenewDialogOpen(true)
+  }, [])
+
+  const handleRenewConfirm = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const idempotencyKey = generateIdempotencyKey()
+      const response = await apiRenewSubscription(priceId, idempotencyKey)
+
+      if (response.ok) {
+        addNotification({
+          message: 'Subscription renewed',
+          description: 'Your subscription has been successfully renewed',
+          type: 'success',
+        })
+        setIsRenewDialogOpen(false)
+        onRenewSuccess?.()
+      } else {
+        addNotification({
+          message: 'Failed to renew subscription',
+          description: 'Please try again or contact support',
+          type: 'error',
+        })
+      }
+    } catch (error) {
+      addNotification({
+        message: 'Something went wrong',
+        description: 'Please try again later',
+        type: 'error',
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [priceId, addNotification, onRenewSuccess])
 
   // No subscription state
   if (status === 'none' || status === 'canceled') {
@@ -197,6 +239,12 @@ export function SubscriptionManagement({
         <Link href="/pricing">
           <DpButton variant="outline">Change Plan</DpButton>
         </Link>
+        {status === 'canceling' && (
+          <DpButton variant="primary" onClick={handleRenewClick}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Renew Subscription
+          </DpButton>
+        )}
         {status === 'active' && (
           <DpButton variant="ghost" className="text-status-error hover:text-status-error" onClick={handleCancelClick}>
             Cancel Subscription
@@ -213,6 +261,16 @@ export function SubscriptionManagement({
         subscription={subscription}
         planName={planName}
         features={planFeatures}
+      />
+
+      {/* Renew Dialog */}
+      <RenewSubscriptionDialog
+        isOpen={isRenewDialogOpen}
+        onClose={() => setIsRenewDialogOpen(false)}
+        onConfirm={handleRenewConfirm}
+        isLoading={isLoading}
+        subscription={subscription}
+        planName={planName}
       />
     </div>
   )

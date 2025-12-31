@@ -81,10 +81,8 @@ export function SubscriptionSettings() {
     return null
   }, [subscription, plans])
 
-  const handleCancelSuccess = useCallback(() => {
-    // Refresh session to update subscription status
+  const refetchSubscription = useCallback(() => {
     refreshSession()
-    // Refetch subscription data
     if (subscriptionPlan?.subscriptionId) {
       apiGetSubscription(subscriptionPlan.subscriptionId).then((response) => {
         if (response.ok) {
@@ -93,6 +91,9 @@ export function SubscriptionSettings() {
       })
     }
   }, [refreshSession, subscriptionPlan?.subscriptionId])
+
+  const handleCancelSuccess = refetchSubscription
+  const handleRenewSuccess = refetchSubscription
 
   const isLoading = isLoadingPlans || isLoadingSubscription
 
@@ -131,6 +132,7 @@ export function SubscriptionSettings() {
             planFeatures={planDetails?.features || {}}
             priceId={planDetails?.priceId || 0}
             onCancelSuccess={handleCancelSuccess}
+            onRenewSuccess={handleRenewSuccess}
           />
         )}
       </SettingsItem>

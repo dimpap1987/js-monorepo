@@ -1,4 +1,3 @@
-import { capitalize } from '@js-monorepo/auth/nest/common/utils'
 import { VaultModule } from '@js-monorepo/nest/vault'
 import { PaymentsModule } from '@js-monorepo/payments-server'
 import KeyvRedis, { Keyv } from '@keyv/redis'
@@ -22,7 +21,6 @@ import { CacheModule } from '@nestjs/cache-manager'
 import { ConfigService } from '@nestjs/config'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
-import moment from 'moment'
 import { ClsModule } from 'nestjs-cls'
 import { GracefulShutdownModule } from 'nestjs-graceful-shutdown'
 import passport from 'passport'
@@ -37,6 +35,12 @@ import { AdminProviderModule } from './modules/admin/admin.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { UserModule } from './modules/user/user.module'
+import {
+  getSubscriptionActivatedMessage,
+  getSubscriptionCanceledMessage,
+  getSubscriptionExpiredMessage,
+  getSubscriptionRenewedMessage,
+} from './notifications/subscription-notifications'
 
 @Module({
   imports: [
@@ -138,28 +142,62 @@ import { UserModule } from './modules/user/user.module'
     }),
     PaymentsModule.forRootAsync({
       imports: [UserPresenceModule, NotificationServerModule],
-      inject: [UserPresenceWebsocketService, NotificationService],
-      useFactory: async (userPresenceWebsocketService, notificationService) => ({
-        onSubscriptionCreateSuccess: (userId, subscription) => {
-          notificationService.createNotification({
-            receiverIds: [userId],
-            message: `Your <strong>${capitalize(subscription.name)}</strong> subscription plan has been successfully activated! 🎉`,
-          })
-        },
-        onSubscriptionEvent: (userId, event) => {
-          apiLogger.log(`Subscription event callback received with event: '${event}' and userId id : ${userId}`)
-          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
-        },
-        onSubscriptionDeleteSuccess(userId, subscription) {
-          const dateMessage = `<strong>${moment(subscription.cancelAt).format('YYYY-MM-DD')}</strong>`
-          const timeMessage = `<strong>${moment(subscription.cancelAt).format('hh:mm A')}</strong>`
+      inject: [UserPresenceWebsocketService, NotificationService, ConfigService],
+      useFactory: async (
+        userPresenceWebsocketService: UserPresenceWebsocketService,
+        notificationService: NotificationService,
+        configService: ConfigService
+      ) => {
+        const appUrl = configService.get<string>('APP_URL') || ''
 
-          notificationService.createNotification({
-            receiverIds: [userId],
-            message: `Your <strong>${capitalize(subscription.name)}</strong> subscription plan will be canceled at the end of the period ${dateMessage} at ${timeMessage}`,
-          })
-        },
-      }),
+        return {
+          onSubscriptionCreateSuccess: (userId, subscription) => {
+            notificationService.createNotification({
+              receiverIds: [userId],
+              message: getSubscriptionActivatedMessage({
+                planName: subscription.name,
+                appUrl,
+              }),
+            })
+          },
+          onSubscriptionEvent: (userId, event) => {
+            apiLogger.log(`Subscription event callback received with event: '${event}' and userId: ${userId}`)
+            userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+          },
+          onSubscriptionUpdateSuccess: () => {
+            // Updates without specific context are handled via webhooks for UI refresh
+            // Specific actions like renewals have their own callbacks
+          },
+          onSubscriptionRenewSuccess: (userId, subscription) => {
+            notificationService.createNotification({
+              receiverIds: [userId],
+              message: getSubscriptionRenewedMessage({
+                planName: subscription.name,
+                appUrl,
+              }),
+            })
+          },
+          onSubscriptionDeleteSuccess: (userId, subscription) => {
+            notificationService.createNotification({
+              receiverIds: [userId],
+              message: getSubscriptionCanceledMessage({
+                planName: subscription.name,
+                appUrl,
+                cancelAt: subscription.cancelAt,
+              }),
+            })
+          },
+          onSubscriptionExpiredSuccess: (userId, subscription) => {
+            notificationService.createNotification({
+              receiverIds: [userId],
+              message: getSubscriptionExpiredMessage({
+                planName: subscription.name,
+                appUrl,
+              }),
+            })
+          },
+        }
+      },
     }),
     CacheModule.registerAsync({
       isGlobal: true,
