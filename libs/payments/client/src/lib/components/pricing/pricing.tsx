@@ -1,24 +1,17 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
-import { useNotifications } from '@js-monorepo/notification'
-import { PricingPlanResponse } from '@js-monorepo/types'
-import { loadStripe } from '@stripe/stripe-js'
-import { useRouter } from 'next-nprogress-bar'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { SessionSubscription, Subscription, SubscriptionPlan } from '../types'
-import { apiCancelSubscription, apiCheckoutPlan, apiGetSubscription } from '../utils/api'
-import { PlanCard } from './plan-card'
-import { useSearchParams } from 'next/navigation'
+import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
 import { ErrorDialog } from '@js-monorepo/dialog'
-import { usePlans } from '../queries/payments-queries'
-
-const PricingHeader = ({ title }: { title: string }) => (
-  <section className="text-center">
-    <h1 className="mt-2 tracking-tight">{title}</h1>
-    <br />
-  </section>
-)
+import { useRouter } from 'next-nprogress-bar'
+import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { usePlans } from '../../queries/payments-queries'
+import { POPULAR_PLAN_NAME, SessionSubscription, Subscription, SubscriptionPlan } from '../../types'
+import { apiGetSubscription } from '../../utils/api'
+import { PricingCard } from './pricing-card'
+import { PricingFAQ } from './pricing-faq'
+import { PricingHero } from './pricing-hero'
+import { PricingTrustSignals } from './pricing-trust-signals'
 
 function useSubscriptionMap() {
   const [subscriptionMap, setSubscriptionMap] = useState<Map<number, Subscription>>(new Map())
@@ -52,8 +45,6 @@ export function Pricing() {
   const { session, isLoggedIn } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { addNotification } = useNotifications()
-  const stripePromise = useMemo(() => loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''), [])
   const [hasErrors, setHasErrors] = useState(false)
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
   const { subscriptionMap, fetchSubscriptions } = useSubscriptionMap()
@@ -72,7 +63,7 @@ export function Pricing() {
             price: price.unitAmount / 100,
             interval: price.interval,
             features: plan.features,
-            actionLabel: 'Get Started',
+            isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
             subscribed: !!subscriptionMap.get(price.id),
           }))
       )
@@ -91,58 +82,16 @@ export function Pricing() {
     }
   }, [sessionSubscription, fetchSubscriptions])
 
-  const handleCheckout = useCallback(
-    async (priceId: number) => {
-      try {
-        if (!isLoggedIn) {
-          router.push('/auth/login')
-          return
-        }
-        const response = await apiCheckoutPlan(priceId)
-        if (response.ok) {
-          const stripe = await stripePromise
-          const stripeResponse = await stripe?.redirectToCheckout({
-            sessionId: response.data.sessionId,
-          })
-          if (stripeResponse?.error) {
-            console.error('Stripe Checkout Error:', stripeResponse.error.message)
-          }
-        }
-      } catch (error) {
-        console.error('Checkout Error:', error)
-        addNotification({
-          message: 'Something went wrong',
-          description: 'Please try again later',
-          type: 'error',
-        })
+  const handleSelectPlan = useCallback(
+    (priceId: number) => {
+      const checkoutUrl = `/checkout?planId=${priceId}`
+      if (!isLoggedIn) {
+        router.push(buildLoginUrl(checkoutUrl))
+        return
       }
+      router.push(checkoutUrl)
     },
-    [isLoggedIn, router, stripePromise, addNotification]
-  )
-
-  const handleCancelSubscription = useCallback(
-    async (priceId: number) => {
-      try {
-        const response = await apiCancelSubscription(priceId)
-        if (response.ok) {
-          addNotification({
-            message: 'Cancelling Subscription',
-            duration: 4000,
-            description: 'Please wait...',
-            type: 'spinner',
-          })
-        } else {
-          addNotification({
-            message: 'Something went wrong',
-            description: 'Please try again later',
-            type: 'error',
-          })
-        }
-      } catch (error) {
-        console.error('Checkout Error:', error)
-      }
-    },
-    [addNotification]
+    [isLoggedIn, router]
   )
 
   const handleErrorDialogClose = () => {
@@ -153,21 +102,41 @@ export function Pricing() {
   }
 
   return (
-    <div>
-      <PricingHeader title="Select a Pricing Plan" />
-      <section className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(360px,1fr))] gap-6 py-5 px-5">
+    <div className="space-y-8 py-8">
+      {/* Hero Section */}
+      <PricingHero
+        title="Choose the Right Plan for You"
+        subtitle="Simple, transparent pricing that grows with you. Start free and upgrade when you're ready."
+      />
+
+      {/* Trust Signals */}
+      <PricingTrustSignals />
+
+      {/* Pricing Cards */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
         {pricingCards?.map((card) => (
-          <PlanCard
+          <PricingCard
             key={card.id}
-            handleCheckout={() => handleCheckout(card.id)}
-            handleCancelSubscription={() => handleCancelSubscription(card.id)}
+            id={card.id}
+            name={card.name}
+            description={card.description}
+            price={card.price}
+            interval={card.interval}
+            features={card.features}
+            isPopular={card.isPopular}
+            subscribed={card.subscribed}
             anySubscribed={!!sessionSubscription?.plans?.length}
             isLoggedIn={isLoggedIn}
             subscription={subscriptionMap.get(card.id)}
-            {...card}
+            onSelect={handleSelectPlan}
           />
         ))}
       </section>
+
+      {/* FAQ Section */}
+      <PricingFAQ className="px-4" />
+
+      {/* Error Dialog */}
       {hasErrors && (
         <ErrorDialog
           isOpen={hasErrors}

@@ -4,6 +4,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Logger, Post, Req,
 import { Request, Response } from 'express'
 import { AuthException } from '../../common/exceptions/api-exception'
 import { AuthOpts, SessionConfiguration } from '../../common/types'
+import { decodeOAuthState } from '../../common/utils'
 import { AuthGithub } from '../guards/github.guard'
 import { AuthGoogle } from '../guards/google.guard'
 import { SessionService } from '../services/session.service'
@@ -117,20 +118,26 @@ export class AuthSessionController {
   }
 
   private async handleSocialRedirect(req: Request, res: Response) {
+    const state = req.query['state'] as string
+    const callbackUrl = state ? decodeOAuthState(state)?.callbackUrl : undefined
+
+    const baseUrl = this.options.redirectUiUrl as string
+
     if (req.user?.user) {
-      // If the user is logged in
       try {
         this.options.onLogin?.(req.user.user)
       } catch (e: any) {
         this.logger.error('Login callback error', e.stack)
       }
-      res.redirect(this.options.redirectUiUrl as string)
+      const redirectUrl = callbackUrl ? `${baseUrl}${callbackUrl}` : baseUrl
+      res.redirect(redirectUrl)
     } else if (req.user?.unRegisteredUser) {
-      // If the user is not logged in but has the UNREGISTERED-USER cookie
-      res.redirect(`${this.options.redirectUiUrl}/auth/onboarding`)
+      const onboardingUrl = callbackUrl
+        ? `${baseUrl}/auth/onboarding?callbackUrl=${encodeURIComponent(callbackUrl)}`
+        : `${baseUrl}/auth/onboarding`
+      res.redirect(onboardingUrl)
     } else {
-      // If the user is neither logged in nor has the cookie
-      res.redirect(`${this.options.redirectUiUrl}/auth/login?error=access-denied`)
+      res.redirect(`${baseUrl}/auth/login?error=access-denied`)
     }
   }
 }

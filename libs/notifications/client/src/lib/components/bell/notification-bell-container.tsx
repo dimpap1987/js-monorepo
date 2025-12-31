@@ -195,7 +195,7 @@ export function NotificationDropdown({
     }
   }, [])
 
-  const scrollAreaHeight = localNotifications.length > 0 ? 'h-[37.5rem] max-h-[37.5rem]' : ''
+  const scrollAreaHeight = localNotifications.length > 4 ? 'h-[37.5rem] max-h-[37.5rem]' : ''
 
   if (!userId) return null
 

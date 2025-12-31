@@ -45,6 +45,7 @@ pnpm ci:local              # Format check, lint, test, build
 ## Architecture
 
 ### Directory Structure
+
 - `apps/my-api/` - NestJS backend API
 - `apps/next-app/` - Next.js 14 frontend (App Router)
 - `libs/auth/` - Authentication (separate nest/next implementations)
@@ -58,12 +59,15 @@ pnpm ci:local              # Format check, lint, test, build
 - `deployments/` - Docker Compose configurations
 
 ### Key Entry Points
+
 - Backend: `apps/my-api/src/main.ts`
 - Frontend: `apps/next-app/app/layout.tsx`
 - Prisma schema: `libs/prisma/db/src/lib/prisma/schema/schema.prisma`
 
 ### Import Aliases
+
 All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.json`):
+
 - `@js-monorepo/db` - Prisma client
 - `@js-monorepo/types` - Shared types
 - `@js-monorepo/ui/*` - UI components
@@ -72,6 +76,7 @@ All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.js
 ## Authentication
 
 **Session-based auth (NOT JWT)** with Redis-backed sessions:
+
 - Cookie: `JSESSIONID`
 - OAuth: Google, GitHub via Passport
 - Roles: `USER`, `ADMIN`
@@ -80,12 +85,14 @@ All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.js
 ## Tech Stack Highlights
 
 ### Frontend (Next.js 14)
+
 - App Router (not Pages Router)
 - Server Components by default, `'use client'` only when needed
 - React Query for server state, Zustand for client state
 - Tailwind CSS with shadcn/ui components
 
 ### Backend (NestJS)
+
 - Dependency injection with feature-based modules
 - Prisma ORM with PostgreSQL
 - Socket.IO with Redis adapter for WebSockets
@@ -94,6 +101,7 @@ All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.js
 ## Environment Variables
 
 Centralized in root `.env` with variable interpolation. Base variables (`HOSTNAME`, `*_PORT`) auto-construct URLs:
+
 ```bash
 HOSTNAME=localhost           # Change for different environments
 DATABASE_URL=${...}          # Auto-constructed

@@ -1,6 +1,13 @@
 import { ClientResponseType } from '@js-monorepo/types'
 import { apiClientBase } from '@js-monorepo/utils/http'
 
+export function buildLoginUrl(callbackUrl?: string): string {
+  if (!callbackUrl) {
+    return '/auth/login'
+  }
+  return `/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+}
+
 export class AuthClient {
   constructor(private readonly authUrl: string) {
     this.authUrl = authUrl
@@ -13,8 +20,12 @@ export class AuthClient {
     }
   }
 
-  login(provider: 'google' | 'github') {
-    window.location.href = `${this.authUrl}/api/auth/${provider}/login`
+  login(provider: 'google' | 'github', callbackUrl?: string) {
+    const url = new URL(`${this.authUrl}/api/auth/${provider}/login`)
+    if (callbackUrl) {
+      url.searchParams.set('callbackUrl', callbackUrl)
+    }
+    window.location.href = url.toString()
   }
 
   async registerUser(

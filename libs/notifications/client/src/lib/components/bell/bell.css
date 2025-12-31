@@ -35,3 +35,25 @@
   -webkit-line-clamp: var(--line-clamp, 7);
   max-height: calc(1.6em * var(--line-clamp, 7));
 }
+
+/* Notification message content styles */
+.notification-content {
+  line-height: 1.6;
+}
+
+.notification-content a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.notification-content a:hover {
+  opacity: 0.8;
+}
+
+.notification-content strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
