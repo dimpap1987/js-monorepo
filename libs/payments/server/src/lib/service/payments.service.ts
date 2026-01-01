@@ -242,8 +242,12 @@ export class PaymentsService {
     return result
   }
 
-  async findAllSubscriptions(page = 1, pageSize = 10) {
-    return this.paymentsRepository.findAllSubscriptions(page, pageSize)
+  async findAllSubscriptions(page = 1, pageSize = 10, filters?: { status?: string; search?: string; plan?: string }) {
+    return this.paymentsRepository.findAllSubscriptions(page, pageSize, filters)
+  }
+
+  async getSubscriptionStats() {
+    return this.paymentsRepository.getSubscriptionStats()
   }
 
   async findActiveTrialForProduct(userId: number, productId: number) {

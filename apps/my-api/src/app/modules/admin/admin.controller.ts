@@ -62,9 +62,18 @@ export class AdminController {
   @Get('subscriptions')
   async getAllSubscriptions(
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
+    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('status') status?: string,
+    @Query('search') search?: string,
+    @Query('plan') plan?: string
   ) {
-    return this.adminPaymentsService.getAllSubscriptions(page, pageSize)
+    const filters = { status, search, plan }
+    return this.adminPaymentsService.getAllSubscriptions(page, pageSize, filters)
+  }
+
+  @Get('subscriptions/stats')
+  async getSubscriptionStats() {
+    return this.adminPaymentsService.getSubscriptionStats()
   }
 
   @Put('users/:id')
