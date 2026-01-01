@@ -46,7 +46,10 @@ export function CancelSubscriptionDialog({
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-status-warning-bg">
             <AlertTriangle className="h-6 w-6 text-status-warning" />
           </div>
-          <DialogTitle className="text-center text-xl">Cancel {planName} Plan?</DialogTitle>
+          <DialogTitle className="text-center text-xl">
+            Cancel <span className="capitalize bg-status-info-bg text-foreground px-2 rounded-md">{planName}</span>{' '}
+            Plan?
+          </DialogTitle>
           <DialogDescription className="text-center text-foreground-neutral">
             We're sorry to see you go. Here's what you'll lose access to:
           </DialogDescription>

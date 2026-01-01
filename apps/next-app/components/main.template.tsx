@@ -15,6 +15,7 @@ import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'
 import { RiAdminFill } from 'react-icons/ri'
+import { ImpersonationBanner } from './impersonation-banner'
 import SVGLogo from './logo-svg'
 import { MobileNavbarWithNotifications } from './mobile-navbar-with-notifications'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
@@ -90,6 +91,7 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
 
   return (
     <>
+      <ImpersonationBanner />
       <DpNextNavbar
         user={user}
         plan={plan}
