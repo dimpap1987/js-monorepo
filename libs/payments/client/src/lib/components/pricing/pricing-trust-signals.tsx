@@ -1,5 +1,6 @@
 import { Shield, CreditCard, XCircle } from 'lucide-react'
 import { cn } from '@js-monorepo/ui/util'
+import { TRIAL_DURATION_DAYS } from '../../constants'
 
 interface TrustSignalItem {
   icon: React.ReactNode
@@ -14,11 +15,11 @@ interface PricingTrustSignalsProps {
 const defaultSignals: TrustSignalItem[] = [
   {
     icon: <Shield className="w-5 h-5" />,
-    text: '30-day Trial',
+    text: `${TRIAL_DURATION_DAYS}-day Trial`,
   },
   {
     icon: <CreditCard className="w-5 h-5" />,
-    text: 'Secure payment with Stripe',
+    text: 'Secure payment',
   },
   {
     icon: <XCircle className="w-5 h-5" />,

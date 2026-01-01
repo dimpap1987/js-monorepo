@@ -1,7 +1,7 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
-import { RolesGuard } from '@js-monorepo/auth/nest/session'
-import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
+import { AuthSessionUserCacheService, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
+import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types'
 import { OnlineUsersService } from '@js-monorepo/user-presence'
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import {
@@ -10,14 +10,19 @@ import {
   Delete,
   Get,
   HttpCode,
+  HttpStatus,
+  Logger,
   Param,
   ParseIntPipe,
+  Post,
   Put,
   Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
+import { Request } from 'express'
 import { AdminPaymentsService } from './admin-payments.service'
 import { AdminService } from './admin.service'
 
@@ -25,10 +30,13 @@ import { AdminService } from './admin.service'
 @UseGuards(RolesGuard)
 @HasRoles(RolesEnum.ADMIN)
 export class AdminController {
+  private readonly logger = new Logger(AdminController.name)
+
   constructor(
     private readonly adminService: AdminService,
     private readonly οnlineUsersService: OnlineUsersService,
-    private readonly adminPaymentsService: AdminPaymentsService
+    private readonly adminPaymentsService: AdminPaymentsService,
+    private readonly authSessionCacheService: AuthSessionUserCacheService
   ) {}
 
   @Get('users')
@@ -88,5 +96,59 @@ export class AdminController {
   @HttpCode(204)
   async deleteUserSession(@Param('id', ParseIntPipe) userId: number) {
     return this.adminService.handleUserDisconnection(userId)
+  }
+
+  @Post('impersonate/:id')
+  @HttpCode(HttpStatus.OK)
+  async impersonateUser(
+    @Param('id', ParseIntPipe) targetUserId: number,
+    @SessionUser() currentUser: SessionUserType,
+    @Req() req: Request
+  ) {
+    // Prevent self-impersonation
+    if (targetUserId === currentUser.id) {
+      return { success: false, message: 'Cannot impersonate yourself' }
+    }
+
+    // Get the target user's session data
+    const targetUser = await this.authSessionCacheService.findOrSaveAuthUserById(targetUserId)
+
+    if (!targetUser) {
+      return { success: false, message: 'User not found' }
+    }
+
+    // Prevent impersonating other admins
+    const isTargetAdmin = targetUser.roles?.includes(RolesEnum.ADMIN)
+    if (isTargetAdmin) {
+      return { success: false, message: 'Cannot impersonate another admin' }
+    }
+
+    const originalAdminId = currentUser.id
+
+    // Login as the target user first
+    await new Promise<void>((resolve, reject) => {
+      req.logIn({ user: targetUser }, (err) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
+
+    // Store original admin info AFTER login (session may have been modified by logIn)
+    const session = req.session as unknown as Record<string, unknown>
+    session.impersonatingFrom = originalAdminId
+
+    // Explicitly save the session
+    await new Promise<void>((resolve, reject) => {
+      req.session.save((err) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
+
+    this.logger.warn(
+      `[IMPERSONATION_START] Admin userId=${originalAdminId} started impersonating userId=${targetUserId} (${targetUser.username})`
+    )
+
+    return { success: true, user: targetUser }
   }
 }
