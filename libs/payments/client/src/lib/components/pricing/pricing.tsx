@@ -7,8 +7,8 @@ import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePlans } from '../../queries/payments-queries'
-import { POPULAR_PLAN_NAME, SessionSubscription, Subscription } from '../../types'
-import { apiCreatePortalSession, apiGetSubscription } from '../../utils/api'
+import { POPULAR_PLAN_NAME, SessionSubscription, Subscription, TrialEligibilityResponse } from '../../types'
+import { apiCheckTrialEligibility, apiCreatePortalSession, apiGetSubscription, apiStartTrial } from '../../utils/api'
 import { PricingCard } from './pricing-card'
 import { PricingFAQ } from './pricing-faq'
 import { PricingHero } from './pricing-hero'
@@ -21,6 +21,8 @@ export function Pricing() {
   const [hasErrors, setHasErrors] = useState(false)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [isPortalLoading, setIsPortalLoading] = useState(false)
+  const [trialLoadingPriceId, setTrialLoadingPriceId] = useState<number | null>(null)
+  const [trialEligibility, setTrialEligibility] = useState<Record<number, TrialEligibilityResponse>>({})
   const { data: plans = [] } = usePlans()
   const { addNotification } = useNotifications()
 
@@ -62,6 +64,28 @@ export function Pricing() {
     }
   }, [sessionSubscription?.subscriptionId])
 
+  // Check trial eligibility for each paid plan
+  useEffect(() => {
+    if (!isLoggedIn || pricingCards.length === 0) return
+
+    const checkEligibility = async () => {
+      const eligibilityMap: Record<number, TrialEligibilityResponse> = {}
+
+      for (const card of pricingCards) {
+        if (card.price > 0 && !card.subscribed) {
+          const response = await apiCheckTrialEligibility(card.id)
+          if (response.ok && response.data) {
+            eligibilityMap[card.id] = response.data
+          }
+        }
+      }
+
+      setTrialEligibility(eligibilityMap)
+    }
+
+    checkEligibility()
+  }, [isLoggedIn, pricingCards])
+
   const handleManageSubscription = useCallback(async () => {
     setIsPortalLoading(true)
     try {
@@ -95,14 +119,56 @@ export function Pricing() {
         router.push(buildLoginUrl(checkoutUrl))
         return
       }
-      // If user has subscription and clicks a different plan, open portal to switch
-      if (sessionSubscription?.isSubscribed && sessionSubscription?.priceId !== priceId) {
+      // If user has PAID subscription (not trial) and clicks a different plan, open portal to switch
+      // Trial users should go to checkout since they don't have a Stripe subscription yet
+      const hasPaidSubscription = sessionSubscription?.isSubscribed && !sessionSubscription?.isTrial
+      if (hasPaidSubscription && sessionSubscription?.priceId !== priceId) {
         handleManageSubscription()
         return
       }
       router.push(checkoutUrl)
     },
-    [isLoggedIn, router, sessionSubscription?.isSubscribed, sessionSubscription?.priceId, handleManageSubscription]
+    [
+      isLoggedIn,
+      router,
+      sessionSubscription?.isSubscribed,
+      sessionSubscription?.isTrial,
+      sessionSubscription?.priceId,
+      handleManageSubscription,
+    ]
+  )
+
+  const handleStartTrial = useCallback(
+    async (priceId: number) => {
+      setTrialLoadingPriceId(priceId)
+      try {
+        const response = await apiStartTrial(priceId)
+
+        if (response.ok && response.data) {
+          addNotification({
+            message: 'Trial Started!',
+            description: response.data.message,
+            type: 'success',
+          })
+          router.refresh()
+        } else {
+          addNotification({
+            message: 'Could not start trial',
+            description: 'Please try again or contact support',
+            type: 'error',
+          })
+        }
+      } catch {
+        addNotification({
+          message: 'Something went wrong',
+          description: 'Please try again later',
+          type: 'error',
+        })
+      } finally {
+        setTrialLoadingPriceId(null)
+      }
+    },
+    [addNotification, router]
   )
 
   const handleErrorDialogClose = () => {
@@ -140,7 +206,11 @@ export function Pricing() {
             isLoggedIn={isLoggedIn}
             subscription={card.subscribed ? subscription ?? undefined : undefined}
             onSelect={handleSelectPlan}
+            onStartTrial={handleStartTrial}
             isLoading={isPortalLoading}
+            isTrialLoading={trialLoadingPriceId === card.id}
+            trialEligibility={trialEligibility[card.id]}
+            isOnTrial={sessionSubscription?.isTrial}
           />
         ))}
       </section>

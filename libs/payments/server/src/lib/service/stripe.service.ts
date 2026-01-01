@@ -165,18 +165,48 @@ export class StripeService {
     const price = await this.paymentsService.findPriceByStripeId(priceId)
 
     if (type === 'created') {
-      const sub = await this.paymentsService.createSubscription({
-        paymentCustomerId: paymentCustomer.id,
-        stripeSubscriptionId: subscriptionId,
-        priceId: price.id,
-        status,
-        currentPeriodStart: timestampToDateRequired(subscriptionData.current_period_start as number),
-        currentPeriodEnd: timestampToDateRequired(subscriptionData.current_period_end as number),
-        trialStart: timestampToDate(subscriptionData.trial_start as number | null),
-        trialEnd: timestampToDate(subscriptionData.trial_end as number | null),
-        cancelAt: timestampToDate(subscriptionData.cancel_at as number | null),
-        canceledAt: timestampToDate(subscriptionData.canceled_at as number | null),
-      })
+      // Check if user has an active trial for this product - convert it instead of creating new
+      const existingTrialForProduct = await this.paymentsService.findActiveTrialForProduct(
+        paymentCustomer.userId,
+        price.product.id
+      )
+
+      let sub
+      if (existingTrialForProduct) {
+        // Convert trial to paid subscription (same product)
+        this.logger.log(
+          `Converting trial subscription ${existingTrialForProduct.id} to paid for user ${paymentCustomer.userId}`
+        )
+        sub = await this.paymentsService.convertTrialToPaid(existingTrialForProduct.id, {
+          stripeSubscriptionId: subscriptionId,
+          status,
+          currentPeriodStart: timestampToDateRequired(subscriptionData.current_period_start as number),
+          currentPeriodEnd: timestampToDateRequired(subscriptionData.current_period_end as number),
+        })
+      } else {
+        // Check if user has a trial for a DIFFERENT product - cancel it
+        const anyActiveTrial = await this.paymentsService.findActiveTrialForUser(paymentCustomer.userId)
+        if (anyActiveTrial) {
+          this.logger.log(
+            `Canceling trial ${anyActiveTrial.id} (${anyActiveTrial.price.product.name}) - user upgrading to ${price.product.name}`
+          )
+          await this.paymentsService.cancelTrialSubscription(anyActiveTrial.id)
+        }
+
+        // Create new subscription
+        sub = await this.paymentsService.createSubscription({
+          paymentCustomerId: paymentCustomer.id,
+          stripeSubscriptionId: subscriptionId,
+          priceId: price.id,
+          status,
+          currentPeriodStart: timestampToDateRequired(subscriptionData.current_period_start as number),
+          currentPeriodEnd: timestampToDateRequired(subscriptionData.current_period_end as number),
+          trialStart: timestampToDate(subscriptionData.trial_start as number | null),
+          trialEnd: timestampToDate(subscriptionData.trial_end as number | null),
+          cancelAt: timestampToDate(subscriptionData.cancel_at as number | null),
+          canceledAt: timestampToDate(subscriptionData.canceled_at as number | null),
+        })
+      }
 
       tryCatch(() => {
         this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(paymentCustomer.userId, {

@@ -19,6 +19,7 @@ import { ClsPluginTransactional } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { CacheModule } from '@nestjs/cache-manager'
 import { ConfigService } from '@nestjs/config'
+import { ScheduleModule } from '@nestjs/schedule'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
 import { ClsModule } from 'nestjs-cls'
@@ -40,6 +41,8 @@ import {
   getSubscriptionCanceledMessage,
   getSubscriptionExpiredMessage,
   getSubscriptionRenewedMessage,
+  getTrialExpiredMessage,
+  getTrialStartedMessage,
 } from './notifications/subscription-notifications'
 
 @Module({
@@ -84,6 +87,7 @@ import {
       keepNodeProcessAlive: true,
     }),
     HealthModule,
+    ScheduleModule.forRoot(),
     RedisModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         url: configService.get('REDIS_URL'),
@@ -181,6 +185,20 @@ import {
             receiverIds: [userId],
             message: getSubscriptionExpiredMessage({ planName: subscription.name }),
           })
+        },
+        onTrialStarted: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getTrialStartedMessage({ planName: subscription.name }),
+          })
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+        },
+        onTrialExpired: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getTrialExpiredMessage({ planName: subscription.name }),
+          })
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
         },
       }),
     }),

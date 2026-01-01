@@ -2,7 +2,7 @@ import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { CreateProductType } from '../../'
-import { ACTIVE_SUBSCRIPTION_STATUSES } from '../constants'
+import { ACTIVE_SUBSCRIPTION_STATUSES, CancelReason } from '../constants'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { SubscriptionDeleteData, SubscriptionUpdateData } from '../dto/subscription-webhook.dto'
@@ -296,6 +296,142 @@ export class PaymentsRepository {
     return this.txHost.tx.product.findUnique({
       where: { name: name },
       select: { hierarchy: true, id: true, name: true },
+    })
+  }
+
+  async hasUsedAnyTrial(userId: number): Promise<boolean> {
+    const subscription = await this.txHost.tx.subscription.findFirst({
+      where: {
+        paymentCustomer: { userId },
+        trialStart: { not: null },
+      },
+    })
+    return !!subscription
+  }
+
+  async hasActiveTrialSubscription(userId: number): Promise<boolean> {
+    const subscription = await this.txHost.tx.subscription.findFirst({
+      where: {
+        paymentCustomer: { userId },
+        status: 'trialing',
+        stripeSubscriptionId: null,
+        trialEnd: { gt: new Date() },
+      },
+    })
+    return !!subscription
+  }
+
+  async findActiveTrialForProduct(userId: number, productId: number) {
+    return this.txHost.tx.subscription.findFirst({
+      where: {
+        paymentCustomer: { userId },
+        status: 'trialing',
+        stripeSubscriptionId: null,
+        price: { productId },
+      },
+      include: {
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async findActiveTrialForUser(userId: number) {
+    return this.txHost.tx.subscription.findFirst({
+      where: {
+        paymentCustomer: { userId },
+        status: 'trialing',
+        stripeSubscriptionId: null,
+      },
+      include: {
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async cancelTrialSubscription(subscriptionId: number) {
+    return this.txHost.tx.subscription.update({
+      where: { id: subscriptionId },
+      data: {
+        status: 'canceled',
+        canceledAt: new Date(),
+        cancelReason: CancelReason.UPGRADED_TO_PAID,
+      },
+    })
+  }
+
+  async convertTrialToPaid(
+    subscriptionId: number,
+    data: {
+      stripeSubscriptionId: string
+      status: string
+      currentPeriodStart: Date
+      currentPeriodEnd: Date
+    }
+  ) {
+    return this.txHost.tx.subscription.update({
+      where: { id: subscriptionId },
+      data: {
+        stripeSubscriptionId: data.stripeSubscriptionId,
+        status: data.status,
+        currentPeriodStart: data.currentPeriodStart,
+        currentPeriodEnd: data.currentPeriodEnd,
+        // Keep trialStart/trialEnd as historical record for hasUsedTrialForProduct check
+      },
+      include: {
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async findExpiredTrialSubscriptions() {
+    return this.txHost.tx.subscription.findMany({
+      where: {
+        status: 'trialing',
+        stripeSubscriptionId: null,
+        trialEnd: { lte: new Date() },
+      },
+      include: {
+        paymentCustomer: { include: { authUser: true } },
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async createLocalTrialSubscription(data: {
+    paymentCustomerId: number
+    priceId: number
+    trialStart: Date
+    trialEnd: Date
+  }) {
+    return this.txHost.tx.subscription.create({
+      data: {
+        paymentCustomerId: data.paymentCustomerId,
+        stripeSubscriptionId: null,
+        priceId: data.priceId,
+        status: 'trialing',
+        currentPeriodStart: data.trialStart,
+        currentPeriodEnd: data.trialEnd,
+        trialStart: data.trialStart,
+        trialEnd: data.trialEnd,
+      },
+      include: {
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async expireTrialSubscription(subscriptionId: number) {
+    return this.txHost.tx.subscription.update({
+      where: { id: subscriptionId },
+      data: {
+        status: 'canceled',
+        canceledAt: new Date(),
+        cancelReason: 'trial_expired',
+      },
+      include: {
+        paymentCustomer: { include: { authUser: true } },
+        price: { include: { product: true } },
+      },
     })
   }
 
