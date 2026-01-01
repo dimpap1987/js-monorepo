@@ -1,3 +1,4 @@
+import { TRIAL_DURATION_DAYS } from '@js-monorepo/payments-server'
 import { capitalize } from 'lodash'
 import moment from 'moment'
 
@@ -68,5 +69,27 @@ export function getSubscriptionChangedMessage({
     Your subscription has been updated to <strong>${capitalize(planName)}</strong>.
     Your new plan is now active with all its features.
     ${subscriptionLink()}
+  `.trim()
+}
+
+/**
+ * Notification when a trial is started
+ */
+export function getTrialStartedMessage({ planName }: SubscriptionNotificationData): string {
+  return `
+    Your ${TRIAL_DURATION_DAYS}-day free trial of <strong>${capitalize(planName)}</strong> has started!
+    Enjoy full access to all premium features. No credit card required.
+    ${subscriptionLink()}
+  `.trim()
+}
+
+/**
+ * Notification when a trial has expired
+ */
+export function getTrialExpiredMessage({ planName }: SubscriptionNotificationData): string {
+  return `
+    Your <strong>${capitalize(planName)}</strong> trial has ended.
+    Subscribe now to continue enjoying premium features.
+    ${pricingLink()}
   `.trim()
 }

@@ -21,9 +21,25 @@ export interface Subscription {
 
 export interface SessionSubscription {
   isSubscribed: boolean
+  isTrial: boolean
   plan: string | null
   subscriptionId: number | null
   priceId: number | null
+  trialEnd: Date | null
+}
+
+export interface TrialEligibilityResponse {
+  eligible: boolean
+  reason?: string
+  trialDurationDays: number
+  productName: string
+}
+
+export interface StartTrialResponse {
+  subscriptionId: number
+  trialEnd: Date
+  productName: string
+  message: string
 }
 
 // FAQ types for pricing page
