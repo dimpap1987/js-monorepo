@@ -111,15 +111,25 @@ export class PaymentsService {
     if (!subscriptions || subscriptions.length === 0) {
       return {
         isSubscribed: false,
+        isTrial: false,
+        plan: null,
+        subscriptionId: null,
+        priceId: null,
+        trialEnd: null,
       }
     }
 
+    // Get the most recent active subscription
+    const activePlan = subscriptions[0]
+    const subscription = await this.findSubscriptionByid(activePlan.id)
+
     return {
       isSubscribed: true,
-      plans: subscriptions.map((subscription) => ({
-        subscriptionId: subscription.id,
-        price: { ...subscription.price },
-      })),
+      isTrial: subscription.status === 'trialing',
+      plan: activePlan.price?.product?.name || null,
+      subscriptionId: activePlan.id,
+      priceId: activePlan.price?.id || null,
+      trialEnd: subscription.trialEnd || null,
     }
   }
 
@@ -227,6 +237,53 @@ export class PaymentsService {
     if (error) {
       this.logger.error(`Error getting product with name: '${name}'`, error.stack)
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_PRODUCT_BY_NAME')
+    }
+
+    return result
+  }
+
+  async findAllSubscriptions(page = 1, pageSize = 10, filters?: { status?: string; search?: string; plan?: string }) {
+    return this.paymentsRepository.findAllSubscriptions(page, pageSize, filters)
+  }
+
+  async getSubscriptionStats() {
+    return this.paymentsRepository.getSubscriptionStats()
+  }
+
+  async findActiveTrialForProduct(userId: number, productId: number) {
+    const { result } = await tryCatch(() => this.paymentsRepository.findActiveTrialForProduct(userId, productId))
+    return result
+  }
+
+  async findActiveTrialForUser(userId: number) {
+    const { result } = await tryCatch(() => this.paymentsRepository.findActiveTrialForUser(userId))
+    return result
+  }
+
+  async cancelTrialSubscription(subscriptionId: number) {
+    this.logger.log(`Canceling trial subscription ${subscriptionId} due to paid upgrade`)
+    const { result, error } = await tryCatch(() => this.paymentsRepository.cancelTrialSubscription(subscriptionId))
+    if (error) {
+      this.logger.error(`Error canceling trial: ${error.message}`, error.stack)
+    }
+    return result
+  }
+
+  async convertTrialToPaid(
+    subscriptionId: number,
+    data: {
+      stripeSubscriptionId: string
+      status: string
+      currentPeriodStart: Date
+      currentPeriodEnd: Date
+    }
+  ) {
+    this.logger.log(`Converting trial subscription ${subscriptionId} to paid`)
+    const { result, error } = await tryCatch(() => this.paymentsRepository.convertTrialToPaid(subscriptionId, data))
+
+    if (error) {
+      this.logger.error(`Error converting trial to paid for subscription: ${subscriptionId}`, error.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CONVERT_TRIAL_TO_PAID')
     }
 
     return result

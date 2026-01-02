@@ -1,0 +1,28 @@
+# Development - HTTP only, no SSL
+# Usage: docker-compose up
+
+services:
+  nginx:
+    image: nginx:1.25.4
+    container_name: nginx_dev
+    ports:
+      - '80:80'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ../shared/proxy_params.conf:/etc/nginx/proxy_params.conf:ro
+    networks:
+      - super-network
+    environment:
+      - NGINX_SERVER_NAME=${NGINX_SERVER_NAME:-localhost}
+
+networks:
+  super-network:
+    external: true

@@ -20,21 +20,26 @@ export interface Subscription {
 }
 
 export interface SessionSubscription {
-  plans?: SubscriptionPlan[]
+  isSubscribed: boolean
+  isTrial: boolean
+  plan: string | null
+  subscriptionId: number | null
+  priceId: number | null
+  trialEnd: Date | null
 }
 
-export interface SubscriptionPlan {
+export interface TrialEligibilityResponse {
+  eligible: boolean
+  reason?: string
+  trialDurationDays: number
+  productName: string
+}
+
+export interface StartTrialResponse {
   subscriptionId: number
-  price: PriceDetails
-}
-
-export interface PriceDetails {
-  id: number
-  product: ProductDetails
-}
-
-export interface ProductDetails {
-  id: number
+  trialEnd: Date
+  productName: string
+  message: string
 }
 
 // FAQ types for pricing page
@@ -59,4 +64,23 @@ export interface PricingCardData {
 export interface TrustSignal {
   icon: React.ReactNode
   text: string
+}
+
+// Invoice types
+export type InvoiceStatus = 'paid' | 'open' | 'void' | 'uncollectible' | 'draft'
+
+export interface Invoice {
+  id: string
+  number: string | null
+  amount: number
+  currency: string
+  status: InvoiceStatus
+  createdAt: string
+  pdfUrl: string | null
+  hostedInvoiceUrl: string | null
+}
+
+export interface InvoiceListResponse {
+  invoices: Invoice[]
+  hasMore: boolean
 }

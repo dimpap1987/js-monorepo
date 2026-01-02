@@ -180,6 +180,8 @@ npm run dev:my-api
 
 ### Building projects
 
+docker network create super-network
+
 #### Next-app
 
 1. npm run build:next
