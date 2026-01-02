@@ -3,6 +3,7 @@ import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-win
 import { ClsService } from 'nestjs-cls'
 import * as winston from 'winston'
 import { LOGGER_CONFIG, LoggerConfig } from './logger.module'
+import { DATE_CONFIG } from '@js-monorepo/utils/date'
 
 type LogLevel = 'error' | 'warn' | 'log' | 'debug' | 'verbose'
 
@@ -16,7 +17,7 @@ const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
 
 const DEFAULT_CONFIG: LoggerConfig = {
   level: 'log',
-  timezone: 'UTC',
+  timezone: DATE_CONFIG.SERVER_TIMEZONE,
   prettyPrint: process.env['NODE_ENV'] !== 'production',
   appName: 'API',
 }

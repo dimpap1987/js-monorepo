@@ -1,6 +1,6 @@
 import { DynamicModule, Global, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-
+import { DATE_CONFIG } from '@js-monorepo/utils/date'
 export const LOGGER_CONFIG = Symbol('LOGGER_CONFIG')
 
 export interface LoggerConfig {
@@ -16,7 +16,7 @@ export interface LoggerConfig {
 
 const DEFAULT_CONFIG: LoggerConfig = {
   level: 'log',
-  timezone: 'UTC',
+  timezone: DATE_CONFIG.SERVER_TIMEZONE,
   prettyPrint: process.env['NODE_ENV'] !== 'production',
   appName: 'API',
 }
@@ -45,7 +45,7 @@ export class LoggerModule {
           provide: LOGGER_CONFIG,
           useFactory: (configService: ConfigService): LoggerConfig => ({
             level: configService.get<string>('LOGGER_LEVEL') || DEFAULT_CONFIG.level,
-            timezone: configService.get<string>('TZ') || DEFAULT_CONFIG.timezone,
+            timezone: configService.get<string>('LOGGER_TZ') || DEFAULT_CONFIG.timezone,
             prettyPrint:
               configService.get<string>('LOG_PRETTY_PRINT') === 'true' ||
               configService.get<string>('NODE_ENV') !== 'production',
