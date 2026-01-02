@@ -40,7 +40,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -90,7 +90,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "count(count(container_last_seen{name!=\"\"} > time() - 10) by (name))",
@@ -106,7 +106,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -187,7 +187,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(container_cpu_usage_seconds_total{name=~\".+\"}[10m])) by (name) * 100",
@@ -215,7 +215,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -293,7 +293,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(container_memory_usage_bytes{name=~\".+\"}[10m])) by (name)",
@@ -309,7 +309,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -387,7 +387,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(container_memory_cache{name=~\".+\"}[10m])) by (name)",
@@ -416,7 +416,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -497,7 +497,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(container_fs_reads_bytes_total{name=~\".+\"}[10m])) by (name)",
@@ -513,7 +513,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -594,7 +594,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(container_fs_writes_bytes_total{name=~\".+\"}[10m])) by (name)",
@@ -623,7 +623,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -704,7 +704,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(container_network_receive_bytes_total{name=~\".+\"}[10m])) by (name)",
@@ -720,7 +720,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -801,7 +801,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum(rate(container_network_transmit_bytes_total{name=~\".+\"}[10m])) by (name)",
@@ -830,7 +830,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "default_prometheus_ds"
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -894,7 +894,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "default_prometheus_ds"
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "count by(name) (count_over_time(container_last_seen{name=~\".+\"}[$__range]))",

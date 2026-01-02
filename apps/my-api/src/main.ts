@@ -1,11 +1,13 @@
 import { DATE_CONFIG } from '@js-monorepo/utils/date'
 process.env.TZ = DATE_CONFIG.SERVER_TIMEZONE
 
+import { Logger, ValidationPipe } from '@nestjs/common'
+export const apiLogger = new Logger('API')
+
 import './otel'
 import { LOGGER_CONFIG, LoggerConfig, LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
-import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
@@ -17,7 +19,6 @@ import { AppModule } from './app/app.module'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
-export const apiLogger = new Logger('API')
 const port = process.env.PORT || 3333
 const globalPrefix = 'api'
 
