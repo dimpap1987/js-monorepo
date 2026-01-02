@@ -1,3 +1,4 @@
+import { DistributedLockService } from '@js-monorepo/nest/distributed-lock'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
@@ -21,7 +22,8 @@ export class StripeService {
     private readonly paymentsService: PaymentsService,
     @Inject('PAYMENTS_OPTIONS')
     private readonly paymentsModuleOptions: PaymentsModuleOptions,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly distributedLockService: DistributedLockService
   ) {}
 
   async findCustomerByEmail(email: string) {
@@ -107,32 +109,51 @@ export class StripeService {
     }
 
     const event = this.paymentsClient.constructWebhookEvent(payload, sig)
-    const storedEvent = await this.paymentsService.findStripeWebhookEvent(event.id)
 
-    if (storedEvent?.result?.id) {
-      this.logger.warn(`Duplicate stripe event occurred. - Stripe - id: ${event.id} type: ${event.type}`)
+    // Use distributed lock to prevent duplicate processing across instances
+    const lockKey = `webhook:stripe:${event.id}`
+    const lockResult = await this.distributedLockService.withLock(
+      lockKey,
+      async () => {
+        // Double-check if event was already processed (inside lock)
+        const storedEvent = await this.paymentsService.findStripeWebhookEvent(event.id)
+
+        if (storedEvent?.result?.id) {
+          this.logger.warn(`Duplicate stripe event occurred. - Stripe - id: ${event.id} type: ${event.type}`)
+          return { received: true, alreadyProcessed: true }
+        }
+
+        // Mark event as being processed
+        await this.paymentsService.createStripeWebhookEvent({
+          eventId: event.id,
+          eventType: event.type,
+        })
+
+        try {
+          await this.paymentsClient.handleWebhookEvent(payload, sig, {
+            onSubscriptionCreated: (evt) => this.handleSubscriptionEvent(evt, 'created'),
+            onSubscriptionUpdated: (evt) => this.handleSubscriptionEvent(evt, 'updated'),
+            onSubscriptionDeleted: (evt) => this.handleSubscriptionEvent(evt, 'deleted'),
+            onInvoicePaymentSucceeded: (evt) => this.handleInvoiceEvent(evt, 'succeeded'),
+            onInvoicePaymentFailed: (evt) => this.handleInvoiceEvent(evt, 'failed'),
+            onCheckoutSessionCompleted: (evt) => this.handleCheckoutSessionCompleted(evt),
+            onOther: (evt) => {
+              this.logger.warn(`Stripe - unhandled event received: ${evt.type}`)
+            },
+          })
+        } catch (e) {
+          this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`, e.stack)
+        }
+
+        return { received: true, alreadyProcessed: false }
+      },
+      { ttlSeconds: 60 }
+    )
+
+    if (!lockResult.success) {
+      // Another instance is processing this event
+      this.logger.debug(`Webhook event ${event.id} is being processed by another instance`)
       return { received: true }
-    }
-
-    await this.paymentsService.createStripeWebhookEvent({
-      eventId: event.id,
-      eventType: event.type,
-    })
-
-    try {
-      await this.paymentsClient.handleWebhookEvent(payload, sig, {
-        onSubscriptionCreated: (evt) => this.handleSubscriptionEvent(evt, 'created'),
-        onSubscriptionUpdated: (evt) => this.handleSubscriptionEvent(evt, 'updated'),
-        onSubscriptionDeleted: (evt) => this.handleSubscriptionEvent(evt, 'deleted'),
-        onInvoicePaymentSucceeded: (evt) => this.handleInvoiceEvent(evt, 'succeeded'),
-        onInvoicePaymentFailed: (evt) => this.handleInvoiceEvent(evt, 'failed'),
-        onCheckoutSessionCompleted: (evt) => this.handleCheckoutSessionCompleted(evt),
-        onOther: (evt) => {
-          this.logger.warn(`Stripe - unhandled event received: ${evt.type}`)
-        },
-      })
-    } catch (e) {
-      this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`, e.stack)
     }
 
     return { received: true }
