@@ -139,7 +139,6 @@
     "leaflet-geosearch": "^3.7.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.363.0",
-    "moment": "^2.30.1",
     "morgan": "^1.10.0",
     "nest-winston": "^1.9.7",
     "nestjs-cls": "^4.4.1",

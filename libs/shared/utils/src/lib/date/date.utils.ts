@@ -1,17 +1,16 @@
 import {
-  format,
+  addDays,
+  addHours,
+  addMinutes,
+  endOfDay,
   formatDistanceToNow,
   isAfter,
   isBefore,
   isValid,
   parseISO,
-  addMinutes,
-  addHours,
-  addDays,
   startOfDay,
-  endOfDay,
 } from 'date-fns'
-import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz'
+import { formatInTimeZone, toZonedTime } from 'date-fns-tz'
 import { DATE_CONFIG, TimezoneId, TIMEZONES } from './constants'
 
 /**
@@ -56,19 +55,12 @@ export function toUserTimezone(date: Date, userTimezone: TimezoneId): Date {
 /**
  * Convert a date from user's timezone to UTC for storage
  */
-export function fromUserTimezone(date: Date, userTimezone: TimezoneId): Date {
-  return fromZonedTime(date, userTimezone)
-}
-
-/**
- * Format a UTC date for display in user's timezone
- */
 export function formatForUser(
-  date: Date,
-  userTimezone: TimezoneId,
-  formatStr: string = DATE_CONFIG.FORMATS.DISPLAY
+  date: Date | string | number,
+  userTimezone: string,
+  formatStr = DATE_CONFIG.FORMATS.RELATIVE
 ): string {
-  return formatInTimeZone(date, userTimezone, formatStr)
+  return formatInTimeZone(new Date(date), userTimezone, formatStr)
 }
 
 /**

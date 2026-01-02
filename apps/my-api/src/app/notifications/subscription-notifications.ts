@@ -1,6 +1,6 @@
+import { formatUTC, DATE_CONFIG } from '@js-monorepo/utils/date'
 import { TRIAL_DURATION_DAYS } from '@js-monorepo/payments-server'
 import { capitalize } from 'lodash'
-import moment from 'moment'
 
 // Use relative paths for client-side navigation via Next.js router
 const subscriptionLink = () => `<a href="/settings/subscription">Manage Subscription</a>`
@@ -38,12 +38,11 @@ export function getSubscriptionRenewedMessage({ planName }: SubscriptionNotifica
  * Notification when a subscription is scheduled to cancel
  */
 export function getSubscriptionCanceledMessage({ planName, cancelAt }: SubscriptionNotificationData): string {
-  const formattedDate = cancelAt ? moment(cancelAt).format('MMMM D, YYYY') : 'the end of your billing period'
-  const formattedTime = cancelAt ? moment(cancelAt).format('h:mm A') : ''
+  const formattedDate = cancelAt ? `${formatUTC(cancelAt, DATE_CONFIG.FORMATS.DATE)}` : 'the end of your billing period'
 
   return `
     Your <strong>${capitalize(planName)}</strong> plan has been canceled.
-    You'll continue to have access until <strong>${formattedDate}</strong>${formattedTime ? ` at <strong>${formattedTime}</strong>` : ''}.
+    You'll continue to have access until <strong>${formattedDate}</strong>.
     Changed your mind? ${subscriptionLink()}
   `.trim()
 }

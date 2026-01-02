@@ -3,11 +3,11 @@
 import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
-import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
+import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'
+import { formatForUser } from '@js-monorepo/utils/date'
 import { AuthUserFullDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
 import { ColumnDef } from '@tanstack/react-table'
-import moment from 'moment'
 import { Dispatch, SetStateAction, Suspense, useCallback, useMemo, useState } from 'react'
 import { FaUserSecret } from 'react-icons/fa'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
@@ -37,6 +37,7 @@ const DashboardUsersTableSuspense = () => {
   }>()
 
   const pageCount = Math.round((data?.totalCount || 0) / pagination.pageSize)
+  const userTimezone = useTimezone()
 
   const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
     () => [
@@ -98,7 +99,9 @@ const DashboardUsersTableSuspense = () => {
         accessorKey: 'createdAt',
         size: 100,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
-        cell: ({ row }) => <div className="text-center">{moment(row.original.createdAt).format('YYYY-MM-DD')}</div>,
+        cell: ({ row }) => (
+          <div className="text-center">{formatForUser(new Date(row.original.createdAt), userTimezone)}</div>
+        ),
       },
       // {
       //   accessorKey: 'provider',
