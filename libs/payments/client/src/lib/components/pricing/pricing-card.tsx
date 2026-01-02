@@ -81,8 +81,8 @@ export function PricingCard({
       className={cn(
         'relative flex flex-col transition-all duration-300',
         // Active/trial plan gets prominence, otherwise popular gets it (but not if user has any subscription)
-        (isCurrentPlan || isCurrentTrial) && 'border-status-success shadow-lg scale-[1.02]',
-        !isCurrentPlan && !isCurrentTrial && isPopular && !anySubscribed && 'border-primary shadow-lg scale-[1.02]',
+        (isCurrentPlan || isCurrentTrial) && 'ring ring-status-success shadow-lg scale-[1.02]',
+        !isCurrentPlan && !isCurrentTrial && isPopular && !anySubscribed && 'ring ring-primary shadow-lg scale-[1.02]',
         // Dim non-active plans when user has a subscription (including free)
         anySubscribed && !subscribed && 'opacity-60 hover:opacity-100'
       )}
@@ -91,11 +91,11 @@ export function PricingCard({
       {showBadge && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           {isCurrentTrial ? (
-            <span className="bg-status-warning-bg text-status-warning text-xs font-semibold px-3 py-1 rounded-full border border-status-warning/50">
+            <span className="bg-status-warning-bg text-status-warning text-xs font-semibold px-3 py-1 rounded-full ring ring-status-warning/50">
               On Trial
             </span>
           ) : isCurrentPlan ? (
-            <span className="bg-status-success-bg text-status-success text-xs font-semibold px-3 py-1 rounded-full border border-status-success/50">
+            <span className="bg-status-success-bg text-status-success text-xs font-semibold px-3 py-1 rounded-full ring ring-status-success/50">
               Active
             </span>
           ) : (
