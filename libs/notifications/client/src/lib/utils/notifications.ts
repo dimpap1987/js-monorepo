@@ -1,6 +1,6 @@
+import { getRelativeTime, fromISOString } from '@js-monorepo/utils/date'
 import { ClientResponseType, PaginationType, UserNotificationType } from '@js-monorepo/types'
 import { apiClient } from '@js-monorepo/utils/http'
-import moment from 'moment'
 
 export async function apiFetchUserNotifications(
   userId: number,
@@ -24,13 +24,14 @@ export async function apiReadAllNotifications() {
   return apiClient.patch('/notifications/read-all')
 }
 
-export function humanatizeNotificationDate(date: string | Date) {
-  const momentDate = moment(date)
-  if (!momentDate.isValid()) return 'Invalid date'
-
-  const timeDifference = moment().diff(momentDate)
-  const formattedDifference = moment.duration(timeDifference).humanize()
-  return formattedDifference
+export function humanatizeNotificationDate(date: string | Date): string {
+  if (!date) return 'Invalid date'
+  try {
+    const dateObj = typeof date === 'string' ? fromISOString(date) : date
+    return getRelativeTime(dateObj)
+  } catch (error) {
+    return 'Invalid date'
+  }
 }
 
 export const updateNotificationAsRead = (

@@ -81,7 +81,7 @@ const NotificationDropdownItem = React.memo(({ content, onRead }: NotificationDr
         {/* Timestamp - aligned to right in second column */}
         <div className="flex justify-end items-center">
           <span className={cn('text-xs whitespace-nowrap', isUnread ? 'text-foreground' : 'text-foreground-neutral')}>
-            {humanatizeNotificationDate(content.notification.createdAt)} ago
+            {humanatizeNotificationDate(content.notification.createdAt)}
           </span>
         </div>
       </div>

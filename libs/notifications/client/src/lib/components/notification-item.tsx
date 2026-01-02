@@ -90,7 +90,7 @@ export function NotificationItem({ notification, onRead, className }: Notificati
                 isUnread ? 'text-foreground-muted' : 'text-foreground-neutral'
               )}
             >
-              {humanatizeNotificationDate(notification?.notification?.createdAt || '')} ago
+              {humanatizeNotificationDate(notification?.notification?.createdAt || '')}
             </span>
           </div>
         </div>
