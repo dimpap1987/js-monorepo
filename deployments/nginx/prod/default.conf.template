@@ -1,23 +1,23 @@
-# Redirect all HTTP to HTTPS
+# Production - HTTPS with SSL (self-hosted)
+# Redirect HTTP to HTTPS
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-
     return 301 https://$host$request_uri;
 }
 
-# Main HTTPS server block
+# Main HTTPS server
 server {
     listen 443 ssl default_server;
     listen [::]:443 ssl default_server;
     http2 on;
-    server_name localhost;  # Replace with your domain or IP address
+    server_name ${NGINX_SERVER_NAME};
 
     # SSL configuration
     ssl_certificate     /etc/ssl/certs/fullchain.pem;
     ssl_certificate_key /etc/ssl/private/key.pem;
 
-    # Optimize SSL
+    # SSL optimization
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
     ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
@@ -25,55 +25,78 @@ server {
     ssl_session_cache shared:SSL:10m;
     ssl_session_tickets off;
 
-    # Gzip compression
+    # OCSP Stapling
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
-    # Security Headers
+    # Security headers
     add_header X-Content-Type-Options nosniff;
     add_header X-XSS-Protection "1; mode=block";
     add_header X-Frame-Options DENY;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-    # Hide Nginx version information from responses.
     server_tokens off;
 
-    #Timeouts
     client_body_timeout 60s;
     client_header_timeout 60s;
     send_timeout 60s;
+    client_max_body_size 50M;
 
-    if ($banned_ip) {
-        return 403;  # Deny access for banned IPs
+    error_page 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+        internal;
+    }
+
+    location = /health {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 'nginx OK';
     }
 
     location / {
-        proxy_pass http://ui;
+        set $ui_upstream http://next-app:3000;
+        proxy_pass $ui_upstream;
         include /etc/nginx/proxy_params.conf;
+        proxy_intercept_errors on;
     }
 
     location /api {
-        limit_req zone=mylimit burst=15 nodelay;   #Rate limiting applied here
-        proxy_pass http://api;
+        limit_req zone=mylimit burst=15 nodelay;
+        set $api_upstream http://my-api:3333;
+        proxy_pass $api_upstream;
         include /etc/nginx/proxy_params.conf;
     }
 
     location /ws {
-        proxy_pass http://api;
-        include /etc/nginx/proxy_params.conf;
-        proxy_read_timeout 86400;  # 24 hour timeout for websockets
+        set $ws_upstream http://my-api:3333;
+        proxy_pass $ws_upstream;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_read_timeout 86400;
         proxy_send_timeout 86400;
+        proxy_connect_timeout 60s;
+        proxy_buffering off;
     }
 
-    # This should be removed from here later
     location /grafana {
         limit_req zone=mylimit burst=15 nodelay;
-        proxy_pass http://grafana:3000;
+        set $grafana_upstream http://grafana:3000;
+        proxy_pass $grafana_upstream;
         include /etc/nginx/proxy_params.conf;
-        
-        # Fix potential path issues with sub-path
+        proxy_intercept_errors on;
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-Server $host;
         proxy_set_header X-Forwarded-Uri /grafana;
     }
-
 }
