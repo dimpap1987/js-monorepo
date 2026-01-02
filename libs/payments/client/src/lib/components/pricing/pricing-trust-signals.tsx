@@ -19,7 +19,7 @@ const defaultSignals: TrustSignalItem[] = [
   },
   {
     icon: <CreditCard className="w-5 h-5" />,
-    text: 'Secure payment',
+    text: 'Secure',
   },
   {
     icon: <XCircle className="w-5 h-5" />,
@@ -29,7 +29,7 @@ const defaultSignals: TrustSignalItem[] = [
 
 export function PricingTrustSignals({ signals = defaultSignals, className }: PricingTrustSignalsProps) {
   return (
-    <div className={cn('flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10', className)}>
+    <div className={cn('flex items-center justify-center gap-3 sm:gap-10', className)}>
       {signals.map((signal, index) => (
         <div key={index} className="flex items-center gap-2 text-foreground-muted">
           <span className="text-status-success">{signal.icon}</span>

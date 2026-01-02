@@ -2,8 +2,10 @@
 
 import { DpButton } from '@js-monorepo/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@js-monorepo/components/card'
+import { UsageBar } from '@js-monorepo/components/usage-bar'
 import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
+import { useMemo } from 'react'
 import { Subscription, TrialEligibilityResponse } from '../../types'
 
 interface PricingCardProps {
@@ -37,6 +39,7 @@ export function PricingCard({
   subscribed,
   anySubscribed,
   isLoggedIn,
+  subscription,
   onSelect,
   onStartTrial,
   isLoading,
@@ -48,6 +51,23 @@ export function PricingCard({
   const canTrial = isLoggedIn && !isFree && trialEligibility?.eligible && !subscribed
 
   const isCurrentTrial = subscribed && isOnTrial
+
+  // Calculate trial progress
+  const trialProgress = useMemo(() => {
+    if (!isCurrentTrial || !subscription?.trialStart || !subscription?.trialEnd) {
+      return null
+    }
+
+    const start = new Date(subscription.trialStart).getTime()
+    const end = new Date(subscription.trialEnd).getTime()
+    const now = Date.now()
+
+    const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+    const daysUsed = Math.ceil((now - start) / (1000 * 60 * 60 * 24))
+    const daysRemaining = Math.max(0, totalDays - daysUsed)
+
+    return { totalDays, daysUsed, daysRemaining }
+  }, [isCurrentTrial, subscription?.trialStart, subscription?.trialEnd])
 
   const getButtonContent = () => {
     if (!isLoggedIn) {
@@ -119,6 +139,19 @@ export function PricingCard({
             {!isFree && interval && <span className="text-foreground-neutral">/{interval}</span>}
           </div>
         </div>
+
+        {/* Trial Progress Bar */}
+        {trialProgress && (
+          <div className="mb-6">
+            <UsageBar
+              current={trialProgress.daysUsed}
+              max={trialProgress.totalDays}
+              label="Trial remaining"
+              size="md"
+              variant="auto"
+            />
+          </div>
+        )}
 
         {/* Features */}
         <ul className="space-y-3">
