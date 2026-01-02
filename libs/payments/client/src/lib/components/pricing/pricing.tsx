@@ -3,6 +3,7 @@
 import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
 import { ErrorDialog } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
+import { SnapCarousel } from '@js-monorepo/components/snap-carousel'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -182,16 +183,54 @@ export function Pricing() {
     <div className="space-y-8 py-8">
       {/* Hero Section */}
       <PricingHero
-        title="Choose the Right Plan for You"
-        subtitle="Simple, transparent pricing that grows with you. Start free and upgrade when you're ready."
+        title="Choose Your Plan."
+        subtitle="Start with our Free tier and unlock professional features when you're ready."
       />
 
       {/* Trust Signals */}
       <PricingTrustSignals />
 
       {/* Pricing Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
-        {pricingCards?.map((card) => (
+      {/* Mobile: Snap Carousel */}
+      <section className="md:hidden">
+        <SnapCarousel
+          activeIndex={(() => {
+            const subscribedIndex = pricingCards.findIndex((card) => card.subscribed)
+            // If subscribed, show that card; otherwise show middle card (index 1 for 3 items)
+            return subscribedIndex >= 0 ? subscribedIndex : undefined
+          })()}
+          itemWidthPercent={75}
+          gap={12}
+          showIndicators={true}
+        >
+          {pricingCards.map((card) => (
+            <PricingCard
+              key={card.id}
+              id={card.id}
+              name={card.name}
+              description={card.description}
+              price={card.price}
+              interval={card.interval}
+              features={card.features}
+              isPopular={card.isPopular}
+              subscribed={card.subscribed}
+              anySubscribed={!!sessionSubscription?.isSubscribed}
+              isLoggedIn={isLoggedIn}
+              subscription={card.subscribed ? subscription ?? undefined : undefined}
+              onSelect={handleSelectPlan}
+              onStartTrial={handleStartTrial}
+              isLoading={isPortalLoading}
+              isTrialLoading={trialLoadingPriceId === card.id}
+              trialEligibility={trialEligibility[card.id]}
+              isOnTrial={sessionSubscription?.isTrial}
+            />
+          ))}
+        </SnapCarousel>
+      </section>
+
+      {/* Desktop: Grid Layout */}
+      <section className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 py-2 max-w-6xl mx-auto">
+        {pricingCards.map((card) => (
           <PricingCard
             key={card.id}
             id={card.id}
