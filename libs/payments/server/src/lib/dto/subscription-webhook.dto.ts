@@ -5,8 +5,8 @@ export interface SubscriptionUpdateData {
   status: string
   current_period_start: number
   current_period_end: number
-  trial_start: number | null
-  trial_end: number | null
+  trial_start?: number | null
+  trial_end?: number | null
   cancel_at: number | null
   canceled_at: number | null
   cancelReason?: CancelReasonType | null

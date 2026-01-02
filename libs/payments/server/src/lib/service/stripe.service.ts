@@ -222,8 +222,9 @@ export class StripeService {
           status,
           currentPeriodStart: timestampToDateRequired(subscriptionData.current_period_start as number),
           currentPeriodEnd: timestampToDateRequired(subscriptionData.current_period_end as number),
-          trialStart: timestampToDate(subscriptionData.trial_start as number | null),
-          trialEnd: timestampToDate(subscriptionData.trial_end as number | null),
+          // Since trial is handled internally
+          // trialStart: timestampToDate(subscriptionData.trial_start as number | null),
+          // trialEnd: timestampToDate(subscriptionData.trial_end as number | null),
           cancelAt: timestampToDate(subscriptionData.cancel_at as number | null),
           canceledAt: timestampToDate(subscriptionData.canceled_at as number | null),
         })
@@ -248,8 +249,9 @@ export class StripeService {
         status,
         current_period_start: subscriptionData.current_period_start as number,
         current_period_end: subscriptionData.current_period_end as number,
-        trial_start: subscriptionData.trial_start as number | null,
-        trial_end: subscriptionData.trial_end as number | null,
+        // Since trial is handled internally
+        // trial_start: subscriptionData.trial_start as number | null,
+        // trial_end: subscriptionData.trial_end as number | null,
         cancel_at: subscriptionData.cancel_at as number | null,
         canceled_at: subscriptionData.canceled_at as number | null,
         cancelReason,

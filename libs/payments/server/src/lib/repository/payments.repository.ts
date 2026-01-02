@@ -72,8 +72,9 @@ export class PaymentsRepository {
         status: subscriptionData.status,
         currentPeriodStart: timestampToDate(subscriptionData.current_period_start),
         currentPeriodEnd: timestampToDate(subscriptionData.current_period_end),
-        trialStart: timestampToDate(subscriptionData.trial_start),
-        trialEnd: timestampToDate(subscriptionData.trial_end),
+        // Since trial is handled internally
+        // trialStart: timestampToDate(subscriptionData.trial_start),
+        // trialEnd: timestampToDate(subscriptionData.trial_end),
         cancelAt: timestampToDate(subscriptionData.cancel_at),
         canceledAt: timestampToDate(subscriptionData.canceled_at),
         cancelReason: subscriptionData.cancelReason,
