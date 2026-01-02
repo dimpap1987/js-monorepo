@@ -7,6 +7,8 @@ import { RedisSessionKey } from '@js-monorepo/auth/nest/common/types'
 import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
 import { AuthSessionMiddleware, AuthSessionModule } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
+import { DistributedLockModule } from '@js-monorepo/nest/distributed-lock'
+import { IdempotencyModule } from '@js-monorepo/nest/idempotency'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import {
   Events as NotificationEvent,
@@ -94,6 +96,8 @@ import {
       }),
       isGlobal: true,
     }),
+    DistributedLockModule,
+    IdempotencyModule,
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
       imports: [UserPresenceModule],

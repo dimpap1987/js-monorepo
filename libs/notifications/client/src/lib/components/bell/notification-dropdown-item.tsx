@@ -58,7 +58,7 @@ const NotificationDropdownItem = React.memo(({ content, onRead }: NotificationDr
     >
       <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2 w-full">
         {/* Unread indicator - left border handles this now, but keep spacing */}
-        <div className="row-span-2 flex items-start pt-1.5 shrink-0">
+        <div className="row-span-2 flex items-center pt-1.5 shrink-0">
           {isUnread && (
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0 shadow-sm shadow-primary/50 animate-pulse" />
           )}

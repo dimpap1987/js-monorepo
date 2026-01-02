@@ -1,6 +1,5 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
 import { InvoiceController } from './controller/invoice.controller'
 import { PaymentsController } from './controller/payments.controller'
 import { TrialController } from './controller/trial.controller'
@@ -34,7 +33,6 @@ const providers: Provider[] = [
   PaymentsRepository,
   PaymentsService,
   SubscriptionGuard,
-  IdempotencyInterceptor,
   TrialService,
   TrialExpiryScheduler,
 ]
