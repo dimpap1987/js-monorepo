@@ -9,6 +9,7 @@ import { AuthSessionMiddleware, AuthSessionModule } from '@js-monorepo/auth/nest
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
 import { DistributedLockModule } from '@js-monorepo/nest/distributed-lock'
 import { IdempotencyModule } from '@js-monorepo/nest/idempotency'
+import { LoggerModule } from '@js-monorepo/nest/logger'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import {
   Events as NotificationEvent,
@@ -49,6 +50,7 @@ import {
 
 @Module({
   imports: [
+    LoggerModule.forRootAsync(),
     VaultModule.register({
       path: 'secret/data/data/my-api/env',
       endpoint: process.env.VAULT_ADDR || '',
