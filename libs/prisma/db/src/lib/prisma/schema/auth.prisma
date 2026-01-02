@@ -4,6 +4,7 @@ model AuthUser {
     updatedAt             DateTime           @updatedAt
     username              String             @unique(map: "unique_username") @db.Citext
     email                 String             @unique
+    timezone              String             @default("UTC")
     userProfiles          UserProfile[]
     sentNotifications     UserNotification[] @relation("sender")
     receivedNotifications UserNotification[] @relation("receiver")

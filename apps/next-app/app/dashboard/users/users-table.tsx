@@ -3,17 +3,18 @@
 import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
-import { usePaginationWithParams } from '@js-monorepo/next/hooks/pagination'
+import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'
+import { formatForUser } from '@js-monorepo/utils/date'
 import { AuthUserFullDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
 import { ColumnDef } from '@tanstack/react-table'
-import moment from 'moment'
 import { Dispatch, SetStateAction, Suspense, useCallback, useMemo, useState } from 'react'
+import { FaUserSecret } from 'react-icons/fa'
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { TiCancelOutline, TiTick } from 'react-icons/ti'
+import { useImpersonateUser, useUpdateUser, useUsers } from './queries'
 import RolesTableInput from './roles-input'
 import { UsernameTableInput } from './username-input'
-import { useUsers, useUpdateUser } from './queries'
 
 declare module '@tanstack/table-core' {
   interface Row<TData> {
@@ -27,6 +28,7 @@ const DashboardUsersTableSuspense = () => {
 
   const { data, isLoading, refetch } = useUsers(searchQuery)
   const updateUserMutation = useUpdateUser()
+  const impersonateMutation = useImpersonateUser()
 
   const [update, setUpdate] = useState<{
     index?: number
@@ -35,6 +37,7 @@ const DashboardUsersTableSuspense = () => {
   }>()
 
   const pageCount = Math.round((data?.totalCount || 0) / pagination.pageSize)
+  const userTimezone = useTimezone()
 
   const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
     () => [
@@ -96,7 +99,9 @@ const DashboardUsersTableSuspense = () => {
         accessorKey: 'createdAt',
         size: 100,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
-        cell: ({ row }) => <div className="text-center">{moment(row.original.createdAt).format('YYYY-MM-DD')}</div>,
+        cell: ({ row }) => (
+          <div className="text-center">{formatForUser(new Date(row.original.createdAt), userTimezone)}</div>
+        ),
       },
       // {
       //   accessorKey: 'provider',
@@ -177,19 +182,50 @@ const DashboardUsersTableSuspense = () => {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    title="Edit User"
-                    className="h-9 w-9 p-0 rounded-md border border-border bg-background hover:bg-accent hover:border-accent text-foreground transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 flex items-center justify-center"
-                    onClick={() => {
-                      row.updatedUser = undefined
-                      setUpdate({
-                        index: row.index,
-                        inProgress: true,
-                      })
-                    }}
-                  >
-                    <MdOutlineModeEditOutline className="text-xl" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      title="Edit User"
+                      className="h-9 w-9 p-0 rounded-md border border-border bg-background hover:bg-accent hover:border-accent text-foreground transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 flex items-center justify-center"
+                      onClick={() => {
+                        row.updatedUser = undefined
+                        setUpdate({
+                          index: row.index,
+                          inProgress: true,
+                        })
+                      }}
+                    >
+                      <MdOutlineModeEditOutline className="text-xl" />
+                    </button>
+                    <button
+                      title="Login as User"
+                      className="h-9 w-9 p-0 rounded-md border border-border bg-background hover:bg-purple-500 hover:text-white hover:border-purple-500 text-foreground transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={impersonateMutation.isPending}
+                      onClick={async () => {
+                        try {
+                          const result = await impersonateMutation.mutateAsync(row.original.id)
+                          if (result.success) {
+                            addNotification({
+                              message: `Now logged in as ${row.original.username}`,
+                              type: 'success',
+                            })
+                            window.location.replace('/')
+                          } else {
+                            addNotification({
+                              message: result.message || 'Failed to impersonate user',
+                              type: 'error',
+                            })
+                          }
+                        } catch {
+                          addNotification({
+                            message: 'Failed to impersonate user',
+                            type: 'error',
+                          })
+                        }
+                      }}
+                    >
+                      <FaUserSecret className="text-lg" />
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -197,7 +233,7 @@ const DashboardUsersTableSuspense = () => {
         },
       },
     ],
-    [update, addNotification, updateUserMutation, refetch]
+    [update, addNotification, updateUserMutation, refetch, impersonateMutation]
   )
 
   const onPaginationChange = useCallback<Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>>(

@@ -7,6 +7,9 @@ import { RedisSessionKey } from '@js-monorepo/auth/nest/common/types'
 import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
 import { AuthSessionMiddleware, AuthSessionModule } from '@js-monorepo/auth/nest/session'
 import { PrismaModule, PrismaService } from '@js-monorepo/db'
+import { DistributedLockModule } from '@js-monorepo/nest/distributed-lock'
+import { IdempotencyModule } from '@js-monorepo/nest/idempotency'
+import { LoggerModule } from '@js-monorepo/nest/logger'
 import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
 import {
   Events as NotificationEvent,
@@ -19,6 +22,7 @@ import { ClsPluginTransactional } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { CacheModule } from '@nestjs/cache-manager'
 import { ConfigService } from '@nestjs/config'
+import { ScheduleModule } from '@nestjs/schedule'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
 import { ClsModule } from 'nestjs-cls'
@@ -40,10 +44,13 @@ import {
   getSubscriptionCanceledMessage,
   getSubscriptionExpiredMessage,
   getSubscriptionRenewedMessage,
+  getTrialExpiredMessage,
+  getTrialStartedMessage,
 } from './notifications/subscription-notifications'
 
 @Module({
   imports: [
+    LoggerModule.forRootAsync(),
     VaultModule.register({
       path: 'secret/data/data/my-api/env',
       endpoint: process.env.VAULT_ADDR || '',
@@ -84,12 +91,15 @@ import {
       keepNodeProcessAlive: true,
     }),
     HealthModule,
+    ScheduleModule.forRoot(),
     RedisModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         url: configService.get('REDIS_URL'),
       }),
       isGlobal: true,
     }),
+    DistributedLockModule,
+    IdempotencyModule,
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
       imports: [UserPresenceModule],
@@ -181,6 +191,20 @@ import {
             receiverIds: [userId],
             message: getSubscriptionExpiredMessage({ planName: subscription.name }),
           })
+        },
+        onTrialStarted: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getTrialStartedMessage({ planName: subscription.name }),
+          })
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+        },
+        onTrialExpired: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getTrialExpiredMessage({ planName: subscription.name }),
+          })
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
         },
       }),
     }),

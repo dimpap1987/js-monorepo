@@ -59,10 +59,24 @@ export class UserPresenceGateway implements OnGatewayConnection, OnGatewayDiscon
   async handleDisconnect(socket: Socket) {
     const userId = socket.user?.id
     this.logger.debug(`User: ${userId} disconnected through websocket`)
+
+    // Remove this specific socket from Redis
     await this.userSocketService.removeSocketUserBySocketId(socket.id)
+
     if (userId) {
+      // Remove this socket entry from online users
       await this.onlineUsersService.remove(`${userId}:${socket.id}`)
+
+      // Check if user has any remaining sockets across all instances
+      // Only emit offline status if this was their last connection
+      const remainingSockets = await this.userSocketService.countUserSockets(userId)
+      if (remainingSockets === 0) {
+        this.logger.debug(`User: ${userId} has no remaining sockets - marking as offline`)
+      } else {
+        this.logger.debug(`User: ${userId} still has ${remainingSockets} active socket(s)`)
+      }
     }
+
     this.emitOnlineUsersToAdmins()
   }
 

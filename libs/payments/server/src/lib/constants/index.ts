@@ -1,3 +1,5 @@
+export const TRIAL_DURATION_DAYS = 14
+
 export const SubscriptionStatus = {
   ACTIVE: 'active',
   TRIALING: 'trialing',
@@ -20,6 +22,8 @@ export const CancelReason = {
   PAYMENT_FAILED: 'payment_failed',
   ADMIN: 'admin',
   EXPIRED: 'expired',
+  TRIAL_EXPIRED: 'trial_expired',
+  UPGRADED_TO_PAID: 'upgraded_to_paid',
 } as const
 
 export type CancelReasonType = (typeof CancelReason)[keyof typeof CancelReason]

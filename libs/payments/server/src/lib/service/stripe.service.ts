@@ -1,12 +1,14 @@
+import { DistributedLockService } from '@js-monorepo/nest/distributed-lock'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { PaymentsClient, type WebhookEvent } from '@super-dp/payments-core'
+import { PaymentsClient, StripeProvider, type WebhookEvent } from '@super-dp/payments-core'
 import { CreateProductWithPricesRequest, PaymentsModuleOptions } from '../../'
 import { CancelReason } from '../constants'
-import { PaymentsClientToken } from '../stripe.module'
+import { InvoiceDto, InvoiceListResponse, InvoiceStatus } from '../dto/invoice.dto'
+import { PaymentsClientToken, StripeProviderToken } from '../stripe.module'
 import { timestampToDate, timestampToDateRequired, withRetry } from '../utils'
 import { PaymentsService } from './payments.service'
 
@@ -16,10 +18,12 @@ export class StripeService {
 
   constructor(
     @Inject(PaymentsClientToken) private readonly paymentsClient: PaymentsClient,
+    @Inject(StripeProviderToken) private readonly stripeProvider: StripeProvider,
     private readonly paymentsService: PaymentsService,
     @Inject('PAYMENTS_OPTIONS')
     private readonly paymentsModuleOptions: PaymentsModuleOptions,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly distributedLockService: DistributedLockService
   ) {}
 
   async findCustomerByEmail(email: string) {
@@ -105,32 +109,51 @@ export class StripeService {
     }
 
     const event = this.paymentsClient.constructWebhookEvent(payload, sig)
-    const storedEvent = await this.paymentsService.findStripeWebhookEvent(event.id)
 
-    if (storedEvent?.result?.id) {
-      this.logger.warn(`Duplicate stripe event occurred. - Stripe - id: ${event.id} type: ${event.type}`)
+    // Use distributed lock to prevent duplicate processing across instances
+    const lockKey = `webhook:stripe:${event.id}`
+    const lockResult = await this.distributedLockService.withLock(
+      lockKey,
+      async () => {
+        // Double-check if event was already processed (inside lock)
+        const storedEvent = await this.paymentsService.findStripeWebhookEvent(event.id)
+
+        if (storedEvent?.result?.id) {
+          this.logger.warn(`Duplicate stripe event occurred. - Stripe - id: ${event.id} type: ${event.type}`)
+          return { received: true, alreadyProcessed: true }
+        }
+
+        // Mark event as being processed
+        await this.paymentsService.createStripeWebhookEvent({
+          eventId: event.id,
+          eventType: event.type,
+        })
+
+        try {
+          await this.paymentsClient.handleWebhookEvent(payload, sig, {
+            onSubscriptionCreated: (evt) => this.handleSubscriptionEvent(evt, 'created'),
+            onSubscriptionUpdated: (evt) => this.handleSubscriptionEvent(evt, 'updated'),
+            onSubscriptionDeleted: (evt) => this.handleSubscriptionEvent(evt, 'deleted'),
+            onInvoicePaymentSucceeded: (evt) => this.handleInvoiceEvent(evt, 'succeeded'),
+            onInvoicePaymentFailed: (evt) => this.handleInvoiceEvent(evt, 'failed'),
+            onCheckoutSessionCompleted: (evt) => this.handleCheckoutSessionCompleted(evt),
+            onOther: (evt) => {
+              this.logger.warn(`Stripe - unhandled event received: ${evt.type}`)
+            },
+          })
+        } catch (e) {
+          this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`, e.stack)
+        }
+
+        return { received: true, alreadyProcessed: false }
+      },
+      { ttlSeconds: 60 }
+    )
+
+    if (!lockResult.success) {
+      // Another instance is processing this event
+      this.logger.debug(`Webhook event ${event.id} is being processed by another instance`)
       return { received: true }
-    }
-
-    await this.paymentsService.createStripeWebhookEvent({
-      eventId: event.id,
-      eventType: event.type,
-    })
-
-    try {
-      await this.paymentsClient.handleWebhookEvent(payload, sig, {
-        onSubscriptionCreated: (evt) => this.handleSubscriptionEvent(evt, 'created'),
-        onSubscriptionUpdated: (evt) => this.handleSubscriptionEvent(evt, 'updated'),
-        onSubscriptionDeleted: (evt) => this.handleSubscriptionEvent(evt, 'deleted'),
-        onInvoicePaymentSucceeded: (evt) => this.handleInvoiceEvent(evt, 'succeeded'),
-        onInvoicePaymentFailed: (evt) => this.handleInvoiceEvent(evt, 'failed'),
-        onCheckoutSessionCompleted: (evt) => this.handleCheckoutSessionCompleted(evt),
-        onOther: (evt) => {
-          this.logger.warn(`Stripe - unhandled event received: ${evt.type}`)
-        },
-      })
-    } catch (e) {
-      this.logger.error(`There was an Error in stripe webhook event with id:${event.id}`, e.stack)
     }
 
     return { received: true }
@@ -163,18 +186,49 @@ export class StripeService {
     const price = await this.paymentsService.findPriceByStripeId(priceId)
 
     if (type === 'created') {
-      const sub = await this.paymentsService.createSubscription({
-        paymentCustomerId: paymentCustomer.id,
-        stripeSubscriptionId: subscriptionId,
-        priceId: price.id,
-        status,
-        currentPeriodStart: timestampToDateRequired(subscriptionData.current_period_start as number),
-        currentPeriodEnd: timestampToDateRequired(subscriptionData.current_period_end as number),
-        trialStart: timestampToDate(subscriptionData.trial_start as number | null),
-        trialEnd: timestampToDate(subscriptionData.trial_end as number | null),
-        cancelAt: timestampToDate(subscriptionData.cancel_at as number | null),
-        canceledAt: timestampToDate(subscriptionData.canceled_at as number | null),
-      })
+      // Check if user has an active trial for this product - convert it instead of creating new
+      const existingTrialForProduct = await this.paymentsService.findActiveTrialForProduct(
+        paymentCustomer.userId,
+        price.product.id
+      )
+
+      let sub
+      if (existingTrialForProduct) {
+        // Convert trial to paid subscription (same product)
+        this.logger.log(
+          `Converting trial subscription ${existingTrialForProduct.id} to paid for user ${paymentCustomer.userId}`
+        )
+        sub = await this.paymentsService.convertTrialToPaid(existingTrialForProduct.id, {
+          stripeSubscriptionId: subscriptionId,
+          status,
+          currentPeriodStart: timestampToDateRequired(subscriptionData.current_period_start as number),
+          currentPeriodEnd: timestampToDateRequired(subscriptionData.current_period_end as number),
+        })
+      } else {
+        // Check if user has a trial for a DIFFERENT product - cancel it
+        const anyActiveTrial = await this.paymentsService.findActiveTrialForUser(paymentCustomer.userId)
+        if (anyActiveTrial) {
+          this.logger.log(
+            `Canceling trial ${anyActiveTrial.id} (${anyActiveTrial.price.product.name}) - user upgrading to ${price.product.name}`
+          )
+          await this.paymentsService.cancelTrialSubscription(anyActiveTrial.id)
+        }
+
+        // Create new subscription
+        sub = await this.paymentsService.createSubscription({
+          paymentCustomerId: paymentCustomer.id,
+          stripeSubscriptionId: subscriptionId,
+          priceId: price.id,
+          status,
+          currentPeriodStart: timestampToDateRequired(subscriptionData.current_period_start as number),
+          currentPeriodEnd: timestampToDateRequired(subscriptionData.current_period_end as number),
+          // Since trial is handled internally
+          // trialStart: timestampToDate(subscriptionData.trial_start as number | null),
+          // trialEnd: timestampToDate(subscriptionData.trial_end as number | null),
+          cancelAt: timestampToDate(subscriptionData.cancel_at as number | null),
+          canceledAt: timestampToDate(subscriptionData.canceled_at as number | null),
+        })
+      }
 
       tryCatch(() => {
         this.paymentsModuleOptions.onSubscriptionCreateSuccess?.(paymentCustomer.userId, {
@@ -195,8 +249,9 @@ export class StripeService {
         status,
         current_period_start: subscriptionData.current_period_start as number,
         current_period_end: subscriptionData.current_period_end as number,
-        trial_start: subscriptionData.trial_start as number | null,
-        trial_end: subscriptionData.trial_end as number | null,
+        // Since trial is handled internally
+        // trial_start: subscriptionData.trial_start as number | null,
+        // trial_end: subscriptionData.trial_end as number | null,
         cancel_at: subscriptionData.cancel_at as number | null,
         canceled_at: subscriptionData.canceled_at as number | null,
         cancelReason,
@@ -295,6 +350,20 @@ export class StripeService {
     }
   }
 
+  async createPortalSession(stripeCustomerId: string, returnUrl: string) {
+    try {
+      const stripe = this.stripeProvider.getStripeClient()
+      const session = await stripe.billingPortal.sessions.create({
+        customer: stripeCustomerId,
+        return_url: returnUrl,
+      })
+      return { url: session.url }
+    } catch (error) {
+      this.logger.error('Error creating portal session:', error.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_CREATING_PORTAL_SESSION')
+    }
+  }
+
   async validateOrCreateCustomer(stripeCustomerId: string, email: string, userId: number) {
     try {
       await this.paymentsClient.getCustomer(stripeCustomerId)
@@ -309,6 +378,49 @@ export class StripeService {
         stripeCustomerId: stripeCustomer.id,
       })
       return createdCustomer.stripeCustomerId
+    }
+  }
+
+  async listInvoices(stripeCustomerId: string, limit = 10, startingAfter?: string): Promise<InvoiceListResponse> {
+    try {
+      const stripe = this.stripeProvider.getStripeClient()
+
+      const invoices = await stripe.invoices.list({
+        customer: stripeCustomerId,
+        limit,
+        starting_after: startingAfter,
+        expand: ['data.subscription'],
+      })
+
+      return {
+        invoices: invoices.data.map((invoice) => this.toInvoiceDto(invoice)),
+        hasMore: invoices.has_more,
+      }
+    } catch (error) {
+      this.logger.error('Error listing invoices:', error.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_LISTING_INVOICES')
+    }
+  }
+
+  private toInvoiceDto(invoice: {
+    id: string
+    number: string | null
+    amount_paid: number
+    currency: string
+    status: string | null
+    created: number
+    invoice_pdf?: string | null
+    hosted_invoice_url?: string | null
+  }): InvoiceDto {
+    return {
+      id: invoice.id,
+      number: invoice.number,
+      amount: invoice.amount_paid,
+      currency: invoice.currency,
+      status: (invoice.status || 'draft') as InvoiceStatus,
+      createdAt: new Date(invoice.created * 1000),
+      pdfUrl: invoice.invoice_pdf ?? null,
+      hostedInvoiceUrl: invoice.hosted_invoice_url ?? null,
     }
   }
 }

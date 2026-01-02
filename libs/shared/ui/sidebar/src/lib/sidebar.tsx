@@ -17,6 +17,7 @@ export interface DpNextSidebarProps {
   readonly items: MenuItem[]
   readonly header?: string
   readonly user?: Partial<SessionUserType>
+  readonly plan?: string | null
 }
 
 const framerSidebarPanel = (position: SidebarPositionType) => ({
@@ -41,6 +42,7 @@ const DpNextSidebarBase = ({
   isOpen,
   onClose,
   user,
+  plan,
   items = [],
   position = 'left',
   header,
@@ -106,6 +108,7 @@ const DpNextSidebarBase = ({
                   profileImage={user.profile?.image}
                   username={user.username}
                   createdAt={user.createdAt}
+                  plan={plan}
                   className="select-none text-sm"
                 ></UserMetadata>
               )}

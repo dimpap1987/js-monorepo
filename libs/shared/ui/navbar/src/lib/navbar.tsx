@@ -29,10 +29,12 @@ function SideBarIcon({ onSideBarClick, className }: { onSideBarClick?: () => voi
 
 function NavUserOptions({
   user,
+  plan,
   onLogout,
   className,
 }: {
   readonly user?: UserNavProps
+  readonly plan?: string | null
   readonly onLogout?: () => void
   readonly className?: string
 }) {
@@ -45,6 +47,7 @@ function NavUserOptions({
           profileImage={user.profile?.image}
           username={user.username}
           createdAt={user.createdAt}
+          plan={plan}
           className="mb-2 border-border border-b select-none"
         ></UserMetadata>
 
@@ -71,6 +74,7 @@ export interface DpNextNavbarProps {
   readonly children?: ReactNode
   readonly menuItems?: MenuItem[]
   readonly user?: UserNavProps
+  readonly plan?: string | null
   readonly onLogout?: () => void
   readonly onSideBarClick?: () => void
 }
@@ -82,7 +86,7 @@ export type UserNavSocial = {
 }
 
 const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
-  ({ children, menuItems = [], user, onLogout, onSideBarClick }, ref) => {
+  ({ children, menuItems = [], user, plan, onLogout, onSideBarClick }, ref) => {
     const isLoggedIn = !!user
 
     const { logo, navbarItems } = useMemo(() => {
@@ -148,7 +152,14 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                       <DpLoginButton></DpLoginButton>
                     </DpNextNavLink>
                   )}
-                  {user && <NavUserOptions className="hidden sm:block mt-[0.58rem]" user={user} onLogout={onLogout} />}
+                  {user && (
+                    <NavUserOptions
+                      className="hidden sm:block mt-[0.58rem]"
+                      user={user}
+                      plan={plan}
+                      onLogout={onLogout}
+                    />
+                  )}
                 </>
               </section>
 

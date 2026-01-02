@@ -8,6 +8,7 @@ export interface StripeModuleOptions {
 }
 
 export const PaymentsClientToken = Symbol('PAYMENTS_CLIENT')
+export const StripeProviderToken = Symbol('STRIPE_PROVIDER')
 
 @Module({})
 export class StripeModule {
@@ -20,6 +21,11 @@ export class StripeModule {
 
     const paymentsClient = new PaymentsClient(stripeProvider)
 
+    const stripeProviderProvider = {
+      provide: StripeProviderToken,
+      useValue: stripeProvider,
+    }
+
     const paymentsClientProvider = {
       provide: PaymentsClientToken,
       useValue: paymentsClient,
@@ -27,8 +33,8 @@ export class StripeModule {
 
     return {
       module: StripeModule,
-      providers: [paymentsClientProvider],
-      exports: [paymentsClientProvider],
+      providers: [paymentsClientProvider, stripeProviderProvider],
+      exports: [paymentsClientProvider, stripeProviderProvider],
     }
   }
 
@@ -36,27 +42,35 @@ export class StripeModule {
     useFactory: (...args: any[]) => StripeModuleOptions | Promise<StripeModuleOptions>
     inject?: any[]
   }): DynamicModule {
-    const paymentsClientProvider = {
-      provide: PaymentsClientToken,
+    // Create a shared factory that creates the StripeProvider once
+    const stripeProviderFactory = {
+      provide: StripeProviderToken,
       useFactory: async (...args: any[]) => {
         const config = await options.useFactory(...args)
         if (!config.apiKey) {
           throw new Error('Stripe API key is required')
         }
-        const stripeProvider = new StripeProvider({
+        return new StripeProvider({
           apiKey: config.apiKey,
           apiVersion: config.apiVersion as any,
           webhookSecret: config.webhookSecret,
         })
-        return new PaymentsClient(stripeProvider)
       },
       inject: options.inject || [],
     }
 
+    const paymentsClientProvider = {
+      provide: PaymentsClientToken,
+      useFactory: (stripeProvider: StripeProvider) => {
+        return new PaymentsClient(stripeProvider)
+      },
+      inject: [StripeProviderToken],
+    }
+
     return {
       module: StripeModule,
-      providers: [paymentsClientProvider],
-      exports: [paymentsClientProvider],
+      providers: [stripeProviderFactory, paymentsClientProvider],
+      exports: [paymentsClientProvider, stripeProviderFactory],
     }
   }
 }

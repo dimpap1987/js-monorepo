@@ -2,54 +2,31 @@
 
 import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
 import { ErrorDialog } from '@js-monorepo/dialog'
+import { useNotifications } from '@js-monorepo/notification'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePlans } from '../../queries/payments-queries'
-import { POPULAR_PLAN_NAME, SessionSubscription, Subscription, SubscriptionPlan } from '../../types'
-import { apiGetSubscription } from '../../utils/api'
+import { POPULAR_PLAN_NAME, SessionSubscription, Subscription, TrialEligibilityResponse } from '../../types'
+import { apiCheckTrialEligibility, apiCreatePortalSession, apiGetSubscription, apiStartTrial } from '../../utils/api'
 import { PricingCard } from './pricing-card'
 import { PricingFAQ } from './pricing-faq'
 import { PricingHero } from './pricing-hero'
 import { PricingTrustSignals } from './pricing-trust-signals'
-
-function useSubscriptionMap() {
-  const [subscriptionMap, setSubscriptionMap] = useState<Map<number, Subscription>>(new Map())
-
-  const fetchSubscriptions = useCallback(async (plans: SubscriptionPlan[]) => {
-    try {
-      const promises = plans.map((plan) =>
-        plan.subscriptionId
-          ? apiGetSubscription(plan.subscriptionId).then((res) => {
-              if (res.ok) {
-                const sub = res.data as Subscription
-                setSubscriptionMap((prev) => {
-                  const updatedMap = new Map(prev)
-                  updatedMap.set(sub?.priceId, sub)
-                  return updatedMap
-                })
-              }
-            })
-          : Promise.resolve()
-      )
-      await Promise.all(promises)
-    } catch (error) {
-      console.error('Error fetching subscriptions:', error)
-    }
-  }, [])
-
-  return { subscriptionMap, fetchSubscriptions }
-}
 
 export function Pricing() {
   const { session, isLoggedIn } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [hasErrors, setHasErrors] = useState(false)
-  const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
-  const { subscriptionMap, fetchSubscriptions } = useSubscriptionMap()
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [isPortalLoading, setIsPortalLoading] = useState(false)
+  const [trialLoadingPriceId, setTrialLoadingPriceId] = useState<number | null>(null)
+  const [trialEligibility, setTrialEligibility] = useState<Record<number, TrialEligibilityResponse>>({})
+  const { data: plans = [] } = usePlans()
+  const { addNotification } = useNotifications()
 
-  const sessionSubscription = session?.subscription as SessionSubscription
+  const sessionSubscription = session?.subscription as SessionSubscription | undefined
 
   const pricingCards = useMemo(() => {
     return plans
@@ -64,11 +41,11 @@ export function Pricing() {
             interval: price.interval,
             features: plan.features,
             isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
-            subscribed: !!subscriptionMap.get(price.id),
+            subscribed: sessionSubscription?.priceId === price.id,
           }))
       )
       .sort((a, b) => a.price - b.price)
-  }, [plans, subscriptionMap])
+  }, [plans, sessionSubscription?.priceId])
 
   useEffect(() => {
     if (searchParams?.get('success') === 'false') {
@@ -76,11 +53,64 @@ export function Pricing() {
     }
   }, [searchParams])
 
+  // Fetch full subscription details when user has an active subscription
   useEffect(() => {
-    if (sessionSubscription?.plans?.length) {
-      fetchSubscriptions(sessionSubscription.plans)
+    if (sessionSubscription?.subscriptionId) {
+      apiGetSubscription(sessionSubscription.subscriptionId).then((res) => {
+        if (res.ok) {
+          setSubscription(res.data as Subscription)
+        }
+      })
     }
-  }, [sessionSubscription, fetchSubscriptions])
+  }, [sessionSubscription?.subscriptionId])
+
+  // Check trial eligibility for each paid plan
+  useEffect(() => {
+    if (!isLoggedIn || pricingCards.length === 0) return
+
+    const checkEligibility = async () => {
+      const eligibilityMap: Record<number, TrialEligibilityResponse> = {}
+
+      for (const card of pricingCards) {
+        if (card.price > 0 && !card.subscribed) {
+          const response = await apiCheckTrialEligibility(card.id)
+          if (response.ok && response.data) {
+            eligibilityMap[card.id] = response.data
+          }
+        }
+      }
+
+      setTrialEligibility(eligibilityMap)
+    }
+
+    checkEligibility()
+  }, [isLoggedIn, pricingCards])
+
+  const handleManageSubscription = useCallback(async () => {
+    setIsPortalLoading(true)
+    try {
+      const returnUrl = window.location.href
+      const response = await apiCreatePortalSession(returnUrl)
+
+      if (response.ok && response.data?.url) {
+        window.location.href = response.data.url
+      } else {
+        addNotification({
+          message: 'Failed to open subscription portal',
+          description: 'Please try again or contact support',
+          type: 'error',
+        })
+        setIsPortalLoading(false)
+      }
+    } catch (error) {
+      addNotification({
+        message: 'Something went wrong',
+        description: 'Please try again later',
+        type: 'error',
+      })
+      setIsPortalLoading(false)
+    }
+  }, [addNotification])
 
   const handleSelectPlan = useCallback(
     (priceId: number) => {
@@ -89,9 +119,56 @@ export function Pricing() {
         router.push(buildLoginUrl(checkoutUrl))
         return
       }
+      // If user has PAID subscription (not trial) and clicks a different plan, open portal to switch
+      // Trial users should go to checkout since they don't have a Stripe subscription yet
+      const hasPaidSubscription = sessionSubscription?.isSubscribed && !sessionSubscription?.isTrial
+      if (hasPaidSubscription && sessionSubscription?.priceId !== priceId) {
+        handleManageSubscription()
+        return
+      }
       router.push(checkoutUrl)
     },
-    [isLoggedIn, router]
+    [
+      isLoggedIn,
+      router,
+      sessionSubscription?.isSubscribed,
+      sessionSubscription?.isTrial,
+      sessionSubscription?.priceId,
+      handleManageSubscription,
+    ]
+  )
+
+  const handleStartTrial = useCallback(
+    async (priceId: number) => {
+      setTrialLoadingPriceId(priceId)
+      try {
+        const response = await apiStartTrial(priceId)
+
+        if (response.ok && response.data) {
+          addNotification({
+            message: 'Trial Started!',
+            description: response.data.message,
+            type: 'success',
+          })
+          router.refresh()
+        } else {
+          addNotification({
+            message: 'Could not start trial',
+            description: 'Please try again or contact support',
+            type: 'error',
+          })
+        }
+      } catch {
+        addNotification({
+          message: 'Something went wrong',
+          description: 'Please try again later',
+          type: 'error',
+        })
+      } finally {
+        setTrialLoadingPriceId(null)
+      }
+    },
+    [addNotification, router]
   )
 
   const handleErrorDialogClose = () => {
@@ -125,10 +202,15 @@ export function Pricing() {
             features={card.features}
             isPopular={card.isPopular}
             subscribed={card.subscribed}
-            anySubscribed={!!sessionSubscription?.plans?.length}
+            anySubscribed={!!sessionSubscription?.isSubscribed}
             isLoggedIn={isLoggedIn}
-            subscription={subscriptionMap.get(card.id)}
+            subscription={card.subscribed ? subscription ?? undefined : undefined}
             onSelect={handleSelectPlan}
+            onStartTrial={handleStartTrial}
+            isLoading={isPortalLoading}
+            isTrialLoading={trialLoadingPriceId === card.id}
+            trialEligibility={trialEligibility[card.id]}
+            isOnTrial={sessionSubscription?.isTrial}
           />
         ))}
       </section>

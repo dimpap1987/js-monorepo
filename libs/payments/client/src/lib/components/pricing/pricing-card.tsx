@@ -4,7 +4,7 @@ import { DpButton } from '@js-monorepo/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@js-monorepo/components/card'
 import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
-import { Subscription } from '../../types'
+import { Subscription, TrialEligibilityResponse } from '../../types'
 
 interface PricingCardProps {
   id: number
@@ -19,7 +19,11 @@ interface PricingCardProps {
   isLoggedIn?: boolean
   subscription?: Subscription
   onSelect: (planId: number) => void
+  onStartTrial?: (planId: number) => void
   isLoading?: boolean
+  isTrialLoading?: boolean
+  trialEligibility?: TrialEligibilityResponse
+  isOnTrial?: boolean
 }
 
 export function PricingCard({
@@ -34,39 +38,63 @@ export function PricingCard({
   anySubscribed,
   isLoggedIn,
   onSelect,
+  onStartTrial,
   isLoading,
+  isTrialLoading,
+  trialEligibility,
+  isOnTrial,
 }: PricingCardProps) {
   const isFree = price === 0
+  const canTrial = isLoggedIn && !isFree && trialEligibility?.eligible && !subscribed
+
+  const isCurrentTrial = subscribed && isOnTrial
 
   const getButtonContent = () => {
     if (!isLoggedIn) {
       return 'Get Started'
     }
-    if (isFree && !anySubscribed) {
-      return 'Current Plan'
+    if (isCurrentTrial) {
+      return 'Subscribe Now'
     }
     if (subscribed) {
+      return 'Current Plan'
+    }
+    if (isFree && anySubscribed) {
+      return 'Included'
+    }
+    if (isFree && !anySubscribed) {
       return 'Current Plan'
     }
     return 'Get Started'
   }
 
-  const isCurrentPlan = subscribed || (isLoggedIn && isFree && !anySubscribed)
-  const isDisabled = isCurrentPlan
+  const isCurrentPaidPlan = subscribed && !isOnTrial
+  const isCurrentFreePlan = isLoggedIn && isFree && !anySubscribed
+  const isFreeWithSubscription = isFree && anySubscribed
+  const isDisabled = isCurrentPaidPlan || isCurrentFreePlan || isFreeWithSubscription
+
+  const isCurrentPlan = isCurrentPaidPlan || isCurrentFreePlan
+  const showBadge = isCurrentPlan || isCurrentTrial || (isPopular && !anySubscribed)
 
   return (
     <Card
       className={cn(
         'relative flex flex-col transition-all duration-300',
-        isPopular && 'border-primary shadow-lg scale-[1.02]',
-        anySubscribed && !subscribed && !isFree && 'opacity-60 hover:opacity-100',
-        subscribed && 'border-status-success'
+        // Active/trial plan gets prominence, otherwise popular gets it (but not if user has any subscription)
+        (isCurrentPlan || isCurrentTrial) && 'border-status-success shadow-lg scale-[1.02]',
+        !isCurrentPlan && !isCurrentTrial && isPopular && !anySubscribed && 'border-primary shadow-lg scale-[1.02]',
+        // Dim non-active plans when user has a subscription (including free)
+        anySubscribed && !subscribed && 'opacity-60 hover:opacity-100'
       )}
     >
-      {/* Badge - Priority: Active > Popular (Active state is more relevant than marketing nudge) */}
-      {(isCurrentPlan || isPopular) && (
+      {/* Badge - Priority: Active/Trial > Popular (only show Popular if no subscription) */}
+      {showBadge && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          {isCurrentPlan ? (
+          {isCurrentTrial ? (
+            <span className="bg-status-warning-bg text-status-warning text-xs font-semibold px-3 py-1 rounded-full border border-status-warning/50">
+              On Trial
+            </span>
+          ) : isCurrentPlan ? (
             <span className="bg-status-success-bg text-status-success text-xs font-semibold px-3 py-1 rounded-full border border-status-success/50">
               Active
             </span>
@@ -103,17 +131,31 @@ export function PricingCard({
         </ul>
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex-col gap-2">
         <DpButton
           className="w-full"
           size="large"
-          variant={isPopular ? 'primary' : 'outline'}
-          disabled={isDisabled}
-          loading={isLoading}
+          variant={
+            isCurrentTrial ? 'primary' : isCurrentPlan ? 'outline' : isPopular && !anySubscribed ? 'primary' : 'outline'
+          }
+          disabled={isDisabled || isLoading}
+          loading={isLoading && !isCurrentPlan && !isFree && anySubscribed}
           onClick={() => onSelect(id)}
         >
           {getButtonContent()}
         </DpButton>
+        {canTrial && (
+          <DpButton
+            className="w-full"
+            size="large"
+            variant="ghost"
+            disabled={isTrialLoading}
+            loading={isTrialLoading}
+            onClick={() => onStartTrial?.(id)}
+          >
+            Start {trialEligibility.trialDurationDays}-day Free Trial
+          </DpButton>
+        )}
       </CardFooter>
     </Card>
   )

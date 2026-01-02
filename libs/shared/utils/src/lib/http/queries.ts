@@ -29,5 +29,6 @@ export const queryKeys = {
   payments: {
     plans: () => ['payments', 'plans'] as const,
     subscription: (id: number) => ['payments', 'subscription', id] as const,
+    invoices: (limit?: number, startingAfter?: string) => ['payments', 'invoices', { limit, startingAfter }] as const,
   },
 } as const

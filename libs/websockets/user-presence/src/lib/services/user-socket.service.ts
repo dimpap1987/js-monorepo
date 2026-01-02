@@ -94,4 +94,13 @@ export class UserSocketService {
       return []
     }
   }
+
+  /**
+   * Counts the number of active sockets for a user across all instances.
+   * Used to determine if user should be marked offline on disconnect.
+   */
+  async countUserSockets(userId: string | number): Promise<number> {
+    const sockets = await this.findSocketsByUserId(userId)
+    return sockets.length
+  }
 }

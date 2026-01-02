@@ -58,7 +58,7 @@ export function NotificationItem({ notification, onRead, className }: Notificati
         }
       }}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3">
         {/* Unread indicator */}
         <div className="flex-shrink-0 pt-1">
           {isUnread ? (
@@ -90,7 +90,7 @@ export function NotificationItem({ notification, onRead, className }: Notificati
                 isUnread ? 'text-foreground-muted' : 'text-foreground-neutral'
               )}
             >
-              {humanatizeNotificationDate(notification?.notification?.createdAt || '')} ago
+              {humanatizeNotificationDate(notification?.notification?.createdAt || '')}
             </span>
           </div>
         </div>

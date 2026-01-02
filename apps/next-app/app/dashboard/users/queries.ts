@@ -49,3 +49,21 @@ export function useUpdateUser() {
     },
   })
 }
+
+interface ImpersonateResponse {
+  success: boolean
+  user?: AuthUserFullDto
+  message?: string
+}
+
+/**
+ * Hook to impersonate a user
+ */
+export function useImpersonateUser() {
+  return useMutation({
+    mutationFn: async (userId: number): Promise<ImpersonateResponse> => {
+      const response = await apiClient.post<ImpersonateResponse>(`/admin/impersonate/${userId}`)
+      return handleQueryResponse(response)
+    },
+  })
+}

@@ -1,11 +1,14 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
+import { InvoiceController } from './controller/invoice.controller'
 import { PaymentsController } from './controller/payments.controller'
+import { TrialController } from './controller/trial.controller'
 import { SubscriptionGuard } from './guards/subscription.guard'
 import { PaymentsRepository } from './repository/payments.repository'
 import { PaymentsService } from './service/payments.service'
 import { StripeService } from './service/stripe.service'
+import { TrialService } from './service/trial.service'
+import { TrialExpiryScheduler } from './service/trial-expiry.scheduler'
 import { StripeModule } from './stripe.module'
 
 export interface SubscriptionCallback {
@@ -21,6 +24,8 @@ export interface PaymentsModuleOptions {
   onSubscriptionRenewSuccess?: (userId: number, subscription: SubscriptionCallback) => void
   onSubscriptionExpiredSuccess?: (userId: number, subscription: SubscriptionCallback) => void
   onSubscriptionEvent?: (userId: number, event: 'created' | 'updated' | 'deleted') => void
+  onTrialStarted?: (userId: number, subscription: SubscriptionCallback) => void
+  onTrialExpired?: (userId: number, subscription: SubscriptionCallback) => void
 }
 
 const providers: Provider[] = [
@@ -28,7 +33,8 @@ const providers: Provider[] = [
   PaymentsRepository,
   PaymentsService,
   SubscriptionGuard,
-  IdempotencyInterceptor,
+  TrialService,
+  TrialExpiryScheduler,
 ]
 
 @Global()
@@ -61,7 +67,7 @@ export class PaymentsModule {
         },
         ...providers,
       ],
-      controllers: [PaymentsController],
+      controllers: [PaymentsController, InvoiceController, TrialController],
       exports: [...providers, 'PAYMENTS_OPTIONS'],
     }
   }
