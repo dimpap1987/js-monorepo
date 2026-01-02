@@ -1,5 +1,5 @@
 import './otel'
-import { LoggerService } from '@js-monorepo/nest/logger'
+import { LOGGER_CONFIG, LoggerConfig, LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
 import { Logger, ValidationPipe } from '@nestjs/common'
@@ -25,7 +25,7 @@ function logServerMetadata() {
   apiLogger.log('Parent Process ID: ' + process.ppid)
   apiLogger.log('Node Version: ' + process.version)
   apiLogger.log('Platform: ' + process.platform)
-  apiLogger.log(`🚀 Api is up on: ${protocol}://${host}:${port}/${globalPrefix}`)
+  apiLogger.log(`Api is up on: ${protocol}://${host}:${port}/${globalPrefix}`)
 }
 
 async function bootstrap() {
@@ -37,7 +37,9 @@ async function bootstrap() {
 
   setupGracefulShutdown({ app })
 
-  app.useLogger(new LoggerService(app.get(ClsService), process.env.LOGGER_LEVEL))
+  // Get logger config from DI container (configured via LoggerModule.forRootAsync)
+  const loggerConfig = app.get<LoggerConfig>(LOGGER_CONFIG)
+  app.useLogger(new LoggerService(app.get(ClsService), loggerConfig))
   app.setGlobalPrefix(globalPrefix)
   app.use(cookieParser())
   app.enableCors({

@@ -1,127 +1,175 @@
-import { Inject, LoggerService as LS } from '@nestjs/common'
+import { Inject, LoggerService as NestLoggerService, Optional } from '@nestjs/common'
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston'
 import { ClsService } from 'nestjs-cls'
 import * as winston from 'winston'
-import 'winston-daily-rotate-file'
+import { LOGGER_CONFIG, LoggerConfig } from './logger.module'
 
-const { combine, timestamp, json, prettyPrint } = winston.format
+type LogLevel = 'error' | 'warn' | 'log' | 'debug' | 'verbose'
 
-const serverTimezone = () => {
-  return new Date().toLocaleString('en-US', {
-    timeZone: 'Europe/Athens',
-  })
+const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
+  error: 0,
+  warn: 1,
+  log: 2,
+  debug: 3,
+  verbose: 4,
 }
 
-export class LoggerService implements LS {
-  private logger: LS
+const DEFAULT_CONFIG: LoggerConfig = {
+  level: 'log',
+  timezone: 'UTC',
+  prettyPrint: process.env['NODE_ENV'] !== 'production',
+  appName: 'API',
+}
+
+export class LoggerService implements NestLoggerService {
+  private logger: NestLoggerService
+  private readonly config: LoggerConfig
+  private readonly configuredLevel: number
 
   constructor(
-    private readonly cls: ClsService,
-    @Inject('LOG_LEVEL') private logLevel = 'info'
+    @Optional() private readonly cls?: ClsService,
+    @Optional() @Inject(LOGGER_CONFIG) config?: LoggerConfig
   ) {
+    this.config = config || DEFAULT_CONFIG
+    this.configuredLevel = LOG_LEVEL_PRIORITY[this.config.level as LogLevel] ?? LOG_LEVEL_PRIORITY.log
+
     this.logger = WinstonModule.createLogger({
       levels: winston.config.npm.levels,
-      level: logLevel,
-      format: combine(timestamp({ format: serverTimezone }), json()),
-      transports: [
+      level: this.mapToWinstonLevel(this.config.level),
+      format: winston.format.combine(
+        winston.format.timestamp({ format: this.getTimestampFormat() }),
+        winston.format.json()
+      ),
+      transports: this.createTransports(),
+    })
+  }
+
+  log(message: string, context?: string): void {
+    if (!this.shouldLog('log')) return
+    this.logger.log(this.formatMessage(message), context)
+  }
+
+  error(message: string, stack?: string, context?: string): void {
+    if (!this.shouldLog('error')) return
+    this.logger.error(this.formatMessage(message), this.formatStack(stack), context)
+  }
+
+  warn(message: string, context?: string): void {
+    if (!this.shouldLog('warn')) return
+    this.logger.warn(this.formatMessage(message), context)
+  }
+
+  debug(message: string, context?: string): void {
+    if (!this.shouldLog('debug')) return
+    this.logger.debug?.(this.formatMessage(message), context)
+  }
+
+  verbose(message: string, context?: string): void {
+    if (!this.shouldLog('verbose')) return
+    this.logger.verbose?.(this.formatMessage(message), context)
+  }
+
+  private shouldLog(level: LogLevel): boolean {
+    return LOG_LEVEL_PRIORITY[level] <= this.configuredLevel
+  }
+
+  private mapToWinstonLevel(level: string): string {
+    const mapping: Record<string, string> = {
+      error: 'error',
+      warn: 'warn',
+      log: 'info',
+      debug: 'debug',
+      verbose: 'silly',
+    }
+    return mapping[level] || 'info'
+  }
+
+  private getTimestampFormat(): () => string {
+    const timezone = this.config.timezone
+    return () => {
+      return new Date().toLocaleString('en-US', {
+        timeZone: timezone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      })
+    }
+  }
+
+  private createTransports(): winston.transport[] {
+    const transports: winston.transport[] = []
+
+    if (this.config.prettyPrint) {
+      // Development: Pretty console output
+      transports.push(
         new winston.transports.Console({
           handleExceptions: true,
           format: winston.format.combine(
-            winston.format.timestamp(),
+            winston.format.timestamp({ format: this.getTimestampFormat() }),
             winston.format.ms(),
-            nestWinstonModuleUtilities.format.nestLike('API', {
+            nestWinstonModuleUtilities.format.nestLike(this.config.appName, {
               colors: true,
               prettyPrint: true,
               processId: true,
               appName: true,
             })
           ),
-        }),
+        })
+      )
+    } else {
+      // Production: JSON structured logs (for log aggregation)
+      transports.push(
+        new winston.transports.Console({
+          handleExceptions: true,
+          format: winston.format.combine(
+            winston.format.timestamp({ format: this.getTimestampFormat() }),
+            winston.format.json()
+          ),
+        })
+      )
+    }
 
-        // new winston.transports.DailyRotateFile({
-        //   filename: `logs/error-%DATE%.log`,
-        //   level: 'error',
-        //   format: combine(
-        //     prettyPrint({
-        //       depth: 10,
-        //     }),
-        //     json()
-        //   ),
-        //   datePattern: 'YYYY-MM-DD',
-        //   json: true,
-        //   zippedArchive: false, // don't want to zip our logs
-        //   maxFiles: '30d', // will keep log until they are older than 30 days
-        // }),
-        // new winston.transports.DailyRotateFile({
-        //   filename: `logs/info-%DATE%.log`,
-        //   level: 'info',
-        //   format: combine(
-        //     prettyPrint({
-        //       depth: 10,
-        //     }),
-        //     json()
-        //   ),
-        //   datePattern: 'YYYY-MM-DD',
-        //   json: true,
-        //   zippedArchive: false,
-        //   maxFiles: '30d',
-        // }),
-      ],
-    })
+    return transports
   }
 
-  log(message: any, context?: any) {
-    this.logger.log(message + this.sessionMessage(), context)
+  private formatMessage(message: string): string {
+    const sessionId = this.getSessionId()
+    if (sessionId) {
+      return `${message} [sid:${this.truncateSessionId(sessionId)}]`
+    }
+    return message
   }
 
-  error(message: any, stack: any, context: string) {
-    this.logger.error('❌ ' + message + this.sessionMessage(), this.toPrettyJson(stack), context)
+  private formatStack(stack?: string): Record<string, unknown> {
+    if (!stack) return {}
+
+    const cleaned = this.stripAnsiCodes(stack)
+    return { stack: cleaned }
   }
 
-  warn(message: any, context?: any) {
-    this.logger.warn('⚠️  ' + message + this.sessionMessage(), context)
+  private getSessionId(): string | undefined {
+    try {
+      return this.cls?.get('session-id')
+    } catch {
+      return undefined
+    }
   }
 
-  debug(message: any, context?: any) {
-    this.logger.debug?.('🐞 ' + message + this.sessionMessage(), context)
-  }
-
-  verbose(message: any, context?: any) {
-    throw new Error('NOT EXISTING')
+  private truncateSessionId(sessionId: string): string {
+    // Extract just the UUID part from signed session (s:uuid.signature)
+    const match = sessionId.match(/^s:([^.]+)/)
+    if (match) {
+      const uuid = match[1]
+      return uuid.substring(0, 8) // First 8 chars of UUID
+    }
+    return sessionId.substring(0, 8)
   }
 
   private stripAnsiCodes(input: string): string {
-    // Define the regex pattern to match ANSI color codes
-    const ansiRegex = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g
-
-    // Use the replace method to remove ANSI codes
-    return input.replace(ansiRegex, '')
-  }
-
-  private toPrettyJson(message: any, fields?: any) {
-    const log: Record<string, any> = {}
-
-    if (typeof message === 'string') {
-      log['message'] = this.stripAnsiCodes(message)
-    } else if (typeof message === 'object') {
-      for (const [key, value] of Object.entries(message)) {
-        log[key] = typeof value === 'string' ? this.stripAnsiCodes(value) : value
-      }
-    }
-    if (fields) {
-      if (typeof fields === 'object') {
-        for (const [key, value] of Object.entries(fields)) {
-          log[key] = typeof value === 'string' ? this.stripAnsiCodes(value) : value
-        }
-      } else if (typeof fields === 'string') {
-        log['context'] = typeof fields === 'string' ? this.stripAnsiCodes(fields) : fields
-      }
-    }
-    return log
-  }
-
-  private sessionMessage() {
-    const sessionId = this.cls.get('session-id')
-    return sessionId ? `- [SESSION_ID=${sessionId}]` : ''
+    return input.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')
   }
 }
