@@ -1,0 +1,102 @@
+# Development Override - Use with: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# This exposes ports and configures services to connect to LOCAL (non-containerized) apps
+#
+# Usage:
+#   make dev          # Start monitoring stack for local development
+#   make dev-down     # Stop monitoring stack
+
+services:
+  prometheus:
+    container_name: prometheus_dev
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./config/prometheus.dev.yaml:/etc/prometheus/prometheus.yaml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+      - '--web.enable-lifecycle'
+      - '--web.enable-remote-write-receiver' # Allow Tempo to push metrics
+      - '--enable-feature=exemplar-storage'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  grafana:
+    container_name: grafana_dev
+    ports:
+      - '3001:3000' # Use 3001 to avoid conflict with Next.js on 3000
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+      - GF_SERVER_SERVE_FROM_SUB_PATH=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  # Node exporter disabled on macOS - host mount doesn't work with Docker Desktop
+  # Uncomment on Linux servers
+  node_exporter:
+    profiles:
+      - linux-only
+    container_name: node_exporter_dev
+    ports:
+      - '9100:9100'
+
+  redis_exporter:
+    container_name: redis_exporter_dev
+    environment:
+      - REDIS_ADDR=redis://host.docker.internal:6379
+    ports:
+      - '9121:9121'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  cadvisor:
+    container_name: cadvisor_dev
+    ports:
+      - '8098:8098'
+
+  postgres-exporter:
+    container_name: postgres-exporter_dev
+    env_file:
+      - .env.dev
+    environment:
+      DATA_SOURCE_NAME: ${DATABASE_URL}
+    ports:
+      - '9187:9187'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  otel-collector:
+    container_name: otel-collector_dev
+    volumes:
+      - ./config/otel-collector-config.dev.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - '4317:4317' # OTLP gRPC
+      - '4318:4318' # OTLP HTTP
+      - '9464:9464' # Prometheus metrics
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  tempo:
+    container_name: tempo_dev
+    ports:
+      - '3200:3200' # Tempo HTTP
+      - '4320:4317' # OTLP gRPC (different port to avoid conflict)
+
+  loki:
+    container_name: loki_dev
+    ports:
+      - '3100:3100'
+
+  promtail:
+    container_name: promtail_dev
+    volumes:
+      - ./config/promtail.dev.yaml:/etc/promtail/config.yaml
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  super-network:
+    external: true

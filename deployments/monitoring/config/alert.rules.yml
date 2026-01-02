@@ -1,0 +1,276 @@
+# Prometheus Alerting Rules
+# Comprehensive alerts for infrastructure, applications, and databases
+
+groups:
+  # ===========================================
+  # Infrastructure Alerts
+  # ===========================================
+  - name: infrastructure
+    rules:
+      - alert: HighCpuUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High CPU usage detected'
+          description: 'CPU usage is above 80% for more than 5 minutes on {{ $labels.instance }}. Current value: {{ $value | printf "%.2f" }}%'
+
+      - alert: CriticalCpuUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Critical CPU usage'
+          description: 'CPU usage is above 95% for more than 2 minutes on {{ $labels.instance }}. Current value: {{ $value | printf "%.2f" }}%'
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High memory usage detected'
+          description: 'Memory usage is above 85% on {{ $labels.instance }}. Current value: {{ $value | printf "%.2f" }}%'
+
+      - alert: CriticalMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Critical memory usage'
+          description: 'Memory usage is above 95% on {{ $labels.instance }}. Immediate action required!'
+
+      - alert: DiskSpaceWarning
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs"})) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Disk space running low'
+          description: 'Disk usage is above 80% on {{ $labels.mountpoint }} ({{ $labels.instance }}). Current value: {{ $value | printf "%.2f" }}%'
+
+      - alert: DiskSpaceCritical
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs"})) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Disk space critical'
+          description: 'Disk usage is above 95% on {{ $labels.mountpoint }}. Service disruption imminent!'
+
+  # ===========================================
+  # Container Alerts
+  # ===========================================
+  - name: containers
+    rules:
+      - alert: ContainerHighCpu
+        expr: sum(rate(container_cpu_usage_seconds_total{name!=""}[3m])) by (name) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Container {{ $labels.name }} high CPU usage'
+          description: 'Container {{ $labels.name }} is using more than 80% CPU. Current value: {{ $value | printf "%.2f" }}%'
+
+      - alert: ContainerHighMemory
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Container {{ $labels.name }} high memory usage'
+          description: 'Container {{ $labels.name }} memory usage is above 85% of its limit. Current value: {{ $value | printf "%.2f" }}%'
+
+      - alert: ContainerRestarting
+        expr: increase(container_last_seen{name!=""}[10m]) < 1 and increase(container_start_time_seconds{name!=""}[10m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Container {{ $labels.name }} is restarting'
+          description: 'Container {{ $labels.name }} has been restarting frequently.'
+
+      - alert: ContainerDown
+        expr: absent(container_last_seen{name=~"my-api_container|next-app_container"})
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Application container is down'
+          description: 'Container {{ $labels.name }} is not running.'
+
+  # ===========================================
+  # PostgreSQL Alerts
+  # ===========================================
+  - name: postgresql
+    rules:
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'PostgreSQL is down'
+          description: 'PostgreSQL database is not responding. Check postgres container immediately!'
+
+      - alert: PostgresHighConnections
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High number of PostgreSQL connections'
+          description: 'PostgreSQL has {{ $value }} active connections. Consider connection pooling.'
+
+      - alert: PostgresConnectionPoolExhausted
+        expr: pg_stat_activity_count > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'PostgreSQL connection pool nearly exhausted'
+          description: 'PostgreSQL has {{ $value }} active connections. New connections may fail!'
+
+      - alert: PostgresSlowQueries
+        expr: rate(pg_stat_statements_seconds_total[5m]) / rate(pg_stat_statements_calls_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Slow PostgreSQL queries detected'
+          description: 'Average query execution time is above 1 second. Check slow query log.'
+
+      - alert: PostgresDeadlocks
+        expr: increase(pg_stat_database_deadlocks[1h]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'PostgreSQL deadlocks detected'
+          description: 'Deadlocks have been detected in the last hour. Count: {{ $value }}'
+
+  # ===========================================
+  # Redis Alerts
+  # ===========================================
+  - name: redis
+    rules:
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Redis is down'
+          description: 'Redis server is not responding. Session management may be affected!'
+
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Redis high memory usage'
+          description: 'Redis memory usage is above 80%. Current: {{ $value | printf "%.2f" }}%'
+
+      - alert: RedisMemoryCritical
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Redis memory critical'
+          description: 'Redis memory is nearly exhausted. Evictions will occur!'
+
+      - alert: RedisHighKeyEviction
+        expr: rate(redis_evicted_keys_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Redis key eviction rate high'
+          description: 'Redis is evicting keys at {{ $value }} keys/sec. Memory pressure detected.'
+
+      - alert: RedisTooManyConnections
+        expr: redis_connected_clients > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Too many Redis connections'
+          description: 'Redis has {{ $value }} connected clients. Check for connection leaks.'
+
+  # ===========================================
+  # Application Alerts (via OTEL)
+  # ===========================================
+  - name: application
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_server_duration_milliseconds_count{http_status_code=~"5.."}[5m])) / sum(rate(http_server_duration_milliseconds_count[5m])) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High HTTP error rate'
+          description: 'More than 5% of HTTP requests are failing. Error rate: {{ $value | printf "%.2f" }}%'
+
+      - alert: CriticalErrorRate
+        expr: sum(rate(http_server_duration_milliseconds_count{http_status_code=~"5.."}[5m])) / sum(rate(http_server_duration_milliseconds_count[5m])) * 100 > 25
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Critical HTTP error rate'
+          description: 'More than 25% of HTTP requests are failing. Immediate investigation required!'
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_server_duration_milliseconds_bucket[5m])) by (le)) > 2000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High API latency'
+          description: '95th percentile latency is above 2 seconds. P95: {{ $value | printf "%.0f" }}ms'
+
+      - alert: NoTrafficDetected
+        expr: sum(rate(http_server_duration_milliseconds_count[5m])) == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'No API traffic detected'
+          description: 'No HTTP requests have been received in the last 10 minutes. Is the API down?'
+
+  # ===========================================
+  # Monitoring Stack Health
+  # ===========================================
+  - name: monitoring
+    rules:
+      - alert: PrometheusTargetDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Prometheus target {{ $labels.job }} is down'
+          description: 'Target {{ $labels.instance }} in job {{ $labels.job }} has been down for more than 5 minutes.'
+
+      - alert: PrometheusConfigReloadFailed
+        expr: prometheus_config_last_reload_successful == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Prometheus configuration reload failed'
+          description: 'Prometheus failed to reload configuration. Check for syntax errors.'
+
+      - alert: AlertmanagerDown
+        expr: absent(up{job="alertmanager"})
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Alertmanager is down'
+          description: 'Alertmanager is not running. Alerts will not be delivered!'

@@ -1,0 +1,75 @@
+# OpenTelemetry Collector Configuration for LOCAL DEVELOPMENT
+# Receives telemetry from local apps and routes to monitoring services
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: '0.0.0.0:4317'
+      http:
+        endpoint: '0.0.0.0:4318'
+        cors:
+          allowed_origins:
+            - 'http://localhost:3000'
+            - 'http://localhost:3333'
+
+processors:
+  batch:
+    send_batch_size: 100
+    timeout: 5s
+
+  attributes:
+    actions:
+      - key: environment
+        value: development
+        action: insert
+      - key: deployment
+        value: local
+        action: insert
+
+exporters:
+  prometheus:
+    endpoint: '0.0.0.0:9464'
+    send_timestamps: true
+
+  otlp/traces:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+  otlphttp/logs:
+    endpoint: http://loki:3100/otlp
+    tls:
+      insecure: true
+
+  # Debug exporters enabled for development
+  debug/metrics:
+    verbosity: basic
+  debug/traces:
+    verbosity: basic
+  debug/logs:
+    verbosity: basic
+
+extensions:
+  health_check:
+    endpoint: '0.0.0.0:13133'
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, attributes]
+      exporters: [otlp/traces, debug/traces]
+    metrics:
+      receivers: [otlp]
+      processors: [batch, attributes]
+      exporters: [prometheus, debug/metrics]
+    logs:
+      receivers: [otlp]
+      processors: [batch, attributes]
+      exporters: [otlphttp/logs, debug/logs]
+
+  telemetry:
+    logs:
+      level: info

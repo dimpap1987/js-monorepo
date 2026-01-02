@@ -797,9 +797,9 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(increase(http_server_duration_milliseconds_count{net_host_name=\"${host}\"}[$__range])) by (http_route)",
+          "expr": "sum(increase(http_server_duration_milliseconds_count{net_host_name=\"${host}\", http_route!=\"\"}[$__range])) by (http_route)",
           "instant": false,
-          "legendFormat": "__auto",
+          "legendFormat": "{{http_route}}",
           "range": true,
           "refId": "A"
         }
@@ -1087,12 +1087,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_duration_milliseconds_count{net_host_name=\"${host}\"}[$__range])) by(http_route) ",
+          "expr": "sum(rate(http_server_duration_milliseconds_count{net_host_name=\"${host}\"}[$__range])) by(http_route)",
+          "format": "table",
           "hide": false,
-          "instant": false,
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
-          "refId": "Request Rate Trend"
+          "range": false,
+          "refId": "Request Rate"
         },
         {
           "datasource": {
@@ -1116,10 +1117,11 @@
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.5,sum(rate(http_server_duration_milliseconds_bucket{net_host_name=\"${host}\"}[$__range])) by(http_route,le))",
+          "format": "table",
           "hide": false,
-          "instant": false,
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
+          "range": false,
           "refId": "P50"
         },
         {
@@ -1129,10 +1131,11 @@
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.9,sum(rate(http_server_duration_milliseconds_bucket{net_host_name=\"${host}\"}[$__range])) by(http_route,le))",
+          "format": "table",
           "hide": false,
-          "instant": false,
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
+          "range": false,
           "refId": "P90"
         },
         {
@@ -1142,19 +1145,16 @@
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99,sum(rate(http_server_duration_milliseconds_bucket{net_host_name=\"${host}\"}[$__range])) by(http_route,le))",
+          "format": "table",
           "hide": false,
-          "instant": false,
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
+          "range": false,
           "refId": "P99"
         }
       ],
       "title": "HTTP Workload",
       "transformations": [
-        {
-          "id": "timeSeriesTable",
-          "options": {}
-        },
         {
           "id": "merge",
           "options": {}
@@ -1163,16 +1163,28 @@
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true
             },
             "includeByName": {},
-            "indexByName": {},
+            "indexByName": {
+              "http_route": 0,
+              "Value #Success Rate": 1,
+              "Value #Request Rate": 2,
+              "Value #P50": 3,
+              "Value #P90": 4,
+              "Value #P99": 5
+            },
             "renameByName": {
-              "Trend #P50": "P50 Duration",
-              "Trend #P90": "P90 Duration",
-              "Trend #P99": "P99 Duration",
-              "Trend #Request Rate Trend": "Request Rate",
-              "Value": "Success Rate (non 5xx)",
+              "Value #P50": "P50 Duration",
+              "Value #P90": "P90 Duration",
+              "Value #P99": "P99 Duration",
+              "Value #Request Rate": "Request Rate",
+              "Value #Success Rate": "Success Rate (non 5xx)",
               "http_route": "Route"
             }
           }

@@ -1,31 +1,16 @@
-# Prometheus Configuration for PRODUCTION
-# Includes alerting rules and alertmanager integration
+# Prometheus configuration for LOCAL DEVELOPMENT
+# Scrapes services running on host machine (not in containers)
 
 global:
   scrape_interval: 15s
   scrape_timeout: 10s
   evaluation_interval: 15s
 
-# Alertmanager configuration
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-            - alertmanager:9093
-
-# Alerting rules files
-rule_files:
-  - /etc/prometheus/alert.rules.yml
-
 scrape_configs:
-  # System metrics from node_exporter
+  # System metrics from node_exporter (disabled on macOS - enable on Linux)
   - job_name: 'node-exporter'
     static_configs:
       - targets: ['node_exporter:9100']
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: environment
-        replacement: 'production'
 
   # Container metrics from cAdvisor
   - job_name: 'cadvisor'
@@ -37,32 +22,37 @@ scrape_configs:
       - source_labels: ['name']
         target_label: 'container'
 
-  # PostgreSQL metrics
+  # PostgreSQL metrics - connects to LOCAL postgres on host
   - job_name: 'postgres-exporter'
     static_configs:
       - targets: ['postgres-exporter:9187']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: environment
+        replacement: 'development'
 
-  # OTEL Collector metrics (application telemetry)
+  # OTEL Collector metrics
   - job_name: 'otel-collector'
     static_configs:
       - targets: ['otel-collector:9464']
 
-  # Tempo metrics (tracing backend)
+  # Tempo metrics
   - job_name: 'tempo'
     static_configs:
       - targets: ['tempo:3200']
 
-  # Redis metrics
+  # Redis metrics - connects to LOCAL redis on host
   - job_name: 'redis_exporter'
     static_configs:
       - targets: ['redis_exporter:9121']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: environment
+        replacement: 'development'
 
-  # Alertmanager metrics (self-monitoring)
-  - job_name: 'alertmanager'
-    static_configs:
-      - targets: ['alertmanager:9093']
-
-  # Loki metrics
-  - job_name: 'loki'
-    static_configs:
-      - targets: ['loki:3100']
+  # LOCAL NestJS API metrics (if running with OTEL)
+  # Uncomment if your local my-api exposes prometheus metrics directly
+  # - job_name: 'my-api-local'
+  #   static_configs:
+  #     - targets: ['host.docker.internal:3333']
+  #   metrics_path: /metrics
