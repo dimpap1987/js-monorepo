@@ -1,3 +1,6 @@
+import { DATE_CONFIG } from '@js-monorepo/utils/date'
+process.env.TZ = DATE_CONFIG.SERVER_TIMEZONE
+
 import './otel'
 import { LOGGER_CONFIG, LoggerConfig, LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
