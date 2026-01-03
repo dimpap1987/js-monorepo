@@ -1,10 +1,10 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
+import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
 import { loadStripe } from '@stripe/stripe-js'
 import { ArrowLeft, Lock } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -127,23 +127,23 @@ export function Checkout() {
     return (
       <div className="text-center py-12">
         <h2 className="text-xl font-semibold text-foreground mb-4">No plan selected</h2>
-        <Link href="/pricing">
+        <DpNextNavLink href="/pricing">
           <DpButton>View Plans</DpButton>
-        </Link>
+        </DpNextNavLink>
       </div>
     )
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4">
+    <div className="max-w-5xl mx-auto">
       {/* Back Link */}
-      <Link
+      <DpNextNavLink
         href="/pricing"
         className="inline-flex items-center gap-2 text-foreground-muted hover:text-foreground mb-8 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to pricing</span>
-      </Link>
+      </DpNextNavLink>
 
       {/* Header */}
       <div className="mb-8">
@@ -155,7 +155,7 @@ export function Checkout() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Left Column - Order Summary */}
         <div className="lg:col-span-3 space-y-6">
-          <CheckoutOrderSummary plan={selectedPlan} />
+          <CheckoutOrderSummary plan={selectedPlan} className="h-auto" />
 
           {/* Security Note */}
           <div className="flex items-center gap-2 text-sm text-foreground-muted">
