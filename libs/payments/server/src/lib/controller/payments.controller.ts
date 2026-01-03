@@ -60,10 +60,16 @@ export class PaymentsController {
   async cancelSubscription(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
     const subscription = await this.paymentsService.findSubscriptionByPriceIdAndUserId(priceId, sessionUser.id)
 
-    const { error } = await tryCatch(() => this.stripeService.cancelSubscription(subscription.stripeSubscriptionId))
-
-    if (error) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_SUBSCRIPTION_STRIPE_CANCEL')
+    if (subscription.stripeSubscriptionId) {
+      const { error } = await tryCatch(() => this.stripeService.cancelSubscription(subscription.stripeSubscriptionId))
+      if (error) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_SUBSCRIPTION_STRIPE_CANCEL')
+      }
+    } else {
+      const { error } = await this.paymentsService.cancelTrialSubscription(subscription.id)
+      if (error) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_SUBSCRIPTION_TRIAL_CANCEL')
+      }
     }
   }
 
