@@ -28,7 +28,7 @@ export function UsageBar({
   variant = 'auto',
   className,
 }: UsageBarProps) {
-  const remaining = Math.max(0, max - current)
+  const remaining = Math.max(0, max - current + 1)
   const percentage = max > 0 ? Math.min(100, (remaining / max) * 100) : 0
 
   // Determine color based on remaining percentage
