@@ -93,7 +93,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "count(count(container_last_seen{name!=\"\"} > time() - 10) by (name))",
+          "expr": "count(count(container_last_seen{name=~\".+\"} > time() - 10) by (name))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
