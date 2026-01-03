@@ -3,6 +3,7 @@ import { Crown } from 'lucide-react'
 
 interface PlanBadgeProps {
   plan: string | null | undefined
+  size?: 'sm' | 'md' | 'xl'
   className?: string
 }
 
@@ -17,23 +18,42 @@ const planConfig: Record<string, { label: string; className: string }> = {
   },
 }
 
-export function PlanBadge({ plan, className }: PlanBadgeProps) {
+const sizeConfig = {
+  sm: {
+    container: 'px-2 py-0.5 text-xs',
+    icon: 'h-3 w-3',
+  },
+  md: {
+    container: 'px-2.5 py-1 text-sm',
+    icon: 'h-3.5 w-3.5',
+  },
+  xl: {
+    container: 'px-4 py-1.5 text-lg font-semibold',
+    icon: 'h-5 w-5',
+  },
+}
+
+export function PlanBadge({ plan, size = 'sm', className }: PlanBadgeProps) {
   if (!plan) return null
 
-  const config = planConfig[plan.toLowerCase()] || {
+  const normalizedPlan = plan.toLowerCase()
+  const config = planConfig[normalizedPlan] || {
     label: plan,
     className: 'bg-primary/10 text-primary border-primary/20',
   }
 
+  const selectedSize = sizeConfig[size]
+
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium capitalize',
+        'inline-flex items-center gap-1 rounded-full border font-medium capitalize',
+        selectedSize.container,
         config.className,
         className
       )}
     >
-      <Crown className="h-3 w-3" />
+      <Crown className={cn(selectedSize.icon)} />
       {config.label}
     </span>
   )

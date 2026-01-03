@@ -1,9 +1,9 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
+import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
 import { Calendar, CheckCircle, CreditCard, RefreshCw, Settings, XCircle } from 'lucide-react'
-import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { Subscription } from '../../types'
 import {
@@ -214,9 +214,9 @@ export function SubscriptionManagement({
         <p className="text-foreground-neutral mb-6">
           You're currently on the free plan. Upgrade to unlock premium features.
         </p>
-        <Link href="/pricing">
+        <DpNextNavLink href="/pricing">
           <DpButton>View Plans</DpButton>
-        </Link>
+        </DpNextNavLink>
       </div>
     )
   }

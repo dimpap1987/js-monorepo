@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from '@js-monorepo/components/card'
 import { Separator } from '@js-monorepo/components/separator'
 import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
+import { PlanBadge } from '../plan-badge'
 
 interface CheckoutOrderSummaryProps {
   plan: {
@@ -28,7 +29,7 @@ export function CheckoutOrderSummary({ plan, className }: CheckoutOrderSummaryPr
           <div className="flex items-center justify-between">
             <span className="font-medium text-foreground capitalize">{plan.name} Plan</span>
             <span className="font-semibold text-foreground">
-              €{plan.price}/{plan.interval}
+              <PlanBadge plan={plan.name} size="xl"></PlanBadge>
             </span>
           </div>
           <p className="text-sm text-foreground-neutral">{plan.description}</p>
