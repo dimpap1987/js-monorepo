@@ -266,7 +266,7 @@ export class PaymentsService {
     if (error) {
       this.logger.error(`Error canceling trial: ${error.message}`, error.stack)
     }
-    return result
+    return { result, error }
   }
 
   async convertTrialToPaid(
