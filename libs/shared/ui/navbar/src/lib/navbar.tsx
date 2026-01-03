@@ -134,7 +134,11 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
                   >
                     {(item?.roles?.includes('PUBLIC') ||
                       item?.roles?.some((role) => user?.roles?.includes(role as AuthRole))) && (
-                      <DpNextNavLink className="p-2" activeClassName="underline-offset-8" href={item.href}>
+                      <DpNextNavLink
+                        className="p-2 h-full flex items-center border-b-2 border-transparent content-center"
+                        activeClassName="border-primary"
+                        href={item.href}
+                      >
                         {item.name}
                       </DpNextNavLink>
                     )}
