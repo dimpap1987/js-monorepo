@@ -1,4 +1,7 @@
-import { Prisma } from '@prisma/client'
+// JSON value type (replaces JsonValue to avoid backend dependency)
+export type JsonValue = string | number | boolean | null | JsonObject | JsonArray
+export type JsonObject = { [key: string]: JsonValue }
+export type JsonArray = JsonValue[]
 
 export interface SessionUserType {
   id: number
@@ -108,7 +111,7 @@ export type NotificationCreateDto = {
   message: string
   link?: string
   type?: string
-  additionalData?: Prisma.JsonValue
+  additionalData?: JsonValue
 }
 
 export type NotificationDto = {
@@ -204,7 +207,7 @@ export type NotificationDetailsType = {
   createdAt: Date | string
   message: string
   link?: string
-  additionalData?: Prisma.JsonValue
+  additionalData?: JsonValue
 }
 
 export type NotificationUserType = {
@@ -233,7 +236,7 @@ export interface CreateUserNotificationType {
   createdAt: Date
   message: string
   link?: string
-  additionalData?: Prisma.JsonValue
+  additionalData?: JsonValue
 }
 
 export interface EditUserDto {
