@@ -91,19 +91,26 @@ export class AdminRepositoryPrisma implements AdminRepository {
   }
 
   async updateUser(userId: number, updateUser: AuthUserUpdateDto): Promise<AuthUserDto> {
-    const currentRoleIds = await this.getCurrentUserRoleIds(userId)
-    const newRoleIds = this.getNewRoleIds(updateUser.roles)
+    let roleOperations = {}
+    if (updateUser.roles) {
+      const currentRoleIds = await this.getCurrentUserRoleIds(userId)
+      const newRoleIds = this.getNewRoleIds(updateUser.roles)
+      const { rolesToAdd, rolesToRemove } = this.determineRoles(currentRoleIds, newRoleIds)
 
-    const { rolesToAdd, rolesToRemove } = this.determineRoles(currentRoleIds, newRoleIds)
-
-    return this.txHost.tx.authUser.update({
-      where: { id: userId },
-      data: {
-        username: updateUser.username,
+      roleOperations = {
         userRole: {
           create: this.createRoles(rolesToAdd),
           deleteMany: this.deleteRoles(rolesToRemove),
         },
+      }
+    }
+
+    return this.txHost.tx.authUser.update({
+      where: { id: userId },
+      data: {
+        // Only update username if provided
+        ...(updateUser.username && { username: updateUser.username }),
+        ...roleOperations,
       },
       select: {
         id: true,

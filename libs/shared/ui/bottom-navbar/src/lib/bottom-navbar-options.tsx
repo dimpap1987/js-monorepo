@@ -6,77 +6,102 @@ import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
 import { IconType } from 'react-icons/lib'
 
-const BottomNavbarOptions = ({ href, Icon, label }: { href: string; Icon: IconType; label: string }) => {
+interface BottomNavbarItemProps {
+  href: string
+  label: string
+  children: ReactNode
+  /** Custom active check function. Defaults to exact pathname match */
+  isActiveCheck?: (pathname: string) => boolean
+  className?: string
+}
+
+/**
+ * Base component for bottom navbar items.
+ * Uses fixed dimensions to prevent layout shifts.
+ */
+function BottomNavbarItem({ href, label, children, isActiveCheck, className }: BottomNavbarItemProps) {
   const pathname = usePathname()
-  const isActive = pathname === href
+  const isActive = isActiveCheck ? isActiveCheck(pathname) : pathname === href
 
   return (
     <DpNextNavLink
       href={href}
       className={cn(
-        'flex flex-col items-center justify-center gap-2',
-        'flex-1 h-full min-w-0',
-        'px-3 py-2',
-        'transition-all duration-200 ease-in-out',
+        'w-16',
+        'flex flex-col items-center justify-center',
+        'h-full py-1.5',
+        'transition-transform duration-150 ease-out',
         'active:scale-95',
-        'rounded-lg',
-        'relative group'
+        'tap-highlight-transparent',
+        className
       )}
     >
-      <div className="relative flex items-center justify-center">
-        <Icon className={cn('shrink-0 text-xl transition-all duration-200', 'group-active:scale-110')} />
-        {/* Active indicator dot */}
-        {isActive && (
-          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200 shadow-sm" />
+      {/* Icon container - fixed size */}
+      <div
+        className={cn(
+          // Fixed dimensions for icon container
+          'w-6 h-6',
+          'flex items-center justify-center',
+          'relative'
         )}
+      >
+        {/* Icon with color transition */}
+        <div
+          className={cn(
+            'text-[22px] leading-none',
+            'transition-colors duration-150',
+            isActive ? 'text-primary' : 'text-muted-foreground'
+          )}
+        >
+          {children}
+        </div>
       </div>
+
+      {/* Label */}
       <span
         className={cn(
-          'text-[10px] font-medium leading-tight truncate w-full text-center',
-          'transition-colors duration-200'
+          'mt-1',
+          'text-[10px] font-medium leading-none',
+          'transition-colors duration-150',
+          'max-w-full truncate',
+          isActive ? 'text-primary' : 'text-muted-foreground'
         )}
       >
         {label}
       </span>
+
+      {/* Active indicator bar */}
+      {isActive && (
+        <span className={cn('absolute bottom-0 left-1/2 -translate-x-1/2', 'w-4 h-0.5 rounded-full', 'bg-primary')} />
+      )}
     </DpNextNavLink>
   )
 }
 
-const BottomNavbarAlert = ({ href, label, children }: { label: string; href: string; children: ReactNode }) => {
-  const pathname = usePathname()
-  const isActive = pathname === href || pathname?.startsWith('/notifications')
-
+/**
+ * Standard navbar item with an icon
+ */
+function BottomNavbarOptions({ href, Icon, label }: { href: string; Icon: IconType; label: string }) {
   return (
-    <DpNextNavLink
-      href={href}
-      className={cn(
-        'flex flex-col items-center justify-center gap-1',
-        'flex-1 h-full min-w-0',
-        'px-3 py-2',
-        'transition-all duration-200 ease-in-out',
-        'text-foreground',
-        'active:scale-95',
-        'rounded-lg',
-        'relative group'
-      )}
-    >
-      <div className="relative flex items-center justify-center">
-        <div className={cn('transition-all duration-200', isActive && 'scale-110')}>{children}</div>
-        {/* Active indicator dot */}
-        {isActive && (
-          <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200" />
-        )}
-      </div>
-      <span
-        className={cn(
-          'text-[10px] font-medium leading-tight truncate w-full text-center',
-          'transition-colors duration-200'
-        )}
-      >
-        {label}
-      </span>
-    </DpNextNavLink>
+    <BottomNavbarItem href={href} label={label}>
+      <Icon />
+    </BottomNavbarItem>
   )
 }
 
-export { BottomNavbarAlert, BottomNavbarOptions }
+/**
+ * Navbar item for notifications/alerts with custom children (e.g., bell with badge)
+ */
+function BottomNavbarAlert({ href, label, children }: { href: string; label: string; children: ReactNode }) {
+  return (
+    <BottomNavbarItem
+      href={href}
+      label={label}
+      isActiveCheck={(pathname) => pathname === href || pathname?.startsWith('/notifications')}
+    >
+      {children}
+    </BottomNavbarItem>
+  )
+}
+
+export { BottomNavbarAlert, BottomNavbarItem, BottomNavbarOptions }

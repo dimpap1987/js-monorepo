@@ -23,6 +23,7 @@ import { ReactNode, useState } from 'react'
 import { AiFillRocket } from 'react-icons/ai'
 import { SITE_NAME } from '../lib/site-config'
 import BannerSVG from './banner-svg'
+import { PlanGateShowcase } from './plan-gate-showcase'
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
@@ -295,6 +296,9 @@ export default function LandingComponent({ children, className }: MainProps) {
             </Drawer>
           </CardContent>
         </Card>
+
+        {/* Plan Gate Component */}
+        <PlanGateShowcase />
       </div>
 
       {/* {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && user?.username && (
