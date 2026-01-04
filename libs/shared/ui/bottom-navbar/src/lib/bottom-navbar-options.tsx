@@ -27,12 +27,13 @@ function BottomNavbarItem({ href, label, children, isActiveCheck, className }: B
     <DpNextNavLink
       href={href}
       className={cn(
-        'w-16',
+        'w-full',
         'flex flex-col items-center justify-center',
         'h-full py-1.5',
         'transition-transform duration-150 ease-out',
         'active:scale-95',
         'tap-highlight-transparent',
+        isActive && 'border-t-2 border-primary',
         className
       )}
     >
@@ -46,15 +47,7 @@ function BottomNavbarItem({ href, label, children, isActiveCheck, className }: B
         )}
       >
         {/* Icon with color transition */}
-        <div
-          className={cn(
-            'text-[22px] leading-none',
-            'transition-colors duration-150',
-            isActive ? 'text-primary' : 'text-muted-foreground'
-          )}
-        >
-          {children}
-        </div>
+        <div className={cn('text-[22px] leading-none', 'transition-colors duration-150')}>{children}</div>
       </div>
 
       {/* Label */}
@@ -63,8 +56,7 @@ function BottomNavbarItem({ href, label, children, isActiveCheck, className }: B
           'mt-1',
           'text-[10px] font-medium leading-none',
           'transition-colors duration-150',
-          'max-w-full truncate',
-          isActive ? 'text-primary' : 'text-muted-foreground'
+          'max-w-full truncate'
         )}
       >
         {label}
