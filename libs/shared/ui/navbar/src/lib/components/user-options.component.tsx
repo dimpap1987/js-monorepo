@@ -14,7 +14,7 @@ const UserOptionsDropdown = ({ className, children }: { className?: string; chil
         <FaCircleUser className="text-xl" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className={cn('w-85 p-3 rounded-xl bg-popover border border-border shadow-lg space-y-2', className)}
+        className={cn('min-w-[330px] p-3 rounded-xl bg-popover border border-border shadow-lg space-y-2', className)}
       >
         {React.Children.map(children, (child) => {
           const reactChild = child as ReactElement
