@@ -107,10 +107,7 @@ export default function OnlineUsersTableComponent() {
                   </tr>
                 ))
               : Object.entries(groupedUsers).map(([userId, user]) => (
-                  <tr
-                    key={userId}
-                    className="border-b border-border hover:bg-accent transition-colors duration-150"
-                  >
+                  <tr key={userId} className="border-b border-border hover:bg-accent transition-colors duration-150">
                     <td className="p-3 pl-4">
                       <FaCircle className="text-status-success animate-pulse" />
                     </td>
