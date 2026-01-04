@@ -93,7 +93,7 @@ export function MultiSelectDropdown({
         asChild
         className={cn(
           'w-full border-2 border-border rounded-lg text-foreground hide-scrollbar text-foreground',
-          'px-6 py-1 text-base hover:border-border/80 cursor-pointer shadow-sm transition-colors',
+          'px-6 py-1 text-base hover:border-primary cursor-pointer shadow-sm transition-colors',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
           classNameTrigger
         )}

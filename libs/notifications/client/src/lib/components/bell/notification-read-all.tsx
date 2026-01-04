@@ -10,8 +10,8 @@ export function NotificationReadAllButton({ onReadAll }: { onReadAll?: () => Pro
       variant="outline"
       className={cn(
         'h-7 px-3 text-xs font-medium',
-        'border-border hover:border-border/80',
-        'bg-transparent hover:bg-background-secondary/50',
+        'border-border hover:border-primary',
+        'bg-transparent hover:bg-background-secondary',
         'text-foreground-neutral hover:text-foreground',
         'transition-all duration-200'
       )}

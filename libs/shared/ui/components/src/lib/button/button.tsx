@@ -9,16 +9,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md focus-visible:ring-primary/50 active:bg-primary/95 [&>*]:text-primary-foreground',
+          'bg-primary text-primary-foreground shadow-sm hover:brightness-90 hover:shadow-md focus-visible:ring-primary active:brightness-95 [&>*]:text-primary-foreground',
         destructive:
-          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md focus-visible:ring-destructive/50 active:bg-destructive/95 [&>*]:text-destructive-foreground',
+          'bg-destructive text-destructive-foreground shadow-sm hover:brightness-90 hover:shadow-md focus-visible:ring-destructive active:brightness-95 [&>*]:text-destructive-foreground',
         outline:
-          'border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-accent focus-visible:ring-accent/50 active:bg-accent/80 [&>*]:text-inherit',
+          'border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-accent focus-visible:ring-accent active:brightness-95 [&>*]:text-inherit',
         secondary:
-          'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md focus-visible:ring-secondary/50 active:bg-secondary/90 [&>*]:text-secondary-foreground',
+          'bg-secondary text-secondary-foreground shadow-sm hover:brightness-90 hover:shadow-md focus-visible:ring-secondary active:brightness-95 [&>*]:text-secondary-foreground',
         ghost:
-          'text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-accent/50 active:bg-accent/80 [&>*]:text-inherit',
-        link: 'text-primary underline-offset-4 hover:underline focus-visible:ring-primary/50 [&>*]:text-inherit',
+          'text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-accent active:brightness-95 [&>*]:text-inherit',
+        link: 'text-primary underline-offset-4 hover:underline focus-visible:ring-primary [&>*]:text-inherit',
       },
       size: {
         default: 'h-9 px-4 py-2',

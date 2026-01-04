@@ -33,9 +33,7 @@ export function CheckoutPlanComparison({
               disabled={isFree}
               className={cn(
                 'relative flex items-center justify-between p-4 rounded-lg border text-left transition-all',
-                isSelected
-                  ? 'border-primary bg-primary/5 ring-2 ring-primary'
-                  : 'border-border hover:border-primary/50',
+                isSelected ? 'border-primary bg-accent ring-2 ring-primary' : 'border-border hover:border-primary',
                 isFree && 'opacity-50 cursor-not-allowed'
               )}
             >

@@ -55,10 +55,8 @@ export function ThemeSettings() {
                 onClick={() => setTheme(themeOption.id)}
                 className={cn(
                   'relative flex flex-col items-start p-4 rounded-lg border-2 transition-all',
-                  'hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
-                  isSelected
-                    ? 'border-primary bg-primary/10'
-                    : 'border-border bg-background hover:bg-background-secondary'
+                  'hover:border-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
+                  isSelected ? 'border-primary bg-accent' : 'border-border bg-background hover:bg-background-secondary'
                 )}
                 aria-pressed={isSelected}
               >
@@ -81,7 +79,7 @@ export function ThemeSettings() {
 
                 {/* Theme Preview */}
                 {themeOption.preview ? (
-                  <div className="w-full mb-3 rounded-md overflow-hidden border border-border/50">
+                  <div className="w-full mb-3 rounded-md overflow-hidden border border-border">
                     <div
                       className="h-12 flex items-center justify-between px-3"
                       style={{ backgroundColor: themeOption.preview.background }}
@@ -103,7 +101,7 @@ export function ThemeSettings() {
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full mb-3 rounded-md overflow-hidden border border-border/50 h-12 flex items-center justify-center bg-background-secondary">
+                  <div className="w-full mb-3 rounded-md overflow-hidden border border-border h-12 flex items-center justify-center bg-background-secondary">
                     <svg
                       className="w-6 h-6 text-foreground-neutral"
                       fill="none"

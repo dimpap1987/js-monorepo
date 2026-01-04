@@ -213,19 +213,19 @@ export default function LandingComponent({ children, className }: MainProps) {
             <PermissionGate
               permission="ADMIN"
               fallback={
-                <div className="p-4 border border-border rounded-lg bg-muted/50">
+                <div className="p-4 border border-border rounded-lg bg-muted">
                   <p className="text-sm text-muted-foreground">You don&apos;t have permission to see this content</p>
                 </div>
               }
             >
-              <div className="p-4 border border-primary/20 rounded-lg bg-primary/5">
+              <div className="p-4 border border-primary rounded-lg bg-accent">
                 <p className="text-sm font-medium">Admin Content</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   This content is only visible to users with admin permissions
                 </p>
               </div>
             </PermissionGate>
-            <div className="p-4 border border-border rounded-lg bg-muted/50">
+            <div className="p-4 border border-border rounded-lg bg-muted">
               <p className="text-sm text-muted-foreground">Public content is always visible</p>
             </div>
           </CardContent>

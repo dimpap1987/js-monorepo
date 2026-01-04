@@ -87,11 +87,10 @@ function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
                 href={item.href}
                 className={cn(
                   'group flex items-center rounded-lg transition-colors duration-200',
-                  'hover:bg-background-secondary hover:text-foreground text-foreground-muted',
-                  'focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
+                  'hover:bg-background-secondary text-foreground',
                   isCollapsed ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2.5 border-l-2 border-transparent'
                 )}
-                activeClassName="bg-primary/10 text-primary font-medium border-l-2 border-primary"
+                activeClassName="bg-accent text-primary font-medium border-l-2 border-primary"
               >
                 <Icon
                   className={cn(

@@ -203,7 +203,7 @@ export function NotificationDropdown({
     <>
       {isDropdownOpen && (
         <div
-          className="fixed inset-0 top-navbar-offset bg-background/40 backdrop-blur-sm z-10 transition-opacity duration-200"
+          className="fixed inset-0 top-navbar-offset bg-black/40 backdrop-blur-sm z-10 transition-opacity duration-200"
           aria-hidden="true"
         />
       )}
@@ -221,12 +221,12 @@ export function NotificationDropdown({
           )}
           aria-label="Notifications dropdown"
         >
-          <div className="sticky top-0 z-10 bg-background-secondary/95 backdrop-blur-sm border-b border-border-glass px-4 py-3.5">
+          <div className="sticky top-0 z-10 bg-background-secondary backdrop-blur-sm border-b border-border-glass px-4 py-3.5">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-semibold text-foreground tracking-tight">Notifications</h3>
               {unreadCount > 0 && (
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-accent text-primary border border-primary">
                     {unreadCount} {unreadCount === 1 ? 'unread' : 'unreads'}
                   </span>
                   <NotificationReadAllButton onReadAll={handleReadAllLocal} />

@@ -127,7 +127,7 @@ const DashboardUsersTableSuspense = () => {
                   <div className="flex items-center gap-3 bg-background-secondary">
                     <button
                       title="Submit"
-                      className="h-9 w-9 p-0 rounded-md bg-status-success text-status-success-foreground hover:bg-status-success/90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-success/50 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="h-9 w-9 p-0 rounded-md bg-status-success text-status-success-foreground hover:brightness-90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-success flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={updateUserMutation.isPending}
                       onClick={async () => {
                         const updateData = row.updatedUser
@@ -170,7 +170,7 @@ const DashboardUsersTableSuspense = () => {
                     </button>
                     <button
                       title="Cancel"
-                      className="h-9 w-9 p-0 rounded-md bg-status-error text-status-error-foreground hover:bg-status-error/90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-error/50 flex items-center justify-center"
+                      className="h-9 w-9 p-0 rounded-md bg-status-error text-status-error-foreground hover:brightness-90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-error flex items-center justify-center"
                       onClick={async () => {
                         row.updatedUser = undefined
                         setUpdate({

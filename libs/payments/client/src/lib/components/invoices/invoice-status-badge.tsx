@@ -10,12 +10,12 @@ interface InvoiceStatusBadgeProps {
 const statusConfig: Record<InvoiceStatus, { label: string; className: string; icon: typeof CheckCircle }> = {
   paid: {
     label: 'Paid',
-    className: 'bg-status-success-bg text-status-success border-status-success/30',
+    className: 'bg-status-success-bg text-status-success border-status-success',
     icon: CheckCircle,
   },
   open: {
     label: 'Pending',
-    className: 'bg-status-warning-bg text-status-warning border-status-warning/30',
+    className: 'bg-status-warning-bg text-status-warning border-status-warning',
     icon: Clock,
   },
   draft: {
@@ -30,7 +30,7 @@ const statusConfig: Record<InvoiceStatus, { label: string; className: string; ic
   },
   uncollectible: {
     label: 'Failed',
-    className: 'bg-status-error-bg text-status-error border-status-error/30',
+    className: 'bg-status-error-bg text-status-error border-status-error',
     icon: XCircle,
   },
 }

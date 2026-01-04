@@ -127,7 +127,7 @@ function CookieBannerComponent({
             <div className="flex justify-between items-center gap-3 shrink-0 flex-wrap w-full sm:w-auto">
               <DpNextNavLink
                 href={privacyUrl}
-                className="text-sm underline font-medium text-primary hover:text-primary/80 transition-colors"
+                className="text-sm underline font-medium text-primary hover:brightness-90 transition-colors"
               >
                 {learnMoreText}
               </DpNextNavLink>
@@ -136,7 +136,7 @@ function CookieBannerComponent({
                   onClick={() => setIsExpanded(!isExpanded)}
                   className={cn(
                     'px-3 py-1.5 rounded-md text-sm font-medium',
-                    'border border-border bg-accent/50 hover:bg-accent',
+                    'border border-border bg-accent hover:brightness-95',
                     'text-foreground hover:text-foreground',
                     'transition-all duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
@@ -152,7 +152,7 @@ function CookieBannerComponent({
                   className={cn(
                     'px-4 py-2 rounded-lg font-medium text-sm',
                     'bg-primary text-primary-foreground',
-                    'hover:bg-primary/90 active:scale-95',
+                    'hover:brightness-90 active:scale-95',
                     'transition-all duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                   )}
@@ -177,7 +177,7 @@ function CookieBannerComponent({
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-sm font-semibold text-foreground">{category.name}</h3>
                         {isEssential && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-primary font-medium">
                             Required
                           </span>
                         )}
@@ -217,7 +217,7 @@ function CookieBannerComponent({
                   className={cn(
                     'px-4 py-2 rounded-lg font-medium text-sm',
                     'bg-primary text-primary-foreground',
-                    'hover:bg-primary/90 active:scale-95',
+                    'hover:brightness-90 active:scale-95',
                     'transition-all duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
                   )}

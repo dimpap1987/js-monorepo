@@ -27,7 +27,7 @@ const BottomNavbarOptions = ({ href, Icon, label }: { href: string; Icon: IconTy
         <Icon className={cn('shrink-0 text-xl transition-all duration-200', 'group-active:scale-110')} />
         {/* Active indicator dot */}
         {isActive && (
-          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200 shadow-sm shadow-primary/50" />
+          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary animate-in fade-in duration-200 shadow-sm" />
         )}
       </div>
       <span

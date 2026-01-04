@@ -175,7 +175,7 @@ export function SnapCarousel({
               onClick={() => handleIndicatorClick(index)}
               className={cn(
                 'w-2 h-2 rounded-full transition-all duration-300',
-                currentIndex === index ? 'bg-primary w-4' : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                currentIndex === index ? 'bg-primary w-4' : 'bg-muted-foreground hover:brightness-110'
               )}
               aria-label={`Go to item ${index + 1}`}
             />

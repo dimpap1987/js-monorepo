@@ -15,8 +15,8 @@ const DpLogoutButton = forwardRef<HTMLButtonElement, DpLogoutButtonProps>(({ cla
       className={cn(
         'flex items-center gap-3 justify-start w-full px-4 py-2.5 rounded-xl select-none',
         'transition-all duration-200 ease-in-out',
-        'hover:shadow-lg hover:shadow-danger/20',
-        'focus-visible:ring-danger/50',
+        'hover:shadow-lg',
+        'focus-visible:ring-danger',
         className
       )}
       ref={ref}

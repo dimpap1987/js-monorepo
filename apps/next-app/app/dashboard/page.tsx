@@ -46,7 +46,7 @@ export default function DashboardController() {
           {opts?.map((opt) => (
             <Card
               key={opt.href}
-              className="text-center transition-all duration-200 ease-in-out hover:scale-[1.02] hover:shadow-md cursor-pointer border border-border hover:border-primary/50 bg-card"
+              className="text-center transition-all duration-200 ease-in-out hover:scale-[1.02] hover:shadow-md cursor-pointer border border-border hover:border-primary bg-card"
             >
               <DpNextNavLink className="p-6 block text-foreground hover:text-primary transition-colors" href={opt.href}>
                 {opt.label}
