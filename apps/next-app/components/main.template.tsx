@@ -14,6 +14,7 @@ import { useRouter } from 'next-nprogress-bar'
 import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'
+import { MdOutlineContactMail } from 'react-icons/md'
 import { RiAdminFill } from 'react-icons/ri'
 import { ImpersonationBanner } from './impersonation-banner'
 import SVGLogo from './logo-svg'
@@ -25,6 +26,12 @@ const menuItems: MenuItem[] = [
     href: '/pricing',
     name: 'Pricing',
     Icon: ImPriceTags,
+    roles: ['PUBLIC'],
+  },
+  {
+    href: '/contact',
+    name: 'Contact',
+    Icon: MdOutlineContactMail,
     roles: ['PUBLIC'],
   },
   {

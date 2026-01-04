@@ -16,7 +16,7 @@ function Notifications({ notifications, onRead, showLoader }: NotificationDropdo
   }
 
   return (
-    <div className="space-y-2.5 px-2 py-2">
+    <div className="space-y-2.5 px-2 py-2 mr-2">
       {notifications.map((content, index) => (
         <div key={content.notification.id}>
           <NotificationDropdownItem content={content} onRead={onRead} />

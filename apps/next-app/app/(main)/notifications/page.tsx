@@ -1,5 +1,4 @@
 import { NotificationPage } from './notication-page'
-import { DynamicHeightTemplate } from '@js-monorepo/templates'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -7,9 +6,5 @@ export const metadata: Metadata = {
 }
 
 export default function Notifications() {
-  return (
-    <DynamicHeightTemplate>
-      <NotificationPage></NotificationPage>
-    </DynamicHeightTemplate>
-  )
+  return <NotificationPage></NotificationPage>
 }

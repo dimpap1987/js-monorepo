@@ -7,6 +7,7 @@ import { useCallback } from 'react'
 import { GoDotFill } from 'react-icons/go'
 import { humanatizeNotificationDate } from '../utils/notifications'
 import './bell/bell.css'
+import { MdOpenInNew } from 'react-icons/md'
 
 interface NotificationItemProps {
   notification: UserNotificationType
@@ -43,12 +44,11 @@ export function NotificationItem({ notification, onRead, className }: Notificati
   return (
     <div
       className={cn(
-        'group relative cursor-pointer rounded-lg p-3 sm:p-4 transition-all duration-200',
+        'group relative rounded-lg p-3 sm:p-4 transition-all duration-200',
         'border border-border-glass hover:border-border',
-        'hover:shadow-md hover:scale-[1.01] hover:-translate-y-0.5',
-        'active:scale-[0.99]',
+        'hover:bg-primary/10 hover:border-l-primary/80 hover:shadow-md hover:scale-[1.01] hover:-translate-y-0.5',
         isUnread
-          ? 'bg-primary/5 border-l-4 border-l-primary hover:bg-primary/10 hover:border-l-primary/80'
+          ? 'cursor-pointer bg-primary/5 border-l-4 border-l-primary'
           : 'bg-card/50 opacity-75 hover:opacity-100 hover:bg-card',
         className
       )}
@@ -70,6 +70,12 @@ export function NotificationItem({ notification, onRead, className }: Notificati
 
         {/* Content */}
         <div className="flex-1 min-w-0">
+          {notification.notification.link && (
+            <MdOpenInNew
+              className="w-5 h-5 absolute text-primary right-2 cursor-pointer"
+              onClick={() => router.push(notification.notification.link as string)}
+            />
+          )}
           <div
             className={cn(
               'notification-content',

@@ -3,10 +3,14 @@ import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { NotificationRepository } from './notification.repository'
+import { PrismaService } from '@js-monorepo/db'
 
 @Injectable()
 export class NotificationRepositoryPrisma implements NotificationRepository {
-  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
+    private readonly prisma: PrismaService
+  ) {}
 
   async getNotifications(
     userId: number,
@@ -31,6 +35,8 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
             isArchived: true,
             createdAt: true,
             message: true,
+            link: true,
+            additionalData: true,
           },
         },
         isRead: true,
@@ -97,6 +103,8 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
             isArchived: true,
             createdAt: true,
             message: true,
+            additionalData: true,
+            link: true,
           },
         },
         isRead: true,
@@ -146,7 +154,7 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
   }> {
     const { message, type, link, additionalData, senderId = 1, receiverIds } = payload
 
-    const notification = await this.txHost.tx.notification.create({
+    const notification = await this.prisma.notification.create({
       data: {
         message,
         type,
@@ -157,6 +165,8 @@ export class NotificationRepositoryPrisma implements NotificationRepository {
         id: true,
         createdAt: true,
         message: true,
+        link: true,
+        additionalData: true,
       },
     })
 

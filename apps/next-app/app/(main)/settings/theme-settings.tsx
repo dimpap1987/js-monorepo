@@ -55,7 +55,7 @@ export function ThemeSettings() {
                 onClick={() => setTheme(themeOption.id)}
                 className={cn(
                   'relative flex flex-col items-start p-4 rounded-lg border-2 transition-all',
-                  'hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
+                  'hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
                   isSelected
                     ? 'border-primary bg-primary/10'
                     : 'border-border bg-background hover:bg-background-secondary'

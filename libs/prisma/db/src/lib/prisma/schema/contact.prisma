@@ -1,0 +1,17 @@
+model ContactMessage {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    email     String
+    message   String   @db.Text
+    category  String   @default("general") // general, support, feedback, bug, other
+    status    String   @default("unread") // unread, read, archived
+    userId    Int?     @map("user_id")
+
+    user AuthUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    @@index([status])
+    @@index([createdAt])
+    @@index([userId])
+    @@map(name: "contact_messages")
+}

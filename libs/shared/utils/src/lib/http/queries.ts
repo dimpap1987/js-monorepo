@@ -31,4 +31,9 @@ export const queryKeys = {
     subscription: (id: number) => ['payments', 'subscription', id] as const,
     invoices: (limit?: number, startingAfter?: string) => ['payments', 'invoices', { limit, startingAfter }] as const,
   },
+  contact: {
+    messages: (params?: string) => ['contact', 'messages', params] as const,
+    message: (id: number) => ['contact', 'message', id] as const,
+    unreadCount: () => ['contact', 'unread-count'] as const,
+  },
 } as const

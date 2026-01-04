@@ -128,7 +128,6 @@ export class NotificationService {
     }
   }
 
-  @Transactional()
   async createNotification(payload: NotificationCreateDto) {
     this.logger.debug(`Creating new notification - Sender is : '${payload.senderId}'`)
     const sanitizedMessage = sanitizeHtml(payload.message)

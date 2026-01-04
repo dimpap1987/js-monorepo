@@ -10,6 +10,7 @@ model AuthUser {
     receivedNotifications UserNotification[] @relation("receiver")
     userRole              UserRole[]
     paymentCustomer       PaymentCustomer?
+    contactMessages       ContactMessage[]
 
     @@index([email])
     @@index([username])
