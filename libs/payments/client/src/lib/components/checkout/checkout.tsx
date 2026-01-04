@@ -139,14 +139,14 @@ export function Checkout() {
       {/* Back Link */}
       <DpNextNavLink
         href="/pricing"
-        className="inline-flex items-center gap-2 text-foreground-muted hover:text-foreground mb-8 transition-colors"
+        className="inline-flex items-center gap-2 text-foreground-muted hover:text-foreground mb-3 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Back to pricing</span>
       </DpNextNavLink>
 
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Complete your purchase</h1>
         <p className="text-foreground-neutral mt-2">Review your order and proceed to secure payment</p>
       </div>
