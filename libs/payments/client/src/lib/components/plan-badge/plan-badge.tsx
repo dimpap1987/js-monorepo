@@ -39,7 +39,7 @@ export function PlanBadge({ plan, size = 'sm', className }: PlanBadgeProps) {
   const normalizedPlan = plan.toLowerCase()
   const config = planConfig[normalizedPlan] || {
     label: plan,
-    className: 'bg-primary/10 text-primary border-primary/20',
+    className: 'bg-accent text-primary border-primary',
   }
 
   const selectedSize = sizeConfig[size]

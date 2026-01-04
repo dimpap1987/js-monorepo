@@ -22,7 +22,7 @@ export function RegisterDialog({ formInput, userProfileImage }: RegisterDialogTy
   return (
     <RegisterDialogComponent open={mounted}>
       <div className="flex flex-col items-center gap-3 mb-2">
-        <Avatar className="h-24 w-24 border-4 border-primary/20 shadow-lg">
+        <Avatar className="h-24 w-24 border-4 border-primary shadow-lg">
           {userProfileImage && <AvatarImage src={userProfileImage} alt={`user's picture`}></AvatarImage>}
           <AvatarFallback className="text-lg font-semibold">
             {formInput?.email?.slice(0, 2)?.toUpperCase() || 'A'}

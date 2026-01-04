@@ -41,17 +41,17 @@ function StatusBadge({ status }: { status: SubscriptionStatus }) {
   const config = {
     active: {
       label: 'Active',
-      className: 'bg-status-success-bg text-status-success border-status-success/30',
+      className: 'bg-status-success-bg text-status-success border-status-success',
       icon: CheckCircle,
     },
     canceling: {
       label: 'Cancels Soon',
-      className: 'bg-status-warning-bg text-status-warning border-status-warning/30',
+      className: 'bg-status-warning-bg text-status-warning border-status-warning',
       icon: XCircle,
     },
     canceled: {
       label: 'Canceled',
-      className: 'bg-status-error-bg text-status-error border-status-error/30',
+      className: 'bg-status-error-bg text-status-error border-status-error',
       icon: XCircle,
     },
     none: {
@@ -240,7 +240,7 @@ export function SubscriptionManagement({
       {/* Billing Info */}
       <div className="grid gap-4 sm:grid-cols-2">
         {status === 'canceling' && cancelAt ? (
-          <div className="flex items-start gap-3 rounded-lg border border-status-warning/30 bg-status-warning-bg p-4">
+          <div className="flex items-start gap-3 rounded-lg border border-status-warning bg-status-warning-bg p-4">
             <XCircle className="h-5 w-5 shrink-0 text-status-warning mt-0.5" />
             <div>
               <p className="text-sm font-medium text-foreground">Cancellation scheduled</p>

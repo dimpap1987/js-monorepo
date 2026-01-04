@@ -21,7 +21,7 @@ import { handleValidation, handleValidationErrros, initialRegisterValidations } 
 const RegisterDialogErrorComponent = ({ validations }: { validations: RegisterDialogErrorComponentType[] }) => {
   return (
     validations && (
-      <div className="mt-4 p-4 rounded-lg bg-muted/30 border border-border space-y-2">
+      <div className="mt-4 p-4 rounded-lg bg-muted border border-border space-y-2">
         {validations?.map((validation) => (
           <div key={validation.type} className="flex items-start gap-3">
             {/* Render IoMdInformationCircle when status is 'untouched' */}
@@ -123,7 +123,7 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
                     <Input
                       {...field}
                       readOnly
-                      className="pl-10 pr-4 h-11 bg-muted/50 text-foreground-muted cursor-not-allowed border-border"
+                      className="pl-10 pr-4 h-11 bg-muted text-foreground-muted cursor-not-allowed border-border"
                     />
                   </FormControl>
                 </FormItem>

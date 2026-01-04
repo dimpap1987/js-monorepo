@@ -113,7 +113,7 @@ export function AccountSettings() {
                       {isEditing && (
                         <label
                           htmlFor="profileImage"
-                          className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full cursor-pointer flex items-center justify-center h-9 w-9 text-sm font-medium border-2 border-background shadow-lg hover:bg-primary/90 transition-colors"
+                          className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full cursor-pointer flex items-center justify-center h-9 w-9 text-sm font-medium border-2 border-background shadow-lg hover:brightness-90 transition-colors"
                         >
                           <input
                             {...form.register('profileImage')}
@@ -229,10 +229,7 @@ export function AccountSettings() {
                 {user?.roles && user.roles.length > 0 ? (
                   <span className="inline-flex items-center gap-2">
                     {user.roles.map((role: string) => (
-                      <span
-                        key={role}
-                        className="px-2.5 py-1 bg-primary/10 text-primary rounded-md text-xs font-semibold"
-                      >
+                      <span key={role} className="px-2.5 py-1 bg-accent text-primary rounded-md text-xs font-semibold">
                         {role}
                       </span>
                     ))}

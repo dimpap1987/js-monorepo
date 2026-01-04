@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Override Tailwind's default border color with theme color */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+}
+
 h1 {
   @apply text-2xl sm:text-4xl;
   @apply font-bold;

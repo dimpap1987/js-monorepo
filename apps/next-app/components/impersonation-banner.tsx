@@ -64,7 +64,7 @@ export function ImpersonationBanner() {
       <button
         onClick={handleStopImpersonation}
         disabled={stopMutation.isPending}
-        className="ml-1 p-1 rounded-full hover:bg-primary-foreground/20 transition-colors disabled:opacity-50"
+        className="ml-1 p-1 rounded-full hover:bg-accent transition-colors disabled:opacity-50"
         title="Stop Impersonating"
       >
         <IoClose className="text-lg" />

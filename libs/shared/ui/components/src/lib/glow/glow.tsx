@@ -118,7 +118,7 @@ export const Glow = (props: GlowProps) => {
         }}
         className={cn(
           className,
-          "absolute pointer-events-none inset-0 mix-blend-soft-light rounded-xl after:content-[''] after:absolute after:bg-background/90 after:inset-0.25 after:rounded-[inherit]"
+          "absolute pointer-events-none inset-0 mix-blend-soft-light rounded-xl after:content-[''] after:absolute after:bg-background after:inset-0.25 after:rounded-[inherit]"
         )}
       ></div>
       {children}

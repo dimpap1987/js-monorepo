@@ -111,11 +111,11 @@ export function PricingCard({
       {showBadge && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           {isCurrentTrial ? (
-            <span className="bg-status-warning-bg text-status-warning text-xs font-semibold px-3 py-1 rounded-full ring ring-status-warning/50">
+            <span className="bg-status-warning-bg text-status-warning text-xs font-semibold px-3 py-1 rounded-full ring ring-status-warning">
               On Trial
             </span>
           ) : isCurrentPlan ? (
-            <span className="bg-status-success-bg text-status-success text-xs font-semibold px-3 py-1 rounded-full ring ring-status-success/50">
+            <span className="bg-status-success-bg text-status-success text-xs font-semibold px-3 py-1 rounded-full ring ring-status-success">
               Active
             </span>
           ) : (

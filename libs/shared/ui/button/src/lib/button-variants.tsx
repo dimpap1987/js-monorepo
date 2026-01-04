@@ -1,19 +1,19 @@
 export const buttonVariants = {
-  base: 'relative inline-flex items-center justify-center whitespace-nowrap rounded-lg font-medium text-sm transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&>*]:text-inherit',
+  base: 'relative inline-flex items-center justify-center whitespace-nowrap rounded-lg font-medium text-sm cursor-pointer transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] [&>*]:text-inherit',
   variants: {
     variant: {
       primary:
-        'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md focus-visible:ring-primary/50 active:bg-primary/95 [&>*]:text-primary-foreground',
+        'bg-primary text-primary-foreground shadow-sm hover:brightness-110 hover:shadow-md focus-visible:ring-primary active:brightness-95 [&>*]:text-primary-foreground',
       accent:
-        'bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 hover:shadow-md focus-visible:ring-accent/50 active:bg-accent/95 [&>*]:text-accent-foreground',
+        'bg-accent text-accent-foreground shadow-sm hover:brightness-105 hover:shadow-md focus-visible:ring-accent active:brightness-95 [&>*]:text-accent-foreground',
       secondary:
-        'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md focus-visible:ring-secondary/50 active:bg-secondary/90 [&>*]:text-secondary-foreground',
+        'bg-secondary text-secondary-foreground shadow-sm hover:brightness-110 hover:shadow-md focus-visible:ring-secondary active:brightness-95 [&>*]:text-secondary-foreground',
       danger:
-        'bg-danger text-danger-foreground shadow-sm hover:bg-danger/90 hover:shadow-md focus-visible:ring-danger/50 active:bg-danger/95 [&>*]:text-danger-foreground',
+        'bg-danger text-danger-foreground shadow-sm hover:brightness-110 hover:shadow-md focus-visible:ring-danger active:brightness-95 [&>*]:text-danger-foreground',
       outline:
-        'border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-accent focus-visible:ring-accent/50 active:bg-accent/80 [&>*]:text-inherit',
+        'border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-accent focus-visible:ring-accent active:brightness-95',
       ghost:
-        'text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-accent/50 active:bg-accent/80 [&>*]:text-inherit',
+        'text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-accent active:brightness-95',
     },
     size: {
       default: 'h-9 px-4 py-2',

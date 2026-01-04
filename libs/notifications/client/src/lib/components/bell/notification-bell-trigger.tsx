@@ -23,7 +23,7 @@ export const NotificationBellButton = forwardRef<
         'relative outline-none rounded-lg',
         'text-2xl text-foreground',
         'transition-all duration-200 ease-in-out',
-        'hover:bg-background-secondary/50 active:bg-background-secondary/70',
+        'hover:bg-background-secondary active:bg-accent',
         'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         className
       )}
@@ -46,10 +46,10 @@ export const NotificationBellButton = forwardRef<
             'flex items-center justify-center',
             'rounded-full text-[11px] font-bold tracking-tight',
             'bg-primary text-primary-foreground',
-            'shadow-md shadow-primary/30',
+            'shadow-md',
             'border-2 border-background',
-            'ring-2 ring-primary/20',
-            'hover:scale-110 hover:shadow-lg hover:shadow-primary/40'
+            'ring-2 ring-primary',
+            'hover:scale-110 hover:shadow-lg'
           )}
           aria-label={`${unreadNotificationCount} unread notifications`}
         >

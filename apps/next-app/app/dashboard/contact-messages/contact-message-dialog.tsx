@@ -57,7 +57,7 @@ export function ContactMessageDialog({ message, open, onOpenChange }: ContactMes
             )}
           </div>
 
-          <div className="border rounded-lg p-4 bg-muted/30">
+          <div className="border rounded-lg p-4 bg-muted">
             <h4 className="font-semibold mb-2">Message:</h4>
             <p className="whitespace-pre-wrap text-foreground bg-secondary p-2 rounded-lg">{message.message}</p>
           </div>
@@ -65,7 +65,7 @@ export function ContactMessageDialog({ message, open, onOpenChange }: ContactMes
           <div className="flex gap-2 justify-end">
             <a
               href={`mailto:${message.email}?subject=Re: Your ${message.category} inquiry`}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:brightness-90 h-10 px-4 py-2"
             >
               Reply via Email
             </a>

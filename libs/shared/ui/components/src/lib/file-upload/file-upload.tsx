@@ -227,7 +227,7 @@ export function FileUpload({
         onDrop={handleDrop}
         className={cn(
           'p-8 border-2 border-dashed rounded-lg cursor-pointer transition-colors',
-          isDragActive && !disabled ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50',
+          isDragActive && !disabled ? 'border-primary bg-accent' : 'border-border hover:border-primary',
           disabled && 'opacity-50 cursor-not-allowed'
         )}
         onClick={() => !disabled && fileInputRef.current?.click()}

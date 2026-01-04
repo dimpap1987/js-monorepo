@@ -245,7 +245,7 @@ export default function SubscriptionsPage() {
         <div className="rounded-md border bg-card">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/50">
+              <TableRow className="bg-muted">
                 <TableHead>User</TableHead>
                 <TableHead>Plan</TableHead>
                 <TableHead>Status</TableHead>

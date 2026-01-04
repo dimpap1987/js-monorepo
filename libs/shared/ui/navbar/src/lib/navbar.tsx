@@ -119,7 +119,7 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     return (
       <header>
         <nav
-          className="text-foreground border-b border-border-glass bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 navbar-height overflow-hidden flex items-center shadow-sm"
+          className="text-foreground border-b border-border-glass bg-background backdrop-blur supports-[backdrop-filter]:bg-background navbar-height overflow-hidden flex items-center shadow-sm"
           ref={ref}
         >
           <div className="px-4 sm:px-6 flex gap-3 justify-between w-full items-center self-stretch">

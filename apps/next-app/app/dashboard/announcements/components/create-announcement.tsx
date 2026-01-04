@@ -122,7 +122,7 @@ const CreateAnnouncement = () => {
                   <FormLabel className="text-sm font-medium text-foreground">Select Users</FormLabel>
                   <FormControl>
                     <SelectUsersComponent
-                      classNameTrigger="w-full border border-border bg-background text-foreground hover:bg-accent/50"
+                      classNameTrigger="w-full border border-border bg-background text-foreground hover:bg-accent"
                       className="text-foreground"
                       onChange={(selected) => field.onChange(selected.map((u) => u.id))}
                       selectedUserIds={field.value || []}

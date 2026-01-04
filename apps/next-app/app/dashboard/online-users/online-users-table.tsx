@@ -80,7 +80,7 @@ export default function OnlineUsersTableComponent() {
         <table className="w-full">
           {!loading && (
             <thead>
-              <tr className="border-b border-border bg-muted/30">
+              <tr className="border-b border-border bg-muted">
                 <th className="p-3 pl-4 text-left"></th>
                 <th className="p-3 text-left text-sm font-semibold text-foreground">Username</th>
                 <th className="p-3 text-center text-sm font-semibold text-foreground">WebSockets</th>
@@ -91,7 +91,7 @@ export default function OnlineUsersTableComponent() {
           <tbody>
             {loading
               ? Array.from({ length: 5 }).map((_, index) => (
-                  <tr key={`skeleton-${index}`} className="border-b border-border/50">
+                  <tr key={`skeleton-${index}`} className="border-b border-border">
                     <td className="p-3 pl-4">
                       <Skeleton className="h-4 w-4 rounded-full" />
                     </td>
@@ -109,7 +109,7 @@ export default function OnlineUsersTableComponent() {
               : Object.entries(groupedUsers).map(([userId, user]) => (
                   <tr
                     key={userId}
-                    className="border-b border-border/50 hover:bg-accent/30 transition-colors duration-150"
+                    className="border-b border-border hover:bg-accent transition-colors duration-150"
                   >
                     <td className="p-3 pl-4">
                       <FaCircle className="text-status-success animate-pulse" />

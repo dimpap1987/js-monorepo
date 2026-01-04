@@ -70,7 +70,7 @@ export function CancelSubscriptionDialog({
 
         {/* When access ends */}
         {periodEnd && (
-          <div className="flex items-center gap-3 rounded-lg border border-status-info/30 bg-status-info-bg p-3">
+          <div className="flex items-center gap-3 rounded-lg border border-status-info bg-status-info-bg p-3">
             <Calendar className="h-5 w-5 shrink-0 text-status-info" />
             <div className="text-sm">
               <p className="font-medium text-foreground">You'll have access until</p>
