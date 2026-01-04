@@ -1,3 +1,4 @@
+import { ContactServerModule } from '@js-monorepo/contact-server'
 import { VaultModule } from '@js-monorepo/nest/vault'
 import { PaymentsModule } from '@js-monorepo/payments-server'
 import KeyvRedis, { Keyv } from '@keyv/redis'
@@ -47,6 +48,7 @@ import {
   getTrialExpiredMessage,
   getTrialStartedMessage,
 } from './notifications/subscription-notifications'
+import { getContactMessage } from './notifications/contact-form'
 
 @Module({
   imports: [
@@ -117,7 +119,7 @@ import {
         },
         csrf: {
           enabled: true,
-          middlewareExclusions: ['exceptions', 'admin/(.*)', 'health', 'payments/webhook'],
+          middlewareExclusions: ['exceptions', 'admin/(.*)', 'health', 'payments/webhook', 'contact'],
         },
         redirectUiUrl: configService.get('AUTH_LOGIN_REDIRECT'),
         onRegister: async (user: AuthUserDto) => {
@@ -208,6 +210,37 @@ import {
         },
       }),
     }),
+    ContactServerModule.forRootAsync({
+      imports: [NotificationServerModule, PrismaModule],
+      inject: [NotificationService, PrismaService],
+      useFactory: async (notificationService: NotificationService, prisma: PrismaService) => ({
+        onContactMessageCreated: async (message) => {
+          const adminUsers = await prisma.authUser.findMany({
+            where: {
+              userRole: {
+                some: {
+                  role: {
+                    name: 'ADMIN',
+                  },
+                },
+              },
+            },
+            select: { id: true },
+          })
+
+          if (adminUsers.length > 0) {
+            const adminIds = adminUsers.map((u) => u.id)
+            await notificationService.createNotification({
+              receiverIds: adminIds,
+              message: getContactMessage(message),
+              type: 'contact_message',
+              link: '/dashboard/contact-messages',
+            })
+            apiLogger.log(`Contact message notification sent to ${adminIds.length} admin(s)`)
+          }
+        },
+      }),
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [REDIS, ConfigService],
@@ -262,7 +295,7 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware) // Apply LoggerMiddleware
       .forRoutes('*')
       .apply(AuthSessionMiddleware)
-      .exclude('health', 'payments/(.*)')
+      .exclude('health', 'payments/(.*)', 'contact')
       .forRoutes('*')
   }
 }

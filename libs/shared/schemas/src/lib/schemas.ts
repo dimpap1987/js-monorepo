@@ -1,4 +1,4 @@
-import { PROVIDERS_ARRAY } from '@js-monorepo/types'
+import { CONTACT_CATEGORIES, CONTACT_STATUSES, PROVIDERS_ARRAY } from '@js-monorepo/types'
 import * as z from 'zod'
 
 class RegisterUserSchemaConfig {
@@ -76,3 +76,16 @@ export const EditUserSchema = z
     message: 'At least one of "username" or "profileImage" must be provided.',
     path: [], // Applies to the entire object
   })
+
+// Contact Message Schemas
+export const ContactMessageSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email address.' }).optional().or(z.literal('')),
+  message: z.string().min(10, { message: 'Message must be at least 10 characters.' }).max(5000),
+  category: z.enum(CONTACT_CATEGORIES).default('general'),
+})
+
+export type ContactMessageSchemaType = z.infer<typeof ContactMessageSchema>
+
+export const ContactMessageUpdateStatusSchema = z.object({
+  status: z.enum(CONTACT_STATUSES),
+})

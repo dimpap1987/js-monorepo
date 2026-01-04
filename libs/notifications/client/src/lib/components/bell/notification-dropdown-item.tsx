@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import React, { useCallback } from 'react'
 import { humanatizeNotificationDate } from '../../utils/notifications'
 import './bell.css'
+import { MdOpenInNew } from 'react-icons/md'
 
 interface NotificationDropdownItemProps {
   content: UserNotificationType
@@ -40,15 +41,12 @@ const NotificationDropdownItem = React.memo(({ content, onRead }: NotificationDr
   return (
     <DropdownMenuItem
       className={cn(
-        'relative cursor-pointer',
-        'px-4 py-3.5 rounded-lg mx-1',
-        'focus:bg-transparent focus:text-foreground',
-        'outline-none',
-        'transition-all duration-300 ease-in-out',
-        'animate-in fade-in slide-in-from-top-1',
-        'hover:shadow-md hover:scale-[1.01] hover:-translate-y-0.5',
-        'active:scale-[0.99] active:translate-y-0 border border-border-glass',
-        isUnread ? 'border-l-4 border-l-primary bg-primary/5 hover:bg-primary/80 hover:border-l-primary' : 'opacity-75'
+        'group relative rounded-lg p-3 sm:p-4 transition-all duration-200',
+        'border border-border-glass hover:border-border',
+        'hover:bg-primary/10 hover:border-l-primary/80 hover:shadow-md hover:scale-[1.01] hover:-translate-y-0.5',
+        isUnread
+          ? 'cursor-pointer bg-primary/5 border-l-4 border-l-primary'
+          : 'bg-card/50 opacity-75 hover:opacity-100 hover:bg-card'
       )}
       onSelect={(e) => {
         e.preventDefault()
@@ -63,6 +61,18 @@ const NotificationDropdownItem = React.memo(({ content, onRead }: NotificationDr
             <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0 shadow-sm shadow-primary/50 animate-pulse" />
           )}
         </div>
+
+        {content.notification.link && (
+          <MdOpenInNew
+            className="w-5 h-5 absolute text-primary right-2 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault()
+              router.push(content.notification.link as string)
+              if (!isUnread) return
+              onRead(content.notification.id)
+            }}
+          />
+        )}
 
         {/* Message content - takes full width of second column */}
         <div

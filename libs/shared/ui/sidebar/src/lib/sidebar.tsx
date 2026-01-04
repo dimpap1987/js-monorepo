@@ -101,7 +101,7 @@ const DpNextSidebarBase = ({
             aria-label="Sidebar"
             tabIndex={-1}
           >
-            <div className="flex items-center justify-between p-5 border-b-2 border-border">
+            <div className="flex items-center justify-between py-4 px-1 flex-wrap-reverse border-b-2 border-border">
               {/* <ModeToggle></ModeToggle> */}
               {user?.username && (
                 <UserMetadata

@@ -53,7 +53,7 @@ function NavUserOptions({
 
         <DpNextNavLink
           href="/settings"
-          className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-accent/50 hover:text-accent-foreground"
+          className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-secondary"
         >
           <IoIosSettings className="text-xl flex-shrink-0" />
           <span className="text-sm">Settings</span>

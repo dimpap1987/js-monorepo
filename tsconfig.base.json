@@ -25,6 +25,8 @@
       "@js-monorepo/bottom-navbar": ["libs/shared/ui/bottom-navbar/src/index.ts"],
       "@js-monorepo/button": ["libs/shared/ui/button/src/index.ts"],
       "@js-monorepo/components/*": ["libs/shared/ui/components/src/lib/*"],
+      "@js-monorepo/contact-form": ["libs/shared/ui/contact-form/src/index.ts"],
+      "@js-monorepo/contact-server": ["libs/contact/server/src/index.ts"],
       "@js-monorepo/db": ["libs/prisma/db/src/index.ts"],
       "@js-monorepo/dialog": ["libs/shared/ui/dialog/src/index.ts"],
       "@js-monorepo/error": ["libs/shared/ui/error/src/index.ts"],

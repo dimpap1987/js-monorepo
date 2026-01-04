@@ -8,7 +8,7 @@ import { GrAnnounce } from 'react-icons/gr'
 import { HiMiniUsers } from 'react-icons/hi2'
 import { IoMdNotifications } from 'react-icons/io'
 import { RiUserSettingsFill } from 'react-icons/ri'
-import { MdOutlineSubscriptions } from 'react-icons/md'
+import { MdOutlineContactMail, MdOutlineSubscriptions } from 'react-icons/md'
 
 const navLinksOpts = [
   {
@@ -41,6 +41,12 @@ const navLinksOpts = [
     label: 'Announcements',
     activeClassName: 'bg-primary text-primary-foreground',
   },
+  {
+    href: '/dashboard/contact-messages',
+    icon: MdOutlineContactMail,
+    label: 'Contact Messages',
+    activeClassName: 'bg-primary text-primary-foreground',
+  },
 ] as const
 
 function SidebarOpts() {
@@ -50,7 +56,7 @@ function SidebarOpts() {
         <DpNextNavLink
           key={href}
           className={cn(
-            'p-2 transition-colors duration-300 grid place-items-center gap-2 items-center border border-border rounded-md hover:ring-1 ring-border',
+            'p-2 transition-colors duration-300 grid place-items-center gap-2 items-center border border-border rounded-md hover:ring-2 hover:ring-inset ring-border',
             'grid-cols-[30px_auto]'
           )}
           href={href}

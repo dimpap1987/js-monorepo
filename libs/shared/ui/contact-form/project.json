@@ -1,0 +1,8 @@
+{
+  "name": "contact-form",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/ui/contact-form/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {}
+}
