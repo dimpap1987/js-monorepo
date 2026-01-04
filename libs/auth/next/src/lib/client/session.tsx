@@ -79,7 +79,7 @@ export const SessionProvider = ({
   }, [clientBuilder, endpoint])
 
   useEffect(() => {
-    if (value !== undefined) return
+    if (value) return
 
     cancelledRef.current = false
 
