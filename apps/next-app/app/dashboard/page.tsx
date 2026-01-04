@@ -19,6 +19,14 @@ const opts = [
     label: 'Announcements',
     href: 'dashboard/announcements',
   },
+  {
+    label: 'Subscriptions',
+    href: 'dashboard/subscriptions',
+  },
+  {
+    label: 'Contact messages',
+    href: 'dashboard/contact-messages',
+  },
 ]
 
 export default function DashboardController() {
