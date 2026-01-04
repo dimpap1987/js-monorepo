@@ -23,7 +23,7 @@ export function BottomNavbar({ children, className }: PropsWithChildren & { clas
   return (
     <div
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-50',
+        'fixed bottom-0 left-0 right-0 z-50 w-screen',
         'h-[var(--bottom-navbar-height)]',
         'transition-transform duration-300 ease-in-out',
         'backdrop-blur-xl bg-background',
@@ -34,7 +34,7 @@ export function BottomNavbar({ children, className }: PropsWithChildren & { clas
         className
       )}
     >
-      <div className="flex items-center justify-around h-full px-2 max-w-screen-sm mx-auto">{children}</div>
+      <div className="flex items-center justify-evenly h-full max-w-md mx-auto">{children}</div>
     </div>
   )
 }

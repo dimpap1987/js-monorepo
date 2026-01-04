@@ -40,21 +40,21 @@ export const NotificationBellButton = forwardRef<
 
       {/* Badge */}
       {isRinging && (
-        <div
+        <span
           className={cn(
-            'absolute -top-2 -right-3 min-w-[20px] h-[20px]',
+            'absolute -top-1.5 -right-2.5',
+            'min-w-[18px] h-[18px] px-1',
             'flex items-center justify-center',
-            'rounded-full text-[11px] font-bold tracking-tight',
-            'bg-primary text-primary-foreground',
-            'shadow-md',
+            'rounded-full',
+            'text-[10px] font-semibold leading-none',
+            'bg-destructive text-destructive-foreground',
             'border-2 border-background',
-            'ring-2 ring-primary',
-            'hover:scale-110 hover:shadow-lg'
+            'animate-badge-pop'
           )}
-          aria-label={`${unreadNotificationCount} unread notifications`}
+          aria-hidden="true"
         >
           {badgeCount}
-        </div>
+        </span>
       )}
     </button>
   )
