@@ -102,7 +102,7 @@ const setupRequestWithCsrf = (config: InternalAxiosRequestConfig<any>) => {
 
 const createApiClient = (handle401Error = false) => {
   const instance = axios.create({
-    baseURL: `${process.env.NEXT_PUBLIC_AUTH_URL}/api`,
+    baseURL: '/api',
     timeout: 10000,
     withCredentials: true,
   }) as CustomAxiosInstance

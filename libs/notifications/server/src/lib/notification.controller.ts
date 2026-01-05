@@ -161,7 +161,7 @@ export class NotificationController {
         title: payload.title,
         message: payload.message,
         data: {
-          url: this.configService.get('AUTH_LOGIN_REDIRECT'),
+          url: this.configService.get('APP_URL'),
         },
       })
     } catch (e: any) {

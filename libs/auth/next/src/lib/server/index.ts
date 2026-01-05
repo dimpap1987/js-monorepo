@@ -2,10 +2,12 @@
 
 import { cookies } from 'next/headers'
 
-const API_URL = process.env.API_URL
+const isDev = process.env.NODE_ENV === 'development'
 
-if (!API_URL) {
-  console.warn('[auth/next/server] API_URL environment variable is not set')
+const APP_URL = isDev ? process.env.DEV_BACKEND_URL : process.env.APP_URL
+
+if (!APP_URL) {
+  console.warn('[auth/next/server] APP_URL environment variable is not set')
 }
 
 function createCookieHeaders(): Headers {
@@ -20,14 +22,14 @@ function createCookieHeaders(): Headers {
 }
 
 export async function getCurrentSession() {
-  if (!API_URL) {
-    console.error('[getCurrentSession] API_URL is not configured')
+  if (!APP_URL) {
+    console.error('[getCurrentSession] APP_URL is not configured')
     return null
   }
 
   try {
     const headers = createCookieHeaders()
-    const url = `${API_URL}/api/session`
+    const url = `${APP_URL}/api/session`
 
     const response = await fetch(url, {
       method: 'GET',
@@ -53,7 +55,7 @@ export async function getCurrentSession() {
     const errorMessage = error instanceof Error ? error.message : String(error)
     if (!errorMessage.includes('Dynamic server usage')) {
       console.error('[getCurrentSession] Fetch failed', {
-        url: `${API_URL}/api/session`,
+        url: `${APP_URL}/api/session`,
         error: errorMessage,
         stack: error instanceof Error ? error.stack : undefined,
       })
@@ -69,14 +71,14 @@ export async function getCurrentSession() {
  * @returns Unregistered user object or null if not found or error occurred
  */
 export async function findUnregisteredUser(headers?: Headers) {
-  if (!API_URL) {
-    console.error('[findUnregisteredUser] API_URL is not configured')
+  if (!APP_URL) {
+    console.error('[findUnregisteredUser] APP_URL is not configured')
     return null
   }
 
   try {
     const requestHeaders = headers ?? createCookieHeaders()
-    const url = `${API_URL}/api/auth/unregistered-user`
+    const url = `${APP_URL}/api/auth/unregistered-user`
 
     const response = await fetch(url, {
       method: 'GET',
@@ -101,7 +103,7 @@ export async function findUnregisteredUser(headers?: Headers) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     if (!errorMessage.includes('Dynamic server usage')) {
       console.error('[findUnregisteredUser] Fetch failed', {
-        url: `${API_URL}/api/auth/unregistered-user`,
+        url: `${APP_URL}/api/auth/unregistered-user`,
         error: errorMessage,
         stack: error instanceof Error ? error.stack : undefined,
       })

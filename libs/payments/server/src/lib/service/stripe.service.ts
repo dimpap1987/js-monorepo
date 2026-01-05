@@ -62,8 +62,8 @@ export class StripeService {
         this.paymentsClient.createCheckoutSession({
           customerId: stripeCustomerId,
           priceId: price.stripeId,
-          successUrl: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=true`,
-          cancelUrl: `${this.configService.get('AUTH_LOGIN_REDIRECT')}/pricing?success=false`,
+          successUrl: `${this.configService.get('APP_URL')}/pricing?success=true`,
+          cancelUrl: `${this.configService.get('APP_URL')}/pricing?success=false`,
         })
       )
 
