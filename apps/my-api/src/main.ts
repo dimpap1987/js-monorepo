@@ -16,6 +16,7 @@ import helmet from 'helmet'
 import { ClsService } from 'nestjs-cls'
 import { setupGracefulShutdown } from 'nestjs-graceful-shutdown'
 import { AppModule } from './app/app.module'
+import { NestExpressApplication } from '@nestjs/platform-express'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
@@ -34,7 +35,7 @@ function logServerMetadata() {
 
 async function bootstrap() {
   apiLogger.log('Starting application...')
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
     forceCloseConnections: true,
   })
@@ -70,6 +71,7 @@ async function bootstrap() {
       stopAtFirstError: true,
     })
   )
+  app.set('trust proxy', 1)
 
   const redisIoAdapter = new RedisIoAdapter(app)
   await redisIoAdapter.connectToRedis()
