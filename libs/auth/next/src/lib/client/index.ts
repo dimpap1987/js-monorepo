@@ -9,8 +9,18 @@ export function buildLoginUrl(callbackUrl?: string): string {
 }
 
 export class AuthClient {
-  constructor(private readonly authUrl: string) {
-    this.authUrl = authUrl
+  constructor(private readonly authUrl?: string) {
+    const isBrowser = typeof window !== 'undefined'
+
+    if (authUrl) {
+      this.authUrl = authUrl
+      return
+    }
+    if (!this.authUrl && isBrowser) {
+      this.authUrl = window.location.origin
+    } else if (!this.authUrl) {
+      this.authUrl = process.env.NEXT_PUBLIC_APP_URL as string
+    }
   }
 
   async logout(axiosClient = apiClientBase) {
@@ -38,7 +48,7 @@ export class AuthClient {
   }
 }
 
-const authClient = new AuthClient(process.env.NEXT_PUBLIC_AUTH_URL ?? '')
+const authClient = new AuthClient()
 
 export { authClient }
 

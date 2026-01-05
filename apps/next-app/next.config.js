@@ -5,6 +5,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
+const isDev = process.env.NODE_ENV === 'development'
+
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
  * */
@@ -13,6 +15,16 @@ const nextConfig = {
     // Set this to true if you would like to use SVGR
     // See: https://github.com/gregberge/svgr
     svgr: false,
+  },
+  async rewrites() {
+    if (!isDev) return []
+
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.DEV_BACKEND_URL}/api/:path*`,
+      },
+    ]
   },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }) => {
     const newConfig = {

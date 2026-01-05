@@ -144,8 +144,6 @@ gh run view <run-id>
 
 ### Application Secrets
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD` - Stripe publishable key
-- `NEXT_PUBLIC_AUTH_URL_PROD` - Auth URL
-- `NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL_PROD` - WebSocket URL
 - `NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD` - VAPID public key
 
 ## Environment Strategy

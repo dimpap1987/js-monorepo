@@ -12,8 +12,6 @@ All workflows use **only existing secrets** that you already have configured. He
 - ✅ `DOCKERHUB_TOKEN` - Already exists
 - ✅ `DOCKERHUB_USERNAME` - Already exists (or defaults to "dimpap")
 - ✅ `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD` - Already exists
-- ✅ `NEXT_PUBLIC_AUTH_URL_PROD` - Already exists
-- ✅ `NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL_PROD` - Already exists
 - ✅ `NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD` - Already exists
 
 ### From `actions-migrations-integration.yml`:

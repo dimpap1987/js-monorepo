@@ -10,8 +10,6 @@ Before you build the image you need to set .env in `apps/next-app/.env`
 
 ```.env
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-NEXT_PUBLIC_AUTH_URL=http://localhost:80                         ##  Replace with your domain
-NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL=ws://localhost:80/presence    ## Replace with your domain
 ```
 
 ## BUILD API

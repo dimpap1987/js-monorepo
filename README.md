@@ -78,23 +78,7 @@ This monorepo uses **centralized environment variable management** with **config
    cp .env.example .env
    ```
 
-2. **Configure base variables** (edit `.env`):
-
-   ```bash
-   # For local development:
-   HOSTNAME=localhost
-   API_PORT=3333
-   FRONTEND_PORT=3000
-   DATABASE_PORT=5432
-   REDIS_PORT=6379
-
-   # For production, just change HOSTNAME:
-   # HOSTNAME=yourdomain.com
-   # API_PORT=3333
-   # FRONTEND_PORT=3000
-   ```
-
-3. **Sync to all apps**:
+2. **Sync to all apps**:
    ```bash
    npm run sync:env
    ```
@@ -107,18 +91,18 @@ This monorepo uses **centralized environment variable management** with **config
 
 The `.env` file uses **variable interpolation** (via `dotenv-expand`). Base variables are defined at the top, and all URLs are constructed from them:
 
-```bash
+````bash
 # Base configuration
-HOSTNAME=localhost
-API_PORT=3333
-FRONTEND_PORT=3000
+# HOSTNAME=localhost
+# API_PORT=3333
+# FRONTEND_PORT=3000
 
-# Auto-constructed URLs
-HOSTNAME_API=${HOSTNAME}:${API_PORT}           # → localhost:3333
-HOSTNAME_FRONTEND=${HOSTNAME}:${FRONTEND_PORT} # → localhost:3000
-AUTH_LOGIN_REDIRECT=http://${HOSTNAME_FRONTEND} # → http://localhost:3000
-GOOGLE_REDIRECT_URL=http://${HOSTNAME_API}/api/auth/google/redirect
-```
+# # Auto-constructed URLs
+# HOSTNAME_API=${HOSTNAME}:${API_PORT}           # → localhost:3333
+# HOSTNAME_FRONTEND=${HOSTNAME}:${FRONTEND_PORT} # → localhost:3000
+# AUTH_LOGIN_REDIRECT=http://${HOSTNAME_FRONTEND} # → http://localhost:3000
+# GOOGLE_REDIRECT_URL=http://${HOSTNAME_API}/api/auth/google/redirect
+# ```
 
 #### Workflow
 
@@ -136,14 +120,14 @@ GOOGLE_REDIRECT_URL=http://${HOSTNAME_API}/api/auth/google/redirect
 HOSTNAME=localhost
 API_PORT=3333
 FRONTEND_PORT=3000
-```
+````
 
 **Staging/Production:**
 
 ```bash
-HOSTNAME=staging.yourdomain.com  # or yourdomain.com
-API_PORT=3333
-FRONTEND_PORT=3000
+# HOSTNAME=staging.yourdomain.com  # or yourdomain.com
+# API_PORT=3333
+# FRONTEND_PORT=3000
 # All URLs automatically update!
 ```
 
@@ -162,8 +146,6 @@ FRONTEND_PORT=3000
 - `HOSTNAME_API`, `HOSTNAME_FRONTEND`, `HOSTNAME_DATABASE`, `HOSTNAME_REDIS`
 - `DATABASE_URL`, `REDIS_URL`
 - `AUTH_LOGIN_REDIRECT`, `GOOGLE_REDIRECT_URL`, `GITHUB_REDIRECT_URL`
-- `NEXT_PUBLIC_AUTH_URL`, `NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL`
-- `APP_URL`, `API_URL`
 
 See `.env.example` for the complete template.
 

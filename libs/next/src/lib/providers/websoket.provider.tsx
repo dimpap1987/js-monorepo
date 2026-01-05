@@ -3,6 +3,14 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react'
 import { io, Socket } from 'socket.io-client'
 
+const isDev = process.env.NODE_ENV === 'development'
+// Dev: http://localhost:3333 | Prod: https://your-domain.com
+const BASE_URL = isDev
+  ? process.env.NEXT_PUBLIC_DEV_BACKEND_URL
+  : typeof window !== 'undefined'
+    ? window.location.origin
+    : ''
+
 export type WebSocketOptionsType = {
   url: string
   path?: string
@@ -36,25 +44,27 @@ const WebSocketContext = createContext<WebSocketContextValue<any> | undefined>(u
 
 interface WebSocketProviderProps {
   children: React.ReactNode
-  options: WebSocketOptionsType
+  uri?: string
   shouldConnect?: boolean
 }
 
-export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, options, shouldConnect = true }) => {
+export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
+  children,
+  shouldConnect = true,
+  uri = '/presence',
+}) => {
   const socketRef = useRef<Socket | null>(null)
   const subscriptionsRef = useRef<EventSubscription[]>([])
   const [isConnected, setIsConnected] = useState(false)
-  const optionsRef = useRef(options)
   const shouldConnectRef = useRef(shouldConnect)
 
   useEffect(() => {
-    optionsRef.current = options
     shouldConnectRef.current = shouldConnect
-  }, [options, shouldConnect])
+  }, [shouldConnect])
 
   // Connection management
   useEffect(() => {
-    if (!shouldConnect || !optionsRef.current?.url) {
+    if (!shouldConnect) {
       if (socketRef.current) {
         socketRef.current.removeAllListeners()
         socketRef.current.disconnect()
@@ -74,8 +84,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
     // Create new socket connection
 
     try {
-      const socket = io(optionsRef.current.url, {
-        path: optionsRef.current.path ?? '/ws',
+      const socket = io(`${BASE_URL}${uri}`, {
+        path: '/ws',
         secure: true,
         withCredentials: true,
         reconnection: true,
@@ -92,7 +102,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
 
       // Setup connection event handlers
       socket.on('connect', () => {
-        console.log(`WebSocket connected to: ${optionsRef.current.url}`)
+        console.log(`WebSocket connected to: ${uri}`)
         setIsConnected(true)
 
         // Re-register all subscriptions on reconnect
@@ -146,7 +156,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
       subscriptionsRef.current = []
       setIsConnected(false)
     }
-  }, [shouldConnect, options.url, options.path])
+  }, [shouldConnect, uri])
 
   // Subscribe to an event with automatic cleanup
   const subscribe = useCallback(
