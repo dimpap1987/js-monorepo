@@ -24,18 +24,36 @@ const framerSidebarPanel = (position: SidebarPositionType) => ({
   initial: { x: position === 'left' ? '-100%' : '100%' },
   animate: { x: 0 },
   exit: { x: position === 'left' ? '-100%' : '100%' },
-  transition: { duration: 0.3 },
+  transition: { type: 'tween', duration: 0.2, ease: 'easeOut' },
 })
 
-const framerText = (position: SidebarPositionType) => {
-  return {
-    initial: { opacity: 0, x: position === 'left' ? -50 : 50 },
-    animate: { opacity: 1, x: 0 },
-    transition: {
-      delay: 0.2,
-    },
-  }
+const framerBackdrop = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { type: 'tween', duration: 0.2 },
 }
+
+const MenuSideBarItem = memo(
+  ({ item, position, onClose }: { item: MenuItem; position: SidebarPositionType; onClose: () => void }) => (
+    <li>
+      <DpNextNavLink
+        className={`flex text-sm sm:text-base items-center w-full ${
+          position === 'right' ? 'flex-row-reverse' : ''
+        } justify-between gap-5 p-5 transition-all border-b-2 hover:bg-zinc-800 border-border`}
+        href={item.href}
+        onClick={onClose}
+      >
+        <div className="grid grid-cols-[max-content_25px] gap-2">
+          <div>{item.name}</div>
+          <div>{item.Icon && <item.Icon className="text-xl" />}</div>
+        </div>
+      </DpNextNavLink>
+    </li>
+  )
+)
+
+MenuSideBarItem.displayName = 'MenuSideBarItem'
 
 const DpNextSidebarBase = ({
   children,
@@ -50,31 +68,20 @@ const DpNextSidebarBase = ({
   const localRef = useRef<HTMLDivElement | null>(null)
 
   const handleClickAway = useCallback(() => {
-    onClose()
-  }, [onClose])
+    if (isOpen) onClose()
+  }, [onClose, isOpen])
 
   useClickAway(localRef as RefObject<HTMLElement | null>, handleClickAway)
 
   useEffect(() => {
     if (isOpen) {
-      const originalOverflow = document.body.style.overflow || ''
+      const originalOverflow = document.body.style.overflow
       document.body.style.overflow = 'hidden'
-
       return () => {
-        document.body.style.overflow = originalOverflow || ''
+        document.body.style.overflow = originalOverflow
       }
     }
   }, [isOpen])
-
-  useEffect(() => {
-    if (isOpen && localRef?.current) {
-      localRef.current.focus()
-    }
-  }, [isOpen])
-
-  const handleClose = useCallback(() => {
-    onClose()
-  }, [onClose])
 
   const filteredItems = useMemo(() => {
     return items.filter(
@@ -82,18 +89,15 @@ const DpNextSidebarBase = ({
     )
   }, [items, user?.roles])
 
+  // Memoize panel variants
+  const panelVariants = useMemo(() => framerSidebarPanel(position), [position])
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="wait">
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 text-gray-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <motion.div className="fixed inset-0 bg-black bg-opacity-50 z-50 text-gray-300" {...framerBackdrop}>
           <motion.div
-            {...framerSidebarPanel(position)}
+            {...panelVariants}
             className={`fixed top-0 bottom-0 p-2 ${
               position === 'left' ? 'left-0' : 'right-0'
             } w-full h-[100svh] max-w-xs border-r-2 border-border bg-zinc-900 flex flex-col cursor-auto md:hidden`}
@@ -102,7 +106,6 @@ const DpNextSidebarBase = ({
             tabIndex={-1}
           >
             <div className="flex items-center justify-between py-4 px-1 flex-wrap-reverse border-b-2 border-border">
-              {/* <ModeToggle></ModeToggle> */}
               {user?.username && (
                 <UserMetadata
                   profileImage={user.profile?.image}
@@ -110,11 +113,11 @@ const DpNextSidebarBase = ({
                   createdAt={user.createdAt}
                   plan={plan}
                   className="select-none text-sm"
-                ></UserMetadata>
+                />
               )}
               <span>{header}</span>
               <button
-                onClick={handleClose}
+                onClick={onClose}
                 className="p-3 border-2 border-border rounded-xl hover:bg-zinc-800"
                 aria-label="close sidebar"
               >
@@ -123,20 +126,7 @@ const DpNextSidebarBase = ({
             </div>
             <ul>
               {filteredItems.map((item) => (
-                <li key={item.name}>
-                  <DpNextNavLink
-                    className={`flex text-sm sm:text-base items-center w-full ${
-                      position === 'right' ? 'flex-row-reverse' : ''
-                    } justify-between gap-5 p-5 transition-all border-b-2 hover:bg-zinc-800 border-border`}
-                    href={item.href}
-                    onClick={handleClose}
-                  >
-                    <motion.div {...framerText(position)} className="grid grid-cols-[max-content_25px] gap-2">
-                      <div>{item.name}</div>
-                      <div>{item.Icon && <item.Icon className="text-xl" />}</div>
-                    </motion.div>
-                  </DpNextNavLink>
-                </li>
+                <MenuSideBarItem key={item.name} item={item} position={position} onClose={onClose} />
               ))}
             </ul>
             {children && (
