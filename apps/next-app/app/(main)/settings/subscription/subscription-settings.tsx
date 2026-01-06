@@ -13,6 +13,7 @@ import {
 } from '@js-monorepo/payments-ui'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SettingsItem } from '../settings-items'
+import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 
 export function SubscriptionSettings() {
   const { session, refreshSession } = useSession()
@@ -100,10 +101,10 @@ export function SubscriptionSettings() {
   return (
     <section className="space-y-8">
       {/* Page Header */}
-      <div className="mb-8">
+      <BackArrowWithLabel>
         <h2 className="mb-2">Subscription</h2>
         <p className="text-sm text-foreground-muted">Manage your subscription and billing preferences</p>
-      </div>
+      </BackArrowWithLabel>
 
       {/* Subscription Management */}
       <SettingsItem label="Current Plan">

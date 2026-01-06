@@ -1,21 +1,30 @@
+'use client'
+
+import React, { HTMLAttributes } from 'react'
 import { cn } from '@js-monorepo/ui/util'
 import { BackArrow } from './back-arrow'
+import { useDeviceType } from '@js-monorepo/next/hooks'
 
-function BackArrowWithLabel({
-  children,
-  arrowClassName,
-  className,
-}: {
-  children: React.ReactNode
+interface BackArrowWithLabelProps extends HTMLAttributes<HTMLDivElement> {
   arrowClassName?: string
-  className?: string
-}) {
-  return (
-    <div className={cn('relative content-center mb-4 mt-1', className)}>
-      <BackArrow className={cn('absolute top-1/2 left-2 transform -translate-y-1/2', arrowClassName)}></BackArrow>
-      <div className="px-2 ml-7">{children}</div>
-    </div>
-  )
 }
+
+const BackArrowWithLabel = React.forwardRef<HTMLDivElement, BackArrowWithLabelProps>(
+  ({ children, arrowClassName, className, ...props }, ref) => {
+    const { deviceType } = useDeviceType()
+    const isMobile = deviceType === 'mobile'
+
+    return (
+      <div ref={ref} className={cn('group flex items-start gap-2', className)} {...props}>
+        {isMobile && (
+          <BackArrow className={cn('mt-1 shrink-0 transition-transform group-hover:-translate-x-1', arrowClassName)} />
+        )}
+        <div className="flex-1 text-end">{children}</div>
+      </div>
+    )
+  }
+)
+
+BackArrowWithLabel.displayName = 'BackArrowWithLabel'
 
 export { BackArrowWithLabel }

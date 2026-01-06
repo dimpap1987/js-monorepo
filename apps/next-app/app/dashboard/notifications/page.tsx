@@ -6,8 +6,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@j
 export default async function NotificationsController() {
   return (
     <>
-      <BackArrowWithLabel arrowClassName="sm:hidden">
-        <h2 className="text-center sm:text-left">Manage Notifications</h2>
+      <BackArrowWithLabel className="mb-2">
+        <h2>Manage Notifications</h2>
       </BackArrowWithLabel>
 
       <div className="p-4">

@@ -18,8 +18,9 @@ import { EditUserSchema } from '@js-monorepo/schemas'
 import { compressAvatar } from '@js-monorepo/utils/common'
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { SettingsItem } from './settings-items'
-import { useUpdateUserAccount } from './queries'
+import { SettingsItem } from '../settings-items'
+import { useUpdateUserAccount } from '../queries'
+import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 
 export function AccountSettings() {
   const { session, refreshSession, isAdmin } = useSession()
@@ -77,10 +78,10 @@ export function AccountSettings() {
   return (
     <section className="space-y-8">
       {/* Page Header */}
-      <div className="mb-8">
+      <BackArrowWithLabel>
         <h2 className="mb-2">Account Settings</h2>
         <p className="text-sm text-foreground-muted">Manage your profile information and account details</p>
-      </div>
+      </BackArrowWithLabel>
 
       {/* Profile Section */}
       <Form {...form}>

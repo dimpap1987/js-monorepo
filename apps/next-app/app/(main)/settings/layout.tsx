@@ -4,9 +4,10 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useDeviceType } from '@js-monorepo/next/hooks'
 import { ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
-import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import { PropsWithChildren, useCallback, useState } from 'react'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdAccountCircle, MdChevronLeft, MdPalette, MdCreditCard } from 'react-icons/md'
+import { SettingsMobileTabs } from './settings-mobile-tabs'
 
 interface SettingsNavItem {
   href: string
@@ -120,34 +121,30 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const isMobile = deviceType === 'mobile'
 
-  useEffect(() => {
-    if (isMobile) {
-      setIsCollapsed(true)
-    }
-  }, [isMobile])
-
   const handleToggle = useCallback(() => {
     if (isMobile) return // Prevent toggling on mobile
     setIsCollapsed((prev) => !prev)
   }, [isMobile])
 
   return (
-    <div className="grid grid-cols-[auto_1fr] gap-0 min-h-[calc(95svh-var(--navbar-height))]">
-      {/* Sidebar - First column with dynamic width based on collapsed state */}
+    <div className="grid sm:grid-cols-[auto_1fr] gap-0 min-h-[calc(95svh-var(--navbar-height))]">
+      {/* Sidebar - Hidden on mobile, shown on sm and up */}
       <div
         className={cn(
-          'flex flex-col justify-between p-2 border-r border-border rounded-md',
-          // Disable transition on mobile to prevent shrinking animation
-          isMobile ? '' : 'transition-[width] duration-300 ease-in-out',
+          'hidden sm:flex flex-col justify-between p-2 border-r border-border rounded-md',
+          'transition-[width] duration-300 ease-in-out',
           'overflow-hidden',
-          isMobile || isCollapsed ? 'w-16' : 'w-64'
+          isCollapsed ? 'w-16' : 'w-64'
         )}
       >
-        <SettingsSidebar isCollapsed={isMobile || isCollapsed} onToggle={handleToggle} />
+        <SettingsSidebar isCollapsed={isCollapsed} onToggle={handleToggle} />
       </div>
 
-      {/* Content Area - Second column takes remaining space */}
-      <div className="p-3 overflow-y-auto sm:pl-6">
+      {/* Content Area */}
+      <div className="overflow-y-auto sm:pl-6">
+        {/* Mobile Navigation */}
+        {isMobile && <SettingsMobileTabs />}
+
         <ContainerTemplate>{children}</ContainerTemplate>
       </div>
     </div>

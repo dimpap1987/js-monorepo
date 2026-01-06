@@ -4,8 +4,8 @@ import { CreateAnnouncement } from './components/create-announcement'
 export default async function AnnouncementsController() {
   return (
     <>
-      <BackArrowWithLabel arrowClassName="sm:hidden">
-        <h2 className="text-center sm:text-left">Announcements</h2>
+      <BackArrowWithLabel className="mb-2">
+        <h2>Announcements</h2>
       </BackArrowWithLabel>
 
       <CreateAnnouncement></CreateAnnouncement>
