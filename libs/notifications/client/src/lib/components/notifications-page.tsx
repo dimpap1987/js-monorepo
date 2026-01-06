@@ -24,7 +24,7 @@ export function NotificationPage({ userId, className, headerClassName, showBackA
     <div className={cn('text-sm sm:text-base select-none', className)}>
       <div className={cn('flex justify-between items-center mb-4 sm:mb-6 px-2', headerClassName)}>
         {showBackArrow ? (
-          <BackArrowWithLabel className="flex-1" arrowClassName="sm:hidden">
+          <BackArrowWithLabel className="flex-1 mb-2">
             <h3>Notifications</h3>
           </BackArrowWithLabel>
         ) : (

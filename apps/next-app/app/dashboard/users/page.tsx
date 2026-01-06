@@ -4,8 +4,8 @@ import { DashboardUsersTable } from './users-table'
 async function UsersDashboardController() {
   return (
     <>
-      <BackArrowWithLabel arrowClassName="sm:hidden">
-        <h2 className="text-center sm:text-left">Users Overview</h2>
+      <BackArrowWithLabel className="mb-2">
+        <h2>Users Overview</h2>
       </BackArrowWithLabel>
       <DashboardUsersTable></DashboardUsersTable>
     </>

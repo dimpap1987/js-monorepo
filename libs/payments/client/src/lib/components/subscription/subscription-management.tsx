@@ -269,7 +269,6 @@ export function SubscriptionManagement({
       {/* Actions */}
       <div className="flex flex-wrap gap-3 pt-2 justify-end">
         <DpButton variant="outline" onClick={handleManageSubscription} loading={isPortalLoading}>
-          <Settings className="h-4 w-4 mr-2" />
           Manage
         </DpButton>
         {status === 'canceling' && (

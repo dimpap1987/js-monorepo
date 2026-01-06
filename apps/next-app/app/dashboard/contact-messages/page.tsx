@@ -4,8 +4,8 @@ import { ContactMessagesTable } from './contact-messages-table'
 export default function ContactMessagesDashboardPage() {
   return (
     <>
-      <BackArrowWithLabel arrowClassName="sm:hidden">
-        <h2 className="text-center sm:text-left">Contact Messages</h2>
+      <BackArrowWithLabel className="mb-2">
+        <h2>Contact Messages</h2>
       </BackArrowWithLabel>
       <ContactMessagesTable />
     </>
