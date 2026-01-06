@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic'
+
+import { getCurrentSession } from '@js-monorepo/auth/next/server'
 import { BodyTemplate } from '@js-monorepo/templates'
 import RootProviders from '@next-app/components/root.providers'
-import { Poppins } from 'next/font/google'
 import { Metadata, Viewport } from 'next'
+import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
 import MainTemplate from '../components/main.template'
 import { StructuredData } from '../components/structured-data'
@@ -94,11 +97,13 @@ export const viewport: Viewport = {
 }
 
 export default async function RootLayout(props: { readonly children: ReactNode; readonly auth: ReactNode }) {
+  const session = await getCurrentSession()
+
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <BodyTemplate className={poppins.className}>
         <StructuredData />
-        <RootProviders>
+        <RootProviders session={session}>
           <MainTemplate>
             {props.auth}
             {props.children}

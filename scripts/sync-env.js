@@ -19,8 +19,8 @@ const targetPaths = [
   path.join(__dirname, '..', 'apps', 'my-api', '.env'),
   path.join(__dirname, '..', 'apps', 'next-app', '.env'),
   path.join(__dirname, '..', 'libs', 'prisma', 'run_migrations', '.env'),
+  path.join(__dirname, '..', 'deployments', '.env'),
 ]
-
 /**
  * Expands environment variables in .env content
  * Preserves comments and formatting

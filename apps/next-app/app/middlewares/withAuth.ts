@@ -1,5 +1,5 @@
 import { buildLoginUrl } from '@js-monorepo/auth/next/client'
-import { getCurrentUser } from '@next-app/actions/session'
+import { getCurrentSession } from '@js-monorepo/auth/next/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { apiAuthPrefix, authRoutes, isPublicRoute, routes } from './routes'
 
@@ -23,7 +23,7 @@ export function withAuth(
       return nextMiddleware(request)
     }
 
-    const session = await getCurrentUser()
+    const session = await getCurrentSession()
     const isLoggedIn = !!session?.user
 
     if (isAuthRoute) {

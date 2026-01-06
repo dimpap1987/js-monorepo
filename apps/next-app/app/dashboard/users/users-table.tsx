@@ -16,9 +16,9 @@ import { useImpersonateUser, useUpdateUser, useUsers } from './queries'
 import RolesTableInput from './roles-input'
 import { UsernameTableInput } from './username-input'
 
-declare module '@tanstack/table-core' {
+declare module '@tanstack/react-table' {
   interface Row<TData> {
-    updatedUser: AuthUserUpdateDto | undefined
+    updatedUser?: any
   }
 }
 
