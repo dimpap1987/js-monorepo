@@ -4,6 +4,7 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
 import { memo, useEffect, useMemo, useState } from 'react'
 import { COOKIE_CATEGORY_IDS, COOKIE_CONSENT_KEY, COOKIE_CONSENT_VALUE, COOKIE_PREFERENCES_KEY } from './cookie-utils'
+import { X } from 'lucide-react'
 
 export interface CookieCategory {
   id: string
@@ -104,7 +105,7 @@ function CookieBannerComponent({
   return (
     <div
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-50',
+        'fixed bottom-0 left-0 right-0 z-50 w-[100vw]',
         'bg-card border-t-2 border-border',
         'shadow-2xl shadow-black/40',
         'transition-all duration-300 ease-in-out',
@@ -114,12 +115,25 @@ function CookieBannerComponent({
       role="banner"
       aria-label="Cookie consent banner"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      {/* Close Button - Absolute Top Right */}
+      <button
+        onClick={handleAccept}
+        className={cn(
+          'absolute top-2 right-2 sm:top-0 p-1 rounded-lg z-10',
+          'hover:bg-accent active:scale-95',
+          'transition-all duration-200',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+        )}
+        aria-label="Close cookie banner"
+      >
+        <X className="w-5 h-5 text-muted-foreground" />
+      </button>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col gap-4">
-          {/* Header */}
+          {/* Header with Close Button */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex-1">
-              <p className="text-sm text-foreground leading-relaxed">
+              <p className="text-sm text-foreground leading-relaxed w-[95%]">
                 We use cookies to provide essential functionality and improve your experience. You can customize your
                 preferences below.
               </p>

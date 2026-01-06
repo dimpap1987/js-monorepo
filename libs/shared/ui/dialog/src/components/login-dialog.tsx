@@ -42,7 +42,7 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 {social.type === 'google' && (
                   <button
                     type="button"
-                    className="flex justify-center bg-zinc-200 w-full rounded-lg px-5 py-3 text-center text-black items-center
+                    className="flex justify-center bg-zinc-300 w-full rounded-lg px-5 py-3 text-center text-black items-center
                      mr-2 shadow-effect transition-transform duration-300 hover:scale-105 font-medium text-sm"
                     onClick={() => {
                       social.onLogin()
