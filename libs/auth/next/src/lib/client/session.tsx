@@ -62,7 +62,6 @@ export const SessionProvider = ({
   endpoint?: string
 }) => {
   const [session, setSession] = useState<Record<string, any> | null>(value)
-  const cancelledRef = useRef(false)
 
   const refreshSession = useCallback(async () => {
     const { data, error } = await fetchSession(clientBuilder, endpoint)
@@ -73,29 +72,17 @@ export const SessionProvider = ({
       setSession(null)
       const isAuthError = error?.response?.status === 401 || error?.response?.status === 403
       if (isAuthError) {
-        window.location.reload()
+        window.location.href = '/auth/login'
       }
     }
   }, [clientBuilder, endpoint])
 
   useEffect(() => {
-    if (value) return
+    if (value !== null) return
 
-    cancelledRef.current = false
-
-    fetchSession(clientBuilder, endpoint).then(({ data, error }) => {
-      if (cancelledRef.current) return
-
-      if (data) {
-        setSession(data)
-      } else {
-        setSession(null)
-      }
+    fetchSession(clientBuilder, endpoint).then(({ data }) => {
+      setSession(data ?? null)
     })
-
-    return () => {
-      cancelledRef.current = true
-    }
   }, [clientBuilder, endpoint, value])
 
   useEffect(() => {

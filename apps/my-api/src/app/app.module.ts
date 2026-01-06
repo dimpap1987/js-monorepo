@@ -280,6 +280,7 @@ export class AppModule implements NestModule {
           genid: () => uuidv4(),
           saveUninitialized: false,
           secret: this.configService.get('SESSION_SECRET'),
+          proxy: true, // IMPORTANT: Tells Express to trust the X-Forwarded-Proto header
           resave: false,
           rolling: true, // Reset the expiration on every request
           name: 'JSESSIONID',

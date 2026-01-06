@@ -51,7 +51,7 @@ declare module 'express-session' {
   }
 }
 
-declare module 'express-serve-static-core' {
+declare module 'express' {
   interface Request {
     user?: {
       user?: any

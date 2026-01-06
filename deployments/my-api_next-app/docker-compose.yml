@@ -1,9 +1,9 @@
 services:
   my-api:
-    image: dimpap/my-api:latest
+    image: dimpap/my-api:dev
     container_name: my-api_container
     env_file:
-      - .env
+      - ../.env
     restart: unless-stopped
     volumes:
       - logs-data:/usr/src/app/logs
@@ -21,10 +21,10 @@ services:
       - postgres
 
   next-app:
-    image: dimpap/next-app:latest
+    image: dimpap/next-app:dev
     container_name: next-app_container
     env_file:
-      - .env
+      - ../.env
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
       interval: 30s
@@ -37,35 +37,35 @@ services:
   postgres:
     image: postgres:16.1-alpine3.19
     container_name: postgres_container
-    # ports:
-    #   - '5432:5432'
+    ports:
+      - '5432:5432'
     env_file:
-      - .env
+      - ../.env
     environment:
-      POSTGRES_DB: ${DATABASE_DB}
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      # These defaults ensure the container starts even if .env lookup fails
+      POSTGRES_DB: ${DATABASE_DB:-my-db}
+      POSTGRES_USER: ${DATABASE_USER:-user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-mypassword}
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER} -d ${DATABASE_DB}']
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
       interval: 10s
       timeout: 3s
       retries: 3
     networks:
       - super-network
-    # ports:
-    #   - '5432:5432'
     volumes:
-      - ${POSTGRES_VOLUME_PATH}:/var/lib/postgresql/data
+      # If POSTGRES_VOLUME_PATH is empty, it will create a folder called 'pgdata' in your current directory
+      - ${POSTGRES_VOLUME_PATH:-./data}:/var/lib/postgresql/data
     command: postgres -c shared_preload_libraries=pg_stat_statements
 
   redis:
     image: bitnami/redis:latest
     container_name: redis_container
-    # ports:
-    #   - '6379:6379'
+    ports:
+      - '6379:6379'
     env_file:
-      - .env
+      - ../.env
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
@@ -88,15 +88,14 @@ services:
     restart: unless-stopped
     environment:
       - REDIS_HOSTS=local:redis:6379
-    # ports:
-    #   - '8081:8081'
+    ports:
+      - '8081:8081'
     networks:
       - super-network
     depends_on:
       - redis
 
 volumes:
-  dumpnew:
   redis-data:
   logs-data:
 
