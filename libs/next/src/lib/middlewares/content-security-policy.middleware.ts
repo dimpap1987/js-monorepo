@@ -1,39 +1,41 @@
-import { generateNonce, removePathNameFromUrl } from '@js-monorepo/utils/common'
-import { NextRequest, NextResponse } from 'next/server'
+// TODO
 
-const isDev = process.env.NODE_ENV === 'development'
-const websocketUrl = removePathNameFromUrl(process.env.NEXT_PUBLIC_WEBSOCKET_PRESENCE_URL ?? '')
-const apiUrl = removePathNameFromUrl(process.env.NEXT_PUBLIC_AUTH_URL ?? '')
+// import { generateNonce, removePathNameFromUrl } from '@js-monorepo/utils/common'
+// import { NextRequest, NextResponse } from 'next/server'
 
-export function withCSP(
-  nextMiddleware: (request: NextRequest) => Promise<NextResponse> | NextResponse
-): (request: NextRequest) => Promise<NextResponse> | NextResponse {
-  return async function middlewareCSP(request: NextRequest): Promise<NextResponse> {
-    const nonce = generateNonce()
-    const cspHeader = `
-    default-src 'self';
-    script-src 'self' https://js.stripe.com ${isDev ? "'unsafe-eval' 'unsafe-inline'" : `'nonce-${nonce}'`};
-    style-src 'self' 'unsafe-inline';
-    connect-src 'self' ${websocketUrl} ${apiUrl};
-    frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
-    img-src 'self' blob: data:;
-    font-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    frame-ancestors 'none';
-    upgrade-insecure-requests;
-`
-      .replace(/\s{2,}/g, ' ')
-      .trim()
+// const isDev = process.env.NODE_ENV === 'development'
+// const appUrl = removePathNameFromUrl(process.env.APP_URL ?? '')
+// const apiUrl = process.env.INTERNAL_API_URL
 
-    // Attach nonce to request for downstream use if needed
-    const requestHeaders = new Headers(request.headers)
-    requestHeaders.set('x-nonce', nonce)
+// export function withCSP(
+//   nextMiddleware: (request: NextRequest) => Promise<NextResponse> | NextResponse
+// ): (request: NextRequest) => Promise<NextResponse> | NextResponse {
+//   return async function middlewareCSP(request: NextRequest): Promise<NextResponse> {
+//     const nonce = generateNonce()
+//     const cspHeader = `
+//     default-src 'self';
+//     script-src 'self' https://js.stripe.com ${isDev ? "'unsafe-eval' 'unsafe-inline'" : `'nonce-${nonce}'`};
+//     style-src 'self' 'unsafe-inline';
+//     connect-src 'self' ${apiUrl} ${appUrl};
+//     frame-src 'self' https://js.stripe.com https://hooks.stripe.com;
+//     img-src 'self' blob: data:;
+//     font-src 'self';
+//     object-src 'none';
+//     base-uri 'self';
+//     form-action 'self';
+//     frame-ancestors 'none';
+//     upgrade-insecure-requests;
+// `
+//       .replace(/\s{2,}/g, ' ')
+//       .trim()
 
-    const response = await nextMiddleware(new NextRequest(request, { headers: requestHeaders }))
+//     // Attach nonce to request for downstream use if needed
+//     const requestHeaders = new Headers(request.headers)
+//     requestHeaders.set('x-nonce', nonce)
 
-    response.headers.set('Content-Security-Policy', cspHeader)
-    return response
-  }
-}
+//     const response = await nextMiddleware(new NextRequest(request, { headers: requestHeaders }))
+
+//     response.headers.set('Content-Security-Policy', cspHeader)
+//     return response
+//   }
+// }

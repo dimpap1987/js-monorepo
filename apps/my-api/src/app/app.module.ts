@@ -87,7 +87,6 @@ import { getContactMessage } from './notifications/contact-form'
     GracefulShutdownModule.forRoot({
       cleanup: async (app, signal) => {
         apiLogger.warn(`Shutdown hook received with signal: ${signal}`)
-        app.close()
       },
       gracefulShutdownTimeout: Number(process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 3000),
       keepNodeProcessAlive: true,
