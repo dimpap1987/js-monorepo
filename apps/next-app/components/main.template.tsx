@@ -2,7 +2,8 @@
 import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
-import { CookieBanner, COOKIE_CATEGORY_IDS, type CookieCategory } from '@js-monorepo/components/cookie-banner'
+import { COOKIE_CATEGORY_IDS, CookieBanner, type CookieCategory } from '@js-monorepo/components/cookie-banner'
+import { SidebarInset, SidebarProvider } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
@@ -11,14 +12,14 @@ import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
 import { useRouter } from 'next-nprogress-bar'
-import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
+import { PropsWithChildren, useMemo } from 'react'
 import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'
 import { MdOutlineContactMail } from 'react-icons/md'
 import { RiAdminFill } from 'react-icons/ri'
 import { ImpersonationBanner } from './impersonation-banner'
 import SVGLogo from './logo-svg'
-import { MobileNavbarWithNotifications } from './mobile-navbar-with-notifications'
+import { MobileNavbar } from './mobile-navbar'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
 
 const menuItems: MenuItem[] = [
@@ -60,7 +61,6 @@ const cookieCategories: CookieCategory[] = [
 
 export default function MainTemplate({ children }: Readonly<PropsWithChildren>) {
   const { session, isAdmin, refreshSession } = useSession()
-  const [openSideBar, setOpenSideBar] = useState(false)
   const router = useRouter()
   const user = session?.user
   const plan = (session?.subscription as { plan?: string } | undefined)?.plan
@@ -69,11 +69,6 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
   useOfflineIndicator()
   useTapEffect()
-
-  // Memoize callbacks to prevent sidebar re-renders
-  const handleSidebarClose = useCallback(() => {
-    setOpenSideBar(false)
-  }, [])
 
   // Memoize sidebar children to prevent re-renders
   const sidebarChildren = useMemo(
@@ -97,39 +92,28 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
   )
 
   return (
-    <>
-      <ImpersonationBanner />
-      <DpNextNavbar
-        user={user}
-        plan={plan}
-        menuItems={menuItems}
-        onSideBarClick={() => setOpenSideBar(true)}
-        onLogout={() => authClient.logout()}
-      >
-        <DpLogo onClick={() => router.push('/')}>
-          <SVGLogo></SVGLogo>
-        </DpLogo>
-        <NavbarItems>{user && <NotificationBellContainerVirtual userId={user.id} />}</NavbarItems>
-      </DpNextNavbar>
-
-      <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20"></AnnouncementsComponent>
-
-      <DpNextSidebar
-        isOpen={openSideBar}
-        onClose={handleSidebarClose}
-        position="right"
-        items={menuItems}
-        user={user}
-        plan={plan}
-      >
+    <SidebarProvider defaultOpen={false}>
+      <DpNextSidebar items={menuItems} user={user} plan={plan}>
         {sidebarChildren}
       </DpNextSidebar>
 
-      <main className="mt-6">{children}</main>
+      <SidebarInset className="flex flex-col">
+        <ImpersonationBanner />
 
-      {user && <MobileNavbarWithNotifications userId={user.id} isSidebarOpen={openSideBar} />}
+        <DpNextNavbar user={user} plan={plan} menuItems={menuItems} onLogout={() => authClient.logout()}>
+          <DpLogo onClick={() => router.push('/')}>
+            <SVGLogo />
+          </DpLogo>
+          <NavbarItems>{user && <NotificationBellContainerVirtual userId={user.id} />}</NavbarItems>
+        </DpNextNavbar>
 
-      <CookieBanner optionalCategories={cookieCategories} />
-    </>
+        <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />
+
+        <main className="mt-6 flex-1 px-4 md:px-6">{children}</main>
+
+        {user?.id && <MobileNavbar />}
+        <CookieBanner optionalCategories={cookieCategories} />
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

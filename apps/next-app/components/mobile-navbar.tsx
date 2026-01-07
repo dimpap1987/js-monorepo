@@ -5,15 +5,10 @@ import { useDeviceType } from '@js-monorepo/next/hooks'
 import { NotificationBellButton } from '@js-monorepo/notifications-ui'
 import { AiFillHome } from 'react-icons/ai'
 
-interface MobileNavbarProps {
-  isSidebarOpen?: boolean
-}
-
-export const MobileNavbar = ({ isSidebarOpen = false }: MobileNavbarProps) => {
+export const MobileNavbar = () => {
   const { deviceType } = useDeviceType()
 
-  // Hide bottom navbar on mobile when sidebar is open (standard UX pattern)
-  if (deviceType !== 'mobile' || isSidebarOpen) return null
+  if (deviceType !== 'mobile') return null
 
   return (
     <BottomNavbar>
