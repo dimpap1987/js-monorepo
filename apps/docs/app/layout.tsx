@@ -10,7 +10,7 @@ export const metadata = {
 export default function RootLayout({ children }: { readonly children?: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-100svh bg-slate-50">
+      <body className="bg-slate-50">
         <DpNextPageProgressBar color="red">
           <section className="flex">
             <div className="min-w-[200px] sticky top-0 h-screen bg-gray-200 p-4">

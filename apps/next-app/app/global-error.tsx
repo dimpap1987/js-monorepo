@@ -33,7 +33,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
     <html lang="en">
       <ThemeProvider attribute="class" defaultTheme="system">
         <body
-          className={`${poppins.className} flex justify-center container items-center min-h-100svh 
+          className={`${poppins.className} flex justify-center container items-center
                     bg-background text-foreground overflow-x-hidden`}
         >
           <ErrorComponent type="global" className="container">
