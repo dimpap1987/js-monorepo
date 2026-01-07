@@ -23,7 +23,7 @@ export function BottomNavbar({ children, className }: PropsWithChildren & { clas
   return (
     <div
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-50 w-screen',
+        'fixed bottom-0 left-0 right-0 z-50 w-full',
         'h-[var(--bottom-navbar-height)]',
         'transition-transform duration-300 ease-in-out',
         'backdrop-blur-xl bg-background',

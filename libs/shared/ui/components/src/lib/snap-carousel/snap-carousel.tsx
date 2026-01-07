@@ -148,7 +148,7 @@ export function SnapCarousel({
           <div
             key={index}
             data-carousel-item
-            className={cn('flex-shrink-0 snap-center py-2', itemClassName)}
+            className={cn('flex-shrink-0 snap-center snap-always py-2', itemClassName)}
             style={{
               width: `${itemWidthPercent}%`,
               marginRight: index < itemCount - 1 ? `${gap}px` : 0,

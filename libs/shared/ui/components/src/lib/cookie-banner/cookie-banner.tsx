@@ -105,7 +105,7 @@ function CookieBannerComponent({
   return (
     <div
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-50 w-[100vw]',
+        'fixed bottom-0 left-0 right-0 z-50 w-full',
         'bg-card border-t-2 border-border',
         'shadow-2xl shadow-black/40',
         'transition-all duration-300 ease-in-out',
