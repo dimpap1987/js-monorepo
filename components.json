@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "default",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "libs/shared/styles/src/lib/tailwind.config.js",
+    "css": "libs/shared/styles/src/lib/_tailwind.css",
+    "baseColor": "slate",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "libs/shared/ui/components/src/lib",
+    "utils": "@js-monorepo/ui/util"
+  }
+}
