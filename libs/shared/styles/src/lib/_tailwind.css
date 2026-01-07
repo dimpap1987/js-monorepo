@@ -8,6 +8,10 @@
   ::before,
   ::after {
     border-color: var(--color-border);
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
