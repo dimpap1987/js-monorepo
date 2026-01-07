@@ -11,6 +11,7 @@ import { usePlans } from '../../queries/payments-queries'
 import { POPULAR_PLAN_NAME, SessionSubscription, Subscription, TrialEligibilityResponse } from '../../types'
 import { apiCheckTrialEligibility, apiCreatePortalSession, apiGetSubscription, apiStartTrial } from '../../utils/api'
 import { PricingCard } from './pricing-card'
+import { PricingCardSkeleton } from './pricing-card-skeleton'
 import { PricingFAQ } from './pricing-faq'
 import { PricingHero } from './pricing-hero'
 import { PricingTrustSignals } from './pricing-trust-signals'
@@ -24,7 +25,7 @@ export function Pricing() {
   const [isPortalLoading, setIsPortalLoading] = useState(false)
   const [trialLoadingPriceId, setTrialLoadingPriceId] = useState<number | null>(null)
   const [trialEligibility, setTrialEligibility] = useState<Record<number, TrialEligibilityResponse>>({})
-  const { data: plans = [] } = usePlans()
+  const { data: plans = [], isLoading: isPlansLoading } = usePlans()
   const { addNotification } = useNotifications()
 
   const sessionSubscription = session?.subscription as SessionSubscription | undefined
@@ -193,65 +194,75 @@ export function Pricing() {
       {/* Pricing Cards */}
       {/* Mobile: Snap Carousel */}
       <section className="md:hidden">
-        <SnapCarousel
-          activeIndex={(() => {
-            const subscribedIndex = pricingCards.findIndex((card) => card.subscribed)
-            // If subscribed, show that card; otherwise show middle card (index 1 for 3 items)
-            return subscribedIndex >= 0 ? subscribedIndex : undefined
-          })()}
-          itemWidthPercent={75}
-          gap={12}
-          showIndicators={true}
-        >
-          {pricingCards.map((card) => (
-            <PricingCard
-              key={card.id}
-              id={card.id}
-              name={card.name}
-              description={card.description}
-              price={card.price}
-              interval={card.interval}
-              features={card.features}
-              isPopular={card.isPopular}
-              subscribed={card.subscribed}
-              anySubscribed={!!sessionSubscription?.isSubscribed}
-              isLoggedIn={isLoggedIn}
-              subscription={card.subscribed ? subscription ?? undefined : undefined}
-              onSelect={handleSelectPlan}
-              onStartTrial={handleStartTrial}
-              isLoading={isPortalLoading}
-              isTrialLoading={trialLoadingPriceId === card.id}
-              trialEligibility={trialEligibility[card.id]}
-              isOnTrial={sessionSubscription?.isTrial}
-            />
-          ))}
-        </SnapCarousel>
+        {isPlansLoading ? (
+          <SnapCarousel itemWidthPercent={75} gap={12} showIndicators={true}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <PricingCardSkeleton key={i} />
+            ))}
+          </SnapCarousel>
+        ) : (
+          <SnapCarousel
+            activeIndex={(() => {
+              const subscribedIndex = pricingCards.findIndex((card) => card.subscribed)
+              // If subscribed, show that card; otherwise show middle card (index 1 for 3 items)
+              return subscribedIndex >= 0 ? subscribedIndex : undefined
+            })()}
+            itemWidthPercent={75}
+            gap={12}
+            showIndicators={true}
+          >
+            {pricingCards.map((card) => (
+              <PricingCard
+                key={card.id}
+                id={card.id}
+                name={card.name}
+                description={card.description}
+                price={card.price}
+                interval={card.interval}
+                features={card.features}
+                isPopular={card.isPopular}
+                subscribed={card.subscribed}
+                anySubscribed={!!sessionSubscription?.isSubscribed}
+                isLoggedIn={isLoggedIn}
+                subscription={card.subscribed ? subscription ?? undefined : undefined}
+                onSelect={handleSelectPlan}
+                onStartTrial={handleStartTrial}
+                isLoading={isPortalLoading}
+                isTrialLoading={trialLoadingPriceId === card.id}
+                trialEligibility={trialEligibility[card.id]}
+                isOnTrial={sessionSubscription?.isTrial}
+              />
+            ))}
+          </SnapCarousel>
+        )}
       </section>
 
       {/* Desktop: Grid Layout */}
       <section className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 py-2 max-w-6xl mx-auto">
-        {pricingCards.map((card) => (
-          <PricingCard
-            key={card.id}
-            id={card.id}
-            name={card.name}
-            description={card.description}
-            price={card.price}
-            interval={card.interval}
-            features={card.features}
-            isPopular={card.isPopular}
-            subscribed={card.subscribed}
-            anySubscribed={!!sessionSubscription?.isSubscribed}
-            isLoggedIn={isLoggedIn}
-            subscription={card.subscribed ? subscription ?? undefined : undefined}
-            onSelect={handleSelectPlan}
-            onStartTrial={handleStartTrial}
-            isLoading={isPortalLoading}
-            isTrialLoading={trialLoadingPriceId === card.id}
-            trialEligibility={trialEligibility[card.id]}
-            isOnTrial={sessionSubscription?.isTrial}
-          />
-        ))}
+        {isPlansLoading
+          ? Array.from({ length: 3 }).map((_, i) => <PricingCardSkeleton key={i} />)
+          : pricingCards.map((card) => (
+              <PricingCard
+                key={card.id}
+                id={card.id}
+                name={card.name}
+                description={card.description}
+                price={card.price}
+                interval={card.interval}
+                features={card.features}
+                isPopular={card.isPopular}
+                subscribed={card.subscribed}
+                anySubscribed={!!sessionSubscription?.isSubscribed}
+                isLoggedIn={isLoggedIn}
+                subscription={card.subscribed ? subscription ?? undefined : undefined}
+                onSelect={handleSelectPlan}
+                onStartTrial={handleStartTrial}
+                isLoading={isPortalLoading}
+                isTrialLoading={trialLoadingPriceId === card.id}
+                trialEligibility={trialEligibility[card.id]}
+                isOnTrial={sessionSubscription?.isTrial}
+              />
+            ))}
       </section>
 
       {/* FAQ Section */}
