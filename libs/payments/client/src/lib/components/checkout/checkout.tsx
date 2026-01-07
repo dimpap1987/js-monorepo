@@ -3,7 +3,7 @@
 import { DpButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
-import { loadStripe } from '@stripe/stripe-js'
+import { loadStripe } from '@stripe/stripe-js/pure'
 import { ArrowLeft, Lock } from 'lucide-react'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'

@@ -31,9 +31,9 @@ export function PricingTrustSignals({ signals = defaultSignals, className }: Pri
   return (
     <div className={cn('flex items-center justify-center gap-3 sm:gap-10', className)}>
       {signals.map((signal, index) => (
-        <div key={index} className="flex items-center gap-2 text-foreground-muted">
+        <div key={index} className="flex items-center gap-2">
           <span className="text-status-success">{signal.icon}</span>
-          <span className="text-sm font-medium">{signal.text}</span>
+          <span className="text-sm font-medium text-foreground-neutral">{signal.text}</span>
         </div>
       ))}
     </div>

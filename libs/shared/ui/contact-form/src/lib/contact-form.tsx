@@ -144,7 +144,7 @@ export function ContactForm({
                 <FormLabel className="text-sm font-medium text-foreground">Category</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger className="w-full h-10">
+                    <SelectTrigger className="w-full h-10" aria-label="Select contact category">
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
                   </FormControl>
