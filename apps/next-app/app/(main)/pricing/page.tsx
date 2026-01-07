@@ -11,14 +11,10 @@ export const metadata: Metadata = generateSEOMetadata({
   type: 'website',
 })
 
-function PricingPage() {
+export default function PricingPage() {
   return (
-    <ContainerTemplate>
-      <div className="px-2">
-        <Pricing></Pricing>
-      </div>
+    <ContainerTemplate className="px-2">
+      <Pricing></Pricing>
     </ContainerTemplate>
   )
 }
-
-export default PricingPage
