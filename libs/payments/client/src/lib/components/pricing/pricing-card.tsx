@@ -127,7 +127,7 @@ export function PricingCard({
       )}
 
       <CardHeader className="text-center pb-2">
-        <h3 className="text-xl font-semibold text-foreground capitalize">{name} Plan</h3>
+        <h2 className="text-xl font-semibold text-foreground capitalize">{name} Plan</h2>
         <p className="text-sm text-foreground-neutral mt-1">{description}</p>
       </CardHeader>
 

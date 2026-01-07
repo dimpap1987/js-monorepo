@@ -168,17 +168,21 @@ export function SnapCarousel({
 
       {/* Indicators */}
       {showIndicators && itemCount > 1 && (
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex justify-center gap-1 mt-4">
           {Array.from({ length: itemCount }).map((_, index) => (
             <button
               key={index}
               onClick={() => handleIndicatorClick(index)}
-              className={cn(
-                'w-2 h-2 rounded-full transition-all duration-300',
-                currentIndex === index ? 'bg-primary w-4' : 'bg-muted-foreground hover:brightness-110'
-              )}
+              className="relative flex items-center justify-center w-6 h-6"
               aria-label={`Go to item ${index + 1}`}
-            />
+            >
+              <span
+                className={cn(
+                  'block h-2 rounded-full transition-all duration-300',
+                  currentIndex === index ? 'bg-primary w-4' : 'bg-muted-foreground w-2 hover:brightness-110'
+                )}
+              />
+            </button>
           ))}
         </div>
       )}

@@ -19,11 +19,16 @@ import { useLoader } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
 import { cn } from '@js-monorepo/ui/util'
+import dynamic from 'next/dynamic'
 import { ReactNode, useState } from 'react'
 import { AiFillRocket } from 'react-icons/ai'
 import { SITE_NAME } from '../lib/site-config'
 import BannerSVG from './banner-svg'
-import { PlanGateShowcase } from './plan-gate-showcase'
+
+const PlanGateShowcase = dynamic(() => import('./plan-gate-showcase').then((mod) => mod.PlanGateShowcase), {
+  ssr: false,
+  loading: () => <div className="h-96 animate-pulse bg-muted rounded-xl" />,
+})
 interface MainProps {
   readonly children?: ReactNode
   readonly className?: string
