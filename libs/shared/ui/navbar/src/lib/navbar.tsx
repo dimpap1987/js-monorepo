@@ -1,31 +1,14 @@
 'use client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
+import { SidebarTrigger } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
 import React, { ReactNode, forwardRef, useMemo } from 'react'
-import { GiHamburgerMenu } from 'react-icons/gi'
 import { IoIosSettings } from 'react-icons/io'
 import { UserMetadata } from './components/user-metadata'
 import { UserOptionsDropdown } from './components/user-options.component'
 import './navbar.css'
-
-function SideBarIcon({ onSideBarClick, className }: { onSideBarClick?: () => void; className?: string }) {
-  return (
-    onSideBarClick && (
-      <div className={cn(`navbar-burger self-center cursor-pointer select-none`, className)} aria-label="user-options">
-        <button
-          onClick={onSideBarClick}
-          className="p-2.5 border border-border rounded-lg hover:bg-accent hover:border-accent transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-label="toggle sidebar"
-          tabIndex={0}
-        >
-          <GiHamburgerMenu className="text-lg" />
-        </button>
-      </div>
-    )
-  )
-}
 
 function NavUserOptions({
   user,
@@ -76,7 +59,6 @@ export interface DpNextNavbarProps {
   readonly user?: UserNavProps
   readonly plan?: string | null
   readonly onLogout?: () => void
-  readonly onSideBarClick?: () => void
 }
 export type UserNavProps = Partial<SessionUserType>
 
@@ -86,7 +68,7 @@ export type UserNavSocial = {
 }
 
 const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
-  ({ children, menuItems = [], user, plan, onLogout, onSideBarClick }, ref) => {
+  ({ children, menuItems = [], user, plan, onLogout }, ref) => {
     const isLoggedIn = !!user
 
     const { logo, navbarItems } = useMemo(() => {
@@ -119,55 +101,54 @@ const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
     return (
       <header>
         <nav
-          className="text-foreground border-b border-border-glass bg-background backdrop-blur supports-[backdrop-filter]:bg-background navbar-height overflow-hidden flex items-center shadow-sm"
+          className="border-b border-border-glass navbar-height overflow-hidden flex items-center shadow-sm w-full px-4 sm:px-6 gap-3 justify-between"
           ref={ref}
         >
-          <div className="px-4 sm:px-6 flex gap-3 justify-between w-full items-center self-stretch">
-            {logo}
-            <ul className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center gap-1 self-stretch">
-              {menuItems &&
-                menuItems?.length > 0 &&
-                menuItems.map((item, index) => (
-                  <li
-                    key={index}
-                    className={cn(`text-center text-nowrap relative content-center self-stretch`, item.className)}
-                  >
-                    {(item?.roles?.includes('PUBLIC') ||
-                      item?.roles?.some((role) => user?.roles?.includes(role as AuthRole))) && (
-                      <DpNextNavLink
-                        className="p-2 h-full flex items-center border-b-2 border-transparent content-center"
-                        activeClassName="border-primary"
-                        href={item.href}
-                      >
-                        {item.name}
-                      </DpNextNavLink>
-                    )}
-                  </li>
-                ))}
-            </ul>
-
-            <div className="flex items-center">
-              <section className="hidden sm:flex items-center gap-4 justify-end">
-                <>
-                  {navbarItems && navbarItems}
-
-                  {!isLoggedIn && (
-                    <DpNextNavLink href="/auth/login">
-                      <DpLoginButton></DpLoginButton>
+          {logo}
+          <ul className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center gap-1 self-stretch">
+            {menuItems &&
+              menuItems?.length > 0 &&
+              menuItems.map((item, index) => (
+                <li
+                  key={index}
+                  className={cn(`text-center text-nowrap relative content-center self-stretch`, item.className)}
+                >
+                  {(item?.roles?.includes('PUBLIC') ||
+                    item?.roles?.some((role) => user?.roles?.includes(role as AuthRole))) && (
+                    <DpNextNavLink
+                      className="p-2 h-full flex items-center border-b-2 border-transparent content-center"
+                      activeClassName="border-primary"
+                      href={item.href}
+                    >
+                      {item.name}
                     </DpNextNavLink>
                   )}
-                  {user && (
-                    <NavUserOptions
-                      className="hidden sm:block mt-[0.58rem]"
-                      user={user}
-                      plan={plan}
-                      onLogout={onLogout}
-                    />
-                  )}
-                </>
-              </section>
+                </li>
+              ))}
+          </ul>
 
-              <SideBarIcon className="block sm:hidden" onSideBarClick={onSideBarClick}></SideBarIcon>
+          <div className="flex items-center">
+            <section className="hidden sm:flex items-center gap-4 justify-end">
+              <>
+                {navbarItems && navbarItems}
+
+                {!isLoggedIn && (
+                  <DpNextNavLink href="/auth/login">
+                    <DpLoginButton></DpLoginButton>
+                  </DpNextNavLink>
+                )}
+                {user && (
+                  <NavUserOptions
+                    className="hidden sm:block mt-[0.58rem]"
+                    user={user}
+                    plan={plan}
+                    onLogout={onLogout}
+                  />
+                )}
+              </>
+            </section>
+            <div className="block sm:hidden">
+              <SidebarTrigger />
             </div>
           </div>
         </nav>
