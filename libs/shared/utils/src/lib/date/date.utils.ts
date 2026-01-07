@@ -55,11 +55,7 @@ export function toUserTimezone(date: Date, userTimezone: TimezoneId): Date {
 /**
  * Convert a date from user's timezone to UTC for storage
  */
-export function formatForUser(
-  date: Date | string | number,
-  userTimezone: string,
-  formatStr = DATE_CONFIG.FORMATS.RELATIVE
-): string {
+export function formatForUser(date: Date | string | number, userTimezone: string, formatStr = 'PPP'): string {
   return formatInTimeZone(new Date(date), userTimezone, formatStr)
 }
 

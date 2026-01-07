@@ -1,4 +1,5 @@
 import { ContainerTemplate } from '@js-monorepo/templates'
+import { LastUpdated } from '@next-app/components/last-updated'
 import { Metadata } from 'next'
 import { generateMetadata as generateSEOMetadata } from '../../../lib/seo'
 import { SITE_NAME } from '../../../lib/site-config'
@@ -13,17 +14,11 @@ export const metadata: Metadata = generateSEOMetadata({
 })
 
 function PrivacyCookieStatementPage() {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-
   return (
     <ContainerTemplate>
       <div className="mt-4 max-w-4xl mx-auto text-foreground">
         <h1 className="text-3xl font-bold mb-6 text-foreground">Privacy and Cookie Statement</h1>
-        <p className="text-muted-foreground mb-8">Last updated: {currentDate}</p>
+        <LastUpdated></LastUpdated>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-foreground">1. Introduction</h2>
