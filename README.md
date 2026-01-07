@@ -218,3 +218,7 @@ GitHub Actions workflows are configured for:
 - **Linting**: ESLint
 - **Type Safety**: TypeScript
 - **Testing**: Jest
+
+# TODO
+
+1. move all shadcn compoents in libs/shared/ui/components/src/lib/ui by executing comands from the oficial site
