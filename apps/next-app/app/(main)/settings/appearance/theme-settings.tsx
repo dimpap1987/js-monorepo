@@ -1,37 +1,17 @@
 'use client'
 
+import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 import { getEnabledThemes } from '@js-monorepo/theme-provider'
 import { cn } from '@js-monorepo/ui/util'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
 import { SettingsItem } from '../settings-items'
-import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 
 const themes = getEnabledThemes()
 
 export function ThemeSettings() {
   const { theme, setTheme, resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const currentTheme = mounted ? (theme === 'system' ? 'system' : resolvedTheme || theme || 'light') : 'light'
-
-  if (!mounted) {
-    return (
-      <section className="space-y-6 text-foreground">
-        <div className="mb-6">
-          <h2 className="mb-2">Appearance</h2>
-          <p className="text-sm text-foreground-muted">Customize how the app looks and feels</p>
-        </div>
-        <SettingsItem label="Theme">
-          <div className="text-sm text-foreground-muted">Loading themes...</div>
-        </SettingsItem>
-      </section>
-    )
-  }
+  const currentTheme = theme === 'system' ? 'system' : resolvedTheme || theme || 'light'
 
   return (
     <section className="space-y-6 text-foreground">

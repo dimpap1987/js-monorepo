@@ -3,7 +3,7 @@
 import { DpButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
-import { Calendar, CheckCircle, CreditCard, RefreshCw, Settings, XCircle } from 'lucide-react'
+import { Calendar, CheckCircle, CreditCard, RefreshCw, XCircle } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { Subscription } from '../../types'
 import {
@@ -12,6 +12,7 @@ import {
   apiRenewSubscription,
   generateIdempotencyKey,
 } from '../../utils/api'
+import { PlanBadge } from '../plan-badge'
 import { CancelSubscriptionDialog } from './cancel-subscription-dialog'
 import { RenewSubscriptionDialog } from './renew-subscription-dialog'
 
@@ -64,7 +65,7 @@ function StatusBadge({ status }: { status: SubscriptionStatus }) {
   const { label, className, icon: Icon } = config[status]
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs font-medium ${className}`}>
       <Icon className="h-3.5 w-3.5" />
       {label}
     </span>
@@ -224,10 +225,10 @@ export function SubscriptionManagement({
   return (
     <div className="space-y-6">
       {/* Plan Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2 flex-wrap">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h3 className="text-xl font-semibold text-foreground capitalize">{planName} Plan</h3>
+            <h2 className="font-semibold text-foreground capitalize">{planName} Plan</h2>
             <StatusBadge status={status} />
           </div>
           <p className="text-2xl font-bold text-foreground">
@@ -235,6 +236,7 @@ export function SubscriptionManagement({
             <span className="text-base font-normal text-foreground-neutral">/{planInterval}</span>
           </p>
         </div>
+        <PlanBadge plan={planName} size="md"></PlanBadge>
       </div>
 
       {/* Billing Info */}
