@@ -11,6 +11,8 @@ import {
 } from '@js-monorepo/components/ui/dialog'
 import { RefreshCw } from 'lucide-react'
 import { Subscription } from '../../types'
+import { formatForUser } from '@js-monorepo/utils/date'
+import { useTimezone } from '@js-monorepo/next/hooks'
 
 interface RenewSubscriptionDialogProps {
   isOpen: boolean
@@ -29,12 +31,9 @@ export function RenewSubscriptionDialog({
   subscription,
   planName,
 }: RenewSubscriptionDialogProps) {
+  const userTimezone = useTimezone()
   const nextChargeDate = subscription?.currentPeriodEnd
-    ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      })
+    ? formatForUser(subscription.currentPeriodEnd, userTimezone, 'PPP')
     : null
 
   return (

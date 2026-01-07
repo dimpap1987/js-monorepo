@@ -11,6 +11,8 @@ import {
 } from '@js-monorepo/components/ui/dialog'
 import { AlertTriangle, Calendar, X } from 'lucide-react'
 import { Subscription } from '../../types'
+import { formatForUser } from '@js-monorepo/utils/date'
+import { useTimezone } from '@js-monorepo/next/hooks'
 
 interface CancelSubscriptionDialogProps {
   isOpen: boolean
@@ -31,12 +33,9 @@ export function CancelSubscriptionDialog({
   planName,
   features,
 }: CancelSubscriptionDialogProps) {
+  const userTimezone = useTimezone()
   const periodEnd = subscription?.currentPeriodEnd
-    ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+    ? formatForUser(subscription.currentPeriodEnd, userTimezone, 'PPP')
     : null
 
   return (

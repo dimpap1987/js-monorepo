@@ -6,6 +6,8 @@ import { useNotifications } from '@js-monorepo/notification'
 import { Calendar, CheckCircle, CreditCard, RefreshCw, XCircle } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { Subscription } from '../../types'
+import { formatForUser } from '@js-monorepo/utils/date'
+import { useTimezone } from '@js-monorepo/next/hooks'
 import {
   apiCancelSubscription,
   apiCreatePortalSession,
@@ -87,24 +89,15 @@ export function SubscriptionManagement({
   const [isLoading, setIsLoading] = useState(false)
   const [isPortalLoading, setIsPortalLoading] = useState(false)
   const { addNotification } = useNotifications()
+  const userTimezone = useTimezone()
 
   const status = getSubscriptionStatus(subscription)
 
   const periodEnd = subscription?.currentPeriodEnd
-    ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+    ? formatForUser(subscription.currentPeriodEnd, userTimezone, 'PPP')
     : null
 
-  const cancelAt = subscription?.cancelAt
-    ? new Date(subscription.cancelAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : null
+  const cancelAt = subscription?.cancelAt ? formatForUser(subscription.cancelAt, userTimezone, 'PPP') : null
 
   const handleCancelClick = useCallback(() => {
     setIsCancelDialogOpen(true)

@@ -7,15 +7,13 @@ import { useCallback, useEffect, useState } from 'react'
 import { Invoice } from '../../types'
 import { apiGetInvoices } from '../../utils/api'
 import { InvoiceStatusBadge } from './invoice-status-badge'
+import { formatForUser } from '@js-monorepo/utils/date'
+import { useTimezone } from '@js-monorepo/next/hooks'
 
 const PAGE_SIZE = 5
 
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
+function formatDate(dateString: string, userTimezone: string): string {
+  return formatForUser(dateString, userTimezone, 'PPP')
 }
 
 function formatAmount(amount: number, currency: string): string {
@@ -25,7 +23,7 @@ function formatAmount(amount: number, currency: string): string {
   }).format(amount / 100)
 }
 
-function InvoiceRow({ invoice }: { invoice: Invoice }) {
+function InvoiceRow({ invoice, userTimezone }: { invoice: Invoice; userTimezone: string }) {
   const handleDownload = () => {
     if (invoice.pdfUrl) {
       window.open(invoice.pdfUrl, '_blank', 'noopener,noreferrer')
@@ -51,7 +49,7 @@ function InvoiceRow({ invoice }: { invoice: Invoice }) {
             </span>
             <InvoiceStatusBadge status={invoice.status} />
           </div>
-          <p className="text-sm text-foreground-neutral">{formatDate(invoice.createdAt)}</p>
+          <p className="text-sm text-foreground-neutral">{formatDate(invoice.createdAt, userTimezone)}</p>
         </div>
       </div>
 
@@ -129,6 +127,7 @@ export function InvoiceHistory() {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const userTimezone = useTimezone()
 
   // Initial load
   const loadInitial = useCallback(async () => {
@@ -194,7 +193,7 @@ export function InvoiceHistory() {
     <div>
       <div className="divide-y divide-border">
         {invoices.map((invoice) => (
-          <InvoiceRow key={invoice.id} invoice={invoice} />
+          <InvoiceRow key={invoice.id} invoice={invoice} userTimezone={userTimezone} />
         ))}
       </div>
       {hasMore && (

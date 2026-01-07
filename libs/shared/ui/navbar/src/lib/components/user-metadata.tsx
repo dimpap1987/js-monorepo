@@ -1,7 +1,11 @@
+'use client'
+
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { PlanBadge } from '@js-monorepo/payments-ui'
 import { cn } from '@js-monorepo/ui/util'
 import { FaAt } from 'react-icons/fa'
+import { formatForUser } from '@js-monorepo/utils/date'
+import { useTimezone } from '@js-monorepo/next/hooks'
 
 export function UserMetadata({
   profileImage,
@@ -16,6 +20,7 @@ export function UserMetadata({
   plan?: string | null
   className?: string | null
 }) {
+  const userTimezone = useTimezone()
   return (
     <div className={cn('px-1 py-4 flex gap-3 items-center w-full', className)}>
       <Avatar className="h-10 w-10">
@@ -33,7 +38,7 @@ export function UserMetadata({
         </div>
         {createdAt && (
           <div className="text-xs text-foreground-muted mt-1">
-            Member since {new Date(createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            Member since {formatForUser(createdAt, userTimezone, 'MMM yyyy')}
           </div>
         )}
       </div>

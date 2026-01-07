@@ -9,6 +9,8 @@ import { Input } from '@js-monorepo/components/ui/form'
 import { useNotifications } from '@js-monorepo/notification'
 import { EditUserSchema } from '@js-monorepo/schemas'
 import { compressAvatar } from '@js-monorepo/utils/common'
+import { formatForUser } from '@js-monorepo/utils/date'
+import { useTimezone } from '@js-monorepo/next/hooks'
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { SettingsItem } from '../settings-items'
@@ -21,6 +23,7 @@ export function AccountSettings() {
   const { addNotification } = useNotifications()
   const user = session?.user
   const updateUserAccountMutation = useUpdateUserAccount()
+  const userTimezone = useTimezone()
 
   const initUser = useMemo(
     () => ({
@@ -206,13 +209,7 @@ export function AccountSettings() {
           <div className="gap-4 flex">
             <dt className="text-sm font-medium text-foreground-muted content-center">Account Created</dt>
             <dd className="text-foreground font-medium">
-              {user?.createdAt
-                ? new Date(user.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })
-                : 'N/A'}
+              {user?.createdAt ? formatForUser(user.createdAt, userTimezone, 'PPP') : 'N/A'}
             </dd>
           </div>
 

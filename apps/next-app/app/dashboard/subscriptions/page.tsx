@@ -14,6 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
 import { PlanBadge } from '@js-monorepo/payments-ui'
 import { apiClient } from '@js-monorepo/utils/http'
+import { formatForUser } from '@js-monorepo/utils/date'
+import { DATE_CONFIG } from '@js-monorepo/utils/date/constants'
+import { useTimezone } from '@js-monorepo/next/hooks'
 import { useQuery } from '@tanstack/react-query'
 import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -155,6 +158,7 @@ export default function SubscriptionsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [status, setStatus] = useState<string>('')
   const pageSize = 10
+  const userTimezone = useTimezone()
 
   const debouncedSearch = useDebounce(searchInput, 300)
 
@@ -284,7 +288,7 @@ export default function SubscriptionsPage() {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p>{new Date(sub.currentPeriodEnd).toLocaleDateString()}</p>
+                        <p>{formatForUser(sub.currentPeriodEnd, userTimezone, DATE_CONFIG.FORMATS.DISPLAY)}</p>
                         <p className="text-sm text-muted-foreground">
                           {formatRelativeDate(new Date(sub.currentPeriodEnd))}
                         </p>
