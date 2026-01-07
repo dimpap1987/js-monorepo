@@ -180,7 +180,7 @@ export function Pricing() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Hero Section */}
       <PricingHero
         title="Choose Your Plan."

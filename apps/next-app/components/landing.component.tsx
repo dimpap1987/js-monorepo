@@ -176,7 +176,7 @@ export default function LandingComponent({ children, className }: MainProps) {
       </div>
 
       {/* Component Showcase Section */}
-      <div className="my-12 space-y-8">
+      <div className="my-12 space-y-6">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-2">Component Showcase</h2>
           <p className="text-muted-foreground">Explore our reusable components</p>

@@ -19,7 +19,7 @@ const BackArrowWithLabel = React.forwardRef<HTMLDivElement, BackArrowWithLabelPr
         {isMobile && (
           <BackArrow className={cn('mt-1 shrink-0 transition-transform group-hover:-translate-x-1', arrowClassName)} />
         )}
-        <div className="flex-1 text-end">{children}</div>
+        <div className="flex-1 text-center sm:text-start">{children}</div>
       </div>
     )
   }

@@ -47,7 +47,7 @@ const NotificationPermissionComponent = () => {
       {/* Page Header */}
       <BackArrowWithLabel>
         <h2 className="mb-2">Notification Settings</h2>
-        <p className="text-sm text-foreground-muted">Control how you receive notifications and alerts</p>
+        <p className="text-sm text-foreground-muted">Control how you receive notifications</p>
       </BackArrowWithLabel>
 
       <SettingsItem label="Push Notifications">

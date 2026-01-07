@@ -76,11 +76,11 @@ export function AccountSettings() {
   const profileImageWatch = form.watch('profileImage')
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-6">
       {/* Page Header */}
       <BackArrowWithLabel>
         <h2 className="mb-2">Account Settings</h2>
-        <p className="text-sm text-foreground-muted">Manage your profile information and account details</p>
+        <p className="text-sm text-foreground-muted">Manage your profile information</p>
       </BackArrowWithLabel>
 
       {/* Profile Section */}
@@ -104,7 +104,7 @@ export function AccountSettings() {
                   name="profileImage"
                   render={({ field }) => (
                     <div className="relative">
-                      <Avatar className="h-28 w-28 ring-2 ring-border ring-offset-2 ring-offset-background">
+                      <Avatar className="h-24 w-24 ring-2 ring-border ring-offset-2 ring-offset-background">
                         {profileImageWatch && <AvatarImage src={profileImageWatch} alt="user's picture" />}
                         <AvatarFallback className="bg-background-secondary text-lg font-semibold">
                           {user?.username?.charAt(0).toUpperCase() || 'NA'}
@@ -210,8 +210,8 @@ export function AccountSettings() {
       {/* Account Metadata Section */}
       <SettingsItem label="Account Details">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="space-y-1">
-            <dt className="text-sm font-medium text-foreground-muted mb-1">Account Created</dt>
+          <div className="gap-4 flex">
+            <dt className="text-sm font-medium text-foreground-muted content-center">Account Created</dt>
             <dd className="text-foreground font-medium">
               {user?.createdAt
                 ? new Date(user.createdAt).toLocaleDateString('en-US', {
@@ -224,8 +224,8 @@ export function AccountSettings() {
           </div>
 
           {isAdmin && (
-            <div className="space-y-1">
-              <dt className="text-sm font-medium text-foreground-muted mb-1">Roles</dt>
+            <div className="gap-4 flex">
+              <dt className="text-sm font-medium text-foreground-muted content-center">Roles</dt>
               <dd className="text-foreground font-medium">
                 {user?.roles && user.roles.length > 0 ? (
                   <span className="inline-flex items-center gap-2">

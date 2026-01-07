@@ -99,11 +99,11 @@ export function SubscriptionSettings() {
   const isLoading = isLoadingPlans || isLoadingSubscription
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-6">
       {/* Page Header */}
       <BackArrowWithLabel>
         <h2 className="mb-2">Subscription</h2>
-        <p className="text-sm text-foreground-muted">Manage your subscription and billing preferences</p>
+        <p className="text-sm text-foreground-muted">Manage your subscription and billing</p>
       </BackArrowWithLabel>
 
       {/* Subscription Management */}
