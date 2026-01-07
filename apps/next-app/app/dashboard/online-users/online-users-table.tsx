@@ -1,7 +1,7 @@
 'use client'
 
-import { Badge } from '@js-monorepo/components/badge'
-import { Skeleton } from '@js-monorepo/components/skeleton'
+import { Badge } from '@js-monorepo/components/ui/badge'
+import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import {
   useWebSocketEvent,
   useWebSocketEmit,

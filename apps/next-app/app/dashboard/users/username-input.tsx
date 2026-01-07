@@ -1,6 +1,6 @@
 'use client'
 
-import { Input } from '@js-monorepo/components/form'
+import { Input } from '@js-monorepo/components/ui/form'
 import { AuthUserUpdateDto } from '@js-monorepo/types'
 import { Row } from '@tanstack/react-table'
 import React from 'react'

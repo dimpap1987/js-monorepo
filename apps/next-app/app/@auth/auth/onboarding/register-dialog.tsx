@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { RegisterDialogComponent } from '@js-monorepo/dialog'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'

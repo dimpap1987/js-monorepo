@@ -1,10 +1,10 @@
 'use client'
 
 import { useCallback, useState, useRef } from 'react'
-import { Card } from '../card'
-import { Progress } from '../progress'
+import { Card } from './card'
+import { Progress } from './progress'
 import { X, Upload, File as FileIcon, CheckCircle2, AlertCircle } from 'lucide-react'
-import { Button } from '../button'
+import { Button } from './button'
 import { cn } from '@js-monorepo/ui/util'
 
 export interface FileUploadFile {

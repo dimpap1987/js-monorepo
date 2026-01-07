@@ -1,17 +1,16 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
-import { Badge } from '@js-monorepo/components/badge'
-import { Card, CardContent } from '@js-monorepo/components/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
+import { Badge } from '@js-monorepo/components/ui/badge'
+import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@js-monorepo/components/dropdown'
-import { Input } from '@js-monorepo/components/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
+} from '@js-monorepo/components/ui/dropdown'
+import { Input } from '@js-monorepo/components/ui/form'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
 import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
 import { PlanBadge } from '@js-monorepo/payments-ui'
 import { apiClient } from '@js-monorepo/utils/http'

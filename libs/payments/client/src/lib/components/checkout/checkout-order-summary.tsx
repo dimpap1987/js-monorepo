@@ -1,7 +1,7 @@
 'use client'
 
-import { Card, CardContent, CardHeader } from '@js-monorepo/components/card'
-import { Separator } from '@js-monorepo/components/separator'
+import { Card, CardContent, CardHeader } from '@js-monorepo/components/ui/card'
+import { Separator } from '@js-monorepo/components/ui/separator'
 import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
 import { PlanBadge } from '../plan-badge'

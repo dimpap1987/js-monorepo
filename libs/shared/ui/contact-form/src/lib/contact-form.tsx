@@ -1,7 +1,7 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
-import { Card } from '@js-monorepo/components/card'
+import { Card } from '@js-monorepo/components/ui/card'
 import {
   Form,
   FormControl,
@@ -10,9 +10,9 @@ import {
   FormItem,
   FormLabel,
   Input,
-} from '@js-monorepo/components/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/select'
-import { Textarea } from '@js-monorepo/components/textarea'
+} from '@js-monorepo/components/ui/form'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
+import { Textarea } from '@js-monorepo/components/ui/textarea'
 import { useNotifications } from '@js-monorepo/notification'
 import { ContactCategory, CONTACT_CATEGORIES } from '@js-monorepo/types'
 import { z } from 'zod'

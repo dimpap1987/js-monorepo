@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import React from 'react'
 import { LocationListProps, ThingsToDoContentProps } from '../app/types'
 import DynamicIcon from '../shared/dynamic-icon'

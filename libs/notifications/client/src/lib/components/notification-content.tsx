@@ -59,7 +59,7 @@ export function NotificationContent({
   )
 
   return (
-    <div className="flex items-center gap-3 w-full">
+    <div className="flex items-center gap-2 w-full">
       {/* Unread indicator dot */}
       {showReadIndicator && (
         <div className="flex-shrink-0 pt-1.5 transform -translate-y-[90%]">

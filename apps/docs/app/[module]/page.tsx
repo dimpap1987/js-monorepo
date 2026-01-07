@@ -1,4 +1,4 @@
-import jsonData from '../../public/README.json'
+import jsonData from '../../data/README.json'
 import DocPage from './DocPage'
 
 interface PageProps {

@@ -1,9 +1,6 @@
 'use client'
-import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
-import { UserMetadata } from '@js-monorepo/navbar'
-import { ReactNode, useMemo, memo } from 'react'
-import { X } from 'lucide-react'
+import { Button } from '@js-monorepo/components/ui/button'
+import { Separator } from '@js-monorepo/components/ui/separator'
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +11,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@js-monorepo/components/ui/sidebar'
-import { Button } from '@js-monorepo/components/button'
+import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { UserMetadata } from '@js-monorepo/navbar'
+import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
+import { X } from 'lucide-react'
+import { memo, ReactNode, useMemo } from 'react'
 
 export type SidebarPositionType = 'right' | 'left'
 
@@ -33,9 +34,9 @@ const MenuSideBarItem = memo(({ item, onClose }: { item: MenuItem; onClose: () =
       <DpNextNavLink
         href={item.href}
         onClick={onClose}
-        className="flex items-end flex-row-reverse gap-3 text-base p-3 w-full h-full"
+        className="flex items-end flex-row-reverse gap-3 text-base p-3 px-5 w-full h-full tracking-wide"
       >
-        {item.Icon && <item.Icon className="h-5 w-5" />}
+        {item.Icon && <item.Icon className="h-5 w-5 self-center" />}
         <span>{item.name}</span>
       </DpNextNavLink>
     </SidebarMenuButton>
@@ -56,7 +57,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
   return (
     <Sidebar side="right" variant="inset" collapsible="offcanvas" className={className}>
       <SidebarHeader>
-        <div className="flex items-center justify-between py-4 px-2 border-b-2 border-border">
+        <div className="flex items-center justify-between my-4 py-2 px-2 border-b border-border">
           {user?.username && (
             <UserMetadata
               profileImage={user.profile?.image}
@@ -70,16 +71,16 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
         </div>
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
           onClick={() => setOpenMobile(false)}
-          className="md:hidden absolute top-3 right-3"
+          className="md:hidden absolute top-2 right-2"
           aria-label="close sidebar"
         >
           <X className="h-5 w-5" />
         </Button>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="flex-none">
         <SidebarMenu>
           {filteredItems.map((item) => (
             <MenuSideBarItem key={item.name} item={item} onClose={() => setOpenMobile(false)} />
@@ -87,9 +88,10 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
         </SidebarMenu>
       </SidebarContent>
 
+      <Separator className="my-4"></Separator>
       {children && (
         <SidebarFooter>
-          <div className="w-full text-center p-3">{children}</div>
+          <div className="w-full text-center">{children}</div>
         </SidebarFooter>
       )}
     </Sidebar>

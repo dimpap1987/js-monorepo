@@ -1,4 +1,4 @@
-import { Card } from '@js-monorepo/components/card'
+import { Card } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpVersion } from '@js-monorepo/version'
 

@@ -1,5 +1,5 @@
 import { DpButton } from '@js-monorepo/button'
-import { Dialog, DialogFooter, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/dialog'
+import { Dialog, DialogFooter, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/ui/dialog'
 import { TiWarning } from 'react-icons/ti'
 export type ErrorDialogProps = {
   isOpen: boolean

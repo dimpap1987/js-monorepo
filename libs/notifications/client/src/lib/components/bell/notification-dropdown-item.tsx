@@ -1,6 +1,6 @@
 'use client'
 
-import { DropdownMenuItem } from '@js-monorepo/components/dropdown'
+import { DropdownMenuItem } from '@js-monorepo/components/ui/dropdown'
 import { UserNotificationType } from '@js-monorepo/types'
 import React from 'react'
 import { getNotificationContainerClasses, NotificationContent } from '../notification-content'

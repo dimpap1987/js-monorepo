@@ -1,0 +1,177 @@
+[
+  {
+    "path": "libs/shared/ui/ai-image-generator",
+    "data": "# ai-image-generator\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test ai-image-generator` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "ai-image-generator"
+  },
+  {
+    "path": "libs/shared/ui/announcements",
+    "data": "# announcements\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test announcements` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "announcements"
+  },
+  {
+    "path": "libs/shared/ui/back-arrow",
+    "data": "# back-arrow\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test back-arrow` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "back-arrow"
+  },
+  {
+    "path": "libs/shared/ui/bottom-navbar",
+    "data": "# bottom-navbar\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test bottom-navbar` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "bottom-navbar"
+  },
+  {
+    "path": "libs/shared/ui/button",
+    "data": "# DpButton\n\n## Example\n\n```tsx\nimport { DpButton } from '@js-monorepo/button'\n\nexport default function Example() {\n  return <DpButton>Submit</DpButton>\n}\n```\n\n## Properties\n\n- variant?: `'primary' | 'secondary' | 'danger'` **_-- default: 'primary'_**\n- size?: `'small' | 'medium' | 'large'` **_-- default: 'medium'_**\n- className?: `string`\n- children?: `React.ReactNode`\n- loading?: `boolean` **_-- default: false_**\n",
+    "module": "button"
+  },
+  {
+    "path": "libs/payments/client",
+    "data": "# payments\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test payments` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "client"
+  },
+  {
+    "path": "libs/notifications/client",
+    "data": "# notifications\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test notifications` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "client"
+  },
+  {
+    "path": "libs/shared/ui/components",
+    "data": "# table\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test table` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "components"
+  },
+  {
+    "path": "libs/prisma/db",
+    "data": "# db\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test db` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "db"
+  },
+  {
+    "path": "libs/shared/ui/dialog",
+    "data": "# DpDialog\n\n## Example\n\n```jsx\nimport { DpDialog, DpDialogHeader, DpDialogContent, DpDialogFooter } from '@js-monorepo/dialog'\n\nexport default function Example() {\n  const [isOpen, setIsOpen] = useState(false)\n\n  return (\n    <DpDialog isOpen={isOpen} onClose={setIsOpen(false)}>\n      <DpDialogHeader>**Your Header**</DpDialogHeader>\n      <DpDialogContent>**Your content**</DpDialogContent>\n      <DpDialogFooter>**Your Footer**</DpDialogFooter>\n    </DpDialog>\n  )\n}\n```\n\n## Properties\n\n- isOpen?: `boolean` **_--- default: true_**\n- onClose: () => `void`\n- children: `React.ReactNode`\n- className?: `string`\n\n# DpLoginDialog\n\n## Example\n\n```jsx\nimport { DpLoginDialog } from '@js-monorepo/dialog'\n\nconst socialLogin: SocialConfig[] = [\n  {\n    type: 'github',\n    onLogin: () => {},\n  },\n  {\n    type: 'google',\n    onLogin: () => {},\n  },\n  {\n    type: 'facebook',\n    onLogin: () => {},\n  },\n]\nexport default function Example() {\n  const [isLoginDialog, setIsLoginDialog] = useState(false)\n\n  return (\n    <DpLoginDialog\n      socialConfig={socialLogin}\n      isOpen={isLoginDialog}\n      onClose={() => setIsLoginDialog(false)}\n    ></DpLoginDialog>\n  )\n}\n```\n\n## Properties\n\n- isOpen?: `boolean` **_--- default: true_**\n- onClose: () => `void`\n- socialConfig: `SocialConfig[]`\n\n# DpConfirmationDialog\n\n## Example\n\n```jsx\nexport default function Example() {\n  const [isOpenDialog, setOpenDialog] = useState(false)\n\n  return (\n    <DpConfirmationDialog\n      isOpen={isOpenDialog}\n      onClose={() => setOpenDialog(false)}\n      onCancel={() => setOpenDialog(false)}\n      onConfirm={async () => setOpenDialog(false)}\n    ></DpConfirmationDialog>\n  )\n}\n```\n\n## Properties\n\n- className?: `string`\n- isOpen: `boolean`\n- onClose: () => `void`\n- title?: `string` // Header content\n- content?: `string | ReactNode` // Main content\n- confirmLabel?: `string` // Confirm button label\n- onConfirm?: () => `void` // Confirm button action\n- cancelLabel?: `string` // Cancel button label\n- onCancel?: () => `void` // Cancel button action\n",
+    "module": "dialog"
+  },
+  {
+    "path": "libs/shared/ui/error",
+    "data": "# error-boundary\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test error-boundary` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "error"
+  },
+  {
+    "path": "libs/shared/ui/loader",
+    "data": "# DpLoaderProvider\n\n## Example\n\n```jsx\n// example.tsx\nimport { DpLoaderProvider } from '@js-monorepo/loader'\n\nexport function Example() {\n  return (\n    <DpLoaderProvider>\n      <Component></Component>\n    </DpLoaderProvider>\n  )\n}\n```\n\n```jsx\n// component.tsx\nimport { useLoader } from '@js-monorepo/loader'\n\nexport function Component() {\n  const { state, setLoaderState } = useLoader()\n\n  return <button onClick={() => setLoaderState({ show: true, message: 'Loading' })}>Trigger loading</button>\n}\n```\n",
+    "module": "loader"
+  },
+  {
+    "path": "libs/shared/ui/map",
+    "data": "<h1 style=\"display:inline\"> DpNextMap </h1> <sub>a nextjs library</sub>\n\n## Example\n\n```jsx\nimport { DpNextMap, DpMarker, DpPopup } from '@js-monorepo/map'\n\nexport function Example() {\n  return (\n    <DpNextMap\n      mapContainerProps={{\n        center: { lat: 37.98381, lng: 23.727539 },\n        zoom: 10,\n      }}\n    >\n      <DpMarker\n        position={{\n          lat: 37.98381,\n          lng: 23.727539,\n        }}\n      >\n        <DpPopup>You are here</DpPopup>\n      </DpMarker>\n    </DpNextMap>\n  )\n}\n```\n",
+    "module": "map"
+  },
+  {
+    "path": "libs/shared/ui/markdown",
+    "data": "# DpMarkdown\n\n## Example\n\n```jsx\nimport { DpMarkdown } from '@js-monorepo/markdown'\nconst markdownExample = `\n    # Heading\n    ## Sub heading\n    - point\n    some text\n  `\n\nexport function Example() {\n  return <DpMarkdown markdownCode={markdownExample}></DpMarkdown>\n}\n```\n\n## Properties\n\n- markdownCode: `string`\n- className?: `string`\n",
+    "module": "markdown"
+  },
+  {
+    "path": "libs/shared/ui/nav-link",
+    "data": "<h1 style=\"display:inline\"> DpNextNavLink </h1> <sub>a nextjs library</sub>\n\n## Example\n\n```jsx\nimport { DpNextNavLink } from '@js-monorepo/nav-link'\n\nexport function Example() {\n  return <DpNextNavLink href={'/example'}>example</DpNextNavLink>\n}\n```\n\n**_IMPORTANT_**  \nIf you want to use `<DpNextPageProgressBar>`, then you must use `<DpNextNavLink>`\n",
+    "module": "nav-link"
+  },
+  {
+    "path": "libs/shared/ui/navbar",
+    "data": "<h1 style=\"display:inline\"> DpNextNavbar </h1> <sub>a nextjs library</sub>\n\n## Example\n\n```jsx\nimport {\n  DpLogo,\n  DpNextNavbar,\n  UserNavSocial,\n} from '@js-monorepo/navbar'\n\nexport function Example() {\n\n    const socials: UserNavSocial[] = [\n        {\n            type: 'github',\n            onLogin: () => {},\n        },\n        {\n            type: 'google',\n            onLogin: () => {},\n        },\n        {\n            type: 'facebook',\n            onLogin: () => {},\n        },\n    ]\n    const menuItems: MenuItem[] = [\n        {\n            href: '/',\n            name: 'Home',\n        },\n        {\n            href: '/about',\n            name: 'About',\n        },\n    ]\n  return (\n    <DpNextNavbar\n      user={{ isLoggedIn: true, username: 'username1' }}\n      socialLogin={socials}\n      menuItems={menuItems}\n      onLogout={() => console.log('logged out')}\n    >\n      <DpLogo>\n        Next App\n      </DpLogo>\n    </DpNextNavbar>\n  )\n}\n```\n\n## Properties\n\n- children?: `ReactNode`\n- menuItems?: `MenuItem[]`\n- user?: `UserNavProps`\n- socialLogin?: `UserNavSocial[]`\n- onLogout?: () => `void`\n",
+    "module": "navbar"
+  },
+  {
+    "path": "libs/auth/nest",
+    "data": "# auth\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test auth` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "nest"
+  },
+  {
+    "path": "libs/nest-utils",
+    "data": "# nest-utils\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Building\n\nRun `nx build nest-utils` to build the library.\n\n## Running unit tests\n\nRun `nx test nest-utils` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "nest-utils"
+  },
+  {
+    "path": "libs/next",
+    "data": "# client\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test client` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "next"
+  },
+  {
+    "path": "libs/auth/next",
+    "data": "# auth-client\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test auth-client` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "next"
+  },
+  {
+    "path": "libs/shared/ui/notification",
+    "data": "# DpNotificationProvider\n\n## Example\n\n```jsx\n// example.tsx\nimport { DpNotificationProvider } from '@js-monorepo/notification'\n\nexport function Example() {\n  return (\n    <DpNotificationProvider>\n      <Component></Component>\n    </DpNotificationProvider>\n  )\n}\n```\n\n```jsx\n// component.tsx\nimport { useNotifications } from '@js-monorepo/notification'\n\nexport function Component() {\n  const { addNotification } = useNotifications()\n  return (\n    <button\n      onClick={() =>\n        addNotification({\n          message: 'Something went wrong',\n          description: 'Please try again later...',\n          type: 'error',\n          duration: 4000,\n        })\n      }\n    >\n      Submit\n    </button>\n  )\n}\n```\n\n> addNotification: (notification: NotificationType) => void\n\nNotificationType\n\n- id?: `number`\n- type: `'success' | 'error' | 'spinner'`\n- message: `string`\n- description?: `string`\n- duration?: `number`\n",
+    "module": "notification"
+  },
+  {
+    "path": "libs/shared/ui/page-progress-bar",
+    "data": "<h1 style=\"display:inline\"> DpNextPageProgressBar </h1> <sub>a nextjs library</sub>\n\n## Example\n\n```jsx\nimport { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'\n\nexport function Example() {\n  return <DpNextPageProgressBar color=\"red\">{children}</DpNextPageProgressBar>\n}\n```\n\n**_IMPORTANT_**  \nIf you want to use `<DpNextNavLink>`, then you must use `<DpNextPageProgressBar>`\n\n## Properties\n\n- children: `React.ReactNode`\n- color?: `string`\n- height?: `string`\n- options?: `Partial<NProgressOptions>`\n- shallowRouting?: `boolean`\n- delay?: `number`\n- style?: `string`\n",
+    "module": "page-progress-bar"
+  },
+  {
+    "path": "libs/shared/ui/pagination",
+    "data": "# pagination\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test pagination` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "pagination"
+  },
+  {
+    "path": "libs/shared/ui/payment",
+    "data": "# DpCheckoutDialog\n\n## Example\n\n```jsx\nimport { DpCheckoutDialog } from '@js-monorepo/payment'\nimport { checkoutSessionClient } from '@js-monorepo/utils'\n\nexport function Example() {\n  const [isOpenCheckoutDialog, setOpenCheckoutDialog] = useState(false)\n\n  return (\n    <DpCheckoutDialog\n      stripePublishableKey={process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''}\n      isOpen={isOpenCheckoutDialog}\n      onClose={() => setOpenCheckoutDialog(false)}\n      checkOutPromise={() =>\n        checkoutSessionClient({\n          username: 'username',\n          url: '/api/checkout_sessions',\n          customSubmitMessage: 'Thank you for your support',\n          isDonate: true,\n          price: 500,\n        })\n      }\n    />\n  )\n}\n```\n",
+    "module": "payment"
+  },
+  {
+    "path": "libs/shared/schemas",
+    "data": "# schemas\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test schemas` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "schemas"
+  },
+  {
+    "path": "libs/payments/server",
+    "data": "# payments-server\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test payments-server` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "server"
+  },
+  {
+    "path": "libs/notifications/server",
+    "data": "# notifications-server\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test notifications-server` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "server"
+  },
+  {
+    "path": "libs/shared/ui/sidebar",
+    "data": "<h1 style=\"display:inline\"> DpNextSidebar </h1> <sub>a nextjs library</sub>\n\n## Example\n\n```jsx\nimport { DpNextSidebar, MenuItem } from '@js-monorepo/sidebar'\n\nexport function Example() {\n  const [openSideBar, setOpenSideBar] = useState(false)\n  return (\n    <DpNextSidebar\n      isOpen={openSideBar}\n      onClose={() => setOpenSideBar(false)}\n      position=\"right\"\n      items={menuItems}\n    ></DpNextSidebar>\n  )\n}\n```\n\n## Properties\n\n- children?: `ReactNode`\n- isOpen: `boolean`\n- onClose: () => `void`\n- position?: `SidebarPositionType`\n- items: `MenuItem[]`\n- header?: `string`\n",
+    "module": "sidebar"
+  },
+  {
+    "path": "libs/shared/styles",
+    "data": "# styles\n\n## How to use\n\n```css\n@import '@js-monorepo/base';\n```\n\n**_NOTE_**  \nYou need to create a typescript project in order to use it\nbecause it is being imported from tsconfig.\\*.json\n\n## @js-monorepo/base\n\n```css\nhtml,\nbody,\nmain {\n  scroll-behavior: smooth;\n  font-size: 14px;\n}\n\n.min-h-100svh {\n  min-height: 100vh;\n  min-height: 100svh;\n}\n\n*,\n*:before,\n*:after {\n  box-sizing: border-box;\n}\n\n* {\n  font: inherit;\n  margin: 0;\n  padding: 0;\n}\n\nimg {\n  max-width: 100%;\n  height: auto;\n}\n```\n\n## import tailwind\n\n```css\n@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\nh1 {\n  @apply text-2xl;\n  @apply font-bold;\n}\n\nh2 {\n  @apply text-xl;\n  @apply font-bold;\n}\n\nh3 {\n  @apply text-lg;\n  @apply font-bold;\n}\n\nh4 {\n  @apply text-lg;\n  @apply font-semibold;\n}\n```\n",
+    "module": "styles"
+  },
+  {
+    "path": "libs/shared/ui/templates",
+    "data": "# templates\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test templates` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "templates"
+  },
+  {
+    "path": "libs/shared/ui/theme-provider",
+    "data": "# theme-provider\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test theme-provider` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "theme-provider"
+  },
+  {
+    "path": "libs/shared/types",
+    "data": "# types\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test types` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "types"
+  },
+  {
+    "path": "libs/websockets/user-presence",
+    "data": "# user-presence\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test user-presence` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "user-presence"
+  },
+  {
+    "path": "libs/shared/ui/version",
+    "data": "# DpVersion\n\n## Example\n\n```jsx\nimport { DpVersion } from '@js-monorepo/version'\n\nexport function Example() {\n  return <DpVersion></DpVersion>\n}\n```\n",
+    "module": "version"
+  },
+  {
+    "path": "libs/shared/ui/web-notification",
+    "data": "# web-notification\n\nThis library was generated with [Nx](https://nx.dev).\n\n## Running unit tests\n\nRun `nx test web-notification` to execute the unit tests via [Jest](https://jestjs.io).\n",
+    "module": "web-notification"
+  }
+]

@@ -3,16 +3,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
-import {
-  Form,
-  FormControl,
-  FormErrorDisplay,
-  FormField,
-  FormItem,
-  FormLabel,
-  Input,
-} from '@js-monorepo/components/form'
+import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
+import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
+import { Input } from '@js-monorepo/components/ui/form'
 import { useNotifications } from '@js-monorepo/notification'
 import { EditUserSchema } from '@js-monorepo/schemas'
 import { compressAvatar } from '@js-monorepo/utils/common'

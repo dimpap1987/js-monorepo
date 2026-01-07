@@ -1,4 +1,4 @@
-import { Carousel } from '@js-monorepo/components/carousel'
+import { Carousel } from '@js-monorepo/components/ui/carousel'
 import { ContainerTemplate } from '@js-monorepo/templates'
 import Footer from 'apps/tranquil-studio/components/footer'
 import Hero from 'apps/tranquil-studio/components/hero'

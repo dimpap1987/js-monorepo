@@ -1,7 +1,7 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@js-monorepo/components/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@js-monorepo/components/ui/tooltip'
 import { useNotifications } from '@js-monorepo/notification'
 import { apiClient } from '@js-monorepo/utils/http'
 import { VscDebugDisconnect } from 'react-icons/vsc'

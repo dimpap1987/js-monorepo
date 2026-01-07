@@ -1,5 +1,5 @@
 'use client'
-import { Dialog, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/dialog'
+import { Dialog, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/ui/dialog'
 import { useRouter } from 'next-nprogress-bar'
 import { PropsWithChildren } from 'react'
 

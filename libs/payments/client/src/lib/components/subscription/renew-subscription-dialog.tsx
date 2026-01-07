@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DpDialogContent,
-} from '@js-monorepo/components/dialog'
+} from '@js-monorepo/components/ui/dialog'
 import { RefreshCw } from 'lucide-react'
 import { Subscription } from '../../types'
 

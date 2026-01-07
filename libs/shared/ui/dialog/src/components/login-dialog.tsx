@@ -1,6 +1,6 @@
 'use client'
 
-import { Dialog, DialogFooter, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/dialog'
+import { Dialog, DialogFooter, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/ui/dialog'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import React, { forwardRef, useState } from 'react'
 import './login-dialog.css'

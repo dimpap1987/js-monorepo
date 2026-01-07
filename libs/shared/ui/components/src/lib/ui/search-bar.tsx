@@ -1,7 +1,7 @@
 'use client'
 
-import { Input } from '../form'
-import { Button } from '../button'
+import { Input } from './form'
+import { Button } from './button'
 import { Search, X } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { cn } from '@js-monorepo/ui/util'

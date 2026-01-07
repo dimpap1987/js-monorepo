@@ -9,19 +9,7 @@ export interface DpLogoutButtonProps extends ButtonProps {
 
 const DpLogoutButton = forwardRef<HTMLButtonElement, DpLogoutButtonProps>(({ className, ...props }, ref) => {
   return (
-    <DpButton
-      variant="danger"
-      title="Sign out"
-      className={cn(
-        'flex items-center gap-3 justify-start w-full px-4 py-2.5 rounded-xl select-none',
-        'transition-all duration-200 ease-in-out',
-        'hover:shadow-lg',
-        'focus-visible:ring-danger',
-        className
-      )}
-      ref={ref}
-      {...props}
-    >
+    <DpButton variant="primary" title="Sign out" className={cn('w-full rounded-xl', className)} ref={ref} {...props}>
       <BiLogOutCircle className="text-xl flex-shrink-0" />
       <span className="font-medium">Sign out</span>
     </DpButton>

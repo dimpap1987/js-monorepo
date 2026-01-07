@@ -1,6 +1,6 @@
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import './global.css'
-import jsonData from '../public/README.json'
+import jsonData from '../data/README.json'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 
 export const metadata = {
