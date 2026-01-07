@@ -1,7 +1,7 @@
 import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 import { NotificationSender } from './components/notification-sender'
 import { PushNotificationSender } from './components/push-notification-sender'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@js-monorepo/components/accordion'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@js-monorepo/components/ui/accordion'
 
 export default async function NotificationsController() {
   return (

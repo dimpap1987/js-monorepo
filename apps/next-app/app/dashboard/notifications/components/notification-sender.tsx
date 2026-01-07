@@ -2,7 +2,7 @@
 
 import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
-import { Card } from '@js-monorepo/components/card'
+import { Card } from '@js-monorepo/components/ui/card'
 import { useNotifications } from '@js-monorepo/notification'
 import { SelectUsersComponent } from '@next-app/components/select-users'
 import { useState } from 'react'

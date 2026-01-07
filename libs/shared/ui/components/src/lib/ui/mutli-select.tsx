@@ -9,7 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../dropdown'
+} from './dropdown'
 
 export type OptionType = {
   id: number

@@ -1,7 +1,7 @@
 'use client'
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@js-monorepo/components/dropdown'
-import { ScrollArea } from '@js-monorepo/components/scroll'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@js-monorepo/components/ui/dropdown'
+import { ScrollArea } from '@js-monorepo/components/ui/scroll'
 import { DpLoadingSpinner } from '@js-monorepo/loader'
 import { UserNotificationType } from '@js-monorepo/types'
 import { cn } from '@js-monorepo/ui/util'
@@ -224,14 +224,14 @@ export function NotificationDropdown({
           <div className="sticky top-0 z-10 bg-background-secondary backdrop-blur-sm border-b border-border-glass px-4 py-3.5">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-semibold text-foreground tracking-tight">Notifications</h3>
-              {unreadCount > 0 && (
-                <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3">
+                {!!unreadCount && (
                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-accent text-primary border border-primary">
                     {unreadCount} {unreadCount === 1 ? 'unread' : 'unreads'}
                   </span>
-                  <NotificationReadAllButton onReadAll={handleReadAllLocal} />
-                </div>
-              )}
+                )}
+                <NotificationReadAllButton disabled={!unreadCount} onReadAll={handleReadAllLocal} />
+              </div>
             </div>
           </div>
           <ScrollArea className={cn('rounded-md', scrollAreaHeight)} viewPortRef={notificationContainerRef}>

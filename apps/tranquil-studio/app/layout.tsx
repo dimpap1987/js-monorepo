@@ -1,4 +1,4 @@
-import { Toaster } from '@js-monorepo/components/sonner'
+import { Toaster } from '@js-monorepo/components/ui/sonner'
 import { BodyTemplate } from '@js-monorepo/templates'
 import { Montserrat } from 'next/font/google'
 import MainTemplate from '../components/main-template'

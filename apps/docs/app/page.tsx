@@ -1,6 +1,6 @@
 import { RedirectType } from 'next/dist/client/components/redirect'
 import { redirect } from 'next/navigation'
-import jsonData from '../public/README.json'
+import jsonData from '../data/README.json'
 
 export default function LandingPage() {
   if (jsonData?.length) {

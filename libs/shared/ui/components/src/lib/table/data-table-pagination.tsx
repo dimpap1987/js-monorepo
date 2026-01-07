@@ -2,7 +2,7 @@ import { DpButton } from '@js-monorepo/button'
 import { cn } from '@js-monorepo/ui/util'
 import { ChevronLeftIcon, ChevronRightIcon, DoubleArrowLeftIcon, DoubleArrowRightIcon } from '@radix-ui/react-icons'
 import { Table } from '@tanstack/react-table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>

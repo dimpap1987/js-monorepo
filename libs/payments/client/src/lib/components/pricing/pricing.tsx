@@ -3,7 +3,7 @@
 import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
 import { ErrorDialog } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { SnapCarousel } from '@js-monorepo/components/snap-carousel'
+import { SnapCarousel } from '@js-monorepo/components/ui/snap-carousel'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -184,7 +184,7 @@ export function Pricing() {
       {/* Hero Section */}
       <PricingHero
         title="Choose Your Plan."
-        subtitle="Start with our Free tier and unlock professional features when you're ready."
+        // subtitle="Start with our Free tier and unlock professional features when you're ready."
       />
 
       {/* Trust Signals */}

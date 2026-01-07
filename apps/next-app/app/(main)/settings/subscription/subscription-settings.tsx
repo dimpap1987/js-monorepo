@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { Skeleton } from '@js-monorepo/components/skeleton'
+import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { useWebSocketEvent } from '@js-monorepo/next/providers'
 import {
   apiGetSubscription,

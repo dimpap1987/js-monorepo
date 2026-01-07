@@ -1,4 +1,4 @@
-import { cn } from '../utils'
+import { cn } from '@js-monorepo/ui/util'
 
 function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('animate-pulse rounded-md bg-muted', className)} {...props} />

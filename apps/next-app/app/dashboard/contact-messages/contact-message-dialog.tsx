@@ -1,7 +1,7 @@
 'use client'
 
-import { Badge } from '@js-monorepo/components/badge'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@js-monorepo/components/dialog'
+import { Badge } from '@js-monorepo/components/ui/badge'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@js-monorepo/components/ui/dialog'
 import { ContactCategory, ContactMessageDto, ContactStatus } from '@js-monorepo/types'
 import { useTimezone } from '@js-monorepo/next/hooks'
 import { formatForUser } from '@js-monorepo/utils/date'

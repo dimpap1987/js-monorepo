@@ -75,7 +75,7 @@ export function NotificationList({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className="space-y-1 px-2">
+      <div className="space-y-1">
         {notifications.map((notification) => (
           <NotificationItem key={notification.notification.id} notification={notification} onRead={onRead} />
         ))}

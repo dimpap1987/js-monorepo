@@ -10,8 +10,8 @@ import {
   FormItem,
   FormLabel,
   Input,
-} from '@js-monorepo/components/form'
-import { Textarea } from '@js-monorepo/components/textarea'
+} from '@js-monorepo/components/ui/form'
+import { Textarea } from '@js-monorepo/components/ui/textarea'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { sendEmail } from '../app/actions/send-email'

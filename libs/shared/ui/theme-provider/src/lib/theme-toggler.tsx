@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@js-monorepo/components/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'

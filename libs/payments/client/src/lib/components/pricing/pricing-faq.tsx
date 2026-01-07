@@ -1,6 +1,6 @@
 'use client'
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@js-monorepo/components/accordion'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@js-monorepo/components/ui/accordion'
 import { cn } from '@js-monorepo/ui/util'
 import { FAQItem } from '../../types'
 

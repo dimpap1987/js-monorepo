@@ -1,8 +1,8 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@js-monorepo/components/card'
-import { UsageBar } from '@js-monorepo/components/usage-bar'
+import { Card, CardContent, CardFooter, CardHeader } from '@js-monorepo/components/ui/card'
+import { UsageBar } from '@js-monorepo/components/ui/usage-bar'
 import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
 import { useMemo } from 'react'

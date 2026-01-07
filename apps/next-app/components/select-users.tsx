@@ -1,6 +1,6 @@
 'use client'
 
-import { MultiSelectDropdown, OptionType } from '@js-monorepo/components/multiselect'
+import { MultiSelectDropdown, OptionType } from '@js-monorepo/components/ui/mutli-select'
 import { UserDropdown } from '@next-app/app/dashboard/notifications/components/types'
 import { findUsers } from '@next-app/app/dashboard/notifications/utils'
 import { useEffect, useState } from 'react'

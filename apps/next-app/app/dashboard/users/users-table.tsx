@@ -2,7 +2,7 @@
 
 import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'
 import { formatForUser } from '@js-monorepo/utils/date'

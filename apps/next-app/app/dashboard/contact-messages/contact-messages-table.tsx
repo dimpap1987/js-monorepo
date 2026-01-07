@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '@js-monorepo/components/badge'
+import { Badge } from '@js-monorepo/components/ui/badge'
 import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'

@@ -3,9 +3,14 @@
 import { DpButton } from '@js-monorepo/button'
 import { cn } from '@js-monorepo/ui/util'
 
-export function NotificationReadAllButton({ onReadAll }: { onReadAll?: () => Promise<any> }) {
+interface NotificationReadAllButtonProps extends React.ComponentPropsWithoutRef<'button'> {
+  onReadAll?: () => Promise<any>
+}
+
+export function NotificationReadAllButton({ onReadAll, ...props }: NotificationReadAllButtonProps) {
   return (
     <DpButton
+      {...props}
       size="small"
       variant="outline"
       className={cn(

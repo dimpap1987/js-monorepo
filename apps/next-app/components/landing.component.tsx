@@ -1,7 +1,7 @@
 'use client'
 import { DpButton } from '@js-monorepo/button'
-import { Badge } from '@js-monorepo/components/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/card'
+import { Badge } from '@js-monorepo/components/ui/badge'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import {
   Drawer,
   DrawerClose,
@@ -11,10 +11,10 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@js-monorepo/components/drawer'
-import { FileUpload } from '@js-monorepo/components/file-upload'
-import { PermissionGate } from '@js-monorepo/components/permission'
-import { SearchBar } from '@js-monorepo/components/search'
+} from '@js-monorepo/components/ui/drawer'
+import { FileUpload } from '@js-monorepo/components/ui/file-upload'
+import { PermissionGate } from '@js-monorepo/components/ui/permission-gate'
+import { SearchBar } from '@js-monorepo/components/ui/search-bar'
 import { useLoader } from '@js-monorepo/loader'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'

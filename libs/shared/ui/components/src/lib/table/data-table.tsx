@@ -4,7 +4,7 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack
 
 import { Pageable } from '@js-monorepo/types'
 import { Dispatch, SetStateAction } from 'react'
-import { Skeleton } from '../skeleton'
+import { Skeleton } from '../ui/skeleton'
 import { DataTablePagination } from './data-table-pagination'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
 

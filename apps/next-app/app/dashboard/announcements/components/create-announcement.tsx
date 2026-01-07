@@ -1,16 +1,9 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
-import { Card } from '@js-monorepo/components/card'
-import {
-  Form,
-  FormControl,
-  FormErrorDisplay,
-  FormField,
-  FormItem,
-  FormLabel,
-  Input,
-} from '@js-monorepo/components/form'
+import { Card } from '@js-monorepo/components/ui/card'
+import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
+import { Input } from '@js-monorepo/components/ui/form'
 import { useNotifications } from '@js-monorepo/notification'
 import { useCreateAnnouncement } from '../queries'
 import { SelectUsersComponent } from '@next-app/components/select-users'

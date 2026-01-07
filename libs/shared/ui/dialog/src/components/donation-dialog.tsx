@@ -1,6 +1,6 @@
 'use client'
 
-import { Dialog, DialogTrigger, DpDialogContent } from '@js-monorepo/components/dialog'
+import { Dialog, DialogTrigger, DpDialogContent } from '@js-monorepo/components/ui/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import { ClientResponseType } from '@js-monorepo/types'
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js'

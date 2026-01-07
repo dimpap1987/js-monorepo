@@ -1,6 +1,6 @@
 import { DpButton } from '@js-monorepo/button'
-import { Badge } from '@js-monorepo/components/badge'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@js-monorepo/components/card'
+import { Badge } from '@js-monorepo/components/ui/badge'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@js-monorepo/components/ui/card'
 import { useNotifications } from '@js-monorepo/notification'
 import { PlanGate, PlanGateInline, usePlanAccess } from '@js-monorepo/payments-ui'
 import { BarChart3, Download, Lock, Settings, Sparkles, Zap } from 'lucide-react'

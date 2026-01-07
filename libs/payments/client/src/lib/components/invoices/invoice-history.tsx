@@ -1,7 +1,7 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
-import { Skeleton } from '@js-monorepo/components/skeleton'
+import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { ChevronDown, Download, ExternalLink, FileText, Receipt } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { Invoice } from '../../types'

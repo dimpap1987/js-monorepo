@@ -1,8 +1,9 @@
 const fs = require('fs')
 const glob = require('glob')
+const path = require('path')
 
 ;(async () => {
-  const targetComponentPath = 'apps/docs/public/README.json'
+  const targetComponentPath = 'apps/docs/data/README.json'
   const readmeObject = transformDocsToJson('libs/**/README.md')
   const sortedArray = readmeObject.sort((a, b) => a.module?.localeCompare(b.module))
   fs.writeFileSync(targetComponentPath, JSON.stringify(sortedArray))
@@ -17,10 +18,10 @@ function transformDocsToJson(...paths) {
       .map((readmeFile) => {
         try {
           const data = fs.readFileSync(readmeFile, 'utf-8')
-          const parts = readmeFile.split('\\')
+          const parts = readmeFile.split(path.sep)
           const secondToLastPart = parts[parts?.length - 2]
           return {
-            path: readmeFile.substring(0, readmeFile.lastIndexOf('\\')),
+            path: readmeFile.substring(0, readmeFile.lastIndexOf(path.sep)),
             data: data,
             module: secondToLastPart,
           }

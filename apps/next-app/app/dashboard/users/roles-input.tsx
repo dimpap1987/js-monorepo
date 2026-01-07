@@ -1,6 +1,6 @@
 'use client'
 
-import { MultiSelectDropdown } from '@js-monorepo/components/multiselect'
+import { MultiSelectDropdown } from '@js-monorepo/components/ui/mutli-select'
 import { AuthUserDto, AuthUserUpdateDto } from '@js-monorepo/types'
 import { Row } from '@tanstack/react-table'
 import React, { useEffect, useMemo, useState } from 'react'

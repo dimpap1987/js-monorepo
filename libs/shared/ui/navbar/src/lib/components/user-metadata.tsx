@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { PlanBadge } from '@js-monorepo/payments-ui'
 import { cn } from '@js-monorepo/ui/util'
 import { FaAt } from 'react-icons/fa'
@@ -32,7 +32,7 @@ export function UserMetadata({
           <PlanBadge className="ml-1" plan={plan} />
         </div>
         {createdAt && (
-          <div className="text-xs text-foreground-muted mt-1 hidden sm:block">
+          <div className="text-xs text-foreground-muted mt-1">
             Member since {new Date(createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
           </div>
         )}

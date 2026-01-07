@@ -1,7 +1,7 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@js-monorepo/components/card'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 
 function CardList({ className }: { className: string }) {
   return (

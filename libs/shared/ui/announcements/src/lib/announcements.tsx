@@ -1,6 +1,6 @@
 'use client'
 
-import { Marquee } from '@js-monorepo/components/marquee'
+import { Marquee } from '@js-monorepo/components/ui/marquee'
 import { useWebSocketEvent, type BaseWebSocketEventMap } from '@js-monorepo/next/providers'
 import { cn } from '@js-monorepo/ui/util'
 import { useState } from 'react'

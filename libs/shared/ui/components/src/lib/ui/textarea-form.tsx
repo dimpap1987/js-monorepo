@@ -1,12 +1,11 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { DpButton } from '@js-monorepo/button'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Button } from '../button'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './form'
 import { Textarea } from './textarea'
-import { DpButton } from '@js-monorepo/button'
 
 const FormSchema = z.object({
   notification: z

@@ -32,10 +32,9 @@ export function NotificationPage({ userId, className, headerClassName, showBackA
         )}
 
         <NotificationReadAllButton
+          disabled={!unreadCount}
           onReadAll={async () => {
-            if (unreadCount > 0) {
-              await handleReadAll()
-            }
+            await handleReadAll()
           }}
         />
       </div>

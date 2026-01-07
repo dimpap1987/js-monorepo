@@ -1,6 +1,6 @@
 'use client'
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@js-monorepo/components/dropdown'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@js-monorepo/components/ui/dropdown'
 import { cn } from '@js-monorepo/ui/util'
 import React, { ReactElement, ReactNode, useState } from 'react'
 import { FaCircleUser } from 'react-icons/fa6'
