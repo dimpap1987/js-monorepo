@@ -1,6 +1,6 @@
 'use client'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
+import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import {
@@ -12,17 +12,17 @@ import {
 import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
 import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
+import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { PlanBadge } from '@js-monorepo/payments-ui'
 import { apiClient } from '@js-monorepo/utils/http'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { DATE_CONFIG } from '@js-monorepo/utils/date/constants'
-import { useTimezone } from '@js-monorepo/next/hooks'
-import { useQuery } from '@tanstack/react-query'
-import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { SubscriptionPagination } from './subscription-pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
-import { PaginationType } from '@js-monorepo/types/pagination'
+import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
+import { useQuery } from '@tanstack/react-query'
+import { ColumnDef } from '@tanstack/react-table'
+import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
+import { Dispatch, SetStateAction, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 
 interface SubscriptionStats {
   activeCount: number
@@ -31,17 +31,10 @@ interface SubscriptionStats {
   mrr: number
 }
 
-const fetchSubscriptions = async (
-  page: number,
-  pageSize: number,
-  filters: { status?: string; search?: string; plan?: string }
-): Promise<PaginationType<Subscription>> => {
-  const params = new URLSearchParams()
-  params.set('page', page.toString())
-  params.set('pageSize', pageSize.toString())
+const fetchSubscriptions = async (searchQuery: string, filters: { status?: string; search?: string }) => {
+  const params = new URLSearchParams(searchQuery)
   if (filters.status) params.set('status', filters.status)
   if (filters.search) params.set('search', filters.search)
-  if (filters.plan) params.set('plan', filters.plan)
 
   const { data } = await apiClient.get<PaginationType<Subscription>>(`/admin/subscriptions?${params.toString()}`)
   return data
@@ -117,36 +110,35 @@ function StatCard({
   )
 }
 
-export default function SubscriptionsPage() {
-  const [page, setPage] = useState(1)
+function SubscriptionsPageContent() {
+  const { pagination, searchQuery, setPagination } = usePaginationWithParams()
   const [searchInput, setSearchInput] = useState('')
   const [status, setStatus] = useState<string>('')
-  const pageSize = 10
   const userTimezone = useTimezone()
 
   const debouncedSearch = useDebounce(searchInput, 300)
 
-  // Reset page when search changes
   useEffect(() => {
-    setPage(1)
-  }, [debouncedSearch])
+    setPagination((prev) => ({ ...prev, page: 1 }))
+  }, [debouncedSearch, setPagination])
 
   const { data: stats } = useQuery<SubscriptionStats>({
     queryKey: ['subscription-stats'],
     queryFn: fetchStats,
   })
 
-  const { data, isLoading, error } = useQuery<PaginationType<Subscription>>({
-    queryKey: ['subscriptions', page, pageSize, status, debouncedSearch],
+  const { data, isLoading } = useQuery<PaginationType<Subscription>>({
+    queryKey: ['subscriptions', searchQuery, status, debouncedSearch],
     queryFn: () =>
-      fetchSubscriptions(page, pageSize, { status: status || undefined, search: debouncedSearch || undefined }),
+      fetchSubscriptions(searchQuery, { status: status || undefined, search: debouncedSearch || undefined }),
+    placeholderData: (previousData) => previousData,
   })
 
-  const totalPages = Math.ceil((data?.totalCount || 0) / pageSize)
+  const pageCount = Math.ceil((data?.totalCount || 0) / pagination.pageSize)
 
   const handleStatusChange = (value: string) => {
     setStatus(value === 'all' ? '' : value)
-    setPage(1)
+    setPagination((prev) => ({ ...prev, page: 1 }))
   }
 
   const openStripeCustomer = (stripeCustomerId: string) => {
@@ -156,6 +148,144 @@ export default function SubscriptionsPage() {
   const openStripeSubscription = (stripeSubscriptionId: string) => {
     window.open(`https://dashboard.stripe.com/subscriptions/${stripeSubscriptionId}`, '_blank')
   }
+
+  const onPaginationChange = useCallback<Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>>(
+    (newPaginationOrUpdater) => {
+      setPagination((prevPagination: Pageable) => {
+        const currentState = {
+          pageSize: prevPagination.pageSize,
+          pageIndex: prevPagination.page - 1,
+        }
+
+        const updated =
+          typeof newPaginationOrUpdater === 'function' ? newPaginationOrUpdater(currentState) : newPaginationOrUpdater
+
+        return {
+          pageSize: updated.pageSize,
+          page: updated.pageIndex + 1,
+        }
+      })
+    },
+    [setPagination]
+  )
+
+  const columns: ColumnDef<Subscription>[] = useMemo(
+    () => [
+      {
+        accessorKey: 'user',
+        size: 200,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="User" />,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="font-medium">{row.original.paymentCustomer.authUser.username}</p>
+              <p className="text-sm text-muted-foreground">{row.original.paymentCustomer.authUser.email}</p>
+            </div>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'plan',
+        size: 120,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Plan" />,
+        cell: ({ row }) => <PlanBadge plan={row.original.price.product.name} />,
+      },
+      {
+        accessorKey: 'status',
+        size: 100,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: ({ row }) => getStatusBadge(row.original.status),
+      },
+      {
+        accessorKey: 'amount',
+        size: 120,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
+        cell: ({ row }) => (
+          <div>
+            <p className="font-medium">{formatCurrency(row.original.price.unitAmount, row.original.price.currency)}</p>
+            <p className="text-sm text-muted-foreground">/{row.original.price.interval}</p>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'currentPeriodEnd',
+        size: 140,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Period End" />,
+        cell: ({ row }) => (
+          <div>
+            <p>
+              {row.original.currentPeriodEnd
+                ? formatForUser(row.original.currentPeriodEnd, userTimezone, DATE_CONFIG.FORMATS.DISPLAY)
+                : '-'}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {row.original.currentPeriodEnd ? formatRelativeDate(new Date(row.original.currentPeriodEnd)) : '-'}
+            </p>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'info',
+        size: 160,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Info" />,
+        cell: ({ row }) => {
+          const sub = row.original
+          return (
+            <div>
+              {sub.status === 'trialing' && sub.trialEnd && (
+                <div className="text-sm">
+                  <span className="text-amber-600 dark:text-amber-400">Trial ends </span>
+                  <span>{formatRelativeDate(new Date(sub.trialEnd))}</span>
+                </div>
+              )}
+              {sub.cancelAt && (
+                <div className="text-sm">
+                  <span className="text-red-600 dark:text-red-400">Cancels </span>
+                  <span>{formatRelativeDate(new Date(sub.cancelAt))}</span>
+                </div>
+              )}
+              {sub.cancelReason && (
+                <p className="text-xs text-muted-foreground capitalize">{sub.cancelReason.replace(/_/g, ' ')}</p>
+              )}
+              {!sub.stripeSubscriptionId && sub.status === 'trialing' && (
+                <Badge variant="outline" className="text-xs">
+                  Local Trial
+                </Badge>
+              )}
+            </div>
+          )
+        },
+      },
+      {
+        id: 'actions',
+        size: 50,
+        header: () => null,
+        cell: ({ row }) => {
+          const sub = row.original
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="p-2 rounded-md">
+                <MoreHorizontal className="w-4 h-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => openStripeCustomer(sub.paymentCustomer.stripeCustomerId)}>
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  View Customer in Stripe
+                </DropdownMenuItem>
+                {sub.stripeSubscriptionId && (
+                  <DropdownMenuItem onClick={() => openStripeSubscription(sub.stripeSubscriptionId as string)}>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    View Subscription in Stripe
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
+        },
+      },
+    ],
+    [userTimezone]
+  )
 
   return (
     <div className="space-y-6">
@@ -202,120 +332,22 @@ export default function SubscriptionsPage() {
       </div>
 
       {/* Table */}
-      {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      ) : error ? (
-        <div className="text-center py-12 text-destructive">Error loading subscriptions</div>
-      ) : (
-        <div className="rounded-md border bg-card">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted">
-                <TableHead>User</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Period End</TableHead>
-                <TableHead>Info</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.content?.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
-                    No subscriptions found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data?.content?.map((sub) => (
-                  <TableRow key={sub.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <p className="font-medium">{sub.paymentCustomer.authUser.username}</p>
-                          <p className="text-sm text-muted-foreground">{sub.paymentCustomer.authUser.email}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <PlanBadge plan={sub.price.product.name} />
-                    </TableCell>
-                    <TableCell>{getStatusBadge(sub.status)}</TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{formatCurrency(sub.price.unitAmount, sub.price.currency)}</p>
-                        <p className="text-sm text-muted-foreground">/{sub.price.interval}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p>
-                          {sub.currentPeriodEnd
-                            ? formatForUser(sub.currentPeriodEnd, userTimezone, DATE_CONFIG.FORMATS.DISPLAY)
-                            : '-'}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {sub.currentPeriodEnd ? formatRelativeDate(new Date(sub.currentPeriodEnd)) : '-'}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {sub.status === 'trialing' && sub.trialEnd && (
-                        <div className="text-sm">
-                          <span className="text-amber-600 dark:text-amber-400">Trial ends </span>
-                          <span>{formatRelativeDate(new Date(sub.trialEnd))}</span>
-                        </div>
-                      )}
-                      {sub.cancelAt && (
-                        <div className="text-sm">
-                          <span className="text-red-600 dark:text-red-400">Cancels </span>
-                          <span>{formatRelativeDate(new Date(sub.cancelAt))}</span>
-                        </div>
-                      )}
-                      {sub.cancelReason && (
-                        <p className="text-xs text-muted-foreground capitalize">
-                          {sub.cancelReason.replace(/_/g, ' ')}
-                        </p>
-                      )}
-                      {!sub.stripeSubscriptionId && sub.status === 'trialing' && (
-                        <Badge variant="outline" className="text-xs">
-                          Local Trial
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="p-2 rounded-md">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => openStripeCustomer(sub.paymentCustomer.stripeCustomerId)}>
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            View Customer in Stripe
-                          </DropdownMenuItem>
-                          {sub.stripeSubscriptionId && (
-                            <DropdownMenuItem
-                              onClick={() => openStripeSubscription(sub.stripeSubscriptionId as string)}
-                            >
-                              <ExternalLink className="w-4 h-4 mr-2" />
-                              View Subscription in Stripe
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-
-      {totalPages > 1 && <SubscriptionPagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />}
+      <DataTable
+        columns={columns}
+        data={data?.content || []}
+        onPaginationChange={onPaginationChange}
+        totalCount={pageCount}
+        pagination={pagination}
+        loading={isLoading}
+      />
     </div>
+  )
+}
+
+export default function SubscriptionsPage() {
+  return (
+    <Suspense>
+      <SubscriptionsPageContent />
+    </Suspense>
   )
 }
