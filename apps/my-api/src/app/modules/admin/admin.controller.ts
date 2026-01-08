@@ -1,7 +1,7 @@
+import { PaginationType, AuthUserDto, AuthUserFullDto, SessionUserType, Subscription } from '@js-monorepo/types'
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
-import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types'
 import { OnlineUsersService } from '@js-monorepo/user-presence'
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import {
@@ -74,7 +74,7 @@ export class AdminController {
     @Query('status') status?: string,
     @Query('search') search?: string,
     @Query('plan') plan?: string
-  ) {
+  ): Promise<PaginationType<Subscription>> {
     const filters = { status, search, plan }
     return this.adminPaymentsService.getAllSubscriptions(page, pageSize, filters)
   }

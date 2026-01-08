@@ -1,3 +1,4 @@
+import { PaginationType, Subscription } from '@js-monorepo/types'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
@@ -436,7 +437,11 @@ export class PaymentsRepository {
     })
   }
 
-  async findAllSubscriptions(page = 1, pageSize = 10, filters?: { status?: string; search?: string; plan?: string }) {
+  async findAllSubscriptions(
+    page = 1,
+    pageSize = 10,
+    filters?: { status?: string; search?: string; plan?: string }
+  ): Promise<PaginationType<Subscription>> {
     const skip = (page - 1) * pageSize
 
     const where: Record<string, unknown> = {}
@@ -460,7 +465,7 @@ export class PaymentsRepository {
       }
     }
 
-    const [subscriptions, totalCount] = await Promise.all([
+    const [content, totalCount] = await Promise.all([
       this.txHost.tx.subscription.findMany({
         where,
         skip,
@@ -516,7 +521,13 @@ export class PaymentsRepository {
       this.txHost.tx.subscription.count({ where }),
     ])
 
-    return { subscriptions, totalCount }
+    return {
+      content,
+      totalCount,
+      page,
+      pageSize,
+      totalPages: Math.ceil(totalCount / pageSize),
+    }
   }
 
   async getSubscriptionStats() {

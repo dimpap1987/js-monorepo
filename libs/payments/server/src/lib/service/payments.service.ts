@@ -1,3 +1,4 @@
+import { PaginationType, Subscription } from '@js-monorepo/types'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
@@ -242,7 +243,11 @@ export class PaymentsService {
     return result
   }
 
-  async findAllSubscriptions(page = 1, pageSize = 10, filters?: { status?: string; search?: string; plan?: string }) {
+  async findAllSubscriptions(
+    page = 1,
+    pageSize = 10,
+    filters?: { status?: string; search?: string; plan?: string }
+  ): Promise<PaginationType<Subscription>> {
     return this.paymentsRepository.findAllSubscriptions(page, pageSize, filters)
   }
 
