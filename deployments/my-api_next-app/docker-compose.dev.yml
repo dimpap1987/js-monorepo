@@ -1,6 +1,6 @@
 services:
   my-api:
-    image: dimpap/my-api:latest
+    image: my-api:dev
     container_name: my-api_container
     env_file:
       - .env
@@ -21,7 +21,7 @@ services:
       - postgres
 
   next-app:
-    image: dimpap/next-app:latest
+    image: next-app:dev
     container_name: next-app_container
     env_file:
       - .env
