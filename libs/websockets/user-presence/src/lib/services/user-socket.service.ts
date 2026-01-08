@@ -1,6 +1,6 @@
 import { RedisSessionKey, RedisSocketUserKey } from '@js-monorepo/auth/nest/common/types'
 import { REDIS } from '@js-monorepo/nest/redis'
-import { SocketUser } from '@js-monorepo/types'
+import { SocketUser } from '@js-monorepo/types/websocket'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RedisClientType } from '@redis/client'

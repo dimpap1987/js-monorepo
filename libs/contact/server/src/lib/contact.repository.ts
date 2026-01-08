@@ -1,4 +1,5 @@
-import { ContactMessageCreateDto, ContactMessageDto, ContactStatus, Pageable, PaginationType } from '@js-monorepo/types'
+import { ContactMessageCreateDto, ContactMessageDto, ContactStatus } from '@js-monorepo/types/contact'
+import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 
 export const ContactRepo = Symbol('ContactRepo')
 

@@ -3,7 +3,7 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types'
+import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types/auth'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
 

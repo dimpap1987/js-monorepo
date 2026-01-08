@@ -17,7 +17,7 @@ import {
   NotificationServerModule,
   NotificationService,
 } from '@js-monorepo/notifications-server'
-import { AuthUserDto } from '@js-monorepo/types'
+import { AuthUserDto } from '@js-monorepo/types/auth'
 import { Events, UserPresenceModule, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { ClsPluginTransactional } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'

@@ -1,5 +1,5 @@
-// @ts-expect-error - Jest resolves this path alias correctly at runtime
-import { UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
+import { apiClient } from '@js-monorepo/utils/http'
 import {
   apiFetchUserNotifications,
   apiReadAllNotifications,
@@ -7,8 +7,6 @@ import {
   humanatizeNotificationDate,
   updateNotificationAsRead,
 } from './notifications'
-// @ts-expect-error - Jest resolves this path alias correctly at runtime
-import { apiClient } from '@js-monorepo/utils/http'
 
 // Mock the apiClient
 jest.mock('@js-monorepo/utils/http', () => ({

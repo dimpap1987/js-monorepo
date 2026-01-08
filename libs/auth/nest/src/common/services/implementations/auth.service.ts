@@ -1,5 +1,5 @@
 import { RegisterUserSchema } from '@js-monorepo/schemas'
-import { AuthRole, AuthUserCreateDto, AuthUserDto, ProvidersDto, SessionUserType } from '@js-monorepo/types'
+import { AuthRole, AuthUserCreateDto, AuthUserDto, ProvidersDto, SessionUserType } from '@js-monorepo/types/auth'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
@@ -73,7 +73,7 @@ export class AuthServiceImpl implements AuthService {
     return {
       id: authUser?.id,
       username: authUser?.username,
-      roles: authUser?.userRole?.map((userRole) => userRole.role.name),
+      roles: authUser?.userRole?.map((userRole: { role: { name: string } }) => userRole.role.name),
       createdAt: authUser?.createdAt,
       profile: {
         image: authUser?.userProfiles?.[0]?.profileImage,

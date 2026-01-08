@@ -1,5 +1,5 @@
 import { DpButton } from '@js-monorepo/button'
-import { Pageable, PaginationType } from '@js-monorepo/types'
+import { Pageable } from '@js-monorepo/types/pagination'
 import { Dispatch, SetStateAction } from 'react'
 import {
   MdOutlineKeyboardDoubleArrowLeft,

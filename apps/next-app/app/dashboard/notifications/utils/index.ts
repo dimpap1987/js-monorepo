@@ -1,4 +1,5 @@
-import { AuthUserFullDto, CreatePushNotificationType, NotificationCreateDto } from '@js-monorepo/types'
+import { AuthUserFullDto } from '@js-monorepo/types/auth'
+import { CreatePushNotificationType, NotificationCreateDto } from '@js-monorepo/types/notifications'
 import { apiClient } from '@js-monorepo/utils/http'
 
 export const findUsers = async (page = 1, pageSize = 50) => {

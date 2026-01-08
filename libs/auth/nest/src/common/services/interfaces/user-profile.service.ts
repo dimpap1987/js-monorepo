@@ -1,4 +1,4 @@
-import { UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types'
+import { UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types/user-profile'
 
 export interface UserProfileService {
   findUserProfileById(id: number): Promise<UserProfileDto>

@@ -1,4 +1,4 @@
-import { ContactMessageDto } from '@js-monorepo/types'
+import { ContactMessageDto } from '@js-monorepo/types/contact'
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
 import { ContactController } from './contact.controller'
 import { ContactRepo } from './contact.repository'

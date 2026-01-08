@@ -1,9 +1,10 @@
-import { CreateUserNotificationType, CursorPagination, NotificationCreateDto, Pageable } from '@js-monorepo/types'
+import { PrismaService } from '@js-monorepo/db'
+import { CreateUserNotificationType, NotificationCreateDto } from '@js-monorepo/types/notifications'
+import { CursorPagination, Pageable } from '@js-monorepo/types/pagination'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { NotificationRepository } from './notification.repository'
-import { PrismaService } from '@js-monorepo/db'
 
 @Injectable()
 export class NotificationRepositoryPrisma implements NotificationRepository {

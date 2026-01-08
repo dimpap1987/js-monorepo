@@ -1,7 +1,7 @@
 import { AuthSessionUserCacheService, LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
 import { EditUserSchema } from '@js-monorepo/schemas'
-import { EditUserDto, SessionUserType } from '@js-monorepo/types'
+import { EditUserDto, SessionUserType } from '@js-monorepo/types/auth'
 import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Patch, Post, Req, UseGuards } from '@nestjs/common'
 import { Request } from 'express'
 import { UserService } from './user.service'

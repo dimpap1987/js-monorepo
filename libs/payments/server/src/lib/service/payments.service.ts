@@ -1,4 +1,5 @@
-import { PaginationType, Subscription } from '@js-monorepo/types'
+import { PaginationType } from '@js-monorepo/types/pagination'
+import { Subscription } from '@js-monorepo/types/subscription'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'

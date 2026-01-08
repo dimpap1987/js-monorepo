@@ -1,11 +1,5 @@
-import {
-  CreateUserNotificationType,
-  CursorPagination,
-  CursorPaginationType,
-  NotificationCreateDto,
-  Pageable,
-  PaginationType,
-} from '@js-monorepo/types'
+import { CreateUserNotificationType, NotificationCreateDto } from '@js-monorepo/types/notifications'
+import { CursorPagination, CursorPaginationType, Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import { Prisma } from '@prisma/client'
 
 export const NotificationRepo = Symbol()

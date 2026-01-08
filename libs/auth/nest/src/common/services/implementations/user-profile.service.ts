@@ -1,8 +1,9 @@
-import { ProviderName, UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types'
+import { ProviderName } from '@js-monorepo/types/auth'
 import { Inject, Injectable } from '@nestjs/common'
 import { UserProfileRepository } from '../../repositories/user-profile.repository'
 import { RepoUserProfile } from '../../types'
 import { UserProfileService } from '../interfaces/user-profile.service'
+import { UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types/user-profile'
 
 @Injectable()
 export class UserProfileServiceImpl implements UserProfileService {

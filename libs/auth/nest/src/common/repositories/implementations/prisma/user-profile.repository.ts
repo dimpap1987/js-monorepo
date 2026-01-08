@@ -1,10 +1,11 @@
-import { ProviderName, UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types'
+import { ProviderName } from '@js-monorepo/types/auth'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { ConstraintCode, ConstraintViolationException } from '../../../exceptions/contraint-violation'
 import { UserProfileRepository } from '../../user-profile.repository'
+import { UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types/user-profile'
 
 @Injectable()
 export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {

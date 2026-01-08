@@ -1,5 +1,7 @@
-import { getRelativeTime, fromISOString } from '@js-monorepo/utils/date'
-import { ClientResponseType, PaginationType, UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
+import { PaginationType } from '@js-monorepo/types/pagination'
+import { ClientResponseType } from '@js-monorepo/types/responses'
+import { fromISOString, getRelativeTime } from '@js-monorepo/utils/date'
 import { apiClient } from '@js-monorepo/utils/http'
 
 export async function apiFetchUserNotifications(

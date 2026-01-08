@@ -1,5 +1,5 @@
 import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
-import { SessionUserType } from '@js-monorepo/types'
+import { SessionUserType } from '@js-monorepo/types/auth'
 import { Controller, Get, Query, UseGuards } from '@nestjs/common'
 import { InvoiceListResponse } from '../dto/invoice.dto'
 import { PaymentsService } from '../service/payments.service'

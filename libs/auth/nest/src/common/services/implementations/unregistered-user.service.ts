@@ -1,5 +1,5 @@
 import { CreateUnregisteredUserSchema } from '@js-monorepo/schemas'
-import { UnRegisteredUserCreateDto, UnRegisteredUserDto } from '@js-monorepo/types'
+import { UnRegisteredUserCreateDto, UnRegisteredUserDto } from '@js-monorepo/types/auth'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
 import { UnregisteredRepository } from '../../repositories/unregistered.repository'

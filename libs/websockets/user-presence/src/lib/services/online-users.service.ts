@@ -1,9 +1,9 @@
 import { RedisOnlineUsersKey, RedisSocketUserKey } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { REDIS } from '@js-monorepo/nest/redis'
+import { SocketUser } from '@js-monorepo/types/websocket'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from '@redis/client'
-import { SocketUser } from '@js-monorepo/types'
 
 @Injectable()
 export class OnlineUsersService {

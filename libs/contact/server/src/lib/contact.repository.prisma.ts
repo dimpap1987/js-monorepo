@@ -1,4 +1,5 @@
-import { ContactMessageCreateDto, ContactMessageDto, ContactStatus, Pageable, PaginationType } from '@js-monorepo/types'
+import { ContactMessageCreateDto, ContactMessageDto, ContactStatus } from '@js-monorepo/types/contact'
+import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'

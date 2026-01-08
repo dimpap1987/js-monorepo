@@ -3,7 +3,7 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@js-monorepo/components/ui/dropdown'
 import { ScrollArea } from '@js-monorepo/components/ui/scroll'
 import { DpLoadingSpinner } from '@js-monorepo/loader'
-import { UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
 import { cn } from '@js-monorepo/ui/util'
 import { debounce } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'

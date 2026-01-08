@@ -1,4 +1,4 @@
-import { SessionUserType } from '@js-monorepo/types'
+import { SessionUserType } from '@js-monorepo/types/auth'
 import { Injectable } from '@nestjs/common'
 import { PassportSerializer } from '@nestjs/passport'
 import { AuthSessionUserCacheService } from './auth-session-cache.service'

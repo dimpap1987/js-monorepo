@@ -3,11 +3,10 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { REDIS } from '@js-monorepo/nest/redis'
 import {
   CreateUserNotificationType,
-  CursorPagination,
   NotificationCreateDto,
-  Pageable,
   UserNotificationType,
-} from '@js-monorepo/types'
+} from '@js-monorepo/types/notifications'
+import { CursorPagination, Pageable } from '@js-monorepo/types/pagination'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'

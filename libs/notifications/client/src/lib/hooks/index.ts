@@ -1,7 +1,7 @@
 'use client'
 
 import { useWebSocketEvent } from '@js-monorepo/next/providers'
-import { UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
 import { useEffect, useRef } from 'react'
 import { NOTIFICATIONS_EVENT, type NotificationWebSocketEventMap } from '../types/websocket-events'
 

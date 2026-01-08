@@ -2,7 +2,7 @@
 
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 
-import { Pageable } from '@js-monorepo/types'
+import { Pageable } from '@js-monorepo/types/pagination'
 import { Dispatch, SetStateAction } from 'react'
 import { Skeleton } from '../ui/skeleton'
 import { DataTablePagination } from './data-table-pagination'

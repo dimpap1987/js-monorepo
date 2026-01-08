@@ -1,4 +1,4 @@
-import { AuthRole, AuthRoleDTO } from '@js-monorepo/types'
+import { AuthRole, AuthRoleDTO } from '@js-monorepo/types/auth'
 import { Injectable } from '@nestjs/common'
 import { RolesRepository } from '../../repositories/implementations/prisma/role.repository'
 import { RolesService } from '../interfaces/roles.service'

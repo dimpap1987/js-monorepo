@@ -1,4 +1,5 @@
-import { PaginationType, Subscription } from '@js-monorepo/types'
+import { Subscription } from '@js-monorepo/types/subscription'
+import { PaginationType } from '@js-monorepo/types/pagination'
 import { PaymentsService } from '@js-monorepo/payments-server'
 import { Injectable } from '@nestjs/common'
 

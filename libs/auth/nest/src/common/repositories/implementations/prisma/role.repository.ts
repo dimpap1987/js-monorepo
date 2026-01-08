@@ -1,4 +1,4 @@
-import { AuthRole } from '@js-monorepo/types'
+import { AuthRole } from '@js-monorepo/types/auth'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'

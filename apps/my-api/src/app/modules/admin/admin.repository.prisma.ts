@@ -1,4 +1,5 @@
-import { AuthRoleDTO, AuthUserDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
+import { AuthRoleDTO, AuthUserDto, AuthUserUpdateDto } from '@js-monorepo/types/auth'
+import { Pageable } from '@js-monorepo/types/pagination'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'

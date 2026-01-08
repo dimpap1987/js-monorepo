@@ -1,6 +1,6 @@
 import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
-import { SessionUserType } from '@js-monorepo/types'
+import { SessionUserType } from '@js-monorepo/types/auth'
 import { Body, Controller, Get, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common'
 import { StartTrialDto } from '../dto/start-trial.dto'
 import { TrialService } from '../service/trial.service'

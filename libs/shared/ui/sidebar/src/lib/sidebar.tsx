@@ -13,7 +13,8 @@ import {
 } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { UserMetadata } from '@js-monorepo/navbar'
-import { AuthRole, MenuItem, SessionUserType } from '@js-monorepo/types'
+import { AuthRole, SessionUserType } from '@js-monorepo/types/auth'
+import { MenuItem } from '@js-monorepo/types/menu'
 import { X } from 'lucide-react'
 import { memo, ReactNode, useMemo } from 'react'
 

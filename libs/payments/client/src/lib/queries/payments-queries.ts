@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
-import { PricingPlanResponse } from '@js-monorepo/types'
+import { PricingPlanResponse } from '@js-monorepo/types/pricing'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
+import { useQuery } from '@tanstack/react-query'
 import { Subscription } from '../types'
 
 /**

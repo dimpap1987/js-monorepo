@@ -1,5 +1,5 @@
 import { REDIS } from '@js-monorepo/nest/redis'
-import { SessionObject, SessionUserType } from '@js-monorepo/types'
+import { SessionObject, SessionUserType } from '@js-monorepo/types/auth'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from 'redis'
 import { AuthException } from '../../common/exceptions/api-exception'

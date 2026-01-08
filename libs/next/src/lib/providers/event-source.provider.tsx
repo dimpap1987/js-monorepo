@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { EventsReponse, EventsReponseType } from '@js-monorepo/types'
+import { EventsReponse, EventsReponseType } from '@js-monorepo/types/notifications'
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 
 interface EventSourceContextType {

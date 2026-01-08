@@ -1,6 +1,6 @@
 /// <reference types="express-session" />
 
-import { AuthUserDto, SessionUserType } from '@js-monorepo/types'
+import { AuthUserDto, SessionUserType } from '@js-monorepo/types/auth'
 import { RouteInfo } from '@nestjs/common/interfaces'
 
 export interface GoogleAuth {

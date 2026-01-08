@@ -1,7 +1,7 @@
 import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
-import { SessionUserType } from '@js-monorepo/types'
+import { SessionUserType } from '@js-monorepo/types/auth'
 import { tryCatch } from '@js-monorepo/utils/common'
 import {
   Body,
