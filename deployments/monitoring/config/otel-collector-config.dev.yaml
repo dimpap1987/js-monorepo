@@ -46,7 +46,7 @@ exporters:
   debug/metrics:
     verbosity: basic
   debug/traces:
-    verbosity: basic
+    verbosity: detailed
   debug/logs:
     verbosity: basic
 

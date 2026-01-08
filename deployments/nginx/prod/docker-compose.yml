@@ -8,8 +8,7 @@ services:
     ports:
       - '8000:80'
       # - '443:443'
-    env_file:
-      - ../../.env
+
     restart: unless-stopped
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost/health']
@@ -22,6 +21,7 @@ services:
       - ./tunnel.default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ../shared/proxy_params.conf:/etc/nginx/proxy_params.conf:ro
       - ../shared/cloudflare-ips.conf:/etc/nginx/cloudflare-ips.conf:ro
+      - ./nginx_status.conf.template:/etc/nginx/conf.d/nginx_status.conf:ro
       # SSL certificates - adjust paths
       # - /etc/letsencrypt/live/${NGINX_SERVER_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
       # - /etc/letsencrypt/live/${NGINX_SERVER_NAME}/privkey.pem:/etc/ssl/private/key.pem:ro
@@ -33,8 +33,7 @@ services:
   tunnel:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run
-    env_file:
-      - ../../.env
+
     networks:
       - super-network
     environment:

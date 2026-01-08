@@ -113,6 +113,16 @@ services:
     networks:
       - super-network
 
+  # Nginx Prometheus Exporter
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx_exporter_prod
+    command:
+      - '--no-nginx.plus'
+      - '--nginx.scrape-uri=http://nginx:8080/nginx_status'
+    networks:
+      - super-network
+
   # Loki - Log Aggregator
   loki:
     image: grafana/loki:2.9.3

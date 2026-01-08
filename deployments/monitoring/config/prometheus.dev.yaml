@@ -33,6 +33,13 @@ scrape_configs:
         regex: '^/docker$|^/kubepods.*|^/buildx.*'
         action: drop
 
+  # Nginx Exporter
+  - job_name: 'nginx-exporter'
+    static_configs:
+      - targets: ['host.docker.internal:9113'] # Scrape exporter running on host
+    extra_hosts:
+      - 'host.docker.internal:host-gateway' # Ensure host.docker.internal is resolved
+
   # PostgreSQL metrics - connects to LOCAL postgres on host
   - job_name: 'postgres-exporter'
     static_configs:
