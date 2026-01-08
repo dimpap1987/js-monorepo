@@ -22,43 +22,7 @@ import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, 
 import { useEffect, useState } from 'react'
 import { SubscriptionPagination } from './subscription-pagination'
 
-interface Subscription {
-  id: number
-  stripeSubscriptionId: string | null
-  status: string
-  currentPeriodStart: string
-  currentPeriodEnd: string
-  trialStart: string | null
-  trialEnd: string | null
-  cancelAt: string | null
-  canceledAt: string | null
-  cancelReason: string | null
-  createdAt: string
-  price: {
-    id: number
-    unitAmount: number
-    currency: string
-    interval: string
-    product: {
-      id: number
-      name: string
-    }
-  }
-  paymentCustomer: {
-    stripeCustomerId: string
-    authUser: {
-      id: number
-      username: string
-      email: string
-      userProfiles: Array<{ profileImage: string }>
-    }
-  }
-}
-
-interface SubscriptionsResponse {
-  subscriptions: Subscription[]
-  totalCount: number
-}
+import { PaginationType, Subscription } from '@js-monorepo/types'
 
 interface SubscriptionStats {
   activeCount: number
@@ -71,7 +35,7 @@ const fetchSubscriptions = async (
   page: number,
   pageSize: number,
   filters: { status?: string; search?: string; plan?: string }
-) => {
+): Promise<PaginationType<Subscription>> => {
   const params = new URLSearchParams()
   params.set('page', page.toString())
   params.set('pageSize', pageSize.toString())
@@ -79,7 +43,7 @@ const fetchSubscriptions = async (
   if (filters.search) params.set('search', filters.search)
   if (filters.plan) params.set('plan', filters.plan)
 
-  const { data } = await apiClient.get<SubscriptionsResponse>(`/admin/subscriptions?${params.toString()}`)
+  const { data } = await apiClient.get<PaginationType<Subscription>>(`/admin/subscriptions?${params.toString()}`)
   return data
 }
 
@@ -172,7 +136,7 @@ export default function SubscriptionsPage() {
     queryFn: fetchStats,
   })
 
-  const { data, isLoading, error } = useQuery<SubscriptionsResponse>({
+  const { data, isLoading, error } = useQuery<PaginationType<Subscription>>({
     queryKey: ['subscriptions', page, pageSize, status, debouncedSearch],
     queryFn: () =>
       fetchSubscriptions(page, pageSize, { status: status || undefined, search: debouncedSearch || undefined }),
@@ -259,14 +223,14 @@ export default function SubscriptionsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data?.subscriptions.length === 0 ? (
+              {data?.content?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                     No subscriptions found
                   </TableCell>
                 </TableRow>
               ) : (
-                data?.subscriptions.map((sub) => (
+                data?.content?.map((sub) => (
                   <TableRow key={sub.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -288,9 +252,13 @@ export default function SubscriptionsPage() {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p>{formatForUser(sub.currentPeriodEnd, userTimezone, DATE_CONFIG.FORMATS.DISPLAY)}</p>
+                        <p>
+                          {sub.currentPeriodEnd
+                            ? formatForUser(sub.currentPeriodEnd, userTimezone, DATE_CONFIG.FORMATS.DISPLAY)
+                            : '-'}
+                        </p>
                         <p className="text-sm text-muted-foreground">
-                          {formatRelativeDate(new Date(sub.currentPeriodEnd))}
+                          {sub.currentPeriodEnd ? formatRelativeDate(new Date(sub.currentPeriodEnd)) : '-'}
                         </p>
                       </div>
                     </TableCell>

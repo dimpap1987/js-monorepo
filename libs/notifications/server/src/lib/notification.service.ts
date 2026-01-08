@@ -17,7 +17,7 @@ import { sendNotification, setVapidDetails } from 'web-push'
 import { NotificationRepo, NotificationRepository } from './notification.repository'
 import { NotificationModuleOptions } from './notifications.module'
 
-export interface Subscription {
+interface Subscription {
   endpoint: string
   keys: {
     p256dh: string
@@ -27,7 +27,7 @@ export interface Subscription {
   createdAt: string
 }
 
-export interface UserSubscription {
+interface UserSubscription {
   endpoint: string
   subscription: Subscription
 }
