@@ -36,6 +36,7 @@ datasources:
     jsonData:
       httpMethod: GET
       serviceMap:
+        datasourceUid: 'prometheus'
         enabled: true
       nodeGraph:
         enabled: true

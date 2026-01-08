@@ -97,6 +97,15 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
 
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx_exporter_dev
+    ports:
+      - '9113:9113' # Default exporter port
+    command: -nginx.plus=false -nginx.scrape-uri=http://host.docker.internal:8080/nginx_status
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
 networks:
   super-network:
     external: true
