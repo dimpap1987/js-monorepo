@@ -1,7 +1,7 @@
 import { RedisPushSubscriptionsKey } from '@js-monorepo/auth/nest/common/types'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { REDIS } from '@js-monorepo/nest/redis'
-import { NotificationCreateDto } from '@js-monorepo/types'
+import { NotificationCreateDto } from '@js-monorepo/types/notifications'
 import { Test, TestingModule } from '@nestjs/testing'
 import { RedisClientType } from '@redis/client'
 import { NotificationService } from './notification.service'

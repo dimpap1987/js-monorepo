@@ -1,4 +1,4 @@
-import { UnRegisteredUserCreateDto, UnRegisteredUserDto } from '@js-monorepo/types'
+import { UnRegisteredUserCreateDto, UnRegisteredUserDto } from '@js-monorepo/types/auth'
 
 export interface UnregisteredService {
   createUnRegisteredUser(unRegisteredUser: UnRegisteredUserCreateDto): Promise<UnRegisteredUserDto>

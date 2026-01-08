@@ -1,4 +1,4 @@
-import { ClientResponseType } from '@js-monorepo/types'
+import { ClientResponseType } from '@js-monorepo/types/responses'
 import { apiClientBase } from '@js-monorepo/utils/http'
 
 export function buildLoginUrl(callbackUrl?: string): string {

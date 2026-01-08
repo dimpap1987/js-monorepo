@@ -1,5 +1,5 @@
 import type { BaseWebSocketEventMap, WebSocketEventMap } from '@js-monorepo/next/providers'
-import type { UserNotificationType } from '@js-monorepo/types'
+import type { UserNotificationType } from '@js-monorepo/types/notifications'
 
 export const NOTIFICATIONS_EVENT = 'events:notifications' as const
 

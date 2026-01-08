@@ -5,8 +5,8 @@ import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'
+import { AuthUserFullDto } from '@js-monorepo/types/auth'
 import { formatForUser } from '@js-monorepo/utils/date'
-import { AuthUserFullDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
 import { ColumnDef } from '@tanstack/react-table'
 import { Dispatch, SetStateAction, Suspense, useCallback, useMemo, useState } from 'react'
 import { FaUserSecret } from 'react-icons/fa'
@@ -15,6 +15,7 @@ import { TiCancelOutline, TiTick } from 'react-icons/ti'
 import { useImpersonateUser, useUpdateUser, useUsers } from './queries'
 import RolesTableInput from './roles-input'
 import { UsernameTableInput } from './username-input'
+import { Pageable } from '@js-monorepo/types/pagination'
 
 declare module '@tanstack/react-table' {
   interface Row<TData> {

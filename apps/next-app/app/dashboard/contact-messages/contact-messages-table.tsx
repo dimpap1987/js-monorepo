@@ -1,16 +1,17 @@
 'use client'
 
-import { Badge } from '@js-monorepo/components/ui/badge'
 import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
+import { Badge } from '@js-monorepo/components/ui/badge'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'
-import { ContactCategory, ContactMessageDto, ContactStatus, Pageable } from '@js-monorepo/types'
+import { ContactCategory, ContactMessageDto, ContactStatus } from '@js-monorepo/types/contact'
+import { Pageable } from '@js-monorepo/types/pagination'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { ColumnDef } from '@tanstack/react-table'
 import { Dispatch, SetStateAction, Suspense, useCallback, useMemo, useState } from 'react'
-import { FaEnvelope, FaEnvelopeOpen, FaArchive, FaTrash, FaEye, FaSync } from 'react-icons/fa'
-import { useContactMessages, useUpdateContactStatus, useDeleteContactMessage } from './queries'
+import { FaArchive, FaEnvelope, FaEnvelopeOpen, FaEye, FaSync, FaTrash } from 'react-icons/fa'
 import { ContactMessageDialog } from './contact-message-dialog'
+import { useContactMessages, useDeleteContactMessage, useUpdateContactStatus } from './queries'
 
 const CATEGORY_COLORS: Record<ContactCategory, string> = {
   general: 'bg-blue-500/10 text-blue-500 border-blue-500/20',

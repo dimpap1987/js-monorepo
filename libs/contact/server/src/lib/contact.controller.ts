@@ -4,12 +4,7 @@ import { LoggedInGuard, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/s
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
 import { ContactMessageSchema, ContactMessageUpdateStatusSchema } from '@js-monorepo/schemas'
-import {
-  ContactMessageCreateDto,
-  ContactMessageUpdateStatusDto,
-  ContactStatus,
-  SessionUserType,
-} from '@js-monorepo/types'
+import { ContactMessageCreateDto, ContactMessageUpdateStatusDto, ContactStatus } from '@js-monorepo/types/contact'
 import {
   Body,
   Controller,
@@ -26,6 +21,7 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { ContactService } from './contact.service'
+import { SessionUserType } from '@js-monorepo/types/auth'
 
 @Controller('contact')
 export class ContactController {

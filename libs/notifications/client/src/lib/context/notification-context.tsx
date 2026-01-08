@@ -1,6 +1,6 @@
 'use client'
 
-import { UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse } from '@js-monorepo/utils/http/queries'
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'

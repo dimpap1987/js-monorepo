@@ -1,6 +1,6 @@
 'use client'
 
-import { UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
 import { cn } from '@js-monorepo/ui/util'
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'

@@ -1,5 +1,5 @@
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
-import { EditUserDto } from '@js-monorepo/types'
+import { EditUserDto } from '@js-monorepo/types/auth'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { UserRepo, UserRepository } from './user.repository'

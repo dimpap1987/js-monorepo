@@ -1,5 +1,5 @@
 import { DpLoadingSpinner } from '@js-monorepo/loader'
-import { UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
 import { memo } from 'react'
 import { NotificationEmptyState } from '../notification-empty-state'
 import { NotificationDropdownItem } from './notification-dropdown-item'

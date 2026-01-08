@@ -1,4 +1,5 @@
-import { AuthRoleDTO, AuthUserDto, AuthUserFullDto, AuthUserUpdateDto, Pageable } from '@js-monorepo/types'
+import { AuthRoleDTO, AuthUserDto, AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types/auth'
+import { Pageable } from '@js-monorepo/types/pagination'
 
 export const AdminRepo = Symbol()
 

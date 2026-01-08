@@ -1,4 +1,4 @@
-import { ClientResponseType } from '@js-monorepo/types'
+import { ClientResponseType } from '@js-monorepo/types/responses'
 import { apiClient } from '@js-monorepo/utils/http'
 import { generateIdempotencyKey, IDEMPOTENCY_HEADER } from '@js-monorepo/utils/idempotency'
 import { InvoiceListResponse, StartTrialResponse, Subscription, TrialEligibilityResponse } from '../types'

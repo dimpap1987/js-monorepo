@@ -1,4 +1,4 @@
-import { AuthRole, AuthUserCreateDto, AuthUserDto, ProvidersDto, SessionUserType } from '@js-monorepo/types'
+import { AuthRole, AuthUserCreateDto, AuthUserDto, ProvidersDto, SessionUserType } from '@js-monorepo/types/auth'
 import { AuthUser } from '@prisma/client'
 
 export interface AuthService {

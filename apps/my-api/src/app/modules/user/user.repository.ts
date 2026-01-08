@@ -1,4 +1,4 @@
-import { EditUserDto } from '@js-monorepo/types'
+import { EditUserDto } from '@js-monorepo/types/auth'
 
 export const UserRepo = Symbol()
 

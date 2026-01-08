@@ -2,7 +2,7 @@
 
 import { Dialog, DialogTrigger, DpDialogContent } from '@js-monorepo/components/ui/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { ClientResponseType } from '@js-monorepo/types'
+import { ClientResponseType } from '@js-monorepo/types/responses'
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js/pure'
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react'

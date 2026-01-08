@@ -1,6 +1,6 @@
+import { registerUserSchemaConfig } from '@js-monorepo/schemas'
 import { FieldErrors, UseFormReturn } from 'react-hook-form'
 import { RegisterDialogErrorComponentType } from './types'
-import { registerUserSchemaConfig } from '@js-monorepo/schemas'
 
 export const initialRegisterValidations: RegisterDialogErrorComponentType[] = [
   {

@@ -1,4 +1,6 @@
-import { PaginationType, AuthUserDto, AuthUserFullDto, SessionUserType, Subscription } from '@js-monorepo/types'
+import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types/auth'
+import { Subscription } from '@js-monorepo/types/subscription'
+import { PaginationType } from '@js-monorepo/types/pagination'
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'

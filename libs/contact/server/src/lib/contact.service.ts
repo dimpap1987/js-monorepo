@@ -1,5 +1,6 @@
 import { PrismaService } from '@js-monorepo/db'
-import { ContactMessageCreateDto, ContactStatus, Pageable } from '@js-monorepo/types'
+import { ContactMessageCreateDto, ContactStatus } from '@js-monorepo/types/contact'
+import { Pageable } from '@js-monorepo/types/pagination'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common'
@@ -30,7 +31,7 @@ export class ContactService {
         where: { id: userId },
         select: { email: true },
       })
-      email = user?.email
+      email = user?.email || ''
     }
 
     const message = await this.contactRepository.create(

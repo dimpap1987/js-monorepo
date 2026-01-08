@@ -1,5 +1,5 @@
 import { RedisPushSubscriptionsKey } from '@js-monorepo/auth/nest/common/types'
-import { CreateUserNotificationType } from '@js-monorepo/types'
+import { CreateUserNotificationType } from '@js-monorepo/types/notifications'
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NotificationController } from './notification.controller'

@@ -1,6 +1,6 @@
 'use client'
 
-import { UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
 import { cn } from '@js-monorepo/ui/util'
 import { useEffect, useRef, useState } from 'react'
 import { DpLoadingSpinner } from '@js-monorepo/loader'

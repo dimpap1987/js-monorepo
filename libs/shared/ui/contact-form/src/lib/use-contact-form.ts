@@ -1,5 +1,5 @@
 import { ContactMessageSchema, ContactMessageSchemaType } from '@js-monorepo/schemas'
-import { ContactMessageDto } from '@js-monorepo/types'
+import { ContactMessageDto } from '@js-monorepo/types/contact'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse } from '@js-monorepo/utils/http/queries'
 import { zodResolver } from '@hookform/resolvers/zod'

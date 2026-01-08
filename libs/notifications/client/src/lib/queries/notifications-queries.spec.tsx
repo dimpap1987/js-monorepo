@@ -1,5 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { apiClient } from '@js-monorepo/utils/http'
+import { queryKeys } from '@js-monorepo/utils/http/queries'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import {
   useReadAllNotifications,
@@ -7,12 +9,6 @@ import {
   useUserNotifications,
   useUserNotificationsByCursor,
 } from './notifications-queries'
-// @ts-expect-error - Jest resolves this path alias correctly at runtime
-import { apiClient } from '@js-monorepo/utils/http'
-// @ts-expect-error - Jest resolves this path alias correctly at runtime
-import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
-// @ts-expect-error - Jest resolves this path alias correctly at runtime
-import { UserNotificationType } from '@js-monorepo/types'
 
 // Mock dependencies
 jest.mock('@js-monorepo/utils/http', () => ({

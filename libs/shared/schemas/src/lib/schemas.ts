@@ -1,4 +1,5 @@
-import { CONTACT_CATEGORIES, CONTACT_STATUSES, PROVIDERS_ARRAY } from '@js-monorepo/types'
+import { CONTACT_CATEGORIES, CONTACT_STATUSES } from '@js-monorepo/types/contact'
+import { PROVIDERS_ARRAY } from '@js-monorepo/types/auth'
 import * as z from 'zod'
 
 class RegisterUserSchemaConfig {

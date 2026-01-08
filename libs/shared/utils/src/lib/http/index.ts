@@ -1,4 +1,4 @@
-import { ClientResponseType, ErrorResponse, SuccessResponse } from '@js-monorepo/types'
+import { ClientResponseType, ErrorResponse, SuccessResponse } from '@js-monorepo/types/responses'
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { Request } from 'express'
 

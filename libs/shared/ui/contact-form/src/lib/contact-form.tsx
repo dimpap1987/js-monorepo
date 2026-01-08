@@ -14,10 +14,10 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
 import { Textarea } from '@js-monorepo/components/ui/textarea'
 import { useNotifications } from '@js-monorepo/notification'
-import { ContactCategory, CONTACT_CATEGORIES } from '@js-monorepo/types'
-import { z } from 'zod'
+import { CONTACT_CATEGORIES, ContactCategory } from '@js-monorepo/types/contact'
 import { cn } from '@js-monorepo/ui/util'
 import { FiMail, FiMessageSquare, FiSend } from 'react-icons/fi'
+import { z } from 'zod'
 import { useContactForm } from './use-contact-form'
 
 const CATEGORY_LABELS: Record<ContactCategory, string> = {

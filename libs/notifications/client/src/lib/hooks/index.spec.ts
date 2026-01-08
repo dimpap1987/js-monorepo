@@ -1,10 +1,8 @@
 import { renderHook, act } from '@testing-library/react'
 import { useNotificationWebSocket } from './index'
-// @ts-expect-error - Jest resolves this path alias correctly at runtime
 import { useWebSocketEvent } from '@js-monorepo/next/providers'
 import { NOTIFICATIONS_EVENT } from '../types/websocket-events'
-// @ts-expect-error - Jest resolves this path alias correctly at runtime
-import { UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
 
 // Mock dependencies
 jest.mock('@js-monorepo/next/providers', () => ({

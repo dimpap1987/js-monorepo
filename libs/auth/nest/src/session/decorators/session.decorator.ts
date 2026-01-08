@@ -1,4 +1,4 @@
-import { SessionUserType } from '@js-monorepo/types'
+import { SessionUserType } from '@js-monorepo/types/auth'
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 
 export const SessionUser = createParamDecorator((data: unknown, ctx: ExecutionContext): SessionUserType | undefined => {

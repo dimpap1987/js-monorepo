@@ -1,7 +1,7 @@
 import { AuthException } from '@js-monorepo/auth/nest/common/exceptions/api-exception'
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { UserUpdateUserSchema } from '@js-monorepo/schemas'
-import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types'
+import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types/auth'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'

@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CursorPaginationType, PaginationType, UserNotificationType } from '@js-monorepo/types'
+import { UserNotificationType } from '@js-monorepo/types/notifications'
+import { CursorPaginationType, PaginationType } from '@js-monorepo/types/pagination'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 interface NotificationsResponse extends PaginationType<UserNotificationType> {
   unReadTotal?: number

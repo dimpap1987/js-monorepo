@@ -2,14 +2,13 @@ import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { LoggedInGuard, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { SessionUserType } from '@js-monorepo/types/auth'
 import {
   CreatePushNotificationType,
-  CursorPaginationType,
   NotificationCreateDto,
-  PaginationType,
-  SessionUserType,
   UserNotificationType,
-} from '@js-monorepo/types'
+} from '@js-monorepo/types/notifications'
+import { CursorPaginationType, PaginationType } from '@js-monorepo/types/pagination'
 import {
   Body,
   Controller,

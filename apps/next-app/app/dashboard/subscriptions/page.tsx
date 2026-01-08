@@ -21,8 +21,8 @@ import { useQuery } from '@tanstack/react-query'
 import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubscriptionPagination } from './subscription-pagination'
-
-import { PaginationType, Subscription } from '@js-monorepo/types'
+import { Subscription } from '@js-monorepo/types/subscription'
+import { PaginationType } from '@js-monorepo/types/pagination'
 
 interface SubscriptionStats {
   activeCount: number

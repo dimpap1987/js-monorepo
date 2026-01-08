@@ -1,4 +1,4 @@
-import { ClientResponseType } from '@js-monorepo/types'
+import { ClientResponseType } from '@js-monorepo/types/responses'
 
 export async function handleQueryResponse<T>(response: ClientResponseType<T> & { ok: boolean }): Promise<T> {
   if (response.ok) {

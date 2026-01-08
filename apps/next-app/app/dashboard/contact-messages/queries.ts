@@ -1,4 +1,5 @@
-import { ContactMessageDto, ContactStatus, PaginationType } from '@js-monorepo/types'
+import { ContactMessageDto, ContactStatus } from '@js-monorepo/types/contact'
+import { PaginationType } from '@js-monorepo/types/pagination'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'

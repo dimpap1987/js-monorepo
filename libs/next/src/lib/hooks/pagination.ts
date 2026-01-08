@@ -1,4 +1,4 @@
-import { Pageable } from '@js-monorepo/types'
+import { Pageable } from '@js-monorepo/types/pagination'
 import { constructURIQueryString } from '@js-monorepo/ui/util'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
