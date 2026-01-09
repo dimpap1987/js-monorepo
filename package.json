@@ -26,7 +26,6 @@
     "test": "nx affected:test --all",
     "test:all": "nx run-many --target=test --all --skip-nx-cache",
     "prepare": "husky install",
-    "sync:env": "node scripts/sync-env.js",
     "graph": "nx graph --affected",
     "affected": "nx show projects --affected",
     "generate:docs": "node scripts/build-readme-template.js",

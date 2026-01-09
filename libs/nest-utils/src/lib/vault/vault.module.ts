@@ -14,7 +14,7 @@ export class VaultModule {
       imports: [
         ConfigModule.forRoot({
           isGlobal: true,
-          envFilePath: [`.env.${process.env['NODE_ENV']}`, '.env'], // Load .env files
+          envFilePath: options.envFilePaths || [`.env.${process.env['NODE_ENV']}`, '.env'], // Load .env files
           load: [async () => this.loadVaultSecrets(options)], // Load Vault secrets
         }),
       ],

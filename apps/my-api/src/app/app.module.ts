@@ -59,6 +59,7 @@ import { getContactMessage } from './notifications/contact-form'
       roleId: process.env.VAULT_ROLE_ID || '',
       secretId: process.env.VAULT_SECRET_ID || '',
       apiVersion: 'v1',
+      envFilePaths: [process.env['MY_API_ENV_PATH']],
     }),
     ClsModule.forRoot({
       global: true,

@@ -67,59 +67,24 @@ The architecture includes:
 
 ### Environment Variables
 
-This monorepo uses **centralized environment variable management** with **configurable base variables**. All environment variables are defined in a single root `.env` file using variable interpolation.
+Each application now manages its own environment variables using a local `.env` file. This allows for greater flexibility and ensures that each app's configuration is self-contained.
 
-#### Setup
+To get started, create a `.env` file in the root of each application that requires environment variables. Common locations include:
 
-1. **Create root `.env` file**:
+- `apps/next-app/.env`
+- `apps/my-api/.env`
+- `apps/gym-api/.env`
+- `apps/webhook-server/.env`
+- `libs/prisma/run_migrations/.env`
 
-   ```bash
-   # Copy from template
-   cp .env.example .env
-   ```
+Refer to the `.env.example` file (if available in the respective app's directory or the root for general guidance) for a list of necessary variables.
 
-2. **Sync to all apps**:
-   ```bash
-   npm run sync:env
-   ```
-   This syncs and expands variables from root `.env` to:
-   - `apps/my-api/.env`
-   - `apps/next-app/.env`
-   - `libs/prisma/run_migrations/.env`
+**Note**: When using `dotenv-expand` (e.g., in `apps/my-api` or `apps/gym-api`), variable interpolation within these local `.env` files is supported.
 
-#### How It Works
-
-The `.env` file uses **variable interpolation** (via `dotenv-expand`). Base variables are defined at the top, and all URLs are constructed from them:
-
-````bash
-# Base configuration
-# HOSTNAME=localhost
-# API_PORT=3333
-# FRONTEND_PORT=3000
-
-# # Auto-constructed URLs
-# HOSTNAME_API=${HOSTNAME}:${API_PORT}           # → localhost:3333
-# HOSTNAME_FRONTEND=${HOSTNAME}:${FRONTEND_PORT} # → localhost:3000
-# AUTH_LOGIN_REDIRECT=http://${HOSTNAME_FRONTEND} # → http://localhost:3000
-# GOOGLE_REDIRECT_URL=http://${HOSTNAME_API}/api/auth/google/redirect
-# ```
-
-#### Workflow
-
-- **Edit base variables**: Change `HOSTNAME`, `*_PORT` in root `.env`
-- **Sync changes**: Run `npm run sync:env` (expands variables automatically)
-- **Restart services**: Restart dev servers to load new values
-
-> **Note**: Run `npm run sync:env` whenever you change the root `.env` file. Variables are automatically expanded for Next.js compatibility.
-
-#### Environment-Specific Configuration
-
-**Local Development:**
-
-```bash
 HOSTNAME=localhost
 API_PORT=3333
 FRONTEND_PORT=3000
+
 ````
 
 **Staging/Production:**
@@ -222,3 +187,4 @@ GitHub Actions workflows are configured for:
 # TODO
 
 1. move all shadcn compoents in libs/shared/ui/components/src/lib/ui by executing comands from the oficial site
+````

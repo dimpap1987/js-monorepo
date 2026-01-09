@@ -4,6 +4,7 @@ export interface VaultClientOptions extends Vault.VaultOptions {
   roleId: string
   secretId: string
   path: string
+  envFilePaths?: string[]
 }
 
 export class VaultClient {

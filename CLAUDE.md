@@ -42,8 +42,7 @@ pnpm db:gym:create         # Create new migration
 pnpm db:gym:generate       # Generate Prisma client
 pnpm db:gym:studio         # Open Prisma Studio
 
-# Environment
-pnpm sync:env              # Sync root .env to app .env files (run after changing root .env)
+
 
 # Full CI locally
 pnpm ci:local              # Format check, lint, test, build
@@ -115,15 +114,7 @@ All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.js
 
 ## Environment Variables
 
-Centralized in root `.env` with variable interpolation. Base variables (`HOSTNAME`, `*_PORT`) auto-construct URLs:
-
-```bash
-HOSTNAME=localhost           # Change for different environments
-DATABASE_URL=${...}          # Core database (my-api, shared libs)
-GYM_DATABASE_URL=${...}      # Gym database (gym-api)
-```
-
-**Always run `pnpm sync:env` after modifying root `.env`**
+Each application now manages its own environment variables using a local `.env` file. This allows for greater flexibility and ensures that each app's configuration is self-contained. For detailed instructions, refer to the project's main `README.md` file.
 
 ## Code Conventions
 
