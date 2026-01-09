@@ -7,7 +7,7 @@ import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { RedisSessionKey } from '@js-monorepo/auth/nest/common/types'
 import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
 import { AuthSessionMiddleware, AuthSessionModule } from '@js-monorepo/auth/nest/session'
-import { PrismaModule, PrismaService } from '@js-monorepo/db'
+import { PrismaModule, PrismaService } from '@js-monorepo/gym-db'
 import { DistributedLockModule } from '@js-monorepo/nest/distributed-lock'
 import { IdempotencyModule } from '@js-monorepo/nest/idempotency'
 import { LoggerModule } from '@js-monorepo/nest/logger'
@@ -81,7 +81,7 @@ import { getContactMessage } from './notifications/contact-form'
     }),
     PrismaModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
-        databaseUrl: configService.get('DATABASE_URL'),
+        databaseUrl: configService.get('GYM_DATABASE_URL'),
       }),
     }),
     GracefulShutdownModule.forRoot({

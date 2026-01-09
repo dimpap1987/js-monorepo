@@ -1,16 +1,16 @@
-import { PrismaService } from '@js-monorepo/db'
+import { PRISMA_SERVICE, BasePrismaService } from '@js-monorepo/prisma-shared'
 import { CreateUserNotificationType, NotificationCreateDto } from '@js-monorepo/types/notifications'
 import { CursorPagination, Pageable } from '@js-monorepo/types/pagination'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { NotificationRepository } from './notification.repository'
 
 @Injectable()
 export class NotificationRepositoryPrisma implements NotificationRepository {
   constructor(
     private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
-    private readonly prisma: PrismaService
+    @Inject(PRISMA_SERVICE) private readonly prisma: BasePrismaService
   ) {}
 
   async getNotifications(

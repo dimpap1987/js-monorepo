@@ -1,0 +1,78 @@
+model AuthUser {
+    id                    Int                @id @default(autoincrement())
+    createdAt             DateTime           @default(now())
+    updatedAt             DateTime           @updatedAt
+    username              String             @unique(map: "unique_username") @db.Citext
+    email                 String             @unique
+    timezone              String             @default("UTC")
+    userProfiles          UserProfile[]
+    sentNotifications     UserNotification[] @relation("sender")
+    receivedNotifications UserNotification[] @relation("receiver")
+    userRole              UserRole[]
+    paymentCustomer       PaymentCustomer?
+    contactMessages       ContactMessage[]
+
+    @@index([email])
+    @@index([username])
+    @@map(name: "auth_users")
+}
+
+model UserProfile {
+    id           Int      @id @default(autoincrement())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    userId       Int
+    providerId   Int
+    profileImage String?
+
+    authUser AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+    provider Provider @relation(fields: [providerId], references: [id])
+
+    @@map(name: "user_profiles")
+}
+
+model UnRegisteredUser {
+    id           Int      @id @default(autoincrement())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    token        String   @unique
+    email        String   @unique
+    profileImage String?
+    providerId   Int
+
+    provider Provider @relation(fields: [providerId], references: [id])
+
+    @@index([email])
+    @@index([token])
+    @@map(name: "unregistered_users")
+}
+
+model Provider {
+    id               Int                @id @default(autoincrement())
+    name             String             @unique
+    userProfiles     UserProfile[]
+    unRegisteredUser UnRegisteredUser[]
+
+    @@map(name: "providers")
+}
+
+model Role {
+    id       Int        @id @default(autoincrement())
+    name     String     @unique
+    userRole UserRole[]
+
+    @@map(name: "roles")
+}
+
+model UserRole {
+    userId    Int
+    roleId    Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    authUser AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+    role     Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+    @@id([userId, roleId]) // Composite primary key
+    @@map(name: "user_role")
+}

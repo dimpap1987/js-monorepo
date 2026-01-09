@@ -28,12 +28,19 @@ pnpm test:all              # Test all
 # Run single test file
 npx nx test <project> --testFile=<filename>
 
-# Database (Prisma)
-pnpm db:migrate            # Run migrations
-pnpm db:deploy             # Deploy migrations to production
-pnpm db:create             # Create new migration
-pnpm db:generate           # Generate Prisma client
-pnpm db:studio             # Open Prisma Studio
+# Database (Prisma) - Core DB (my-api, shared libs)
+pnpm db:core:migrate       # Run migrations
+pnpm db:core:deploy        # Deploy migrations to production
+pnpm db:core:create        # Create new migration
+pnpm db:core:generate      # Generate Prisma client
+pnpm db:core:studio        # Open Prisma Studio
+
+# Database (Prisma) - Gym DB (gym-api)
+pnpm db:gym:migrate        # Run migrations
+pnpm db:gym:deploy         # Deploy migrations to production
+pnpm db:gym:create         # Create new migration
+pnpm db:gym:generate       # Generate Prisma client
+pnpm db:gym:studio         # Open Prisma Studio
 
 # Environment
 pnpm sync:env              # Sync root .env to app .env files (run after changing root .env)
@@ -46,10 +53,13 @@ pnpm ci:local              # Format check, lint, test, build
 
 ### Directory Structure
 
-- `apps/my-api/` - NestJS backend API
+- `apps/my-api/` - NestJS backend API (uses core-db)
+- `apps/gym-api/` - NestJS gym API (uses gym-db)
 - `apps/next-app/` - Next.js 14 frontend (App Router)
 - `libs/auth/` - Authentication (separate nest/next implementations)
-- `libs/prisma/db/` - Prisma schema and database access
+- `libs/prisma/shared/` - Shared Prisma types, tokens (PRISMA_SERVICE), and interfaces
+- `libs/prisma/core-db/` - Core Prisma schema (my-api) - uses DATABASE_URL
+- `libs/prisma/gym-db/` - Gym Prisma schema (gym-api) - uses GYM_DATABASE_URL
 - `libs/shared/ui/` - 23+ shadcn-based UI component libraries
 - `libs/shared/types/` - Shared TypeScript types
 - `libs/shared/schemas/` - Zod validation schemas
@@ -60,15 +70,20 @@ pnpm ci:local              # Format check, lint, test, build
 
 ### Key Entry Points
 
-- Backend: `apps/my-api/src/main.ts`
+- Backend (my-api): `apps/my-api/src/main.ts`
+- Backend (gym-api): `apps/gym-api/src/main.ts`
 - Frontend: `apps/next-app/app/layout.tsx`
-- Prisma schema: `libs/prisma/db/src/lib/prisma/schema/schema.prisma`
+- Core Prisma schema: `libs/prisma/core-db/src/lib/prisma/schema/`
+- Gym Prisma schema: `libs/prisma/gym-db/src/lib/prisma/schema/`
 
 ### Import Aliases
 
 All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.json`):
 
-- `@js-monorepo/db` - Prisma client
+- `@js-monorepo/prisma-shared` - Shared Prisma types, DI tokens (PRISMA_SERVICE)
+- `@js-monorepo/gym-db` - Core Prisma client (alias to core-db)
+- `@js-monorepo/core-db` - Core Prisma client (my-api)
+- `@js-monorepo/gym-db` - Gym Prisma client (gym-api)
 - `@js-monorepo/types` - Shared types
 - `@js-monorepo/ui/*` - UI components
 - `@js-monorepo/auth/*` - Auth libraries
@@ -104,7 +119,8 @@ Centralized in root `.env` with variable interpolation. Base variables (`HOSTNAM
 
 ```bash
 HOSTNAME=localhost           # Change for different environments
-DATABASE_URL=${...}          # Auto-constructed
+DATABASE_URL=${...}          # Core database (my-api, shared libs)
+GYM_DATABASE_URL=${...}      # Gym database (gym-api)
 ```
 
 **Always run `pnpm sync:env` after modifying root `.env`**

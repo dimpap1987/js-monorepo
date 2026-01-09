@@ -64,7 +64,7 @@ pnpm ci:local              # Format check, lint, test, build
 
 ### Import Aliases
 All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.json`):
-- `@js-monorepo/db` - Prisma client
+- `@js-monorepo/gym-db` - Prisma client
 - `@js-monorepo/types` - Shared types
 - `@js-monorepo/ui/*` - UI components
 - `@js-monorepo/auth/*` - Auth libraries

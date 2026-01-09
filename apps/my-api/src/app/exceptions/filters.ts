@@ -9,7 +9,7 @@ import {
   Logger,
 } from '@nestjs/common'
 import { BaseExceptionFilter } from '@nestjs/core'
-import { Prisma } from '@js-monorepo/db'
+import { Prisma } from '@js-monorepo/core-db'
 import { ZodError } from 'zod'
 
 const INTERNAL_ERROR = 'Internal server error'

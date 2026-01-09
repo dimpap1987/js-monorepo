@@ -8,7 +8,7 @@ import {
   Logger,
 } from '@nestjs/common'
 import { BaseExceptionFilter } from '@nestjs/core'
-import { Prisma } from '@js-monorepo/db'
+import { Prisma } from '@js-monorepo/prisma-shared'
 import { ZodError } from 'zod'
 import { ApiException } from './api-exception'
 

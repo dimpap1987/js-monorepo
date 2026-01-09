@@ -1,4 +1,4 @@
-import { PrismaService } from '@js-monorepo/db'
+import { PRISMA_SERVICE, BasePrismaService } from '@js-monorepo/prisma-shared'
 import { ContactMessageCreateDto, ContactStatus } from '@js-monorepo/types/contact'
 import { Pageable } from '@js-monorepo/types/pagination'
 import { tryCatch } from '@js-monorepo/utils/common'
@@ -15,7 +15,7 @@ export class ContactService {
   constructor(
     @Inject(ContactRepo)
     private readonly contactRepository: ContactRepository,
-    private readonly prisma: PrismaService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: BasePrismaService,
     @Optional()
     @Inject('CONTACT_OPTIONS')
     private readonly contactOptions?: ContactModuleOptions

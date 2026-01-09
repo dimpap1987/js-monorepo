@@ -7,7 +7,7 @@ import { PaginationType } from '@js-monorepo/types/pagination'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { HttpStatus, Inject, Injectable, Logger, UseInterceptors } from '@nestjs/common'
-import { AuthUser } from '@js-monorepo/db'
+import { AuthUser } from '@js-monorepo/core-db'
 import { AdminRepo, AdminRepository } from './admin.repository'
 
 @Injectable()

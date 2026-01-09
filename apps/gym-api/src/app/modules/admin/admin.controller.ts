@@ -23,7 +23,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { AuthUser } from '@js-monorepo/db'
+import { AuthUser } from '@js-monorepo/gym-db'
 import { Request } from 'express'
 import { AdminPaymentsService } from './admin-payments.service'
 import { AdminService } from './admin.service'

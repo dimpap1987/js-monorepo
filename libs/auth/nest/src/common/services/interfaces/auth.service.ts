@@ -1,5 +1,4 @@
 import { AuthRole, AuthUserCreateDto, AuthUserDto, ProvidersDto, SessionUserType } from '@js-monorepo/types/auth'
-import { AuthUser } from '@js-monorepo/db'
 
 export interface AuthService {
   findAuthUserByEmail(email: string): Promise<AuthUserDto | null>
@@ -8,5 +7,5 @@ export interface AuthService {
 
   createAuthUser(authUserDTO: AuthUserCreateDto, providerDTO: ProvidersDto, roles?: AuthRole[]): Promise<AuthUserDto>
 
-  createSessionUser(authUser: Partial<AuthUser>): SessionUserType
+  createSessionUser(authUser: Partial<AuthUserDto>): SessionUserType
 }

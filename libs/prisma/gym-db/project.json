@@ -1,7 +1,7 @@
 {
-  "name": "db",
+  "name": "gym-db",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/prisma/db/src",
+  "sourceRoot": "libs/prisma/gym-db/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -12,7 +12,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/prisma/db/jest.config.ts"
+        "jestConfig": "libs/prisma/gym-db/jest.config.ts"
       }
     }
   }
