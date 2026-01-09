@@ -2,7 +2,7 @@ import { ProviderName } from '@js-monorepo/types/auth'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { Prisma } from '@js-monorepo/db'
 import { ConstraintCode, ConstraintViolationException } from '../../../exceptions/contraint-violation'
 import { UserProfileRepository } from '../../user-profile.repository'
 import { UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types/user-profile'
@@ -39,7 +39,7 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
         },
       })
       .catch((e: unknown) => {
-        if (e instanceof PrismaClientKnownRequestError) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === 'P2002') {
             throw new ConstraintViolationException(ConstraintCode.PROFILE_EXISTS)
           }

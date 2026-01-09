@@ -219,7 +219,7 @@ export class EmailSetupService implements OnModuleInit {
 
   onModuleInit() {
     this.emailService.registerTemplates({
-      'welcome': {
+      welcome: {
         subject: 'Welcome to {{appName}}, {{userName}}!',
         html: `
           <h1>Welcome, {{userName}}!</h1>
@@ -242,7 +242,7 @@ export class EmailSetupService implements OnModuleInit {
         html: `
           <h1>Thank you for your order!</h1>
           <p>Order ID: {{orderId}}</p>
-          <p>Total: ${{total}}</p>
+          <p>Total: ${{ total }}</p>
         `,
       },
     })
@@ -325,17 +325,17 @@ export class AppModule {}
 
 ## Configuration Options
 
-| Option | Type | Required | Description |
-|--------|------|----------|-------------|
-| `provider` | `'smtp' \| 'sendgrid' \| 'console'` | Yes | Email provider to use |
-| `defaultFrom` | `string \| EmailAddress` | Yes | Default sender address |
-| `smtp` | `SmtpConfig` | If provider is 'smtp' | SMTP configuration |
-| `sendgrid` | `SendGridConfig` | If provider is 'sendgrid' | SendGrid configuration |
-| `debug` | `boolean` | No | Enable debug logging |
-| `retryAttempts` | `number` | No | Number of retry attempts (default: 1) |
-| `retryDelay` | `number` | No | Delay between retries in ms (default: 1000) |
-| `onEmailSent` | `function` | No | Callback after successful send |
-| `onEmailFailed` | `function` | No | Callback after all retries fail |
+| Option          | Type                                | Required                  | Description                                 |
+| --------------- | ----------------------------------- | ------------------------- | ------------------------------------------- |
+| `provider`      | `'smtp' \| 'sendgrid' \| 'console'` | Yes                       | Email provider to use                       |
+| `defaultFrom`   | `string \| EmailAddress`            | Yes                       | Default sender address                      |
+| `smtp`          | `SmtpConfig`                        | If provider is 'smtp'     | SMTP configuration                          |
+| `sendgrid`      | `SendGridConfig`                    | If provider is 'sendgrid' | SendGrid configuration                      |
+| `debug`         | `boolean`                           | No                        | Enable debug logging                        |
+| `retryAttempts` | `number`                            | No                        | Number of retry attempts (default: 1)       |
+| `retryDelay`    | `number`                            | No                        | Delay between retries in ms (default: 1000) |
+| `onEmailSent`   | `function`                          | No                        | Callback after successful send              |
+| `onEmailFailed` | `function`                          | No                        | Callback after all retries fail             |
 
 ## Environment Variables Example
 
@@ -381,8 +381,6 @@ const mockEmailService = {
 }
 
 const module = await Test.createTestingModule({
-  providers: [
-    { provide: EmailService, useValue: mockEmailService },
-  ],
+  providers: [{ provide: EmailService, useValue: mockEmailService }],
 }).compile()
 ```

@@ -297,14 +297,12 @@ jobs:
         if: matrix.app == 'my-api'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL_PROD }}
         run: |
-          pnpm prisma generate --schema=libs/prisma/db/src/lib/prisma/schema
+          pnpm prisma generate --config=libs/prisma/db/prisma.config.ts
 
       - name: Build ${{ matrix.app }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL_PROD }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }}
           NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD }}
         run: |

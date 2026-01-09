@@ -150,9 +150,8 @@ jobs:
       - name: Deploy migrations
         env:
           DATABASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.DATABASE_URL_PROD || (secrets.TEST_DATABASE_URL || secrets.DATABASE_URL_PROD) }}
-          DIRECT_URL: ${{ github.ref == 'refs/heads/main' && secrets.DIRECT_URL_PROD || (secrets.TEST_DIRECT_URL || secrets.DIRECT_URL_PROD) }}
         run: |
-          pnpm prisma migrate deploy --schema=libs/prisma/db/src/lib/prisma/schema
+          pnpm prisma migrate deploy --config=libs/prisma/db/prisma.config.ts
 
   # ============================================
   # Check CI Status
@@ -255,7 +254,6 @@ jobs:
           cache-to: type=registry,ref=${{ env.DOCKERHUB_USERNAME }}/${{ matrix.app }}:buildcache,mode=max
           build-args: |
             DATABASE_URL=${{ github.ref == 'refs/heads/main' && secrets.DATABASE_URL_PROD || (secrets.TEST_DATABASE_URL || secrets.DATABASE_URL_PROD) }}
-            DIRECT_URL=${{ github.ref == 'refs/heads/main' && secrets.DIRECT_URL_PROD || (secrets.TEST_DIRECT_URL || secrets.DIRECT_URL_PROD) }}
             NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }}
             NEXT_PUBLIC_VAPID_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD }}
             VERSION=${{ steps.version.outputs.version }}

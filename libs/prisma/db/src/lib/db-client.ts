@@ -1,28 +1,49 @@
 import { Inject, Injectable, Logger, OnApplicationShutdown, OnModuleInit } from '@nestjs/common'
-import { Prisma, PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
+import { PrismaClient } from './prisma/generated/prisma/client'
 import { PrismaModuleOptions } from './prisma.module'
 
+// Create a typed PrismaClient with log events enabled
+const createPrismaClient = (adapter: PrismaPg) => {
+  return new PrismaClient({
+    adapter,
+    errorFormat: 'pretty',
+    log: [
+      { level: 'query', emit: 'event' },
+      { level: 'warn', emit: 'event' },
+      { level: 'info', emit: 'event' },
+      { level: 'error', emit: 'event' },
+    ],
+  })
+}
+
+type PrismaClientWithEvents = ReturnType<typeof createPrismaClient>
+
+const delay = (ms: number) => new Promise((resolve) => globalThis.setTimeout(resolve, ms))
+
 @Injectable()
-export class PrismaService
-  extends PrismaClient<Prisma.PrismaClientOptions, 'query' | 'info' | 'warn' | 'error'>
-  implements OnModuleInit, OnApplicationShutdown
-{
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export class PrismaService implements OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger(PrismaService.name)
-
   private readonly maxRetries = 10
-
   private readonly retryDelay = 10000 // 10 seconds
+  private pool: Pool
+  private _client: PrismaClientWithEvents
 
   constructor(@Inject('PRISMA_MODULE_OPTIONS') private readonly options: PrismaModuleOptions) {
-    super({
-      datasourceUrl: options.databaseUrl,
-      errorFormat: 'pretty',
-      log: [
-        { level: 'query', emit: 'event' },
-        { level: 'warn', emit: 'event' },
-        { level: 'info', emit: 'event' },
-        { level: 'error', emit: 'event' },
-      ],
+    this.pool = new Pool({ connectionString: options.databaseUrl })
+    const adapter = new PrismaPg(this.pool)
+    this._client = createPrismaClient(adapter)
+
+    // Return a proxy that delegates all PrismaClient calls to the internal client
+    return new Proxy(this, {
+      get: (target, prop) => {
+        if (prop in target) {
+          return (target as any)[prop]
+        }
+        return (target._client as any)[prop]
+      },
     })
   }
 
@@ -33,7 +54,8 @@ export class PrismaService
 
   async onApplicationShutdown(signal?: string) {
     this.logger.warn(`Application shutting down... Signal: ${signal}`)
-    await this.$disconnect()
+    await this._client.$disconnect()
+    await this.pool.end()
     this.logger.warn('Disconnected from database.')
   }
 
@@ -42,17 +64,16 @@ export class PrismaService
 
     while (retryCount < this.maxRetries) {
       try {
-        await this.$connect()
+        await this._client.$connect()
         this.logger.log('Connected to database')
         return
-      } catch (error) {
+      } catch (error: any) {
         retryCount++
         this.logger.error(`Error connecting to database (attempt ${retryCount}/${this.maxRetries})`, error.stack)
 
         if (retryCount < this.maxRetries) {
           this.logger.log(`Retrying connection in ${this.retryDelay / 1000} seconds...`)
-          // eslint-disable-next-line @typescript-eslint/no-loop-func
-          await new Promise((resolve) => setTimeout(resolve, this.retryDelay))
+          await delay(this.retryDelay)
         }
       }
     }
@@ -62,19 +83,23 @@ export class PrismaService
   }
 
   private handleEvents() {
-    const showSql = process.env.SHOW_SQL === 'true'
+    const showSql = process.env['SHOW_SQL'] === 'true'
 
     if (showSql) {
-      this.$on('query', (e: Prisma.QueryEvent) => {
+      this._client.$on('query', (e) => {
         this.logger.log(`Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration} ms`)
       })
-      this.$on('info', (e: Prisma.LogEvent) => {
+      this._client.$on('info', (e) => {
         this.logger.log(`Message: ${e.message}`)
       })
     }
 
-    this.$on('error', (e: Prisma.LogEvent) => {
+    this._client.$on('error', (e) => {
       this.logger.error(`Error Message: ${e.message}`)
     })
   }
 }
+
+// Type augmentation for PrismaService to include PrismaClient methods
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export interface PrismaService extends PrismaClientWithEvents {}

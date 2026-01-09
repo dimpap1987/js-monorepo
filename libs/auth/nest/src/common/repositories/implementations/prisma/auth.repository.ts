@@ -2,7 +2,7 @@ import { AuthUserCreateDto, AuthUserDto, ProvidersDto } from '@js-monorepo/types
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import { Prisma } from '@js-monorepo/db'
 import { ConstraintCode, ConstraintViolationException } from '../../../exceptions/contraint-violation'
 import { AuthRepository } from '../../auth.repository'
 
@@ -53,7 +53,7 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
         select: this.authUserSelectStatement(),
       })
       .catch((e: unknown) => {
-        if (e instanceof PrismaClientKnownRequestError) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === 'P2002') {
             throw new ConstraintViolationException(ConstraintCode.USERNAME_EXISTS)
           }

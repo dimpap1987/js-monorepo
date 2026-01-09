@@ -51,3 +51,6 @@ apps/docs/public/README.json
 logs/
 
 deployments/my-api_next-app/data/
+
+# Prisma generated client
+libs/prisma/db/src/lib/prisma/generated/
