@@ -29,6 +29,7 @@
       "@js-monorepo/contact-server": ["libs/contact/server/src/index.ts"],
       "@js-monorepo/db": ["libs/prisma/db/src/index.ts"],
       "@js-monorepo/dialog": ["libs/shared/ui/dialog/src/index.ts"],
+      "@js-monorepo/email-server": ["libs/email/server/src/index.ts"],
       "@js-monorepo/error": ["libs/shared/ui/error/src/index.ts"],
       "@js-monorepo/loader": ["libs/shared/ui/loader/src/index.ts"],
       "@js-monorepo/map": ["libs/shared/ui/map/src/index.ts"],

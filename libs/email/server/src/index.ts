@@ -1,0 +1,6 @@
+export * from './lib/email.module'
+export * from './lib/email.service'
+export * from './lib/email.tokens'
+export * from './lib/email.types'
+export * from './lib/providers'
+export * from './lib/templates'
