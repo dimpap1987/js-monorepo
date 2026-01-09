@@ -37,7 +37,7 @@ const DashboardUsersTableSuspense = () => {
     user?: AuthUserFullDto
   }>()
 
-  const pageCount = Math.round((data?.totalCount || 0) / pagination.pageSize)
+  const pageCount = Math.ceil((data?.totalCount || 0) / pagination.pageSize)
   const userTimezone = useTimezone()
 
   const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
@@ -242,7 +242,7 @@ const DashboardUsersTableSuspense = () => {
       setPagination((prevPagination: Pageable) => {
         const currentState = {
           pageSize: prevPagination.pageSize,
-          pageIndex: prevPagination.page,
+          pageIndex: prevPagination.page - 1, // Convert to zero-based for tanstack
         }
 
         const updated =
@@ -261,7 +261,7 @@ const DashboardUsersTableSuspense = () => {
     <div>
       <DataTable
         columns={memoizedColumns}
-        data={data?.users || []}
+        data={data?.content || []}
         onPaginationChange={onPaginationChange}
         totalCount={pageCount}
         pagination={pagination}

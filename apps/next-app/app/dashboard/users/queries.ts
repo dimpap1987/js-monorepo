@@ -4,19 +4,15 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types/auth'
+import { PaginationType } from '@js-monorepo/types/pagination'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
-
-interface UsersResponse {
-  users: AuthUserFullDto[]
-  totalCount: number
-}
 
 /**
  * Fetch users with pagination and search
  */
-const findUsers = async (searchParams?: string): Promise<UsersResponse> => {
-  const response = await apiClient.get<UsersResponse>(`/admin/users${searchParams || ''}`)
+const findUsers = async (searchParams?: string): Promise<PaginationType<AuthUserFullDto>> => {
+  const response = await apiClient.get<PaginationType<AuthUserFullDto>>(`/admin/users${searchParams || ''}`)
   return handleQueryResponse(response)
 }
 

@@ -27,7 +27,7 @@ interface MultiSelectDropdownProps {
 }
 
 export function MultiSelectDropdown({
-  options,
+  options = [],
   onChange,
   prompt = 'Select',
   selectedIds = [],
@@ -49,7 +49,7 @@ export function MultiSelectDropdown({
     return localLabel ? localLabel : prompt
   }
 
-  const label = useMemo(() => constructLabel(selectedOptions), [selectedOptions])
+  const label = useMemo(() => constructLabel(selectedOptions), [selectedOptions, options])
 
   useClickAway(dropdownContentRef, (event) => {
     if (dropdownTriggerRef.current?.contains(event.target as Node)) {

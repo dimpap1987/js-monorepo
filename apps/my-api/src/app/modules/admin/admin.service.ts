@@ -1,12 +1,14 @@
 import { AuthException } from '@js-monorepo/auth/nest/common/exceptions/api-exception'
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import { UserUpdateUserSchema } from '@js-monorepo/schemas'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types/auth'
+import { PaginationType } from '@js-monorepo/types/pagination'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
+import { HttpStatus, Inject, Injectable, Logger, UseInterceptors } from '@nestjs/common'
 import { AuthUser } from '@prisma/client'
 import { AdminRepo, AdminRepository } from './admin.repository'
-import { ApiException } from '@js-monorepo/nest/exceptions'
 
 @Injectable()
 export class AdminService {
@@ -19,18 +21,12 @@ export class AdminService {
     private readonly userPresenceWebsocketService: UserPresenceWebsocketService
   ) {}
 
-  async getUsers(
-    page?: number,
-    pageSize?: number
-  ): Promise<{
-    users: AuthUserFullDto[]
-    totalCount: number
-  }> {
+  async getUsers(page?: number, pageSize?: number): Promise<PaginationType<AuthUserFullDto>> {
     this.logger.debug(`Fetching user: page: '${page}' - pageSize: '${pageSize}'`)
     try {
       return await this.adminRepository.getUsers({
-        page,
-        pageSize,
+        page: page ?? 1,
+        pageSize: pageSize ?? 10,
       })
     } catch (e) {
       this.logger.error(`Error fetching user: page: '${page}' - pageSize: '${pageSize}'`, e.stack)
@@ -59,6 +55,9 @@ export class AdminService {
     }
   }
 
+  @CacheKey('admin-service:user_roles')
+  @CacheTTL(10 * 60 * 1000) // Cache for 10 minutes (600,000 milliseconds)
+  @UseInterceptors(CacheInterceptor)
   getRoles() {
     return this.adminRepository.getRoles()
   }

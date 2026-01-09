@@ -19,7 +19,7 @@ const SelectUsersComponent = ({
   const [usersDropDown, setUsersDropDown] = useState<UserDropdown[]>([])
 
   useEffect(() => {
-    findUsers().then((users) => setUsersDropDown(users.users?.map((u) => ({ id: u.id, name: u.username }))))
+    findUsers().then((data) => setUsersDropDown(data.content?.map((u) => ({ id: u.id, name: u.username })) ?? []))
   }, [])
 
   return (

@@ -1,11 +1,11 @@
-import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types/auth'
-import { Subscription } from '@js-monorepo/types/subscription'
-import { PaginationType } from '@js-monorepo/types/pagination'
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
+import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types/auth'
+import { PaginationType } from '@js-monorepo/types/pagination'
+import { Subscription } from '@js-monorepo/types/subscription'
 import { OnlineUsersService } from '@js-monorepo/user-presence'
-import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
+import { CacheInterceptor } from '@nestjs/cache-manager'
 import {
   Body,
   Controller,
@@ -46,17 +46,11 @@ export class AdminController {
   async getUsers(
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
-  ): Promise<{
-    users: AuthUserFullDto[]
-    totalCount: number
-  }> {
+  ): Promise<PaginationType<AuthUserFullDto>> {
     return this.adminService.getUsers(page, pageSize)
   }
 
   @Get('roles')
-  @CacheKey('admin-controller:user_roles')
-  @CacheTTL(10 * 60 * 1000) // Cache for 10 minutes (600,000 milliseconds)
-  @UseInterceptors(CacheInterceptor)
   async getRoles() {
     return this.adminService.getRoles()
   }
