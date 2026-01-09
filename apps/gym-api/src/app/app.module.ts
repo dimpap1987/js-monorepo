@@ -1,0 +1,301 @@
+import { ContactServerModule } from '@js-monorepo/contact-server'
+import { VaultModule } from '@js-monorepo/nest/vault'
+import { PaymentsModule } from '@js-monorepo/payments-server'
+import KeyvRedis, { Keyv } from '@keyv/redis'
+import { Inject, MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
+
+import { RedisSessionKey } from '@js-monorepo/auth/nest/common/types'
+import { authCookiesOptions } from '@js-monorepo/auth/nest/common/utils'
+import { AuthSessionMiddleware, AuthSessionModule } from '@js-monorepo/auth/nest/session'
+import { PrismaModule, PrismaService } from '@js-monorepo/db'
+import { DistributedLockModule } from '@js-monorepo/nest/distributed-lock'
+import { IdempotencyModule } from '@js-monorepo/nest/idempotency'
+import { LoggerModule } from '@js-monorepo/nest/logger'
+import { REDIS, RedisModule } from '@js-monorepo/nest/redis'
+import {
+  Events as NotificationEvent,
+  NotificationServerModule,
+  NotificationService,
+} from '@js-monorepo/notifications-server'
+import { AuthUserDto } from '@js-monorepo/types/auth'
+import { Events, UserPresenceModule, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
+import { ClsPluginTransactional } from '@nestjs-cls/transactional'
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
+import { CacheModule } from '@nestjs/cache-manager'
+import { ConfigService } from '@nestjs/config'
+import { ScheduleModule } from '@nestjs/schedule'
+import RedisStore from 'connect-redis'
+import session from 'express-session'
+import { ClsModule } from 'nestjs-cls'
+import { GracefulShutdownModule } from 'nestjs-graceful-shutdown'
+import passport from 'passport'
+import { RedisClientType } from 'redis'
+import { v4 as uuidv4 } from 'uuid'
+import { apiLogger } from '../main'
+import { LoggerMiddleware } from '../middlewares/logger.middleware'
+import { AnnouncementsController } from './controllers/announcements'
+import { AppController } from './controllers/app.controller'
+import { ExceptionController } from './controllers/exception.controller'
+import { AdminProviderModule } from './modules/admin/admin.module'
+import { FilterProviderModule } from './modules/filter.modules'
+import { HealthModule } from './modules/health/health.module'
+import { UserModule } from './modules/user/user.module'
+import {
+  getSubscriptionActivatedMessage,
+  getSubscriptionCanceledMessage,
+  getSubscriptionExpiredMessage,
+  getSubscriptionRenewedMessage,
+  getTrialExpiredMessage,
+  getTrialStartedMessage,
+} from './notifications/subscription-notifications'
+import { getContactMessage } from './notifications/contact-form'
+
+@Module({
+  imports: [
+    LoggerModule.forRootAsync(),
+    VaultModule.register({
+      path: 'secret/data/data/gym-api/env',
+      endpoint: process.env.VAULT_ADDR || '',
+      roleId: process.env.VAULT_ROLE_ID || '',
+      secretId: process.env.VAULT_SECRET_ID || '',
+      apiVersion: 'v1',
+    }),
+    ClsModule.forRoot({
+      global: true,
+      middleware: {
+        mount: true,
+        setup: (cls, req) => {
+          if (req.cookies['JSESSIONID']) {
+            cls.set('session-id', req.cookies['JSESSIONID'])
+          }
+        },
+      },
+      plugins: [
+        new ClsPluginTransactional({
+          imports: [PrismaModule],
+          adapter: new TransactionalAdapterPrisma({
+            prismaInjectionToken: PrismaService,
+          }),
+        }),
+      ],
+    }),
+    PrismaModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        databaseUrl: configService.get('DATABASE_URL'),
+      }),
+    }),
+    GracefulShutdownModule.forRoot({
+      cleanup: async (app, signal) => {
+        apiLogger.warn(`Shutdown hook received with signal: ${signal}`)
+      },
+      gracefulShutdownTimeout: Number(process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 3000),
+      keepNodeProcessAlive: true,
+    }),
+    HealthModule,
+    ScheduleModule.forRoot(),
+    RedisModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        url: configService.get('REDIS_URL'),
+      }),
+      isGlobal: true,
+    }),
+    DistributedLockModule,
+    IdempotencyModule,
+    UserPresenceModule,
+    AuthSessionModule.forRootAsync({
+      imports: [UserPresenceModule],
+      inject: [UserPresenceWebsocketService],
+      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService, configService: ConfigService) => ({
+        google: {
+          clientId: configService.get('GOOGLE_CLIENT_ID'),
+          clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
+          callBackUrl: configService.get('GOOGLE_REDIRECT_URL'),
+        },
+        github: {
+          clientId: configService.get('GITHUB_CLIENT_ID'),
+          clientSecret: configService.get('GITHUB_CLIENT_SECRET'),
+          callBackUrl: configService.get('GITHUB_REDIRECT_URL'),
+        },
+        csrf: {
+          enabled: true,
+          middlewareExclusions: ['exceptions', 'admin/(.*)', 'health', 'payments/webhook', 'contact'],
+        },
+        redirectUiUrl: configService.get('AUTH_LOGIN_REDIRECT'),
+        onRegister: async (user: AuthUserDto) => {
+          userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' has joined 🚀`])
+        },
+        onLogin: async (user) => {
+          userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' is online 😎`])
+        },
+      }),
+    }),
+    FilterProviderModule,
+    AdminProviderModule,
+    UserModule,
+    NotificationServerModule.forRootAsync({
+      imports: [UserPresenceModule],
+      inject: [UserPresenceWebsocketService],
+      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService, configService: ConfigService) => ({
+        adminEmail: configService.get('ADMIN_EMAIL'),
+        vapidPrivateKey: configService.get('VAPID_PRIVATE_KEY'),
+        vapidPublicKey: configService.get('VAPID_PUBLIC_KEY'),
+        onNotificationCreation(receiverIds, notification) {
+          apiLogger.log(
+            `Notification created with id: '${notification.id}' and publish it to users : [${receiverIds?.join(', ')}]`
+          )
+          userPresenceWebsocketService.sendToUsers(receiverIds, NotificationEvent.notifications, {
+            data: {
+              notification,
+            },
+          })
+        },
+      }),
+    }),
+    PaymentsModule.forRootAsync({
+      imports: [UserPresenceModule, NotificationServerModule],
+      inject: [UserPresenceWebsocketService, NotificationService],
+      useFactory: async (
+        userPresenceWebsocketService: UserPresenceWebsocketService,
+        notificationService: NotificationService
+      ) => ({
+        onSubscriptionCreateSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getSubscriptionActivatedMessage({ planName: subscription.name }),
+          })
+        },
+        onSubscriptionEvent: (userId, event) => {
+          apiLogger.log(`Subscription event callback received with event: '${event}' and userId: ${userId}`)
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+        },
+        onSubscriptionUpdateSuccess: () => {
+          // Updates without specific context are handled via webhooks for UI refresh
+          // Specific actions like renewals have their own callbacks
+        },
+        onSubscriptionRenewSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getSubscriptionRenewedMessage({ planName: subscription.name }),
+          })
+        },
+        onSubscriptionDeleteSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getSubscriptionCanceledMessage({
+              planName: subscription.name,
+              cancelAt: subscription.cancelAt,
+            }),
+          })
+        },
+        onSubscriptionExpiredSuccess: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getSubscriptionExpiredMessage({ planName: subscription.name }),
+          })
+        },
+        onTrialStarted: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getTrialStartedMessage({ planName: subscription.name }),
+          })
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+        },
+        onTrialExpired: (userId, subscription) => {
+          notificationService.createNotification({
+            receiverIds: [userId],
+            message: getTrialExpiredMessage({ planName: subscription.name }),
+          })
+          userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+        },
+      }),
+    }),
+    ContactServerModule.forRootAsync({
+      imports: [NotificationServerModule, PrismaModule],
+      inject: [NotificationService, PrismaService],
+      useFactory: async (notificationService: NotificationService, prisma: PrismaService) => ({
+        onContactMessageCreated: async (message) => {
+          const adminUsers = await prisma.authUser.findMany({
+            where: {
+              userRole: {
+                some: {
+                  role: {
+                    name: 'ADMIN',
+                  },
+                },
+              },
+            },
+            select: { id: true },
+          })
+
+          if (adminUsers.length > 0) {
+            const adminIds = adminUsers.map((u) => u.id)
+            await notificationService.createNotification({
+              receiverIds: adminIds,
+              message: getContactMessage(message),
+              type: 'contact_message',
+              link: '/dashboard/contact-messages',
+            })
+            apiLogger.log(`Contact message notification sent to ${adminIds.length} admin(s)`)
+          }
+        },
+      }),
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      inject: [REDIS, ConfigService],
+      useFactory: async (redisClient: RedisClientType, configService: ConfigService) => {
+        const redisStore = new Keyv({
+          store: new KeyvRedis(redisClient, {
+            keyPrefixSeparator: ':caches:',
+          }),
+          ttl: 5000,
+          useKeyPrefix: false,
+          namespace: configService.get('REDIS_NAMESPACE'),
+        })
+        return {
+          stores: redisStore,
+        }
+      },
+    }),
+  ],
+  controllers: [ExceptionController, AnnouncementsController, AppController],
+  providers: [LoggerMiddleware],
+})
+export class AppModule implements NestModule {
+  constructor(
+    @Inject(REDIS) private readonly redis: RedisClientType,
+    @Inject(RedisSessionKey) private redisSessionPath: string,
+    private readonly configService: ConfigService
+  ) {}
+
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        session({
+          store: new RedisStore({
+            client: this.redis,
+            prefix: this.redisSessionPath,
+          }),
+          genid: () => uuidv4(),
+          saveUninitialized: false,
+          secret: this.configService.get('SESSION_SECRET'),
+          proxy: true, // IMPORTANT: Tells Express to trust the X-Forwarded-Proto header
+          resave: false,
+          rolling: true, // Reset the expiration on every request
+          name: 'JSESSIONID',
+          cookie: {
+            ...authCookiesOptions,
+            maxAge: 1000 * 60 * 60 * 24, // 1 day
+          },
+        }),
+        passport.initialize(),
+        passport.session()
+      )
+      .forRoutes('*')
+      .apply(LoggerMiddleware) // Apply LoggerMiddleware
+      .forRoutes('*')
+      .apply(AuthSessionMiddleware)
+      .exclude('health', 'payments/(.*)', 'contact')
+      .forRoutes('*')
+  }
+}

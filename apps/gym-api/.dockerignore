@@ -1,0 +1,48 @@
+# --- Version Control & IDEs ---
+.git
+.github
+.vscode
+.idea
+.DS_Store
+.husky
+.editorconfig
+
+# --- Build Outputs & Caches ---
+dist
+tmp
+out
+coverage
+.next
+.swc
+.nx/cache
+.nx/workspace-data
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Project Configuration (Ignored during context upload) ---
+# Note: You will manually COPY the ones you need in the Dockerfile
+README.md
+LICENSE
+.storybook
+.eslintrc.json
+.prettierrc
+.prettierignore
+babel.config.json
+jest.config.js
+jest.preset.js
+*.md
+
+# --- Scripts & Deployment (Hidden as requested) ---
+scripts
+deployments
+tools
+docker-compose*
+Dockerfile*
+
+# --- Sensitive Information ---
+.env
+.env.*
+!.env.example

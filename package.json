@@ -18,7 +18,7 @@
     ]
   },
   "scripts": {
-    "ci:local": "nx run-many --target=lint,test --all --skip-nx-cache && nx run-many --target=build --projects=my-api,next-app --skip-nx-cache --configuration=production",
+    "ci:local": "nx run-many --target=lint,test --all --skip-nx-cache && nx run-many --target=build --projects=gym-api,my-api,next-app --skip-nx-cache --configuration=production",
     "lint": "nx affected:lint --all",
     "lint:all": "nx run-many --all --target=lint",
     "format": "prettier --write .",
@@ -33,17 +33,20 @@
     "dev:next": "nx run next-app:serve:development",
     "dev:tranquil": "nx run tranquil-studio:serve:development",
     "dev:my-api": "nx run my-api:serve:development",
+    "dev:gym-api": "nx run gym-api:serve:development",
     "dev:docs": "nx serve docs",
     "dev:webhook": "nx serve webhook-server",
     "build:next": "nx build next-app --prod --verbose",
     "build:tranquil": "nx build tranquil-studio --prod --verbose",
     "build:my-api": "nx build my-api --prod",
+    "build:gym-api": "nx build gym-api --prod",
     "build:webhook": "nx build webhook-server --prod",
     "build:docs": "pnpm generate:docs && nx build docs --prod",
     "start:next": "cd dist/apps/next-app && pnpm start",
     "start:tranquil": "cd dist/apps/tranquil-studio && next start",
     "start:webhook": "cd dist/apps/webhook-server && node main.js",
     "start:my-api": "cd dist/apps/my-api && node main.js",
+    "start:gym-api": "cd dist/apps/gym-api && node main.js",
     "start:docs": "cd dist/apps/docs && next start",
     "db:migrate": "prisma migrate dev --config=libs/prisma/db/prisma.config.ts",
     "db:deploy": "prisma migrate deploy --config=libs/prisma/db/prisma.config.ts",
@@ -51,6 +54,7 @@
     "db:generate": "prisma generate --config=libs/prisma/db/prisma.config.ts",
     "db:studio": "prisma studio --config=libs/prisma/db/prisma.config.ts",
     "docker:my-api": "BRANCH=$(git rev-parse --abbrev-ref HEAD) && TAG=$([ \"$BRANCH\" = \"main\" ] && echo 'latest' || echo \"$BRANCH\") && docker build -f apps/my-api/Dockerfile -t my-api:$TAG .",
+    "docker:gym-api": "BRANCH=$(git rev-parse --abbrev-ref HEAD) && TAG=$([ \"$BRANCH\" = \"main\" ] && echo 'latest' || echo \"$BRANCH\") && docker build -f apps/gym-api/Dockerfile -t gym-api:$TAG .",
     "docker:next-app": "BRANCH=$(git rev-parse --abbrev-ref HEAD) && TAG=$([ \"$BRANCH\" = \"main\" ] && echo 'latest' || echo \"$BRANCH\") && docker build -f apps/next-app/Dockerfile -t next-app:$TAG ."
   },
   "lint-staged": {
