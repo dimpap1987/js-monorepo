@@ -1,0 +1,83 @@
+model PaymentCustomer {
+    id               Int      @id @default(autoincrement())
+    userId           Int      @unique
+    stripeCustomerId String   @unique @map("stripe_customer_id")
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+
+    authUser      AuthUser       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    subscriptions Subscription[]
+
+    @@index([userId])
+    @@index([stripeCustomerId])
+    @@map("stripe_customers")
+}
+
+model Subscription {
+    id                   Int       @id @default(autoincrement())
+    paymentCustomerId    Int       @map("payment_customer_id")
+    stripeSubscriptionId String?   @unique @map("stripe_subscription_id")
+    priceId              Int
+    status               String
+    currentPeriodStart   DateTime  @map("current_period_start")
+    currentPeriodEnd     DateTime  @map("current_period_end")
+    trialStart           DateTime? @map("trial_start")
+    trialEnd             DateTime? @map("trial_end")
+    cancelAt             DateTime? @map("cancel_at")
+    canceledAt           DateTime? @map("canceled_at")
+    cancelReason         String?   @map("cancel_reason")
+    createdAt            DateTime  @default(now())
+    updatedAt            DateTime  @updatedAt
+
+    paymentCustomer PaymentCustomer @relation(fields: [paymentCustomerId], references: [id])
+    price           Price           @relation(fields: [priceId], references: [id])
+
+    @@index([paymentCustomerId])
+    @@index([priceId])
+    @@index([status])
+    @@index([status, currentPeriodEnd])
+    @@map("subscriptions")
+}
+
+model StripeWebhookEvent {
+    id        Int      @id @default(autoincrement())
+    eventId   String   @unique @map("event_id")
+    eventType String   @map("event_type")
+    createdAt DateTime @default(now())
+
+    @@index([eventId])
+    @@map("stripe_webhook_events")
+}
+
+model Product {
+    id          Int      @id @default(autoincrement())
+    stripeId    String   @unique
+    name        String   @unique
+    description String
+    active      Boolean  @default(true)
+    prices      Price[]
+    features    Json?
+    hierarchy   Int      @default(0)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@map("products")
+}
+
+model Price {
+    id         Int     @id @default(autoincrement())
+    stripeId   String  @unique
+    unitAmount Int
+    currency   String
+    interval   String
+    active     Boolean @default(true)
+    productId  Int
+    product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    subscriptions Subscription[]
+
+    @@index([active])
+    @@map("prices")
+}
