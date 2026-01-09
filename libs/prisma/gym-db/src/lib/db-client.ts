@@ -60,26 +60,29 @@ export class PrismaService implements OnModuleInit, OnApplicationShutdown {
   }
 
   private async handleDatabaseConnection() {
-    let retryCount = 0
-
-    while (retryCount < this.maxRetries) {
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
         await this._client.$connect()
-        this.logger.log('Connected to database')
-        return
-      } catch (error: any) {
-        retryCount++
-        this.logger.error(`Error connecting to database (attempt ${retryCount}/${this.maxRetries})`, error.stack)
 
-        if (retryCount < this.maxRetries) {
+        // Ping database with a lightweight query
+        await this._client.$queryRaw`SELECT 1`
+
+        this.logger.log('✅ Connected to database and ping succeeded')
+        return // success, exit the loop
+      } catch (error: any) {
+        this.logger.error(`❌ Database connection attempt ${attempt} failed`, error.stack)
+
+        if (attempt < this.maxRetries) {
           this.logger.log(`Retrying connection in ${this.retryDelay / 1000} seconds...`)
           await delay(this.retryDelay)
+        } else {
+          this.logger.error(
+            `🚨 Maximum retry attempts reached (${this.maxRetries}). Unable to connect to the database.`
+          )
+          throw new Error('Failed to connect to the database')
         }
       }
     }
-
-    this.logger.error('Maximum number of retries reached. Unable to connect to the database.')
-    throw new Error('Failed to connect to the database')
   }
 
   private handleEvents() {
