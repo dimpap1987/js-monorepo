@@ -54,7 +54,7 @@ import { getContactMessage } from './notifications/contact-form'
   imports: [
     LoggerModule.forRootAsync(),
     VaultModule.register({
-      path: 'secret/data/data/gym-api/env',
+      path: process.env.GYM_API_VAULT_PATH || '',
       endpoint: process.env.VAULT_ADDR || '',
       roleId: process.env.VAULT_ROLE_ID || '',
       secretId: process.env.VAULT_SECRET_ID || '',
@@ -83,6 +83,7 @@ import { getContactMessage } from './notifications/contact-form'
     PrismaModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         databaseUrl: configService.get('GYM_DATABASE_URL'),
+        clientName: 'gym_db',
       }),
     }),
     GracefulShutdownModule.forRoot({

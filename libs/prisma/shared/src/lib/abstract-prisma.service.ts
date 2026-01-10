@@ -39,12 +39,15 @@ const delay = (ms: number) => new Promise((resolve) => globalThis.setTimeout(res
 export abstract class AbstractPrismaService<TClient extends PrismaClientBase>
   implements OnModuleInit, OnApplicationShutdown
 {
-  protected readonly logger = new Logger(this.constructor.name)
+  protected readonly logger: Logger
+  protected readonly clientName: string
   protected readonly config: Required<PrismaServiceConfig>
   protected pool: Pool
   protected _client: TClient
 
   constructor(@Inject(PRISMA_MODULE_OPTIONS) protected readonly options: PrismaModuleOptions) {
+    this.clientName = options.clientName ?? 'PrismaService'
+    this.logger = new Logger(this.clientName)
     this.config = { ...DEFAULT_CONFIG, ...this.getConfig() }
     this.pool = new Pool({ connectionString: options.databaseUrl })
     const adapter = new PrismaPg(this.pool)

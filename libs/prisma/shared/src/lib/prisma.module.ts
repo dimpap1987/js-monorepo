@@ -4,6 +4,7 @@ import { PRISMA_MODULE_OPTIONS, PRISMA_SERVICE } from './prisma.tokens'
 
 export interface PrismaModuleOptions {
   databaseUrl: string
+  clientName?: string
 }
 
 export interface PrismaModuleAsyncOptions {
