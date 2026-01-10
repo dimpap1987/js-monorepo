@@ -1,4 +1,5 @@
-import { DynamicModule, Global, Module, Provider, Type } from '@nestjs/common'
+import { DynamicModule, Global, InjectionToken, Module, OptionalFactoryDependency, Type } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { PRISMA_MODULE_OPTIONS, PRISMA_SERVICE } from './prisma.tokens'
 
 export interface PrismaModuleOptions {
@@ -6,35 +7,78 @@ export interface PrismaModuleOptions {
 }
 
 export interface PrismaModuleAsyncOptions {
-  useFactory: (...args: any[]) => Promise<PrismaModuleOptions> | PrismaModuleOptions
-  inject?: any[]
-  imports?: any[]
+  useFactory: (...args: unknown[]) => Promise<PrismaModuleOptions> | PrismaModuleOptions
+  inject?: (InjectionToken | OptionalFactoryDependency)[]
+  imports?: unknown[]
 }
 
 /**
- * Abstract module for Prisma integration
- * Apps should use their specific PrismaModule (from core-db or gym-db)
- * This module is used by shared libraries to access the PrismaService token
+ * Interface for the dynamic Prisma module with static factory methods
+ */
+export interface PrismaModuleClass {
+  forRoot(options: PrismaModuleOptions): DynamicModule
+  forRootAsync(options: PrismaModuleAsyncOptions): DynamicModule
+}
+
+/**
+ * Factory for creating Prisma modules with consistent configuration.
+ * Each database module (core-db, gym-db) uses this to create their module.
+ *
+ * @example
+ * ```typescript
+ * import { createPrismaModule } from '@js-monorepo/prisma-shared'
+ * import { PrismaService } from './db-client'
+ *
+ * export const PrismaModule = createPrismaModule(PrismaService)
+ * ```
+ */
+export function createPrismaModule(PrismaServiceClass: Type<unknown>): PrismaModuleClass {
+  @Global()
+  @Module({})
+  class PrismaModule {
+    static forRoot(options: PrismaModuleOptions): DynamicModule {
+      return {
+        module: PrismaModule,
+        providers: [
+          { provide: PRISMA_MODULE_OPTIONS, useValue: options },
+          PrismaServiceClass,
+          { provide: PRISMA_SERVICE, useExisting: PrismaServiceClass },
+        ],
+        exports: [PrismaServiceClass, PRISMA_SERVICE],
+      }
+    }
+
+    static forRootAsync(options: PrismaModuleAsyncOptions): DynamicModule {
+      return {
+        module: PrismaModule,
+        providers: [
+          {
+            provide: PRISMA_MODULE_OPTIONS,
+            useFactory: options.useFactory,
+            inject: options.inject ?? [ConfigService],
+          },
+          PrismaServiceClass,
+          { provide: PRISMA_SERVICE, useExisting: PrismaServiceClass },
+        ],
+        exports: [PrismaServiceClass, PRISMA_SERVICE],
+      }
+    }
+  }
+
+  return PrismaModule
+}
+
+/**
+ * @deprecated Use createPrismaModule() factory instead
+ * Shared module for apps that need to inject PRISMA_SERVICE from shared libraries.
  */
 @Global()
 @Module({})
 export class PrismaSharedModule {
-  /**
-   * Register a PrismaService implementation
-   * Used by apps to provide their specific PrismaService
-   */
-  static forFeature(prismaServiceClass: Type<any>): DynamicModule {
-    const providers: Provider[] = [
-      prismaServiceClass,
-      {
-        provide: PRISMA_SERVICE,
-        useExisting: prismaServiceClass,
-      },
-    ]
-
+  static forFeature(prismaServiceClass: Type<unknown>): DynamicModule {
     return {
       module: PrismaSharedModule,
-      providers,
+      providers: [prismaServiceClass, { provide: PRISMA_SERVICE, useExisting: prismaServiceClass }],
       exports: [PRISMA_SERVICE, prismaServiceClass],
     }
   }
