@@ -4,7 +4,6 @@ import { generateMetadata as generateSEOMetadata } from '../lib/seo'
 import { SITE_NAME } from '../lib/site-config'
 
 export const metadata: Metadata = generateSEOMetadata({
-  title: 'Home',
   description: `Welcome to ${SITE_NAME} - Your fitness journey starts here.`,
   keywords: ['gym', 'fitness', 'workout', 'health', 'training'],
   type: 'website',

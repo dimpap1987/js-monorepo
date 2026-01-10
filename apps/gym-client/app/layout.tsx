@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   creator: siteName,
   publisher: siteName,
   icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    icon: [{ url: '/favicon.ico', type: 'image/svg+xml' }],
     apple: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
   },
   formatDetection: {
