@@ -1,8 +1,10 @@
 'use client'
 
 import { useLocale } from 'next-intl'
-import { usePathname, useRouter } from 'next/navigation'
-import { locales, getDomainForLocale, type Locale } from '../i18n/config'
+import { useRouter } from 'next-nprogress-bar'
+import { usePathname } from 'next/navigation'
+import { getDomainForLocale, locales, type Locale } from '../i18n/config'
+import { AppConfig } from '../lib/app-config'
 
 const localeLabels: Record<Locale, string> = {
   en: 'EN',
@@ -18,20 +20,20 @@ export function LocaleSwitcher() {
   const currentLocale = useLocale() as Locale
   const pathname = usePathname()
   const router = useRouter()
-  const isDev = process.env.NODE_ENV === 'development'
 
   const handleChange = (locale: Locale) => {
     if (locale === currentLocale) return
 
-    if (isDev) {
+    if (AppConfig.isDev) {
       router.push(`${pathname}?locale=${locale}`)
+      router.refresh()
     } else {
       window.location.href = `https://${getDomainForLocale(locale)}${pathname}`
     }
   }
 
   return (
-    <div className="flex gap-1">
+    <div className="flex">
       {locales.map((locale) => (
         <button
           key={locale}

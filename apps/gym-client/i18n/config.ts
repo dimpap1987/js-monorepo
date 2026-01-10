@@ -1,7 +1,15 @@
+import {
+  createDomainResolver,
+  createLocaleValidator,
+  createLocalizationConfig,
+  type LocalizationConfig,
+} from '@js-monorepo/localization'
 import { AppConfig } from '../lib/app-config'
 
-export const locales = AppConfig.locales
-export type Locale = (typeof locales)[number]
+/**
+ * Application-specific locale type
+ */
+export type Locale = (typeof AppConfig.locales)[number]
 
 const enHost = process.env.NEXT_PUBLIC_EN_DOMAIN
 const elHost = process.env.NEXT_PUBLIC_EL_DOMAIN
@@ -15,46 +23,40 @@ const elDomain = elHost ?? 'localhost'
 
 /**
  * Domain to locale mapping
- * Supports both production domains and local development domains
  */
-function getDomainLocaleMap(): Record<string, Locale> {
-  return {
-    // Production domains
-    [enDomain]: 'en',
-    [elDomain]: 'el',
-    // Common development hosts
-    localhost: 'en',
-    '127.0.0.1': 'en',
-  }
+const domainMap: Record<string, Locale> = {
+  [enDomain]: 'en',
+  [elDomain]: 'el',
+  localhost: 'en',
+  '127.0.0.1': 'en',
 }
 
 /**
- * Get locale from domain/host
- * Strips port if present (e.g., fitgym.gr:4200 -> fitgym.gr)
+ * Full localization configuration for the application
  */
-export function getLocaleFromDomain(host: string): Locale {
-  const hostname = host.split(':')[0]
-  const domainMap = getDomainLocaleMap()
-  return domainMap[hostname] ?? AppConfig.defaultLocale
-}
+export const localizationConfig: LocalizationConfig<Locale> = createLocalizationConfig({
+  locales: AppConfig.locales,
+  defaultLocale: AppConfig.defaultLocale as Locale,
+  domainMap,
+  isDev: AppConfig.isDev,
+})
 
-/**
- * Get domain for a locale
- */
-export function getDomainForLocale(locale: Locale): string {
-  const localeToDomain: Record<Locale, string> = {
-    en: enDomain,
-    el: elDomain,
-  }
-  return localeToDomain[locale]
-}
+// Re-export commonly used values for convenience
+export const locales = localizationConfig.locales
+export const LOCALE_COOKIE = localizationConfig.cookieName
+export const LOCALE_HEADER = localizationConfig.headerName
 
 /**
  * Type guard for locale validation
  */
-export function isValidLocale(value: unknown): value is Locale {
-  return typeof value === 'string' && locales.includes(value as Locale)
-}
+export const isValidLocale = createLocaleValidator(locales)
 
-const LOCALE_COOKIE = 'NEXT_LOCALE'
-export { LOCALE_COOKIE }
+/**
+ * Get domain for a specific locale
+ */
+export const getDomainForLocale = createDomainResolver(domainMap)
+
+/**
+ * Get locale from domain/host
+ */
+export { getLocaleFromDomain } from '@js-monorepo/localization'

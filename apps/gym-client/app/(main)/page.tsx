@@ -1,6 +1,14 @@
+import { generateMetadata } from '@js-monorepo/seo'
+import { AppConfig } from '../../lib/app-config'
+import { Metadata } from 'next/types'
 import { ContainerTemplate } from '@js-monorepo/templates'
 import { getTranslations } from 'next-intl/server'
-import { LocaleSwitcher } from '../components/locale-switcher'
+import { LocaleSwitcher } from '../../components/locale-switcher'
+
+export const metadata: Metadata = generateMetadata({
+  title: 'Home',
+  description: `Welcome to ${AppConfig.appName} - A modern web application built with Next.js. Discover our features, pricing, and more.`,
+})
 
 export default async function HomePage() {
   const t = await getTranslations('home')

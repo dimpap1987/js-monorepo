@@ -1,7 +1,6 @@
 import { getRequestConfig } from 'next-intl/server'
 import { headers } from 'next/headers'
-import { isValidLocale, type Locale } from './config'
-import { AppConfig } from '../lib/app-config'
+import { isValidLocale, localizationConfig, type Locale } from './config'
 
 /**
  * Server-side locale configuration for next-intl
@@ -11,8 +10,8 @@ export default getRequestConfig(async () => {
   const headersList = await headers()
 
   // Get locale from middleware header, fallback to default
-  const headerLocale = headersList.get('x-locale')
-  const locale: Locale = isValidLocale(headerLocale) ? headerLocale : AppConfig.defaultLocale
+  const headerLocale = headersList.get(localizationConfig.headerName)
+  const locale: Locale = isValidLocale(headerLocale) ? headerLocale : localizationConfig.defaultLocale
 
   return {
     locale,

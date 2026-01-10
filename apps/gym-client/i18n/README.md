@@ -2,6 +2,9 @@
 
 Domain-based locale routing using `next-intl` for App Router.
 
+> This app uses `@js-monorepo/localization` library for locale detection and middleware.
+> See [Library Documentation](../../../libs/shared/localization/README.md) for details.
+
 ## Locale Configuration
 
 | Locale | Domain       | Language          |
@@ -113,13 +116,15 @@ Edit `i18n/messages/{locale}.json`:
 
 ```
 i18n/
-├── config.ts        # Locale config, domain mapping
+├── config.ts        # App-specific locale config (uses @js-monorepo/localization)
 ├── request.ts       # next-intl server config
 ├── messages/
 │   ├── en.json
 │   └── el.json
 ├── README.md
-middleware.ts        # Locale detection (app root)
+lib/locale/
+└── locale-utils.ts  # URL utilities for locale switching
+middleware.ts        # Clean middleware using library helpers
 components/
 └── locale-switcher.tsx
 ```

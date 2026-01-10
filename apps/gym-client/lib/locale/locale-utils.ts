@@ -1,4 +1,19 @@
-import { locales, getDomainForLocale, type Locale } from '../../i18n/config'
+import { createLocaleUrlGenerator, createAlternateUrlsGenerator } from '@js-monorepo/localization'
+import { localizationConfig, locales, getDomainForLocale, type Locale } from '../../i18n/config'
+
+/**
+ * Get locale URL generator configured for this application
+ */
+const getLocaleUrlGenerator = createLocaleUrlGenerator(localizationConfig, {
+  useQueryParam: localizationConfig.isDev,
+})
+
+/**
+ * Get alternate URLs generator configured for this application
+ */
+const getAlternateUrlsGenerator = createAlternateUrlsGenerator(localizationConfig, {
+  useQueryParam: localizationConfig.isDev,
+})
 
 /**
  * Get the URL for switching to a different locale
@@ -7,28 +22,14 @@ import { locales, getDomainForLocale, type Locale } from '../../i18n/config'
  * Development: Returns path with ?locale= query param
  */
 export function getLocaleUrl(locale: Locale, pathname = '/'): string {
-  const isDev = process.env.NODE_ENV === 'development'
-
-  if (isDev) {
-    const params = new URLSearchParams({ locale })
-    return `${pathname}?${params.toString()}`
-  }
-
-  const domain = getDomainForLocale(locale)
-  return `https://${domain}${pathname}`
+  return getLocaleUrlGenerator(locale, pathname)
 }
 
 /**
  * Get alternate URLs for all locales (useful for SEO hreflang tags)
  */
 export function getAlternateLocaleUrls(pathname = '/'): Record<Locale, string> {
-  return locales.reduce(
-    (acc, locale) => {
-      acc[locale] = getLocaleUrl(locale, pathname)
-      return acc
-    },
-    {} as Record<Locale, string>
-  )
+  return getAlternateUrlsGenerator(pathname)
 }
 
 // Re-export for convenience
