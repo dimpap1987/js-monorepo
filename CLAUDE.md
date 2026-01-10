@@ -4,18 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-NX monorepo with Next.js 14 frontend (`apps/next-app`), NestJS backend (`apps/my-api`), and shared libraries (`libs/`). Uses pnpm as package manager.
+NX monorepo with Next.js 14 frontend (`apps/gym-client`), NestJS backend (`apps/gym-api`), and shared libraries (`libs/`). Uses pnpm as package manager.
 
 ## Common Commands
 
 ```bash
 # Development
 pnpm dev:next              # Start Next.js dev server
-pnpm dev:my-api            # Start NestJS dev server
+pnpm dev:gym-api            # Start NestJS dev server
 
 # Building
 pnpm build:next            # Build Next.js (production)
-pnpm build:my-api          # Build NestJS (production)
+pnpm build:gym-api          # Build NestJS (production)
 
 # Code Quality
 pnpm lint                  # Lint affected files
@@ -28,21 +28,12 @@ pnpm test:all              # Test all
 # Run single test file
 npx nx test <project> --testFile=<filename>
 
-# Database (Prisma) - Core DB (my-api, shared libs)
-pnpm db:core:migrate       # Run migrations
-pnpm db:core:deploy        # Deploy migrations to production
-pnpm db:core:create        # Create new migration
-pnpm db:core:generate      # Generate Prisma client
-pnpm db:core:studio        # Open Prisma Studio
-
 # Database (Prisma) - Gym DB (gym-api)
 pnpm db:gym:migrate        # Run migrations
 pnpm db:gym:deploy         # Deploy migrations to production
 pnpm db:gym:create         # Create new migration
 pnpm db:gym:generate       # Generate Prisma client
 pnpm db:gym:studio         # Open Prisma Studio
-
-
 
 # Full CI locally
 pnpm ci:local              # Format check, lint, test, build
