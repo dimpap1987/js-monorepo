@@ -50,6 +50,7 @@
       "@js-monorepo/payments-server": ["libs/payments/server/src/index.ts"],
       "@js-monorepo/payments-ui": ["libs/payments/client/src/index.ts"],
       "@js-monorepo/schemas": ["libs/shared/schemas/src/index.ts"],
+      "@js-monorepo/seo": ["libs/shared/seo/src/index.ts"],
       "@js-monorepo/sidebar": ["libs/shared/ui/sidebar/src/index.ts"],
       "@js-monorepo/styles/*": ["libs/shared/styles/src/lib/*"],
       "@js-monorepo/templates": ["libs/shared/ui/templates/src/index.ts"],
