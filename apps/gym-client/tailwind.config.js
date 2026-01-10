@@ -13,5 +13,16 @@ module.exports = {
       // Add gym-client specific theme extensions here
     },
   },
-  plugins: [],
+  plugins: [
+    ({ addUtilities }) => {
+      addUtilities({
+        '.navbar-height': {
+          height: 'var(--navbar-height)',
+        },
+        '.top-navbar-offset': {
+          top: 'var(--navbar-height)',
+        },
+      })
+    },
+  ],
 }

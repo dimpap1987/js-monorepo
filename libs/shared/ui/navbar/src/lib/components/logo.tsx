@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react'
 
-const DpLogo = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ children, ...props }, ref) => {
+const NavbarLogo = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ children, ...props }, ref) => {
   return (
     <div ref={ref} {...props} className="hover:cursor-pointer">
       {children}
@@ -8,6 +8,6 @@ const DpLogo = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   )
 })
 
-DpLogo.displayName = 'DpLogo'
+NavbarLogo.displayName = 'NavbarLogo'
 
-export { DpLogo }
+export { NavbarLogo }

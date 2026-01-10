@@ -18,7 +18,7 @@
     ]
   },
   "scripts": {
-    "ci:local": "nx run-many --target=lint,test --all --skip-nx-cache && nx run-many --target=build --projects=gym-api,gym-client --skip-nx-cache --configuration=production",
+    "ci:local": "nx run-many --target=lint,test --all --skip-nx-cache && nx run-many --target=build --projects=gym-api,gym-client,my-api,next-app --skip-nx-cache --configuration=production",
     "lint": "nx affected:lint --all",
     "lint:all": "nx run-many --all --target=lint",
     "format": "prettier --write .",

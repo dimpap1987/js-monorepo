@@ -1,6 +1,5 @@
 'use client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
-import { SidebarTrigger } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AuthRole, SessionUserType } from '@js-monorepo/types/auth'
 import { MenuItem } from '@js-monorepo/types/menu'
@@ -54,7 +53,7 @@ function NavUserOptions({
   )
 }
 
-export interface DpNextNavbarProps {
+export interface NavbarProps {
   readonly children?: ReactNode
   readonly menuItems?: MenuItem[]
   readonly user?: UserNavProps
@@ -68,95 +67,89 @@ export type UserNavSocial = {
   onLogin: () => void
 }
 
-const DpNextNavbar = forwardRef<HTMLDivElement, DpNextNavbarProps>(
-  ({ children, menuItems = [], user, plan, onLogout }, ref) => {
-    const isLoggedIn = !!user
+const Navbar = forwardRef<HTMLDivElement, NavbarProps>(({ children, menuItems = [], user, plan, onLogout }, ref) => {
+  const isLoggedIn = !!user
 
-    const { logo, navbarItems } = useMemo(() => {
-      let logoElement: ReactNode | null = null
-      let navbarItemsElement: ReactNode | null = null
+  const { logo, navbarItems, sidebarTrigger } = useMemo(() => {
+    let logoElement: ReactNode | null = null
+    let navbarItemsElement: ReactNode | null = null
+    let sidebarTriggerElement: ReactNode | null = null
 
-      const visit = (node: ReactNode) => {
-        React.Children.forEach(node, (child) => {
-          if (!React.isValidElement(child)) return
-          if (child.type === React.Fragment) {
-            visit(child.props.children)
-            return
-          }
+    const visit = (node: ReactNode) => {
+      React.Children.forEach(node, (child) => {
+        if (!React.isValidElement(child)) return
+        if (child.type === React.Fragment) {
+          visit(child.props.children)
+          return
+        }
 
-          if (typeof child.type === 'string') return
+        if (typeof child.type === 'string') return
 
-          const displayName = (child.type as React.ComponentType).displayName
-          if (displayName === 'DpLogo') {
-            logoElement = child
-          } else if (displayName === 'NavbarItems') {
-            navbarItemsElement = child
-          }
-        })
-      }
+        const displayName = (child.type as React.ComponentType).displayName
+        if (displayName === 'NavbarLogo') {
+          logoElement = child
+        } else if (displayName === 'NavbarItems') {
+          navbarItemsElement = child
+        } else if (displayName === 'NavbarSidebarTrigger') {
+          sidebarTriggerElement = child
+        }
+      })
+    }
 
-      visit(children)
-      return { logo: logoElement, navbarItems: navbarItemsElement }
-    }, [children])
+    visit(children)
+    return { logo: logoElement, navbarItems: navbarItemsElement, sidebarTrigger: sidebarTriggerElement }
+  }, [children])
 
-    return (
-      <header>
-        <nav
-          className="border-b border-border-glass navbar-height overflow-hidden flex items-center shadow-sm w-full px-4 sm:px-6 gap-3 justify-between"
-          ref={ref}
-        >
-          {logo}
-          <ul className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center gap-1 self-stretch">
-            {menuItems &&
-              menuItems?.length > 0 &&
-              menuItems.map((item, index) => (
-                <li
-                  key={index}
-                  className={cn(`text-center text-nowrap relative content-center self-stretch`, item.className)}
-                >
-                  {(item?.roles?.includes('PUBLIC') ||
-                    item?.roles?.some((role) => user?.roles?.includes(role as AuthRole))) && (
-                    <DpNextNavLink
-                      className="p-2 h-full flex items-center border-b-2 border-transparent content-center"
-                      activeClassName="border-primary"
-                      href={item.href}
-                    >
-                      {item.name}
-                    </DpNextNavLink>
-                  )}
-                </li>
-              ))}
-          </ul>
-
-          <div className="flex items-center">
-            <section className="hidden sm:flex items-center gap-4 justify-end">
-              <>
-                {navbarItems && navbarItems}
-
-                {!isLoggedIn && (
-                  <DpNextNavLink href="/auth/login">
-                    <DpLoginButton></DpLoginButton>
+  return (
+    <header>
+      <nav
+        className="border-b border-border-glass navbar-height overflow-hidden flex items-center shadow-sm w-full px-4 sm:px-6 gap-3 justify-between"
+        ref={ref}
+      >
+        {logo}
+        <ul className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center gap-1 self-stretch">
+          {menuItems &&
+            menuItems?.length > 0 &&
+            menuItems.map((item, index) => (
+              <li
+                key={index}
+                className={cn(`text-center text-nowrap relative content-center self-stretch`, item.className)}
+              >
+                {(item?.roles?.includes('PUBLIC') ||
+                  item?.roles?.some((role) => user?.roles?.includes(role as AuthRole))) && (
+                  <DpNextNavLink
+                    className="p-2 h-full flex items-center border-b-2 border-transparent content-center"
+                    activeClassName="border-primary"
+                    href={item.href}
+                  >
+                    {item.name}
                   </DpNextNavLink>
                 )}
-                {user && (
-                  <NavUserOptions
-                    className="hidden sm:block mt-[0.58rem]"
-                    user={user}
-                    plan={plan}
-                    onLogout={onLogout}
-                  />
-                )}
-              </>
-            </section>
-            <div className="block sm:hidden">
-              <SidebarTrigger />
-            </div>
-          </div>
-        </nav>
-      </header>
-    )
-  }
-)
+              </li>
+            ))}
+        </ul>
 
-DpNextNavbar.displayName = 'DpNextNavbar'
-export { DpNextNavbar }
+        <div className="flex items-center">
+          <section className="hidden sm:flex items-center gap-4 justify-end">
+            <>
+              {navbarItems && navbarItems}
+
+              {!isLoggedIn && (
+                <DpNextNavLink href="/auth/login">
+                  <DpLoginButton></DpLoginButton>
+                </DpNextNavLink>
+              )}
+              {user && (
+                <NavUserOptions className="hidden sm:block mt-[0.58rem]" user={user} plan={plan} onLogout={onLogout} />
+              )}
+            </>
+          </section>
+          {sidebarTrigger && <div className="block sm:hidden">{sidebarTrigger}</div>}
+        </div>
+      </nav>
+    </header>
+  )
+})
+
+Navbar.displayName = 'Navbar'
+export { Navbar }

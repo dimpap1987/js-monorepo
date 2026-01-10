@@ -1,11 +1,12 @@
 import { BodyTemplate } from '@js-monorepo/templates'
+import { Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
-import RootProviders from '../components/root.providers'
-import { StructuredData } from '../components/structured-data'
-import { Viewport } from 'next'
 import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
+import RootComponent from '../components/root-component'
+import RootProviders from '../components/root.providers'
+import { StructuredData } from '../components/structured-data'
 import './global.css'
 
 const poppins = Poppins({
@@ -35,7 +36,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <BodyTemplate className={poppins.className}>
         <StructuredData />
         <NextIntlClientProvider messages={messages}>
-          <RootProviders>{children}</RootProviders>
+          <RootProviders>
+            <RootComponent>{children}</RootComponent>
+          </RootProviders>
         </NextIntlClientProvider>
       </BodyTemplate>
     </html>

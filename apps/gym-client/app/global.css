@@ -4,7 +4,7 @@
 
 /* Base variables (not theme-specific) */
 :root {
-  /* --navbar-height: 60px; */
+  --navbar-height: 60px;
   --bottom-navbar-height: 60px;
   --tw-shadow-color: 0 0% 20%;
 }

@@ -3,9 +3,9 @@ import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { COOKIE_CATEGORY_IDS, CookieBanner, type CookieCategory } from '@js-monorepo/components/cookie-banner'
-import { SidebarInset, SidebarProvider } from '@js-monorepo/components/ui/sidebar'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { DpLogo, DpNextNavbar, NavbarItems } from '@js-monorepo/navbar'
+import { NavbarLogo, Navbar, NavbarItems, NavbarSidebarTrigger } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
 import useTapEffect from '@js-monorepo/next/hooks/tap-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
@@ -100,12 +100,15 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
       <SidebarInset className="flex flex-col">
         <ImpersonationBanner />
 
-        <DpNextNavbar user={user} plan={plan} menuItems={menuItems} onLogout={() => authClient.logout()}>
-          <DpLogo onClick={() => router.push('/')}>
+        <Navbar user={user} plan={plan} menuItems={menuItems} onLogout={() => authClient.logout()}>
+          <NavbarLogo onClick={() => router.push('/')}>
             <SVGLogo />
-          </DpLogo>
+          </NavbarLogo>
           <NavbarItems>{user && <NotificationBellContainerVirtual userId={user.id} />}</NavbarItems>
-        </DpNextNavbar>
+          <NavbarSidebarTrigger>
+            <SidebarTrigger />
+          </NavbarSidebarTrigger>
+        </Navbar>
 
         <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />
 

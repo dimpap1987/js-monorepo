@@ -1,11 +1,11 @@
-<h1 style="display:inline"> DpNextNavbar </h1> <sub>a nextjs library</sub>
+<h1 style="display:inline"> Navbar </h1> <sub>a nextjs library</sub>
 
 ## Example
 
 ```jsx
 import {
-  DpLogo,
-  DpNextNavbar,
+  NavbarLogo,
+  Navbar,
   UserNavSocial,
 } from '@js-monorepo/navbar'
 
@@ -36,16 +36,16 @@ export function Example() {
         },
     ]
   return (
-    <DpNextNavbar
+    <Navbar
       user={{ isLoggedIn: true, username: 'username1' }}
       socialLogin={socials}
       menuItems={menuItems}
       onLogout={() => console.log('logged out')}
     >
-      <DpLogo>
+      <NavbarLogo>
         Next App
-      </DpLogo>
-    </DpNextNavbar>
+      </NavbarLogo>
+    </Navbar>
   )
 }
 ```
