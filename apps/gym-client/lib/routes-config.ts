@@ -1,5 +1,5 @@
 export const AppRoutes = {
   home: '/',
-  dashboard: '/dashboard',
-  settings: '/settings',
+  // dashboard: '/dashboard',
+  // settings: '/settings',
 }

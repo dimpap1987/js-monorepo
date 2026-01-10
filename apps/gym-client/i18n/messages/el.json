@@ -1,0 +1,20 @@
+{
+  "common": {
+    "learnMore": "Μάθετε περισσότερα",
+    "getStarted": "Ξεκινήστε"
+  },
+  "home": {
+    "title": "Καλώς ήρθατε στο Gym Client!",
+    "subtitle": "Το ταξίδι της φυσικής σας κατάστασης ξεκινά εδώ.",
+    "browseWorkouts": "Περιήγηση Προπονήσεων"
+  },
+  "navigation": {
+    "home": "Αρχική",
+    "workouts": "Προπονήσεις",
+    "about": "Σχετικά"
+  },
+  "metadata": {
+    "title": "Gym Client",
+    "description": "Το ταξίδι της φυσικής σας κατάστασης ξεκινά εδώ"
+  }
+}

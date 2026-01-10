@@ -1,0 +1,20 @@
+{
+  "common": {
+    "learnMore": "Learn More",
+    "getStarted": "Get Started"
+  },
+  "home": {
+    "title": "Welcome to Gym Client!",
+    "subtitle": "Your fitness journey starts here.",
+    "browseWorkouts": "Browse Workouts"
+  },
+  "navigation": {
+    "home": "Home",
+    "workouts": "Workouts",
+    "about": "About"
+  },
+  "metadata": {
+    "title": "Gym Client",
+    "description": "Your fitness journey starts here"
+  }
+}

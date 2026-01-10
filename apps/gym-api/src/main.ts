@@ -77,7 +77,7 @@ async function bootstrap() {
   await redisIoAdapter.connectToRedis()
 
   app.useWebSocketAdapter(redisIoAdapter)
-  await app.listen(port)
+  await app.listen(port, '0.0.0.0')
   logServerMetadata()
 }
 

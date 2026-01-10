@@ -156,6 +156,7 @@
     "nestjs-graceful-shutdown": "^1.0.3",
     "next": "14.2.3",
     "next-auth": "^5.0.0-beta.5",
+    "next-intl": "^4.7.0",
     "next-nprogress-bar": "^2.3.11",
     "next-themes": "^0.3.0",
     "node-vault": "^0.10.2",
