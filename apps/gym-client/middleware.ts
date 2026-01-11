@@ -1,36 +1,36 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { shouldProcessPath, createNextLocaleMiddleware } from '@js-monorepo/localization'
-import { localizationConfig } from './i18n/config'
+import { compose } from '@js-monorepo/next/middlewares'
+import { NextResponse } from 'next/server'
+import { withAuth } from './middlewares/withAuth'
+import { withLocale } from './middlewares/withLocale'
 
-/**
- * Locale middleware handler
- * Uses the localization library for domain-based locale detection
- */
-const handleLocale = createNextLocaleMiddleware(localizationConfig)
+const composedMiddlewares = compose(withLocale, withAuth)
 
-/**
- * Main middleware function
- *
- * Current handlers:
- * 1. Locale detection (domain-based routing)
- *
- * Future handlers (add as needed):
- * - Authentication
- * - Rate limiting
- * - Feature flags
- */
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-
-  // Skip static files and API routes
-  if (!shouldProcessPath(pathname)) {
-    return NextResponse.next()
-  }
-
-  // Apply locale middleware
-  return handleLocale(request)
-}
+export const middleware = composedMiddlewares(() => {
+  return NextResponse.next()
+})
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)'],
+  matcher: [
+    {
+      source: '/((?!.+\\.[\\w]+$|_next).*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+    {
+      source: '/',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+    {
+      source: '/(api|trpc)(.*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+  ],
 }
