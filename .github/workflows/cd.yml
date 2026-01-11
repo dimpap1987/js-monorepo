@@ -93,7 +93,7 @@ jobs:
           
           # If version changed but no apps changed, force build all apps
           if [ "$VERSION_CHANGED" == "true" ] && [ -z "$APPS" ]; then
-            APPS="my-api next-app"
+            APPS="my-api next-app gym-api gym-client"
             echo "📦 Version changed - forcing build of all apps: $APPS"
           fi
           
@@ -102,8 +102,8 @@ jobs:
             LIBS=$(git diff --name-only origin/main...HEAD | grep "^libs/" | cut -d'/' -f2 | sort -u | tr '\n' ' ' | xargs)
           fi
           
-          # Detect migrations
-          if git diff --name-only origin/main...HEAD | grep -q "libs/prisma/db/src/lib/prisma/migrations/"; then
+          # Detect migrations (core-db or gym-db)
+          if git diff --name-only origin/main...HEAD | grep -qE "libs/prisma/(core-db|gym-db)/src/lib/prisma/migrations/"; then
             MIGRATIONS="true"
           fi
           
@@ -147,11 +147,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Deploy migrations
+      - name: Deploy core-db migrations
         env:
-          DATABASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.DATABASE_URL_PROD || (secrets.TEST_DATABASE_URL || secrets.DATABASE_URL_PROD) }}
-        run: |
-          pnpm prisma migrate deploy --config=libs/prisma/db/prisma.config.ts
+          DATABASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.DATABASE_URL_PROD || secrets.DATABASE_URL_PROD }}
+        run: pnpm prisma migrate deploy --config=libs/prisma/core-db/prisma.config.ts
+
+      - name: Deploy gym-db migrations
+        env:
+          GYM_DATABASE_URL: ${{ github.ref == 'refs/heads/main' && secrets.GYM_DATABASE_URL_PROD || secrets.GYM_DATABASE_URL_PROD }}
+        run: pnpm prisma migrate deploy --config=libs/prisma/gym-db/prisma.config.ts
 
   # ============================================
   # Check CI Status
@@ -186,13 +190,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [my-api, next-app]
         include:
           - app: my-api
             dockerfile: apps/my-api/Dockerfile
             context: .
           - app: next-app
             dockerfile: apps/next-app/Dockerfile
+            context: .
+          - app: gym-api
+            dockerfile: apps/gym-api/Dockerfile
+            context: .
+          - app: gym-client
+            dockerfile: apps/gym-client/Dockerfile
             context: .
     steps:
       - name: Checkout code
@@ -253,7 +262,8 @@ jobs:
           cache-from: type=registry,ref=${{ env.DOCKERHUB_USERNAME }}/${{ matrix.app }}:buildcache
           cache-to: type=registry,ref=${{ env.DOCKERHUB_USERNAME }}/${{ matrix.app }}:buildcache,mode=max
           build-args: |
-            DATABASE_URL=${{ github.ref == 'refs/heads/main' && secrets.DATABASE_URL_PROD || (secrets.TEST_DATABASE_URL || secrets.DATABASE_URL_PROD) }}
+            DATABASE_URL=${{ github.ref == 'refs/heads/main' && secrets.DATABASE_URL_PROD || secrets.DATABASE_URL_PROD }}
+            GYM_DATABASE_URL=${{ github.ref == 'refs/heads/main' && secrets.GYM_DATABASE_URL_PROD || secrets.GYM_DATABASE_URL_PROD }}
             NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }}
             NEXT_PUBLIC_VAPID_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD }}
             VERSION=${{ steps.version.outputs.version }}

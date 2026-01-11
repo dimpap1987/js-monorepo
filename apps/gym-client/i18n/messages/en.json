@@ -4,7 +4,7 @@
     "getStarted": "Get Started"
   },
   "home": {
-    "title": "Welcome to Gym Ops!",
+    "title": "Welcome to ClassOps!",
     "subtitle": "Your fitness journey starts here.",
     "browseWorkouts": "Browse Workouts"
   },
@@ -14,7 +14,7 @@
     "about": "About"
   },
   "metadata": {
-    "title": "Gym Ops",
+    "title": "ClassOps",
     "description": "Your fitness journey starts here"
   }
 }

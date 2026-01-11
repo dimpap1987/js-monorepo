@@ -262,8 +262,19 @@ jobs:
     needs: [lint, format-check, test, type-check]
     if: always() && (needs.lint.result == 'success' || needs.lint.result == 'skipped') && (needs.test.result == 'success' || needs.test.result == 'skipped')
     strategy:
+      fail-fast: false
       matrix:
-        app: [my-api, next-app]
+        include:
+          - app: my-api
+            prisma-config: libs/prisma/core-db/prisma.config.ts
+            build-cmd: pnpm build:my-api
+          - app: gym-api
+            prisma-config: libs/prisma/gym-db/prisma.config.ts
+            build-cmd: pnpm build:gym-api
+          - app: next-app
+            build-cmd: pnpm build:next
+          - app: gym-client
+            build-cmd: npx nx build gym-client --prod
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -294,26 +305,19 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        if: matrix.app == 'my-api'
+        if: matrix.prisma-config != ''
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-        run: |
-          pnpm prisma generate --config=libs/prisma/db/prisma.config.ts
+          GYM_DATABASE_URL: ${{ secrets.GYM_DATABASE_URL_PROD }}
+        run: pnpm prisma generate --config=${{ matrix.prisma-config }}
 
       - name: Build ${{ matrix.app }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          GYM_DATABASE_URL: ${{ secrets.GYM_DATABASE_URL_PROD }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }}
           NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD }}
-        run: |
-          case "${{ matrix.app }}" in
-            my-api)
-              pnpm build:my-api
-              ;;
-            next-app)
-              pnpm build:next
-              ;;
-          esac
+        run: ${{ matrix.build-cmd }}
 
       - name: Upload build artifacts
         if: always()

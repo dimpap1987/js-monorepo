@@ -4,7 +4,7 @@
     "getStarted": "Ξεκινήστε"
   },
   "home": {
-    "title": "Καλώς ήρθατε στο Gym Ops!",
+    "title": "Καλώς ήρθατε στο ClassOps!",
     "subtitle": "Το ταξίδι της φυσικής σας κατάστασης ξεκινά εδώ.",
     "browseWorkouts": "Περιήγηση Προπονήσεων"
   },
@@ -14,7 +14,7 @@
     "about": "Σχετικά"
   },
   "metadata": {
-    "title": "Gym Ops",
+    "title": "ClassOps",
     "description": "Το ταξίδι της φυσικής σας κατάστασης ξεκινά εδώ"
   }
 }
