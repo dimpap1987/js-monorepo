@@ -6,8 +6,8 @@ import { getLocale, getMessages } from 'next-intl/server'
 import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
 import RootComponent from '../components/root-component'
-import RootProviders from '../components/root.providers'
 import { StructuredData } from '../components/structured-data'
+import RootProviders from '../providers/root.providers'
 import './global.css'
 
 const poppins = Poppins({
