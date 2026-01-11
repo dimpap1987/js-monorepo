@@ -107,6 +107,17 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
             logo={<SVGLogo />}
             rightActions={user && <NotificationBellContainerVirtual userId={user.id} />}
             sidebarTrigger={<SidebarTrigger />}
+            navUserOptionsChildren={useMemo(() => {
+              return (
+                <DpNextNavLink
+                  href="/settings"
+                  className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-secondary"
+                >
+                  <IoIosSettings className="text-xl flex-shrink-0" />
+                  <span className="text-sm">Settings</span>
+                </DpNextNavLink>
+              )
+            }, [])}
           ></Navbar>
 
           <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />

@@ -1,47 +1,14 @@
 'use client'
 
-import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
+import { DpLoginButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { AuthRole, SessionUserType } from '@js-monorepo/types/auth'
+import { AuthRole } from '@js-monorepo/types/auth'
 import { MenuItem } from '@js-monorepo/types/menu'
 import { cn } from '@js-monorepo/ui/util'
-import React, { ReactNode, forwardRef } from 'react'
-import { IoIosSettings } from 'react-icons/io'
-import { UserMetadata } from './components/user-metadata'
-import { UserOptionsDropdown } from './components/user-options.component'
+import { ReactNode, forwardRef } from 'react'
 import './navbar.css'
 
-/* ---------------------- User Options ---------------------- */
-interface NavUserOptionsProps {
-  user: UserNavProps
-  plan?: string | null
-  onLogout?: () => void
-  className?: string
-}
-
-const NavUserOptions: React.FC<NavUserOptionsProps> = ({ user, plan, onLogout, className }) => {
-  return (
-    <UserOptionsDropdown className={className}>
-      <UserMetadata
-        profileImage={user.profile?.image}
-        username={user.username}
-        createdAt={user.createdAt}
-        plan={plan}
-        className="mb-2 border-border border-b select-none"
-      />
-
-      <DpNextNavLink
-        href="/settings"
-        className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-secondary"
-      >
-        <IoIosSettings className="text-xl flex-shrink-0" />
-        <span className="text-sm">Settings</span>
-      </DpNextNavLink>
-
-      <DpLogoutButton className="text-sm" onClick={onLogout} role="menuitem" />
-    </UserOptionsDropdown>
-  )
-}
+import { NavUserOptions, NavUserOptionsProps } from './components/nav-user-options'
 
 /* ---------------------- Types ---------------------- */
 export interface NavbarProps {
@@ -52,6 +19,7 @@ export interface NavbarProps {
   user?: UserNavProps
   plan?: string | null
   onLogout?: () => void
+  navUserOptionsChildren?: NavUserOptionsProps['children']
 }
 
 export type UserNavProps = {
@@ -63,7 +31,7 @@ export type UserNavProps = {
 
 /* ---------------------- Navbar ---------------------- */
 const Navbar = forwardRef<HTMLDivElement, NavbarProps>(
-  ({ logo, rightActions, sidebarTrigger, menuItems = [], user, plan, onLogout }, ref) => {
+  ({ logo, rightActions, sidebarTrigger, menuItems = [], user, plan, onLogout, navUserOptionsChildren }, ref) => {
     const isLoggedIn = !!user
 
     return (
@@ -112,7 +80,9 @@ const Navbar = forwardRef<HTMLDivElement, NavbarProps>(
                   <DpLoginButton />
                 </DpNextNavLink>
               ) : (
-                <NavUserOptions className="hidden sm:block mt-2" user={user} plan={plan} onLogout={onLogout} />
+                <NavUserOptions className="hidden sm:block mt-2" user={user} plan={plan} onLogout={onLogout}>
+                  {navUserOptionsChildren}
+                </NavUserOptions>
               )}
             </section>
 

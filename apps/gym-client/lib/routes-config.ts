@@ -20,6 +20,10 @@ export const routes: RouteConfig[] = [
     path: '/notifications',
     roles: [Role.USER],
   },
+  {
+    path: '/settings',
+    roles: [Role.USER],
+  },
 ]
 
 export const authRoutes = ['/auth/login', '/auth/register', '/auth/onboarding']
@@ -39,7 +43,7 @@ export function getRouteConfig(pathname: string): RouteConfig | undefined {
 
 // Navbar & Sidebar Menu navigation
 
-const menuItems: MenuItem[] = [
+export const navigationsMenuItems: MenuItem[] = [
   {
     href: '/admin',
     name: 'Dashboard',

@@ -6,6 +6,7 @@ import { DpNotificationProvider } from '@js-monorepo/notification'
 import { NotificationProvider } from '@js-monorepo/notifications-ui'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { getEnabledThemeIds, ThemeProvider } from '@js-monorepo/theme-provider'
+import { WebNotificationProvider } from '@js-monorepo/web-notification'
 import { ReactNode } from 'react'
 import { AppConfig } from '../lib/app-config'
 import { WebSocketProviderWrapper } from './websocket-provider-wrapper'
@@ -29,7 +30,9 @@ export default function ClientProviders({ children, session }: RootProvidersProp
             <DpNotificationProvider>
               <SessionProvider value={session} endpoint="/session">
                 <WebSocketProviderWrapper>
-                  <NotificationProvider userId={session?.user?.id}>{children}</NotificationProvider>
+                  <NotificationProvider userId={session?.user?.id}>
+                    <WebNotificationProvider>{children}</WebNotificationProvider>
+                  </NotificationProvider>
                 </WebSocketProviderWrapper>
               </SessionProvider>
             </DpNotificationProvider>

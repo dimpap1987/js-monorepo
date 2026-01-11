@@ -8,21 +8,13 @@ import { Navbar } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types/menu'
-import { PropsWithChildren } from 'react'
-import { RiAdminFill } from 'react-icons/ri'
+import React, { PropsWithChildren, useMemo } from 'react'
 import { useWebSocketConfig } from '../hooks/useWebsocketConfig'
 import { AppConfig } from '../lib/app-config'
+import { navigationsMenuItems } from '../lib/routes-config'
 import { MobileNavbar } from './mobile-navbar'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
-
-const menuItems: MenuItem[] = [
-  {
-    href: '/admin',
-    name: 'Dashboard',
-    roles: ['ADMIN'],
-    Icon: RiAdminFill,
-  },
-]
+import { IoIosSettings } from 'react-icons/io'
 
 function SidebarWrapper({ children, user, items }: PropsWithChildren<{ user?: any; items?: MenuItem[] }>) {
   return (
@@ -40,11 +32,11 @@ export default function RootComponent({ children }: PropsWithChildren) {
   useOfflineIndicator()
 
   return (
-    <SidebarWrapper user={user} items={menuItems}>
+    <SidebarWrapper user={user} items={navigationsMenuItems}>
       <section className="flex min-h-screen flex-col">
         {/* Navbar */}
         <Navbar
-          menuItems={menuItems}
+          menuItems={navigationsMenuItems}
           user={user}
           onLogout={() => authClient.logout()}
           logo={
@@ -54,11 +46,20 @@ export default function RootComponent({ children }: PropsWithChildren) {
           }
           rightActions={user && <NotificationBellContainerVirtual userId={user.id} />}
           sidebarTrigger={<SidebarTrigger />}
+          navUserOptionsChildren={useMemo(() => {
+            return (
+              <DpNextNavLink
+                href="/settings"
+                className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-secondary"
+              >
+                <IoIosSettings className="text-xl flex-shrink-0" />
+                <span className="text-sm">Settings</span>
+              </DpNextNavLink>
+            )
+          }, [])}
         ></Navbar>
-
         {/* Announcements */}
         <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />
-
         {/* Main */}
         <main className="flex-1 mt-6">{children}</main>
         {user?.id && <MobileNavbar />}
