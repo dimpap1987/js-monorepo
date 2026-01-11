@@ -3,6 +3,7 @@ import { SessionProvider } from '@js-monorepo/auth/next/client'
 import { DpLoaderProvider } from '@js-monorepo/loader'
 import { QClientProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
+import { NotificationProvider } from '@js-monorepo/notifications-ui'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { getEnabledThemeIds, ThemeProvider } from '@js-monorepo/theme-provider'
 import { ReactNode } from 'react'
@@ -27,7 +28,9 @@ export default function ClientProviders({ children, session }: RootProvidersProp
           <DpLoaderProvider>
             <DpNotificationProvider>
               <SessionProvider value={session} endpoint="/session">
-                <WebSocketProviderWrapper>{children}</WebSocketProviderWrapper>
+                <WebSocketProviderWrapper>
+                  <NotificationProvider userId={session?.user?.id}>{children}</NotificationProvider>
+                </WebSocketProviderWrapper>
               </SessionProvider>
             </DpNotificationProvider>
           </DpLoaderProvider>

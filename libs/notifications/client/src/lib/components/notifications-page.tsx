@@ -8,21 +8,19 @@ import { NotificationReadAllButton } from './bell/notification-read-all'
 import { NotificationList } from './notification-list-virtual'
 
 interface NotificationPageProps {
-  userId: number
   className?: string
   headerClassName?: string
   showBackArrow?: boolean
 }
 
-export function NotificationPage({ userId, className, headerClassName, showBackArrow = true }: NotificationPageProps) {
+export function NotificationPage({ className, headerClassName, showBackArrow = true }: NotificationPageProps) {
   const { notifications, unreadCount, loadMore, hasMore, isLoading, handleRead, handleReadAll } =
     useNotificationContext()
-
   const isInitialLoading = isLoading && notifications.length === 0
 
   return (
     <div className={cn('text-sm sm:text-base select-none', className)}>
-      <div className={cn('flex justify-between items-center mb-4 sm:mb-6 px-2', headerClassName)}>
+      <div className={cn('flex justify-between items-center mb-2 sm:mb-4 px-2', headerClassName)}>
         {showBackArrow ? (
           <BackArrowWithLabel className="flex-1 mb-2">
             <h3>Notifications</h3>

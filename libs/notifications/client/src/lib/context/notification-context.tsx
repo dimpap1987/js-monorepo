@@ -23,7 +23,7 @@ export function NotificationProvider({ children, userId }: { children: ReactNode
   const [notifications, setNotifications] = useState<UserNotificationType[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [hasMore, setHasMore] = useState(true)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const notificationsRef = useRef<UserNotificationType[]>([])
   const readMutation = useReadNotification()

@@ -1,10 +1,5 @@
 import { NotificationPage as NotificationPageComponent } from '@js-monorepo/notifications-ui'
 import { ContainerTemplate } from '@js-monorepo/templates'
-import { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Notifications',
-}
 
 export default function Notifications() {
   return (

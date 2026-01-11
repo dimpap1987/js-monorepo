@@ -6,7 +6,6 @@ import { getLocale, getMessages } from 'next-intl/server'
 import { Poppins } from 'next/font/google'
 import { ReactNode } from 'react'
 import RootComponent from '../components/root-component'
-import { StructuredData } from '../components/structured-data'
 import RootProviders from '../providers/root.providers'
 import './global.css'
 
@@ -36,7 +35,6 @@ export default async function RootLayout(props: { readonly children: ReactNode; 
   return (
     <html lang={locale} suppressHydrationWarning={true}>
       <BodyTemplate className={poppins.className}>
-        <StructuredData />
         <NextIntlClientProvider messages={messages}>
           <RootProviders session={session}>
             <RootComponent>

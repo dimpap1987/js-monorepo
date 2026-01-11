@@ -7,6 +7,7 @@ import { Navbar } from '@js-monorepo/navbar'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { PropsWithChildren } from 'react'
 import { AppConfig } from '../lib/app-config'
+import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
 
 function SidebarWrapper({ children, user }: PropsWithChildren<{ user?: any }>) {
   return (
@@ -32,6 +33,7 @@ export default function RootComponent({ children }: PropsWithChildren) {
               {AppConfig.appName}
             </DpNextNavLink>
           }
+          rightActions={user && <NotificationBellContainerVirtual userId={user.id} />}
           sidebarTrigger={<SidebarTrigger />}
         ></Navbar>
 
