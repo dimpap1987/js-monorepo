@@ -1,18 +1,25 @@
-import { useState, useEffect } from 'react'
+'use client'
+
+import { useEffect, useState } from 'react'
 
 function useInternetStatus(): boolean {
-  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine)
+  const [isOnline, setIsOnline] = useState<boolean>(true)
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
+    if (typeof window === 'undefined') return
 
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
+    const updateStatus = () => {
+      setIsOnline(navigator.onLine)
+    }
+
+    updateStatus()
+
+    window.addEventListener('online', updateStatus)
+    window.addEventListener('offline', updateStatus)
 
     return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
+      window.removeEventListener('online', updateStatus)
+      window.removeEventListener('offline', updateStatus)
     }
   }, [])
 

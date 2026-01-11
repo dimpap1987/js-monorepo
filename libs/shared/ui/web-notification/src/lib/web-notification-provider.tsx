@@ -6,60 +6,77 @@ import { registerServiceWorker, requestPushPermission, subscribeNotifactionToSer
 
 interface WebNotificationContextType {
   permission: NotificationPermission
-  createNotification: (title: string, options: NotificationOptions) => void
-  requestPermission: () => void
+  requestPermission: () => Promise<void>
+  createNotification: (title: string, options?: NotificationOptions) => void
 }
 
-const WebNotificationContext = createContext<WebNotificationContextType | undefined>(undefined)
+const WebNotificationContext = createContext<WebNotificationContextType | null>(null)
 
-const WebNotificationProvider = ({ children }: { children: ReactNode }) => {
-  const [permission, setPermission] = useState<NotificationPermission>(Notification.permission)
+export function WebNotificationProvider({ children }: { children: ReactNode }) {
   const { session } = useSession()
-  const user = session?.user
+  const userId = session?.user?.id
+
+  const [permission, setPermission] = useState<NotificationPermission>('default')
+
+  // Read Notification ONLY after mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!('Notification' in window)) return
+
+    setPermission(Notification.permission)
+  }, [])
 
   useEffect(() => {
-    registerServiceWorker().then(async () => {
-      if (Notification.permission === 'granted' && user?.id) {
-        await navigator.serviceWorker.ready
-        await subscribeNotifactionToServer(user.id)
-      }
-    })
-  }, [user])
+    if (typeof window === 'undefined') return
+    if (!userId) return
+    if (!('Notification' in window)) return
 
-  const requestPermission = useCallback(() => {
-    requestPushPermission().then(async (perm) => {
-      setPermission(perm)
-      if (perm === 'granted' && user?.id) {
-        subscribeNotifactionToServer(user.id)
-      }
+    registerServiceWorker().then(async () => {
+      if (Notification.permission !== 'granted') return
+
+      await navigator.serviceWorker.ready
+      await subscribeNotifactionToServer(userId)
     })
-  }, [user])
+  }, [userId])
+
+  const requestPermission = useCallback(async () => {
+    if (typeof window === 'undefined') return
+    if (!('Notification' in window)) return
+    if (!userId) return
+
+    const perm = await requestPushPermission()
+    setPermission(perm)
+
+    if (perm === 'granted') {
+      await subscribeNotifactionToServer(userId)
+    }
+  }, [userId])
 
   const createNotification = useCallback(
-    (title: string, options: NotificationOptions) => {
-      if (permission === 'granted') {
-        // Use ServiceWorkerRegistration to show the notification
-        navigator.serviceWorker.ready.then(function (registration) {
-          registration.showNotification(title, options)
-        })
-      }
+    (title: string, options?: NotificationOptions) => {
+      if (permission !== 'granted') return
+      if (typeof window === 'undefined') return
+
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification(title, options)
+      })
     },
     [permission]
   )
 
   return (
-    <WebNotificationContext.Provider value={{ permission, createNotification, requestPermission }}>
+    <WebNotificationContext.Provider value={{ permission, requestPermission, createNotification }}>
       {children}
     </WebNotificationContext.Provider>
   )
 }
 
-const useWebPushNotification = (): WebNotificationContextType => {
-  const context = useContext(WebNotificationContext)
-  if (!context) {
-    throw new Error('useWebPushNotification must be used within a WebNotificationProvider')
-  }
-  return context
-}
+export function useWebPushNotification(): WebNotificationContextType {
+  const ctx = useContext(WebNotificationContext)
 
-export { useWebPushNotification, WebNotificationProvider }
+  if (!ctx) {
+    throw new Error('useWebPushNotification must be used inside WebNotificationProvider')
+  }
+
+  return ctx
+}
