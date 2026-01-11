@@ -5,7 +5,7 @@ import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { COOKIE_CATEGORY_IDS, CookieBanner, type CookieCategory } from '@js-monorepo/components/cookie-banner'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { NavbarLogo, Navbar, NavbarItems, NavbarSidebarTrigger } from '@js-monorepo/navbar'
+import { Navbar } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
 import useTapEffect from '@js-monorepo/next/hooks/tap-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
@@ -97,25 +97,27 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
         {sidebarChildren}
       </DpNextSidebar>
 
-      <SidebarInset className="flex flex-col">
-        <ImpersonationBanner />
+      <SidebarInset asChild>
+        <section className="flex min-h-screen flex-col">
+          <ImpersonationBanner />
 
-        <Navbar user={user} plan={plan} menuItems={menuItems} onLogout={() => authClient.logout()}>
-          <NavbarLogo onClick={() => router.push('/')}>
-            <SVGLogo />
-          </NavbarLogo>
-          <NavbarItems>{user && <NotificationBellContainerVirtual userId={user.id} />}</NavbarItems>
-          <NavbarSidebarTrigger>
-            <SidebarTrigger />
-          </NavbarSidebarTrigger>
-        </Navbar>
+          <Navbar
+            user={user}
+            plan={plan}
+            menuItems={menuItems}
+            onLogout={() => authClient.logout()}
+            logo={<SVGLogo />}
+            rightActions={user && <NotificationBellContainerVirtual userId={user.id} />}
+            sidebarTrigger={<SidebarTrigger />}
+          ></Navbar>
 
-        <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />
+          <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />
 
-        <main className="mt-6 flex-1 px-2">{children}</main>
+          <main className="mt-6 flex-1 px-2">{children}</main>
 
-        {user?.id && <MobileNavbar />}
-        <CookieBanner optionalCategories={cookieCategories} />
+          {user?.id && <MobileNavbar />}
+          <CookieBanner optionalCategories={cookieCategories} />
+        </section>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -58,7 +58,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
   return (
     <Sidebar side="right" variant="inset" collapsible="offcanvas" className={className}>
       <SidebarHeader>
-        <div className="flex items-center justify-between my-4 py-2 px-2 border-b border-border">
+        <div className="flex items-center justify-between my-4 py-2 px-2 border-b border-border min-h-[80px]">
           {user?.username && (
             <UserMetadata
               profileImage={user.profile?.image}
@@ -89,11 +89,13 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
         </SidebarMenu>
       </SidebarContent>
 
-      <Separator className="my-4"></Separator>
       {children && (
-        <SidebarFooter>
-          <div className="w-full text-center">{children}</div>
-        </SidebarFooter>
+        <>
+          <Separator className="my-4"></Separator>
+          <SidebarFooter>
+            <div className="w-full text-center">{children}</div>
+          </SidebarFooter>
+        </>
       )}
     </Sidebar>
   )
