@@ -4,7 +4,7 @@
     "getStarted": "Ξεκινήστε"
   },
   "home": {
-    "title": "Καλώς ήρθατε στο Gym Client!",
+    "title": "Καλώς ήρθατε στο Gym Ops!",
     "subtitle": "Το ταξίδι της φυσικής σας κατάστασης ξεκινά εδώ.",
     "browseWorkouts": "Περιήγηση Προπονήσεων"
   },
@@ -14,7 +14,7 @@
     "about": "Σχετικά"
   },
   "metadata": {
-    "title": "Gym Client",
+    "title": "Gym Ops",
     "description": "Το ταξίδι της φυσικής σας κατάστασης ξεκινά εδώ"
   }
 }

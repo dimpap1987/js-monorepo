@@ -7,7 +7,7 @@ configureSite(
     descriptionEnvVar: 'NEXT_PUBLIC_SITE_DESCRIPTION',
     defaults: {
       url: `https://${process.env.NEXT_PUBLIC_EL_DOMAIN}`,
-      name: 'Gym Client',
+      name: 'Gym Ops',
       description: 'Your fitness journey starts here',
       defaultOgImage: '/og-image.png',
       locale: 'en_US',

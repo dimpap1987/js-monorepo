@@ -4,7 +4,7 @@
     "getStarted": "Get Started"
   },
   "home": {
-    "title": "Welcome to Gym Client!",
+    "title": "Welcome to Gym Ops!",
     "subtitle": "Your fitness journey starts here.",
     "browseWorkouts": "Browse Workouts"
   },
@@ -14,7 +14,7 @@
     "about": "About"
   },
   "metadata": {
-    "title": "Gym Client",
+    "title": "Gym Ops",
     "description": "Your fitness journey starts here"
   }
 }
