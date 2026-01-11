@@ -1,13 +1,16 @@
 'use client'
 
+import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { Navbar } from '@js-monorepo/navbar'
+import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types/menu'
 import { PropsWithChildren } from 'react'
 import { RiAdminFill } from 'react-icons/ri'
+import { useWebSocketConfig } from '../hooks/useWebsocketConfig'
 import { AppConfig } from '../lib/app-config'
 import { MobileNavbar } from './mobile-navbar'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
@@ -31,8 +34,11 @@ function SidebarWrapper({ children, user, items }: PropsWithChildren<{ user?: an
 }
 
 export default function RootComponent({ children }: PropsWithChildren) {
-  const { session } = useSession()
+  const { session, isLoggedIn, isAdmin, refreshSession } = useSession()
   const user = session?.user
+  useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
+  useOfflineIndicator()
+
   return (
     <SidebarWrapper user={user} items={menuItems}>
       <section className="flex min-h-screen flex-col">
@@ -50,8 +56,11 @@ export default function RootComponent({ children }: PropsWithChildren) {
           sidebarTrigger={<SidebarTrigger />}
         ></Navbar>
 
+        {/* Announcements */}
+        <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />
+
         {/* Main */}
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 mt-6">{children}</main>
         {user?.id && <MobileNavbar />}
       </section>
     </SidebarWrapper>

@@ -11,7 +11,6 @@ import useTapEffect from '@js-monorepo/next/hooks/tap-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types/menu'
 import { useWebSocketConfig } from '@next-app/hooks/useWebsocketConfig'
-import { useRouter } from 'next-nprogress-bar'
 import { PropsWithChildren, useMemo } from 'react'
 import { ImPriceTags } from 'react-icons/im'
 import { IoIosSettings } from 'react-icons/io'
@@ -61,7 +60,6 @@ const cookieCategories: CookieCategory[] = [
 
 export default function MainTemplate({ children }: Readonly<PropsWithChildren>) {
   const { session, isAdmin, refreshSession } = useSession()
-  const router = useRouter()
   const user = session?.user
   const plan = (session?.subscription as { plan?: string } | undefined)?.plan
   const isLoggedIn = !!user

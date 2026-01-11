@@ -1,4 +1,6 @@
+import { MenuItem } from '@js-monorepo/types/menu'
 import { Role, type RouteRole } from './roles'
+import { RiAdminFill } from 'react-icons/ri'
 
 export interface RouteConfig {
   path: string
@@ -34,3 +36,14 @@ export function isPublicRoute(pathname: string): boolean {
 export function getRouteConfig(pathname: string): RouteConfig | undefined {
   return routes.find((route) => pathname.startsWith(route.path))
 }
+
+// Navbar & Sidebar Menu navigation
+
+const menuItems: MenuItem[] = [
+  {
+    href: '/admin',
+    name: 'Dashboard',
+    roles: [Role.ADMIN],
+    Icon: RiAdminFill,
+  },
+]
