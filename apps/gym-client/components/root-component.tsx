@@ -8,6 +8,7 @@ import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { PropsWithChildren } from 'react'
 import { AppConfig } from '../lib/app-config'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
+import { MobileNavbar } from './mobile-navbar'
 
 function SidebarWrapper({ children, user }: PropsWithChildren<{ user?: any }>) {
   return (
@@ -39,6 +40,7 @@ export default function RootComponent({ children }: PropsWithChildren) {
 
         {/* Main */}
         <main className="flex-1">{children}</main>
+        {user?.id && <MobileNavbar />}
       </section>
     </SidebarWrapper>
   )
