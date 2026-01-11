@@ -1,5 +1,4 @@
-'use client'
-
+import { SessionProvider } from '@js-monorepo/auth/next/client'
 import { DpLoaderProvider } from '@js-monorepo/loader'
 import { QClientProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
@@ -10,9 +9,10 @@ import { AppConfig } from '../lib/app-config'
 
 interface RootProvidersProps {
   readonly children: ReactNode
+  readonly session?: any
 }
 
-export default function RootProviders({ children }: RootProvidersProps) {
+export default async function RootProviders({ children, session }: RootProvidersProps) {
   return (
     <ThemeProvider
       attribute="class"
@@ -23,7 +23,9 @@ export default function RootProviders({ children }: RootProvidersProps) {
       <DpNextPageProgressBar>
         <DpLoaderProvider>
           <DpNotificationProvider>
-            <QClientProvider>{children}</QClientProvider>
+            <SessionProvider value={session} endpoint="/session">
+              <QClientProvider>{children}</QClientProvider>
+            </SessionProvider>
           </DpNotificationProvider>
         </DpLoaderProvider>
       </DpNextPageProgressBar>

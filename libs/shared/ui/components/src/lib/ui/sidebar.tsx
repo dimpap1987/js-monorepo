@@ -279,9 +279,9 @@ type SidebarInsetProps = React.ComponentPropsWithoutRef<typeof Slot> & {
   asChild?: boolean
 }
 
-const SidebarInset = React.forwardRef<React.ElementRef<typeof Slot>, SidebarInsetProps>(
-  ({ className, asChild, ...props }, ref) => {
-    const Comp = asChild ? Slot : Slot
+const SidebarInset = React.forwardRef<React.ElementRef<'div'>, SidebarInsetProps>(
+  ({ className, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'div'
 
     return (
       <Comp

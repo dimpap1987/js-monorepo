@@ -1,3 +1,4 @@
+import { getCurrentSession } from '@js-monorepo/auth/next/server'
 import { BodyTemplate } from '@js-monorepo/templates'
 import { Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
@@ -27,17 +28,21 @@ export const viewport: Viewport = {
   ],
 }
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout(props: { readonly children: ReactNode; readonly auth: ReactNode }) {
   const locale = await getLocale()
   const messages = await getMessages()
+  const session = await getCurrentSession()
 
   return (
     <html lang={locale} suppressHydrationWarning={true}>
       <BodyTemplate className={poppins.className}>
         <StructuredData />
         <NextIntlClientProvider messages={messages}>
-          <RootProviders>
-            <RootComponent>{children}</RootComponent>
+          <RootProviders session={session}>
+            <RootComponent>
+              {props.auth}
+              {props.children}
+            </RootComponent>
           </RootProviders>
         </NextIntlClientProvider>
       </BodyTemplate>
