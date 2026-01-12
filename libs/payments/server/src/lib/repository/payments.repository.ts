@@ -5,6 +5,14 @@ import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-pr
 import { Injectable } from '@nestjs/common'
 import { CreateProductType } from '../../'
 import { ACTIVE_SUBSCRIPTION_STATUSES, CancelReason } from '../constants'
+import {
+  AdminProductResponse,
+  CreatePriceDto,
+  CreateProductDto,
+  ProductFiltersDto,
+  UpdatePriceDto,
+  UpdateProductDto,
+} from '../dto/admin-product.dto'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { SubscriptionDeleteData, SubscriptionUpdateData } from '../dto/subscription-webhook.dto'
@@ -580,5 +588,195 @@ export class PaymentsRepository {
       churnedThisMonth,
       mrr: Math.round(mrr), // in cents
     }
+  }
+
+  // ============= Admin Product Management =============
+
+  async findAllProductsAdmin(
+    page = 1,
+    pageSize = 10,
+    filters?: ProductFiltersDto
+  ): Promise<PaginationType<AdminProductResponse>> {
+    const skip = (page - 1) * pageSize
+
+    const where: Record<string, unknown> = {}
+
+    if (filters?.active !== undefined) {
+      where.active = filters.active
+    }
+
+    if (filters?.search) {
+      where.OR = [
+        { name: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+      ]
+    }
+
+    const [content, totalCount] = await Promise.all([
+      this.txHost.tx.product.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { hierarchy: 'asc' },
+        include: { prices: { orderBy: { interval: 'asc' } } },
+      }),
+      this.txHost.tx.product.count({ where }),
+    ])
+
+    return {
+      content: content as AdminProductResponse[],
+      totalCount,
+      page,
+      pageSize,
+      totalPages: Math.ceil(totalCount / pageSize),
+    }
+  }
+
+  async findProductByIdAdmin(id: number): Promise<AdminProductResponse | null> {
+    const product = await this.txHost.tx.product.findUnique({
+      where: { id },
+      include: { prices: { orderBy: { interval: 'asc' } } },
+    })
+    return product as AdminProductResponse | null
+  }
+
+  async createProductLocal(dto: CreateProductDto): Promise<AdminProductResponse> {
+    const localStripeId = `local_${Date.now()}`
+
+    const product = await this.txHost.tx.product.create({
+      data: {
+        stripeId: localStripeId,
+        name: dto.name,
+        description: dto.description,
+        features: dto.features || {},
+        hierarchy: dto.hierarchy ?? 0,
+        active: dto.active ?? true,
+      },
+      include: { prices: true },
+    })
+
+    return product as AdminProductResponse
+  }
+
+  async updateProductAdmin(id: number, dto: UpdateProductDto): Promise<AdminProductResponse> {
+    const product = await this.txHost.tx.product.update({
+      where: { id },
+      data: {
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.description !== undefined && { description: dto.description }),
+        ...(dto.features !== undefined && { features: dto.features }),
+        ...(dto.hierarchy !== undefined && { hierarchy: dto.hierarchy }),
+        ...(dto.active !== undefined && { active: dto.active }),
+      },
+      include: { prices: { orderBy: { interval: 'asc' } } },
+    })
+
+    return product as AdminProductResponse
+  }
+
+  async deleteProductAdmin(id: number): Promise<void> {
+    await this.txHost.tx.product.delete({ where: { id } })
+  }
+
+  async updateProductStripeId(id: number, stripeId: string): Promise<AdminProductResponse> {
+    const product = await this.txHost.tx.product.update({
+      where: { id },
+      data: { stripeId },
+      include: { prices: { orderBy: { interval: 'asc' } } },
+    })
+
+    return product as AdminProductResponse
+  }
+
+  async canDeleteProduct(productId: number): Promise<boolean> {
+    const subscriptionCount = await this.txHost.tx.subscription.count({
+      where: { price: { productId } },
+    })
+    return subscriptionCount === 0
+  }
+
+  async getProductStats() {
+    const [totalProducts, activeProducts, allProducts] = await Promise.all([
+      this.txHost.tx.product.count(),
+      this.txHost.tx.product.count({ where: { active: true } }),
+      this.txHost.tx.product.findMany({ select: { stripeId: true } }),
+    ])
+
+    const syncedProducts = allProducts.filter((p) => !p.stripeId.startsWith('local_')).length
+    const localOnlyProducts = totalProducts - syncedProducts
+
+    return {
+      totalProducts,
+      activeProducts,
+      syncedProducts,
+      localOnlyProducts,
+    }
+  }
+
+  // ============= Admin Price Management =============
+
+  async findPricesByProductAdmin(productId?: number) {
+    const where = productId ? { productId } : {}
+
+    return this.txHost.tx.price.findMany({
+      where,
+      orderBy: [{ productId: 'asc' }, { interval: 'asc' }],
+      include: { product: { select: { id: true, name: true } } },
+    })
+  }
+
+  async findPriceByIdAdmin(id: number) {
+    return this.txHost.tx.price.findUnique({
+      where: { id },
+      include: { product: { select: { id: true, name: true } } },
+    })
+  }
+
+  async createPriceLocal(dto: CreatePriceDto) {
+    const localStripeId = `local_price_${Date.now()}`
+
+    return this.txHost.tx.price.create({
+      data: {
+        stripeId: localStripeId,
+        productId: dto.productId,
+        unitAmount: dto.unitAmount,
+        currency: dto.currency.toLowerCase(),
+        interval: dto.interval,
+        active: dto.active ?? true,
+      },
+      include: { product: { select: { id: true, name: true } } },
+    })
+  }
+
+  async updatePriceAdmin(id: number, dto: UpdatePriceDto) {
+    return this.txHost.tx.price.update({
+      where: { id },
+      data: {
+        ...(dto.unitAmount !== undefined && { unitAmount: dto.unitAmount }),
+        ...(dto.currency !== undefined && { currency: dto.currency.toLowerCase() }),
+        ...(dto.interval !== undefined && { interval: dto.interval }),
+        ...(dto.active !== undefined && { active: dto.active }),
+      },
+      include: { product: { select: { id: true, name: true } } },
+    })
+  }
+
+  async deletePriceAdmin(id: number): Promise<void> {
+    await this.txHost.tx.price.delete({ where: { id } })
+  }
+
+  async updatePriceStripeId(id: number, stripeId: string) {
+    return this.txHost.tx.price.update({
+      where: { id },
+      data: { stripeId },
+      include: { product: { select: { id: true, name: true } } },
+    })
+  }
+
+  async canDeletePrice(priceId: number): Promise<boolean> {
+    const subscriptionCount = await this.txHost.tx.subscription.count({
+      where: { priceId },
+    })
+    return subscriptionCount === 0
   }
 }

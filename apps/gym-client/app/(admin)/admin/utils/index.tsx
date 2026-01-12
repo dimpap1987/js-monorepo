@@ -3,6 +3,7 @@ import { HiMiniUsers } from 'react-icons/hi2'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdOutlineContactMail, MdOutlineSubscriptions } from 'react-icons/md'
 import { RiUserSettingsFill } from 'react-icons/ri'
+import { FiPackage } from 'react-icons/fi'
 
 export const ADMIN_NAV_LINKS = [
   {
@@ -21,6 +22,12 @@ export const ADMIN_NAV_LINKS = [
     href: '/admin/subscriptions',
     icon: MdOutlineSubscriptions,
     label: 'Subscriptions',
+    activeClassName: 'bg-primary text-primary-foreground',
+  },
+  {
+    href: '/admin/products',
+    icon: FiPackage,
+    label: 'Products',
     activeClassName: 'bg-primary text-primary-foreground',
   },
   {

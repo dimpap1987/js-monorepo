@@ -9,7 +9,6 @@ import {
   FormProvider,
   useFormContext,
 } from 'react-hook-form'
-import { FaRegTimesCircle } from 'react-icons/fa'
 
 type FormItemContextValue = {
   id: string
@@ -191,14 +190,14 @@ const FormErrorDisplay: React.FC<FormErrorProps> = ({ errors, fields, className 
 }
 
 export {
-  useFormField,
   Form,
-  FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
-  FormMessage,
-  FormField,
-  Input,
   FormErrorDisplay,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  useFormField,
 }

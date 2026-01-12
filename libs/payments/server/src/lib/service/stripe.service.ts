@@ -26,6 +26,13 @@ export class StripeService {
     private readonly distributedLockService: DistributedLockService
   ) {}
 
+  /**
+   * Get the underlying Stripe client for direct API access
+   */
+  getStripeClient() {
+    return this.stripeProvider.getStripeClient()
+  }
+
   async findCustomerByEmail(email: string) {
     return this.paymentsClient.findCustomerByEmail(email)
   }

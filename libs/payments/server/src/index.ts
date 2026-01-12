@@ -5,8 +5,12 @@ export * from './lib/payments.module'
 export * from './lib/rawBody.middleware'
 export * from './lib/service/payments.service'
 export * from './lib/service/stripe.service'
+export * from './lib/service/admin-products.service'
 export * from './lib/stripe.module'
 export * from './lib/utils'
+
+// Admin Product DTOs
+export * from './lib/dto/admin-product.dto'
 
 export type CreateProductType = {
   stripeId: string

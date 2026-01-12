@@ -15,3 +15,8 @@ export {
   generateIdempotencyKey,
 } from './lib/utils/api'
 export * from './lib/constants'
+
+// Admin exports
+export * from './lib/components/admin'
+export * from './lib/queries/admin-products-queries'
+export * from './lib/utils/admin-api'

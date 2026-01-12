@@ -1,10 +1,12 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { AdminProductsController } from './controller/admin-products.controller'
 import { InvoiceController } from './controller/invoice.controller'
 import { PaymentsController } from './controller/payments.controller'
 import { TrialController } from './controller/trial.controller'
 import { SubscriptionGuard } from './guards/subscription.guard'
 import { PaymentsRepository } from './repository/payments.repository'
+import { AdminProductsService } from './service/admin-products.service'
 import { PaymentsService } from './service/payments.service'
 import { StripeService } from './service/stripe.service'
 import { TrialService } from './service/trial.service'
@@ -35,6 +37,7 @@ const providers: Provider[] = [
   SubscriptionGuard,
   TrialService,
   TrialExpiryScheduler,
+  AdminProductsService,
 ]
 
 @Global()
@@ -67,7 +70,7 @@ export class PaymentsModule {
         },
         ...providers,
       ],
-      controllers: [PaymentsController, InvoiceController, TrialController],
+      controllers: [PaymentsController, InvoiceController, TrialController, AdminProductsController],
       exports: [...providers, 'PAYMENTS_OPTIONS'],
     }
   }

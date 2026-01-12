@@ -84,3 +84,75 @@ export interface InvoiceListResponse {
   invoices: Invoice[]
   hasMore: boolean
 }
+
+// ============= Admin Types =============
+
+export interface AdminPrice {
+  id: number
+  stripeId: string
+  unitAmount: number
+  currency: string
+  interval: 'month' | 'year'
+  active: boolean
+  productId: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AdminProduct {
+  id: number
+  stripeId: string
+  name: string
+  description: string
+  features: Record<string, string> | null
+  hierarchy: number
+  active: boolean
+  prices: AdminPrice[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AdminProductStats {
+  totalProducts: number
+  activeProducts: number
+  syncedProducts: number
+  localOnlyProducts: number
+}
+
+export interface CreateProductRequest {
+  name: string
+  description: string
+  features?: Record<string, string>
+  hierarchy?: number
+  active?: boolean
+  syncToStripe?: boolean
+}
+
+export interface UpdateProductRequest {
+  name?: string
+  description?: string
+  features?: Record<string, string>
+  hierarchy?: number
+  active?: boolean
+}
+
+export interface CreatePriceRequest {
+  productId: number
+  unitAmount: number
+  currency: string
+  interval: 'month' | 'year'
+  active?: boolean
+  syncToStripe?: boolean
+}
+
+export interface UpdatePriceRequest {
+  unitAmount?: number
+  currency?: string
+  interval?: 'month' | 'year'
+  active?: boolean
+}
+
+export interface AdminProductFilters {
+  active?: boolean
+  search?: string
+}
