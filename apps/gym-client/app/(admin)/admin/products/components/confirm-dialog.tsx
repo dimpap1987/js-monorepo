@@ -9,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@js-monorepo/components/ui/dialog'
-import { useEffect } from 'react'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -34,15 +33,6 @@ export function ConfirmDialog({
   isLoading,
   variant = 'default',
 }: ConfirmDialogProps) {
-  // Fix for Radix Dialog not properly cleaning up pointer-events on body
-  // useEffect(() => {
-  //   if (!open) {
-  //     const timeout = setTimeout(() => {
-  //       document.body.style.pointerEvents = ''
-  //     }, 100)
-  //     return () => clearTimeout(timeout)
-  //   }
-  // }, [open])
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

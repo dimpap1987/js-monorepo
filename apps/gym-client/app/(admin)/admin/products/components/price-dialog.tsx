@@ -11,7 +11,6 @@ import {
   useCreatePrice,
   useUpdatePrice,
 } from '@js-monorepo/payments-ui'
-import { useEffect } from 'react'
 
 interface PriceDialogProps {
   open: boolean
@@ -22,19 +21,9 @@ interface PriceDialogProps {
 }
 
 export function PriceDialog({ open, onOpenChange, products, defaultProductId, price }: PriceDialogProps) {
-  // Fix for Radix Dialog not properly cleaning up pointer-events on body
-  // useEffect(() => {
-  //   if (!open) {
-  //     const timeout = setTimeout(() => {
-  //       document.body.style.pointerEvents = ''
-  //     }, 100)
-  //     return () => clearTimeout(timeout)
-  //   }
-  // }, [open])
   const { addNotification } = useNotifications()
   const createPrice = useCreatePrice()
   const updatePrice = useUpdatePrice()
-
   const isEditMode = !!price
 
   const handleSubmit = async (data: CreatePriceRequest | UpdatePriceRequest) => {

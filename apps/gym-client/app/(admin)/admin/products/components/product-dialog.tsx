@@ -10,7 +10,6 @@ import {
   useCreateProduct,
   useUpdateProduct,
 } from '@js-monorepo/payments-ui'
-import { useEffect } from 'react'
 
 interface ProductDialogProps {
   open: boolean
@@ -19,14 +18,6 @@ interface ProductDialogProps {
 }
 
 export function ProductDialog({ open, onOpenChange, product }: ProductDialogProps) {
-  // useEffect(() => {
-  //   if (!open) {
-  //     const timeout = setTimeout(() => {
-  //       document.body.style.pointerEvents = ''
-  //     }, 100)
-  //     return () => clearTimeout(timeout)
-  //   }
-  // }, [open])
   const { addNotification } = useNotifications()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
