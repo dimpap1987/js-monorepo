@@ -13,7 +13,7 @@ import { AuthException } from '../../exceptions/api-exception'
 import { ConstraintCode, ConstraintViolationException } from '../../exceptions/contraint-violation'
 import { AuthRepository } from '../../repositories/auth.repository'
 import { RepoAuth, ServiceRole } from '../../types'
-import { AuthService } from '../interfaces/auth.service'
+import { AuthService, ProfileExtras } from '../interfaces/auth.service'
 import { RolesService } from '../interfaces/roles.service'
 
 @Injectable()
@@ -86,20 +86,40 @@ export class AuthServiceImpl implements AuthService {
     authUserDTO: AuthUserCreateDto,
     providerName: ProviderName,
     profileImage?: string | null,
-    roles: AuthRole[] = ['USER']
+    roles: AuthRole[] = ['USER'],
+    profileExtras?: ProfileExtras
   ): Promise<AuthUserDto> {
     this.logger.debug(`Create auth user by provider name: '${providerName}' with username: '${authUserDTO?.username}'`)
 
-    const provider = await this.authRepository.findProviderByName(providerName)
+    RegisterUserSchema.parse(authUserDTO)
 
-    return this.createAuthUser(
-      authUserDTO,
-      {
-        id: provider.id,
-        profileImage: profileImage,
-      },
-      roles
-    )
+    try {
+      const provider = await this.authRepository.findProviderByName(providerName)
+      const roleIds = await this.getRoleIds(roles)
+
+      return await this.authRepository.createAuthUser(
+        authUserDTO,
+        { id: provider.id, profileImage },
+        roleIds,
+        profileExtras
+      )
+    } catch (err: any) {
+      if (err instanceof ConstraintViolationException) {
+        if (err.code === ConstraintCode.USERNAME_EXISTS) {
+          this.logger.warn(`Username: '${authUserDTO.username}' already exists`)
+          throw new AuthException(HttpStatus.BAD_REQUEST, 'Username already exists', 'USERNAME_EXISTS')
+        }
+      } else if (err instanceof AuthException) {
+        throw err
+      }
+
+      this.logger.error(`There was an error when creating a user with username: ${authUserDTO.username}`, err.stack)
+      throw new AuthException(
+        HttpStatus.BAD_REQUEST,
+        'Something went wrong while creating user',
+        'CREATE_USER_EXCEPTION'
+      )
+    }
   }
 
   createSessionUser(authUser: AuthUserDto): SessionUserType {

@@ -47,8 +47,8 @@ export const UsernameSchema = z
     message: registerUserSchemaConfig.MAX_ERROR_MESSAGE,
   })
   // eslint-disable-next-line no-useless-escape
-  .regex(/^[^\s!@#$%^&*()_+|~=`{}\[\]:";'<>?,\/\\]+$/, {
-    message: 'Username contains invalid characters.',
+  .regex(/^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*$/, {
+    message: 'Username contain invalid characters.',
   })
 
 export const RegisterUserSchema = registerUserSchemaConfig.createSchema()

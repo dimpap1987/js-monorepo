@@ -18,18 +18,23 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     })
   }
 
-  async validate(_accessToken: string, _refreshToken: string, profile: any, done: VerifyCallback): Promise<void> {
-    const profileData = this.extractProfileData(profile)
+  async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback): Promise<void> {
+    const profileData = this.extractProfileData(profile, accessToken, refreshToken)
     return this.oauthHandler.handleOAuthCallback(profileData, 'GOOGLE', this.options, done)
   }
 
-  private extractProfileData(profile: any): OAuthProfileData {
+  private extractProfileData(profile: any, accessToken: string, refreshToken: string): OAuthProfileData {
     const { name, emails, photos } = profile
 
     return {
       email: emails?.[0]?.value,
       displayName: this.extractDisplayName(name, profile),
       profileImage: photos?.[0]?.value,
+      firstName: name?.givenName,
+      lastName: name?.familyName,
+      accessToken,
+      refreshToken,
+      scopes: ['email', 'profile'],
     }
   }
 

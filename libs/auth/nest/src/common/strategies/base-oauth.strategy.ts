@@ -2,13 +2,19 @@ import { ProviderName } from '@js-monorepo/types/auth'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthService } from '../services/interfaces/auth.service'
 import { UnregisteredService } from '../services/interfaces/unregistered-user.service'
-import { ServiceAuth, ServiceUnRegisteredUser, SessionConfiguration } from '../types'
+import { UserProfileService } from '../services/interfaces/user-profile.service'
+import { ServiceAuth, ServiceUnRegisteredUser, ServiceUserProfile, SessionConfiguration } from '../types'
 import { generateUniqueUsername, normalizeDisplayName } from '../utils'
 
 export interface OAuthProfileData {
   email: string
   displayName: string
   profileImage?: string | null
+  firstName?: string | null
+  lastName?: string | null
+  accessToken?: string
+  refreshToken?: string
+  scopes?: string[]
 }
 
 @Injectable()
@@ -17,7 +23,8 @@ export class OAuthHandler {
 
   constructor(
     @Inject(ServiceAuth) private readonly authService: AuthService,
-    @Inject(ServiceUnRegisteredUser) private readonly unRegisteredUserService: UnregisteredService
+    @Inject(ServiceUnRegisteredUser) private readonly unRegisteredUserService: UnregisteredService,
+    @Inject(ServiceUserProfile) private readonly userProfileService: UserProfileService
   ) {}
 
   async handleOAuthCallback(
@@ -26,60 +33,82 @@ export class OAuthHandler {
     options: SessionConfiguration,
     done: (error: any, user?: any) => void
   ): Promise<void> {
-    const { email, displayName, profileImage } = profileData
+    const { email } = profileData
 
     try {
       const existingUser = await this.authService.findAuthUserByEmail(email)
 
       if (existingUser) {
-        return this.handleExistingUser(existingUser, done)
+        return await this.handleExistingUser(existingUser, profileData, providerName, done)
       }
 
       if (options.skipOnboarding) {
-        return await this.handleAutoRegistration(email, displayName, profileImage, providerName, done)
+        return await this.handleAutoRegistration(profileData, providerName, done)
       }
 
-      return await this.handleUnregisteredUser(email, profileImage, providerName, done)
+      return await this.handleUnregisteredUser(profileData, providerName, done)
     } catch (error: any) {
       this.logger.error(`OAuth callback failed for ${providerName}`, error.stack)
       done(error, undefined)
     }
   }
 
-  private handleExistingUser(user: any, done: (error: any, user?: any) => void): void {
+  private async handleExistingUser(
+    user: any,
+    profileData: OAuthProfileData,
+    providerName: ProviderName,
+    done: (error: any, user?: any) => void
+  ): Promise<void> {
+    // Account linking: upsert profile for this provider (creates if new, updates if exists)
+    await this.userProfileService.upsertUserProfile(user.id, providerName, {
+      profileImage: profileData.profileImage,
+      firstName: profileData.firstName,
+      lastName: profileData.lastName,
+      accessToken: profileData.accessToken,
+      refreshToken: profileData.refreshToken,
+      scopes: profileData.scopes,
+    })
+
+    this.logger.debug(`Linked/updated ${providerName} profile for user ${user.id}`)
+
     const sessionUser = this.authService.createSessionUser(user)
     done(null, { user: sessionUser })
   }
 
   private async handleAutoRegistration(
-    email: string,
-    displayName: string,
-    profileImage: string | null | undefined,
+    profileData: OAuthProfileData,
     providerName: ProviderName,
     done: (error: any, user?: any) => void
   ): Promise<void> {
+    const { email, displayName, profileImage, firstName, lastName, accessToken, refreshToken, scopes } = profileData
+
     const normalizedName = normalizeDisplayName(displayName)
     const username = await generateUniqueUsername(normalizedName, async (candidate) => {
       const existing = await this.authService.findAuthUserByUsername(candidate)
       return existing !== null
     })
 
-    const newUser = await this.authService.createAuthUserByProviderName({ email, username }, providerName, profileImage)
+    const newUser = await this.authService.createAuthUserByProviderName(
+      { email, username },
+      providerName,
+      profileImage,
+      undefined,
+      { firstName, lastName, accessToken, refreshToken, scopes }
+    )
 
     const sessionUser = this.authService.createSessionUser(newUser)
     done(null, { user: sessionUser })
   }
 
   private async handleUnregisteredUser(
-    email: string,
-    profileImage: string | null | undefined,
+    profileData: OAuthProfileData,
     providerName: ProviderName,
     done: (error: any, user?: any) => void
   ): Promise<void> {
     const unRegisteredUser = await this.unRegisteredUserService.createUnRegisteredUser({
-      email,
+      email: profileData.email,
       provider: providerName,
-      profileImage,
+      profileImage: profileData.profileImage,
     })
 
     done(null, { unRegisteredUser })

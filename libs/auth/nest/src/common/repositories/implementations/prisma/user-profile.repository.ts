@@ -36,6 +36,12 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
           userId: userProfileCreateDto.userId,
           providerId: userProfileCreateDto.providerId,
           profileImage: userProfileCreateDto.profileImage,
+          firstName: userProfileCreateDto.firstName,
+          lastName: userProfileCreateDto.lastName,
+          accessToken: userProfileCreateDto.accessToken,
+          refreshToken: userProfileCreateDto.refreshToken,
+          tokenExpiry: userProfileCreateDto.tokenExpiry,
+          scopes: userProfileCreateDto.scopes ?? [],
         },
       })
       .catch((e: unknown) => {
@@ -62,6 +68,48 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
         provider: {
           name: providerName,
         },
+      },
+      include: {
+        provider: true,
+      },
+    })
+  }
+
+  async upsertUserProfile(
+    userId: number,
+    providerName: ProviderName,
+    data: Omit<UserProfileCreateDto, 'userId' | 'providerId'>
+  ): Promise<UserProfileDto> {
+    const provider = await this.txHost.tx.provider.findUniqueOrThrow({
+      where: { name: providerName },
+    })
+
+    return this.txHost.tx.userProfile.upsert({
+      where: {
+        userId_providerId: {
+          userId,
+          providerId: provider.id,
+        },
+      },
+      update: {
+        profileImage: data.profileImage,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        tokenExpiry: data.tokenExpiry,
+        scopes: data.scopes ?? [],
+      },
+      create: {
+        userId,
+        providerId: provider.id,
+        profileImage: data.profileImage,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        tokenExpiry: data.tokenExpiry,
+        scopes: data.scopes ?? [],
       },
       include: {
         provider: true,

@@ -31,4 +31,12 @@ export class UserProfileServiceImpl implements UserProfileService {
   async updateUserProfile(id: number, userProfileUpdateDto: Partial<UserProfileCreateDto>): Promise<UserProfileDto> {
     return this.userProfileRepository.updateUserProfile(id, userProfileUpdateDto)
   }
+
+  async upsertUserProfile(
+    userId: number,
+    providerName: ProviderName,
+    data: Omit<UserProfileCreateDto, 'userId' | 'providerId'>
+  ): Promise<UserProfileDto> {
+    return this.userProfileRepository.upsertUserProfile(userId, providerName, data)
+  }
 }

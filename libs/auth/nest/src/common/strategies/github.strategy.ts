@@ -20,19 +20,37 @@ export class GithubOauthStrategy extends PassportStrategy(Strategy, 'github') {
     })
   }
 
-  async validate(accessToken: string, _refreshToken: string, profile: any, done: oauth2.VerifyCallback): Promise<void> {
-    const profileData = await this.extractProfileData(accessToken, profile)
+  async validate(accessToken: string, refreshToken: string, profile: any, done: oauth2.VerifyCallback): Promise<void> {
+    const profileData = await this.extractProfileData(accessToken, refreshToken, profile)
     return this.oauthHandler.handleOAuthCallback(profileData, 'GITHUB', this.options, done)
   }
 
-  private async extractProfileData(accessToken: string, profile: any): Promise<OAuthProfileData> {
+  private async extractProfileData(accessToken: string, refreshToken: string, profile: any): Promise<OAuthProfileData> {
     const email = await this.getPrimaryEmail(accessToken)
+    const { firstName, lastName } = this.extractNames(profile)
 
     return {
       email,
       displayName: this.extractDisplayName(profile, email),
       profileImage: profile.photos?.[0]?.value,
+      firstName,
+      lastName,
+      accessToken,
+      refreshToken,
+      scopes: ['read:project', 'user:email', 'read:user'],
     }
+  }
+
+  private extractNames(profile: any): { firstName?: string; lastName?: string } {
+    // GitHub displayName is often "First Last" format
+    if (profile.displayName) {
+      const parts = profile.displayName.trim().split(/\s+/)
+      if (parts.length >= 2) {
+        return { firstName: parts[0], lastName: parts.slice(1).join(' ') }
+      }
+      return { firstName: parts[0] }
+    }
+    return {}
   }
 
   private extractDisplayName(profile: any, email: string): string {

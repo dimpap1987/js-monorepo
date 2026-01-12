@@ -11,4 +11,10 @@ export interface UserProfileRepository {
   updateUserProfile(id: number, userProfileUpdateDto: Partial<UserProfileCreateDto>): Promise<UserProfileDto>
 
   findUserProfilesByUserIdAndProviderName(userId: number, providerName: ProviderName): Promise<UserProfileDto[]>
+
+  upsertUserProfile(
+    userId: number,
+    providerName: ProviderName,
+    data: Omit<UserProfileCreateDto, 'userId' | 'providerId'>
+  ): Promise<UserProfileDto>
 }

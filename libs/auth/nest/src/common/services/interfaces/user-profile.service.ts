@@ -1,3 +1,4 @@
+import { ProviderName } from '@js-monorepo/types/auth'
 import { UserProfileCreateDto, UserProfileDto } from '@js-monorepo/types/user-profile'
 
 export interface UserProfileService {
@@ -10,4 +11,10 @@ export interface UserProfileService {
   createUserProfile(userProfileCreateDto: UserProfileCreateDto): Promise<UserProfileDto>
 
   updateUserProfile(id: number, userProfileUpdateDto: Partial<UserProfileCreateDto>): Promise<UserProfileDto>
+
+  upsertUserProfile(
+    userId: number,
+    providerName: ProviderName,
+    data: Omit<UserProfileCreateDto, 'userId' | 'providerId'>
+  ): Promise<UserProfileDto>
 }

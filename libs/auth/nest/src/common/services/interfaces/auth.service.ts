@@ -7,6 +7,14 @@ import {
   SessionUserType,
 } from '@js-monorepo/types/auth'
 
+export interface ProfileExtras {
+  firstName?: string | null
+  lastName?: string | null
+  accessToken?: string
+  refreshToken?: string
+  scopes?: string[]
+}
+
 export interface AuthService {
   findAuthUserByEmail(email: string): Promise<AuthUserDto | null>
 
@@ -20,7 +28,8 @@ export interface AuthService {
     authUserDTO: AuthUserCreateDto,
     providerName: ProviderName,
     profileImage?: string | null,
-    roles?: AuthRole[]
+    roles?: AuthRole[],
+    profileExtras?: ProfileExtras
   ): Promise<AuthUserDto>
 
   createSessionUser(authUser: Partial<AuthUserDto>): SessionUserType

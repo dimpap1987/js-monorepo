@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common'
 import { Prisma } from '@js-monorepo/prisma-shared'
 import { ConstraintCode, ConstraintViolationException } from '../../../exceptions/contraint-violation'
 import { AuthRepository } from '../../auth.repository'
+import { ProfileExtras } from '../../../services/interfaces/auth.service'
 
 @Injectable()
 export class AuthRepositoryPrismaImpl implements AuthRepository {
@@ -40,7 +41,8 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
   async createAuthUser(
     authUserDTO: AuthUserCreateDto,
     providerDTO: ProvidersDto,
-    roleIds: number[]
+    roleIds: number[],
+    profileExtras?: ProfileExtras
   ): Promise<AuthUserDto> {
     return this.txHost.tx.authUser
       .create({
@@ -51,6 +53,11 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
             create: {
               providerId: providerDTO.id,
               profileImage: providerDTO.profileImage,
+              firstName: profileExtras?.firstName,
+              lastName: profileExtras?.lastName,
+              accessToken: profileExtras?.accessToken,
+              refreshToken: profileExtras?.refreshToken,
+              scopes: profileExtras?.scopes ?? [],
             },
           },
           userRole: {
