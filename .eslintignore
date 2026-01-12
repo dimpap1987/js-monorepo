@@ -1,3 +1,4 @@
 node_modules
 dist
-libs/prisma/db/src/lib/prisma/generated
+libs/prisma/gym-db/src/lib/prisma/generated
+libs/prisma/core-db/src/lib/prisma/generated

@@ -18,6 +18,7 @@
     ]
   },
   "scripts": {
+    "postinstall": "prisma generate --config=libs/prisma/core-db/prisma.config.ts && prisma generate --config=libs/prisma/gym-db/prisma.config.ts",
     "ci:local": "nx run-many --target=lint,test --all --skip-nx-cache && nx run-many --target=build --projects=gym-api,gym-client,my-api,next-app --skip-nx-cache --configuration=production",
     "lint": "nx affected:lint --all",
     "lint:all": "nx run-many --all --target=lint",

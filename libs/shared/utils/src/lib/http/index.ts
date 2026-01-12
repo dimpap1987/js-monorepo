@@ -1,6 +1,7 @@
 import { ClientResponseType, ErrorResponse, SuccessResponse } from '@js-monorepo/types/responses'
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { Request } from 'express'
+import { parseApiError } from '../errors'
 
 export interface CustomAxiosInstance extends AxiosInstance {
   get<T = any, R = ClientResponseType<T> & AxiosResponse>(url: string, config?: AxiosRequestConfig): Promise<R>
@@ -47,25 +48,23 @@ export function getCookie(name: string) {
 }
 
 async function handleAxiosResponse<T>(response: AxiosResponse): Promise<ClientResponseType<T>> {
-  const errorMessage = 'Something went wrong, please try again later...'
-
   // Check for a successful response
   if (response?.status >= 200 && response?.status < 300) {
-    const finalResponse = {
+    return {
       ok: true,
       status: response.status,
       data: response.data,
-    }
-    return finalResponse as SuccessResponse<T>
+    } as SuccessResponse<T>
   }
 
-  // For non-successful responses, handle errors
-  const errorData = response?.data || {}
+  // For non-successful responses, parse and extract meaningful error messages
+  const parsed = parseApiError(response?.data || {})
+
   return {
     ok: false,
     status: response?.status || 500,
-    message: errorData.message || errorMessage,
-    errors: errorData.errors || [],
+    message: parsed.message,
+    errors: parsed.errors,
   } as ErrorResponse
 }
 
@@ -138,3 +137,5 @@ const apiClientBase = createApiClient(false)
 export { apiClient, apiClientBase }
 
 export { handleQueryResponse, queryKeys } from './queries'
+export { createErrorHandler, getErrorMessage, getErrorMessages, parseError, parseApiError } from '../errors'
+export type { ParsedError, ErrorHandlerConfig, ErrorHandlerOptions } from '../errors'

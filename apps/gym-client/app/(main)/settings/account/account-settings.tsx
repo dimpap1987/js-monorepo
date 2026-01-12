@@ -56,10 +56,10 @@ export function AccountSettings() {
         message: 'Account successfully updated!',
         type: 'success',
       })
-    } catch (error) {
+    } catch (error: any) {
       form.reset(initUser)
       addNotification({
-        message: 'Something went wrong...',
+        message: error?.message ?? 'Something went wrong...',
         type: 'error',
       })
     }
@@ -151,7 +151,7 @@ export function AccountSettings() {
                           <Input id="username" className="h-11" {...field} />
                         ) : (
                           <div className="h-11 px-4 py-2 bg-background-secondary text-foreground rounded-lg border border-border font-medium flex items-center shadow-sm">
-                            {field.value || 'Not set'}
+                            {field.value || 'Anonymous'}
                           </div>
                         )}
 
