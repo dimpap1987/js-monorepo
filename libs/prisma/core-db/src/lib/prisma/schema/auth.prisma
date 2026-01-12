@@ -18,16 +18,25 @@ model AuthUser {
 }
 
 model UserProfile {
-    id           Int      @id @default(autoincrement())
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
+    id           Int       @id @default(autoincrement())
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
     userId       Int
     providerId   Int
     profileImage String?
+    firstName    String?
+    lastName     String?
+
+    // OAuth tokens for API access (e.g., Google Calendar, GitHub repos)
+    accessToken  String?
+    refreshToken String?
+    tokenExpiry  DateTime?
+    scopes       String[]
 
     authUser AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
     provider Provider @relation(fields: [providerId], references: [id])
 
+    @@unique([userId, providerId])
     @@map(name: "user_profiles")
 }
 
