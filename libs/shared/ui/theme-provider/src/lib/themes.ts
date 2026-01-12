@@ -12,6 +12,13 @@ export interface ThemeConfig {
 
 export const THEMES: ThemeConfig[] = [
   {
+    id: 'system',
+    name: 'System',
+    description: 'Follow your system preference',
+    enabled: true,
+    preview: null,
+  },
+  {
     id: 'light',
     name: 'Light',
     description: 'Light theme with bright colors',
@@ -59,7 +66,7 @@ export const THEMES: ThemeConfig[] = [
     id: 'dark-blue',
     name: 'Dark Blue',
     description: 'Dark theme with blue accents',
-    enabled: true,
+    enabled: false,
     preview: {
       background: 'oklch(0.12 0.02 250)',
       primary: 'oklch(0.65 0.2 250)',
@@ -103,7 +110,7 @@ export const THEMES: ThemeConfig[] = [
     id: 'monokai',
     name: 'Monokai',
     description: 'Popular code editor theme',
-    enabled: true,
+    enabled: false,
     preview: {
       background: 'oklch(0.22 0.01 0)',
       primary: 'oklch(0.75 0.15 150)',
@@ -147,7 +154,7 @@ export const THEMES: ThemeConfig[] = [
     id: 'catppuccin',
     name: 'Catppuccin',
     description: 'Soothing pastel theme',
-    enabled: true,
+    enabled: false,
     preview: {
       background: 'oklch(0.95 0.01 280)',
       primary: 'oklch(0.65 0.2 15)',
@@ -158,7 +165,7 @@ export const THEMES: ThemeConfig[] = [
     id: 'onedark',
     name: 'One Dark',
     description: 'Atom One Dark theme',
-    enabled: true,
+    enabled: false,
     preview: {
       background: 'oklch(0.22 0.01 240)',
       primary: 'oklch(0.6 0.2 20)',
@@ -186,13 +193,6 @@ export const THEMES: ThemeConfig[] = [
       primary: 'oklch(0.55 0.25 20)',
       foreground: 'oklch(0.2 0.02 20)',
     },
-  },
-  {
-    id: 'system',
-    name: 'System',
-    description: 'Follow your system preference',
-    enabled: true,
-    preview: null,
   },
 ]
 
