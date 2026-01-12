@@ -40,6 +40,7 @@ export interface SessionConfiguration {
     middlewareExclusions?: (string | RouteInfo)[]
   }
   redirectUiUrl?: string
+  skipOnboarding?: boolean
   onRegister?: (user: AuthUserDto) => Promise<any>
   onLogin?: (user: AuthUserDto) => Promise<any>
 }

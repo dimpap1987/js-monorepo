@@ -1,4 +1,4 @@
-import { AuthUserCreateDto, AuthUserDto, ProvidersDto } from '@js-monorepo/types/auth'
+import { AuthUserCreateDto, AuthUserDto, ProviderName, ProvidersDto } from '@js-monorepo/types/auth'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
@@ -21,6 +21,19 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
     return this.txHost.tx.authUser.findUniqueOrThrow({
       where: { id: id },
       select: this.authUserSelectStatement(),
+    })
+  }
+
+  async findAuthUserByUsername(username: string): Promise<AuthUserDto | null> {
+    return this.txHost.tx.authUser.findUnique({
+      where: { username: username },
+      select: this.authUserSelectStatement(),
+    })
+  }
+
+  async findProviderByName(providerName: ProviderName): Promise<{ id: number; name: string }> {
+    return this.txHost.tx.provider.findUniqueOrThrow({
+      where: { name: providerName },
     })
   }
 

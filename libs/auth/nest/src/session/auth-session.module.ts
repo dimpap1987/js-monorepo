@@ -8,6 +8,7 @@ import { UnRegisteredUserProviderModule } from '../common/modules/unregisteredUs
 import { UserProfileProviderModule } from '../common/modules/user-profile.provider.modules'
 import { AuthService } from '../common/services/interfaces/auth.service'
 import { UnregisteredService } from '../common/services/interfaces/unregistered-user.service'
+import { OAuthHandler } from '../common/strategies/base-oauth.strategy'
 import { GithubOauthStrategy } from '../common/strategies/github.strategy'
 import { GoogleStrategy } from '../common/strategies/google.strategy'
 import {
@@ -104,34 +105,28 @@ export class AuthSessionModule implements NestModule {
             github: config.github,
             crf: config.csrf,
             redirectUiUrl: config.redirectUiUrl,
+            skipOnboarding: config.skipOnboarding,
             onRegister: config.onRegister,
             onLogin: config.onLogin,
           }),
           inject: [AuthConfig],
         },
+        OAuthHandler,
         {
           provide: GoogleStrategy,
-          useFactory: (
-            config: SessionConfiguration,
-            authService: AuthService,
-            unRegisteredUserService: UnregisteredService
-          ) => {
-            if (config.google) return new GoogleStrategy(config, authService, unRegisteredUserService)
+          useFactory: (config: SessionConfiguration, oauthHandler: OAuthHandler) => {
+            if (config.google) return new GoogleStrategy(config, oauthHandler)
             return null
           },
-          inject: [AuthOpts, ServiceAuth, ServiceUnRegisteredUser],
+          inject: [AuthOpts, OAuthHandler],
         },
         {
           provide: GithubOauthStrategy,
-          useFactory: (
-            config: SessionConfiguration,
-            authService: AuthService,
-            unRegisteredUserService: UnregisteredService
-          ) => {
-            if (config.github) return new GithubOauthStrategy(config, authService, unRegisteredUserService)
+          useFactory: (config: SessionConfiguration, oauthHandler: OAuthHandler) => {
+            if (config.github) return new GithubOauthStrategy(config, oauthHandler)
             return null
           },
-          inject: [AuthOpts, ServiceAuth, ServiceUnRegisteredUser],
+          inject: [AuthOpts, OAuthHandler],
         },
       ],
     }

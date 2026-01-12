@@ -1,5 +1,12 @@
 import { RegisterUserSchema } from '@js-monorepo/schemas'
-import { AuthRole, AuthUserCreateDto, AuthUserDto, ProvidersDto, SessionUserType } from '@js-monorepo/types/auth'
+import {
+  AuthRole,
+  AuthUserCreateDto,
+  AuthUserDto,
+  ProviderName,
+  ProvidersDto,
+  SessionUserType,
+} from '@js-monorepo/types/auth'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthException } from '../../exceptions/api-exception'
@@ -38,6 +45,11 @@ export class AuthServiceImpl implements AuthService {
     }
   }
 
+  async findAuthUserByUsername(username: string): Promise<AuthUserDto | null> {
+    this.logger.debug(`Search user with username: '${username}'`)
+    return this.authRepository.findAuthUserByUsername(username)
+  }
+
   @Transactional()
   async createAuthUser(
     authUserDTO: AuthUserCreateDto,
@@ -67,6 +79,27 @@ export class AuthServiceImpl implements AuthService {
         'CREATE_USER_EXCEPTION'
       )
     }
+  }
+
+  @Transactional()
+  async createAuthUserByProviderName(
+    authUserDTO: AuthUserCreateDto,
+    providerName: ProviderName,
+    profileImage?: string | null,
+    roles: AuthRole[] = ['USER']
+  ): Promise<AuthUserDto> {
+    this.logger.debug(`Create auth user by provider name: '${providerName}' with username: '${authUserDTO?.username}'`)
+
+    const provider = await this.authRepository.findProviderByName(providerName)
+
+    return this.createAuthUser(
+      authUserDTO,
+      {
+        id: provider.id,
+        profileImage: profileImage,
+      },
+      roles
+    )
   }
 
   createSessionUser(authUser: AuthUserDto): SessionUserType {

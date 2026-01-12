@@ -123,6 +123,7 @@ import { getContactMessage } from './notifications/contact-form'
           middlewareExclusions: ['exceptions', 'admin/(.*)', 'health', 'payments/webhook', 'contact'],
         },
         redirectUiUrl: configService.get('AUTH_LOGIN_REDIRECT'),
+        skipOnboarding: true,
         onRegister: async (user: AuthUserDto) => {
           userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' has joined 🚀`])
         },
