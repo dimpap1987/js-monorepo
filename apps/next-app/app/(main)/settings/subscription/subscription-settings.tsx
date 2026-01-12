@@ -74,7 +74,7 @@ export function SubscriptionSettings() {
           name: plan.name,
           price: price.unitAmount / 100,
           interval: price.interval,
-          features: plan.features || {},
+          features: plan.metadata?.features,
           priceId: price.id,
         }
       }

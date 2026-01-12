@@ -36,7 +36,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading }: ProductF
     defaultValues: {
       name: product?.name || '',
       description: product?.description || '',
-      features: product?.features || {},
+      features: product?.metadata?.features || {},
       hierarchy: product?.hierarchy ?? 0,
       active: product?.active ?? true,
       syncToStripe: false,
@@ -44,10 +44,11 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading }: ProductF
   })
 
   const handleSubmit = async (data: ProductFormValues) => {
+    const features = data.features && Object.keys(data.features).length > 0 ? data.features : undefined
     await onSubmit({
       name: data.name,
       description: data.description,
-      features: data.features && Object.keys(data.features).length > 0 ? data.features : undefined,
+      metadata: { ...(product?.metadata ?? {}), features },
       hierarchy: data.hierarchy,
       active: data.active,
       ...(isEditMode ? {} : { syncToStripe: data.syncToStripe }),

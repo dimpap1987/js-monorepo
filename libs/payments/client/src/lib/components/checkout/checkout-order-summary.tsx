@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader } from '@js-monorepo/components/ui/card'
 import { Separator } from '@js-monorepo/components/ui/separator'
+import { ProductMetadata } from '@js-monorepo/types/pricing'
 import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
 import { PlanBadge } from '../plan-badge'
@@ -12,7 +13,7 @@ interface CheckoutOrderSummaryProps {
     description: string
     price: number
     interval: string
-    features: Record<string, string>
+    metadata?: ProductMetadata
   }
   className?: string
 }
@@ -41,7 +42,7 @@ export function CheckoutOrderSummary({ plan, className }: CheckoutOrderSummaryPr
         <div className="space-y-3">
           <h3 className="text-sm font-medium text-foreground-neutral tracking-wide">Included Features</h3>
           <ul className="space-y-2">
-            {Object.entries(plan.features).map(([key, value]) => (
+            {Object.entries(plan.metadata?.features ?? {}).map(([key, value]) => (
               <li key={key} className="flex items-start gap-2">
                 <Check className="w-4 h-4 text-status-success flex-shrink-0 mt-0.5" />
                 <span className="text-sm text-foreground">{value as string}</span>

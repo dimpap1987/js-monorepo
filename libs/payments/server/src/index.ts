@@ -12,11 +12,16 @@ export * from './lib/utils'
 // Admin Product DTOs
 export * from './lib/dto/admin-product.dto'
 
+export type ProductMetadataType = {
+  features?: Record<string, string>
+  [key: string]: unknown
+}
+
 export type CreateProductType = {
   stripeId: string
   name: string
   description: string
-  features: Record<string, string>
+  metadata: ProductMetadataType
   prices: {
     stripePrice: string
     unitAmount: number
@@ -28,7 +33,7 @@ export type CreateProductType = {
 export type CreateProductWithPricesRequest = {
   name: string
   description: string
-  features: Record<string, string>
+  features: Record<string, string> // Stripe API expects features directly
   prices: {
     unitAmount: number
     currency: string

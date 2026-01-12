@@ -144,7 +144,7 @@ export class PaymentsService {
       id: product.id,
       name: product.name,
       description: product.description,
-      features: product.features,
+      metadata: product.metadata,
       // active: product.active,
       prices: product.prices?.map((prices) => ({
         id: prices.id,

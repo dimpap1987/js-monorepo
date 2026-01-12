@@ -1,9 +1,14 @@
+export interface ProductMetadata {
+  features?: Record<string, string>
+  [key: string]: unknown
+}
+
 export interface PricingPlanResponse {
   id: number
   name: string
   description: string
   price: number
-  features: Record<string, string>
+  metadata: ProductMetadata
   active?: boolean
   actionLabel: string
   prices: {

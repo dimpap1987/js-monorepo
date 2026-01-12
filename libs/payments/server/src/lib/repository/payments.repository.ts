@@ -28,7 +28,7 @@ export class PaymentsRepository {
         stripeId: payload.stripeId,
         name: payload.name,
         description: payload.description || '',
-        features: payload.features,
+        metadata: payload.metadata,
         prices: {
           create: payload.prices.map((stripePrice) => ({
             stripeId: stripePrice.stripePrice,
@@ -648,7 +648,7 @@ export class PaymentsRepository {
         stripeId: localStripeId,
         name: dto.name,
         description: dto.description,
-        features: dto.features || {},
+        metadata: dto.metadata || {},
         hierarchy: dto.hierarchy ?? 0,
         active: dto.active ?? true,
       },
@@ -664,7 +664,7 @@ export class PaymentsRepository {
       data: {
         ...(dto.name !== undefined && { name: dto.name }),
         ...(dto.description !== undefined && { description: dto.description }),
-        ...(dto.features !== undefined && { features: dto.features }),
+        ...(dto.metadata !== undefined && { metadata: dto.metadata }),
         ...(dto.hierarchy !== undefined && { hierarchy: dto.hierarchy }),
         ...(dto.active !== undefined && { active: dto.active }),
       },

@@ -309,7 +309,7 @@ export class AdminProductsService {
       const stripeResult = await this.stripeService.createProductWithPrices({
         name: product.name,
         description: product.description,
-        features: (product.features as Record<string, string>) || {},
+        features: (product.metadata.features as Record<string, string>) || {},
         prices: [], // Create product without prices first
       })
 

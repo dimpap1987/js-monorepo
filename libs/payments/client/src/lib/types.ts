@@ -1,3 +1,4 @@
+import { ProductMetadata } from '@js-monorepo/types/pricing'
 import Stripe from 'stripe'
 
 // Configuration: which plan to highlight as "Most Popular"
@@ -55,7 +56,7 @@ export interface PricingCardData {
   description: string
   price: number
   interval: string
-  features: Record<string, string>
+  metadata?: ProductMetadata
   isPopular?: boolean
   subscribed?: boolean
 }
@@ -104,7 +105,7 @@ export interface AdminProduct {
   stripeId: string
   name: string
   description: string
-  features: Record<string, string> | null
+  metadata?: ProductMetadata
   hierarchy: number
   active: boolean
   prices: AdminPrice[]
@@ -122,7 +123,7 @@ export interface AdminProductStats {
 export interface CreateProductRequest {
   name: string
   description: string
-  features?: Record<string, string>
+  metadata?: ProductMetadata
   hierarchy?: number
   active?: boolean
   syncToStripe?: boolean
@@ -131,7 +132,7 @@ export interface CreateProductRequest {
 export interface UpdateProductRequest {
   name?: string
   description?: string
-  features?: Record<string, string>
+  metadata?: ProductMetadata
   hierarchy?: number
   active?: boolean
 }

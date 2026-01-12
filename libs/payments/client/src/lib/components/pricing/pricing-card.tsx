@@ -7,6 +7,7 @@ import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
 import { useMemo } from 'react'
 import { Subscription, TrialEligibilityResponse } from '../../types'
+import { ProductMetadata } from '@js-monorepo/types/pricing'
 
 interface PricingCardProps {
   id: number
@@ -14,7 +15,7 @@ interface PricingCardProps {
   description: string
   price: number
   interval: string
-  features: Record<string, string>
+  metadata: ProductMetadata
   isPopular?: boolean
   subscribed?: boolean
   anySubscribed?: boolean
@@ -34,7 +35,7 @@ export function PricingCard({
   description,
   price,
   interval,
-  features,
+  metadata,
   isPopular,
   subscribed,
   anySubscribed,
@@ -155,7 +156,7 @@ export function PricingCard({
 
         {/* Features */}
         <ul className="space-y-3">
-          {Object.entries(features).map(([key, value]) => (
+          {Object.entries(metadata?.features ?? {}).map(([key, value]) => (
             <li key={key} className="flex items-start gap-3">
               <Check className="w-5 h-5 text-status-success flex-shrink-0 mt-0.5" />
               <span className="text-sm text-foreground">{value as string}</span>

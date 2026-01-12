@@ -41,7 +41,7 @@ export function Checkout() {
             description: plan.description,
             price: price.unitAmount / 100,
             interval: price.interval,
-            features: plan.features,
+            metadata: plan.metadata,
             isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
           }))
       )

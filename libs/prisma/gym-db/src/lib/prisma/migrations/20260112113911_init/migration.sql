@@ -132,7 +132,7 @@ CREATE TABLE "products" (
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
-    "features" JSONB,
+    "metadata" JSONB,
     "hierarchy" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

@@ -1,3 +1,4 @@
+import { ProductMetadata } from '@js-monorepo/types/pricing'
 import { Type } from 'class-transformer'
 import {
   IsBoolean,
@@ -13,8 +14,6 @@ import {
   MinLength,
 } from 'class-validator'
 
-// ============= Product DTOs =============
-
 export class CreateProductDto {
   @IsNotEmpty()
   @IsString()
@@ -29,7 +28,7 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsObject()
-  features?: Record<string, string>
+  metadata?: ProductMetadata
 
   @IsOptional()
   @IsInt()
@@ -59,7 +58,7 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsObject()
-  features?: Record<string, string>
+  metadata?: ProductMetadata
 
   @IsOptional()
   @IsInt()
@@ -175,7 +174,7 @@ export interface AdminProductResponse {
   stripeId: string
   name: string
   description: string
-  features: Record<string, string> | null
+  metadata: ProductMetadata | null
   hierarchy: number
   active: boolean
   prices: AdminPriceResponse[]

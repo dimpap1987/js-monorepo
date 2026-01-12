@@ -57,6 +57,7 @@
     "db:gym:migrate": "env-cmd -f apps/gym-api/.env prisma migrate dev --config=libs/prisma/gym-db/prisma.config.ts",
     "db:gym:deploy": "env-cmd -f apps/gym-api/.env prisma migrate deploy --config=libs/prisma/gym-db/prisma.config.ts",
     "db:gym:create": "env-cmd -f apps/gym-api/.env prisma migrate dev --create-only --config=libs/prisma/gym-db/prisma.config.ts",
+    "db:gym:reset": "env-cmd -f apps/gym-api/.env prisma migrate reset --config=libs/prisma/gym-db/prisma.config.ts",
     "db:gym:generate": "env-cmd -f apps/gym-api/.env prisma generate --config=libs/prisma/gym-db/prisma.config.ts",
     "db:gym:studio": "env-cmd -f apps/gym-api/.env prisma studio --config=libs/prisma/gym-db/prisma.config.ts",
     "docker:my-api": "BRANCH=$(git rev-parse --abbrev-ref HEAD) && TAG=$([ \"$BRANCH\" = \"main\" ] && echo 'latest' || echo \"$BRANCH\") && docker build -f apps/my-api/Dockerfile -t my-api:$TAG .",

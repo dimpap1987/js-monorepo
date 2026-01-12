@@ -294,7 +294,7 @@ export function ProductsTable({
             products.map((product) => {
               const isExpanded = expandedRows.has(product.id)
               const isSynced = isProductSynced(product)
-              const features = product.features
+              const features = product.metadata?.features ?? []
               const featureCount = features ? Object.keys(features).length : 0
 
               return (

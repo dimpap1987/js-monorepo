@@ -41,7 +41,7 @@ export function Pricing() {
             description: plan.description,
             price: price.unitAmount / 100,
             interval: price.interval,
-            features: plan.features,
+            metadata: plan.metadata,
             isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
             subscribed: sessionSubscription?.priceId === price.id,
           }))
@@ -219,7 +219,7 @@ export function Pricing() {
                 description={card.description}
                 price={card.price}
                 interval={card.interval}
-                features={card.features}
+                metadata={card.metadata}
                 isPopular={card.isPopular}
                 subscribed={card.subscribed}
                 anySubscribed={!!sessionSubscription?.isSubscribed}
@@ -249,7 +249,7 @@ export function Pricing() {
                 description={card.description}
                 price={card.price}
                 interval={card.interval}
-                features={card.features}
+                metadata={card.metadata}
                 isPopular={card.isPopular}
                 subscribed={card.subscribed}
                 anySubscribed={!!sessionSubscription?.isSubscribed}
