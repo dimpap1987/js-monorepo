@@ -16,10 +16,15 @@ import { MobileNavbar } from './mobile-navbar'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
 import { IoIosSettings } from 'react-icons/io'
 
-function SidebarWrapper({ children, user, items }: PropsWithChildren<{ user?: any; items?: MenuItem[] }>) {
+function SidebarWrapper({
+  children,
+  user,
+  items,
+  plan,
+}: PropsWithChildren<{ user?: any; items?: MenuItem[]; plan?: string }>) {
   return (
     <SidebarProvider defaultOpen={false}>
-      <DpNextSidebar items={items ?? []} user={user}></DpNextSidebar>
+      <DpNextSidebar items={items ?? []} user={user} plan={plan}></DpNextSidebar>
       <SidebarInset asChild>{children}</SidebarInset>
     </SidebarProvider>
   )
@@ -28,16 +33,18 @@ function SidebarWrapper({ children, user, items }: PropsWithChildren<{ user?: an
 export default function RootComponent({ children }: PropsWithChildren) {
   const { session, isLoggedIn, isAdmin, refreshSession } = useSession()
   const user = session?.user
+  const plan = (session?.subscription as { plan?: string } | undefined)?.plan
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
   useOfflineIndicator()
 
   return (
-    <SidebarWrapper user={user} items={navigationsMenuItems}>
+    <SidebarWrapper user={user} items={navigationsMenuItems} plan={plan}>
       <section className="flex min-h-screen flex-col">
         {/* Navbar */}
         <Navbar
           menuItems={navigationsMenuItems}
           user={user}
+          plan={plan}
           onLogout={() => authClient.logout()}
           logo={
             <DpNextNavLink href="/" className="font-bold text-lg">

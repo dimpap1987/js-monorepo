@@ -26,22 +26,11 @@ export const routes: RouteConfig[] = [
     path: '/settings',
     roles: [Role.USER],
   },
+  {
+    path: '/pricing',
+    roles: [Role.PUBLIC],
+  },
 ]
-
-export const authRoutes = ['/auth/login', '/auth/register', '/auth/onboarding']
-
-export const apiAuthPrefix = '/api/auth'
-
-export function isPublicRoute(pathname: string): boolean {
-  if (pathname === '/') return true
-
-  const route = routes.find((r) => pathname.startsWith(r.path))
-  return route?.roles.includes(Role.PUBLIC) ?? false
-}
-
-export function getRouteConfig(pathname: string): RouteConfig | undefined {
-  return routes.find((route) => pathname.startsWith(route.path))
-}
 
 // Navbar & Sidebar Menu navigation
 
@@ -50,6 +39,12 @@ export const navigationsMenuItems: MenuItem[] = [
     href: '/admin',
     name: 'Dashboard',
     roles: [Role.ADMIN],
+    Icon: RiAdminFill,
+  },
+  {
+    href: '/pricing',
+    name: 'Pricing',
+    roles: [Role.PUBLIC],
     Icon: RiAdminFill,
   },
 ]
@@ -74,3 +69,19 @@ export const SETTINGS_NAV_ITEMS = [
     description: 'Push notifications and alerts',
   },
 ] as const
+
+export const authRoutes = ['/auth/login', '/auth/register', '/auth/onboarding']
+
+export const apiAuthPrefix = '/api/auth'
+
+// Utility functions
+export function isPublicRoute(pathname: string): boolean {
+  if (pathname === '/') return true
+
+  const route = routes.find((r) => pathname.startsWith(r.path))
+  return route?.roles.includes(Role.PUBLIC) ?? false
+}
+
+export function getRouteConfig(pathname: string): RouteConfig | undefined {
+  return routes.find((route) => pathname.startsWith(route.path))
+}
