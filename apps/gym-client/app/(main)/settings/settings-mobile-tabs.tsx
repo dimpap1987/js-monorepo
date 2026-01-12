@@ -1,9 +1,9 @@
 'use client'
 
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { SETTINGS_NAV_ITEMS } from '../../../lib/routes-config'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
-import { settingsNavItems } from './utils'
 
 export function SettingsMobileTabs() {
   const pathname = usePathname()
@@ -22,7 +22,7 @@ export function SettingsMobileTabs() {
   return (
     <nav className="sm:hidden border-b border-border mb-6">
       <div className="flex items-center overflow-x-auto whitespace-nowrap no-scrollbar">
-        {settingsNavItems.map((item) => {
+        {SETTINGS_NAV_ITEMS.map((item) => {
           const isActive = pathname.startsWith(item.href)
           return (
             <DpNextNavLink

@@ -4,10 +4,10 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useDeviceType } from '@js-monorepo/next/hooks'
 import { ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
+import { SETTINGS_NAV_ITEMS } from '../../../lib/routes-config'
 import { PropsWithChildren, useCallback, useState } from 'react'
 import { MdChevronLeft } from 'react-icons/md'
 import { SettingsMobileTabs } from './settings-mobile-tabs'
-import { settingsNavItems } from './utils'
 
 interface SettingsSidebarProps {
   isCollapsed: boolean
@@ -46,7 +46,7 @@ function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
 
       {/* Navigation Items */}
       <nav className="space-y-1" aria-label="Settings navigation">
-        {settingsNavItems.map((item) => {
+        {SETTINGS_NAV_ITEMS.map((item) => {
           const Icon = item.icon
           return (
             <div key={item.href} className="relative" title={isCollapsed ? item.label : undefined}>

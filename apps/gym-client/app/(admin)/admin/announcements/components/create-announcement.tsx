@@ -6,11 +6,10 @@ import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } f
 import { Input } from '@js-monorepo/components/ui/form'
 import { useNotifications } from '@js-monorepo/notification'
 import { useCreateAnnouncement } from '../queries'
-import { SelectUsersComponent } from '@next-app/components/select-users'
 import { useForm } from 'react-hook-form'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { SelectUsersComponent } from '../../components/select-users'
 
 const schema = z
   .object({

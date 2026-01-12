@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CreatePushNotificationType, NotificationCreateDto } from '@js-monorepo/types/notifications'
 import { AuthUserFullDto } from '@js-monorepo/types/auth'
+import { CreatePushNotificationType, NotificationCreateDto } from '@js-monorepo/types/notifications'
 import { apiClient } from '@js-monorepo/utils/http'
-import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
+import { handleQueryResponse } from '@js-monorepo/utils/http/queries'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 interface UsersResponse {
   users: AuthUserFullDto[]

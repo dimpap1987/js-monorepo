@@ -1,10 +1,10 @@
 import { GrAnnounce } from 'react-icons/gr'
 import { HiMiniUsers } from 'react-icons/hi2'
 import { IoMdNotifications } from 'react-icons/io'
-import { RiUserSettingsFill } from 'react-icons/ri'
 import { MdOutlineContactMail, MdOutlineSubscriptions } from 'react-icons/md'
+import { RiUserSettingsFill } from 'react-icons/ri'
 
-export const adminNavLinks = [
+export const ADMIN_NAV_LINKS = [
   {
     href: '/admin/users',
     icon: RiUserSettingsFill,

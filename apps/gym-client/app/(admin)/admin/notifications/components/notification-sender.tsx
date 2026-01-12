@@ -4,9 +4,9 @@ import { useSession } from '@js-monorepo/auth/next/client'
 import { DpButton } from '@js-monorepo/button'
 import { Card } from '@js-monorepo/components/ui/card'
 import { useNotifications } from '@js-monorepo/notification'
-import { SelectUsersComponent } from '@next-app/components/select-users'
 import { useState } from 'react'
 import { useSubmitNotification } from '../queries'
+import { SelectUsersComponent } from '../../components/select-users'
 
 export const NotificationSender = () => {
   const { session } = useSession()

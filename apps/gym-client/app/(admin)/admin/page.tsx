@@ -1,8 +1,7 @@
 import { Card } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpVersion } from '@js-monorepo/version'
-
-import { adminNavLinks } from './utils/admin-nav-links'
+import { ADMIN_NAV_LINKS } from './utils'
 
 export default function DashboardController() {
   return (
@@ -18,7 +17,7 @@ export default function DashboardController() {
 
       <div className="p-2 flex justify-center font-semibold sm:hidden">
         <div className="grid grid-cols-1 gap-3 w-full max-w-md">
-          {adminNavLinks?.map(({ href, label }) => (
+          {ADMIN_NAV_LINKS?.map(({ href, label }) => (
             <Card
               key={href}
               className="text-center transition-all duration-200 ease-in-out hover:scale-[1.02] hover:shadow-md cursor-pointer border border-border hover:border-primary bg-card"

@@ -234,7 +234,7 @@ const DashboardUsersTableSuspense = () => {
         },
       },
     ],
-    [update, addNotification, updateUserMutation, refetch, impersonateMutation]
+    [update, addNotification, updateUserMutation, refetch, impersonateMutation, userTimezone]
   )
 
   const onPaginationChange = useCallback<Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>>(

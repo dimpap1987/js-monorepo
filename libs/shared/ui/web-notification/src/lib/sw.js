@@ -1,3 +1,7 @@
+// Example for push notifications.
+// this file should be added in public folder
+/* eslint-disable */
+
 self.addEventListener('push', (event) => {
   console.log('Push message received', event)
 

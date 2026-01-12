@@ -60,10 +60,8 @@ pnpm ci:local              # Format check, lint, test, build
 
 ### Key Entry Points
 
-- Backend (my-api): `apps/my-api/src/main.ts`
 - Backend (gym-api): `apps/gym-api/src/main.ts`
-- Frontend: `apps/next-app/app/layout.tsx`
-- Core Prisma schema: `libs/prisma/core-db/src/lib/prisma/schema/`
+- Frontend: `apps/gym-client/app/layout.tsx`
 - Gym Prisma schema: `libs/prisma/gym-db/src/lib/prisma/schema/`
 
 ### Import Aliases

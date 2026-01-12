@@ -4,12 +4,12 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AdminTemplateContent, AdminTemplateSideBar, ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren } from 'react'
-import { adminNavLinks } from './utils/admin-nav-links'
+import { ADMIN_NAV_LINKS } from './utils'
 
 function SidebarOpts() {
   return (
     <div className="space-y-2">
-      {adminNavLinks.map(({ href, icon: Icon, label, activeClassName }) => (
+      {ADMIN_NAV_LINKS.map(({ href, icon: Icon, label, activeClassName }) => (
         <DpNextNavLink
           key={href}
           className={cn(

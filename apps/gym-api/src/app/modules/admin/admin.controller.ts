@@ -9,6 +9,7 @@ import { CacheInterceptor } from '@nestjs/cache-manager'
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
@@ -44,8 +45,8 @@ export class AdminController {
   @Get('users')
   @UseInterceptors(CacheInterceptor)
   async getUsers(
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number
   ): Promise<PaginationType<AuthUserFullDto>> {
     return this.adminService.getUsers(page, pageSize)
   }
@@ -57,16 +58,16 @@ export class AdminController {
 
   @Get('online-users')
   async getOnlineUsers(
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number
   ) {
     return this.οnlineUsersService.getList(page, pageSize)
   }
 
   @Get('subscriptions')
   async getAllSubscriptions(
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number,
     @Query('status') status?: string,
     @Query('search') search?: string,
     @Query('plan') plan?: string

@@ -3,9 +3,9 @@
 import { DpButton } from '@js-monorepo/button'
 import { Card } from '@js-monorepo/components/ui/card'
 import { useNotifications } from '@js-monorepo/notification'
-import { SelectUsersComponent } from '@next-app/components/select-users'
 import { useState } from 'react'
 import { useSubmitPushNotification } from '../queries'
+import { SelectUsersComponent } from '../../components/select-users'
 
 export const PushNotificationSender = () => {
   const [title, setTitle] = useState('')
