@@ -1,3 +1,6 @@
+import { HasRoles } from '@js-monorepo/auth/nest/common'
+import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
+import { RolesGuard } from '@js-monorepo/auth/nest/session'
 import {
   Body,
   Controller,
@@ -8,12 +11,12 @@ import {
   HttpStatus,
   Logger,
   Param,
-  ParseBoolPipe,
   ParseIntPipe,
   Patch,
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common'
 import {
   CreatePriceDto,
@@ -24,23 +27,13 @@ import {
 } from '../dto/admin-product.dto'
 import { AdminProductsService } from '../service/admin-products.service'
 
-/**
- * Admin Products Controller
- *
- * Note: This controller does NOT include authentication guards.
- * Auth guards should be applied by the consuming application (e.g., RolesGuard with ADMIN role).
- *
- * Example usage in your app:
- * - Import PaymentsModule in your AdminModule
- * - Apply @UseGuards(RolesGuard) and @HasRoles(RolesEnum.ADMIN) at the module level
- */
+@UseGuards(RolesGuard)
+@HasRoles(RolesEnum.ADMIN)
 @Controller('payments/admin')
 export class AdminProductsController {
   private readonly logger = new Logger(AdminProductsController.name)
 
   constructor(private readonly adminProductsService: AdminProductsService) {}
-
-  // ============= Product Endpoints =============
 
   @Get('products')
   async getProducts(

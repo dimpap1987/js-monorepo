@@ -1,17 +1,17 @@
-INSERT INTO "products" (id, "stripeId", name, description, active, "metadata", "updatedAt", "hierarchy")
+INSERT INTO "products" ("stripeId", name, description, active, "metadata", "updatedAt", "hierarchy")
 VALUES
   (
-    1, 'prod_RXfHdROfnLBsKo', 'free', 'Free features', true, 
+    'prod_RXfHdROfnLBsKo', 'free', 'Free features', true, 
     '{"features": {"key1": "feature 1"}}', 
     now(), 0
   ),
   (
-    2, 'prod_RQDnAmArtPERmBh', 'basic', 'The basic plan to start', true, 
+    'prod_RQDnAmArtPERmBh', 'basic', 'The basic plan to start', true, 
     '{"features": {"key1": "feature 1", "key2": "feature 2"}}', 
     now(), 1
   ),
   (
-    3, 'prod_RQJlgfOPUlPKEH', 'pro', 'All features unlocked', true, 
+    'prod_RQJlgfOPUlPKEH', 'pro', 'All features unlocked', true, 
     '{"features": {"key1": "feature 1", "key2": "feature 2", "key3": "feature 3"}}', 
     now(), 2
   );
