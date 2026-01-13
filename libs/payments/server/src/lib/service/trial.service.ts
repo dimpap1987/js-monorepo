@@ -1,6 +1,6 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
 import { PaymentsModuleOptions } from '../../'
 import { TRIAL_DURATION_DAYS } from '../constants'
 import { StartTrialResponse, TrialEligibilityResponse } from '../dto/start-trial.dto'
@@ -14,6 +14,7 @@ export class TrialService {
 
   constructor(
     private readonly paymentsRepository: PaymentsRepository,
+    @Inject(forwardRef(() => PaymentsService))
     private readonly paymentsService: PaymentsService,
     private readonly stripeService: StripeService,
     @Inject('PAYMENTS_OPTIONS')

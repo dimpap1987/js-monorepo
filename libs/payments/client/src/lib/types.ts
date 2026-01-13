@@ -33,7 +33,7 @@ export interface TrialEligibilityResponse {
   eligible: boolean
   reason?: string
   trialDurationDays: number
-  productName: string
+  productName?: string
 }
 
 export interface StartTrialResponse {

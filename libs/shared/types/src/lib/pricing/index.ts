@@ -17,5 +17,11 @@ export interface PricingPlanResponse {
     unitAmount: number
     currency: string
     interval: string
+    trialEligibility?: {
+      eligible: boolean
+      reason?: string
+      trialDurationDays: number
+      productName?: string
+    }
   }[]
 }

@@ -50,6 +50,7 @@ export function PricingCard({
 }: PricingCardProps) {
   const isFree = price == 0
   const canTrial = isLoggedIn && !isFree && trialEligibility?.eligible && !subscribed
+  const trialNotEligible = isLoggedIn && !isFree && trialEligibility && !trialEligibility.eligible && !subscribed
 
   const isCurrentTrial = subscribed && isOnTrial
 
@@ -189,6 +190,9 @@ export function PricingCard({
           >
             Start {trialEligibility.trialDurationDays}-day Free Trial
           </DpButton>
+        )}
+        {trialNotEligible && trialEligibility.reason && (
+          <p className="text-xs text-foreground-neutral text-center mt-1">{trialEligibility.reason}</p>
         )}
       </CardFooter>
     </Card>

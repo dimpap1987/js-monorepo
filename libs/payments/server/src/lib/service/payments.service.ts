@@ -3,19 +3,23 @@ import { PaginationType } from '@js-monorepo/types/pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
-import { HttpStatus, Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
 import { CreateProductType } from '../../'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
 import { SubscriptionDeleteData, SubscriptionUpdateData } from '../dto/subscription-webhook.dto'
 import { PaymentsRepository } from '../repository/payments.repository'
-import { formatCurrency, LOCAL_CURRENCY_MAP } from '@js-monorepo/currency'
+import { TrialService } from './trial.service'
 
 @Injectable()
 export class PaymentsService {
   logger = new Logger(PaymentsService.name)
 
-  constructor(private readonly paymentsRepository: PaymentsRepository) {}
+  constructor(
+    private readonly paymentsRepository: PaymentsRepository,
+    @Inject(forwardRef(() => TrialService))
+    private readonly trialService: TrialService
+  ) {}
 
   async createSubscription(payload: CreateSubscriptionDto) {
     this.logger.log(
@@ -137,24 +141,49 @@ export class PaymentsService {
   }
 
   //TODO create other prices in USD for locale = 'en'
-  async findActiveProductsWithPrices(locale: 'en' | 'el' = 'en') {
+  async findActiveProductsWithPrices(locale: 'en' | 'el' = 'en', userId?: number) {
     const { result, error } = await tryCatch(() => this.paymentsRepository.findActiveProductsWithPrices())
     if (error) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_PRODUCTS')
     }
-    return result.map((product) => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      metadata: product.metadata,
-      // active: product.active,
-      prices: product.prices?.map((prices) => ({
-        id: prices.id,
-        unitAmount: formatCurrency(prices.unitAmount, 'el', prices.currency),
-        currency: prices.currency,
-        interval: prices.interval,
-      })),
-    }))
+
+    return Promise.all(
+      result.map(async (product) => ({
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        metadata: product.metadata,
+        // active: product.active,
+        prices: await Promise.all(
+          (product.prices || []).map(async (price) => {
+            const priceData: any = {
+              id: price.id,
+              unitAmount: price.unitAmount,
+              currency: price.currency,
+              interval: price.interval,
+            }
+
+            // Calculate trial eligibility if user is logged in and price is not free
+            if (userId && price.unitAmount > 0) {
+              try {
+                const eligibility = await this.trialService.checkTrialEligibility(userId, price.id)
+                priceData.trialEligibility = {
+                  eligible: eligibility.eligible,
+                  reason: eligibility.reason,
+                  trialDurationDays: eligibility.trialDurationDays,
+                }
+              } catch (er: any) {
+                this.logger.warn(
+                  `Failed to check trial eligibility for price ${price.id}: ${error instanceof Error ? er.message : er}`
+                )
+              }
+            }
+
+            return priceData
+          })
+        ),
+      }))
+    )
   }
 
   async findPriceByStripeId(stripeId: string) {

@@ -4,13 +4,12 @@ import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
 import { SnapCarousel } from '@js-monorepo/components/ui/snap-carousel'
 import { ConfirmDialog, ErrorDialog } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
-import { cn } from '@js-monorepo/ui/util'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePlans } from '../../queries/payments-queries'
-import { POPULAR_PLAN_NAME, SessionSubscription, Subscription, TrialEligibilityResponse } from '../../types'
-import { apiCheckTrialEligibility, apiCreatePortalSession, apiGetSubscription, apiStartTrial } from '../../utils/api'
+import { POPULAR_PLAN_NAME, SessionSubscription, Subscription } from '../../types'
+import { apiCreatePortalSession, apiGetSubscription, apiStartTrial } from '../../utils/api'
 import { PricingCard } from './pricing-card'
 import { PricingCardSkeleton } from './pricing-card-skeleton'
 import { PricingFAQ } from './pricing-faq'
@@ -25,7 +24,6 @@ export function Pricing() {
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [isPortalLoading, setIsPortalLoading] = useState(false)
   const [trialLoadingPriceId, setTrialLoadingPriceId] = useState<number | null>(null)
-  const [trialEligibility, setTrialEligibility] = useState<Record<number, TrialEligibilityResponse>>({})
   const [showConfirmTrialDialog, setShowConfirmTrialDialog] = useState(false)
   const [trialPriceIdToConfirm, setTrialPriceIdToConfirm] = useState<number | null>(null)
   const { data: plans = [], isLoading: isPlansLoading } = usePlans()
@@ -42,11 +40,12 @@ export function Pricing() {
             id: price.id,
             name: plan.name,
             description: plan.description,
-            price: price.unitAmount,
+            price: price.unitAmount / 100,
             interval: price.interval,
             metadata: plan.metadata,
             isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
             subscribed: sessionSubscription?.priceId === price.id,
+            trialEligibility: price.trialEligibility,
           }))
       )
       .sort((a, b) => a.price - b.price)
@@ -68,28 +67,6 @@ export function Pricing() {
       })
     }
   }, [sessionSubscription?.subscriptionId])
-
-  // Check trial eligibility for each paid plan
-  useEffect(() => {
-    if (!isLoggedIn || pricingCards.length === 0) return
-
-    const checkEligibility = async () => {
-      const eligibilityMap: Record<number, TrialEligibilityResponse> = {}
-
-      for (const card of pricingCards) {
-        if (card.price > 0 && !card.subscribed) {
-          const response = await apiCheckTrialEligibility(card.id)
-          if (response.ok && response.data) {
-            eligibilityMap[card.id] = response.data
-          }
-        }
-      }
-
-      setTrialEligibility(eligibilityMap)
-    }
-
-    checkEligibility()
-  }, [isLoggedIn, pricingCards])
 
   const handleManageSubscription = useCallback(async () => {
     setIsPortalLoading(true)
@@ -239,7 +216,7 @@ export function Pricing() {
                 onStartTrial={handleStartTrial}
                 isLoading={isPortalLoading}
                 isTrialLoading={trialLoadingPriceId === card.id}
-                trialEligibility={trialEligibility[card.id]}
+                trialEligibility={card.trialEligibility}
                 isOnTrial={sessionSubscription?.isTrial}
               />
             ))}
@@ -272,7 +249,7 @@ export function Pricing() {
                 onStartTrial={handleStartTrial}
                 isLoading={isPortalLoading}
                 isTrialLoading={trialLoadingPriceId === card.id}
-                trialEligibility={trialEligibility[card.id]}
+                trialEligibility={card.trialEligibility}
                 isOnTrial={sessionSubscription?.isTrial}
               />
             ))}

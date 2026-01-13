@@ -32,8 +32,11 @@ export class PaymentsController {
   ) {}
 
   @Get('plans')
-  async getPlans(@Cookies('NEXT_LOCALE') locale?: 'en' | 'el') {
-    return this.paymentsService.findActiveProductsWithPrices(locale)
+  async getPlans(
+    @Cookies('NEXT_LOCALE') locale?: 'en' | 'el',
+    @SessionUser({ optional: true }) sessionUser?: SessionUserType
+  ) {
+    return this.paymentsService.findActiveProductsWithPrices(locale, sessionUser?.id)
   }
 
   @Get('subscriptions/:subscriptionId')

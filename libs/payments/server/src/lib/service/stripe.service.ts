@@ -2,7 +2,7 @@ import { DistributedLockService } from '@js-monorepo/nest/distributed-lock'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PaymentsClient, StripeProvider, type WebhookEvent } from '@super-dp/payments-core'
 import { CreateProductWithPricesRequest, PaymentsModuleOptions } from '../../'
@@ -19,6 +19,7 @@ export class StripeService {
   constructor(
     @Inject(PaymentsClientToken) private readonly paymentsClient: PaymentsClient,
     @Inject(StripeProviderToken) private readonly stripeProvider: StripeProvider,
+    @Inject(forwardRef(() => PaymentsService))
     private readonly paymentsService: PaymentsService,
     @Inject('PAYMENTS_OPTIONS')
     private readonly paymentsModuleOptions: PaymentsModuleOptions,
