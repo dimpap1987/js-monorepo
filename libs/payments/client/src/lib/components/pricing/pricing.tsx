@@ -4,6 +4,7 @@ import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
 import { SnapCarousel } from '@js-monorepo/components/ui/snap-carousel'
 import { ConfirmDialog, ErrorDialog } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
+import { cn } from '@js-monorepo/ui/util'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -246,8 +247,11 @@ export function Pricing() {
         )}
       </section>
 
-      {/* Desktop: Grid Layout */}
-      <section className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 py-2 max-w-6xl mx-auto">
+      {/* Desktop: Grid Layout - CSS-only responsive grid */}
+      <section
+        className="hidden md:grid gap-8 py-2 max-w-6xl mx-auto justify-items-center self-end"
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}
+      >
         {isPlansLoading
           ? Array.from({ length: 3 }).map((_, i) => <PricingCardSkeleton key={i} />)
           : pricingCards.map((card) => (

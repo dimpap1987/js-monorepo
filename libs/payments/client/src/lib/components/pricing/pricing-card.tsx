@@ -100,7 +100,7 @@ export function PricingCard({
   return (
     <Card
       className={cn(
-        'relative flex flex-col transition-all duration-300',
+        'relative flex flex-col transition-all duration-300 p-2 w-full',
         // Active/trial plan gets prominence, otherwise popular gets it (but not if user has any subscription)
         (isCurrentPlan || isCurrentTrial) && 'ring ring-status-success shadow-lg scale-[1.02]',
         !isCurrentPlan && !isCurrentTrial && isPopular && !anySubscribed && 'ring ring-primary shadow-lg scale-[1.02]',

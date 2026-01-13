@@ -5,7 +5,7 @@ import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 
 export function PricingCardSkeleton() {
   return (
-    <Card className="relative flex flex-col">
+    <Card className="relative flex flex-col w-full">
       <CardHeader className="text-center pb-2">
         {/* Plan name */}
         <Skeleton className="h-7 w-32 mx-auto" />
