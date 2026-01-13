@@ -21,20 +21,12 @@ class RegisterUserSchemaConfig {
   }
 
   updateSchema() {
-    return z
-      .object({
-        username: UsernameSchema.optional(),
-        roles: z.array(ObjectIdSchema).optional(),
-      })
-      .refine((data) => data.username || (data.roles && data.roles.length > 0), {
-        message: "At least one of 'username' or 'roles' must be provided.",
-      })
+    return z.object({
+      username: UsernameSchema.optional(),
+      roles: z.array(z.number()).optional(),
+    })
   }
 }
-
-const ObjectIdSchema = z.object({
-  id: z.number(),
-})
 
 export const registerUserSchemaConfig = new RegisterUserSchemaConfig()
 

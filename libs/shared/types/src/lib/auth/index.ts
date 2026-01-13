@@ -40,6 +40,7 @@ export type UnRegisteredUserDto = {
   createdAt: Date
 }
 
+// Deprecated
 export type AuthUserUpdateDto =
   | { username: string; roles?: { id: number }[] }
   | { username?: string; roles: { id: number }[] }

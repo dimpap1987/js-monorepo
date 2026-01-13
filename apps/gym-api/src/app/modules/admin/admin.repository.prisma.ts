@@ -1,9 +1,10 @@
-import { AuthRoleDTO, AuthUserDto, AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types/auth'
+import { AuthRoleDTO, AuthUserDto, AuthUserFullDto } from '@js-monorepo/types/auth'
 import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { AdminRepository } from './admin.repository'
+import { UpdateUserSchemaType } from '@js-monorepo/schemas'
 
 @Injectable()
 export class AdminRepositoryPrisma implements AdminRepository {
@@ -60,25 +61,27 @@ export class AdminRepositoryPrisma implements AdminRepository {
     }
   }
 
-  async updateUser(userId: number, updateUser: AuthUserUpdateDto): Promise<AuthUserDto> {
-    let roleOperations = {}
-    if (updateUser.roles) {
-      const currentRoleIds = await this.getCurrentUserRoleIds(userId)
-      const newRoleIds = this.getNewRoleIds(updateUser.roles)
-      const { rolesToAdd, rolesToRemove } = this.determineRoles(currentRoleIds, newRoleIds)
+  async updateUser(userId: number, updateUser: UpdateUserSchemaType): Promise<AuthUserDto> {
+    let roleOperations: { userRole?: any } | undefined = undefined
 
-      roleOperations = {
-        userRole: {
-          create: this.createRoles(rolesToAdd),
-          deleteMany: this.deleteRoles(rolesToRemove),
-        },
+    if (updateUser.roles !== undefined) {
+      const currentRoleIds = await this.getCurrentUserRoleIds(userId)
+      const { rolesToAdd, rolesToRemove } = this.determineRoles(currentRoleIds, updateUser.roles)
+
+      // Only include role ops if something actually changed
+      if (rolesToAdd.length > 0 || rolesToRemove.length > 0) {
+        roleOperations = {
+          userRole: {
+            ...(rolesToAdd.length > 0 && { create: this.createRoles(rolesToAdd) }),
+            ...(rolesToRemove.length > 0 && { deleteMany: { roleId: { in: rolesToRemove } } }),
+          },
+        }
       }
     }
 
     return this.txHost.tx.authUser.update({
       where: { id: userId },
       data: {
-        // Only update username if provided
         ...(updateUser.username && { username: updateUser.username }),
         ...roleOperations,
       },
@@ -129,9 +132,12 @@ export class AdminRepositoryPrisma implements AdminRepository {
 
   // Function to determine which roles to add and remove
   private determineRoles(currentRoleIds: number[], newRoleIds: number[]) {
-    const rolesToAdd = newRoleIds.filter((roleId) => !currentRoleIds.includes(roleId))
-    const rolesToRemove = currentRoleIds.filter((roleId) => !newRoleIds.includes(roleId))
-
+    const rolesToAdd = newRoleIds.filter((id) => !currentRoleIds.includes(id))
+    const rolesToRemove = currentRoleIds.filter((id) => !newRoleIds.includes(id))
+    const finalRoleCount = currentRoleIds.length - rolesToRemove.length + rolesToAdd.length
+    if (finalRoleCount <= 0) {
+      throw new BadRequestException('User must have at least one role')
+    }
     return { rolesToAdd, rolesToRemove }
   }
 

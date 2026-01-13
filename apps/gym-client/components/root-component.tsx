@@ -16,6 +16,7 @@ import { navigationsMenuItems } from '../lib/routes-config'
 import { MobileNavbar } from './mobile-navbar'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
 import { useTranslations } from 'next-intl'
+import { ImpersonationBanner } from './impersonation-banner'
 
 function SidebarWrapper({
   children,
@@ -82,6 +83,7 @@ export default function RootComponent({ children }: PropsWithChildren) {
         <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />
         {/* Main */}
         <main className="flex-1 mt-6">{children}</main>
+        <ImpersonationBanner />
         {user?.id && <MobileNavbar />}
       </section>
     </SidebarWrapper>

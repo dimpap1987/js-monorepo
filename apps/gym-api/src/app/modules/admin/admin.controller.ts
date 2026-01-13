@@ -1,6 +1,7 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
+import { UpdateUserSchemaType } from '@js-monorepo/schemas'
 import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types/auth'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
@@ -24,14 +25,13 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
-import { AuthUser } from '@js-monorepo/gym-db'
 import { Request } from 'express'
 import { AdminPaymentsService } from './admin-payments.service'
 import { AdminService } from './admin.service'
 
-@Controller('admin')
 @UseGuards(RolesGuard)
 @HasRoles(RolesEnum.ADMIN)
+@Controller('admin')
 export class AdminController {
   private readonly logger = new Logger(AdminController.name)
 
@@ -84,7 +84,7 @@ export class AdminController {
   @Put('users/:id')
   async updateUser(
     @Param('id', ParseIntPipe) userId: number,
-    @Body() updateUser: Omit<AuthUser, 'id' | 'email' | 'createdAt'>
+    @Body() updateUser: UpdateUserSchemaType
   ): Promise<AuthUserDto> {
     return this.adminService.updateUser(userId, updateUser)
   }

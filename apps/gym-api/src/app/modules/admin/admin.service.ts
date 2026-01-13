@@ -1,13 +1,12 @@
 import { AuthException } from '@js-monorepo/auth/nest/common/exceptions/api-exception'
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
-import { UserUpdateUserSchema } from '@js-monorepo/schemas'
+import { UpdateUserSchemaType, UserUpdateUserSchema } from '@js-monorepo/schemas'
 import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types/auth'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
 import { HttpStatus, Inject, Injectable, Logger, UseInterceptors } from '@nestjs/common'
-import { AuthUser } from '@js-monorepo/gym-db'
 import { AdminRepo, AdminRepository } from './admin.repository'
 
 @Injectable()
@@ -34,7 +33,7 @@ export class AdminService {
     throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_FETCHING_USERS')
   }
 
-  async updateUser(userId: number, updateUser: Omit<AuthUser, 'id' | 'email' | 'createdAt'>): Promise<AuthUserDto> {
+  async updateUser(userId: number, updateUser: UpdateUserSchemaType): Promise<AuthUserDto> {
     this.logger.debug(`Updating User with id: '${userId}'`)
     UserUpdateUserSchema.parse(updateUser)
     try {

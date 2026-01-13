@@ -1,281 +1,325 @@
 'use client'
 
-import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
-
+import { DpButton } from '@js-monorepo/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@js-monorepo/components/ui/dropdown'
+import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'
+import { UpdateUserSchemaType } from '@js-monorepo/schemas'
 import { AuthUserFullDto } from '@js-monorepo/types/auth'
+import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import { formatForUser } from '@js-monorepo/utils/date'
-import { ColumnDef } from '@tanstack/react-table'
-import { Dispatch, SetStateAction, Suspense, useCallback, useMemo, useState } from 'react'
-import { FaUserSecret } from 'react-icons/fa'
-import { MdOutlineModeEditOutline } from 'react-icons/md'
-import { TiCancelOutline, TiTick } from 'react-icons/ti'
-import { useImpersonateUser, useUpdateUser, useUsers } from './queries'
-import RolesTableInput from './roles-input'
-import { UsernameTableInput } from './username-input'
-import { Pageable } from '@js-monorepo/types/pagination'
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Edit,
+  MoreHorizontal,
+  Trash2,
+  UserCog,
+} from 'lucide-react'
+import { Suspense, useCallback, useState } from 'react'
+import { ConfirmDialog } from './components/confirm-dialog'
+import { useDeleteUser, useImpersonateUser, useUpdateUser, useUsers } from './queries'
+import { UserEditDialog } from './user-edit-dialog'
 
-declare module '@tanstack/react-table' {
-  interface Row<TData> {
-    updatedUser?: any
-  }
+interface UsersTableProps {
+  data: PaginationType<AuthUserFullDto> | undefined
+  pagination: Pageable
+  onPaginationChange: (pagination: Pageable) => void
+  isLoading?: boolean
+  onEdit?: (user: AuthUserFullDto) => void
+  onDelete?: (user: AuthUserFullDto) => void
+  onImpersonate?: (user: AuthUserFullDto) => void
 }
 
-const DashboardUsersTableSuspense = () => {
+function TablePagination({
+  pagination,
+  totalCount,
+  onPaginationChange,
+}: {
+  pagination: Pageable
+  totalCount: number
+  onPaginationChange: (pagination: Pageable) => void
+}) {
+  const pageCount = Math.ceil(totalCount / pagination.pageSize)
+  const currentPage = pagination.page
+  const canGoPrevious = currentPage > 1
+  const canGoNext = currentPage < pageCount
+
+  return (
+    <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-card">
+      <div className="text-sm text-muted-foreground">
+        Page {currentPage} of {pageCount || 1}
+      </div>
+      <div className="flex items-center gap-2">
+        <DpButton
+          variant="outline"
+          size="small"
+          onClick={() => onPaginationChange({ ...pagination, page: 1 })}
+          disabled={!canGoPrevious}
+        >
+          <ChevronsLeft className="w-4 h-4" />
+        </DpButton>
+        <DpButton
+          variant="outline"
+          size="small"
+          onClick={() => onPaginationChange({ ...pagination, page: currentPage - 1 })}
+          disabled={!canGoPrevious}
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </DpButton>
+        <DpButton
+          variant="outline"
+          size="small"
+          onClick={() => onPaginationChange({ ...pagination, page: currentPage + 1 })}
+          disabled={!canGoNext}
+        >
+          <ChevronRight className="w-4 h-4" />
+        </DpButton>
+        <DpButton
+          variant="outline"
+          size="small"
+          onClick={() => onPaginationChange({ ...pagination, page: pageCount })}
+          disabled={!canGoNext}
+        >
+          <ChevronsRight className="w-4 h-4" />
+        </DpButton>
+      </div>
+    </div>
+  )
+}
+
+function LoadingSkeleton() {
+  return (
+    <>
+      {Array.from({ length: 10 }).map((_, i) => (
+        <TableRow key={i}>
+          <TableCell>
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-4 w-10" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-4 w-40" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-4 w-40" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-4 w-24" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-4 w-24" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-8 w-8" />
+          </TableCell>
+        </TableRow>
+      ))}
+    </>
+  )
+}
+
+function UsersTable({
+  data,
+  pagination,
+  onPaginationChange,
+  isLoading,
+  onEdit,
+  onDelete,
+  onImpersonate,
+}: UsersTableProps) {
+  const userTimezone = useTimezone()
+  const users = data?.content || []
+  const totalCount = data?.totalCount || 0
+
+  return (
+    <div className="overflow-auto rounded-lg border border-border bg-card">
+      <Table>
+        <TableHeader className="bg-muted">
+          <TableRow>
+            <TableHead className="w-[80px]"></TableHead>
+            <TableHead>ID</TableHead>
+            <TableHead>Username</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Roles</TableHead>
+            <TableHead>Created At</TableHead>
+            <TableHead className="w-[50px]"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : users.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                No users found
+              </TableCell>
+            </TableRow>
+          ) : (
+            users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>
+                  <Avatar className="h-10 w-10">
+                    {user.userProfiles?.[0]?.profileImage && (
+                      <AvatarImage src={user.userProfiles?.[0]?.profileImage} alt={`${user.username} picture`} />
+                    )}
+                    <AvatarFallback>{user.username?.slice(0, 2).toUpperCase() || 'A'}</AvatarFallback>
+                  </Avatar>
+                </TableCell>
+                <TableCell>{user.id}</TableCell>
+                <TableCell className="font-medium">{user.username}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.userRole?.map((r) => r.role.name).join(', ')}</TableCell>
+                <TableCell>{formatForUser(new Date(user.createdAt), userTimezone)}</TableCell>
+                <TableCell>
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger className="p-2 rounded-md hover:bg-accent">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onEdit?.(user)}>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit User
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onImpersonate?.(user)}>
+                        <UserCog className="w-4 h-4 mr-2" />
+                        Impersonate
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => onDelete?.(user)}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete User
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+      {!isLoading && totalCount > 0 && (
+        <TablePagination pagination={pagination} totalCount={totalCount} onPaginationChange={onPaginationChange} />
+      )}
+    </div>
+  )
+}
+
+function DashboardUsersTableContent() {
   const { addNotification } = useNotifications()
   const { pagination, searchQuery, setPagination } = usePaginationWithParams()
-
   const { data, isLoading, refetch } = useUsers(searchQuery)
-  const updateUserMutation = useUpdateUser()
-  const impersonateMutation = useImpersonateUser()
+  const updateUser = useUpdateUser()
+  const impersonateUser = useImpersonateUser()
+  const deleteUserMutation = useDeleteUser()
 
-  const [update, setUpdate] = useState<{
-    index?: number
-    inProgress: boolean
-    user?: AuthUserFullDto
-  }>()
+  const [editUser, setEditUser] = useState<AuthUserFullDto | null>(null)
+  const [deleteUser, setDeleteUser] = useState<AuthUserFullDto | null>(null)
 
-  const pageCount = Math.ceil((data?.totalCount || 0) / pagination.pageSize)
-  const userTimezone = useTimezone()
-
-  const memoizedColumns: ColumnDef<AuthUserFullDto>[] = useMemo(
-    () => [
-      {
-        accessorKey: 'profileImage',
-        size: 50,
-        header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
-        cell: ({ row }) => {
-          return (
-            <div className="flex justify-center items-center select-none">
-              <Avatar className="h-12 w-12">
-                {row.original?.userProfiles?.[0]?.profileImage && (
-                  <AvatarImage
-                    src={row.original?.userProfiles?.[0]?.profileImage}
-                    alt={`${row.original.username} picture`}
-                  ></AvatarImage>
-                )}
-                <AvatarFallback>{row.original.username?.slice(0, 3)?.toUpperCase() || 'A'}</AvatarFallback>
-              </Avatar>
-            </div>
-          )
-        },
-      },
-      {
-        accessorKey: 'id',
-        size: 50,
-        header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
-        cell: ({ row }) => <div className="text-center">{row.getValue('id')}</div>,
-      },
-      {
-        accessorKey: 'username',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Username" />,
-        cell: ({ row }) => {
-          return update?.index === row.index ? (
-            <UsernameTableInput row={row} />
-          ) : (
-            <div className="text-center">{row.original.username}</div>
-          )
-        },
-      },
-      {
-        accessorKey: 'email',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
-        cell: ({ row }) => <div className="text-center">{row.getValue('email')}</div>,
-      },
-      {
-        accessorKey: 'roles',
-        size: 140,
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Roles" />,
-        cell: ({ row }) => {
-          return update?.index === row.index ? (
-            <RolesTableInput row={row} />
-          ) : (
-            <div className="text-center">{row.original?.userRole?.map((r) => r.role.name).join(', ')}</div>
-          )
-        },
-      },
-      {
-        accessorKey: 'createdAt',
-        size: 100,
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
-        cell: ({ row }) => (
-          <div className="text-center">{formatForUser(new Date(row.original.createdAt), userTimezone)}</div>
-        ),
-      },
-      // {
-      //   accessorKey: 'provider',
-      //   size: 100,
-      //   header: ({ column }) => (
-      //     <DataTableColumnHeader column={column} title="Provider" />
-      //   ),
-      //   cell: ({ row }) => (
-      //     <div className="text-center">
-      //       {row.original?.userProfiles?.[0].providerId}
-      //     </div>
-      //   ),
-      // },
-      {
-        id: 'actions',
-        size: 100,
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" />,
-        cell: ({ row }) => {
-          return (
-            <div className="flex gap-2 p-4 justify-center items-center select-none">
-              <div id="update-user">
-                {update?.inProgress && update.index === row.index ? (
-                  <div className="flex items-center gap-3 bg-background-secondary">
-                    <button
-                      title="Submit"
-                      className="h-9 w-9 p-0 rounded-md bg-status-success text-status-success-foreground hover:brightness-90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-success flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={updateUserMutation.isPending}
-                      onClick={async () => {
-                        const updateData = row.updatedUser
-
-                        // Check if there's actually something to update
-                        if (!updateData || (!updateData.username && !updateData.roles)) {
-                          setUpdate({
-                            inProgress: false,
-                          })
-                          return
-                        }
-
-                        try {
-                          await updateUserMutation.mutateAsync({
-                            userId: row.original.id,
-                            data: { ...updateData },
-                          })
-
-                          addNotification({
-                            message: 'User updated successfully',
-                            type: 'success',
-                          })
-
-                          await refetch()
-
-                          setUpdate({
-                            inProgress: false,
-                          })
-                        } catch (err: any) {
-                          addNotification({
-                            message:
-                              err?.errors?.map((error: { message: string }) => error.message).join(', ') ||
-                              'Failed to update user',
-                            type: 'error',
-                          })
-                        }
-                      }}
-                    >
-                      <TiTick className="text-xl" />
-                    </button>
-                    <button
-                      title="Cancel"
-                      className="h-9 w-9 p-0 rounded-md bg-status-error text-status-error-foreground hover:brightness-90 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-error flex items-center justify-center"
-                      onClick={async () => {
-                        row.updatedUser = undefined
-                        setUpdate({
-                          inProgress: false,
-                        })
-                      }}
-                    >
-                      <TiCancelOutline className="text-xl" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <button
-                      title="Edit User"
-                      className="h-9 w-9 p-0 rounded-md border border-border bg-background hover:bg-accent hover:border-accent text-foreground transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 flex items-center justify-center"
-                      onClick={() => {
-                        row.updatedUser = undefined
-                        setUpdate({
-                          index: row.index,
-                          inProgress: true,
-                        })
-                      }}
-                    >
-                      <MdOutlineModeEditOutline className="text-xl" />
-                    </button>
-                    <button
-                      title="Login as User"
-                      className="h-9 w-9 p-0 rounded-md border border-border bg-background hover:bg-purple-500 hover:text-white hover:border-purple-500 text-foreground transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={impersonateMutation.isPending}
-                      onClick={async () => {
-                        try {
-                          const result = await impersonateMutation.mutateAsync(row.original.id)
-                          if (result.success) {
-                            addNotification({
-                              message: `Now logged in as ${row.original.username}`,
-                              type: 'success',
-                            })
-                            window.location.replace('/')
-                          } else {
-                            addNotification({
-                              message: result.message || 'Failed to impersonate user',
-                              type: 'error',
-                            })
-                          }
-                        } catch {
-                          addNotification({
-                            message: 'Failed to impersonate user',
-                            type: 'error',
-                          })
-                        }
-                      }}
-                    >
-                      <FaUserSecret className="text-lg" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        },
-      },
-    ],
-    [update, addNotification, updateUserMutation, refetch, impersonateMutation, userTimezone]
-  )
-
-  const onPaginationChange = useCallback<Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>>(
-    (newPaginationOrUpdater) => {
-      setPagination((prevPagination: Pageable) => {
-        const currentState = {
-          pageSize: prevPagination.pageSize,
-          pageIndex: prevPagination.page - 1, // Convert to zero-based for tanstack
-        }
-
-        const updated =
-          typeof newPaginationOrUpdater === 'function' ? newPaginationOrUpdater(currentState) : newPaginationOrUpdater
-
-        return {
-          pageSize: updated.pageSize,
-          page: updated.pageIndex + 1, // Convert back to one-based for API
-        }
+  const handleUpdateUser = async (userData: UpdateUserSchemaType) => {
+    if (!editUser) return
+    try {
+      await updateUser.mutateAsync({ userId: editUser.id, data: userData })
+      addNotification({ message: 'User updated successfully', type: 'success' })
+      setEditUser(null)
+      refetch()
+    } catch (err: any) {
+      addNotification({
+        message: err?.errors?.map((error: { message: string }) => error.message).join(', ') || 'Failed to update user',
+        type: 'error',
       })
+    }
+  }
+
+  const handleImpersonate = async (user: AuthUserFullDto) => {
+    try {
+      const result = await impersonateUser.mutateAsync(user.id)
+      if (result.success) {
+        addNotification({ message: `Now logged in as ${user.username}`, type: 'success' })
+        window.location.replace('/')
+      } else {
+        addNotification({ message: result.message || 'Failed to impersonate user', type: 'error' })
+      }
+    } catch {
+      addNotification({ message: 'Failed to impersonate user', type: 'error' })
+    }
+  }
+
+  const handleDeleteUser = async () => {
+    if (!deleteUser) return
+    try {
+      await deleteUserMutation.mutateAsync(deleteUser.id)
+      addNotification({ message: 'User deleted successfully', type: 'success' })
+      setDeleteUser(null)
+      refetch()
+    } catch (err: any) {
+      addNotification({
+        message: 'Failed to delete user',
+        type: 'error',
+      })
+    }
+  }
+
+  const handlePaginationChange = useCallback(
+    (newPagination: Pageable) => {
+      setPagination(newPagination)
     },
     [setPagination]
   )
 
   return (
-    <div>
-      <DataTable
-        columns={memoizedColumns}
-        data={data?.content || []}
-        onPaginationChange={onPaginationChange}
-        totalCount={pageCount}
+    <>
+      <UsersTable
+        data={data}
         pagination={pagination}
-        loading={isLoading}
-      ></DataTable>
-    </div>
+        onPaginationChange={handlePaginationChange}
+        isLoading={isLoading}
+        onEdit={setEditUser}
+        onDelete={setDeleteUser}
+        onImpersonate={handleImpersonate}
+      />
+      <UserEditDialog
+        user={editUser}
+        open={!!editUser}
+        onOpenChange={(open) => !open && setEditUser(null)}
+        onSave={handleUpdateUser}
+        isSaving={updateUser.isPending}
+      />
+      <ConfirmDialog
+        open={!!deleteUser}
+        onOpenChange={(open) => !open && setDeleteUser(null)}
+        title="Delete User"
+        description={`Are you sure you want to delete "${deleteUser?.username}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleDeleteUser}
+        isLoading={deleteUserMutation.isPending}
+        variant="destructive"
+      />
+    </>
   )
 }
 
 function DashboardUsersTable() {
   return (
     <Suspense>
-      <DashboardUsersTableSuspense></DashboardUsersTableSuspense>
+      <DashboardUsersTableContent />
     </Suspense>
   )
 }
+
 export { DashboardUsersTable }

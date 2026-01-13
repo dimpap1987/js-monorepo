@@ -1,12 +1,9 @@
-/**
- * Query hooks for dashboard users
- */
-
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AuthUserFullDto, AuthUserUpdateDto } from '@js-monorepo/types/auth'
+import { UpdateUserSchemaType } from '@js-monorepo/schemas'
+import { AuthUserFullDto } from '@js-monorepo/types/auth'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 /**
  * Fetch users with pagination and search
@@ -35,7 +32,7 @@ export function useUpdateUser() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ userId, data }: { userId: number; data: AuthUserUpdateDto }) => {
+    mutationFn: async ({ userId, data }: { userId: number; data: UpdateUserSchemaType }) => {
       const response = await apiClient.put(`/admin/users/${userId}`, data)
       return handleQueryResponse(response)
     },
@@ -60,6 +57,23 @@ export function useImpersonateUser() {
     mutationFn: async (userId: number): Promise<ImpersonateResponse> => {
       const response = await apiClient.post<ImpersonateResponse>(`/admin/impersonate/${userId}`)
       return handleQueryResponse(response)
+    },
+  })
+}
+
+/**
+ * Hook to delete a user
+ */
+export function useDeleteUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      const response = await apiClient.delete(`/admin/users/${userId}`)
+      return handleQueryResponse(response)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() })
     },
   })
 }
