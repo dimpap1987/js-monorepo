@@ -1,9 +1,9 @@
 'use client'
 
 import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
-import { ErrorDialog } from '@js-monorepo/dialog'
-import { useNotifications } from '@js-monorepo/notification'
 import { SnapCarousel } from '@js-monorepo/components/ui/snap-carousel'
+import { ConfirmDialog, ErrorDialog } from '@js-monorepo/dialog'
+import { useNotifications } from '@js-monorepo/notification'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -25,6 +25,8 @@ export function Pricing() {
   const [isPortalLoading, setIsPortalLoading] = useState(false)
   const [trialLoadingPriceId, setTrialLoadingPriceId] = useState<number | null>(null)
   const [trialEligibility, setTrialEligibility] = useState<Record<number, TrialEligibilityResponse>>({})
+  const [showConfirmTrialDialog, setShowConfirmTrialDialog] = useState(false)
+  const [trialPriceIdToConfirm, setTrialPriceIdToConfirm] = useState<number | null>(null)
   const { data: plans = [], isLoading: isPlansLoading } = usePlans()
   const { addNotification } = useNotifications()
 
@@ -140,7 +142,7 @@ export function Pricing() {
     ]
   )
 
-  const handleStartTrial = useCallback(
+  const handleConfirmStartTrial = useCallback(
     async (priceId: number) => {
       setTrialLoadingPriceId(priceId)
       try {
@@ -168,10 +170,17 @@ export function Pricing() {
         })
       } finally {
         setTrialLoadingPriceId(null)
+        setShowConfirmTrialDialog(false) // Close dialog on completion
+        setTrialPriceIdToConfirm(null) // Clear priceId
       }
     },
     [addNotification, router]
   )
+
+  const handleStartTrial = useCallback((priceId: number) => {
+    setTrialPriceIdToConfirm(priceId)
+    setShowConfirmTrialDialog(true)
+  }, [])
 
   const handleErrorDialogClose = () => {
     const newSearchParams = new URLSearchParams(searchParams.toString())
@@ -277,6 +286,21 @@ export function Pricing() {
           onClose={handleErrorDialogClose}
         />
       )}
+
+      {/* Confirm Trial Dialog */}
+      <ConfirmDialog
+        open={showConfirmTrialDialog}
+        onOpenChange={setShowConfirmTrialDialog}
+        title="Start Free Trial?"
+        description="By confirming, you will start a free trial for this plan. You can cancel anytime."
+        confirmLabel="Start Trial"
+        onConfirm={() => {
+          if (trialPriceIdToConfirm) {
+            handleConfirmStartTrial(trialPriceIdToConfirm)
+          }
+        }}
+        isLoading={trialLoadingPriceId === trialPriceIdToConfirm}
+      />
     </div>
   )
 }

@@ -32,3 +32,5 @@ export type VariantProps = {
   variant?: keyof typeof buttonVariants.variants.variant
   size?: keyof typeof buttonVariants.variants.size
 }
+
+export type ButtonVariant = keyof typeof buttonVariants.variants.variant

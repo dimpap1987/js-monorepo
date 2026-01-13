@@ -201,7 +201,7 @@ function SubscriptionsPageContent() {
         size: 120,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
         cell: ({ row }) => (
-          <div>
+          <div className="flex gap-1">
             <p className="font-medium">{formatCurrency(row.original.price.unitAmount, row.original.price.currency)}</p>
             <p className="text-sm text-muted-foreground">/{row.original.price.interval}</p>
           </div>

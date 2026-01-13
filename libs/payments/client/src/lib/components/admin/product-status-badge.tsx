@@ -83,13 +83,12 @@ export function VerifiedSyncStatusBadge({ status, className }: VerifiedSyncStatu
 // ============= Stripe Sync Badge =============
 
 interface StripeSyncBadgeProps {
-  stripeId: string
   verifiedStatus?: SyncStatus
   isVerifying?: boolean
   className?: string
 }
 
-export function StripeSyncBadge({ stripeId, verifiedStatus, isVerifying, className }: StripeSyncBadgeProps) {
+export function StripeSyncBadge({ verifiedStatus, isVerifying, className }: StripeSyncBadgeProps) {
   // If we have a verified status, use that instead of the prefix check
   if (isVerifying) {
     return (

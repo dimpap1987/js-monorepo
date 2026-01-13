@@ -1,5 +1,5 @@
 export * from './components/donation-dialog'
 export * from './components/login-dialog'
 export * from './components/register-dialog'
-export * from './components/confirmation-dialog'
+export * from './components/confirm-dialog'
 export * from './components/error-dialog'

@@ -110,7 +110,7 @@ function PricesSubRow({
                     <ActiveStatusBadge active={price.active} />
                   </td>
                   <td className="py-2">
-                    <StripeSyncBadge stripeId={price.stripeId} />
+                    <StripeSyncBadge />
                   </td>
                   <td className="py-2 text-right">
                     <DropdownMenu modal={false}>
@@ -336,11 +336,7 @@ export function ProductsTable({
                       <ActiveStatusBadge active={product.active} />
                     </TableCell>
                     <TableCell>
-                      <StripeSyncBadge
-                        stripeId={product.stripeId}
-                        verifiedStatus={verifiedStatus}
-                        isVerifying={isVerifying}
-                      />
+                      <StripeSyncBadge verifiedStatus={verifiedStatus} isVerifying={isVerifying} />
                     </TableCell>
                     <TableCell>
                       {featureCount === 0 ? (
@@ -353,7 +349,7 @@ export function ProductsTable({
                             </TooltipTrigger>
                             <TooltipContent className="max-w-xs">
                               <ul className="space-y-1">
-                                {Object.entries(features!).map(([key, value]) => (
+                                {Object.entries(features).map(([key, value]) => (
                                   <li key={key} className="text-sm">
                                     <span className="font-medium">{key}:</span> {value}
                                   </li>
