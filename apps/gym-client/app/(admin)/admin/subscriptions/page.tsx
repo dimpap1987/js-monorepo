@@ -11,18 +11,21 @@ import {
 } from '@js-monorepo/components/ui/dropdown'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
-import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
+import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
 import { PlanBadge } from '@js-monorepo/payments-ui'
-import { apiClient } from '@js-monorepo/utils/http'
+import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
+import { Subscription } from '@js-monorepo/types/subscription'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { DATE_CONFIG } from '@js-monorepo/utils/date/constants'
-import { Subscription } from '@js-monorepo/types/subscription'
-import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
+import { apiClient } from '@js-monorepo/utils/http'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { Dispatch, SetStateAction, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import { Locale } from '../../../../i18n/config'
+import { formatCurrency } from '../../../../i18n/currency-formatter'
 
 interface SubscriptionStats {
   activeCount: number
@@ -56,14 +59,6 @@ function getStatusBadge(status: string) {
   }
   const config = variants[status] || { variant: 'outline' as const, label: status }
   return <Badge variant={config.variant}>{config.label}</Badge>
-}
-
-function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-    minimumFractionDigits: 0,
-  }).format(amount / 100)
 }
 
 function formatRelativeDate(date: Date): string {
@@ -115,7 +110,7 @@ function SubscriptionsPageContent() {
   const [searchInput, setSearchInput] = useState('')
   const [status, setStatus] = useState<string>('')
   const userTimezone = useTimezone()
-
+  const currentLocale = useLocale()
   const debouncedSearch = useDebounce(searchInput, 300)
 
   useEffect(() => {
@@ -202,7 +197,9 @@ function SubscriptionsPageContent() {
         header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
         cell: ({ row }) => (
           <div className="flex gap-1">
-            <p className="font-medium">{formatCurrency(row.original.price.unitAmount, row.original.price.currency)}</p>
+            <p className="font-medium">
+              {formatCurrency(row.original.price.unitAmount, currentLocale as Locale, row.original.price.currency)}
+            </p>
             <p className="text-sm text-muted-foreground">/{row.original.price.interval}</p>
           </div>
         ),
@@ -284,7 +281,7 @@ function SubscriptionsPageContent() {
         },
       },
     ],
-    [userTimezone]
+    [currentLocale, userTimezone]
   )
 
   return (
@@ -299,7 +296,7 @@ function SubscriptionsPageContent() {
         <StatCard title="Active Subscriptions" value={stats?.activeCount ?? '-'} icon={Users} />
         <StatCard
           title="Monthly Revenue"
-          value={stats?.mrr ? formatCurrency(stats.mrr, 'eur') : '-'}
+          value={stats?.mrr ? formatCurrency(stats.mrr, currentLocale as Locale, 'EUR') : '-'}
           icon={TrendingUp}
         />
         <StatCard title="Active Trials" value={stats?.trialingCount ?? '-'} icon={Zap} />
