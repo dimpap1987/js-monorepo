@@ -206,7 +206,7 @@ export function AccountSettings() {
       {/* Account Metadata Section */}
       <SettingsItem label="Account Details">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="gap-4 flex">
+          <div className="gap-4 flex items-center">
             <dt className="text-sm font-medium text-foreground-muted content-center">Account Created</dt>
             <dd className="text-foreground font-medium">
               {user?.createdAt ? formatForUser(user.createdAt, userTimezone, 'PPP') : 'N/A'}
@@ -214,7 +214,7 @@ export function AccountSettings() {
           </div>
 
           {isAdmin && (
-            <div className="gap-4 flex">
+            <div className="gap-4 flex items-center">
               <dt className="text-sm font-medium text-foreground-muted content-center">Roles</dt>
               <dd className="text-foreground font-medium">
                 {user?.roles && user.roles.length > 0 ? (

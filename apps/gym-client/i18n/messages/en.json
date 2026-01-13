@@ -10,11 +10,30 @@
   },
   "navigation": {
     "home": "Home",
-    "workouts": "Workouts",
-    "about": "About"
+    "about": "About",
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "pricing": "Plans",
+    "alert": "Alert"
   },
   "metadata": {
     "title": "ClassOps",
     "description": "Your fitness journey starts here"
+  },
+  "settings": {
+    "nav": {
+      "account": {
+        "label": "Account",
+        "description": "Account information"
+      },
+      "appearance": {
+        "label": "Appearance",
+        "description": "Themes and preferences"
+      },
+      "notifications": {
+        "label": "Notifications",
+        "description": "Push notifications and alerts"
+      }
+    }
   }
 }

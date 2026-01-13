@@ -5,9 +5,10 @@ import { useDeviceType } from '@js-monorepo/next/hooks'
 import { ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
 import { SETTINGS_NAV_ITEMS } from '../../../lib/routes-config'
-import { PropsWithChildren, useCallback, useState } from 'react'
+import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { MdChevronLeft } from 'react-icons/md'
 import { SettingsMobileTabs } from './settings-mobile-tabs'
+import { useTranslations } from 'next-intl'
 
 interface SettingsSidebarProps {
   isCollapsed: boolean
@@ -15,6 +16,17 @@ interface SettingsSidebarProps {
 }
 
 function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
+  const t = useTranslations()
+
+  // 1. Memoize and translate both label and description
+  const translatedSettingsItems = useMemo(() => {
+    return SETTINGS_NAV_ITEMS.map((item) => ({
+      ...item,
+      label: t(item.label),
+      description: t(item.description),
+    }))
+  }, [t])
+
   return (
     <div>
       {/* Header with Collapse Button */}
@@ -46,7 +58,7 @@ function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
 
       {/* Navigation Items */}
       <nav className="space-y-1" aria-label="Settings navigation">
-        {SETTINGS_NAV_ITEMS.map((item) => {
+        {translatedSettingsItems.map((item) => {
           const Icon = item.icon
           return (
             <div key={item.href} className="relative" title={isCollapsed ? item.label : undefined}>

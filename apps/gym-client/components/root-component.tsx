@@ -8,13 +8,14 @@ import { Navbar } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types/menu'
-import React, { PropsWithChildren, useMemo } from 'react'
+import { PropsWithChildren, useMemo } from 'react'
+import { IoIosSettings } from 'react-icons/io'
 import { useWebSocketConfig } from '../hooks/useWebsocketConfig'
 import { AppConfig } from '../lib/app-config'
 import { navigationsMenuItems } from '../lib/routes-config'
 import { MobileNavbar } from './mobile-navbar'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
-import { IoIosSettings } from 'react-icons/io'
+import { useTranslations } from 'next-intl'
 
 function SidebarWrapper({
   children,
@@ -32,17 +33,39 @@ function SidebarWrapper({
 
 export default function RootComponent({ children }: PropsWithChildren) {
   const { session, isLoggedIn, isAdmin, refreshSession } = useSession()
+  const t = useTranslations()
   const user = session?.user
   const plan = (session?.subscription as { plan?: string } | undefined)?.plan
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
   useOfflineIndicator()
 
+  // 1. Translate the main navigation items for Navbar and Sidebar
+  const translatedMenuItems = useMemo(() => {
+    return navigationsMenuItems.map((item) => ({
+      ...item,
+      name: t(item.name as any),
+    }))
+  }, [t])
+
+  // 2. Memoize the Settings Link (navUserOptionsChildren)
+  const settingsNavLink = useMemo(() => {
+    return (
+      <DpNextNavLink
+        href="/settings"
+        className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-secondary"
+      >
+        <IoIosSettings className="text-xl flex-shrink-0" />
+        <span className="text-sm">{t('navigation.settings' as any)}</span>
+      </DpNextNavLink>
+    )
+  }, [t])
+
   return (
-    <SidebarWrapper user={user} items={navigationsMenuItems} plan={plan}>
+    <SidebarWrapper user={user} items={translatedMenuItems} plan={plan}>
       <section className="flex min-h-screen flex-col">
         {/* Navbar */}
         <Navbar
-          menuItems={navigationsMenuItems}
+          menuItems={translatedMenuItems} // Pass translated list
           user={user}
           plan={plan}
           onLogout={() => authClient.logout()}
@@ -53,17 +76,7 @@ export default function RootComponent({ children }: PropsWithChildren) {
           }
           rightActions={user && <NotificationBellContainerVirtual userId={user.id} />}
           sidebarTrigger={<SidebarTrigger />}
-          navUserOptionsChildren={useMemo(() => {
-            return (
-              <DpNextNavLink
-                href="/settings"
-                className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-secondary"
-              >
-                <IoIosSettings className="text-xl flex-shrink-0" />
-                <span className="text-sm">Settings</span>
-              </DpNextNavLink>
-            )
-          }, [])}
+          navUserOptionsChildren={settingsNavLink}
         ></Navbar>
         {/* Announcements */}
         <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />

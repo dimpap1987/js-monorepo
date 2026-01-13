@@ -10,11 +10,30 @@
   },
   "navigation": {
     "home": "Αρχική",
-    "workouts": "Προπονήσεις",
-    "about": "Σχετικά"
+    "about": "Σχετικά",
+    "settings": "Ρυθμήσεις",
+    "dashboard": "Πίνακας ελέγχου",
+    "pricing": "Συνδρομές",
+    "alert": "Ειδοποιήσεις"
   },
   "metadata": {
     "title": "ClassOps",
     "description": "Το ταξίδι της φυσικής σας κατάστασης ξεκινά εδώ"
+  },
+  "settings": {
+    "nav": {
+      "account": {
+        "label": "Λογαριασμός",
+        "description": "Πληροφορίες λογαριασμού"
+      },
+      "appearance": {
+        "label": "Εμφάνιση",
+        "description": "Αλλαγή εμφάνισης εφαρμογής"
+      },
+      "notifications": {
+        "label": "Ειδοποιήσεις",
+        "description": "Push ειδοποιήσεις"
+      }
+    }
   }
 }

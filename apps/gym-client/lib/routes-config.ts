@@ -1,7 +1,7 @@
 import { MenuItem } from '@js-monorepo/types/menu'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdAccountCircle, MdPalette } from 'react-icons/md'
-import { RiAdminFill } from 'react-icons/ri'
+import { RiDashboardLine, RiPriceTag3Line } from 'react-icons/ri'
 import { Role, type RouteRole } from './roles'
 
 export interface RouteConfig {
@@ -37,36 +37,36 @@ export const routes: RouteConfig[] = [
 export const navigationsMenuItems: MenuItem[] = [
   {
     href: '/admin',
-    name: 'Dashboard',
+    name: 'navigation.dashboard',
     roles: [Role.ADMIN],
-    Icon: RiAdminFill,
+    Icon: RiDashboardLine,
   },
   {
     href: '/pricing',
-    name: 'Pricing',
+    name: 'navigation.pricing',
     roles: [Role.PUBLIC],
-    Icon: RiAdminFill,
+    Icon: RiPriceTag3Line,
   },
 ]
 
 export const SETTINGS_NAV_ITEMS = [
   {
     href: '/settings/account',
-    label: 'Account',
+    label: 'settings.nav.account.label',
     icon: MdAccountCircle,
-    description: 'Account information',
+    description: 'settings.nav.account.description',
   },
   {
     href: '/settings/appearance',
-    label: 'Appearance',
+    label: 'settings.nav.appearance.label',
     icon: MdPalette,
-    description: 'Themes and preferences',
+    description: 'settings.nav.appearance.description',
   },
   {
     href: '/settings/notifications',
-    label: 'Notifications',
+    label: 'settings.nav.notifications.label',
     icon: IoMdNotifications,
-    description: 'Push notifications and alerts',
+    description: 'settings.nav.notifications.description',
   },
 ] as const
 
