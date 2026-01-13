@@ -245,10 +245,10 @@ export class AdminProductsService {
           const hasActiveSubscriptions = subscriptionCount > 0
 
           // Determine new price values (use dto values or existing values)
-          // Ensure currency is uppercase for consistency
+          // Ensure currency is lowercase for Stripe compatibility
           const newPriceData = {
             unitAmount: dto.unitAmount ?? existingPrice.unitAmount,
-            currency: (dto.currency ?? existingPrice.currency).toUpperCase(),
+            currency: (dto.currency ?? existingPrice.currency).toLowerCase(),
             interval: dto.interval ?? existingPrice.interval,
             active: dto.active ?? existingPrice.active,
           }
@@ -468,7 +468,7 @@ export class AdminProductsService {
       const stripePrice = await stripe.prices.create({
         product: stripeProductId,
         unit_amount: price.unitAmount,
-        currency: price.currency.toLowerCase(), // Stripe expects lowercase currency codes
+        currency: price.currency, // Already lowercase in database
         recurring: {
           interval: price.interval as 'month' | 'year',
         },

@@ -94,8 +94,8 @@ export class CreatePriceDto {
   @IsString()
   @MinLength(3)
   @MaxLength(3)
-  @Transform(({ value }) => (typeof value === 'string' ? value.toUpperCase() : value))
-  @IsIn(['USD', 'EUR'])
+  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase() : value))
+  @IsIn(['usd', 'eur'])
   currency: string
 
   @IsNotEmpty()
@@ -122,8 +122,8 @@ export class UpdatePriceDto {
   @IsString()
   @MinLength(3)
   @MaxLength(3)
-  @Transform(({ value }) => (typeof value === 'string' ? value.toUpperCase() : value))
-  @IsIn(['USD', 'EUR'])
+  @Transform(({ value }) => (typeof value === 'string' ? value.toLowerCase() : value))
+  @IsIn(['usd', 'eur'])
   currency?: string
 
   @IsOptional()

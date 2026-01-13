@@ -193,7 +193,10 @@ export class PaymentsRepository {
         id: 'asc',
       },
       include: {
-        prices: true,
+        prices: {
+          where: { status: 'active' }, // Public endpoint: only show active prices
+          orderBy: { interval: 'asc' },
+        },
       },
     })
   }
@@ -621,7 +624,11 @@ export class PaymentsRepository {
         skip,
         take: pageSize,
         orderBy: { hierarchy: 'asc' },
-        include: { prices: { orderBy: [{ status: 'asc' }, { interval: 'asc' }] } },
+        include: {
+          prices: {
+            orderBy: [{ status: 'asc' }, { interval: 'asc' }], // Show all prices, active first
+          },
+        },
       }),
       this.txHost.tx.product.count({ where }),
     ])
@@ -638,7 +645,11 @@ export class PaymentsRepository {
   async findProductByIdAdmin(id: number): Promise<AdminProductResponse | null> {
     const product = await this.txHost.tx.product.findUnique({
       where: { id },
-      include: { prices: { orderBy: { interval: 'asc' } } },
+      include: {
+        prices: {
+          orderBy: [{ status: 'asc' }, { interval: 'asc' }], // Show all prices, active first
+        },
+      },
     })
     return product as AdminProductResponse | null
   }
@@ -671,7 +682,11 @@ export class PaymentsRepository {
         ...(dto.hierarchy !== undefined && { hierarchy: dto.hierarchy }),
         ...(dto.active !== undefined && { active: dto.active }),
       },
-      include: { prices: { orderBy: { interval: 'asc' } } },
+      include: {
+        prices: {
+          orderBy: [{ status: 'asc' }, { interval: 'asc' }], // Show all prices, active first
+        },
+      },
     })
 
     return product as AdminProductResponse
@@ -685,7 +700,11 @@ export class PaymentsRepository {
     const product = await this.txHost.tx.product.update({
       where: { id },
       data: { stripeId },
-      include: { prices: { orderBy: { interval: 'asc' } } },
+      include: {
+        prices: {
+          orderBy: [{ status: 'asc' }, { interval: 'asc' }], // Show all prices, active first
+        },
+      },
     })
 
     return product as AdminProductResponse
@@ -743,7 +762,7 @@ export class PaymentsRepository {
         stripeId: localStripeId,
         productId: dto.productId,
         unitAmount: dto.unitAmount,
-        currency: dto.currency.toUpperCase(),
+        currency: dto.currency.toLowerCase(),
         interval: dto.interval,
         active: dto.active ?? true,
         status: 'active',
@@ -769,7 +788,7 @@ export class PaymentsRepository {
         stripeId: localStripeId,
         productId: oldPrice.productId,
         unitAmount: dto.unitAmount,
-        currency: dto.currency.toUpperCase(),
+        currency: dto.currency.toLowerCase(),
         interval: dto.interval,
         active: dto.active ?? true,
         status: 'active',
@@ -794,7 +813,7 @@ export class PaymentsRepository {
       where: { id },
       data: {
         ...(dto.unitAmount !== undefined && { unitAmount: dto.unitAmount }),
-        ...(dto.currency !== undefined && { currency: dto.currency.toUpperCase() }),
+        ...(dto.currency !== undefined && { currency: dto.currency.toLowerCase() }),
         ...(dto.interval !== undefined && { interval: dto.interval }),
         ...(dto.active !== undefined && { active: dto.active }),
         ...(dto.status !== undefined && { status: dto.status }),
@@ -847,7 +866,11 @@ export class PaymentsRepository {
 
   async findAllProductsForReconciliation(): Promise<AdminProductResponse[]> {
     const products = await this.txHost.tx.product.findMany({
-      include: { prices: { orderBy: { interval: 'asc' } } },
+      include: {
+        prices: {
+          orderBy: [{ status: 'asc' }, { interval: 'asc' }], // Show all prices, active first
+        },
+      },
       orderBy: { id: 'asc' },
     })
     return products as AdminProductResponse[]
@@ -863,7 +886,11 @@ export class PaymentsRepository {
   async findProductByStripeId(stripeId: string): Promise<AdminProductResponse | null> {
     const product = await this.txHost.tx.product.findUnique({
       where: { stripeId },
-      include: { prices: { orderBy: { interval: 'asc' } } },
+      include: {
+        prices: {
+          orderBy: [{ status: 'asc' }, { interval: 'asc' }], // Show all prices, active first
+        },
+      },
     })
     return product as AdminProductResponse | null
   }
@@ -930,7 +957,11 @@ export class PaymentsRepository {
         ...(data.active !== undefined && { active: data.active }),
         ...(data.metadata !== undefined && { metadata: data.metadata }),
       },
-      include: { prices: { orderBy: { interval: 'asc' } } },
+      include: {
+        prices: {
+          orderBy: [{ status: 'asc' }, { interval: 'asc' }], // Show all prices, active first
+        },
+      },
     })
     return product as AdminProductResponse
   }
@@ -961,7 +992,11 @@ export class PaymentsRepository {
     const product = await this.txHost.tx.product.update({
       where: { id },
       data: { stripeId: localStripeId },
-      include: { prices: { orderBy: { interval: 'asc' } } },
+      include: {
+        prices: {
+          orderBy: [{ status: 'asc' }, { interval: 'asc' }], // Show all prices, active first
+        },
+      },
     })
     return product as AdminProductResponse
   }
