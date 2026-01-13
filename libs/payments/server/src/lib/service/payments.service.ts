@@ -1,14 +1,15 @@
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
-import { ApiException } from '@js-monorepo/nest/exceptions'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { CreateProductType } from '../../'
 import { CreateSubscriptionDto } from '../dto/create-subscription.dto'
 import { CreateStripeWebhookEventDto } from '../dto/stripe-event.dto'
-import { SubscriptionUpdateData, SubscriptionDeleteData } from '../dto/subscription-webhook.dto'
+import { SubscriptionDeleteData, SubscriptionUpdateData } from '../dto/subscription-webhook.dto'
 import { PaymentsRepository } from '../repository/payments.repository'
+import { formatCurrency, LOCAL_CURRENCY_MAP } from '@js-monorepo/currency'
 
 @Injectable()
 export class PaymentsService {
@@ -135,7 +136,8 @@ export class PaymentsService {
     }
   }
 
-  async findActiveProductsWithPrices() {
+  //TODO create other prices in USD for locale = 'en'
+  async findActiveProductsWithPrices(locale: 'en' | 'el' = 'en') {
     const { result, error } = await tryCatch(() => this.paymentsRepository.findActiveProductsWithPrices())
     if (error) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_PRODUCTS')
@@ -148,7 +150,7 @@ export class PaymentsService {
       // active: product.active,
       prices: product.prices?.map((prices) => ({
         id: prices.id,
-        unitAmount: prices.unitAmount,
+        unitAmount: formatCurrency(prices.unitAmount, 'el', prices.currency),
         currency: prices.currency,
         interval: prices.interval,
       })),

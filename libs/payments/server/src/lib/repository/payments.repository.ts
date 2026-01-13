@@ -189,6 +189,9 @@ export class PaymentsRepository {
       where: {
         active: true,
       },
+      orderBy: {
+        id: 'asc',
+      },
       include: {
         prices: true,
       },

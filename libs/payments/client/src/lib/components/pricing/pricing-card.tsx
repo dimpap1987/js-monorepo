@@ -136,7 +136,7 @@ export function PricingCard({
         {/* Price */}
         <div className="text-center mb-6">
           <div className="flex items-baseline justify-center gap-1">
-            <span className="text-4xl font-bold text-foreground">{isFree ? 'Free' : `€${price}`}</span>
+            <span className="text-4xl font-bold text-foreground">{isFree ? 'Free' : `${price}`}</span>
             {!isFree && interval && <span className="text-foreground-neutral">/{interval}</span>}
           </div>
         </div>

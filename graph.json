@@ -1,0 +1,3686 @@
+{
+  "graph": {
+    "nodes": {
+      "ai-image-generator": {
+        "name": "ai-image-generator",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/ai-image-generator",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "ai-image-generator",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/ai-image-generator/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "page-progress-bar": {
+        "name": "page-progress-bar",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/page-progress-bar",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "page-progress-bar",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/page-progress-bar/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "web-notification": {
+        "name": "web-notification",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/web-notification",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/shared/ui/web-notification",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "web-notification",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/web-notification/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "theme-provider": {
+        "name": "theme-provider",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/theme-provider",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "theme-provider",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/theme-provider/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "user-presence": {
+        "name": "user-presence",
+        "type": "lib",
+        "data": {
+          "root": "libs/websockets/user-presence",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/websockets/user-presence",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/websockets/user-presence/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "user-presence",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/websockets/user-presence/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "announcements": {
+        "name": "announcements",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/announcements",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "announcements",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/announcements/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "bottom-navbar": {
+        "name": "bottom-navbar",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/bottom-navbar",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "bottom-navbar",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/bottom-navbar/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "contact-form": {
+        "name": "contact-form",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/contact-form",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/shared/ui/contact-form",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "contact-form",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/contact-form/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "notification": {
+        "name": "notification",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/notification",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "notification",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/notification/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "back-arrow": {
+        "name": "back-arrow",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/back-arrow",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/shared/ui/back-arrow",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "back-arrow",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/back-arrow/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "notifications-client": {
+        "name": "notifications-client",
+        "type": "lib",
+        "data": {
+          "root": "libs/notifications/client",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/notifications/client",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/notifications/client/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "notifications-client",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/notifications/client/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "notifications-server": {
+        "name": "notifications-server",
+        "type": "lib",
+        "data": {
+          "root": "libs/notifications/server",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/notifications/server",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/notifications/server/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "notifications-server",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/notifications/server/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "pagination": {
+        "name": "pagination",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/pagination",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/shared/ui/pagination",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "pagination",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/pagination/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "table": {
+        "name": "table",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/components",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/shared/ui/components",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "table",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/components/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "localization": {
+        "name": "localization",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/localization",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "localization",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/localization/src",
+          "projectType": "library",
+          "tags": ["scope:shared", "type:util"],
+          "implicitDependencies": []
+        }
+      },
+      "templates": {
+        "name": "templates",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/templates",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/shared/ui/templates",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "templates",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/templates/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "markdown": {
+        "name": "markdown",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/markdown",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "markdown",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/markdown/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "nav-link": {
+        "name": "nav-link",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/nav-link",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "nav-link",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/nav-link/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "sidebar": {
+        "name": "sidebar",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/sidebar",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/shared/ui/sidebar/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "sidebar",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/sidebar/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "version": {
+        "name": "version",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/version",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "version",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/version/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "button": {
+        "name": "button",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/button",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "button",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/button/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "dialog": {
+        "name": "dialog",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/dialog",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "dialog",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/dialog/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "loader": {
+        "name": "loader",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/loader",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "loader",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/loader/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "navbar": {
+        "name": "navbar",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/navbar",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/shared/ui/navbar/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "navbar",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/navbar/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "error-boundary": {
+        "name": "error-boundary",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/error",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/shared/ui/error",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "error-boundary",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/error/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "index": {
+        "name": "index",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/utils",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "index",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/utils/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "payments": {
+        "name": "payments",
+        "type": "lib",
+        "data": {
+          "root": "libs/payments/client",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/payments/client",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "payments",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/payments/client/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "payments-server": {
+        "name": "payments-server",
+        "type": "lib",
+        "data": {
+          "root": "libs/payments/server",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/payments/server",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/payments/server/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "payments-server",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/payments/server/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "tranquil-studio": {
+        "name": "tranquil-studio",
+        "type": "app",
+        "data": {
+          "root": "apps/tranquil-studio",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "apps/tranquil-studio",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/next:build",
+              "outputs": ["{options.outputPath}"],
+              "defaultConfiguration": "production",
+              "options": {
+                "outputPath": "dist/apps/tranquil-studio"
+              },
+              "configurations": {
+                "development": {
+                  "outputPath": "apps/tranquil-studio"
+                },
+                "production": {}
+              },
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"]
+            },
+            "serve": {
+              "executor": "@nx/next:server",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "tranquil-studio:build",
+                "dev": true
+              },
+              "configurations": {
+                "development": {
+                  "buildTarget": "tranquil-studio:build:development",
+                  "dev": true
+                },
+                "production": {
+                  "buildTarget": "tranquil-studio:build:production",
+                  "dev": false
+                }
+              },
+              "parallelism": true
+            },
+            "export": {
+              "executor": "@nx/next:export",
+              "options": {
+                "buildTarget": "tranquil-studio:build:production"
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "tranquil-studio",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/tranquil-studio",
+          "projectType": "application",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "contact-server": {
+        "name": "contact-server",
+        "type": "lib",
+        "data": {
+          "root": "libs/contact/server",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/contact/server",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/contact/server/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "contact-server",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/contact/server/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "core-db": {
+        "name": "core-db",
+        "type": "lib",
+        "data": {
+          "root": "libs/prisma/core-db",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/prisma/core-db/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "core-db",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/prisma/core-db/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "schemas": {
+        "name": "schemas",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/schemas",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/shared/schemas/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "schemas",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/schemas/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "webhook-server": {
+        "name": "webhook-server",
+        "type": "app",
+        "data": {
+          "root": "apps/webhook-server",
+          "projectType": "application",
+          "metadata": {},
+          "targets": {
+            "build": {
+              "executor": "@nx/webpack:webpack",
+              "outputs": ["{options.outputPath}"],
+              "defaultConfiguration": "production",
+              "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/apps/webhook-server",
+                "main": "apps/webhook-server/src/main.ts",
+                "tsConfig": "apps/webhook-server/tsconfig.app.json",
+                "assets": [],
+                "webpackConfig": "apps/webhook-server/webpack.config.js"
+              },
+              "configurations": {
+                "development": {},
+                "production": {}
+              },
+              "parallelism": true,
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"],
+              "cache": true
+            },
+            "serve": {
+              "executor": "@nx/js:node",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "webhook-server:build"
+              },
+              "configurations": {
+                "development": {
+                  "buildTarget": "webhook-server:build:development"
+                },
+                "production": {
+                  "buildTarget": "webhook-server:build:production"
+                }
+              },
+              "parallelism": true
+            },
+            "preview": {
+              "options": {
+                "cwd": "apps/webhook-server",
+                "args": ["--node-env=production"],
+                "command": "webpack-cli serve"
+              },
+              "metadata": {
+                "technologies": ["webpack"],
+                "description": "Starts Webpack dev server in production mode",
+                "help": {
+                  "command": "pnpm exec webpack-cli serve --help",
+                  "example": {
+                    "options": {
+                      "args": ["--client-progress", "--history-api-fallback "]
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "serve-static": {
+              "executor": "@nx/web:file-server",
+              "options": {
+                "buildTarget": "build",
+                "spa": true
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": ["apps/webhook-server/**/*.ts"]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "apps/webhook-server/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "webhook-server",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/webhook-server/src",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "gym-db": {
+        "name": "gym-db",
+        "type": "lib",
+        "data": {
+          "root": "libs/prisma/gym-db",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/prisma/gym-db/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "gym-db",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/prisma/gym-db/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "map": {
+        "name": "map",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/ui/map",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            }
+          },
+          "name": "map",
+          "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/ui/map/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "prisma-shared": {
+        "name": "prisma-shared",
+        "type": "lib",
+        "data": {
+          "root": "libs/prisma/shared",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/prisma/shared/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "prisma-shared",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/prisma/shared/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "styles": {
+        "name": "styles",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/styles",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/shared/styles/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "styles",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/styles/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "email-server": {
+        "name": "email-server",
+        "type": "lib",
+        "data": {
+          "root": "libs/email/server",
+          "name": "email-server",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/email/server/src",
+          "projectType": "library",
+          "tags": [],
+          "targets": {
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/email/server/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "types": {
+        "name": "types",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/types",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/shared/types/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "types",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/types/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "utils": {
+        "name": "utils",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/utils",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/shared/utils/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "utils",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/utils/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "gym-client": {
+        "name": "gym-client",
+        "type": "app",
+        "data": {
+          "root": "apps/gym-client",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "build": {
+              "executor": "@nx/next:build",
+              "outputs": ["{options.outputPath}"],
+              "defaultConfiguration": "production",
+              "options": {
+                "outputPath": "dist/apps/gym-client"
+              },
+              "configurations": {
+                "development": {
+                  "outputPath": "apps/gym-client"
+                },
+                "production": {
+                  "generateLockfile": true
+                }
+              },
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"]
+            },
+            "serve": {
+              "executor": "@nx/next:server",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "gym-client:build",
+                "dev": true,
+                "port": 4200,
+                "hostname": "0.0.0.0"
+              },
+              "configurations": {
+                "development": {
+                  "buildTarget": "gym-client:build:development",
+                  "dev": true
+                },
+                "production": {
+                  "buildTarget": "gym-client:build:production",
+                  "dev": false
+                }
+              },
+              "parallelism": true
+            },
+            "export": {
+              "executor": "@nx/next:export",
+              "options": {
+                "buildTarget": "gym-client:build:production"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "apps/gym-client/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "gym-client",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/gym-client",
+          "projectType": "application",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "nest-utils": {
+        "name": "nest-utils",
+        "type": "lib",
+        "data": {
+          "root": "libs/nest-utils",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/nest-utils",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/nest-utils/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "nest-utils",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/nest-utils/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "seo": {
+        "name": "seo",
+        "type": "lib",
+        "data": {
+          "root": "libs/shared/seo",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/shared/seo/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "seo",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/shared/seo/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "auth-nest": {
+        "name": "auth-nest",
+        "type": "lib",
+        "data": {
+          "root": "libs/auth/nest",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/auth/nest",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/auth/nest/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "auth-nest",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/auth/nest/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "next-auth": {
+        "name": "next-auth",
+        "type": "lib",
+        "data": {
+          "root": "libs/auth/next",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/auth/next",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "next-auth",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/auth/next/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "currency": {
+        "name": "currency",
+        "type": "lib",
+        "data": {
+          "root": "libs/currency",
+          "name": "currency",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/currency/src",
+          "projectType": "library",
+          "tags": [],
+          "targets": {
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "libs/currency/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
+      "next-app": {
+        "name": "next-app",
+        "type": "app",
+        "data": {
+          "root": "apps/next-app",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "build": {
+              "executor": "@nx/next:build",
+              "outputs": ["{options.outputPath}"],
+              "defaultConfiguration": "production",
+              "options": {
+                "outputPath": "dist/apps/next-app"
+              },
+              "configurations": {
+                "development": {
+                  "outputPath": "apps/next-app"
+                },
+                "production": {
+                  "generateLockfile": true
+                }
+              },
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"]
+            },
+            "serve": {
+              "executor": "@nx/next:server",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "next-app:build",
+                "dev": true,
+                "port": 3000
+              },
+              "configurations": {
+                "development": {
+                  "buildTarget": "next-app:build:development",
+                  "dev": true
+                },
+                "production": {
+                  "buildTarget": "next-app:build:production",
+                  "dev": false
+                }
+              },
+              "parallelism": true
+            },
+            "export": {
+              "executor": "@nx/next:export",
+              "options": {
+                "buildTarget": "next-app:build:production"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "apps/next-app/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            },
+            "container": {
+              "executor": "@nx-tools/nx-container:build",
+              "dependsOn": ["build"],
+              "options": {
+                "engine": "docker",
+                "metadata": {
+                  "images": ["undefined/next-app"],
+                  "load": true,
+                  "tags": [
+                    "type=schedule",
+                    "type=ref,event=branch",
+                    "type=ref,event=tag",
+                    "type=ref,event=pr",
+                    "type=sha,prefix=sha-"
+                  ]
+                }
+              },
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "next-app",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/next-app",
+          "projectType": "application",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "gym-api": {
+        "name": "gym-api",
+        "type": "app",
+        "data": {
+          "root": "apps/gym-api",
+          "projectType": "application",
+          "metadata": {},
+          "targets": {
+            "build": {
+              "executor": "@nx/webpack:webpack",
+              "outputs": ["{options.outputPath}"],
+              "defaultConfiguration": "production",
+              "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/apps/gym-api",
+                "main": "apps/gym-api/src/main.ts",
+                "generatePackageJson": true,
+                "tsConfig": "apps/gym-api/tsconfig.app.json",
+                "assets": [],
+                "webpackConfig": "apps/gym-api/webpack.config.js"
+              },
+              "configurations": {
+                "development": {},
+                "production": {}
+              },
+              "parallelism": true,
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"],
+              "cache": true
+            },
+            "serve": {
+              "executor": "@nx/js:node",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "gym-api:build"
+              },
+              "configurations": {
+                "development": {
+                  "buildTarget": "gym-api:build:development"
+                },
+                "production": {
+                  "buildTarget": "gym-api:build:production"
+                }
+              },
+              "parallelism": true
+            },
+            "preview": {
+              "options": {
+                "cwd": "apps/gym-api",
+                "args": ["--node-env=production"],
+                "command": "webpack-cli serve"
+              },
+              "metadata": {
+                "technologies": ["webpack"],
+                "description": "Starts Webpack dev server in production mode",
+                "help": {
+                  "command": "pnpm exec webpack-cli serve --help",
+                  "example": {
+                    "options": {
+                      "args": ["--client-progress", "--history-api-fallback "]
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "serve-static": {
+              "executor": "@nx/web:file-server",
+              "options": {
+                "buildTarget": "build",
+                "spa": true
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": ["apps/gym-api/**/*.ts"]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "apps/gym-api/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "gym-api",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/gym-api/src",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "my-api": {
+        "name": "my-api",
+        "type": "app",
+        "data": {
+          "root": "apps/my-api",
+          "projectType": "application",
+          "metadata": {},
+          "targets": {
+            "build": {
+              "executor": "@nx/webpack:webpack",
+              "outputs": ["{options.outputPath}"],
+              "defaultConfiguration": "production",
+              "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/apps/my-api",
+                "main": "apps/my-api/src/main.ts",
+                "generatePackageJson": true,
+                "tsConfig": "apps/my-api/tsconfig.app.json",
+                "assets": [],
+                "webpackConfig": "apps/my-api/webpack.config.js"
+              },
+              "configurations": {
+                "development": {},
+                "production": {}
+              },
+              "parallelism": true,
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"],
+              "cache": true
+            },
+            "serve": {
+              "executor": "@nx/js:node",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "my-api:build"
+              },
+              "configurations": {
+                "development": {
+                  "buildTarget": "my-api:build:development"
+                },
+                "production": {
+                  "buildTarget": "my-api:build:production"
+                }
+              },
+              "parallelism": true
+            },
+            "preview": {
+              "options": {
+                "cwd": "apps/my-api",
+                "args": ["--node-env=production"],
+                "command": "webpack-cli serve"
+              },
+              "metadata": {
+                "technologies": ["webpack"],
+                "description": "Starts Webpack dev server in production mode",
+                "help": {
+                  "command": "pnpm exec webpack-cli serve --help",
+                  "example": {
+                    "options": {
+                      "args": ["--client-progress", "--history-api-fallback "]
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "serve-static": {
+              "executor": "@nx/web:file-server",
+              "options": {
+                "buildTarget": "build",
+                "spa": true
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": ["apps/my-api/**/*.ts"]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "apps/my-api/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "my-api",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/my-api/src",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "docs": {
+        "name": "docs",
+        "type": "app",
+        "data": {
+          "root": "apps/docs",
+          "targets": {
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {},
+              "configurations": {},
+              "parallelism": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/.eslintignore",
+                "{workspaceRoot}/eslint.config.js"
+              ],
+              "cache": true
+            },
+            "build": {
+              "executor": "@nx/next:build",
+              "outputs": ["{options.outputPath}"],
+              "defaultConfiguration": "production",
+              "options": {
+                "outputPath": "dist/apps/docs"
+              },
+              "configurations": {
+                "development": {
+                  "outputPath": "apps/docs"
+                },
+                "production": {}
+              },
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"]
+            },
+            "serve": {
+              "executor": "@nx/next:server",
+              "defaultConfiguration": "development",
+              "options": {
+                "buildTarget": "docs:build",
+                "dev": true
+              },
+              "configurations": {
+                "development": {
+                  "buildTarget": "docs:build:development",
+                  "dev": true
+                },
+                "production": {
+                  "buildTarget": "docs:build:production",
+                  "dev": false
+                }
+              },
+              "parallelism": true
+            },
+            "export": {
+              "executor": "@nx/next:export",
+              "options": {
+                "buildTarget": "docs:build:production"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+              "options": {
+                "jestConfig": "apps/docs/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "parallelism": true,
+              "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
+              "cache": true
+            }
+          },
+          "name": "docs",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "apps/docs",
+          "projectType": "application",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      },
+      "next": {
+        "name": "next",
+        "type": "lib",
+        "data": {
+          "root": "libs/next",
+          "targets": {
+            "lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/next",
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{projectRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*",
+                {
+                  "externalDependencies": ["eslint"]
+                }
+              ],
+              "outputs": ["{options.outputFile}"],
+              "metadata": {
+                "technologies": ["eslint"],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "next",
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/next/src",
+          "projectType": "library",
+          "tags": [],
+          "implicitDependencies": []
+        }
+      }
+    },
+    "dependencies": {
+      "ai-image-generator": [
+        {
+          "source": "ai-image-generator",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "ai-image-generator",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "ai-image-generator",
+          "target": "notification",
+          "type": "static"
+        }
+      ],
+      "page-progress-bar": [],
+      "web-notification": [
+        {
+          "source": "web-notification",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "web-notification",
+          "target": "next-auth",
+          "type": "static"
+        }
+      ],
+      "theme-provider": [
+        {
+          "source": "theme-provider",
+          "target": "table",
+          "type": "static"
+        }
+      ],
+      "user-presence": [
+        {
+          "source": "user-presence",
+          "target": "nest-utils",
+          "type": "static"
+        },
+        {
+          "source": "user-presence",
+          "target": "auth-nest",
+          "type": "static"
+        },
+        {
+          "source": "user-presence",
+          "target": "types",
+          "type": "static"
+        }
+      ],
+      "announcements": [
+        {
+          "source": "announcements",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "announcements",
+          "target": "next",
+          "type": "static"
+        },
+        {
+          "source": "announcements",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "bottom-navbar": [
+        {
+          "source": "bottom-navbar",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "bottom-navbar",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "contact-form": [
+        {
+          "source": "contact-form",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "contact-form",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "contact-form",
+          "target": "notification",
+          "type": "static"
+        },
+        {
+          "source": "contact-form",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "contact-form",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "contact-form",
+          "target": "schemas",
+          "type": "static"
+        },
+        {
+          "source": "contact-form",
+          "target": "utils",
+          "type": "static"
+        }
+      ],
+      "notification": [
+        {
+          "source": "notification",
+          "target": "loader",
+          "type": "static"
+        },
+        {
+          "source": "notification",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "back-arrow": [
+        {
+          "source": "back-arrow",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "back-arrow",
+          "target": "next",
+          "type": "static"
+        }
+      ],
+      "notifications-client": [
+        {
+          "source": "notifications-client",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "notifications-client",
+          "target": "loader",
+          "type": "static"
+        },
+        {
+          "source": "notifications-client",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "notifications-client",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "notifications-client",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "notifications-client",
+          "target": "back-arrow",
+          "type": "static"
+        },
+        {
+          "source": "notifications-client",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "notifications-client",
+          "target": "next",
+          "type": "static"
+        }
+      ],
+      "notifications-server": [
+        {
+          "source": "notifications-server",
+          "target": "auth-nest",
+          "type": "static"
+        },
+        {
+          "source": "notifications-server",
+          "target": "nest-utils",
+          "type": "static"
+        },
+        {
+          "source": "notifications-server",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "notifications-server",
+          "target": "prisma-shared",
+          "type": "static"
+        },
+        {
+          "source": "notifications-server",
+          "target": "utils",
+          "type": "static"
+        }
+      ],
+      "pagination": [
+        {
+          "source": "pagination",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "pagination",
+          "target": "types",
+          "type": "static"
+        }
+      ],
+      "table": [
+        {
+          "source": "table",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "table",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "table",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "table",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "table",
+          "target": "next-auth",
+          "type": "static"
+        },
+        {
+          "source": "table",
+          "target": "next",
+          "type": "static"
+        }
+      ],
+      "localization": [],
+      "templates": [
+        {
+          "source": "templates",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "markdown": [],
+      "nav-link": [
+        {
+          "source": "nav-link",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "sidebar": [
+        {
+          "source": "sidebar",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "sidebar",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "sidebar",
+          "target": "navbar",
+          "type": "static"
+        },
+        {
+          "source": "sidebar",
+          "target": "types",
+          "type": "static"
+        }
+      ],
+      "version": [
+        {
+          "source": "version",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "button": [
+        {
+          "source": "button",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "dialog": [
+        {
+          "source": "dialog",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "dialog",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "dialog",
+          "target": "notification",
+          "type": "static"
+        },
+        {
+          "source": "dialog",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "dialog",
+          "target": "nav-link",
+          "type": "static"
+        }
+      ],
+      "loader": [
+        {
+          "source": "loader",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "navbar": [
+        {
+          "source": "navbar",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "navbar",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "navbar",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "navbar",
+          "target": "payments",
+          "type": "static"
+        },
+        {
+          "source": "navbar",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "navbar",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "navbar",
+          "target": "next",
+          "type": "static"
+        },
+        {
+          "source": "navbar",
+          "target": "types",
+          "type": "static"
+        }
+      ],
+      "error-boundary": [
+        {
+          "source": "error-boundary",
+          "target": "index",
+          "type": "static"
+        }
+      ],
+      "index": [],
+      "payments": [
+        {
+          "source": "payments",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "notification",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "next",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "next-auth",
+          "type": "static"
+        },
+        {
+          "source": "payments",
+          "target": "dialog",
+          "type": "static"
+        }
+      ],
+      "payments-server": [
+        {
+          "source": "payments-server",
+          "target": "auth-nest",
+          "type": "static"
+        },
+        {
+          "source": "payments-server",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "payments-server",
+          "target": "nest-utils",
+          "type": "static"
+        },
+        {
+          "source": "payments-server",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "payments-server",
+          "target": "currency",
+          "type": "static"
+        }
+      ],
+      "tranquil-studio": [
+        {
+          "source": "tranquil-studio",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "tranquil-studio",
+          "target": "templates",
+          "type": "static"
+        },
+        {
+          "source": "tranquil-studio",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "tranquil-studio",
+          "target": "page-progress-bar",
+          "type": "static"
+        },
+        {
+          "source": "tranquil-studio",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "tranquil-studio",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "tranquil-studio",
+          "target": "styles",
+          "type": "static"
+        }
+      ],
+      "contact-server": [
+        {
+          "source": "contact-server",
+          "target": "auth-nest",
+          "type": "static"
+        },
+        {
+          "source": "contact-server",
+          "target": "nest-utils",
+          "type": "static"
+        },
+        {
+          "source": "contact-server",
+          "target": "schemas",
+          "type": "static"
+        },
+        {
+          "source": "contact-server",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "contact-server",
+          "target": "prisma-shared",
+          "type": "static"
+        },
+        {
+          "source": "contact-server",
+          "target": "utils",
+          "type": "static"
+        }
+      ],
+      "core-db": [
+        {
+          "source": "core-db",
+          "target": "prisma-shared",
+          "type": "static"
+        }
+      ],
+      "schemas": [
+        {
+          "source": "schemas",
+          "target": "types",
+          "type": "static"
+        }
+      ],
+      "webhook-server": [],
+      "gym-db": [
+        {
+          "source": "gym-db",
+          "target": "prisma-shared",
+          "type": "static"
+        }
+      ],
+      "map": [
+        {
+          "source": "map",
+          "target": "loader",
+          "type": "static"
+        }
+      ],
+      "prisma-shared": [],
+      "styles": [],
+      "email-server": [],
+      "types": [],
+      "utils": [
+        {
+          "source": "utils",
+          "target": "types",
+          "type": "static"
+        }
+      ],
+      "gym-client": [
+        {
+          "source": "gym-client",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "notification",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "back-arrow",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "next",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "templates",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "next-auth",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "version",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "payments",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "schemas",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "seo",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "notifications-client",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "theme-provider",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "web-notification",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "dialog",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "loader",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "navbar",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "bottom-navbar",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "announcements",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "sidebar",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "localization",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "page-progress-bar",
+          "type": "static"
+        },
+        {
+          "source": "gym-client",
+          "target": "styles",
+          "type": "static"
+        }
+      ],
+      "nest-utils": [
+        {
+          "source": "nest-utils",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "nest-utils",
+          "target": "prisma-shared",
+          "type": "static"
+        }
+      ],
+      "seo": [],
+      "auth-nest": [
+        {
+          "source": "auth-nest",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "auth-nest",
+          "target": "prisma-shared",
+          "type": "static"
+        },
+        {
+          "source": "auth-nest",
+          "target": "schemas",
+          "type": "static"
+        },
+        {
+          "source": "auth-nest",
+          "target": "nest-utils",
+          "type": "static"
+        }
+      ],
+      "next-auth": [
+        {
+          "source": "next-auth",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "next-auth",
+          "target": "utils",
+          "type": "static"
+        }
+      ],
+      "currency": [],
+      "next-app": [
+        {
+          "source": "next-app",
+          "target": "templates",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "ai-image-generator",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "payments",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "next-auth",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "contact-form",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "button",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "table",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "notifications-client",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "notification",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "schemas",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "next",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "back-arrow",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "theme-provider",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "web-notification",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "dialog",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "loader",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "navbar",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "version",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "currency",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "error-boundary",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "announcements",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "sidebar",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "bottom-navbar",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "page-progress-bar",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "seo",
+          "type": "static"
+        },
+        {
+          "source": "next-app",
+          "target": "styles",
+          "type": "static"
+        }
+      ],
+      "gym-api": [
+        {
+          "source": "gym-api",
+          "target": "contact-server",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "nest-utils",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "payments-server",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "auth-nest",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "gym-db",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "notifications-server",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "user-presence",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "gym-api",
+          "target": "schemas",
+          "type": "static"
+        }
+      ],
+      "my-api": [
+        {
+          "source": "my-api",
+          "target": "contact-server",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "nest-utils",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "payments-server",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "auth-nest",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "core-db",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "notifications-server",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "user-presence",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "my-api",
+          "target": "schemas",
+          "type": "static"
+        }
+      ],
+      "docs": [
+        {
+          "source": "docs",
+          "target": "markdown",
+          "type": "dynamic"
+        },
+        {
+          "source": "docs",
+          "target": "nav-link",
+          "type": "static"
+        },
+        {
+          "source": "docs",
+          "target": "page-progress-bar",
+          "type": "static"
+        }
+      ],
+      "next": [
+        {
+          "source": "next",
+          "target": "utils",
+          "type": "static"
+        },
+        {
+          "source": "next",
+          "target": "notification",
+          "type": "static"
+        },
+        {
+          "source": "next",
+          "target": "types",
+          "type": "static"
+        },
+        {
+          "source": "next",
+          "target": "index",
+          "type": "static"
+        },
+        {
+          "source": "next",
+          "target": "next-auth",
+          "type": "static"
+        }
+      ]
+    }
+  }
+}

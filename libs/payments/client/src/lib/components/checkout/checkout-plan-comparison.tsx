@@ -1,6 +1,5 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
 import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
 import { PricingCardData } from '../../types'
@@ -24,7 +23,7 @@ export function CheckoutPlanComparison({
       <div className="grid grid-cols-1 gap-3">
         {plans.map((plan) => {
           const isSelected = plan.id === selectedPlanId
-          const isFree = plan.price === 0
+          const isFree = plan.price == 0
 
           return (
             <button

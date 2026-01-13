@@ -24,8 +24,6 @@ import { ColumnDef } from '@tanstack/react-table'
 import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
 import { useLocale } from 'next-intl'
 import { Dispatch, SetStateAction, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
-import { Locale } from '../../../../i18n/config'
-import { formatCurrency } from '../../../../i18n/currency-formatter'
 
 interface SubscriptionStats {
   activeCount: number
@@ -198,7 +196,9 @@ function SubscriptionsPageContent() {
         cell: ({ row }) => (
           <div className="flex gap-1">
             <p className="font-medium">
-              {formatCurrency(row.original.price.unitAmount, currentLocale as Locale, row.original.price.currency)}
+              {row.original.status === 'trialing'
+                ? '0'
+                : `${row.original.price.unitAmount / 100} ${row.original.price.currency}`}
             </p>
             <p className="text-sm text-muted-foreground">/{row.original.price.interval}</p>
           </div>
@@ -281,7 +281,7 @@ function SubscriptionsPageContent() {
         },
       },
     ],
-    [currentLocale, userTimezone]
+    [userTimezone]
   )
 
   return (
@@ -294,11 +294,7 @@ function SubscriptionsPageContent() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Active Subscriptions" value={stats?.activeCount ?? '-'} icon={Users} />
-        <StatCard
-          title="Monthly Revenue"
-          value={stats?.mrr ? formatCurrency(stats.mrr, currentLocale as Locale, 'EUR') : '-'}
-          icon={TrendingUp}
-        />
+        <StatCard title="Monthly Revenue" value={stats?.mrr ? `${stats.mrr / 100} EUR` : '-'} icon={TrendingUp} />
         <StatCard title="Active Trials" value={stats?.trialingCount ?? '-'} icon={Zap} />
         <StatCard title="Churned (This Month)" value={stats?.churnedThisMonth ?? '-'} icon={TrendingDown} />
       </div>

@@ -11,14 +11,14 @@ import {
 } from '@js-monorepo/components/ui/dropdown'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
-import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
+import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
 import { PlanBadge } from '@js-monorepo/payments-ui'
-import { apiClient } from '@js-monorepo/utils/http'
+import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
+import { Subscription } from '@js-monorepo/types/subscription'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { DATE_CONFIG } from '@js-monorepo/utils/date/constants'
-import { Subscription } from '@js-monorepo/types/subscription'
-import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
+import { apiClient } from '@js-monorepo/utils/http'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
 import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
@@ -56,14 +56,6 @@ function getStatusBadge(status: string) {
   }
   const config = variants[status] || { variant: 'outline' as const, label: status }
   return <Badge variant={config.variant}>{config.label}</Badge>
-}
-
-function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-    minimumFractionDigits: 0,
-  }).format(amount / 100)
 }
 
 function formatRelativeDate(date: Date): string {
@@ -202,7 +194,7 @@ function SubscriptionsPageContent() {
         header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
         cell: ({ row }) => (
           <div>
-            <p className="font-medium">{formatCurrency(row.original.price.unitAmount, row.original.price.currency)}</p>
+            <p className="font-medium">{`${row.original.price.unitAmount}`}</p>
             <p className="text-sm text-muted-foreground">/{row.original.price.interval}</p>
           </div>
         ),
@@ -297,11 +289,7 @@ function SubscriptionsPageContent() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Active Subscriptions" value={stats?.activeCount ?? '-'} icon={Users} />
-        <StatCard
-          title="Monthly Revenue"
-          value={stats?.mrr ? formatCurrency(stats.mrr, 'eur') : '-'}
-          icon={TrendingUp}
-        />
+        <StatCard title="Monthly Revenue" value={stats?.mrr ? stats.mrr : '-'} icon={TrendingUp} />
         <StatCard title="Active Trials" value={stats?.trialingCount ?? '-'} icon={Zap} />
         <StatCard title="Churned (This Month)" value={stats?.churnedThisMonth ?? '-'} icon={TrendingDown} />
       </div>

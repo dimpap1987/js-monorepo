@@ -111,25 +111,6 @@ export function isProductSynced(product: AdminProduct): boolean {
   return !product.stripeId.startsWith('local_')
 }
 
-/**
- * Check if a price might be synced to Stripe based on prefix.
- * NOTE: This is a preliminary check. Use apiGetPriceSyncStatus for accurate verification.
- * @deprecated Use reconciliation API for accurate sync status
- */
-export function isPriceSynced(price: AdminPrice): boolean {
-  return !price.stripeId.startsWith('local_price_')
-}
-
-/**
- * Format price amount from cents to display string
- */
-export function formatPriceAmount(unitAmount: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-  }).format(unitAmount / 100)
-}
-
 // ============= Reconciliation API Functions =============
 
 export async function apiGetReconciliationReport(): Promise<ClientResponseType<ReconciliationReport>> {

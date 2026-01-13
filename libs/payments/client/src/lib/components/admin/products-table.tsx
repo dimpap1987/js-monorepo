@@ -32,7 +32,6 @@ import {
 } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { AdminProduct, SyncStatus } from '../../types'
-import { formatPriceAmount } from '../../utils/admin-api'
 import {
   ActiveStatusBadge,
   FeatureCountBadge,
@@ -104,7 +103,7 @@ function PricesSubRow({
             <tbody>
               {product.prices.map((price) => (
                 <tr key={price.id} className="border-t border-border/50">
-                  <td className="py-2 font-medium">{formatPriceAmount(price.unitAmount, price.currency)}</td>
+                  <td className="py-2 font-medium">{`${price.unitAmount} ${price.currency}`}</td>
                   <td className="py-2 capitalize">{price.interval}ly</td>
                   <td className="py-2">
                     <ActiveStatusBadge active={price.active} />

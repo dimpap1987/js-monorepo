@@ -1,4 +1,5 @@
 import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
+import { Cookies } from '@js-monorepo/nest/decorators'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
 import { SessionUserType } from '@js-monorepo/types/auth'
@@ -31,8 +32,8 @@ export class PaymentsController {
   ) {}
 
   @Get('plans')
-  async getPlans() {
-    return this.paymentsService.findActiveProductsWithPrices()
+  async getPlans(@Cookies('NEXT_LOCALE') locale?: 'en' | 'el') {
+    return this.paymentsService.findActiveProductsWithPrices(locale)
   }
 
   @Get('subscriptions/:subscriptionId')

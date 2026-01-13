@@ -72,7 +72,7 @@ export function SubscriptionSettings() {
       if (price) {
         return {
           name: plan.name,
-          price: price.unitAmount / 100,
+          price: price.unitAmount,
           interval: price.interval,
           features: plan.metadata?.features,
           priceId: price.id,
