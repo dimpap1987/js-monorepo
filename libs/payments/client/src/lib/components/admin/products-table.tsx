@@ -19,15 +19,19 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Cloud,
+  Download,
   Edit,
   ExternalLink,
+  Link2Off,
   MoreHorizontal,
   Plus,
   Power,
+  RefreshCw,
   Trash2,
+  Upload,
 } from 'lucide-react'
 import { Fragment, useState } from 'react'
-import { AdminProduct } from '../../types'
+import { AdminProduct, SyncStatus } from '../../types'
 import { formatPriceAmount, isProductSynced } from '../../utils/admin-api'
 import {
   ActiveStatusBadge,
@@ -51,6 +55,13 @@ interface ProductsTableProps {
   onDeletePrice?: (productId: number, priceId: number) => void
   onTogglePriceActive?: (productId: number, priceId: number, active: boolean) => void
   onSyncPrice?: (productId: number, priceId: number) => void
+  // Reconciliation handlers
+  onVerifySync?: (product: AdminProduct) => void
+  onPushToStripe?: (product: AdminProduct) => void
+  onPullFromStripe?: (product: AdminProduct) => void
+  onUnlink?: (product: AdminProduct) => void
+  verifiedSyncStatus?: Map<number, SyncStatus>
+  verifyingProductIds?: Set<number>
 }
 
 function PricesSubRow({
@@ -248,6 +259,12 @@ export function ProductsTable({
   onDeletePrice,
   onTogglePriceActive,
   onSyncPrice,
+  onVerifySync,
+  onPushToStripe,
+  onPullFromStripe,
+  onUnlink,
+  verifiedSyncStatus,
+  verifyingProductIds,
 }: ProductsTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
 
@@ -296,6 +313,8 @@ export function ProductsTable({
               const isSynced = isProductSynced(product)
               const features = product.metadata?.features ?? []
               const featureCount = features ? Object.keys(features).length : 0
+              const verifiedStatus = verifiedSyncStatus?.get(product.id)
+              const isVerifying = verifyingProductIds?.has(product.id)
 
               return (
                 <Fragment key={product.id}>
@@ -318,7 +337,11 @@ export function ProductsTable({
                       <ActiveStatusBadge active={product.active} />
                     </TableCell>
                     <TableCell>
-                      <StripeSyncBadge stripeId={product.stripeId} />
+                      <StripeSyncBadge
+                        stripeId={product.stripeId}
+                        verifiedStatus={verifiedStatus}
+                        isVerifying={isVerifying}
+                      />
                     </TableCell>
                     <TableCell>
                       {featureCount === 0 ? (
@@ -363,7 +386,37 @@ export function ProductsTable({
                             <Power className="w-4 h-4 mr-2" />
                             {product.active ? 'Deactivate' : 'Activate'}
                           </DropdownMenuItem>
-                          {!isSynced && (
+                          <DropdownMenuSeparator />
+                          {/* Reconciliation Actions */}
+                          <DropdownMenuItem onClick={() => onVerifySync?.(product)}>
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Verify Sync Status
+                          </DropdownMenuItem>
+                          {/* Show Push to Stripe for local-only or orphaned products */}
+                          {(!isSynced ||
+                            verifiedStatus === SyncStatus.LOCAL_ONLY ||
+                            verifiedStatus === SyncStatus.ORPHANED) && (
+                            <DropdownMenuItem onClick={() => onPushToStripe?.(product)}>
+                              <Upload className="w-4 h-4 mr-2" />
+                              Push to Stripe
+                            </DropdownMenuItem>
+                          )}
+                          {/* Show Pull from Stripe for synced products with drift */}
+                          {isSynced && verifiedStatus === SyncStatus.DRIFT && (
+                            <DropdownMenuItem onClick={() => onPullFromStripe?.(product)}>
+                              <Download className="w-4 h-4 mr-2" />
+                              Pull from Stripe
+                            </DropdownMenuItem>
+                          )}
+                          {/* Show Unlink for orphaned products */}
+                          {verifiedStatus === SyncStatus.ORPHANED && (
+                            <DropdownMenuItem onClick={() => onUnlink?.(product)}>
+                              <Link2Off className="w-4 h-4 mr-2" />
+                              Unlink from Stripe
+                            </DropdownMenuItem>
+                          )}
+                          {/* Legacy sync button for backward compatibility */}
+                          {!isSynced && !verifiedStatus && (
                             <DropdownMenuItem onClick={() => onSync?.(product)}>
                               <Cloud className="w-4 h-4 mr-2" />
                               Sync to Stripe

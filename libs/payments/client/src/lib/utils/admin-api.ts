@@ -6,8 +6,13 @@ import {
   AdminProduct,
   AdminProductFilters,
   AdminProductStats,
+  BulkReconcileRequest,
   CreatePriceRequest,
   CreateProductRequest,
+  PriceSyncStatus,
+  ProductSyncStatus,
+  ReconciliationReport,
+  ReconciliationResult,
   UpdatePriceRequest,
   UpdateProductRequest,
 } from '../types'
@@ -98,14 +103,18 @@ export async function apiSyncPriceToStripe(id: number): Promise<ClientResponseTy
 // ============= Helper Functions =============
 
 /**
- * Check if a product is synced to Stripe (not a local-only product)
+ * Check if a product might be synced to Stripe based on prefix.
+ * NOTE: This is a preliminary check. Use apiGetProductSyncStatus for accurate verification.
+ * @deprecated Use reconciliation API for accurate sync status
  */
 export function isProductSynced(product: AdminProduct): boolean {
   return !product.stripeId.startsWith('local_')
 }
 
 /**
- * Check if a price is synced to Stripe (not a local-only price)
+ * Check if a price might be synced to Stripe based on prefix.
+ * NOTE: This is a preliminary check. Use apiGetPriceSyncStatus for accurate verification.
+ * @deprecated Use reconciliation API for accurate sync status
  */
 export function isPriceSynced(price: AdminPrice): boolean {
   return !price.stripeId.startsWith('local_price_')
@@ -119,4 +128,56 @@ export function formatPriceAmount(unitAmount: number, currency: string): string 
     style: 'currency',
     currency: currency.toUpperCase(),
   }).format(unitAmount / 100)
+}
+
+// ============= Reconciliation API Functions =============
+
+export async function apiGetReconciliationReport(): Promise<ClientResponseType<ReconciliationReport>> {
+  return apiClient.get('/payments/admin/reconciliation/report')
+}
+
+export async function apiGetProductSyncStatus(id: number): Promise<ClientResponseType<ProductSyncStatus>> {
+  return apiClient.get(`/payments/admin/reconciliation/products/${id}/status`)
+}
+
+export async function apiGetPriceSyncStatus(id: number): Promise<ClientResponseType<PriceSyncStatus>> {
+  return apiClient.get(`/payments/admin/reconciliation/prices/${id}/status`)
+}
+
+export async function apiPushProductToStripe(id: number): Promise<ClientResponseType<ProductSyncStatus>> {
+  return apiClient.post(`/payments/admin/reconciliation/products/${id}/push`, {})
+}
+
+export async function apiPullProductFromStripe(id: number): Promise<ClientResponseType<ProductSyncStatus>> {
+  return apiClient.post(`/payments/admin/reconciliation/products/${id}/pull`, {})
+}
+
+export async function apiUnlinkProduct(id: number): Promise<ClientResponseType<ProductSyncStatus>> {
+  return apiClient.post(`/payments/admin/reconciliation/products/${id}/unlink`, {})
+}
+
+export async function apiImportProductFromStripe(stripeId: string): Promise<ClientResponseType<ProductSyncStatus>> {
+  return apiClient.post('/payments/admin/reconciliation/products/import', { stripeId })
+}
+
+export async function apiPushPriceToStripe(id: number): Promise<ClientResponseType<PriceSyncStatus>> {
+  return apiClient.post(`/payments/admin/reconciliation/prices/${id}/push`, {})
+}
+
+export async function apiPullPriceFromStripe(id: number): Promise<ClientResponseType<PriceSyncStatus>> {
+  return apiClient.post(`/payments/admin/reconciliation/prices/${id}/pull`, {})
+}
+
+export async function apiUnlinkPrice(id: number): Promise<ClientResponseType<PriceSyncStatus>> {
+  return apiClient.post(`/payments/admin/reconciliation/prices/${id}/unlink`, {})
+}
+
+export async function apiImportPriceFromStripe(stripeId: string): Promise<ClientResponseType<PriceSyncStatus>> {
+  return apiClient.post('/payments/admin/reconciliation/prices/import', { stripeId })
+}
+
+export async function apiBulkReconcile(
+  request: BulkReconcileRequest
+): Promise<ClientResponseType<ReconciliationResult>> {
+  return apiClient.post('/payments/admin/reconciliation/bulk', request)
 }

@@ -157,3 +157,108 @@ export interface AdminProductFilters {
   active?: boolean
   search?: string
 }
+
+// ============= Reconciliation Types =============
+
+export enum SyncStatus {
+  SYNCED = 'synced',
+  LOCAL_ONLY = 'local_only',
+  STRIPE_ONLY = 'stripe_only',
+  DRIFT = 'drift',
+  ORPHANED = 'orphaned',
+  UNVERIFIED = 'unverified',
+}
+
+export interface ProductLocalData {
+  name: string
+  description: string
+  active: boolean
+  hierarchy: number
+  metadata: Record<string, unknown>
+}
+
+export interface ProductStripeData {
+  name: string
+  description: string
+  active: boolean
+  metadata: Record<string, string>
+}
+
+export interface ProductSyncStatus {
+  localId: number | null
+  stripeId: string | null
+  status: SyncStatus
+  localData?: ProductLocalData
+  stripeData?: ProductStripeData
+  differences?: string[]
+  lastVerified: Date
+}
+
+export interface PriceLocalData {
+  unitAmount: number
+  currency: string
+  interval: string
+  active: boolean
+}
+
+export interface PriceStripeData {
+  unitAmount: number
+  currency: string
+  interval: string
+  active: boolean
+}
+
+export interface PriceSyncStatus {
+  localId: number | null
+  stripeId: string | null
+  productLocalId: number | null
+  productStripeId: string | null
+  status: SyncStatus
+  localData?: PriceLocalData
+  stripeData?: PriceStripeData
+  differences?: string[]
+  lastVerified: Date
+}
+
+export interface ReconciliationSummary {
+  total: number
+  synced: number
+  localOnly: number
+  stripeOnly: number
+  drift: number
+  orphaned: number
+}
+
+export interface ReconciliationError {
+  type: 'product' | 'price'
+  localId?: number
+  stripeId?: string
+  message: string
+}
+
+export interface ReconciliationReport {
+  timestamp: Date
+  products: ReconciliationSummary & {
+    items: ProductSyncStatus[]
+  }
+  prices: ReconciliationSummary & {
+    items: PriceSyncStatus[]
+  }
+  errors: ReconciliationError[]
+}
+
+export interface ReconciliationResult {
+  success: boolean
+  action: string
+  affectedProducts: number
+  affectedPrices: number
+  errors: ReconciliationError[]
+  details: string[]
+}
+
+export type BulkReconcileAction = 'push_all_local' | 'pull_all_stripe' | 'sync_missing'
+
+export interface BulkReconcileRequest {
+  action: BulkReconcileAction
+  dryRun?: boolean
+}

@@ -779,4 +779,133 @@ export class PaymentsRepository {
     })
     return subscriptionCount === 0
   }
+
+  // ============= Reconciliation Methods =============
+
+  async findAllProductsForReconciliation(): Promise<AdminProductResponse[]> {
+    const products = await this.txHost.tx.product.findMany({
+      include: { prices: { orderBy: { interval: 'asc' } } },
+      orderBy: { id: 'asc' },
+    })
+    return products as AdminProductResponse[]
+  }
+
+  async findAllPricesForReconciliation() {
+    return this.txHost.tx.price.findMany({
+      include: { product: { select: { id: true, name: true, stripeId: true } } },
+      orderBy: { id: 'asc' },
+    })
+  }
+
+  async findProductByStripeId(stripeId: string): Promise<AdminProductResponse | null> {
+    const product = await this.txHost.tx.product.findUnique({
+      where: { stripeId },
+      include: { prices: { orderBy: { interval: 'asc' } } },
+    })
+    return product as AdminProductResponse | null
+  }
+
+  async findPriceByStripeIdAdmin(stripeId: string) {
+    return this.txHost.tx.price.findUnique({
+      where: { stripeId },
+      include: { product: { select: { id: true, name: true, stripeId: true } } },
+    })
+  }
+
+  async createProductFromStripe(data: {
+    stripeId: string
+    name: string
+    description: string
+    active: boolean
+    metadata: Record<string, unknown>
+  }): Promise<AdminProductResponse> {
+    const product = await this.txHost.tx.product.create({
+      data: {
+        stripeId: data.stripeId,
+        name: data.name,
+        description: data.description,
+        active: data.active,
+        metadata: data.metadata,
+        hierarchy: 0, // Default hierarchy for imported products
+      },
+      include: { prices: true },
+    })
+    return product as AdminProductResponse
+  }
+
+  async createPriceFromStripe(data: {
+    stripeId: string
+    productId: number
+    unitAmount: number
+    currency: string
+    interval: string
+    active: boolean
+  }) {
+    return this.txHost.tx.price.create({
+      data,
+      include: { product: { select: { id: true, name: true, stripeId: true } } },
+    })
+  }
+
+  async updateProductFromStripe(
+    id: number,
+    data: {
+      name?: string
+      description?: string
+      active?: boolean
+      metadata?: Record<string, unknown>
+    }
+  ): Promise<AdminProductResponse> {
+    const product = await this.txHost.tx.product.update({
+      where: { id },
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.active !== undefined && { active: data.active }),
+        ...(data.metadata !== undefined && { metadata: data.metadata }),
+      },
+      include: { prices: { orderBy: { interval: 'asc' } } },
+    })
+    return product as AdminProductResponse
+  }
+
+  async updatePriceFromStripe(
+    id: number,
+    data: {
+      unitAmount?: number
+      currency?: string
+      interval?: string
+      active?: boolean
+    }
+  ) {
+    return this.txHost.tx.price.update({
+      where: { id },
+      data: {
+        ...(data.unitAmount !== undefined && { unitAmount: data.unitAmount }),
+        ...(data.currency !== undefined && { currency: data.currency }),
+        ...(data.interval !== undefined && { interval: data.interval }),
+        ...(data.active !== undefined && { active: data.active }),
+      },
+      include: { product: { select: { id: true, name: true, stripeId: true } } },
+    })
+  }
+
+  async unlinkProductFromStripe(id: number): Promise<AdminProductResponse> {
+    const localStripeId = `local_${Date.now()}`
+    const product = await this.txHost.tx.product.update({
+      where: { id },
+      data: { stripeId: localStripeId },
+      include: { prices: { orderBy: { interval: 'asc' } } },
+    })
+    return product as AdminProductResponse
+  }
+
+  async unlinkPriceFromStripe(id: number) {
+    const localStripeId = `local_price_${Date.now()}`
+    return this.txHost.tx.price.update({
+      where: { id },
+      data: { stripeId: localStripeId },
+      include: { product: { select: { id: true, name: true, stripeId: true } } },
+    })
+  }
 }

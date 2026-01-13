@@ -7,12 +7,16 @@ import {
   AdminProduct,
   AdminProductFilters,
   AdminProductStats,
+  BulkReconcileRequest,
   CreatePriceRequest,
   CreateProductRequest,
+  ProductSyncStatus,
+  ReconciliationReport,
   UpdatePriceRequest,
   UpdateProductRequest,
 } from '../types'
 import {
+  apiBulkReconcile,
   apiCreatePrice,
   apiCreateProduct,
   apiDeletePrice,
@@ -21,10 +25,16 @@ import {
   apiGetAdminProductStats,
   apiGetAdminProducts,
   apiGetAdminPrices,
+  apiGetProductSyncStatus,
+  apiGetReconciliationReport,
+  apiImportProductFromStripe,
+  apiPullProductFromStripe,
+  apiPushProductToStripe,
   apiSyncPriceToStripe,
   apiSyncProductToStripe,
   apiTogglePriceActive,
   apiToggleProductActive,
+  apiUnlinkProduct,
   apiUpdatePrice,
   apiUpdateProduct,
 } from '../utils/admin-api'
@@ -41,6 +51,11 @@ export const adminProductKeys = {
     all: ['admin', 'prices'] as const,
     list: (productId?: number) => [...adminProductKeys.prices.all, 'list', productId] as const,
     detail: (id: number) => [...adminProductKeys.prices.all, 'detail', id] as const,
+  },
+  reconciliation: {
+    all: ['admin', 'reconciliation'] as const,
+    report: () => [...adminProductKeys.reconciliation.all, 'report'] as const,
+    productStatus: (id: number) => [...adminProductKeys.reconciliation.all, 'product', id] as const,
   },
 }
 
@@ -239,6 +254,87 @@ export function useSyncPriceToStripe() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminProductKeys.all })
       queryClient.invalidateQueries({ queryKey: adminProductKeys.prices.all })
+    },
+  })
+}
+
+// ============= Reconciliation Queries and Mutations =============
+
+export function useReconciliationReport() {
+  return useQuery<ReconciliationReport, Error>({
+    queryKey: adminProductKeys.reconciliation.report(),
+    queryFn: async () => {
+      const response = await apiGetReconciliationReport()
+      return handleQueryResponse(response)
+    },
+    enabled: false, // Only run when manually triggered
+  })
+}
+
+export function useVerifyProductSync() {
+  const queryClient = useQueryClient()
+  return useMutation<ProductSyncStatus, Error, number>({
+    mutationFn: async (id: number) => {
+      const response = await apiGetProductSyncStatus(id)
+      return handleQueryResponse(response)
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(adminProductKeys.reconciliation.productStatus(data.localId!), data)
+    },
+  })
+}
+
+export function usePushToStripe() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => apiPushProductToStripe(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.reconciliation.all })
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.all })
+    },
+  })
+}
+
+export function usePullFromStripe() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => apiPullProductFromStripe(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.reconciliation.all })
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.all })
+    },
+  })
+}
+
+export function useUnlinkProduct() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => apiUnlinkProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.reconciliation.all })
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.all })
+    },
+  })
+}
+
+export function useImportProduct() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (stripeId: string) => apiImportProductFromStripe(stripeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.reconciliation.all })
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.all })
+    },
+  })
+}
+
+export function useBulkReconcile() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (request: BulkReconcileRequest) => apiBulkReconcile(request),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.reconciliation.all })
+      queryClient.invalidateQueries({ queryKey: adminProductKeys.all })
     },
   })
 }

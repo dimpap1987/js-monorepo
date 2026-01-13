@@ -10,14 +10,20 @@ import { useNotifications } from '@js-monorepo/notification'
 import {
   AdminProduct,
   ProductsTable,
+  ReconciliationPanel,
+  SyncStatus,
   useAdminProducts,
   useAdminProductStats,
   useDeletePrice,
   useDeleteProduct,
+  usePullFromStripe,
+  usePushToStripe,
   useSyncPriceToStripe,
   useSyncProductToStripe,
   useTogglePriceActive,
   useToggleProductActive,
+  useUnlinkProduct,
+  useVerifyProductSync,
 } from '@js-monorepo/payments-ui'
 import { Box, Cloud, CloudOff, Package, Plus, Search } from 'lucide-react'
 import { Suspense, useCallback, useEffect, useState } from 'react'
@@ -61,6 +67,10 @@ function ProductsPageContent() {
   const [selectedProductForPrice, setSelectedProductForPrice] = useState<number | null>(null)
   const [selectedPriceId, setSelectedPriceId] = useState<number | null>(null)
 
+  // Reconciliation state
+  const [verifiedSyncStatus, setVerifiedSyncStatus] = useState<Map<number, SyncStatus>>(new Map())
+  const [verifyingProductIds, setVerifyingProductIds] = useState<Set<number>>(new Set())
+
   // Build filters
   const filters = {
     ...(activeFilter !== 'all' && { active: activeFilter === 'active' }),
@@ -68,8 +78,8 @@ function ProductsPageContent() {
   }
 
   // Queries
-  const { data: stats } = useAdminProductStats()
-  const { data, isLoading } = useAdminProducts(pagination.page, pagination.pageSize, filters)
+  const { data: stats, refetch: refetchStats } = useAdminProductStats()
+  const { data, isLoading, refetch: refetchProducts } = useAdminProducts(pagination.page, pagination.pageSize, filters)
 
   // Mutations
   const deleteProduct = useDeleteProduct()
@@ -79,10 +89,22 @@ function ProductsPageContent() {
   const togglePriceActive = useTogglePriceActive()
   const syncPriceToStripe = useSyncPriceToStripe()
 
+  // Reconciliation mutations
+  const verifySync = useVerifyProductSync()
+  const pushToStripe = usePushToStripe()
+  const pullFromStripe = usePullFromStripe()
+  const unlinkProduct = useUnlinkProduct()
+
   // Reset page on filter change
   useEffect(() => {
     setPagination((prev) => ({ ...prev, page: 1 }))
   }, [debouncedSearch, activeFilter, setPagination])
+
+  const onReconciliationComplete = () => {
+    addNotification({ message: 'Reconciliation complete', type: 'success' })
+    refetchProducts()
+    refetchStats()
+  }
 
   // Handlers
   const handleEdit = (product: AdminProduct) => {
@@ -186,6 +208,51 @@ function ProductsPageContent() {
     [setPagination]
   )
 
+  // Reconciliation handlers
+  const handleVerifySync = async (product: AdminProduct) => {
+    setVerifyingProductIds((prev) => new Set(prev).add(product.id))
+    try {
+      const status = await verifySync.mutateAsync(product.id)
+      setVerifiedSyncStatus((prev) => new Map(prev).set(product.id, status.status))
+      addNotification({ message: `Verified ${product.name}`, type: 'success' })
+    } catch (e) {
+      addNotification({ message: `Failed to verify ${product.name}`, type: 'error' })
+    } finally {
+      setVerifyingProductIds((prev) => {
+        const next = new Set(prev)
+        next.delete(product.id)
+        return next
+      })
+    }
+  }
+
+  const handlePush = async (product: AdminProduct) => {
+    try {
+      await pushToStripe.mutateAsync(product.id)
+      onReconciliationComplete()
+    } catch {
+      addNotification({ message: `Failed to push ${product.name}`, type: 'error' })
+    }
+  }
+
+  const handlePull = async (product: AdminProduct) => {
+    try {
+      await pullFromStripe.mutateAsync(product.id)
+      onReconciliationComplete()
+    } catch {
+      addNotification({ message: `Failed to pull ${product.name}`, type: 'error' })
+    }
+  }
+
+  const handleUnlink = async (product: AdminProduct) => {
+    try {
+      await unlinkProduct.mutateAsync(product.id)
+      onReconciliationComplete()
+    } catch {
+      addNotification({ message: `Failed to unlink ${product.name}`, type: 'error' })
+    }
+  }
+
   // Find selected price for edit dialog
   const selectedPrice = selectedPriceId
     ? data?.content.flatMap((p) => p.prices).find((p) => p.id === selectedPriceId)
@@ -256,7 +323,16 @@ function ProductsPageContent() {
         onDeletePrice={handleDeletePrice}
         onTogglePriceActive={handleTogglePriceActive}
         onSyncPrice={handleSyncPrice}
+        onVerifySync={handleVerifySync}
+        onPushToStripe={handlePush}
+        onPullFromStripe={handlePull}
+        onUnlink={handleUnlink}
+        verifiedSyncStatus={verifiedSyncStatus}
+        verifyingProductIds={verifyingProductIds}
       />
+
+      {/* Reconciliation Panel */}
+      <ReconciliationPanel onReconciliationComplete={onReconciliationComplete} />
 
       {/* Dialogs */}
       <ProductDialog open={productDialogOpen} onOpenChange={setProductDialogOpen} product={selectedProduct} />

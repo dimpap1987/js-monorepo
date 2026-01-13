@@ -3,11 +3,13 @@ import { ConfigService } from '@nestjs/config'
 import { AdminProductsController } from './controller/admin-products.controller'
 import { InvoiceController } from './controller/invoice.controller'
 import { PaymentsController } from './controller/payments.controller'
+import { ReconciliationController } from './controller/reconciliation.controller'
 import { TrialController } from './controller/trial.controller'
 import { SubscriptionGuard } from './guards/subscription.guard'
 import { PaymentsRepository } from './repository/payments.repository'
 import { AdminProductsService } from './service/admin-products.service'
 import { PaymentsService } from './service/payments.service'
+import { ReconciliationService } from './service/reconciliation.service'
 import { StripeService } from './service/stripe.service'
 import { TrialService } from './service/trial.service'
 import { TrialExpiryScheduler } from './service/trial-expiry.scheduler'
@@ -38,6 +40,7 @@ const providers: Provider[] = [
   TrialService,
   TrialExpiryScheduler,
   AdminProductsService,
+  ReconciliationService,
 ]
 
 @Global()
@@ -70,7 +73,13 @@ export class PaymentsModule {
         },
         ...providers,
       ],
-      controllers: [PaymentsController, InvoiceController, TrialController, AdminProductsController],
+      controllers: [
+        PaymentsController,
+        InvoiceController,
+        TrialController,
+        AdminProductsController,
+        ReconciliationController,
+      ],
       exports: [...providers, 'PAYMENTS_OPTIONS'],
     }
   }
