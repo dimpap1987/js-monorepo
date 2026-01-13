@@ -10,12 +10,12 @@ NX monorepo with Next.js 14 frontend (`apps/gym-client`), NestJS backend (`apps/
 
 ```bash
 # Development
-pnpm dev:next              # Start Next.js dev server
 pnpm dev:gym-api            # Start NestJS dev server
+pnpm dev:gym-client            # Start NextJS dev server
 
 # Building
-pnpm build:next            # Build Next.js (production)
 pnpm build:gym-api          # Build NestJS (production)
+pnpm build:gym-client          # Build NextJS (production)
 
 # Code Quality
 pnpm lint                  # Lint affected files
@@ -75,12 +75,18 @@ All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.js
 - `@js-monorepo/types` - Shared types
 - `@js-monorepo/ui/*` - UI components
 - `@js-monorepo/auth/*` - Auth libraries
+- `@js-monorepo/currency` - Library handling currencies
+- `@js-monorepo/payments-ui` - UI for subscriptions - stripe - payments and plans
+- `@js-monorepo/payments-server` - API for subscriptions - stripe - payments and plans
+- `@js-monorepo/auth/nest/*` - Nestjs utils
+- `@js-monorepo/schemas` - Zod schemas and types
+- `@js-monorepo/localization` - localization utils 
+- `@js-monorepo/seo` - SEO
 
 ## Authentication
 
 **Session-based auth (NOT JWT)** with Redis-backed sessions:
 
-- Cookie: `JSESSIONID`
 - OAuth: Google, GitHub via Passport
 - Roles: `USER`, `ADMIN`
 - Guards: `LoggedInGuard`, `RolesGuard`, `WsLoginGuard`, `WsRolesGuard`
@@ -156,3 +162,7 @@ Each application now manages its own environment variables using a local `.env` 
 - **Maintainability**: Code should be easy to understand and modify by other developers
 
 **CRITICAL: Only senior-level code and best practices are acceptable.**
+
+# TODO and keep in mind
+Price and Locale Rule:
+Each product in Stripe will have a separate price for EUR (existing) and USD (new). In the app, the price displayed to the user will match their locale: users with el locale will see the EUR price, while users with en locale will see the USD price. Always ensure the displayed price corresponds to the Stripe price in that currency for consistency during checkout.åç
