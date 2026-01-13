@@ -208,23 +208,35 @@ function ProductsPageContent() {
     [setPagination]
   )
 
-  // Reconciliation handlers
-  const handleVerifySync = async (product: AdminProduct) => {
-    setVerifyingProductIds((prev) => new Set(prev).add(product.id))
-    try {
-      const status = await verifySync.mutateAsync(product.id)
-      setVerifiedSyncStatus((prev) => new Map(prev).set(product.id, status.status))
-      addNotification({ message: `Verified ${product.name}`, type: 'success' })
-    } catch (e) {
-      addNotification({ message: `Failed to verify ${product.name}`, type: 'error' })
-    } finally {
-      setVerifyingProductIds((prev) => {
-        const next = new Set(prev)
-        next.delete(product.id)
-        return next
+  const handleVerifySync = useCallback(
+    async (product: AdminProduct) => {
+      setVerifyingProductIds((prev) => new Set(prev).add(product.id))
+      try {
+        const status = await verifySync.mutateAsync(product.id)
+        setVerifiedSyncStatus((prev) => new Map(prev).set(product.id, status.status))
+      } catch (e) {
+        addNotification({ message: `Failed to verify ${product.name}`, type: 'error' })
+      } finally {
+        setVerifyingProductIds((prev) => {
+          const next = new Set(prev)
+          next.delete(product.id)
+          return next
+        })
+      }
+    },
+    [verifySync, addNotification]
+  )
+
+  // Auto-verify products on load
+  useEffect(() => {
+    if (data?.content) {
+      data.content.forEach((product) => {
+        if (!verifiedSyncStatus.has(product.id) && !verifyingProductIds.has(product.id)) {
+          handleVerifySync(product)
+        }
       })
     }
-  }
+  }, [data?.content, verifiedSyncStatus, verifyingProductIds, handleVerifySync])
 
   const handlePush = async (product: AdminProduct) => {
     try {

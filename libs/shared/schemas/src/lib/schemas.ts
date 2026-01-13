@@ -56,6 +56,7 @@ export const RegisterUserSchema = registerUserSchemaConfig.createSchema()
 export const UserUpdateUserSchema = registerUserSchemaConfig.updateSchema()
 
 export type RegisterUserSchemaType = z.infer<typeof RegisterUserSchema>
+export type UpdateUserSchemaType = z.infer<typeof UserUpdateUserSchema>
 
 export const CreateUnregisteredUserSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),

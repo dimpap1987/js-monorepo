@@ -1,6 +1,7 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from '@js-monorepo/components/ui/dropdown'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@js-monorepo/components/ui/tooltip'
 import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import {
@@ -32,7 +32,7 @@ import {
 } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { AdminProduct, SyncStatus } from '../../types'
-import { formatPriceAmount, isProductSynced } from '../../utils/admin-api'
+import { formatPriceAmount } from '../../utils/admin-api'
 import {
   ActiveStatusBadge,
   FeatureCountBadge,
@@ -310,7 +310,6 @@ export function ProductsTable({
           ) : (
             products.map((product) => {
               const isExpanded = expandedRows.has(product.id)
-              const isSynced = isProductSynced(product)
               const features = product.metadata?.features ?? []
               const featureCount = features ? Object.keys(features).length : 0
               const verifiedStatus = verifiedSyncStatus?.get(product.id)
@@ -393,16 +392,14 @@ export function ProductsTable({
                             Verify Sync Status
                           </DropdownMenuItem>
                           {/* Show Push to Stripe for local-only or orphaned products */}
-                          {(!isSynced ||
-                            verifiedStatus === SyncStatus.LOCAL_ONLY ||
-                            verifiedStatus === SyncStatus.ORPHANED) && (
+                          {(verifiedStatus === SyncStatus.LOCAL_ONLY || verifiedStatus === SyncStatus.ORPHANED) && (
                             <DropdownMenuItem onClick={() => onPushToStripe?.(product)}>
                               <Upload className="w-4 h-4 mr-2" />
                               Push to Stripe
                             </DropdownMenuItem>
                           )}
                           {/* Show Pull from Stripe for synced products with drift */}
-                          {isSynced && verifiedStatus === SyncStatus.DRIFT && (
+                          {verifiedStatus === SyncStatus.DRIFT && (
                             <DropdownMenuItem onClick={() => onPullFromStripe?.(product)}>
                               <Download className="w-4 h-4 mr-2" />
                               Pull from Stripe
@@ -415,14 +412,7 @@ export function ProductsTable({
                               Unlink from Stripe
                             </DropdownMenuItem>
                           )}
-                          {/* Legacy sync button for backward compatibility */}
-                          {!isSynced && !verifiedStatus && (
-                            <DropdownMenuItem onClick={() => onSync?.(product)}>
-                              <Cloud className="w-4 h-4 mr-2" />
-                              Sync to Stripe
-                            </DropdownMenuItem>
-                          )}
-                          {isSynced && (
+                          {product.stripeId && !product.stripeId.startsWith('local_') && (
                             <DropdownMenuItem
                               onClick={() =>
                                 window.open(`https://dashboard.stripe.com/products/${product.stripeId}`, '_blank')
