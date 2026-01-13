@@ -10,6 +10,7 @@ import {
   BulkReconcileRequest,
   CreatePriceRequest,
   CreateProductRequest,
+  PriceSyncStatus,
   ProductSyncStatus,
   ReconciliationReport,
   UpdatePriceRequest,
@@ -25,6 +26,7 @@ import {
   apiGetAdminProductStats,
   apiGetAdminProducts,
   apiGetAdminPrices,
+  apiGetPriceSyncStatus,
   apiGetProductSyncStatus,
   apiGetReconciliationReport,
   apiImportProductFromStripe,
@@ -56,6 +58,7 @@ export const adminProductKeys = {
     all: ['admin', 'reconciliation'] as const,
     report: () => [...adminProductKeys.reconciliation.all, 'report'] as const,
     productStatus: (id: number) => [...adminProductKeys.reconciliation.all, 'product', id] as const,
+    priceStatus: (id: number) => [...adminProductKeys.reconciliation.all, 'price', id] as const,
   },
 }
 
@@ -280,6 +283,19 @@ export function useVerifyProductSync() {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(adminProductKeys.reconciliation.productStatus(data.localId!), data)
+    },
+  })
+}
+
+export function useVerifyPriceSync() {
+  const queryClient = useQueryClient()
+  return useMutation<PriceSyncStatus, Error, number>({
+    mutationFn: async (id: number) => {
+      const response = await apiGetPriceSyncStatus(id)
+      return handleQueryResponse(response)
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(adminProductKeys.reconciliation.priceStatus(data.localId!), data)
     },
   })
 }

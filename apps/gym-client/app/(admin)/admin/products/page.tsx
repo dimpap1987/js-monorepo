@@ -23,6 +23,7 @@ import {
   useTogglePriceActive,
   useToggleProductActive,
   useUnlinkProduct,
+  useVerifyPriceSync,
   useVerifyProductSync,
 } from '@js-monorepo/payments-ui'
 import { Box, Cloud, CloudOff, Package, Plus, Search } from 'lucide-react'
@@ -70,6 +71,9 @@ function ProductsPageContent() {
   // Reconciliation state
   const [verifiedSyncStatus, setVerifiedSyncStatus] = useState<Map<number, SyncStatus>>(new Map())
   const [verifyingProductIds, setVerifyingProductIds] = useState<Set<number>>(new Set())
+  const [verifiedPriceSyncStatus, setVerifiedPriceSyncStatus] = useState<Map<number, SyncStatus>>(new Map())
+  const [verifyingPriceIds, setVerifyingPriceIds] = useState<Set<number>>(new Set())
+  const [syncingPriceIds, setSyncingPriceIds] = useState<Set<number>>(new Set())
 
   // Build filters
   const filters = {
@@ -91,6 +95,7 @@ function ProductsPageContent() {
 
   // Reconciliation mutations
   const verifySync = useVerifyProductSync()
+  const verifyPriceSync = useVerifyPriceSync()
   const pushToStripe = usePushToStripe()
   const pullFromStripe = usePullFromStripe()
   const unlinkProduct = useUnlinkProduct()
@@ -192,12 +197,41 @@ function ProductsPageContent() {
     }
   }
 
+  const handleVerifyPriceSync = useCallback(
+    async (priceId: number) => {
+      setVerifyingPriceIds((prev) => new Set(prev).add(priceId))
+      try {
+        const status = await verifyPriceSync.mutateAsync(priceId)
+        setVerifiedPriceSyncStatus((prev) => new Map(prev).set(priceId, status.status))
+      } catch (e) {
+        addNotification({ message: `Failed to verify price`, type: 'error' })
+      } finally {
+        setVerifyingPriceIds((prev) => {
+          const next = new Set(prev)
+          next.delete(priceId)
+          return next
+        })
+      }
+    },
+    [verifyPriceSync, addNotification]
+  )
+
   const handleSyncPrice = async (productId: number, priceId: number) => {
+    setSyncingPriceIds((prev) => new Set(prev).add(priceId))
     try {
       await syncPriceToStripe.mutateAsync(priceId)
       addNotification({ message: 'Price synced to Stripe successfully', type: 'success' })
+      // Refresh the price sync status after successful sync
+      await handleVerifyPriceSync(priceId)
+      refetchProducts()
     } catch {
       addNotification({ message: 'Failed to sync price to Stripe', type: 'error' })
+    } finally {
+      setSyncingPriceIds((prev) => {
+        const next = new Set(prev)
+        next.delete(priceId)
+        return next
+      })
     }
   }
 
@@ -234,9 +268,23 @@ function ProductsPageContent() {
         if (!verifiedSyncStatus.has(product.id) && !verifyingProductIds.has(product.id)) {
           handleVerifySync(product)
         }
+        // Auto-verify prices for each product
+        product.prices.forEach((price) => {
+          if (!verifiedPriceSyncStatus.has(price.id) && !verifyingPriceIds.has(price.id)) {
+            handleVerifyPriceSync(price.id)
+          }
+        })
       })
     }
-  }, [data?.content, verifiedSyncStatus, verifyingProductIds, handleVerifySync])
+  }, [
+    data?.content,
+    verifiedSyncStatus,
+    verifyingProductIds,
+    verifiedPriceSyncStatus,
+    verifyingPriceIds,
+    handleVerifySync,
+    handleVerifyPriceSync,
+  ])
 
   const handlePush = async (product: AdminProduct) => {
     try {
@@ -341,6 +389,9 @@ function ProductsPageContent() {
         onUnlink={handleUnlink}
         verifiedSyncStatus={verifiedSyncStatus}
         verifyingProductIds={verifyingProductIds}
+        verifiedPriceSyncStatus={verifiedPriceSyncStatus}
+        verifyingPriceIds={verifyingPriceIds}
+        syncingPriceIds={syncingPriceIds}
       />
 
       {/* Reconciliation Panel */}
@@ -355,6 +406,7 @@ function ProductsPageContent() {
         products={data?.content || []}
         defaultProductId={selectedProductForPrice ?? undefined}
         price={selectedPrice}
+        verifiedPriceSyncStatus={selectedPriceId ? verifiedPriceSyncStatus.get(selectedPriceId) : undefined}
       />
 
       <ConfirmDialog

@@ -11,6 +11,7 @@ import {
 } from '@js-monorepo/components/ui/dropdown'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@js-monorepo/components/ui/tooltip'
+import { cn } from '@js-monorepo/ui/util'
 import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import {
   ChevronDown,
@@ -37,6 +38,7 @@ import {
   FeatureCountBadge,
   HierarchyBadge,
   PriceCountBadge,
+  PriceStatusBadge,
   StripeSyncBadge,
 } from './product-status-badge'
 
@@ -61,6 +63,9 @@ interface ProductsTableProps {
   onUnlink?: (product: AdminProduct) => void
   verifiedSyncStatus?: Map<number, SyncStatus>
   verifyingProductIds?: Set<number>
+  verifiedPriceSyncStatus?: Map<number, SyncStatus>
+  verifyingPriceIds?: Set<number>
+  syncingPriceIds?: Set<number>
 }
 
 function PricesSubRow({
@@ -69,12 +74,18 @@ function PricesSubRow({
   onDeletePrice,
   onTogglePriceActive,
   onSyncPrice,
+  verifiedPriceSyncStatus,
+  verifyingPriceIds,
+  syncingPriceIds,
 }: {
   product: AdminProduct
   onEditPrice?: (productId: number, priceId: number) => void
   onDeletePrice?: (productId: number, priceId: number) => void
   onTogglePriceActive?: (productId: number, priceId: number, active: boolean) => void
   onSyncPrice?: (productId: number, priceId: number) => void
+  verifiedPriceSyncStatus?: Map<number, SyncStatus>
+  verifyingPriceIds?: Set<number>
+  syncingPriceIds?: Set<number>
 }) {
   if (product.prices.length === 0) {
     return (
@@ -96,54 +107,141 @@ function PricesSubRow({
                 <th className="text-left pb-2 font-medium">Amount</th>
                 <th className="text-left pb-2 font-medium">Interval</th>
                 <th className="text-left pb-2 font-medium">Status</th>
+                <th className="text-left pb-2 font-medium">Price Status</th>
                 <th className="text-left pb-2 font-medium">Stripe</th>
+                <th className="text-center pb-2 font-medium">Sync</th>
                 <th className="text-right pb-2 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {product.prices.map((price) => (
-                <tr key={price.id} className="border-t border-border/50">
-                  <td className="py-2 font-medium">{`${price.unitAmount} ${price.currency}`}</td>
-                  <td className="py-2 capitalize">{price.interval}ly</td>
-                  <td className="py-2">
-                    <ActiveStatusBadge active={price.active} />
-                  </td>
-                  <td className="py-2">
-                    <StripeSyncBadge />
-                  </td>
-                  <td className="py-2 text-right">
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger className="p-1 rounded-md hover:bg-accent">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEditPrice?.(product.id, price.id)}>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit Price
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onTogglePriceActive?.(product.id, price.id, !price.active)}>
-                          <Power className="w-4 h-4 mr-2" />
-                          {price.active ? 'Deactivate' : 'Activate'}
-                        </DropdownMenuItem>
-                        {price.stripeId.startsWith('local_price_') && (
-                          <DropdownMenuItem onClick={() => onSyncPrice?.(product.id, price.id)}>
-                            <Cloud className="w-4 h-4 mr-2" />
-                            Sync to Stripe
-                          </DropdownMenuItem>
+              {product.prices.map((price) => {
+                const priceVerifiedStatus = verifiedPriceSyncStatus?.get(price.id)
+                const isPriceVerifying = verifyingPriceIds?.has(price.id)
+                const isPriceSyncing = syncingPriceIds?.has(price.id)
+                // Determine if price can be synced
+                const isPriceLocal = price.stripeId.startsWith('local_price_')
+                const isPriceOrphaned = priceVerifiedStatus === SyncStatus.ORPHANED
+                const isPriceAlreadySynced = priceVerifiedStatus === SyncStatus.SYNCED
+                // Price has a stripeId (not local) - could be synced or orphaned
+                const hasStripeId = !isPriceLocal
+                // Allow sync if:
+                // 1. Price is local (stripeId starts with 'local_price_') - always allow
+                // 2. Price is verified as orphaned - allow to recreate
+                // 3. Price has a stripeId but is NOT verified as synced - could be orphaned, backend will check
+                // Don't allow if price is verified as already synced and exists in Stripe
+                // Backend will handle: checking if price exists in Stripe, creating if orphaned, validating product sync
+                const canSyncPrice = isPriceLocal || isPriceOrphaned || (hasStripeId && !isPriceAlreadySynced)
+
+                // Find the price that replaced this one (if legacy)
+                const replacedByPrice = price.replacedByPriceId
+                  ? product.prices.find((p) => p.id === price.replacedByPriceId)
+                  : null
+
+                return (
+                  <tr
+                    key={price.id}
+                    className={cn(
+                      'border-t border-border/50',
+                      price.status === 'legacy' && 'bg-amber-50/30 dark:bg-amber-950/10'
+                    )}
+                  >
+                    <td className="py-2 font-medium">
+                      <div className="flex flex-col">
+                        <span>{`${price.unitAmount} ${price.currency}`}</span>
+                        {replacedByPrice && (
+                          <span className="text-xs text-muted-foreground">
+                            Replaced by: {replacedByPrice.unitAmount} {replacedByPrice.currency}
+                          </span>
                         )}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => onDeletePrice?.(product.id, price.id)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete Price
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
-                </tr>
-              ))}
+                      </div>
+                    </td>
+                    <td className="py-2 capitalize">{price.interval}ly</td>
+                    <td className="py-2">
+                      <ActiveStatusBadge active={price.active} />
+                    </td>
+                    <td className="py-2">
+                      <PriceStatusBadge
+                        status={(price.status as 'active' | 'legacy' | 'deprecated' | 'archived') || 'active'}
+                      />
+                    </td>
+                    <td className="py-2">
+                      <StripeSyncBadge verifiedStatus={priceVerifiedStatus} isVerifying={isPriceVerifying} />
+                    </td>
+                    <td className="py-2 text-center">
+                      <DpButton
+                        variant="outline"
+                        size="small"
+                        onClick={() => onSyncPrice?.(product.id, price.id)}
+                        disabled={!canSyncPrice || isPriceSyncing}
+                        className="h-7 px-2 text-xs"
+                      >
+                        {isPriceSyncing ? (
+                          <>
+                            <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                            Syncing...
+                          </>
+                        ) : (
+                          <>
+                            <Cloud className="w-3 h-3 mr-1" />
+                            Sync
+                          </>
+                        )}
+                      </DpButton>
+                    </td>
+                    <td className="py-2 text-right">
+                      <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger className="p-1 rounded-md hover:bg-accent">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onEditPrice?.(product.id, price.id)}>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Price
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onTogglePriceActive?.(product.id, price.id, !price.active)}>
+                            <Power className="w-4 h-4 mr-2" />
+                            {price.active ? 'Deactivate' : 'Activate'}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => onSyncPrice?.(product.id, price.id)}
+                            disabled={!canSyncPrice || isPriceSyncing}
+                          >
+                            {isPriceSyncing ? (
+                              <>
+                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                Syncing...
+                              </>
+                            ) : (
+                              <>
+                                <Cloud className="w-4 h-4 mr-2" />
+                                Sync to Stripe
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          {price.stripeId && !price.stripeId.startsWith('local_price_') && (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                window.open(`https://dashboard.stripe.com/prices/${price.stripeId}`, '_blank')
+                              }
+                            >
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              View in Stripe
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => onDeletePrice?.(product.id, price.id)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete Price
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -264,6 +362,9 @@ export function ProductsTable({
   onUnlink,
   verifiedSyncStatus,
   verifyingProductIds,
+  verifiedPriceSyncStatus,
+  verifyingPriceIds,
+  syncingPriceIds,
 }: ProductsTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
 
@@ -436,6 +537,9 @@ export function ProductsTable({
                       onDeletePrice={onDeletePrice}
                       onTogglePriceActive={onTogglePriceActive}
                       onSyncPrice={onSyncPrice}
+                      verifiedPriceSyncStatus={verifiedPriceSyncStatus}
+                      verifyingPriceIds={verifyingPriceIds}
+                      syncingPriceIds={syncingPriceIds}
                     />
                   )}
                 </Fragment>

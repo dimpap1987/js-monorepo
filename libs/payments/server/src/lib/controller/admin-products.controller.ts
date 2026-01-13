@@ -1,6 +1,7 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { RolesGuard } from '@js-monorepo/auth/nest/session'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import {
   Body,
   Controller,
@@ -90,7 +91,11 @@ export class AdminProductsController {
 
   @Get('prices')
   async getPrices(@Query('productId') productId?: string) {
-    const parsedProductId = productId ? parseInt(productId, 10) : undefined
+    // Validate and parse productId if provided
+    const parsedProductId = productId ? (isNaN(Number(productId)) ? undefined : Number(productId)) : undefined
+    if (productId && parsedProductId === undefined) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'INVALID_PRODUCT_ID', 'Invalid productId parameter')
+    }
     return this.adminProductsService.findPricesByProduct(parsedProductId)
   }
 

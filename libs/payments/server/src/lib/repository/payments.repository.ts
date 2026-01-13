@@ -621,7 +621,7 @@ export class PaymentsRepository {
         skip,
         take: pageSize,
         orderBy: { hierarchy: 'asc' },
-        include: { prices: { orderBy: { interval: 'asc' } } },
+        include: { prices: { orderBy: [{ status: 'asc' }, { interval: 'asc' }] } },
       }),
       this.txHost.tx.product.count({ where }),
     ])
@@ -723,7 +723,7 @@ export class PaymentsRepository {
 
     return this.txHost.tx.price.findMany({
       where,
-      orderBy: [{ productId: 'asc' }, { interval: 'asc' }],
+      orderBy: [{ productId: 'asc' }, { status: 'asc' }, { interval: 'asc' }],
       include: { product: { select: { id: true, name: true } } },
     })
   }
@@ -743,12 +743,50 @@ export class PaymentsRepository {
         stripeId: localStripeId,
         productId: dto.productId,
         unitAmount: dto.unitAmount,
-        currency: dto.currency.toLowerCase(),
+        currency: dto.currency.toUpperCase(),
         interval: dto.interval,
         active: dto.active ?? true,
+        status: 'active',
       },
       include: { product: { select: { id: true, name: true } } },
     })
+  }
+
+  async createReplacementPrice(
+    oldPriceId: number,
+    dto: { unitAmount: number; currency: string; interval: string; active?: boolean }
+  ) {
+    const oldPrice = await this.txHost.tx.price.findUniqueOrThrow({
+      where: { id: oldPriceId },
+      select: { productId: true },
+    })
+
+    const localStripeId = `local_price_${Date.now()}`
+
+    // Create new price record
+    const newPrice = await this.txHost.tx.price.create({
+      data: {
+        stripeId: localStripeId,
+        productId: oldPrice.productId,
+        unitAmount: dto.unitAmount,
+        currency: dto.currency.toUpperCase(),
+        interval: dto.interval,
+        active: dto.active ?? true,
+        status: 'active',
+      },
+      include: { product: { select: { id: true, name: true } } },
+    })
+
+    // Mark old price as legacy and link to new price
+    await this.txHost.tx.price.update({
+      where: { id: oldPriceId },
+      data: {
+        status: 'legacy',
+        replacedByPriceId: newPrice.id,
+      },
+    })
+
+    return newPrice
   }
 
   async updatePriceAdmin(id: number, dto: UpdatePriceDto) {
@@ -756,9 +794,10 @@ export class PaymentsRepository {
       where: { id },
       data: {
         ...(dto.unitAmount !== undefined && { unitAmount: dto.unitAmount }),
-        ...(dto.currency !== undefined && { currency: dto.currency.toLowerCase() }),
+        ...(dto.currency !== undefined && { currency: dto.currency.toUpperCase() }),
         ...(dto.interval !== undefined && { interval: dto.interval }),
         ...(dto.active !== undefined && { active: dto.active }),
+        ...(dto.status !== undefined && { status: dto.status }),
       },
       include: { product: { select: { id: true, name: true } } },
     })
@@ -781,6 +820,27 @@ export class PaymentsRepository {
       where: { priceId },
     })
     return subscriptionCount === 0
+  }
+
+  async getPriceSubscriptionCount(priceId: number): Promise<number> {
+    return this.txHost.tx.subscription.count({
+      where: {
+        priceId,
+        status: {
+          in: ACTIVE_SUBSCRIPTION_STATUSES,
+        },
+      },
+    })
+  }
+
+  async updatePriceStatus(priceId: number, status: string, replacedByPriceId?: number) {
+    return this.txHost.tx.price.update({
+      where: { id: priceId },
+      data: {
+        status,
+        ...(replacedByPriceId !== undefined && { replacedByPriceId }),
+      },
+    })
   }
 
   // ============= Reconciliation Methods =============
@@ -845,7 +905,10 @@ export class PaymentsRepository {
     active: boolean
   }) {
     return this.txHost.tx.price.create({
-      data,
+      data: {
+        ...data,
+        status: 'active',
+      },
       include: { product: { select: { id: true, name: true, stripeId: true } } },
     })
   }

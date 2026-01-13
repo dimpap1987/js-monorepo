@@ -88,6 +88,8 @@ export interface InvoiceListResponse {
 
 // ============= Admin Types =============
 
+export type PriceStatus = 'active' | 'legacy' | 'deprecated' | 'archived'
+
 export interface AdminPrice {
   id: number
   stripeId: string
@@ -95,6 +97,8 @@ export interface AdminPrice {
   currency: string
   interval: 'month' | 'year'
   active: boolean
+  status: PriceStatus
+  replacedByPriceId: number | null
   productId: number
   createdAt: string
   updatedAt: string
@@ -151,6 +155,7 @@ export interface UpdatePriceRequest {
   currency?: string
   interval?: 'month' | 'year'
   active?: boolean
+  syncToStripe?: boolean
 }
 
 export interface AdminProductFilters {

@@ -6,6 +6,7 @@ import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
 import { Switch } from '@js-monorepo/components/ui/switch'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { AdminPrice, AdminProduct, CreatePriceRequest, UpdatePriceRequest } from '../../types'
@@ -33,6 +34,12 @@ interface PriceFormProps {
 export function PriceForm({ price, products, defaultProductId, onSubmit, onCancel, isLoading }: PriceFormProps) {
   const isEditMode = !!price
 
+  // Find the selected product to check if it's synced to Stripe
+  const selectedProductId = price?.productId || defaultProductId
+  const selectedProduct = selectedProductId ? products.find((p) => p.id === selectedProductId) : null
+  const isProductSynced = selectedProduct ? !selectedProduct.stripeId.startsWith('local_') : false
+  const isPriceLocal = price ? price.stripeId.startsWith('local_price_') : true
+
   const form = useForm<PriceFormValues>({
     resolver: zodResolver(priceSchema),
     defaultValues: {
@@ -41,9 +48,22 @@ export function PriceForm({ price, products, defaultProductId, onSubmit, onCance
       currency: price?.currency?.toUpperCase() || 'EUR',
       interval: (price?.interval as 'month' | 'year') || 'month',
       active: price?.active ?? true,
-      syncToStripe: false,
+      // Auto-enable sync if product is synced and price is local (or new)
+      // For synced prices, default to false (replacing is a significant action)
+      syncToStripe: isProductSynced && (isPriceLocal || !isEditMode) && !(isEditMode && !isPriceLocal),
     },
   })
+
+  // Watch productId to update syncToStripe when product changes
+  const watchedProductId = form.watch('productId')
+  useEffect(() => {
+    if (!isEditMode && watchedProductId) {
+      const selectedProductInner = products.find((p) => p.id === watchedProductId)
+      const productIsSynced = selectedProductInner ? !selectedProductInner.stripeId.startsWith('local_') : false
+      // Auto-enable sync if product is synced
+      form.setValue('syncToStripe', productIsSynced)
+    }
+  }, [watchedProductId, products, isEditMode, form])
 
   const handleSubmit = async (data: PriceFormValues) => {
     const unitAmount = Math.round(data.amount * 100) // Convert to cents
@@ -54,6 +74,7 @@ export function PriceForm({ price, products, defaultProductId, onSubmit, onCance
         currency: data.currency.toLowerCase(),
         interval: data.interval,
         active: data.active,
+        syncToStripe: data.syncToStripe,
       } as UpdatePriceRequest)
     } else {
       await onSubmit({
@@ -178,24 +199,62 @@ export function PriceForm({ price, products, defaultProductId, onSubmit, onCance
           )}
         />
 
-        {!isEditMode && (
-          <FormField
-            control={form.control}
-            name="syncToStripe"
-            render={({ field }) => (
-              <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">Sync to Stripe</FormLabel>
-                  <p className="text-sm text-muted-foreground">
-                    Create this price in Stripe immediately (requires product to be synced)
-                  </p>
-                </div>
-                <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="syncToStripe"
+          render={({ field }) => (
+            <FormItem className="flex items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">
+                  {isEditMode && !isPriceLocal ? 'Replace Price in Stripe' : 'Sync to Stripe'}
+                </FormLabel>
+                <p className="text-sm text-muted-foreground">
+                  {isEditMode && !isPriceLocal
+                    ? 'Create a new price in Stripe with these changes and deactivate the old one (Stripe prices are immutable)'
+                    : isEditMode && isPriceLocal
+                      ? 'Sync this local price to Stripe (requires product to be synced)'
+                      : isProductSynced
+                        ? 'Automatically sync this price to Stripe when created'
+                        : 'Create this price in Stripe immediately (requires product to be synced first)'}
+                </p>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} disabled={!isProductSynced} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        {isEditMode && !isPriceLocal && (
+          <div className="rounded-lg border p-4 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">⚠️ Stripe Price Immutability</p>
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                This price is synced to Stripe. Stripe prices are <strong>immutable</strong> - you cannot change the
+                amount, currency, or interval of an existing Stripe price.
+              </p>
+              <ul className="text-sm text-amber-700 dark:text-amber-300 list-disc list-inside space-y-1">
+                <li>
+                  <strong>Active status</strong> can be updated directly in Stripe (no new price needed)
+                </li>
+                <li>
+                  <strong>Amount, currency, or interval</strong> changes require creating a new price
+                </li>
+              </ul>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mt-2">
+                If you enable "Replace Price in Stripe" below, a <strong>new price will be created</strong> in Stripe
+                with your changes, and the old price will be <strong>deactivated</strong>. This ensures checkout uses
+                the updated price.
+              </p>
+            </div>
+          </div>
+        )}
+        {!isProductSynced && !isEditMode && (
+          <div className="rounded-lg border p-4 bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              ⚠️ The selected product must be synced to Stripe before you can sync prices. Sync the product first, then
+              create prices.
+            </p>
+          </div>
         )}
 
         <div className="flex justify-end gap-3 pt-4">

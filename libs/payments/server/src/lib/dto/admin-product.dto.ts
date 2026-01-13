@@ -1,5 +1,5 @@
 import { ProductMetadata } from '@js-monorepo/types/pricing'
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import {
   IsBoolean,
   IsIn,
@@ -9,6 +9,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
   Min,
   MinLength,
@@ -86,12 +87,15 @@ export class CreatePriceDto {
   @IsNotEmpty()
   @IsInt()
   @Min(0)
+  @Max(99999999) // Max $999,999.99 (in cents)
   unitAmount: number
 
   @IsNotEmpty()
   @IsString()
   @MinLength(3)
   @MaxLength(3)
+  @Transform(({ value }) => (typeof value === 'string' ? value.toUpperCase() : value))
+  @IsIn(['USD', 'EUR'])
   currency: string
 
   @IsNotEmpty()
@@ -111,12 +115,15 @@ export class UpdatePriceDto {
   @IsOptional()
   @IsInt()
   @Min(0)
+  @Max(99999999)
   unitAmount?: number
 
   @IsOptional()
   @IsString()
   @MinLength(3)
   @MaxLength(3)
+  @Transform(({ value }) => (typeof value === 'string' ? value.toUpperCase() : value))
+  @IsIn(['USD', 'EUR'])
   currency?: string
 
   @IsOptional()
@@ -126,6 +133,15 @@ export class UpdatePriceDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['active', 'legacy', 'deprecated', 'archived'])
+  status?: string
+
+  @IsOptional()
+  @IsBoolean()
+  syncToStripe?: boolean
 }
 
 // ============= Query/Filter DTOs =============
@@ -138,6 +154,7 @@ export class ProductFiltersDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(200)
   search?: string
 }
 
@@ -164,6 +181,8 @@ export interface AdminPriceResponse {
   currency: string
   interval: string
   active: boolean
+  status: string
+  replacedByPriceId: number | null
   productId: number
   createdAt: Date
   updatedAt: Date

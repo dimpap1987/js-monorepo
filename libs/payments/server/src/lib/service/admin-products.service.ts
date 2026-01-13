@@ -220,14 +220,114 @@ export class AdminProductsService {
     this.logger.log(`Updating price: ${id}`)
 
     const existingPrice = await this.findPriceById(id)
+    const isPriceSynced = !existingPrice.stripeId.startsWith('local_price_')
 
-    // Note: Stripe prices are immutable - we can only update our local record
-    // For synced prices, warn the user that Stripe price won't change
-    if (!existingPrice.stripeId.startsWith('local_price_')) {
-      this.logger.warn(`Price ${id} is synced to Stripe. Stripe prices are immutable - only local record updated.`)
+    // Check if only active status is being updated (no immutable fields changed)
+    const onlyActiveChanged =
+      dto.active !== undefined &&
+      dto.unitAmount === undefined &&
+      dto.currency === undefined &&
+      dto.interval === undefined
+
+    // Check if immutable fields are being changed
+    const immutableFieldsChanged =
+      dto.unitAmount !== undefined || dto.currency !== undefined || dto.interval !== undefined
+
+    // If price is synced and immutable fields are changing with sync requested, create replacement
+    if (dto.syncToStripe && isPriceSynced && immutableFieldsChanged) {
+      const product = await this.findProductById(existingPrice.productId)
+      if (!product.stripeId.startsWith('local_')) {
+        // Declare newPrice outside try-catch so it's accessible in catch block
+        let newPrice: Awaited<ReturnType<typeof this.paymentsRepository.createReplacementPrice>> | null = null
+        try {
+          // Check for active subscriptions on the old price
+          const subscriptionCount = await this.paymentsRepository.getPriceSubscriptionCount(id)
+          const hasActiveSubscriptions = subscriptionCount > 0
+
+          // Determine new price values (use dto values or existing values)
+          // Ensure currency is uppercase for consistency
+          const newPriceData = {
+            unitAmount: dto.unitAmount ?? existingPrice.unitAmount,
+            currency: (dto.currency ?? existingPrice.currency).toUpperCase(),
+            interval: dto.interval ?? existingPrice.interval,
+            active: dto.active ?? existingPrice.active,
+          }
+
+          // Create a new price record with updated values (keep old price in DB)
+          newPrice = await this.paymentsRepository.createReplacementPrice(id, newPriceData)
+
+          // Check if old price exists in Stripe before trying to deactivate it
+          const stripe = this.stripeService.getStripeClient()
+          try {
+            await stripe.prices.retrieve(existingPrice.stripeId)
+            // Price exists in Stripe
+            if (hasActiveSubscriptions) {
+              // Keep old price active in Stripe if it has subscriptions
+              this.logger.log(
+                `Old price ${existingPrice.stripeId} has ${subscriptionCount} active subscriptions. Keeping it active in Stripe.`
+              )
+            } else {
+              // No subscriptions, safe to deactivate
+              await this.archiveStripePrice(existingPrice.stripeId)
+            }
+          } catch (error) {
+            // Price doesn't exist (orphaned), just log it
+            this.logger.warn(`Old price ${existingPrice.stripeId} doesn't exist in Stripe, skipping deactivation`)
+          }
+
+          // Create new price in Stripe with updated values
+          const newStripePrice = await this.syncPriceToStripeInternal(newPrice, product.stripeId)
+          this.logger.log(
+            `Price ${id} replaced with new price ${newPrice.id}. Old price marked as legacy with ${subscriptionCount} active subscriptions.`
+          )
+          return newStripePrice
+        } catch (error) {
+          this.logger.error(`Failed to sync updated price to Stripe: ${error.message}`, error.stack)
+          // If sync fails, we still created the replacement price locally
+          // Return the new price that was created (even though Stripe sync failed)
+          if (newPrice) {
+            return newPrice
+          }
+          // If we didn't even create the replacement price, throw the error
+          throw error
+        }
+      } else {
+        this.logger.warn(`Cannot sync price ${id} - product must be synced to Stripe first`)
+      }
+      // Return early - don't update the old price record
+      return existingPrice
     }
 
-    return this.paymentsRepository.updatePriceAdmin(id, dto)
+    // For all other cases, update the existing price record
+    const updatedPrice = await this.paymentsRepository.updatePriceAdmin(id, dto)
+
+    // If only active status changed and price is synced, update Stripe directly
+    if (onlyActiveChanged && isPriceSynced && dto.active !== undefined) {
+      try {
+        await this.updateStripePrice(existingPrice.stripeId, dto.active)
+        return updatedPrice
+      } catch (error) {
+        this.logger.warn(`Failed to update price active status in Stripe: ${error.message}`)
+        return updatedPrice
+      }
+    }
+
+    // If price is local and sync requested, sync it to Stripe
+    if (dto.syncToStripe && !isPriceSynced) {
+      const product = await this.findProductById(existingPrice.productId)
+      if (!product.stripeId.startsWith('local_')) {
+        try {
+          return await this.syncPriceToStripeInternal(updatedPrice, product.stripeId)
+        } catch (error) {
+          this.logger.warn(`Failed to sync price to Stripe after update: ${error.message}`)
+          return updatedPrice
+        }
+      } else {
+        this.logger.warn(`Cannot sync price ${id} - product must be synced to Stripe first`)
+      }
+    }
+
+    return updatedPrice
   }
 
   @Transactional()
@@ -285,8 +385,38 @@ export class AdminProductsService {
 
     const price = await this.findPriceById(id)
 
+    // Check if price is already synced and exists in Stripe
     if (!price.stripeId.startsWith('local_price_')) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'PRICE_ALREADY_SYNCED', 'Price is already synced to Stripe')
+      // Price has a stripeId - check if it actually exists in Stripe
+      try {
+        const stripe = this.stripeService.getStripeClient()
+        await stripe.prices.retrieve(price.stripeId)
+        // Price exists in Stripe, so it's already synced
+        throw new ApiException(HttpStatus.BAD_REQUEST, 'PRICE_ALREADY_SYNCED', 'Price is already synced to Stripe')
+      } catch (error) {
+        // If error is our ApiException, re-throw it
+        if (error instanceof ApiException) {
+          throw error
+        }
+        // Check if it's a Stripe error indicating the price doesn't exist
+        // Stripe errors have a 'type' property (e.g., 'StripeInvalidRequestError')
+        // and statusCode 404 means not found
+        const stripeError = error as any
+        if (stripeError?.statusCode === 404 || stripeError?.code === 'resource_missing') {
+          // Price is orphaned - we'll create a new one in Stripe
+          this.logger.warn(
+            `Price ${id} has stripeId ${price.stripeId} but doesn't exist in Stripe. Creating new price.`
+          )
+        } else {
+          // Some other error occurred, log and re-throw
+          this.logger.error(`Error checking if price exists in Stripe: ${error.message}`, error.stack)
+          throw new ApiException(
+            HttpStatus.SERVICE_UNAVAILABLE,
+            'STRIPE_CHECK_FAILED',
+            'Failed to verify price in Stripe. Please try again later.'
+          )
+        }
+      }
     }
 
     // Get the product to ensure it's synced
@@ -338,7 +468,7 @@ export class AdminProductsService {
       const stripePrice = await stripe.prices.create({
         product: stripeProductId,
         unit_amount: price.unitAmount,
-        currency: price.currency,
+        currency: price.currency.toLowerCase(), // Stripe expects lowercase currency codes
         recurring: {
           interval: price.interval as 'month' | 'year',
         },

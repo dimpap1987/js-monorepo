@@ -48,7 +48,7 @@ export function PricingCard({
   trialEligibility,
   isOnTrial,
 }: PricingCardProps) {
-  const isFree = price === 0
+  const isFree = price == 0
   const canTrial = isLoggedIn && !isFree && trialEligibility?.eligible && !subscribed
 
   const isCurrentTrial = subscribed && isOnTrial

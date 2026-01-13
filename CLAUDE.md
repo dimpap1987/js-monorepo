@@ -80,7 +80,7 @@ All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.js
 - `@js-monorepo/payments-server` - API for subscriptions - stripe - payments and plans
 - `@js-monorepo/auth/nest/*` - Nestjs utils
 - `@js-monorepo/schemas` - Zod schemas and types
-- `@js-monorepo/localization` - localization utils 
+- `@js-monorepo/localization` - localization utils
 - `@js-monorepo/seo` - SEO
 
 ## Authentication
@@ -164,5 +164,6 @@ Each application now manages its own environment variables using a local `.env` 
 **CRITICAL: Only senior-level code and best practices are acceptable.**
 
 # TODO and keep in mind
+
 Price and Locale Rule:
 Each product in Stripe will have a separate price for EUR (existing) and USD (new). In the app, the price displayed to the user will match their locale: users with el locale will see the EUR price, while users with en locale will see the USD price. Always ensure the displayed price corresponds to the Stripe price in that currency for consistency during checkout.åç

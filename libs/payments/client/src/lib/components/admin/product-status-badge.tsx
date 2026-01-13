@@ -159,3 +159,45 @@ export function HierarchyBadge({ hierarchy, className }: HierarchyBadgeProps) {
     </Badge>
   )
 }
+
+// ============= Price Status Badge =============
+
+interface PriceStatusBadgeProps {
+  status: 'active' | 'legacy' | 'deprecated' | 'archived'
+  className?: string
+}
+
+const priceStatusConfig: Record<string, { label: string; icon: React.ElementType; className: string }> = {
+  active: {
+    label: 'Active',
+    icon: CheckCircle,
+    className: 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20',
+  },
+  legacy: {
+    label: 'Legacy',
+    icon: Cloud,
+    className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  },
+  deprecated: {
+    label: 'Deprecated',
+    icon: AlertTriangle,
+    className: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20',
+  },
+  archived: {
+    label: 'Archived',
+    icon: XCircle,
+    className: 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20',
+  },
+}
+
+export function PriceStatusBadge({ status, className }: PriceStatusBadgeProps) {
+  const config = priceStatusConfig[status] || priceStatusConfig.active
+  const Icon = config.icon
+
+  return (
+    <Badge variant="outline" className={cn('gap-1', config.className, className)}>
+      <Icon className="h-3 w-3" />
+      {config.label}
+    </Badge>
+  )
+}
