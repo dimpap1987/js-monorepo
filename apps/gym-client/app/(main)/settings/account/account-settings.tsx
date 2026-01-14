@@ -206,7 +206,7 @@ export function AccountSettings() {
                             </div>
                           ) : (
                             <div className="h-11 sm:h-12 px-4 py-2.5 bg-background-secondary/50 text-foreground rounded-lg border border-border/50 font-medium flex items-center shadow-sm transition-colors hover:bg-background-secondary">
-                              <span className="text-foreground-muted">@</span>
+                              <span className="text-foreground-muted pr-1">@</span>
                               {field.value || 'Anonymous'}
                             </div>
                           )}
