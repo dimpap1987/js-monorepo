@@ -9,7 +9,7 @@ import {
   Logger,
 } from '@nestjs/common'
 import { BaseExceptionFilter } from '@nestjs/core'
-import { Prisma } from '@js-monorepo/core-db'
+import { Prisma } from '@js-monorepo/gym-db'
 import { ZodError } from 'zod'
 
 const INTERNAL_ERROR = 'Internal server error'
@@ -64,7 +64,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         GlobalExceptionFilter.name
       )
     } else {
-      Logger.error(`Unkown error happened - path: '${request.originalUrl}'`, exception, GlobalExceptionFilter.name)
+      message = INTERNAL_ERROR
+      Logger.error(`Unknown error happened - path: '${request.originalUrl}'`, exception, GlobalExceptionFilter.name)
     }
 
     return response.status(status).json({
@@ -72,7 +73,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       path: request.originalUrl,
       errors: [
         {
-          INTERNAL_ERROR,
+          message: message || INTERNAL_ERROR,
         },
       ],
     })
