@@ -2,13 +2,14 @@
 
 import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
+import { DpLogoutButton } from '@js-monorepo/button'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { Navbar } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types/menu'
-import { PropsWithChildren, useMemo } from 'react'
+import { PropsWithChildren, ReactNode, useMemo } from 'react'
 import { IoIosSettings } from 'react-icons/io'
 import { useWebSocketConfig } from '../hooks/useWebsocketConfig'
 import { AppConfig } from '../lib/app-config'
@@ -23,10 +24,13 @@ function SidebarWrapper({
   user,
   items,
   plan,
-}: PropsWithChildren<{ user?: any; items?: MenuItem[]; plan?: string }>) {
+  sidebarChildren,
+}: PropsWithChildren<{ user?: any; items?: MenuItem[]; plan?: string; sidebarChildren?: ReactNode }>) {
   return (
     <SidebarProvider defaultOpen={false}>
-      <DpNextSidebar items={items ?? []} user={user} plan={plan}></DpNextSidebar>
+      <DpNextSidebar items={items ?? []} user={user} plan={plan}>
+        {sidebarChildren}
+      </DpNextSidebar>
       <SidebarInset asChild>{children}</SidebarInset>
     </SidebarProvider>
   )
@@ -61,8 +65,13 @@ export default function RootComponent({ children }: PropsWithChildren) {
     )
   }, [t])
 
+  // 3. Memoize the Logout Button for Sidebar
+  const logoutButton = useMemo(() => {
+    return <DpLogoutButton onClick={() => authClient.logout()} className="px-4" />
+  }, [])
+
   return (
-    <SidebarWrapper user={user} items={translatedMenuItems} plan={plan}>
+    <SidebarWrapper user={user} items={translatedMenuItems} plan={plan} sidebarChildren={logoutButton}>
       <section className="flex min-h-screen flex-col">
         {/* Navbar */}
         <Navbar
