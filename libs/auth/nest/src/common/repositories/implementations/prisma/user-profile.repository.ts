@@ -84,6 +84,44 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
       where: { name: providerName },
     })
 
+    // Check if profile already exists
+    const existingProfile = await this.txHost.tx.userProfile.findUnique({
+      where: {
+        userId_providerId: {
+          userId,
+          providerId: provider.id,
+        },
+      },
+    })
+
+    // Always update: tokens (these change on each OAuth login and are needed for API calls)
+    // Conditionally update: profileImage, firstName/lastName (only if not set by user - preserve user edits)
+    const updateData: Partial<UserProfileCreateDto> = {
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      tokenExpiry: data.tokenExpiry,
+      scopes: data.scopes ?? [],
+    }
+
+    // Preserve user-edited profileImage, firstName, lastName: only update from OAuth if they're not set yet
+    if (existingProfile) {
+      // Profile exists: preserve existing values if they exist
+      if (!existingProfile.profileImage && data.profileImage) {
+        updateData.profileImage = data.profileImage
+      }
+      if (!existingProfile.firstName && data.firstName) {
+        updateData.firstName = data.firstName
+      }
+      if (!existingProfile.lastName && data.lastName) {
+        updateData.lastName = data.lastName
+      }
+    } else {
+      // Profile doesn't exist: set all values from OAuth
+      updateData.profileImage = data.profileImage
+      updateData.firstName = data.firstName
+      updateData.lastName = data.lastName
+    }
+
     return this.txHost.tx.userProfile.upsert({
       where: {
         userId_providerId: {
@@ -91,15 +129,7 @@ export class UserProfileRepositoryPrismaImpl implements UserProfileRepository {
           providerId: provider.id,
         },
       },
-      update: {
-        profileImage: data.profileImage,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        tokenExpiry: data.tokenExpiry,
-        scopes: data.scopes ?? [],
-      },
+      update: updateData,
       create: {
         userId,
         providerId: provider.id,

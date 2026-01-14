@@ -16,10 +16,15 @@ export class UserController {
     private readonly authSessionCacheService: AuthSessionUserCacheService
   ) {}
 
+  @Get('profile')
+  async getUserProfile(@SessionUser() sessionUser: SessionUserType) {
+    return this.userService.getUserProfile(sessionUser.id, sessionUser.profile.id ?? 0)
+  }
+
   @Patch()
   async editUser(@Body(new ZodPipe(EditUserSchema)) payload: EditUserDto, @SessionUser() sessionUser: SessionUserType) {
     this.logger.log(`User profile update with user id: ${sessionUser.id}`)
-    return this.userService.handleUserUpdate(payload, sessionUser.id, sessionUser.profile.id)
+    return this.userService.handleUserUpdate(payload, sessionUser.id, sessionUser.profile.id ?? 0)
   }
 
   @Get('impersonation-status')

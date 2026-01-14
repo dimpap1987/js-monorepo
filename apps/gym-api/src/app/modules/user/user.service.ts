@@ -25,4 +25,8 @@ export class UserService {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_UPDATE_USER')
     }
   }
+
+  async getUserProfile(userId: number, profileId: number) {
+    return this.userRepo.getUserProfile(userId, profileId)
+  }
 }

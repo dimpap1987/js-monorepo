@@ -94,6 +94,8 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
           id: true,
           providerId: true,
           profileImage: true,
+          firstName: true,
+          lastName: true,
           provider: {
             select: {
               name: true,

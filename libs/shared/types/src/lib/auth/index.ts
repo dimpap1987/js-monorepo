@@ -70,6 +70,8 @@ export interface AuthUserDto {
       name: string
     }
     profileImage?: string | null
+    firstName?: string | null
+    lastName?: string | null
   }[]
   userRole: {
     role: {
@@ -105,4 +107,6 @@ export interface SessionObject {
 export interface EditUserDto {
   username?: string
   profileImage?: string
+  firstName?: string | null
+  lastName?: string | null
 }

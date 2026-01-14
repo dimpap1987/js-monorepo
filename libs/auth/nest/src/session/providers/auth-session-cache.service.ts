@@ -60,6 +60,8 @@ export class AuthSessionUserCacheService {
 
         if (!userDb) return
 
+        const primaryProfile = userDb.userProfiles?.[0]
+
         userCache = {
           id: userDb.id,
           username: userDb?.username,
@@ -68,9 +70,9 @@ export class AuthSessionUserCacheService {
           createdAt: userDb?.createdAt,
           status: userDb?.status ?? UserStatus.ACTIVE,
           profile: {
-            id: userDb.userProfiles?.[0]?.id,
-            image: userDb.userProfiles?.[0]?.profileImage,
-            provider: userDb.userProfiles?.[0]?.provider?.name,
+            id: primaryProfile?.id,
+            image: primaryProfile?.profileImage,
+            provider: primaryProfile?.provider?.name,
           },
         } satisfies SessionUserType
       }

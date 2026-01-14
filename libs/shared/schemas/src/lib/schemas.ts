@@ -61,15 +61,18 @@ export const CreateUnregisteredUserSchema = z.object({
   profileImage: z.string().url({ message: 'Profile image must be a valid URL.' }).nullable().optional(),
 })
 
-export const EditUserSchema = z
-  .object({
-    username: UsernameSchema.optional(),
-    profileImage: z.string().optional(),
-  })
-  .refine((data) => data.username !== undefined || data.profileImage !== undefined, {
-    message: 'At least one of "username" or "profileImage" must be provided.',
-    path: [], // Applies to the entire object
-  })
+export const EditUserSchema = z.object({
+  username: UsernameSchema.optional(),
+  profileImage: z.string().optional(),
+  firstName: z
+    .string()
+    .min(1, { message: 'First name is required' })
+    .max(100, { message: 'First name must be less than 100 characters' }),
+  lastName: z
+    .string()
+    .min(1, { message: 'Last name is required' })
+    .max(100, { message: 'Last name must be less than 100 characters' }),
+})
 
 // Contact Message Schemas
 export const ContactMessageSchema = z.object({
