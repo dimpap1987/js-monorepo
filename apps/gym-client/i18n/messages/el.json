@@ -42,7 +42,7 @@
     "subscription": {
       "title": "Συνδρομή",
       "description": "Διαχείριση συνδρομής",
-      "currentPlan": "Τρέχον Σχέδιο",
+      "currentPlan": "Τρέχον Plan",
       "invoiceHistory": "Ιστορικό Τιμολογίων"
     }
   }

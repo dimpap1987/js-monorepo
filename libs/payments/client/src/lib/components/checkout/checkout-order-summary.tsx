@@ -2,8 +2,10 @@
 
 import { Card, CardContent, CardHeader } from '@js-monorepo/components/ui/card'
 import { Separator } from '@js-monorepo/components/ui/separator'
+import { formatPrice } from '@js-monorepo/currency'
 import { ProductMetadata } from '@js-monorepo/types/pricing'
 import { cn } from '@js-monorepo/ui/util'
+import { useLocale } from 'next-intl'
 import { Check } from 'lucide-react'
 import { PlanBadge } from '../plan-badge'
 
@@ -11,7 +13,9 @@ interface CheckoutOrderSummaryProps {
   plan: {
     name: string
     description: string
-    price: number
+    price: number // In cents
+    priceInCents?: number
+    currency?: string
     interval: string
     metadata?: ProductMetadata
   }
@@ -19,6 +23,11 @@ interface CheckoutOrderSummaryProps {
 }
 
 export function CheckoutOrderSummary({ plan, className }: CheckoutOrderSummaryProps) {
+  const locale = useLocale() as 'en' | 'el'
+  const priceInCents = plan.priceInCents ?? plan.price
+  const currency = plan.currency || (locale === 'el' ? 'EUR' : 'USD')
+  const formattedPrice = formatPrice(priceInCents, locale, currency)
+
   return (
     <Card className={cn('', className)}>
       <CardHeader className="pb-4">
@@ -58,11 +67,11 @@ export function CheckoutOrderSummary({ plan, className }: CheckoutOrderSummaryPr
           <div className="flex items-center justify-between text-lg font-semibold">
             <span className="text-foreground">Total</span>
             <span className="text-foreground">
-              €{plan.price}/{plan.interval}
+              {formattedPrice}/{plan.interval}
             </span>
           </div>
           <p className="text-xs text-foreground-muted">
-            You&apos;ll be charged €{plan.price} today, then €{plan.price} every {plan.interval}
+            You&apos;ll be charged {formattedPrice} today, then {formattedPrice} every {plan.interval}
             {plan.interval === 'month' ? ' thereafter' : ''}.
           </p>
         </div>

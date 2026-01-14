@@ -6,6 +6,7 @@ import { useWebSocketEvent } from '@js-monorepo/next/providers'
 import {
   apiGetSubscription,
   InvoiceHistory,
+  PlanInfo,
   SessionSubscription,
   Subscription,
   SubscriptionManagement,
@@ -33,8 +34,24 @@ export function SubscriptionSettings() {
   useWebSocketEvent('events:refresh-session', () => {
     if (subscriptionIdRef.current) {
       apiGetSubscription(subscriptionIdRef.current).then((response) => {
-        if (response.ok) {
-          setSubscription(response.data as Subscription)
+        if (response.ok && response.data) {
+          // Extract subscription from structured response
+          const subData = response.data.subscription
+          setSubscription({
+            id: subData.id,
+            paymentCustomerId: subData.paymentCustomerId,
+            stripeSubscriptionId: subData.stripeSubscriptionId || undefined,
+            priceId: response.data.priceId,
+            status: subData.status as Subscription['status'],
+            currentPeriodStart: subData.currentPeriodStart || undefined,
+            currentPeriodEnd: subData.currentPeriodEnd || undefined,
+            trialStart: subData.trialStart || undefined,
+            trialEnd: subData.trialEnd || undefined,
+            cancelAt: subData.cancelAt || undefined,
+            canceledAt: subData.canceledAt || undefined,
+            createdAt: subData.createdAt,
+            updatedAt: subData.updatedAt,
+          })
         }
       })
     }
@@ -50,8 +67,24 @@ export function SubscriptionSettings() {
 
       try {
         const response = await apiGetSubscription(sessionSubscription.subscriptionId)
-        if (response.ok) {
-          setSubscription(response.data as Subscription)
+        if (response.ok && response.data) {
+          // Extract subscription from structured response
+          const subData = response.data.subscription
+          setSubscription({
+            id: subData.id,
+            paymentCustomerId: subData.paymentCustomerId,
+            stripeSubscriptionId: subData.stripeSubscriptionId || undefined,
+            priceId: response.data.priceId,
+            status: subData.status as Subscription['status'],
+            currentPeriodStart: subData.currentPeriodStart || undefined,
+            currentPeriodEnd: subData.currentPeriodEnd || undefined,
+            trialStart: subData.trialStart || undefined,
+            trialEnd: subData.trialEnd || undefined,
+            cancelAt: subData.cancelAt || undefined,
+            canceledAt: subData.canceledAt || undefined,
+            createdAt: subData.createdAt,
+            updatedAt: subData.updatedAt,
+          })
         }
       } catch (error) {
         console.error('Error fetching subscription:', error)
@@ -64,7 +97,7 @@ export function SubscriptionSettings() {
   }, [sessionSubscription?.subscriptionId])
 
   // Get plan details from the plans list
-  const planDetails = useMemo(() => {
+  const planDetails = useMemo<PlanInfo | null>(() => {
     if (!subscription || !plans.length) return null
 
     for (const plan of plans) {
@@ -72,9 +105,11 @@ export function SubscriptionSettings() {
       if (price) {
         return {
           name: plan.name,
-          price: price.unitAmount,
+          price: price.unitAmount / 100, // Convert cents to amount
+          priceInCents: price.unitAmount,
+          currency: price.currency,
           interval: price.interval,
-          features: plan.metadata?.features,
+          features: (plan.metadata?.features as Record<string, string>) || {},
           priceId: price.id,
         }
       }
@@ -86,8 +121,24 @@ export function SubscriptionSettings() {
     refreshSession()
     if (sessionSubscription?.subscriptionId) {
       apiGetSubscription(sessionSubscription.subscriptionId).then((response) => {
-        if (response.ok) {
-          setSubscription(response.data as Subscription)
+        if (response.ok && response.data) {
+          // Extract subscription from structured response
+          const subData = response.data.subscription
+          setSubscription({
+            id: subData.id,
+            paymentCustomerId: subData.paymentCustomerId,
+            stripeSubscriptionId: subData.stripeSubscriptionId || undefined,
+            priceId: response.data.priceId,
+            status: subData.status as Subscription['status'],
+            currentPeriodStart: subData.currentPeriodStart || undefined,
+            currentPeriodEnd: subData.currentPeriodEnd || undefined,
+            trialStart: subData.trialStart || undefined,
+            trialEnd: subData.trialEnd || undefined,
+            cancelAt: subData.cancelAt || undefined,
+            canceledAt: subData.canceledAt || undefined,
+            createdAt: subData.createdAt,
+            updatedAt: subData.updatedAt,
+          })
         }
       })
     }
@@ -126,12 +177,34 @@ export function SubscriptionSettings() {
           </div>
         ) : (
           <SubscriptionManagement
-            subscription={subscription}
-            planName={planDetails?.name || 'Unknown'}
-            planPrice={planDetails?.price || 0}
-            planInterval={planDetails?.interval || 'month'}
-            planFeatures={planDetails?.features || {}}
-            priceId={planDetails?.priceId || 0}
+            activeSubscription={
+              subscription && planDetails
+                ? {
+                    subscription,
+                    plan: {
+                      name: planDetails.name,
+                      price: planDetails.price,
+                      priceInCents: planDetails.priceInCents,
+                      currency: planDetails.currency,
+                      interval: planDetails.interval,
+                      features: planDetails.features || {},
+                      priceId: planDetails.priceId,
+                    },
+                  }
+                : null
+            }
+            paidSubscription={
+              sessionSubscription?.hasPaidSubscription &&
+              sessionSubscription?.paidSubscriptionId &&
+              sessionSubscription?.paidSubscriptionPriceId &&
+              sessionSubscription?.paidSubscriptionPlan
+                ? {
+                    subscriptionId: sessionSubscription.paidSubscriptionId,
+                    priceId: sessionSubscription.paidSubscriptionPriceId,
+                    planName: sessionSubscription.paidSubscriptionPlan,
+                  }
+                : null
+            }
             onCancelSuccess={handleCancelSuccess}
             onRenewSuccess={handleRenewSuccess}
           />

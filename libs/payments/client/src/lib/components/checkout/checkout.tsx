@@ -39,7 +39,9 @@ export function Checkout() {
             id: price.id,
             name: plan.name,
             description: plan.description,
-            price: price.unitAmount,
+            price: price.unitAmount, // Keep in cents for sorting
+            priceInCents: price.unitAmount,
+            currency: price.currency,
             interval: price.interval,
             metadata: plan.metadata,
             isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,

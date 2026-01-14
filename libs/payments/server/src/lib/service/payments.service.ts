@@ -143,23 +143,54 @@ export class PaymentsService {
 
     // Determine if highest is trial and if there's a separate paid subscription
     const isHighestSubscriptionTrial = highestSubscription.status === SubscriptionStatus.TRIALING
-    const hasPaidSubscription =
+    const hasSeparatePaidSubscription =
       isHighestSubscriptionTrial && !!paidSubscription && paidSubscription.id !== highestSubscription.id
 
-    return {
+    // User has a paid subscription if:
+    // 1. They have a separate paid subscription (on trial with paid subscription), OR
+    // 2. Their highest/active subscription is a paid subscription (ACTIVE status with stripeSubscriptionId)
+    const hasPaidSubscription =
+      hasSeparatePaidSubscription ||
+      (highestSubscription.status === SubscriptionStatus.ACTIVE && highestSubscription.stripeSubscriptionId !== null)
+
+    // Build response object, only including non-null fields
+    const response: Record<string, unknown> = {
       isSubscribed: true,
       isTrial: isHighestSubscriptionTrial,
       plan: highestSubscription.price?.product?.name || null,
       subscriptionId: highestSubscription.id,
       priceId: highestSubscription.price?.id || null,
-      trialEnd: highestSubscription.trialEnd || null,
-      // Inform user about their paid subscription even if they're on a trial
-      hasPaidSubscription,
-      paidSubscriptionPlan: hasPaidSubscription ? paidSubscription.price?.product?.name || null : null,
-      // Trial subscription details (if different from highest)
-      trialSubscriptionPlan: trialSubscription ? trialSubscription.price?.product?.name || null : null,
-      trialSubscriptionId: trialSubscription ? trialSubscription.id : null,
     }
+
+    // Only add trialEnd if it exists
+    if (highestSubscription.trialEnd) {
+      response.trialEnd = highestSubscription.trialEnd
+    }
+
+    // Add paid subscription info
+    response.hasPaidSubscription = hasPaidSubscription
+
+    // Only add paid subscription details if user has a separate paid subscription (on trial)
+    if (hasSeparatePaidSubscription && paidSubscription) {
+      response.paidSubscriptionPlan = paidSubscription.price?.product?.name || null
+      response.paidSubscriptionId = paidSubscription.id
+      response.paidSubscriptionPriceId = paidSubscription.price?.id || null
+    }
+
+    // Only add trial subscription details if different from highest
+    if (trialSubscription && trialSubscription.id !== highestSubscription.id) {
+      response.trialSubscriptionPlan = trialSubscription.price?.product?.name || null
+      response.trialSubscriptionId = trialSubscription.id
+    }
+
+    // Remove null values for cleaner response
+    Object.keys(response).forEach((key) => {
+      if (response[key] === null) {
+        delete response[key]
+      }
+    })
+
+    return response
   }
 
   async hasUserSubscriptionHistory(userId: number): Promise<boolean> {
@@ -251,7 +282,38 @@ export class PaymentsService {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ERROR_FETCH_SUBSCRIPTION_BY_ID_USER_ID')
     }
 
-    return result
+    // Structure the response to accurately reflect database entities
+    // Database structure: Subscription -> Price -> Product
+    return {
+      subscription: {
+        id: result.id,
+        paymentCustomerId: result.paymentCustomerId,
+        stripeSubscriptionId: result.stripeSubscriptionId,
+        status: result.status,
+        currentPeriodStart: result.currentPeriodStart,
+        currentPeriodEnd: result.currentPeriodEnd,
+        trialStart: result.trialStart,
+        trialEnd: result.trialEnd,
+        cancelAt: result.cancelAt,
+        canceledAt: result.canceledAt,
+        cancelReason: result.cancelReason,
+        createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
+      },
+      price: {
+        // Price entity fields
+        id: result.price.id,
+        unitAmount: result.price.unitAmount,
+        currency: result.price.currency,
+        interval: result.price.interval,
+        // Product relation (name is on Product, not Price)
+        product: {
+          id: result.price.product.id,
+          name: result.price.product.name,
+        },
+      },
+      priceId: result.priceId,
+    }
   }
 
   async findSubscriptionByStripeId(stripeSubscriptionId: string) {

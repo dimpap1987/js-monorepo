@@ -280,6 +280,18 @@ export class PaymentsRepository {
       where: {
         id: id,
       },
+      include: {
+        price: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
     })
   }
 

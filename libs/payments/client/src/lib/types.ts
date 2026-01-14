@@ -20,6 +20,41 @@ export interface Subscription {
   updatedAt: Date
 }
 
+/**
+ * Structured subscription response from the API
+ * Accurately reflects database entities: Subscription -> Price -> Product
+ */
+export interface SubscriptionResponse {
+  subscription: {
+    id: number
+    paymentCustomerId: number
+    stripeSubscriptionId: string | null
+    status: string
+    currentPeriodStart: Date | null
+    currentPeriodEnd: Date | null
+    trialStart: Date | null
+    trialEnd: Date | null
+    cancelAt: Date | null
+    canceledAt: Date | null
+    cancelReason: string | null
+    createdAt: Date
+    updatedAt: Date
+  }
+  price: {
+    // Price entity (not "plan" - Price doesn't have a name)
+    id: number
+    unitAmount: number // Price in cents
+    currency: string
+    interval: string
+    product: {
+      // Product entity (name is here, not on Price)
+      id: number
+      name: string
+    }
+  }
+  priceId: number
+}
+
 export interface SessionSubscription {
   isSubscribed: boolean
   isTrial: boolean
@@ -29,6 +64,8 @@ export interface SessionSubscription {
   trialEnd: Date | null
   hasPaidSubscription: boolean
   paidSubscriptionPlan: string | null
+  paidSubscriptionId: number | null
+  paidSubscriptionPriceId: number | null
   trialSubscriptionPlan: string | null
   trialSubscriptionId: number | null
 }
@@ -58,7 +95,9 @@ export interface PricingCardData {
   id: number
   name: string
   description: string
-  price: number
+  price: number // In cents (for sorting/comparison)
+  priceInCents?: number // Explicit cents value
+  currency?: string // Currency code (e.g., 'USD', 'EUR')
   interval: string
   metadata?: ProductMetadata
   isPopular?: boolean

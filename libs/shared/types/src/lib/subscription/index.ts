@@ -43,7 +43,7 @@ export type CancelReasonType = (typeof CancelReason)[keyof typeof CancelReason]
  * Subscription display status for UI purposes
  * Represents the visual state of a subscription in the UI
  */
-export type SubscriptionDisplayStatus = 'active' | 'canceling' | 'canceled' | 'none'
+export type SubscriptionDisplayStatus = 'active' | 'canceling' | 'canceled' | 'none' | 'trialing'
 
 export interface Subscription {
   id: number

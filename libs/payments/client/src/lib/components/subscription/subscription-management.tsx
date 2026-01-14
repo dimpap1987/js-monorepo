@@ -1,357 +1,262 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
-import { formatPrice } from '@js-monorepo/currency'
-import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { useNotifications } from '@js-monorepo/notification'
-import { Calendar, CheckCircle, CreditCard, Info, RefreshCw, XCircle } from 'lucide-react'
+import { amountToCents, formatPrice } from '@js-monorepo/currency'
 import { useLocale } from 'next-intl'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Subscription } from '../../types'
-import {
-  SubscriptionStatus as SubscriptionStatusEnum,
-  SubscriptionDisplayStatus,
-} from '@js-monorepo/types/subscription'
+import { SubscriptionStatus as SubscriptionStatusEnum } from '@js-monorepo/types/subscription'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { useTimezone } from '@js-monorepo/next/hooks'
-import {
-  apiCancelSubscription,
-  apiCreatePortalSession,
-  apiRenewSubscription,
-  generateIdempotencyKey,
-} from '../../utils/api'
-import { PlanBadge } from '../plan-badge'
 import { CancelSubscriptionDialog } from './cancel-subscription-dialog'
 import { RenewSubscriptionDialog } from './renew-subscription-dialog'
+import { NoSubscriptionState } from './no-subscription-state'
+import { PaidSubscriptionInfoBanner } from './paid-subscription-info-banner'
+import { PaidSubscriptionCard } from './paid-subscription-card'
+import { PlanHeader } from './plan-header'
+import { BillingInfo } from './billing-info'
+import { SubscriptionActions } from './subscription-actions'
+import { usePaidSubscription } from './use-paid-subscription'
+import { useSubscriptionActions } from './use-subscription-actions'
+import { getSubscriptionStatus } from './utils'
+import { SubscriptionStatusIndication } from '../pricing'
 
-interface SubscriptionManagementProps {
-  subscription: Subscription | null
-  planName: string
-  planPrice: number // Amount in dollars/euros (already converted from cents)
+/**
+ * Plan information for a subscription
+ */
+export interface PlanInfo {
+  name: string
+  price: number // Amount in dollars/euros (already converted from cents)
   priceInCents?: number // Original price in cents (for formatting)
   currency?: string // Currency code (e.g., 'USD', 'EUR')
-  planInterval: string
-  planFeatures: Record<string, string>
+  interval: string
+  features: Record<string, string>
   priceId: number
-  hasPaidSubscription?: boolean
-  paidSubscriptionPlan?: string | null
-  trialSubscriptionPlan?: string | null
+}
+
+/**
+ * Active subscription details (either trial or paid)
+ */
+export interface ActiveSubscription {
+  subscription: Subscription
+  plan: PlanInfo
+}
+
+/**
+ * Paid subscription details (when user has a paid subscription separate from trial)
+ */
+export interface PaidSubscriptionInfo {
+  subscriptionId: number
+  priceId: number
+  planName: string
+}
+
+/**
+ * Props for the SubscriptionManagement component
+ */
+interface SubscriptionManagementProps {
+  /** The active subscription being displayed (trial or paid) */
+  activeSubscription: ActiveSubscription | null
+  /** Paid subscription details (if user has a paid subscription separate from the active one) */
+  paidSubscription?: PaidSubscriptionInfo | null
+  /** Callback when subscription is canceled */
   onCancelSuccess?: () => void
+  /** Callback when subscription is renewed */
   onRenewSuccess?: () => void
 }
 
-function getSubscriptionStatus(subscription: Subscription | null): SubscriptionDisplayStatus {
-  if (!subscription) return 'none'
-  // Check canceled status first - cancelAt may still have a value after expiration
-  if (subscription.status === SubscriptionStatusEnum.CANCELED) return 'canceled'
-  // Subscription is scheduled to cancel but still active
-  if (subscription.cancelAt || subscription.canceledAt) return 'canceling'
-  return 'active'
-}
-
-function StatusBadge({ status }: { status: SubscriptionDisplayStatus }) {
-  const config = {
-    active: {
-      label: 'Active',
-      className: 'bg-status-success-bg text-status-success border-status-success',
-      icon: CheckCircle,
-    },
-    canceling: {
-      label: 'Cancels Soon',
-      className: 'bg-status-warning-bg text-status-warning border-status-warning',
-      icon: XCircle,
-    },
-    canceled: {
-      label: 'Canceled',
-      className: 'bg-status-error-bg text-status-error border-status-error',
-      icon: XCircle,
-    },
-    none: {
-      label: 'No Subscription',
-      className: 'bg-background-secondary text-foreground-muted border-border',
-      icon: XCircle,
-    },
-  }
-
-  const { label, className, icon: Icon } = config[status]
-
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-xs font-medium ${className}`}>
-      <Icon className="h-3.5 w-3.5" />
-      {label}
-    </span>
-  )
-}
+// Types are exported from the component interface definitions above
 
 export function SubscriptionManagement({
-  subscription,
-  planName,
-  planPrice,
-  priceInCents,
-  currency,
-  planInterval,
-  planFeatures,
-  priceId,
-  hasPaidSubscription = false,
-  paidSubscriptionPlan = null,
-  trialSubscriptionPlan = null,
+  activeSubscription,
+  paidSubscription: paidSubscriptionInfo,
   onCancelSuccess,
   onRenewSuccess,
 }: SubscriptionManagementProps) {
   const locale = useLocale() as 'en' | 'el'
-  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
-  const [isRenewDialogOpen, setIsRenewDialogOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isPortalLoading, setIsPortalLoading] = useState(false)
-  const { addNotification } = useNotifications()
   const userTimezone = useTimezone()
+
+  // Extract active subscription data
+  const subscription = activeSubscription?.subscription ?? null
+  const plan = activeSubscription?.plan
+  const isTrial = subscription?.status === SubscriptionStatusEnum.TRIALING
+
+  // SubscriptionStatusIndication expects the "session subscription" shape.
+  // Build a lightweight version from what we already have here.
+  const sessionLikeSubscription = useMemo(() => {
+    if (!subscription || !plan) return undefined
+
+    const hasPaidSubscription = !!paidSubscriptionInfo?.subscriptionId
+
+    return {
+      isSubscribed: true,
+      isTrial,
+      plan: plan.name,
+      subscriptionId: subscription.id,
+      priceId: plan.priceId,
+      trialEnd: subscription.trialEnd ?? null,
+      hasPaidSubscription,
+      paidSubscriptionPlan: paidSubscriptionInfo?.planName ?? null,
+      paidSubscriptionId: paidSubscriptionInfo?.subscriptionId ?? null,
+      paidSubscriptionPriceId: paidSubscriptionInfo?.priceId ?? null,
+      trialSubscriptionPlan: isTrial ? plan.name : null,
+      trialSubscriptionId: isTrial ? subscription.id : null,
+    }
+  }, [isTrial, paidSubscriptionInfo, plan, subscription])
+
+  // Fetch paid subscription data (only when needed)
+  const { paidSubscriptionData, isLoadingPaidSubscription, setPaidSubscriptionData } = usePaidSubscription({
+    subscription,
+    paidSubscriptionInfo,
+    isTrial,
+  })
+
+  // Handle subscription actions (cancel, renew, manage)
+  const {
+    isCancelDialogOpen,
+    isCancelPaidDialogOpen,
+    isRenewDialogOpen,
+    isLoading,
+    isPortalLoading,
+    handleCancelClick,
+    handleCancelConfirm,
+    handleCancelPaidClick,
+    handleCancelPaidConfirm,
+    handleRenewClick,
+    handleRenewConfirm,
+    handleManageSubscription,
+    setIsCancelDialogOpen,
+    setIsCancelPaidDialogOpen,
+    setIsRenewDialogOpen,
+  } = useSubscriptionActions({
+    plan,
+    subscription,
+    paidSubscriptionInfo,
+    onCancelSuccess,
+    onRenewSuccess,
+    setPaidSubscriptionData,
+  })
 
   // Format price with currency symbol
   const formattedPrice = useMemo(() => {
-    if (priceInCents !== undefined) {
-      return formatPrice(priceInCents, locale, currency)
-    }
-    // Fallback: format the already-converted price
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: currency || (locale === 'el' ? 'EUR' : 'USD'),
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(planPrice)
-  }, [priceInCents, planPrice, locale, currency])
+    if (!plan) return ''
+    const cents = plan.priceInCents ?? amountToCents(plan.price)
+    return formatPrice(cents, locale, plan.currency)
+  }, [plan, locale])
 
   const status = getSubscriptionStatus(subscription)
-
   const periodEnd = subscription?.currentPeriodEnd
     ? formatForUser(subscription.currentPeriodEnd, userTimezone, 'PPP')
     : null
-
   const cancelAt = subscription?.cancelAt ? formatForUser(subscription.cancelAt, userTimezone, 'PPP') : null
 
-  const handleCancelClick = useCallback(() => {
-    setIsCancelDialogOpen(true)
-  }, [])
-
-  const handleCancelConfirm = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const idempotencyKey = generateIdempotencyKey()
-      const response = await apiCancelSubscription(priceId, idempotencyKey)
-
-      if (response.ok) {
-        addNotification({
-          message: 'Subscription canceled',
-          description: `Your subscription will end on ${periodEnd}`,
-          type: 'success',
-        })
-        setIsCancelDialogOpen(false)
-        onCancelSuccess?.()
-      } else {
-        addNotification({
-          message: 'Failed to cancel subscription',
-          description: 'Please try again or contact support',
-          type: 'error',
-        })
-      }
-    } catch (error) {
-      addNotification({
-        message: 'Something went wrong',
-        description: 'Please try again later',
-        type: 'error',
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }, [priceId, periodEnd, addNotification, onCancelSuccess])
-
-  const handleRenewClick = useCallback(() => {
-    setIsRenewDialogOpen(true)
-  }, [])
-
-  const handleRenewConfirm = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const idempotencyKey = generateIdempotencyKey()
-      const response = await apiRenewSubscription(priceId, idempotencyKey)
-
-      if (response.ok) {
-        addNotification({
-          message: 'Subscription renewed',
-          description: 'Your subscription has been successfully renewed',
-          type: 'success',
-        })
-        setIsRenewDialogOpen(false)
-        onRenewSuccess?.()
-      } else {
-        addNotification({
-          message: 'Failed to renew subscription',
-          description: 'Please try again or contact support',
-          type: 'error',
-        })
-      }
-    } catch (error) {
-      addNotification({
-        message: 'Something went wrong',
-        description: 'Please try again later',
-        type: 'error',
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }, [priceId, addNotification, onRenewSuccess])
-
-  const handleManageSubscription = useCallback(async () => {
-    setIsPortalLoading(true)
-    try {
-      const returnUrl = window.location.href
-      const response = await apiCreatePortalSession(returnUrl)
-
-      if (response.ok && response.data?.url) {
-        window.location.href = response.data.url
-      } else {
-        addNotification({
-          message: 'Failed to open subscription portal',
-          description: 'Please try again or contact support',
-          type: 'error',
-        })
-        setIsPortalLoading(false)
-      }
-    } catch (error) {
-      addNotification({
-        message: 'Something went wrong',
-        description: 'Please try again later',
-        type: 'error',
-      })
-      setIsPortalLoading(false)
-    }
-  }, [addNotification])
+  // Paid subscription status calculations
+  const paidSubscriptionStatus = paidSubscriptionData ? getSubscriptionStatus(paidSubscriptionData) : null
+  const isPaidSubscriptionActive = !!(
+    paidSubscriptionData &&
+    (paidSubscriptionData.status === SubscriptionStatusEnum.ACTIVE ||
+      String(paidSubscriptionData.status).toLowerCase() === 'active') &&
+    paidSubscriptionStatus !== 'canceled' &&
+    paidSubscriptionStatus !== 'canceling'
+  )
+  const isPaidSubscriptionCanceled = paidSubscriptionStatus === 'canceled'
+  const isPaidSubscriptionCanceling = paidSubscriptionStatus === 'canceling'
 
   // No subscription state
   if (status === 'none' || status === 'canceled' || subscription?.status === SubscriptionStatusEnum.CANCELED) {
-    return (
-      <div className="text-center py-8">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-background-secondary">
-          <CreditCard className="h-8 w-8 text-foreground-muted" />
-        </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">No Active Subscription</h3>
-        <p className="text-foreground-neutral mb-6">
-          You're currently on the free plan. Upgrade to unlock premium features.
-        </p>
-        <DpNextNavLink href="/pricing">
-          <DpButton>View Plans</DpButton>
-        </DpNextNavLink>
-      </div>
-    )
+    return <NoSubscriptionState />
   }
-
-  const isTrial = subscription?.status === SubscriptionStatusEnum.TRIALING
 
   return (
     <div className="space-y-6">
-      {/* Inform user about paid subscription if they're on a trial */}
-      {isTrial && hasPaidSubscription && paidSubscriptionPlan && (
-        <div className="flex items-start gap-3 rounded-lg border border-status-info bg-status-info-bg p-4">
-          <Info className="h-5 w-5 shrink-0 text-status-info mt-0.5" />
-          <div>
-            <p className="text-sm font-medium text-foreground">Your paid subscription is safe</p>
-            <p className="text-sm text-foreground-neutral">
-              You're currently on a <strong>{planName}</strong> trial. Your <strong>{paidSubscriptionPlan}</strong>{' '}
-              subscription remains active and will continue after the trial ends.
-            </p>
-          </div>
-        </div>
+      {/* Plan Header */}
+      {plan && (
+        <PlanHeader
+          plan={plan}
+          formattedPrice={formattedPrice}
+          status={status}
+          isTrial={isTrial}
+          paidPlanName={paidSubscriptionInfo?.planName}
+        />
       )}
 
-      {/* Plan Header */}
-      <div className="flex items-start justify-between gap-2 flex-wrap">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h2 className="font-semibold text-foreground capitalize">
-              {planName} Plan {isTrial && <span className="text-sm font-normal text-status-info">(Trial)</span>}
-            </h2>
-            <StatusBadge status={status} />
-          </div>
-          <p className="text-2xl font-bold text-foreground">
-            {formattedPrice}
-            <span className="text-base font-normal text-foreground-neutral">/{planInterval}</span>
-          </p>
-          {/* Show active paid subscription if different from current trial */}
-          {isTrial && hasPaidSubscription && paidSubscriptionPlan && (
-            <p className="text-sm text-foreground-muted mt-1">
-              Active subscription: <span className="font-medium capitalize">{paidSubscriptionPlan}</span>
-            </p>
-          )}
-        </div>
-        <PlanBadge plan={planName} size="md"></PlanBadge>
-      </div>
-
       {/* Billing Info */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {status === 'canceling' && cancelAt ? (
-          <div className="flex items-start gap-3 rounded-lg border border-status-warning bg-status-warning-bg p-4">
-            <XCircle className="h-5 w-5 shrink-0 text-status-warning mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-foreground">Cancellation scheduled</p>
-              <p className="text-sm text-foreground-neutral">Your access ends on {cancelAt}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-start gap-3 rounded-lg border border-border bg-background-secondary p-4">
-            <Calendar className="h-5 w-5 shrink-0 text-foreground-muted mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-foreground">Next billing date</p>
-              <p className="text-sm text-foreground-neutral">{periodEnd || 'N/A'}</p>
-            </div>
-          </div>
-        )}
+      {!isTrial && <BillingInfo periodEnd={periodEnd} cancelAt={cancelAt} isCanceling={status === 'canceling'} />}
 
-        <div className="flex items-start gap-3 rounded-lg border border-border bg-background-secondary p-4">
-          <CreditCard className="h-5 w-5 shrink-0 text-foreground-muted mt-0.5" />
-          <div>
-            <p className="text-sm font-medium text-foreground">Payment method</p>
-            <p className="text-sm text-foreground-neutral">Managed by Stripe</p>
-          </div>
-        </div>
-      </div>
+      {isTrial && <SubscriptionStatusIndication subscription={sessionLikeSubscription} className="w-full" />}
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-3 pt-2 justify-end">
-        <DpButton variant="outline" onClick={handleManageSubscription} loading={isPortalLoading}>
-          Manage
-        </DpButton>
-        {status === 'canceling' && (
-          <DpButton variant="primary" onClick={handleRenewClick}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Renew
-          </DpButton>
+      <SubscriptionActions
+        subscription={subscription}
+        status={status}
+        isPortalLoading={isPortalLoading}
+        onManageClick={handleManageSubscription}
+        onRenewClick={handleRenewClick}
+        onCancelClick={handleCancelClick}
+      />
+
+      {/* Inform user about paid subscription if they're on a trial */}
+      {isTrial && paidSubscriptionInfo && !isPaidSubscriptionCanceled && (
+        <PaidSubscriptionInfoBanner
+          planName={plan?.name || ''}
+          paidPlanName={paidSubscriptionInfo.planName}
+          isCanceling={isPaidSubscriptionCanceling}
+        />
+      )}
+
+      {/* Paid Subscription Management Section (when on trial) */}
+      {isTrial &&
+        paidSubscriptionInfo &&
+        !isLoadingPaidSubscription &&
+        paidSubscriptionData &&
+        paidSubscriptionStatus && (
+          <PaidSubscriptionCard
+            planName={paidSubscriptionInfo.planName}
+            subscription={paidSubscriptionData}
+            status={paidSubscriptionStatus}
+            isActive={isPaidSubscriptionActive}
+            isCanceled={isPaidSubscriptionCanceled}
+            isCanceling={isPaidSubscriptionCanceling}
+            onCancelClick={handleCancelPaidClick}
+          />
         )}
-        {subscription?.status === SubscriptionStatusEnum.ACTIVE && (
-          <DpButton variant="ghost" className="text-status-error hover:text-status-error" onClick={handleCancelClick}>
-            Cancel Subscription
-          </DpButton>
-        )}
-      </div>
 
       {/* Cancel Dialog */}
-      <CancelSubscriptionDialog
-        isOpen={isCancelDialogOpen}
-        onClose={() => setIsCancelDialogOpen(false)}
-        onConfirm={handleCancelConfirm}
-        isLoading={isLoading}
-        subscription={subscription}
-        planName={planName}
-        features={planFeatures}
-      />
+      {plan && (
+        <CancelSubscriptionDialog
+          isOpen={isCancelDialogOpen}
+          onClose={() => setIsCancelDialogOpen(false)}
+          onConfirm={handleCancelConfirm}
+          isLoading={isLoading}
+          subscription={subscription}
+          planName={plan.name}
+          features={plan.features}
+        />
+      )}
+
+      {/* Cancel Paid Subscription Dialog */}
+      {paidSubscriptionInfo && plan && (
+        <CancelSubscriptionDialog
+          isOpen={isCancelPaidDialogOpen}
+          onClose={() => setIsCancelPaidDialogOpen(false)}
+          onConfirm={handleCancelPaidConfirm}
+          isLoading={isLoading}
+          subscription={paidSubscriptionData}
+          planName={paidSubscriptionInfo.planName}
+          features={plan.features}
+        />
+      )}
 
       {/* Renew Dialog */}
-      <RenewSubscriptionDialog
-        isOpen={isRenewDialogOpen}
-        onClose={() => setIsRenewDialogOpen(false)}
-        onConfirm={handleRenewConfirm}
-        isLoading={isLoading}
-        subscription={subscription}
-        planName={planName}
-      />
+      {plan && (
+        <RenewSubscriptionDialog
+          isOpen={isRenewDialogOpen}
+          onClose={() => setIsRenewDialogOpen(false)}
+          onConfirm={handleRenewConfirm}
+          isLoading={isLoading}
+          subscription={subscription}
+          planName={plan.name}
+        />
+      )}
     </div>
   )
 }

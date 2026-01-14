@@ -55,7 +55,7 @@ export function PricingCard({
   isOnTrial,
 }: PricingCardProps) {
   const locale = useLocale() as 'en' | 'el'
-  const isFree = price == 0
+  const isFree = price === 0
 
   // Format price with currency symbol
   const formattedPrice = useMemo(() => {

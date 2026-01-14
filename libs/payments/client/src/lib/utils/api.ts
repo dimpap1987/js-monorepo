@@ -1,7 +1,13 @@
 import { ClientResponseType } from '@js-monorepo/types/responses'
 import { apiClient } from '@js-monorepo/utils/http'
 import { generateIdempotencyKey, IDEMPOTENCY_HEADER } from '@js-monorepo/utils/idempotency'
-import { InvoiceListResponse, StartTrialResponse, Subscription, TrialEligibilityResponse } from '../types'
+import {
+  InvoiceListResponse,
+  StartTrialResponse,
+  Subscription,
+  SubscriptionResponse,
+  TrialEligibilityResponse,
+} from '../types'
 
 export { generateIdempotencyKey } from '@js-monorepo/utils/idempotency'
 
@@ -14,7 +20,7 @@ export async function apiGetPlans() {
   return apiClient.get('/payments/plans')
 }
 
-export async function apiGetSubscription(id: number): Promise<ClientResponseType<Subscription>> {
+export async function apiGetSubscription(id: number): Promise<ClientResponseType<SubscriptionResponse>> {
   return apiClient.get(`/payments/subscriptions/${id}`)
 }
 

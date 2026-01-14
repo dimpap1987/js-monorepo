@@ -1,6 +1,8 @@
 'use client'
 
+import { formatPrice } from '@js-monorepo/currency'
 import { cn } from '@js-monorepo/ui/util'
+import { useLocale } from 'next-intl'
 import { Check } from 'lucide-react'
 import { PricingCardData } from '../../types'
 
@@ -17,13 +19,18 @@ export function CheckoutPlanComparison({
   onSelectPlan,
   className,
 }: CheckoutPlanComparisonProps) {
+  const locale = useLocale() as 'en' | 'el'
+
   return (
     <div className={cn('space-y-4', className)}>
       <h3 className="text-sm font-medium text-foreground-neutral uppercase tracking-wide">Change Plan</h3>
       <div className="grid grid-cols-1 gap-3">
         {plans.map((plan) => {
           const isSelected = plan.id === selectedPlanId
-          const isFree = plan.price == 0
+          const isFree = plan.price === 0
+          const priceInCents = plan.priceInCents ?? plan.price
+          const currency = plan.currency || (locale === 'el' ? 'EUR' : 'USD')
+          const formattedPrice = isFree ? 'Free' : formatPrice(priceInCents, locale, currency)
 
           return (
             <button
@@ -54,7 +61,7 @@ export function CheckoutPlanComparison({
               </div>
 
               <div className="text-right">
-                <span className="font-semibold text-foreground">{isFree ? 'Free' : `€${plan.price}`}</span>
+                <span className="font-semibold text-foreground">{formattedPrice}</span>
                 {!isFree && <span className="text-sm text-foreground-neutral">/{plan.interval}</span>}
               </div>
 

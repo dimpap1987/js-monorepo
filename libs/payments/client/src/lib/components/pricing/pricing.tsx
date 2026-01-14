@@ -9,6 +9,8 @@ import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@js-monorepo/utils/http/queries'
 import { usePlans } from '../../queries/payments-queries'
 import { POPULAR_PLAN_NAME, SessionSubscription, Subscription } from '../../types'
 import { apiCreatePortalSession, apiGetSubscription, apiStartTrial } from '../../utils/api'
@@ -24,13 +26,15 @@ export function Pricing() {
   const { session, isLoggedIn } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const queryClient = useQueryClient()
   const [hasErrors, setHasErrors] = useState(false)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [isPortalLoading, setIsPortalLoading] = useState(false)
   const [trialLoadingPriceId, setTrialLoadingPriceId] = useState<number | null>(null)
   const [showConfirmTrialDialog, setShowConfirmTrialDialog] = useState(false)
   const [trialPriceIdToConfirm, setTrialPriceIdToConfirm] = useState<number | null>(null)
-  const { data: plans = [], isLoading: isPlansLoading } = usePlans()
+  const plansQuery = usePlans()
+  const { data: plans = [], isLoading: isPlansLoading } = plansQuery
   const { addNotification } = useNotifications()
 
   const sessionSubscription = session?.subscription as SessionSubscription | undefined
@@ -78,8 +82,23 @@ export function Pricing() {
   useEffect(() => {
     if (sessionSubscription?.subscriptionId) {
       apiGetSubscription(sessionSubscription.subscriptionId).then((res) => {
-        if (res.ok) {
-          setSubscription(res.data as Subscription)
+        if (res.ok && res.data) {
+          const subData = res.data.subscription
+          setSubscription({
+            id: subData.id,
+            paymentCustomerId: subData.paymentCustomerId,
+            stripeSubscriptionId: subData.stripeSubscriptionId || undefined,
+            priceId: res.data.priceId,
+            status: subData.status as Subscription['status'],
+            currentPeriodStart: subData.currentPeriodStart || undefined,
+            currentPeriodEnd: subData.currentPeriodEnd || undefined,
+            trialStart: subData.trialStart || undefined,
+            trialEnd: subData.trialEnd || undefined,
+            cancelAt: subData.cancelAt || undefined,
+            canceledAt: subData.canceledAt || undefined,
+            createdAt: subData.createdAt,
+            updatedAt: subData.updatedAt,
+          })
         }
       })
     }
@@ -149,6 +168,9 @@ export function Pricing() {
             description: response.data.message,
             type: 'success',
           })
+          // Trial is one-time per user; refresh plans so trialEligibility updates
+          await queryClient.invalidateQueries({ queryKey: queryKeys.payments.plans() })
+          await plansQuery.refetch()
           router.refresh()
         } else {
           addNotification({
@@ -169,7 +191,7 @@ export function Pricing() {
         setTrialPriceIdToConfirm(null) // Clear priceId
       }
     },
-    [addNotification, router]
+    [addNotification, plansQuery, queryClient, router]
   )
 
   const handleStartTrial = useCallback((priceId: number) => {
@@ -292,8 +314,6 @@ export function Pricing() {
             })}
       </section>
 
-      {/* Subscription Status Indication */}
-      <SubscriptionStatusIndication subscription={sessionSubscription} className="max-w-6xl mx-auto px-4" />
       {/* FAQ Section */}
       <PricingFAQ className="px-4" />
 
