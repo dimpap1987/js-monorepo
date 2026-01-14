@@ -1,5 +1,4 @@
 import { formatUTC, DATE_CONFIG } from '@js-monorepo/utils/date'
-import { TRIAL_DURATION_DAYS } from '@js-monorepo/payments-server'
 import { capitalize } from 'lodash'
 
 // Use relative paths for client-side navigation via Next.js router
@@ -76,7 +75,7 @@ export function getSubscriptionChangedMessage({
  */
 export function getTrialStartedMessage({ planName }: SubscriptionNotificationData): string {
   return `
-    Your ${TRIAL_DURATION_DAYS}-day free trial of <strong>${capitalize(planName)}</strong> has started!
+    Your free trial of <strong>${capitalize(planName)}</strong> has started!
     Enjoy full access to all premium features. No credit card required.
     ${subscriptionLink()}
   `.trim()

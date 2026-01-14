@@ -3,6 +3,7 @@ import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
 import { PaymentsModuleOptions } from '../../'
 import { TRIAL_DURATION_DAYS } from '../constants'
+import { AssignTrialDto, DeactivateTrialDto, ExtendTrialDto } from '../dto/admin-trial.dto'
 import { StartTrialResponse, TrialEligibilityResponse } from '../dto/start-trial.dto'
 import { PaymentsRepository } from '../repository/payments.repository'
 import { PaymentsService } from './payments.service'
@@ -147,5 +148,107 @@ export class TrialService {
     })
 
     return paymentCustomer.id
+  }
+
+  // ============= Admin Methods =============
+
+  @Transactional()
+  async assignTrialAdmin(dto: AssignTrialDto) {
+    // Get user email from authUser
+    const authUser = await this.paymentsRepository.findAuthUserById(dto.userId)
+    if (!authUser) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'USER_NOT_FOUND', 'User not found')
+    }
+
+    // Validate price exists
+    const price = await this.paymentsService.findPriceById(dto.priceId)
+
+    // Get or create payment customer
+    const paymentCustomerId = await this.getOrCreatePaymentCustomer(dto.userId, authUser.email)
+
+    // Find only active local trials (not paid subscriptions)
+    // We respect paid subscriptions - only cancel existing trials before assigning a new one
+    const activeTrials = await this.paymentsRepository.findActiveTrialsByUserId(dto.userId)
+
+    // Cancel existing active trials before creating new one
+    // Note: We don't cancel paid subscriptions - if user has paid, we respect that
+    if (activeTrials.length > 0) {
+      await this.paymentsRepository.cancelActiveTrialsForUser(dto.userId, 'admin_replaced')
+      this.logger.log(
+        `Canceled ${activeTrials.length} active trial(s) for user ${dto.userId} before assigning new trial`
+      )
+    }
+
+    // Create trial subscription
+    const trialStart = new Date()
+    const trialEnd = new Date()
+    trialEnd.setDate(trialEnd.getDate() + dto.trialDurationDays)
+
+    const subscription = await this.paymentsRepository.createLocalTrialSubscription({
+      paymentCustomerId,
+      priceId: price.id,
+      trialStart,
+      trialEnd,
+    })
+
+    this.logger.log(
+      `Admin assigned ${dto.trialDurationDays}-day trial to user ${dto.userId} for product ${price.product.name}, ends ${trialEnd.toISOString()}`
+    )
+
+    // Call callback AFTER transaction commits
+    this.paymentsModuleOptions.onTrialStarted?.(dto.userId, {
+      id: subscription.id,
+      name: price.product.name,
+    })
+
+    return {
+      subscriptionId: subscription.id,
+      trialEnd,
+      productName: price.product.name,
+      message: `Trial assigned successfully. Ends ${trialEnd.toISOString()}`,
+      canceledPreviousTrials: activeTrials.length,
+    }
+  }
+
+  @Transactional()
+  async extendTrialAdmin(subscriptionId: number, dto: ExtendTrialDto) {
+    const subscription = await this.paymentsRepository.findTrialSubscriptionById(subscriptionId)
+
+    if (!subscription) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'TRIAL_SUBSCRIPTION_NOT_FOUND', 'Trial subscription not found')
+    }
+
+    if (subscription.status !== 'trialing') {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'NOT_TRIAL_SUBSCRIPTION', 'Subscription is not in trialing status')
+    }
+
+    const extendedTrial = await this.paymentsRepository.extendTrialSubscription(subscriptionId, dto.additionalDays)
+
+    this.logger.log(
+      `Admin extended trial ${subscriptionId} by ${dto.additionalDays} days. New end date: ${extendedTrial.trialEnd.toISOString()}`
+    )
+
+    return extendedTrial
+  }
+
+  @Transactional()
+  async deactivateTrialAdmin(subscriptionId: number, dto?: DeactivateTrialDto) {
+    const subscription = await this.paymentsRepository.findTrialSubscriptionById(subscriptionId)
+
+    if (!subscription) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'TRIAL_SUBSCRIPTION_NOT_FOUND', 'Trial subscription not found')
+    }
+
+    if (subscription.status !== 'trialing') {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'NOT_TRIAL_SUBSCRIPTION', 'Subscription is not in trialing status')
+    }
+
+    const deactivatedTrial = await this.paymentsRepository.deactivateTrialSubscription(subscriptionId, dto?.reason)
+
+    this.logger.log(
+      `Admin deactivated trial ${subscriptionId} for user ${subscription.paymentCustomer.userId}. Reason: ${dto?.reason || 'admin_deactivated'}`
+    )
+
+    return deactivatedTrial
   }
 }

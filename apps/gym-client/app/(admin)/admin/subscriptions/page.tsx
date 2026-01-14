@@ -1,27 +1,48 @@
 'use client'
 
+import { DpButton } from '@js-monorepo/button'
 import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@js-monorepo/components/ui/dialog'
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@js-monorepo/components/ui/dropdown'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
-import { PlanBadge } from '@js-monorepo/payments-ui'
+import { useNotifications } from '@js-monorepo/notification'
+import { apiDeactivateTrial, apiExtendTrial, PlanBadge } from '@js-monorepo/payments-ui'
 import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { DATE_CONFIG } from '@js-monorepo/utils/date/constants'
 import { apiClient } from '@js-monorepo/utils/http'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ColumnDef } from '@tanstack/react-table'
-import { ExternalLink, MoreHorizontal, Search, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
+import {
+  CalendarPlus,
+  ExternalLink,
+  MoreHorizontal,
+  Search,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  XCircle,
+  Zap,
+} from 'lucide-react'
 import { useLocale } from 'next-intl'
 import { Dispatch, SetStateAction, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -110,6 +131,15 @@ function SubscriptionsPageContent() {
   const userTimezone = useTimezone()
   const currentLocale = useLocale()
   const debouncedSearch = useDebounce(searchInput, 300)
+  const queryClient = useQueryClient()
+  const { addNotification } = useNotifications()
+  const [extendTrialDialog, setExtendTrialDialog] = useState<{ open: boolean; subscriptionId?: number }>({
+    open: false,
+  })
+  const [deactivateTrialDialog, setDeactivateTrialDialog] = useState<{ open: boolean; subscriptionId?: number }>({
+    open: false,
+  })
+  const [additionalDays, setAdditionalDays] = useState<number>(7)
 
   useEffect(() => {
     setPagination((prev) => ({ ...prev, page: 1 }))
@@ -141,6 +171,50 @@ function SubscriptionsPageContent() {
   const openStripeSubscription = (stripeSubscriptionId: string) => {
     window.open(`https://dashboard.stripe.com/subscriptions/${stripeSubscriptionId}`, '_blank')
   }
+
+  const extendTrialMutation = useMutation({
+    mutationFn: ({ subscriptionId, days }: { subscriptionId: number; days: number }) =>
+      apiExtendTrial(subscriptionId, days),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+      queryClient.invalidateQueries({ queryKey: ['subscription-stats'] })
+      addNotification({
+        message: 'Trial Extended',
+        description: `Trial extended by ${additionalDays} days successfully`,
+        type: 'success',
+      })
+      setExtendTrialDialog({ open: false })
+      setAdditionalDays(7)
+    },
+    onError: (error: any) => {
+      addNotification({
+        message: 'Failed to Extend Trial',
+        description: error?.message || 'An error occurred while extending the trial',
+        type: 'error',
+      })
+    },
+  })
+
+  const deactivateTrialMutation = useMutation({
+    mutationFn: ({ subscriptionId }: { subscriptionId: number }) => apiDeactivateTrial(subscriptionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+      queryClient.invalidateQueries({ queryKey: ['subscription-stats'] })
+      addNotification({
+        message: 'Trial Deactivated',
+        description: 'Trial has been deactivated successfully',
+        type: 'success',
+      })
+      setDeactivateTrialDialog({ open: false })
+    },
+    onError: (error: any) => {
+      addNotification({
+        message: 'Failed to Deactivate Trial',
+        description: error?.message || 'An error occurred while deactivating the trial',
+        type: 'error',
+      })
+    },
+  })
 
   const onPaginationChange = useCallback<Dispatch<SetStateAction<{ pageSize: number; pageIndex: number }>>>(
     (newPaginationOrUpdater) => {
@@ -259,12 +333,39 @@ function SubscriptionsPageContent() {
         header: () => null,
         cell: ({ row }) => {
           const sub = row.original
+          const isTrialing = sub.status === 'trialing'
           return (
             <DropdownMenu>
               <DropdownMenuTrigger className="p-2 rounded-md">
                 <MoreHorizontal className="w-4 h-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                {isTrialing && (
+                  <>
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setTimeout(() => {
+                          setExtendTrialDialog({ open: true, subscriptionId: sub.id })
+                        }, 100)
+                      }}
+                    >
+                      <CalendarPlus className="w-4 h-4 mr-2" />
+                      Extend Trial
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setTimeout(() => {
+                          setDeactivateTrialDialog({ open: true, subscriptionId: sub.id })
+                        }, 100)
+                      }}
+                      className="text-destructive"
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Deactivate Trial
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem onClick={() => openStripeCustomer(sub.paymentCustomer.stripeCustomerId)}>
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View Customer in Stripe
@@ -281,7 +382,7 @@ function SubscriptionsPageContent() {
         },
       },
     ],
-    [userTimezone]
+    [userTimezone, setExtendTrialDialog, setDeactivateTrialDialog]
   )
 
   return (
@@ -333,6 +434,80 @@ function SubscriptionsPageContent() {
         pagination={pagination}
         loading={isLoading}
       />
+
+      {/* Extend Trial Dialog */}
+      <Dialog open={extendTrialDialog.open} onOpenChange={(open) => setExtendTrialDialog({ open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Extend Trial</DialogTitle>
+            <DialogDescription>Add additional days to the trial period</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="days" className="text-sm font-medium">
+                Additional Days
+              </label>
+              <Input
+                id="days"
+                type="number"
+                min="1"
+                max="365"
+                value={additionalDays}
+                onChange={(e) => setAdditionalDays(parseInt(e.target.value) || 7)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DpButton variant="secondary" onClick={() => setExtendTrialDialog({ open: false })}>
+              Cancel
+            </DpButton>
+            <DpButton
+              variant="accent"
+              onClick={() => {
+                if (extendTrialDialog.subscriptionId) {
+                  extendTrialMutation.mutate({
+                    subscriptionId: extendTrialDialog.subscriptionId,
+                    days: additionalDays,
+                  })
+                }
+              }}
+              disabled={extendTrialMutation.isPending}
+              loading={extendTrialMutation.isPending}
+            >
+              Extend Trial
+            </DpButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Deactivate Trial Dialog */}
+      <Dialog open={deactivateTrialDialog.open} onOpenChange={(open) => setDeactivateTrialDialog({ open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Deactivate Trial</DialogTitle>
+            <DialogDescription>
+              This will immediately cancel the trial. The user will lose access to premium features.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DpButton variant="secondary" onClick={() => setDeactivateTrialDialog({ open: false })}>
+              Cancel
+            </DpButton>
+            <DpButton
+              variant="danger"
+              onClick={() => {
+                if (deactivateTrialDialog.subscriptionId) {
+                  deactivateTrialMutation.mutate({ subscriptionId: deactivateTrialDialog.subscriptionId })
+                }
+              }}
+              disabled={deactivateTrialMutation.isPending}
+              loading={deactivateTrialMutation.isPending}
+            >
+              Deactivate Trial
+            </DpButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

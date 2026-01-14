@@ -26,7 +26,9 @@ import {
   UpdatePriceDto,
   UpdateProductDto,
 } from '../dto/admin-product.dto'
+import { AssignTrialDto, DeactivateTrialDto, ExtendTrialDto } from '../dto/admin-trial.dto'
 import { AdminProductsService } from '../service/admin-products.service'
+import { TrialService } from '../service/trial.service'
 
 @UseGuards(RolesGuard)
 @HasRoles(RolesEnum.ADMIN)
@@ -34,7 +36,10 @@ import { AdminProductsService } from '../service/admin-products.service'
 export class AdminProductsController {
   private readonly logger = new Logger(AdminProductsController.name)
 
-  constructor(private readonly adminProductsService: AdminProductsService) {}
+  constructor(
+    private readonly adminProductsService: AdminProductsService,
+    private readonly trialService: TrialService
+  ) {}
 
   @Get('products')
   async getProducts(
@@ -128,5 +133,25 @@ export class AdminProductsController {
   @Post('prices/:id/sync')
   async syncPriceToStripe(@Param('id', ParseIntPipe) id: number) {
     return this.adminProductsService.syncPriceToStripe(id)
+  }
+
+  // ============= Trial Management Endpoints =============
+
+  @Post('trials/:subscriptionId/extend')
+  async extendTrial(@Param('subscriptionId', ParseIntPipe) subscriptionId: number, @Body() dto: ExtendTrialDto) {
+    return this.trialService.extendTrialAdmin(subscriptionId, dto)
+  }
+
+  @Post('trials/:subscriptionId/deactivate')
+  async deactivateTrial(
+    @Param('subscriptionId', ParseIntPipe) subscriptionId: number,
+    @Body() dto?: DeactivateTrialDto
+  ) {
+    return this.trialService.deactivateTrialAdmin(subscriptionId, dto)
+  }
+
+  @Post('trials/assign')
+  async assignTrial(@Body() dto: AssignTrialDto) {
+    return this.trialService.assignTrialAdmin(dto)
   }
 }

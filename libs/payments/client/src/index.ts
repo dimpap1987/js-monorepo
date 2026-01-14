@@ -7,8 +7,11 @@ export * from './lib/components/subscription'
 export * from './lib/queries/payments-queries'
 export * from './lib/types'
 export {
+  apiAssignTrial,
   apiCancelSubscription,
   apiCreatePortalSession,
+  apiDeactivateTrial,
+  apiExtendTrial,
   apiGetInvoices,
   apiGetSubscription,
   apiRenewSubscription,

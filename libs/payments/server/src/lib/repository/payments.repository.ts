@@ -141,6 +141,17 @@ export class PaymentsRepository {
     })
   }
 
+  async findAuthUserById(userId: number) {
+    return this.txHost.tx.authUser.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+      },
+    })
+  }
+
   async findPaymentCustomerByStripeId(stripeCustomerId: string) {
     return this.txHost.tx.paymentCustomer.findUniqueOrThrow({
       where: {
@@ -448,6 +459,113 @@ export class PaymentsRepository {
       include: {
         paymentCustomer: { include: { authUser: true } },
         price: { include: { product: true } },
+      },
+    })
+  }
+
+  async extendTrialSubscription(subscriptionId: number, additionalDays: number) {
+    const subscription = await this.txHost.tx.subscription.findUniqueOrThrow({
+      where: { id: subscriptionId },
+      select: { trialEnd: true },
+    })
+
+    const newTrialEnd = new Date(subscription.trialEnd)
+    newTrialEnd.setDate(newTrialEnd.getDate() + additionalDays)
+
+    return this.txHost.tx.subscription.update({
+      where: { id: subscriptionId },
+      data: {
+        trialEnd: newTrialEnd,
+        currentPeriodEnd: newTrialEnd, // Update current period end to match trial end
+      },
+      include: {
+        paymentCustomer: { include: { authUser: true } },
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async deactivateTrialSubscription(subscriptionId: number, reason?: string) {
+    return this.txHost.tx.subscription.update({
+      where: { id: subscriptionId },
+      data: {
+        status: 'canceled',
+        canceledAt: new Date(),
+        cancelReason: reason || 'admin_deactivated',
+      },
+      include: {
+        paymentCustomer: { include: { authUser: true } },
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async findTrialSubscriptionById(subscriptionId: number) {
+    return this.txHost.tx.subscription.findUnique({
+      where: { id: subscriptionId },
+      include: {
+        paymentCustomer: { include: { authUser: true } },
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async findActiveSubscriptionsByUserId(userId: number) {
+    return this.txHost.tx.subscription.findMany({
+      where: {
+        paymentCustomer: { userId },
+        status: {
+          in: ACTIVE_SUBSCRIPTION_STATUSES,
+        },
+      },
+      include: {
+        paymentCustomer: { include: { authUser: true } },
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async findActiveTrialsByUserId(userId: number) {
+    return this.txHost.tx.subscription.findMany({
+      where: {
+        paymentCustomer: { userId },
+        status: 'trialing',
+        stripeSubscriptionId: null, // Only local trials
+      },
+      include: {
+        paymentCustomer: { include: { authUser: true } },
+        price: { include: { product: true } },
+      },
+    })
+  }
+
+  async cancelActiveSubscriptionsForUser(userId: number, reason: string = 'admin_replaced') {
+    return this.txHost.tx.subscription.updateMany({
+      where: {
+        paymentCustomer: { userId },
+        status: {
+          in: ACTIVE_SUBSCRIPTION_STATUSES,
+        },
+      },
+      data: {
+        status: 'canceled',
+        canceledAt: new Date(),
+        cancelReason: reason,
+      },
+    })
+  }
+
+  async cancelActiveTrialsForUser(userId: number, reason: string = 'admin_replaced') {
+    return this.txHost.tx.subscription.updateMany({
+      where: {
+        paymentCustomer: { userId },
+        status: 'trialing',
+        stripeSubscriptionId: null, // Only local trials
+      },
+      data: {
+        status: 'canceled',
+        canceledAt: new Date(),
+        cancelReason: reason,
       },
     })
   }

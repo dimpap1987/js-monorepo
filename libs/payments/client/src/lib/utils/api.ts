@@ -57,3 +57,15 @@ export async function apiStartTrial(
   const key = idempotencyKey ?? generateIdempotencyKey()
   return apiClient.post('/payments/trial/start', { priceId }, { headers: { [IDEMPOTENCY_HEADER]: key } })
 }
+
+export async function apiExtendTrial(subscriptionId: number, additionalDays: number) {
+  return apiClient.post(`/payments/admin/trials/${subscriptionId}/extend`, { additionalDays })
+}
+
+export async function apiDeactivateTrial(subscriptionId: number, reason?: string) {
+  return apiClient.post(`/payments/admin/trials/${subscriptionId}/deactivate`, reason ? { reason } : {})
+}
+
+export async function apiAssignTrial(userId: number, priceId: number, trialDurationDays: number) {
+  return apiClient.post('/payments/admin/trials/assign', { userId, priceId, trialDurationDays })
+}

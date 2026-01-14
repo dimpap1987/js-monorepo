@@ -18,6 +18,7 @@ import { AuthUserFullDto } from '@js-monorepo/types/auth'
 import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import { formatForUser } from '@js-monorepo/utils/date'
 import {
+  CalendarPlus,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -28,6 +29,9 @@ import {
   UserCog,
 } from 'lucide-react'
 import { Suspense, useCallback, useState } from 'react'
+import { apiAssignTrial } from '@js-monorepo/payments-ui'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { AssignTrialDialog } from './components/assign-trial-dialog'
 import { ConfirmDialog } from './components/confirm-dialog'
 import { useDeleteUser, useImpersonateUser, useUpdateUser, useUsers } from './queries'
 import { UserEditDialog } from './user-edit-dialog'
@@ -40,6 +44,7 @@ interface UsersTableProps {
   onEdit?: (user: AuthUserFullDto) => void
   onDelete?: (user: AuthUserFullDto) => void
   onImpersonate?: (user: AuthUserFullDto) => void
+  onAssignTrial?: (user: AuthUserFullDto) => void
 }
 
 function TablePagination({
@@ -139,6 +144,7 @@ function UsersTable({
   onEdit,
   onDelete,
   onImpersonate,
+  onAssignTrial,
 }: UsersTableProps) {
   const userTimezone = useTimezone()
   const users = data?.content || []
@@ -197,6 +203,16 @@ function UsersTable({
                         <UserCog className="w-4 h-4 mr-2" />
                         Impersonate
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          setTimeout(() => {
+                            onAssignTrial?.(user)
+                          }, 100)
+                        }}
+                      >
+                        <CalendarPlus className="w-4 h-4 mr-2" />
+                        Assign Trial
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => onDelete?.(user)}
@@ -230,6 +246,38 @@ function DashboardUsersTableContent() {
 
   const [editUser, setEditUser] = useState<AuthUserFullDto | null>(null)
   const [deleteUser, setDeleteUser] = useState<AuthUserFullDto | null>(null)
+  const [assignTrialUser, setAssignTrialUser] = useState<AuthUserFullDto | null>(null)
+  const queryClient = useQueryClient()
+
+  const assignTrialMutation = useMutation({
+    mutationFn: ({
+      userId,
+      priceId,
+      trialDurationDays,
+    }: {
+      userId: number
+      priceId: number
+      trialDurationDays: number
+    }) => apiAssignTrial(userId, priceId, trialDurationDays),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscriptions'] })
+      queryClient.invalidateQueries({ queryKey: ['subscription-stats'] })
+      addNotification({
+        message: 'Trial Assigned',
+        description: `Trial has been assigned successfully`,
+        type: 'success',
+      })
+      setAssignTrialUser(null)
+      refetch()
+    },
+    onError: (error: any) => {
+      addNotification({
+        message: 'Failed to Assign Trial',
+        description: error?.message || 'An error occurred while assigning the trial',
+        type: 'error',
+      })
+    },
+  })
 
   const handleUpdateUser = async (userData: UpdateUserSchemaType) => {
     if (!editUser) return
@@ -292,6 +340,7 @@ function DashboardUsersTableContent() {
         onEdit={setEditUser}
         onDelete={setDeleteUser}
         onImpersonate={handleImpersonate}
+        onAssignTrial={setAssignTrialUser}
       />
       <UserEditDialog
         user={editUser}
@@ -309,6 +358,15 @@ function DashboardUsersTableContent() {
         onConfirm={handleDeleteUser}
         isLoading={deleteUserMutation.isPending}
         variant="destructive"
+      />
+      <AssignTrialDialog
+        user={assignTrialUser}
+        open={!!assignTrialUser}
+        onOpenChange={(open) => !open && setAssignTrialUser(null)}
+        onAssign={async (userId, priceId, trialDurationDays) => {
+          await assignTrialMutation.mutateAsync({ userId, priceId, trialDurationDays })
+        }}
+        isLoading={assignTrialMutation.isPending}
       />
     </>
   )
