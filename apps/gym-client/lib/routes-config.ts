@@ -1,7 +1,7 @@
 import { MenuItem } from '@js-monorepo/types/menu'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdAccountCircle, MdPalette } from 'react-icons/md'
-import { RiDashboardLine, RiPriceTag3Line } from 'react-icons/ri'
+import { RiSdCardLine, RiDashboardLine, RiPriceTag3Line } from 'react-icons/ri'
 import { Role, type RouteRole } from './roles'
 
 export interface RouteConfig {
@@ -55,6 +55,12 @@ export const SETTINGS_NAV_ITEMS = [
     label: 'settings.nav.account.label',
     icon: MdAccountCircle,
     description: 'settings.nav.account.description',
+  },
+  {
+    href: '/settings/subscription',
+    label: 'settings.nav.subscription.label',
+    icon: RiSdCardLine,
+    description: 'settings.nav.subscription.description',
   },
   {
     href: '/settings/appearance',

@@ -320,10 +320,10 @@ export class PaymentsRepository {
     return activeSubscription?.price?.product?.hierarchy || null
   }
 
-  async getHighestActiveSubscriptionByUser(userId: number) {
-    // Get all active subscriptions/trials and return the one with highest hierarchy
+  async getActiveSubscriptionsByUserOrderedByHierarchy(userId: number) {
+    // Get all active subscriptions/trials ordered by hierarchy (highest first)
     // This includes both 'active' (paid) and 'trialing' (local trials) statuses
-    const activeSubscriptions = await this.txHost.tx.subscription.findMany({
+    return this.txHost.tx.subscription.findMany({
       where: {
         paymentCustomer: { userId },
         status: {
@@ -348,9 +348,6 @@ export class PaymentsRepository {
         },
       },
     })
-
-    // Return the subscription with the highest hierarchy (first one after ordering)
-    return activeSubscriptions[0] || null
   }
 
   async findProductyByName(name: string) {

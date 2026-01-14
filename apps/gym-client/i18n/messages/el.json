@@ -26,6 +26,10 @@
         "label": "Λογαριασμός",
         "description": "Πληροφορίες λογαριασμού"
       },
+      "subscription": {
+        "label": "Συνδρομή",
+        "description": "Διαχείριση συνδρομής"
+      },
       "appearance": {
         "label": "Εμφάνιση",
         "description": "Αλλαγή εμφάνισης εφαρμογής"
@@ -34,6 +38,12 @@
         "label": "Ειδοποιήσεις",
         "description": "Push ειδοποιήσεις"
       }
+    },
+    "subscription": {
+      "title": "Συνδρομή",
+      "description": "Διαχείριση συνδρομής",
+      "currentPlan": "Τρέχον Σχέδιο",
+      "invoiceHistory": "Ιστορικό Τιμολογίων"
     }
   }
 }

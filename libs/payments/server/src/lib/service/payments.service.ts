@@ -113,10 +113,10 @@ export class PaymentsService {
   }
 
   async findUserSubscriptionStatus(userId: number) {
-    // This includes both paid subscriptions and trials, prioritizing higher tiers
-    const highestSubscription = await this.paymentsRepository.getHighestActiveSubscriptionByUser(userId)
+    // Get all active subscriptions/trials ordered by hierarchy (single query)
+    const activeSubscriptions = await this.paymentsRepository.getActiveSubscriptionsByUserOrderedByHierarchy(userId)
 
-    if (!highestSubscription) {
+    if (activeSubscriptions.length === 0) {
       return {
         isSubscribed: false,
         isTrial: false,
@@ -124,16 +124,41 @@ export class PaymentsService {
         subscriptionId: null,
         priceId: null,
         trialEnd: null,
+        hasPaidSubscription: false,
+        paidSubscriptionPlan: null,
+        trialSubscriptionPlan: null,
+        trialSubscriptionId: null,
       }
     }
 
+    const highestSubscription = activeSubscriptions[0]
+
+    // Find paid subscription (status === 'active' and has stripeSubscriptionId)
+    const paidSubscription = activeSubscriptions.find(
+      (sub) => sub.status === 'active' && sub.stripeSubscriptionId !== null
+    )
+
+    // Find trial subscription (status === 'trialing')
+    const trialSubscription = activeSubscriptions.find((sub) => sub.status === 'trialing')
+
+    // Determine if highest is trial and if there's a separate paid subscription
+    const isHighestSubscriptionTrial = highestSubscription.status === 'trialing'
+    const hasPaidSubscription =
+      isHighestSubscriptionTrial && !!paidSubscription && paidSubscription.id !== highestSubscription.id
+
     return {
       isSubscribed: true,
-      isTrial: highestSubscription.status === 'trialing',
+      isTrial: isHighestSubscriptionTrial,
       plan: highestSubscription.price?.product?.name || null,
       subscriptionId: highestSubscription.id,
       priceId: highestSubscription.price?.id || null,
       trialEnd: highestSubscription.trialEnd || null,
+      // Inform user about their paid subscription even if they're on a trial
+      hasPaidSubscription,
+      paidSubscriptionPlan: hasPaidSubscription ? paidSubscription.price?.product?.name || null : null,
+      // Trial subscription details (if different from highest)
+      trialSubscriptionPlan: trialSubscription ? trialSubscription.price?.product?.name || null : null,
+      trialSubscriptionId: trialSubscription ? trialSubscription.id : null,
     }
   }
 

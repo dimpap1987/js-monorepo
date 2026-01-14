@@ -12,10 +12,12 @@ import {
   usePlans,
 } from '@js-monorepo/payments-ui'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { SettingsItem } from '../settings-items'
 import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 
 export function SubscriptionSettings() {
+  const t = useTranslations()
   const { session, refreshSession } = useSession()
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
@@ -102,12 +104,12 @@ export function SubscriptionSettings() {
     <section className="space-y-6">
       {/* Page Header */}
       <BackArrowWithLabel>
-        <h2 className="mb-2">Subscription</h2>
-        <p className="text-sm text-foreground-muted">Manage your subscription and billing</p>
+        <h2 className="mb-2">{t('settings.subscription.title')}</h2>
+        <p className="text-sm text-foreground-muted">{t('settings.subscription.description')}</p>
       </BackArrowWithLabel>
 
       {/* Subscription Management */}
-      <SettingsItem label="Current Plan">
+      <SettingsItem label={t('settings.subscription.currentPlan')}>
         {isLoading ? (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
@@ -132,6 +134,9 @@ export function SubscriptionSettings() {
             planInterval={planDetails?.interval || 'month'}
             planFeatures={planDetails?.features || {}}
             priceId={planDetails?.priceId || 0}
+            hasPaidSubscription={sessionSubscription?.hasPaidSubscription || false}
+            paidSubscriptionPlan={sessionSubscription?.paidSubscriptionPlan || null}
+            trialSubscriptionPlan={sessionSubscription?.trialSubscriptionPlan || null}
             onCancelSuccess={handleCancelSuccess}
             onRenewSuccess={handleRenewSuccess}
           />
@@ -139,7 +144,7 @@ export function SubscriptionSettings() {
       </SettingsItem>
 
       {/* Invoice History */}
-      <SettingsItem label="Invoice History">
+      <SettingsItem label={t('settings.subscription.invoiceHistory')}>
         <InvoiceHistory />
       </SettingsItem>
     </section>

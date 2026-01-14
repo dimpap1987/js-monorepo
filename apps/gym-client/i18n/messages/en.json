@@ -26,6 +26,10 @@
         "label": "Account",
         "description": "Account information"
       },
+      "subscription": {
+        "label": "Subscription",
+        "description": "Manage your subscription"
+      },
       "appearance": {
         "label": "Appearance",
         "description": "Themes and preferences"
@@ -34,6 +38,12 @@
         "label": "Notifications",
         "description": "Push notifications and alerts"
       }
+    },
+    "subscription": {
+      "title": "Subscription",
+      "description": "Manage your subscription",
+      "currentPlan": "Current Plan",
+      "invoiceHistory": "Invoice History"
     }
   }
 }

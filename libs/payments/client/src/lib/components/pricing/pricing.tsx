@@ -15,6 +15,7 @@ import { PricingCardSkeleton } from './pricing-card-skeleton'
 import { PricingFAQ } from './pricing-faq'
 import { PricingHero } from './pricing-hero'
 import { PricingTrustSignals } from './pricing-trust-signals'
+import { SubscriptionStatusIndication } from './subscription-status-indication'
 
 export function Pricing() {
   const { session, isLoggedIn } = useSession()
@@ -255,6 +256,8 @@ export function Pricing() {
             ))}
       </section>
 
+      {/* Subscription Status Indication */}
+      <SubscriptionStatusIndication subscription={sessionSubscription} className="max-w-6xl mx-auto px-4" />
       {/* FAQ Section */}
       <PricingFAQ className="px-4" />
 

@@ -3,7 +3,7 @@
 import { DpButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
-import { Calendar, CheckCircle, CreditCard, RefreshCw, XCircle } from 'lucide-react'
+import { Calendar, CheckCircle, CreditCard, Info, RefreshCw, XCircle } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { Subscription } from '../../types'
 import { formatForUser } from '@js-monorepo/utils/date'
@@ -25,6 +25,9 @@ interface SubscriptionManagementProps {
   planInterval: string
   planFeatures: Record<string, string>
   priceId: number
+  hasPaidSubscription?: boolean
+  paidSubscriptionPlan?: string | null
+  trialSubscriptionPlan?: string | null
   onCancelSuccess?: () => void
   onRenewSuccess?: () => void
 }
@@ -81,6 +84,9 @@ export function SubscriptionManagement({
   planInterval,
   planFeatures,
   priceId,
+  hasPaidSubscription = false,
+  paidSubscriptionPlan = null,
+  trialSubscriptionPlan = null,
   onCancelSuccess,
   onRenewSuccess,
 }: SubscriptionManagementProps) {
@@ -215,19 +221,43 @@ export function SubscriptionManagement({
     )
   }
 
+  const isTrial = subscription?.status === 'trialing'
+
   return (
     <div className="space-y-6">
+      {/* Inform user about paid subscription if they're on a trial */}
+      {isTrial && hasPaidSubscription && paidSubscriptionPlan && (
+        <div className="flex items-start gap-3 rounded-lg border border-status-info bg-status-info-bg p-4">
+          <Info className="h-5 w-5 shrink-0 text-status-info mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-foreground">Your paid subscription is safe</p>
+            <p className="text-sm text-foreground-neutral">
+              You're currently on a <strong>{planName}</strong> trial. Your <strong>{paidSubscriptionPlan}</strong>{' '}
+              subscription remains active and will continue after the trial ends.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Plan Header */}
       <div className="flex items-start justify-between gap-2 flex-wrap">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h2 className="font-semibold text-foreground capitalize">{planName} Plan</h2>
+            <h2 className="font-semibold text-foreground capitalize">
+              {planName} Plan {isTrial && <span className="text-sm font-normal text-status-info">(Trial)</span>}
+            </h2>
             <StatusBadge status={status} />
           </div>
           <p className="text-2xl font-bold text-foreground">
             €{planPrice}
             <span className="text-base font-normal text-foreground-neutral">/{planInterval}</span>
           </p>
+          {/* Show active paid subscription if different from current trial */}
+          {isTrial && hasPaidSubscription && paidSubscriptionPlan && (
+            <p className="text-sm text-foreground-muted mt-1">
+              Active subscription: <span className="font-medium capitalize">{paidSubscriptionPlan}</span>
+            </p>
+          )}
         </div>
         <PlanBadge plan={planName} size="md"></PlanBadge>
       </div>

@@ -27,6 +27,10 @@ export interface SessionSubscription {
   subscriptionId: number | null
   priceId: number | null
   trialEnd: Date | null
+  hasPaidSubscription: boolean
+  paidSubscriptionPlan: string | null
+  trialSubscriptionPlan: string | null
+  trialSubscriptionId: number | null
 }
 
 export interface TrialEligibilityResponse {
