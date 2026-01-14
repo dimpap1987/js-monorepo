@@ -24,8 +24,10 @@ import {
   Input,
 } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
+import { formatPrice } from '@js-monorepo/currency'
 import { useAdminPrices, useAdminProducts } from '@js-monorepo/payments-ui'
 import { AuthUserFullDto } from '@js-monorepo/types/auth'
+import { useLocale } from 'next-intl'
 
 const assignTrialSchema = z.object({
   productId: z.coerce.number().int().positive('Product is required'),
@@ -48,6 +50,7 @@ interface AssignTrialDialogProps {
 }
 
 export function AssignTrialDialog({ user, open, onOpenChange, onAssign, isLoading = false }: AssignTrialDialogProps) {
+  const locale = useLocale() as 'en' | 'el'
   // Fetch all products (active only for selection)
   const { data: productsData } = useAdminProducts(1, 100, { active: true })
   const products = productsData?.content || []
@@ -160,12 +163,11 @@ export function AssignTrialDialog({ user, open, onOpenChange, onAssign, isLoadin
                             </SelectItem>
                           ) : (
                             activePrices.map((price) => {
-                              const amount = (price.unitAmount / 100).toFixed(2)
-                              const currency = price.currency.toUpperCase()
+                              const formattedPrice = formatPrice(price.unitAmount, locale, price.currency.toUpperCase())
                               const interval = price.interval === 'month' ? 'mo' : 'yr'
                               return (
                                 <SelectItem key={price.id} value={price.id.toString()}>
-                                  {currency} {amount}/{interval}
+                                  {formattedPrice}/{interval}
                                 </SelectItem>
                               )
                             })

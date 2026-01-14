@@ -1,10 +1,12 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
+import { formatPrice } from '@js-monorepo/currency'
 import { Card, CardContent, CardFooter, CardHeader } from '@js-monorepo/components/ui/card'
 import { UsageBar } from '@js-monorepo/components/ui/usage-bar'
 import { cn } from '@js-monorepo/ui/util'
 import { Check } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { useMemo } from 'react'
 import { Subscription, TrialEligibilityResponse } from '../../types'
 import { ProductMetadata } from '@js-monorepo/types/pricing'
@@ -13,7 +15,9 @@ interface PricingCardProps {
   id: number
   name: string
   description: string
-  price: number
+  price: number // Amount in dollars/euros (already converted from cents)
+  priceInCents?: number // Original price in cents (for formatting)
+  currency?: string // Currency code (e.g., 'USD', 'EUR')
   interval: string
   metadata: ProductMetadata
   isPopular?: boolean
@@ -34,6 +38,8 @@ export function PricingCard({
   name,
   description,
   price,
+  priceInCents,
+  currency,
   interval,
   metadata,
   isPopular,
@@ -48,7 +54,23 @@ export function PricingCard({
   trialEligibility,
   isOnTrial,
 }: PricingCardProps) {
+  const locale = useLocale() as 'en' | 'el'
   const isFree = price == 0
+
+  // Format price with currency symbol
+  const formattedPrice = useMemo(() => {
+    if (isFree) return 'Free'
+    if (priceInCents !== undefined) {
+      return formatPrice(priceInCents, locale, currency)
+    }
+    // Fallback: format the already-converted price
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency || (locale === 'el' ? 'EUR' : 'USD'),
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price)
+  }, [isFree, priceInCents, price, locale, currency])
   const canTrial = isLoggedIn && !isFree && trialEligibility?.eligible && !subscribed
   const trialNotEligible = isLoggedIn && !isFree && trialEligibility && !trialEligibility.eligible && !subscribed
 
@@ -137,7 +159,7 @@ export function PricingCard({
         {/* Price */}
         <div className="text-center mb-6">
           <div className="flex items-baseline justify-center gap-1">
-            <span className="text-4xl font-bold text-foreground">{isFree ? 'Free' : `${price}`}</span>
+            <span className="text-4xl font-bold text-foreground">{formattedPrice}</span>
             {!isFree && interval && <span className="text-foreground-neutral">/{interval}</span>}
           </div>
         </div>

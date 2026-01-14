@@ -1,10 +1,12 @@
 'use client'
 
 import { DpButton } from '@js-monorepo/button'
+import { formatPrice } from '@js-monorepo/currency'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
 import { Calendar, CheckCircle, CreditCard, Info, RefreshCw, XCircle } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useLocale } from 'next-intl'
+import { useCallback, useMemo, useState } from 'react'
 import { Subscription } from '../../types'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { useTimezone } from '@js-monorepo/next/hooks'
@@ -21,7 +23,9 @@ import { RenewSubscriptionDialog } from './renew-subscription-dialog'
 interface SubscriptionManagementProps {
   subscription: Subscription | null
   planName: string
-  planPrice: number
+  planPrice: number // Amount in dollars/euros (already converted from cents)
+  priceInCents?: number // Original price in cents (for formatting)
+  currency?: string // Currency code (e.g., 'USD', 'EUR')
   planInterval: string
   planFeatures: Record<string, string>
   priceId: number
@@ -81,6 +85,8 @@ export function SubscriptionManagement({
   subscription,
   planName,
   planPrice,
+  priceInCents,
+  currency,
   planInterval,
   planFeatures,
   priceId,
@@ -90,12 +96,27 @@ export function SubscriptionManagement({
   onCancelSuccess,
   onRenewSuccess,
 }: SubscriptionManagementProps) {
+  const locale = useLocale() as 'en' | 'el'
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
   const [isRenewDialogOpen, setIsRenewDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isPortalLoading, setIsPortalLoading] = useState(false)
   const { addNotification } = useNotifications()
   const userTimezone = useTimezone()
+
+  // Format price with currency symbol
+  const formattedPrice = useMemo(() => {
+    if (priceInCents !== undefined) {
+      return formatPrice(priceInCents, locale, currency)
+    }
+    // Fallback: format the already-converted price
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency || (locale === 'el' ? 'EUR' : 'USD'),
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(planPrice)
+  }, [priceInCents, planPrice, locale, currency])
 
   const status = getSubscriptionStatus(subscription)
 
@@ -249,7 +270,7 @@ export function SubscriptionManagement({
             <StatusBadge status={status} />
           </div>
           <p className="text-2xl font-bold text-foreground">
-            €{planPrice}
+            {formattedPrice}
             <span className="text-base font-normal text-foreground-neutral">/{planInterval}</span>
           </p>
           {/* Show active paid subscription if different from current trial */}

@@ -21,6 +21,7 @@ import {
 } from '@js-monorepo/components/ui/dropdown'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
+import { formatPrice } from '@js-monorepo/currency'
 import { usePaginationWithParams, useTimezone } from '@js-monorepo/next/hooks'
 import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
 import { useNotifications } from '@js-monorepo/notification'
@@ -267,16 +268,28 @@ function SubscriptionsPageContent() {
         accessorKey: 'amount',
         size: 120,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
-        cell: ({ row }) => (
-          <div className="flex gap-1">
-            <p className="font-medium">
-              {row.original.status === 'trialing'
-                ? '0'
-                : `${row.original.price.unitAmount / 100} ${row.original.price.currency}`}
-            </p>
-            <p className="text-sm text-muted-foreground">/{row.original.price.interval}</p>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const sub = row.original
+          if (sub.status === 'trialing') {
+            return (
+              <div className="flex gap-1">
+                <p className="font-medium">0</p>
+                <p className="text-sm text-muted-foreground">/{sub.price.interval}</p>
+              </div>
+            )
+          }
+          const formattedPrice = formatPrice(
+            sub.price.unitAmount,
+            currentLocale as 'en' | 'el',
+            sub.price.currency.toUpperCase()
+          )
+          return (
+            <div className="flex gap-1">
+              <p className="font-medium">{formattedPrice}</p>
+              <p className="text-sm text-muted-foreground">/{sub.price.interval}</p>
+            </div>
+          )
+        },
       },
       {
         accessorKey: 'currentPeriodEnd',
@@ -382,7 +395,7 @@ function SubscriptionsPageContent() {
         },
       },
     ],
-    [userTimezone, setExtendTrialDialog, setDeactivateTrialDialog]
+    [userTimezone, currentLocale, setExtendTrialDialog, setDeactivateTrialDialog]
   )
 
   return (
@@ -395,7 +408,11 @@ function SubscriptionsPageContent() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Active Subscriptions" value={stats?.activeCount ?? '-'} icon={Users} />
-        <StatCard title="Monthly Revenue" value={stats?.mrr ? `${stats.mrr / 100} EUR` : '-'} icon={TrendingUp} />
+        <StatCard
+          title="Monthly Revenue"
+          value={stats?.mrr ? formatPrice(stats.mrr, currentLocale as 'en' | 'el', 'EUR') : '-'}
+          icon={TrendingUp}
+        />
         <StatCard title="Active Trials" value={stats?.trialingCount ?? '-'} icon={Zap} />
         <StatCard title="Churned (This Month)" value={stats?.churnedThisMonth ?? '-'} icon={TrendingDown} />
       </div>

@@ -1,8 +1,10 @@
 'use client'
 
+import { formatPrice } from '@js-monorepo/currency'
 import { DpButton } from '@js-monorepo/button'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { ChevronDown, Download, ExternalLink, FileText, Receipt } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { Invoice } from '../../types'
 import { apiGetInvoices } from '../../utils/api'
@@ -16,14 +18,19 @@ function formatDate(dateString: string, userTimezone: string): string {
   return formatForUser(dateString, userTimezone, 'PPP')
 }
 
-function formatAmount(amount: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-  }).format(amount / 100)
+function formatAmount(amountInCents: number, currency: string, locale: 'en' | 'el'): string {
+  return formatPrice(amountInCents, locale, currency.toUpperCase())
 }
 
-function InvoiceRow({ invoice, userTimezone }: { invoice: Invoice; userTimezone: string }) {
+function InvoiceRow({
+  invoice,
+  userTimezone,
+  locale,
+}: {
+  invoice: Invoice
+  userTimezone: string
+  locale: 'en' | 'el'
+}) {
   const handleDownload = () => {
     if (invoice.pdfUrl) {
       window.open(invoice.pdfUrl, '_blank', 'noopener,noreferrer')
@@ -54,7 +61,7 @@ function InvoiceRow({ invoice, userTimezone }: { invoice: Invoice; userTimezone:
       </div>
 
       <div className="flex items-center gap-4 shrink-0">
-        <span className="font-semibold text-foreground">{formatAmount(invoice.amount, invoice.currency)}</span>
+        <span className="font-semibold text-foreground">{formatAmount(invoice.amount, invoice.currency, locale)}</span>
 
         <div className="flex items-center gap-1">
           {invoice.hostedInvoiceUrl && (
@@ -122,6 +129,7 @@ function EmptyState() {
 }
 
 export function InvoiceHistory() {
+  const locale = useLocale() as 'en' | 'el'
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -193,7 +201,7 @@ export function InvoiceHistory() {
     <div>
       <div className="divide-y divide-border">
         {invoices.map((invoice) => (
-          <InvoiceRow key={invoice.id} invoice={invoice} userTimezone={userTimezone} />
+          <InvoiceRow key={invoice.id} invoice={invoice} userTimezone={userTimezone} locale={locale} />
         ))}
       </div>
       {hasMore && (

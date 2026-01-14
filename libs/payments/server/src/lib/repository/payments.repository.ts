@@ -569,7 +569,7 @@ export class PaymentsRepository {
     })
   }
 
-  async cancelActiveSubscriptionsForUser(userId: number, reason: string = 'admin_replaced') {
+  async cancelActiveSubscriptionsForUser(userId: number, reason = 'admin_replaced') {
     return this.txHost.tx.subscription.updateMany({
       where: {
         paymentCustomer: { userId },
@@ -585,7 +585,7 @@ export class PaymentsRepository {
     })
   }
 
-  async cancelActiveTrialsForUser(userId: number, reason: string = 'admin_replaced') {
+  async cancelActiveTrialsForUser(userId: number, reason = 'admin_replaced') {
     return this.txHost.tx.subscription.updateMany({
       where: {
         paymentCustomer: { userId },

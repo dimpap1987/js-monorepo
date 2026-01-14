@@ -1,5 +1,6 @@
 'use client'
 
+import { centsToAmount } from '@js-monorepo/currency'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { useWebSocketEvent } from '@js-monorepo/next/providers'
@@ -74,7 +75,9 @@ export function SubscriptionSettings() {
       if (price) {
         return {
           name: plan.name,
-          price: price.unitAmount,
+          price: centsToAmount(price.unitAmount), // Convert cents to amount
+          priceInCents: price.unitAmount, // Keep original for formatting
+          currency: price.currency,
           interval: price.interval,
           features: plan.metadata?.features,
           priceId: price.id,
@@ -131,6 +134,8 @@ export function SubscriptionSettings() {
             subscription={subscription}
             planName={planDetails?.name || 'Unknown'}
             planPrice={planDetails?.price || 0}
+            priceInCents={planDetails?.priceInCents}
+            currency={planDetails?.currency}
             planInterval={planDetails?.interval || 'month'}
             planFeatures={planDetails?.features || {}}
             priceId={planDetails?.priceId || 0}

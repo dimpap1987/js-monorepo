@@ -1,11 +1,13 @@
 'use client'
 
 import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
+import { centsToAmount } from '@js-monorepo/currency'
 import { SnapCarousel } from '@js-monorepo/components/ui/snap-carousel'
 import { ConfirmDialog, ErrorDialog } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { usePlans } from '../../queries/payments-queries'
 import { POPULAR_PLAN_NAME, SessionSubscription, Subscription } from '../../types'
@@ -18,6 +20,7 @@ import { PricingTrustSignals } from './pricing-trust-signals'
 import { SubscriptionStatusIndication } from './subscription-status-indication'
 
 export function Pricing() {
+  const locale = useLocale() as 'en' | 'el'
   const { session, isLoggedIn } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -41,7 +44,9 @@ export function Pricing() {
             id: price.id,
             name: plan.name,
             description: plan.description,
-            price: price.unitAmount / 100,
+            price: centsToAmount(price.unitAmount), // Convert cents to amount
+            priceInCents: price.unitAmount, // Keep original for formatting
+            currency: price.currency,
             interval: price.interval,
             metadata: plan.metadata,
             isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
@@ -206,6 +211,8 @@ export function Pricing() {
                 name={card.name}
                 description={card.description}
                 price={card.price}
+                priceInCents={card.priceInCents}
+                currency={card.currency}
                 interval={card.interval}
                 metadata={card.metadata}
                 isPopular={card.isPopular}
@@ -239,6 +246,8 @@ export function Pricing() {
                 name={card.name}
                 description={card.description}
                 price={card.price}
+                priceInCents={card.priceInCents}
+                currency={card.currency}
                 interval={card.interval}
                 metadata={card.metadata}
                 isPopular={card.isPopular}

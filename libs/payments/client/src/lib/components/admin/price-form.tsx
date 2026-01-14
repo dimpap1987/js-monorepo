@@ -1,5 +1,6 @@
 'use client'
 
+import { amountToCents, centsToAmount } from '@js-monorepo/currency'
 import { DpButton } from '@js-monorepo/button'
 import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
 import { Input } from '@js-monorepo/components/ui/form'
@@ -44,7 +45,7 @@ export function PriceForm({ price, products, defaultProductId, onSubmit, onCance
     resolver: zodResolver(priceSchema),
     defaultValues: {
       productId: price?.productId || defaultProductId || 0,
-      amount: price ? price.unitAmount / 100 : 0,
+      amount: price ? centsToAmount(price.unitAmount) : 0, // Convert cents to amount
       currency: price?.currency?.toUpperCase() || 'EUR',
       interval: (price?.interval as 'month' | 'year') || 'month',
       active: price?.active ?? true,
@@ -66,7 +67,7 @@ export function PriceForm({ price, products, defaultProductId, onSubmit, onCance
   }, [watchedProductId, products, isEditMode, form])
 
   const handleSubmit = async (data: PriceFormValues) => {
-    const unitAmount = Math.round(data.amount * 100) // Convert to cents
+    const unitAmount = amountToCents(data.amount) // Convert amount to cents
 
     if (isEditMode) {
       await onSubmit({
