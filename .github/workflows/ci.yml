@@ -317,6 +317,8 @@ jobs:
           GYM_DATABASE_URL: ${{ secrets.GYM_DATABASE_URL_PROD }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }}
           NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD }}
+          NEXT_PUBLIC_EN_DOMAIN: ${{ secrets.NEXT_PUBLIC_EN_DOMAIN }}
+          NEXT_PUBLIC_EL_DOMAIN: ${{ secrets.NEXT_PUBLIC_EL_DOMAIN }}
         run: ${{ matrix.build-cmd }}
 
       - name: Upload build artifacts

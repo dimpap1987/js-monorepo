@@ -14,6 +14,9 @@ export type Locale = (typeof AppConfig.locales)[number]
 const enHost = process.env.NEXT_PUBLIC_EN_DOMAIN
 const elHost = process.env.NEXT_PUBLIC_EL_DOMAIN
 
+// NEXT_PUBLIC_* env vars are injected at build time into the static bundle
+// If missing at build time, they won't be available at runtime either
+// In production, these should always be set during build
 if (!AppConfig.isDev && (!enHost || !elHost)) {
   throw new Error('NEXT_PUBLIC_EN_DOMAIN or NEXT_PUBLIC_EL_DOMAIN is missing')
 }
