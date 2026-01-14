@@ -2,13 +2,14 @@
 
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useDeviceType } from '@js-monorepo/next/hooks'
+import { useHasSubscriptionHistory } from '@js-monorepo/payments-ui'
 import { ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
-import { SETTINGS_NAV_ITEMS } from '../../../lib/routes-config'
+import { useTranslations } from 'next-intl'
 import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { MdChevronLeft } from 'react-icons/md'
+import { SETTINGS_NAV_ITEMS } from '../../../lib/routes-config'
 import { SettingsMobileTabs } from './settings-mobile-tabs'
-import { useTranslations } from 'next-intl'
 
 interface SettingsSidebarProps {
   isCollapsed: boolean
@@ -17,15 +18,23 @@ interface SettingsSidebarProps {
 
 function SettingsSidebar({ isCollapsed, onToggle }: SettingsSidebarProps) {
   const t = useTranslations()
+  const { data: hasSubscriptionHistory = false } = useHasSubscriptionHistory()
 
-  // 1. Memoize and translate both label and description
   const translatedSettingsItems = useMemo(() => {
-    return SETTINGS_NAV_ITEMS.map((item) => ({
+    const items = SETTINGS_NAV_ITEMS.filter((item) => {
+      // Hide subscription item if user doesn't have subscription history
+      if (item.href === '/settings/subscription') {
+        return hasSubscriptionHistory
+      }
+      return true
+    })
+
+    return items.map((item) => ({
       ...item,
       label: t(item.label),
       description: t(item.description),
     }))
-  }, [t])
+  }, [t, hasSubscriptionHistory])
 
   return (
     <div>

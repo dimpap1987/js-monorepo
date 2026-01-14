@@ -8,7 +8,7 @@ if (!API_URL) {
   console.warn('[auth/next/server] API_URL environment variable is not set')
 }
 
-function createCookieHeaders(): Headers {
+export async function createCookieHeaders(): Promise<Headers> {
   const headers = new Headers()
   const cookieStore = cookies()
 
@@ -30,7 +30,7 @@ export async function getCurrentSession() {
   }
 
   try {
-    const headers = createCookieHeaders()
+    const headers = await createCookieHeaders()
     const url = `${API_URL}/api/session`
     const response = await fetch(url, {
       method: 'GET',
@@ -78,7 +78,7 @@ export async function findUnregisteredUser(headers?: Headers) {
   }
 
   try {
-    const requestHeaders = headers ?? createCookieHeaders()
+    const requestHeaders = headers ?? (await createCookieHeaders())
     const url = `${API_URL}/api/auth/unregistered-user`
 
     const response = await fetch(url, {

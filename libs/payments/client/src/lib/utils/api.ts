@@ -18,6 +18,10 @@ export async function apiGetSubscription(id: number): Promise<ClientResponseType
   return apiClient.get(`/payments/subscriptions/${id}`)
 }
 
+export async function apiHasSubscriptionHistory(): Promise<ClientResponseType<{ hasHistory: boolean }>> {
+  return apiClient.get('/payments/has-subscription-history')
+}
+
 export async function apiCancelSubscription(priceId: number, idempotencyKey?: string) {
   const key = idempotencyKey ?? generateIdempotencyKey()
   return apiClient.post('/payments/cancel', { priceId }, { headers: { [IDEMPOTENCY_HEADER]: key } })

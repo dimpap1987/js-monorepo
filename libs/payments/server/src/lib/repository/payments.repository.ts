@@ -199,6 +199,29 @@ export class PaymentsRepository {
     })
   }
 
+  async hasUserSubscriptionHistory(userId: number): Promise<boolean> {
+    const paymentCustomer = await this.txHost.tx.paymentCustomer.findUnique({
+      where: {
+        userId: userId,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!paymentCustomer) {
+      return false
+    }
+
+    const count = await this.txHost.tx.subscription.count({
+      where: {
+        paymentCustomerId: paymentCustomer.id,
+      },
+    })
+
+    return count > 0
+  }
+
   async findActiveProductsWithPrices() {
     return this.txHost.tx.product.findMany({
       where: {

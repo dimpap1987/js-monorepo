@@ -5,6 +5,7 @@ export * from './lib/components/plan-gate'
 export * from './lib/components/pricing'
 export * from './lib/components/subscription'
 export * from './lib/queries/payments-queries'
+export { useHasSubscriptionHistory } from './lib/queries/payments-queries'
 export * from './lib/types'
 export {
   apiAssignTrial,
@@ -14,6 +15,7 @@ export {
   apiExtendTrial,
   apiGetInvoices,
   apiGetSubscription,
+  apiHasSubscriptionHistory,
   apiRenewSubscription,
   generateIdempotencyKey,
 } from './lib/utils/api'

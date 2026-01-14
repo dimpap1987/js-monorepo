@@ -44,6 +44,14 @@ export class PaymentsController {
     return this.paymentsService.findSubscriptionByid(subscriptionId)
   }
 
+  @Get('has-subscription-history')
+  @UseGuards(LoggedInGuard)
+  async hasSubscriptionHistory(@SessionUser() sessionUser: SessionUserType) {
+    return this.paymentsService.hasUserSubscriptionHistory(sessionUser.id).then((hasHistory) => ({
+      hasHistory,
+    }))
+  }
+
   @Post('webhook')
   async handleStripeWebhook(@Headers('stripe-signature') signature: string, @Req() request: RequestWithRawBody) {
     return this.stripeService.handleWebhookEvent(signature, request.rawBody)

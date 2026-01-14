@@ -134,13 +134,13 @@ export function AccountSettings() {
             >
               <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start">
                 {/* Profile Image */}
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 sm:mt-10">
                   <Controller
                     control={form.control}
                     name="profileImage"
                     render={({ field }) => (
                       <div className="relative group">
-                        <Avatar className="h-28 w-28 sm:h-32 sm:w-32 ring-2 ring-border ring-offset-2 ring-offset-background transition-all duration-200 group-hover:ring-primary/50">
+                        <Avatar className="h-26 w-26 sm:h-28 sm:w-28 ring-2 ring-border ring-offset-2 ring-offset-background transition-all duration-200 group-hover:ring-primary/50">
                           {profileImageWatch && <AvatarImage src={profileImageWatch} alt="user's picture" />}
                           <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-2xl sm:text-3xl font-bold text-primary">
                             {user?.username?.charAt(0).toUpperCase() || 'NA'}

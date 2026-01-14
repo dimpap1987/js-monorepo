@@ -162,6 +162,10 @@ export class PaymentsService {
     }
   }
 
+  async hasUserSubscriptionHistory(userId: number): Promise<boolean> {
+    return this.paymentsRepository.hasUserSubscriptionHistory(userId)
+  }
+
   //TODO create other prices in USD for locale = 'en'
   async findActiveProductsWithPrices(locale: 'en' | 'el' = 'en', userId?: number) {
     const { result, error } = await tryCatch(() => this.paymentsRepository.findActiveProductsWithPrices())

@@ -5,18 +5,28 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { SETTINGS_NAV_ITEMS } from '../../../lib/routes-config'
+import { useHasSubscriptionHistory } from '@js-monorepo/payments-ui'
 
 export function SettingsMobileTabs() {
   const pathname = usePathname()
   const t = useTranslations()
   const activeTabRef = useRef<HTMLAnchorElement>(null)
+  const { data: hasSubscriptionHistory = false } = useHasSubscriptionHistory()
 
   const translatedTabs = useMemo(() => {
-    return SETTINGS_NAV_ITEMS.map((item) => ({
+    // Filter out subscription item if user doesn't have subscription history
+    const items = SETTINGS_NAV_ITEMS.filter((item) => {
+      if (item.href === '/settings/subscription') {
+        return hasSubscriptionHistory
+      }
+      return true
+    })
+
+    return items.map((item) => ({
       ...item,
       label: t(item.label),
     }))
-  }, [t])
+  }, [t, hasSubscriptionHistory])
 
   useEffect(() => {
     if (activeTabRef.current) {

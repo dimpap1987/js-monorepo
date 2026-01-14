@@ -3,6 +3,7 @@ import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse, queryKeys } from '@js-monorepo/utils/http/queries'
 import { useQuery } from '@tanstack/react-query'
 import { Subscription } from '../types'
+import { apiHasSubscriptionHistory } from '../utils/api'
 
 /**
  * Fetch pricing plans
@@ -39,5 +40,23 @@ export function useSubscription(id: number | undefined) {
     queryKey: queryKeys.payments.subscription(id || 0),
     queryFn: () => fetchSubscription(id as number),
     enabled: !!id, // Only fetch if id exists
+  })
+}
+
+/**
+ * Hook to check if user has subscription history
+ */
+export function useHasSubscriptionHistory() {
+  return useQuery({
+    queryKey: ['subscription-history-check'],
+    queryFn: async () => {
+      const response = await apiHasSubscriptionHistory()
+      if (!response.ok) {
+        return false
+      }
+      return response.data?.hasHistory ?? false
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: false,
   })
 }
