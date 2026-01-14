@@ -113,9 +113,10 @@ export class PaymentsService {
   }
 
   async findUserSubscriptionStatus(userId: number) {
-    const subscriptions = await this.paymentsRepository.findUserSubscriptions(userId)
+    // This includes both paid subscriptions and trials, prioritizing higher tiers
+    const highestSubscription = await this.paymentsRepository.getHighestActiveSubscriptionByUser(userId)
 
-    if (!subscriptions || subscriptions.length === 0) {
+    if (!highestSubscription) {
       return {
         isSubscribed: false,
         isTrial: false,
@@ -126,17 +127,13 @@ export class PaymentsService {
       }
     }
 
-    // Get the most recent active subscription
-    const activePlan = subscriptions[0]
-    const subscription = await this.findSubscriptionByid(activePlan.id)
-
     return {
       isSubscribed: true,
-      isTrial: subscription.status === 'trialing',
-      plan: activePlan.price?.product?.name || null,
-      subscriptionId: activePlan.id,
-      priceId: activePlan.price?.id || null,
-      trialEnd: subscription.trialEnd || null,
+      isTrial: highestSubscription.status === 'trialing',
+      plan: highestSubscription.price?.product?.name || null,
+      subscriptionId: highestSubscription.id,
+      priceId: highestSubscription.price?.id || null,
+      trialEnd: highestSubscription.trialEnd || null,
     }
   }
 
