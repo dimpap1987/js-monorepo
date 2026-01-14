@@ -36,26 +36,37 @@ export function Pricing() {
   const sessionSubscription = session?.subscription as SessionSubscription | undefined
 
   const pricingCards = useMemo(() => {
+    const currentPlanName = sessionSubscription?.plan?.toLowerCase()
+    const paidPlanName = sessionSubscription?.paidSubscriptionPlan?.toLowerCase()
+
     return plans
       .flatMap((plan) =>
         plan.prices
           .filter((price) => price.interval === 'month')
-          .map((price) => ({
-            id: price.id,
-            name: plan.name,
-            description: plan.description,
-            price: centsToAmount(price.unitAmount), // Convert cents to amount
-            priceInCents: price.unitAmount, // Keep original for formatting
-            currency: price.currency,
-            interval: price.interval,
-            metadata: plan.metadata,
-            isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
-            subscribed: sessionSubscription?.priceId === price.id,
-            trialEligibility: price.trialEligibility,
-          }))
+          .map((price) => {
+            const planNameLower = plan.name.toLowerCase()
+            // Check if user is subscribed to this plan by priceId OR plan name
+            // This handles cases where user has Basic subscription but is on Pro trial
+            const isSubscribedByPriceId = sessionSubscription?.priceId === price.id
+            const isSubscribedByPlanName = planNameLower === currentPlanName || planNameLower === paidPlanName
+
+            return {
+              id: price.id,
+              name: plan.name,
+              description: plan.description,
+              price: centsToAmount(price.unitAmount), // Convert cents to amount
+              priceInCents: price.unitAmount, // Keep original for formatting
+              currency: price.currency,
+              interval: price.interval,
+              metadata: plan.metadata,
+              isPopular: plan.name.toLowerCase() === POPULAR_PLAN_NAME,
+              subscribed: isSubscribedByPriceId || isSubscribedByPlanName,
+              trialEligibility: price.trialEligibility,
+            }
+          })
       )
       .sort((a, b) => a.price - b.price)
-  }, [plans, sessionSubscription?.priceId])
+  }, [plans, sessionSubscription?.priceId, sessionSubscription?.plan, sessionSubscription?.paidSubscriptionPlan])
 
   useEffect(() => {
     if (searchParams?.get('success') === 'false') {
@@ -204,30 +215,38 @@ export function Pricing() {
             gap={12}
             showIndicators={true}
           >
-            {pricingCards.map((card) => (
-              <PricingCard
-                key={card.id}
-                id={card.id}
-                name={card.name}
-                description={card.description}
-                price={card.price}
-                priceInCents={card.priceInCents}
-                currency={card.currency}
-                interval={card.interval}
-                metadata={card.metadata}
-                isPopular={card.isPopular}
-                subscribed={card.subscribed}
-                anySubscribed={!!sessionSubscription?.isSubscribed}
-                isLoggedIn={isLoggedIn}
-                subscription={card.subscribed ? subscription ?? undefined : undefined}
-                onSelect={handleSelectPlan}
-                onStartTrial={handleStartTrial}
-                isLoading={isPortalLoading}
-                isTrialLoading={trialLoadingPriceId === card.id}
-                trialEligibility={card.trialEligibility}
-                isOnTrial={sessionSubscription?.isTrial}
-              />
-            ))}
+            {pricingCards.map((card) => {
+              // Check if this specific card is on trial (not just any subscription)
+              const isThisCardOnTrial =
+                sessionSubscription?.isTrial &&
+                (sessionSubscription?.priceId === card.id ||
+                  sessionSubscription?.plan?.toLowerCase() === card.name.toLowerCase())
+
+              return (
+                <PricingCard
+                  key={card.id}
+                  id={card.id}
+                  name={card.name}
+                  description={card.description}
+                  price={card.price}
+                  priceInCents={card.priceInCents}
+                  currency={card.currency}
+                  interval={card.interval}
+                  metadata={card.metadata}
+                  isPopular={card.isPopular}
+                  subscribed={card.subscribed}
+                  anySubscribed={!!sessionSubscription?.isSubscribed}
+                  isLoggedIn={isLoggedIn}
+                  subscription={card.subscribed ? subscription ?? undefined : undefined}
+                  onSelect={handleSelectPlan}
+                  onStartTrial={handleStartTrial}
+                  isLoading={isPortalLoading}
+                  isTrialLoading={trialLoadingPriceId === card.id}
+                  trialEligibility={card.trialEligibility}
+                  isOnTrial={isThisCardOnTrial}
+                />
+              )
+            })}
           </SnapCarousel>
         )}
       </section>
@@ -239,30 +258,38 @@ export function Pricing() {
       >
         {isPlansLoading
           ? Array.from({ length: 3 }).map((_, i) => <PricingCardSkeleton key={i} />)
-          : pricingCards.map((card) => (
-              <PricingCard
-                key={card.id}
-                id={card.id}
-                name={card.name}
-                description={card.description}
-                price={card.price}
-                priceInCents={card.priceInCents}
-                currency={card.currency}
-                interval={card.interval}
-                metadata={card.metadata}
-                isPopular={card.isPopular}
-                subscribed={card.subscribed}
-                anySubscribed={!!sessionSubscription?.isSubscribed}
-                isLoggedIn={isLoggedIn}
-                subscription={card.subscribed ? subscription ?? undefined : undefined}
-                onSelect={handleSelectPlan}
-                onStartTrial={handleStartTrial}
-                isLoading={isPortalLoading}
-                isTrialLoading={trialLoadingPriceId === card.id}
-                trialEligibility={card.trialEligibility}
-                isOnTrial={sessionSubscription?.isTrial}
-              />
-            ))}
+          : pricingCards.map((card) => {
+              // Check if this specific card is on trial (not just any subscription)
+              const isThisCardOnTrial =
+                sessionSubscription?.isTrial &&
+                (sessionSubscription?.priceId === card.id ||
+                  sessionSubscription?.plan?.toLowerCase() === card.name.toLowerCase())
+
+              return (
+                <PricingCard
+                  key={card.id}
+                  id={card.id}
+                  name={card.name}
+                  description={card.description}
+                  price={card.price}
+                  priceInCents={card.priceInCents}
+                  currency={card.currency}
+                  interval={card.interval}
+                  metadata={card.metadata}
+                  isPopular={card.isPopular}
+                  subscribed={card.subscribed}
+                  anySubscribed={!!sessionSubscription?.isSubscribed}
+                  isLoggedIn={isLoggedIn}
+                  subscription={card.subscribed ? subscription ?? undefined : undefined}
+                  onSelect={handleSelectPlan}
+                  onStartTrial={handleStartTrial}
+                  isLoading={isPortalLoading}
+                  isTrialLoading={trialLoadingPriceId === card.id}
+                  trialEligibility={card.trialEligibility}
+                  isOnTrial={isThisCardOnTrial}
+                />
+              )
+            })}
       </section>
 
       {/* Subscription Status Indication */}
