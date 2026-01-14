@@ -1,4 +1,5 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { SubscriptionStatus, CancelReason } from '@js-monorepo/types/subscription'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
 import { PaymentsModuleOptions } from '../../'
@@ -173,7 +174,7 @@ export class TrialService {
     // Cancel existing active trials before creating new one
     // Note: We don't cancel paid subscriptions - if user has paid, we respect that
     if (activeTrials.length > 0) {
-      await this.paymentsRepository.cancelActiveTrialsForUser(dto.userId, 'admin_replaced')
+      await this.paymentsRepository.cancelActiveTrialsForUser(dto.userId, CancelReason.ADMIN_REPLACED)
       this.logger.log(
         `Canceled ${activeTrials.length} active trial(s) for user ${dto.userId} before assigning new trial`
       )
@@ -218,7 +219,7 @@ export class TrialService {
       throw new ApiException(HttpStatus.NOT_FOUND, 'TRIAL_SUBSCRIPTION_NOT_FOUND', 'Trial subscription not found')
     }
 
-    if (subscription.status !== 'trialing') {
+    if (subscription.status !== SubscriptionStatus.TRIALING) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'NOT_TRIAL_SUBSCRIPTION', 'Subscription is not in trialing status')
     }
 
@@ -239,14 +240,14 @@ export class TrialService {
       throw new ApiException(HttpStatus.NOT_FOUND, 'TRIAL_SUBSCRIPTION_NOT_FOUND', 'Trial subscription not found')
     }
 
-    if (subscription.status !== 'trialing') {
+    if (subscription.status !== SubscriptionStatus.TRIALING) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'NOT_TRIAL_SUBSCRIPTION', 'Subscription is not in trialing status')
     }
 
     const deactivatedTrial = await this.paymentsRepository.deactivateTrialSubscription(subscriptionId, dto?.reason)
 
     this.logger.log(
-      `Admin deactivated trial ${subscriptionId} for user ${subscription.paymentCustomer.userId}. Reason: ${dto?.reason || 'admin_deactivated'}`
+      `Admin deactivated trial ${subscriptionId} for user ${subscription.paymentCustomer.userId}. Reason: ${dto?.reason || CancelReason.ADMIN_DEACTIVATED}`
     )
 
     return deactivatedTrial

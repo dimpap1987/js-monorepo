@@ -8,6 +8,10 @@ import { Calendar, CheckCircle, CreditCard, Info, RefreshCw, XCircle } from 'luc
 import { useLocale } from 'next-intl'
 import { useCallback, useMemo, useState } from 'react'
 import { Subscription } from '../../types'
+import {
+  SubscriptionStatus as SubscriptionStatusEnum,
+  SubscriptionDisplayStatus,
+} from '@js-monorepo/types/subscription'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { useTimezone } from '@js-monorepo/next/hooks'
 import {
@@ -36,18 +40,16 @@ interface SubscriptionManagementProps {
   onRenewSuccess?: () => void
 }
 
-type SubscriptionStatus = 'active' | 'canceling' | 'canceled' | 'none'
-
-function getSubscriptionStatus(subscription: Subscription | null): SubscriptionStatus {
+function getSubscriptionStatus(subscription: Subscription | null): SubscriptionDisplayStatus {
   if (!subscription) return 'none'
   // Check canceled status first - cancelAt may still have a value after expiration
-  if (subscription.status === 'canceled') return 'canceled'
+  if (subscription.status === SubscriptionStatusEnum.CANCELED) return 'canceled'
   // Subscription is scheduled to cancel but still active
   if (subscription.cancelAt || subscription.canceledAt) return 'canceling'
   return 'active'
 }
 
-function StatusBadge({ status }: { status: SubscriptionStatus }) {
+function StatusBadge({ status }: { status: SubscriptionDisplayStatus }) {
   const config = {
     active: {
       label: 'Active',
@@ -225,7 +227,7 @@ export function SubscriptionManagement({
   }, [addNotification])
 
   // No subscription state
-  if (status === 'none' || status === 'canceled') {
+  if (status === 'none' || status === 'canceled' || subscription?.status === SubscriptionStatusEnum.CANCELED) {
     return (
       <div className="text-center py-8">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-background-secondary">
@@ -242,7 +244,7 @@ export function SubscriptionManagement({
     )
   }
 
-  const isTrial = subscription?.status === 'trialing'
+  const isTrial = subscription?.status === SubscriptionStatusEnum.TRIALING
 
   return (
     <div className="space-y-6">
@@ -323,7 +325,7 @@ export function SubscriptionManagement({
             Renew
           </DpButton>
         )}
-        {status === 'active' && (
+        {subscription?.status === SubscriptionStatusEnum.ACTIVE && (
           <DpButton variant="ghost" className="text-status-error hover:text-status-error" onClick={handleCancelClick}>
             Cancel Subscription
           </DpButton>

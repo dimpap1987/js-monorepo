@@ -1,6 +1,6 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { PaginationType } from '@js-monorepo/types/pagination'
-import { Subscription } from '@js-monorepo/types/subscription'
+import { Subscription, SubscriptionStatus } from '@js-monorepo/types/subscription'
 import { tryCatch } from '@js-monorepo/utils/common'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger, forwardRef } from '@nestjs/common'
@@ -135,14 +135,14 @@ export class PaymentsService {
 
     // Find paid subscription (status === 'active' and has stripeSubscriptionId)
     const paidSubscription = activeSubscriptions.find(
-      (sub) => sub.status === 'active' && sub.stripeSubscriptionId !== null
+      (sub) => sub.status === SubscriptionStatus.ACTIVE && sub.stripeSubscriptionId !== null
     )
 
     // Find trial subscription (status === 'trialing')
-    const trialSubscription = activeSubscriptions.find((sub) => sub.status === 'trialing')
+    const trialSubscription = activeSubscriptions.find((sub) => sub.status === SubscriptionStatus.TRIALING)
 
     // Determine if highest is trial and if there's a separate paid subscription
-    const isHighestSubscriptionTrial = highestSubscription.status === 'trialing'
+    const isHighestSubscriptionTrial = highestSubscription.status === SubscriptionStatus.TRIALING
     const hasPaidSubscription =
       isHighestSubscriptionTrial && !!paidSubscription && paidSubscription.id !== highestSubscription.id
 

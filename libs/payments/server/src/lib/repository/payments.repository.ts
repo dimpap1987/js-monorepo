@@ -1,10 +1,14 @@
 import { PaginationType } from '@js-monorepo/types/pagination'
-import { Subscription } from '@js-monorepo/types/subscription'
+import {
+  Subscription,
+  SubscriptionStatus,
+  CancelReason,
+  ACTIVE_SUBSCRIPTION_STATUSES,
+} from '@js-monorepo/types/subscription'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
 import { CreateProductType } from '../../'
-import { ACTIVE_SUBSCRIPTION_STATUSES, CancelReason } from '../constants'
 import {
   AdminProductResponse,
   CreatePriceDto,
@@ -205,7 +209,7 @@ export class PaymentsRepository {
       },
       include: {
         prices: {
-          where: { status: 'active' }, // Public endpoint: only show active prices
+          where: { status: SubscriptionStatus.ACTIVE }, // Public endpoint: only show active prices
           orderBy: { interval: 'asc' },
         },
       },
@@ -371,7 +375,7 @@ export class PaymentsRepository {
     const subscription = await this.txHost.tx.subscription.findFirst({
       where: {
         paymentCustomer: { userId },
-        status: 'trialing',
+        status: SubscriptionStatus.TRIALING,
         stripeSubscriptionId: null,
         trialEnd: { gt: new Date() },
       },
@@ -383,7 +387,7 @@ export class PaymentsRepository {
     return this.txHost.tx.subscription.findFirst({
       where: {
         paymentCustomer: { userId },
-        status: 'trialing',
+        status: SubscriptionStatus.TRIALING,
         stripeSubscriptionId: null,
         price: { productId },
       },
@@ -397,7 +401,7 @@ export class PaymentsRepository {
     return this.txHost.tx.subscription.findFirst({
       where: {
         paymentCustomer: { userId },
-        status: 'trialing',
+        status: SubscriptionStatus.TRIALING,
         stripeSubscriptionId: null,
       },
       include: {
@@ -410,7 +414,7 @@ export class PaymentsRepository {
     return this.txHost.tx.subscription.update({
       where: { id: subscriptionId },
       data: {
-        status: 'canceled',
+        status: SubscriptionStatus.CANCELED,
         canceledAt: new Date(),
         cancelReason: CancelReason.UPGRADED_TO_PAID,
       },
@@ -444,7 +448,7 @@ export class PaymentsRepository {
   async findExpiredTrialSubscriptions() {
     return this.txHost.tx.subscription.findMany({
       where: {
-        status: 'trialing',
+        status: SubscriptionStatus.TRIALING,
         stripeSubscriptionId: null,
         trialEnd: { lte: new Date() },
       },
@@ -466,7 +470,7 @@ export class PaymentsRepository {
         paymentCustomerId: data.paymentCustomerId,
         stripeSubscriptionId: null,
         priceId: data.priceId,
-        status: 'trialing',
+        status: SubscriptionStatus.TRIALING,
         currentPeriodStart: data.trialStart,
         currentPeriodEnd: data.trialEnd,
         trialStart: data.trialStart,
@@ -482,9 +486,9 @@ export class PaymentsRepository {
     return this.txHost.tx.subscription.update({
       where: { id: subscriptionId },
       data: {
-        status: 'canceled',
+        status: SubscriptionStatus.CANCELED,
         canceledAt: new Date(),
-        cancelReason: 'trial_expired',
+        cancelReason: CancelReason.TRIAL_EXPIRED,
       },
       include: {
         paymentCustomer: { include: { authUser: true } },
@@ -519,9 +523,9 @@ export class PaymentsRepository {
     return this.txHost.tx.subscription.update({
       where: { id: subscriptionId },
       data: {
-        status: 'canceled',
+        status: SubscriptionStatus.CANCELED,
         canceledAt: new Date(),
-        cancelReason: reason || 'admin_deactivated',
+        cancelReason: reason || CancelReason.ADMIN_DEACTIVATED,
       },
       include: {
         paymentCustomer: { include: { authUser: true } },
@@ -559,7 +563,7 @@ export class PaymentsRepository {
     return this.txHost.tx.subscription.findMany({
       where: {
         paymentCustomer: { userId },
-        status: 'trialing',
+        status: SubscriptionStatus.TRIALING,
         stripeSubscriptionId: null, // Only local trials
       },
       include: {
@@ -569,7 +573,7 @@ export class PaymentsRepository {
     })
   }
 
-  async cancelActiveSubscriptionsForUser(userId: number, reason = 'admin_replaced') {
+  async cancelActiveSubscriptionsForUser(userId: number, reason = CancelReason.ADMIN_REPLACED) {
     return this.txHost.tx.subscription.updateMany({
       where: {
         paymentCustomer: { userId },
@@ -578,22 +582,22 @@ export class PaymentsRepository {
         },
       },
       data: {
-        status: 'canceled',
+        status: SubscriptionStatus.CANCELED,
         canceledAt: new Date(),
         cancelReason: reason,
       },
     })
   }
 
-  async cancelActiveTrialsForUser(userId: number, reason = 'admin_replaced') {
+  async cancelActiveTrialsForUser(userId: number, reason = CancelReason.ADMIN_REPLACED) {
     return this.txHost.tx.subscription.updateMany({
       where: {
         paymentCustomer: { userId },
-        status: 'trialing',
+        status: SubscriptionStatus.TRIALING,
         stripeSubscriptionId: null, // Only local trials
       },
       data: {
-        status: 'canceled',
+        status: SubscriptionStatus.CANCELED,
         canceledAt: new Date(),
         cancelReason: reason,
       },
@@ -700,22 +704,22 @@ export class PaymentsRepository {
     const [activeCount, trialingCount, churnedThisMonth, allActiveSubscriptions] = await Promise.all([
       // Active subscriptions
       this.txHost.tx.subscription.count({
-        where: { status: 'active' },
+        where: { status: SubscriptionStatus.ACTIVE },
       }),
       // Active trials
       this.txHost.tx.subscription.count({
-        where: { status: 'trialing' },
+        where: { status: SubscriptionStatus.TRIALING },
       }),
       // Churned this month
       this.txHost.tx.subscription.count({
         where: {
-          status: 'canceled',
+          status: SubscriptionStatus.CANCELED,
           canceledAt: { gte: startOfMonth },
         },
       }),
       // All active subscriptions for MRR calculation
       this.txHost.tx.subscription.findMany({
-        where: { status: 'active' },
+        where: { status: SubscriptionStatus.ACTIVE },
         select: {
           price: {
             select: {

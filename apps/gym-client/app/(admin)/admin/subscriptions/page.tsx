@@ -27,7 +27,7 @@ import { useDebounce } from '@js-monorepo/next/hooks/use-debounce'
 import { useNotifications } from '@js-monorepo/notification'
 import { apiDeactivateTrial, apiExtendTrial, PlanBadge } from '@js-monorepo/payments-ui'
 import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
-import { Subscription } from '@js-monorepo/types/subscription'
+import { Subscription, SubscriptionStatus } from '@js-monorepo/types/subscription'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { DATE_CONFIG } from '@js-monorepo/utils/date/constants'
 import { apiClient } from '@js-monorepo/utils/http'
@@ -270,7 +270,7 @@ function SubscriptionsPageContent() {
         header: ({ column }) => <DataTableColumnHeader column={column} title="Amount" />,
         cell: ({ row }) => {
           const sub = row.original
-          if (sub.status === 'trialing') {
+          if (sub.status === SubscriptionStatus.TRIALING) {
             return (
               <div className="flex gap-1">
                 <p className="font-medium">0</p>
@@ -316,7 +316,7 @@ function SubscriptionsPageContent() {
           const sub = row.original
           return (
             <div>
-              {sub.status === 'trialing' && sub.trialEnd && (
+              {sub.status === SubscriptionStatus.TRIALING && sub.trialEnd && (
                 <div className="text-sm">
                   <span className="text-amber-600 dark:text-amber-400">Trial ends </span>
                   <span>{formatRelativeDate(new Date(sub.trialEnd))}</span>
@@ -331,7 +331,7 @@ function SubscriptionsPageContent() {
               {sub.cancelReason && (
                 <p className="text-xs text-muted-foreground capitalize">{sub.cancelReason.replace(/_/g, ' ')}</p>
               )}
-              {!sub.stripeSubscriptionId && sub.status === 'trialing' && (
+              {!sub.stripeSubscriptionId && sub.status === SubscriptionStatus.TRIALING && (
                 <Badge variant="outline" className="text-xs">
                   Local Trial
                 </Badge>
@@ -346,7 +346,7 @@ function SubscriptionsPageContent() {
         header: () => null,
         cell: ({ row }) => {
           const sub = row.original
-          const isTrialing = sub.status === 'trialing'
+          const isTrialing = sub.status === SubscriptionStatus.TRIALING
           return (
             <DropdownMenu>
               <DropdownMenuTrigger className="p-2 rounded-md">
