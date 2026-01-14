@@ -1,4 +1,4 @@
-import { ProviderName } from '@js-monorepo/types/auth'
+import { ProviderName, UserStatus } from '@js-monorepo/types/auth'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { AuthService } from '../services/interfaces/auth.service'
 import { UnregisteredService } from '../services/interfaces/unregistered-user.service'
@@ -59,6 +59,13 @@ export class OAuthHandler {
     providerName: ProviderName,
     done: (error: any, user?: any) => void
   ): Promise<void> {
+    // Check if user is active (not banned or deactivated)
+    if (user.status !== UserStatus.ACTIVE) {
+      const statusMessage = user.status === UserStatus.BANNED ? 'banned' : 'deactivated'
+      this.logger.warn(`Login attempt by ${statusMessage} user: ${user.id} (${user.email})`)
+      return done(new Error(`ACCOUNT_${user.status}`), undefined)
+    }
+
     // Account linking: upsert profile for this provider (creates if new, updates if exists)
     await this.userProfileService.upsertUserProfile(user.id, providerName, {
       profileImage: profileData.profileImage,

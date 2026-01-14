@@ -63,7 +63,7 @@ export function UserEditDialog({ user, open, onOpenChange, onSave, isSaving }: U
       username: user.username,
       roles: roleIds,
     })
-  }, [user, roles, form])
+  }, [user, roles])
 
   const onSubmit = (values: UpdateUserSchemaType) => {
     // Only include fields that have changed
@@ -125,8 +125,8 @@ export function UserEditDialog({ user, open, onOpenChange, onSave, isSaving }: U
                           options={roles}
                           selectedIds={roleIds}
                           prompt={displayText}
-                          onChange={(selectedRoles) => {
-                            field.onChange(selectedRoles.map((role) => role.id))
+                          onChange={(newSelectedRoles) => {
+                            field.onChange(newSelectedRoles.map((role) => role.id))
                           }}
                         />
                       </FormControl>

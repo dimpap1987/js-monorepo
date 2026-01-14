@@ -77,3 +77,54 @@ export function useDeleteUser() {
     },
   })
 }
+
+/**
+ * Hook to ban a user
+ */
+export function useBanUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      const response = await apiClient.post(`/admin/users/${userId}/ban`)
+      return handleQueryResponse(response)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() })
+    },
+  })
+}
+
+/**
+ * Hook to unban a user
+ */
+export function useUnbanUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      const response = await apiClient.post(`/admin/users/${userId}/unban`)
+      return handleQueryResponse(response)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() })
+    },
+  })
+}
+
+/**
+ * Hook to deactivate a user
+ */
+export function useDeactivateUser() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      const response = await apiClient.post(`/admin/users/${userId}/deactivate`)
+      return handleQueryResponse(response)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users() })
+    },
+  })
+}

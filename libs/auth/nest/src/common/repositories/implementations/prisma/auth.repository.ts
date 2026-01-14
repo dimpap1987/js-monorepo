@@ -88,6 +88,7 @@ export class AuthRepositoryPrismaImpl implements AuthRepository {
       createdAt: true,
       username: true,
       email: true,
+      status: true,
       userProfiles: {
         select: {
           id: true,

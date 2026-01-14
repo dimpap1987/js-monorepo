@@ -2,7 +2,7 @@ import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { UpdateUserSchemaType } from '@js-monorepo/schemas'
-import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types/auth'
+import { AuthUserDto, AuthUserFullDto, SessionUserType, UserStatus } from '@js-monorepo/types/auth'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
 import { OnlineUsersService } from '@js-monorepo/user-presence'
@@ -87,6 +87,24 @@ export class AdminController {
     @Body() updateUser: UpdateUserSchemaType
   ): Promise<AuthUserDto> {
     return this.adminService.updateUser(userId, updateUser)
+  }
+
+  @Post('users/:id/ban')
+  @HttpCode(HttpStatus.OK)
+  async banUser(@Param('id', ParseIntPipe) userId: number): Promise<AuthUserDto> {
+    return this.adminService.banUser(userId)
+  }
+
+  @Post('users/:id/unban')
+  @HttpCode(HttpStatus.OK)
+  async unbanUser(@Param('id', ParseIntPipe) userId: number): Promise<AuthUserDto> {
+    return this.adminService.unbanUser(userId)
+  }
+
+  @Post('users/:id/deactivate')
+  @HttpCode(HttpStatus.OK)
+  async deactivateUser(@Param('id', ParseIntPipe) userId: number): Promise<AuthUserDto> {
+    return this.adminService.deactivateUser(userId)
   }
 
   @Delete('users-session/:id')

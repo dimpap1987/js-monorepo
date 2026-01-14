@@ -1,4 +1,4 @@
-import { AuthRoleDTO, AuthUserDto, AuthUserFullDto } from '@js-monorepo/types/auth'
+import { AuthRoleDTO, AuthUserDto, AuthUserFullDto, UserStatus } from '@js-monorepo/types/auth'
 import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
@@ -27,6 +27,7 @@ export class AdminRepositoryPrisma implements AdminRepository {
           createdAt: true,
           username: true,
           email: true,
+          status: true,
           userProfiles: {
             select: {
               id: true,
@@ -90,6 +91,7 @@ export class AdminRepositoryPrisma implements AdminRepository {
         createdAt: true,
         username: true,
         email: true,
+        isActive: true,
         userProfiles: {
           select: {
             id: true,
@@ -140,5 +142,110 @@ export class AdminRepositoryPrisma implements AdminRepository {
     return rolesToAdd.map((roleId) => ({
       roleId,
     }))
+  }
+
+  async banUser(userId: number): Promise<AuthUserDto> {
+    return this.txHost.tx.authUser.update({
+      where: { id: userId },
+      data: { status: UserStatus.BANNED },
+      select: {
+        id: true,
+        createdAt: true,
+        username: true,
+        email: true,
+        status: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        userRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  async unbanUser(userId: number): Promise<AuthUserDto> {
+    return this.txHost.tx.authUser.update({
+      where: { id: userId },
+      data: { status: UserStatus.ACTIVE },
+      select: {
+        id: true,
+        createdAt: true,
+        username: true,
+        email: true,
+        status: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        userRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    })
+  }
+
+  async deactivateUser(userId: number): Promise<AuthUserDto> {
+    return this.txHost.tx.authUser.update({
+      where: { id: userId },
+      data: { status: UserStatus.DEACTIVATED },
+      select: {
+        id: true,
+        createdAt: true,
+        username: true,
+        email: true,
+        status: true,
+        userProfiles: {
+          select: {
+            id: true,
+            providerId: true,
+            profileImage: true,
+            provider: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        userRole: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    })
   }
 }

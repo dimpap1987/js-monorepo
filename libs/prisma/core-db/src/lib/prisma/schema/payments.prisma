@@ -56,7 +56,7 @@ model Product {
     description String
     active      Boolean  @default(true)
     prices      Price[]
-    features    Json?
+    metadata    Json?
     hierarchy   Int      @default(0)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
@@ -65,19 +65,25 @@ model Product {
 }
 
 model Price {
-    id         Int     @id @default(autoincrement())
-    stripeId   String  @unique
-    unitAmount Int
-    currency   String
-    interval   String
-    active     Boolean @default(true)
-    productId  Int
-    product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+    id              Int      @id @default(autoincrement())
+    stripeId        String   @unique
+    unitAmount      Int
+    currency        String
+    interval        String
+    active          Boolean  @default(true)
+    status          String   @default("active") // active, legacy, deprecated, archived
+    replacedByPriceId Int?   @map("replaced_by_price_id")
+    replacedByPrice Price?   @relation("PriceReplacement", fields: [replacedByPriceId], references: [id])
+    replacedPrices  Price[]  @relation("PriceReplacement")
+    productId       Int
+    product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
     createdAt     DateTime       @default(now())
     updatedAt     DateTime       @updatedAt
     subscriptions Subscription[]
 
     @@index([active])
+    @@index([status])
+    @@index([replacedByPriceId])
     @@map("prices")
 }

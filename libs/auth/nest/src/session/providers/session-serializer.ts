@@ -1,4 +1,4 @@
-import { SessionUserType } from '@js-monorepo/types/auth'
+import { SessionUserType, UserStatus } from '@js-monorepo/types/auth'
 import { Injectable } from '@nestjs/common'
 import { PassportSerializer } from '@nestjs/passport'
 import { AuthSessionUserCacheService } from './auth-session-cache.service'
@@ -17,6 +17,10 @@ export class SessionSerializer extends PassportSerializer {
     const user = await this.authSessionUserCacheService.findOrSaveAuthUserById(Number(userId))
 
     if (user) {
+      // Check if user is active (not banned or deactivated) - invalidate session if not active
+      if (user.status !== UserStatus.ACTIVE) {
+        return done(null, null)
+      }
       done(null, { user })
     } else {
       done(null, null)

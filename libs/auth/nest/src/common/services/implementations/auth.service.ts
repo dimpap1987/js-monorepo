@@ -6,6 +6,7 @@ import {
   ProviderName,
   ProvidersDto,
   SessionUserType,
+  UserStatus,
 } from '@js-monorepo/types/auth'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
@@ -128,6 +129,7 @@ export class AuthServiceImpl implements AuthService {
       username: authUser?.username,
       roles: authUser?.userRole?.map((userRole: { role: { name: string } }) => userRole.role.name),
       createdAt: authUser?.createdAt,
+      status: authUser?.status ?? UserStatus.ACTIVE,
       profile: {
         image: authUser?.userProfiles?.[0]?.profileImage,
         provider: authUser?.userProfiles?.[0]?.provider?.name,

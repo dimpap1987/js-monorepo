@@ -1,5 +1,5 @@
 import { REDIS } from '@js-monorepo/nest/redis'
-import { SessionObject, SessionUserType } from '@js-monorepo/types/auth'
+import { SessionObject, SessionUserType, UserStatus } from '@js-monorepo/types/auth'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { RedisClientType } from 'redis'
 import { AuthException } from '../../common/exceptions/api-exception'
@@ -37,7 +37,14 @@ export class AuthSessionUserCacheService {
 
   async findAuthUserById(id: number): Promise<SessionUserType | undefined> {
     const cacheUser = await this.redis.get(`${this.redisUserSessionKey}${id}`)
-    return cacheUser ? JSON.parse(cacheUser) : undefined
+    if (!cacheUser) return undefined
+
+    const user = JSON.parse(cacheUser) as SessionUserType
+    // Check if user is active (not banned or deactivated)
+    if (user.status !== UserStatus.ACTIVE) {
+      return undefined
+    }
+    return user
   }
 
   async saveAuthUserInCache(payload: { user: SessionUserType } | { id: number }, ttl = 60) {
@@ -59,6 +66,7 @@ export class AuthSessionUserCacheService {
           email: userDb?.email,
           roles: userDb.userRole?.map((userRole) => userRole.role.name),
           createdAt: userDb?.createdAt,
+          status: userDb?.status ?? UserStatus.ACTIVE,
           profile: {
             id: userDb.userProfiles?.[0]?.id,
             image: userDb.userProfiles?.[0]?.profileImage,
@@ -66,6 +74,8 @@ export class AuthSessionUserCacheService {
           },
         } satisfies SessionUserType
       }
+
+      if (!userCache) return undefined
 
       await this.redis.set(`${this.redisUserSessionKey}${userCache.id}`, JSON.stringify(userCache), {
         EX: ttl, // Set expiration time

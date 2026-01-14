@@ -6,6 +6,7 @@ export type SessionUserType = {
   createdAt?: Date
   lastLoggedIn?: string
   isAdmin?: boolean
+  status?: UserStatus
   profile: {
     id?: number
     image?: string | null
@@ -19,6 +20,12 @@ export const PROVIDERS_ARRAY = ['GITHUB', 'GOOGLE', 'FACEBOOK'] as const
 export type ProviderName = (typeof PROVIDERS_ARRAY)[number]
 
 export type AuthRole = 'ADMIN' | 'USER'
+
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  DEACTIVATED = 'DEACTIVATED',
+  BANNED = 'BANNED',
+}
 
 export type ProvidersDto = {
   id: number
@@ -55,6 +62,7 @@ export interface AuthUserDto {
   createdAt: Date
   username: string
   email: string
+  status?: UserStatus
   userProfiles: {
     id: number
     providerId: number

@@ -10,4 +10,10 @@ export interface AdminRepository {
   getRoles(): Promise<AuthRoleDTO[]>
 
   updateUser(userId: number, updateUser: UpdateUserSchemaType): Promise<AuthUserDto>
+
+  banUser(userId: number): Promise<AuthUserDto>
+
+  unbanUser(userId: number): Promise<AuthUserDto>
+
+  deactivateUser(userId: number): Promise<AuthUserDto>
 }

@@ -2,7 +2,7 @@ import { AuthException } from '@js-monorepo/auth/nest/common/exceptions/api-exce
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { UpdateUserSchemaType, UserUpdateUserSchema } from '@js-monorepo/schemas'
-import { AuthUserDto, AuthUserFullDto } from '@js-monorepo/types/auth'
+import { AuthUserDto, AuthUserFullDto, UserStatus } from '@js-monorepo/types/auth'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
@@ -72,6 +72,54 @@ export class AdminService {
         return e
       }
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_DISCONNECTING_USER')
+    }
+  }
+
+  async banUser(userId: number): Promise<AuthUserDto> {
+    this.logger.debug(`Banning user with id: '${userId}'`)
+    try {
+      const bannedUser = await this.adminRepository.banUser(userId)
+      // Invalidate cache and disconnect user sessions
+      await this.authSessionUserCacheService.invalidateAuthUserInCache(userId)
+      await this.authSessionUserCacheService.deleteAuthUserSessions(userId)
+      await this.userPresenceWebsocketService.disconnectUser(userId)
+      this.logger.warn(`User ${userId} has been banned`)
+      return bannedUser
+    } catch (e) {
+      this.logger.error(`Error banning user with id: '${userId}'`, e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_BANNING_USER')
+    }
+  }
+
+  async unbanUser(userId: number): Promise<AuthUserDto> {
+    this.logger.debug(`Unbanning user with id: '${userId}'`)
+    try {
+      const unbannedUser = await this.adminRepository.unbanUser(userId)
+      // Invalidate cache to ensure fresh data is fetched on next login
+      await this.authSessionUserCacheService.invalidateAuthUserInCache(userId)
+      // Delete existing sessions to force re-login with fresh user data
+      await this.authSessionUserCacheService.deleteAuthUserSessions(userId)
+      this.logger.warn(`User ${userId} has been unbanned`)
+      return unbannedUser
+    } catch (e) {
+      this.logger.error(`Error unbanning user with id: '${userId}'`, e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_UNBANNING_USER')
+    }
+  }
+
+  async deactivateUser(userId: number): Promise<AuthUserDto> {
+    this.logger.debug(`Deactivating user with id: '${userId}'`)
+    try {
+      const deactivatedUser = await this.adminRepository.deactivateUser(userId)
+      // Invalidate cache and disconnect user sessions
+      await this.authSessionUserCacheService.invalidateAuthUserInCache(userId)
+      await this.authSessionUserCacheService.deleteAuthUserSessions(userId)
+      await this.userPresenceWebsocketService.disconnectUser(userId)
+      this.logger.warn(`User ${userId} has been deactivated`)
+      return deactivatedUser
+    } catch (e) {
+      this.logger.error(`Error deactivating user with id: '${userId}'`, e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_DEACTIVATING_USER')
     }
   }
 }
