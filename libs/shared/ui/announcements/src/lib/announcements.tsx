@@ -21,6 +21,8 @@ export function AnnouncementsComponent({ className }: { className: string }) {
     }
   })
 
+  if (!announcements || announcements?.length === 0) return null
+
   return (
     <Marquee className={cn(`w-full`, className)} duration={15} onAnimationComplete={() => setAnnouncements([])}>
       {announcements.map((message, index) => (

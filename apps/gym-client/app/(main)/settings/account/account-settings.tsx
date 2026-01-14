@@ -140,7 +140,7 @@ export function AccountSettings() {
                     name="profileImage"
                     render={({ field }) => (
                       <div className="relative group">
-                        <Avatar className="h-26 w-26 sm:h-28 sm:w-28 ring-2 ring-border ring-offset-2 ring-offset-background transition-all duration-200 group-hover:ring-primary/50">
+                        <Avatar className="h-24 w-24 sm:h-28 sm:w-28 ring-2 ring-border ring-offset-2 ring-offset-background transition-all duration-200 group-hover:ring-primary/50">
                           {profileImageWatch && <AvatarImage src={profileImageWatch} alt="user's picture" />}
                           <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-2xl sm:text-3xl font-bold text-primary">
                             {user?.username?.charAt(0).toUpperCase() || 'NA'}
