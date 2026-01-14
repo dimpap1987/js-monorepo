@@ -13,5 +13,7 @@ export function getSubscriptionStatus(subscription: Subscription | null): Subscr
   if (subscription.status === SubscriptionStatusEnum.CANCELED) return 'canceled'
   // Subscription is scheduled to cancel but still active
   if (subscription.cancelAt || subscription.canceledAt) return 'canceling'
+  // Trialing subscriptions get their own badge
+  if (subscription.status === SubscriptionStatusEnum.TRIALING) return 'trialing'
   return 'active'
 }

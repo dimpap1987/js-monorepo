@@ -18,9 +18,7 @@ export function PlanHeader({ plan, formattedPrice, status, isTrial, paidPlanName
     <div className="flex items-start justify-between gap-2 flex-wrap">
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <h2 className="font-semibold text-foreground capitalize">
-            {plan.name} Plan {isTrial && <span className="text-sm font-normal text-status-info">(Trial)</span>}
-          </h2>
+          <h2 className="font-semibold text-foreground capitalize">{plan.name} Plan</h2>
           <StatusBadge status={status} />
         </div>
         <p className="text-2xl font-bold text-foreground">

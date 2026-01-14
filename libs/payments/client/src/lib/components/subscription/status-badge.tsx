@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckCircle, XCircle } from 'lucide-react'
+import { CheckCircle, Sparkles, XCircle } from 'lucide-react'
 import { SubscriptionDisplayStatus } from '@js-monorepo/types/subscription'
 
 interface StatusBadgeProps {
@@ -13,6 +13,11 @@ export function StatusBadge({ status }: StatusBadgeProps) {
       label: 'Active',
       className: 'bg-status-success-bg text-status-success border-status-success',
       icon: CheckCircle,
+    },
+    trialing: {
+      label: 'Trial',
+      className: 'bg-status-info-bg text-status-info border-status-info',
+      icon: Sparkles,
     },
     canceling: {
       label: 'Cancels Soon',

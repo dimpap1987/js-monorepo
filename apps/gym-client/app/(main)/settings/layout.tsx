@@ -119,7 +119,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
       <div
         className={cn(
           'hidden sm:flex flex-col justify-between p-2 border-r border-border rounded-md',
-          'transition-[width] duration-300 ease-in-out',
+          'transition-[width] duration-300 ease-in-out h-min',
           'overflow-hidden',
           isCollapsed ? 'w-16' : 'w-64'
         )}
