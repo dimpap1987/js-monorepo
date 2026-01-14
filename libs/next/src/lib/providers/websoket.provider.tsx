@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react'
 import { io, Socket } from 'socket.io-client'
 
-const isDev = process.env.NODE_ENV === 'development'
+const isDev = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_APP_ENV === 'local_build'
 // Dev: http://localhost:3333 | Prod: https://your-domain.com
 const BASE_URL = isDev
   ? process.env.NEXT_PUBLIC_DEV_BACKEND_URL

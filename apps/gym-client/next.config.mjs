@@ -10,7 +10,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
-const isDev = process.env.NODE_ENV === 'development'
+const isDev = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_APP_ENV === 'local_build'
 
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
