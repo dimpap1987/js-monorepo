@@ -50,9 +50,14 @@ export function UserEditDialog({ user, open, onOpenChange, onSave, isSaving }: U
   useEffect(() => {
     if (!user || roles.length === 0) return
 
-    const roleIds = roles
-      .filter((role) => user.userRole?.some((ur) => ur.role.name === role.name))
-      .map((role) => role.id)
+    // Map user roles to role IDs by matching role names
+    const roleIds =
+      user.userRole
+        ?.map((ur) => {
+          const role = roles.find((r) => r.name === ur.role.name)
+          return role?.id
+        })
+        .filter((id): id is number => id !== undefined) ?? []
 
     form.reset({
       username: user.username,
@@ -61,14 +66,17 @@ export function UserEditDialog({ user, open, onOpenChange, onSave, isSaving }: U
   }, [user, roles, form])
 
   const onSubmit = (values: UpdateUserSchemaType) => {
+    // Only include fields that have changed
     const payload: UpdateUserSchemaType = {}
+    const { dirtyFields } = form.formState
 
-    if (form.formState.dirtyFields.username) {
+    if (dirtyFields.username) {
       payload.username = values.username
     }
-    if (form.formState.dirtyFields.roles) {
+    if (dirtyFields.roles) {
       payload.roles = values.roles
     }
+
     onSave(payload)
   }
 
@@ -103,8 +111,11 @@ export function UserEditDialog({ user, open, onOpenChange, onSave, isSaving }: U
                 control={form.control}
                 name="roles"
                 render={({ field }) => {
-                  const value: number[] = field.value ?? []
-                  const selectedRoles = roles.filter((r) => value.includes(r.id))
+                  const roleIds = field.value ?? []
+                  const selectedRoles = roles.filter((role) => roleIds.includes(role.id))
+                  const displayText =
+                    selectedRoles.length > 0 ? selectedRoles.map((r) => r.name).join(', ') : 'Select roles...'
+
                   return (
                     <FormItem>
                       <FormLabel>Roles</FormLabel>
@@ -112,15 +123,10 @@ export function UserEditDialog({ user, open, onOpenChange, onSave, isSaving }: U
                         <MultiSelectDropdown
                           classNameTrigger="h-10"
                           options={roles}
-                          selectedIds={value}
-                          prompt={selectedRoles.map((r) => r.name).join(', ')}
-                          onChange={(localRoles) => {
-                            const newIds = localRoles.map((r) => r.id).sort()
-                            const oldIds = [...value].sort()
-                            const changed = newIds.length !== oldIds.length || newIds.some((id, i) => id !== oldIds[i])
-                            if (changed) {
-                              field.onChange(newIds)
-                            }
+                          selectedIds={roleIds}
+                          prompt={displayText}
+                          onChange={(selectedRoles) => {
+                            field.onChange(selectedRoles.map((role) => role.id))
                           }}
                         />
                       </FormControl>

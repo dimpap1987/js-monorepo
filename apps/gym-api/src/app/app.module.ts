@@ -89,6 +89,27 @@ import { getContactMessage } from './notifications/contact-form'
     GracefulShutdownModule.forRoot({
       cleanup: async (app, signal) => {
         apiLogger.warn(`Shutdown hook received with signal: ${signal}`)
+
+        // Shutdown WebSocket connections before Redis closes
+        try {
+          const httpServer = app.getHttpServer()
+          const io = (httpServer as any)?.io
+          if (io) {
+            apiLogger.debug('Closing WebSocket connections...')
+            // Close all namespaces gracefully
+            io._nsps.forEach((namespace: any) => {
+              if (namespace && typeof namespace.disconnectSockets === 'function') {
+                namespace.disconnectSockets(true)
+              }
+            })
+            apiLogger.debug('WebSocket connections closed')
+          }
+        } catch (error: any) {
+          // Suppress errors during shutdown - they're expected
+          if (!error?.message?.includes('closed')) {
+            apiLogger.debug(`Error closing WebSocket connections during shutdown: ${error?.message}`)
+          }
+        }
       },
       gracefulShutdownTimeout: Number(process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 3000),
       keepNodeProcessAlive: true,

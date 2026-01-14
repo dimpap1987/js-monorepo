@@ -125,11 +125,6 @@ export class AdminRepositoryPrisma implements AdminRepository {
     return currentUserRoles?.userRole.map((role) => role.roleId) || []
   }
 
-  // Function to extract new role IDs or default to 'USER'
-  private getNewRoleIds(roles?: { id: number }[]): number[] {
-    return roles?.map((role) => role.id) || [2]
-  }
-
   // Function to determine which roles to add and remove
   private determineRoles(currentRoleIds: number[], newRoleIds: number[]) {
     const rolesToAdd = newRoleIds.filter((id) => !currentRoleIds.includes(id))
@@ -143,12 +138,6 @@ export class AdminRepositoryPrisma implements AdminRepository {
 
   private createRoles(rolesToAdd: number[]) {
     return rolesToAdd.map((roleId) => ({
-      roleId,
-    }))
-  }
-
-  private deleteRoles(rolesToRemove: number[]) {
-    return rolesToRemove.map((roleId) => ({
       roleId,
     }))
   }

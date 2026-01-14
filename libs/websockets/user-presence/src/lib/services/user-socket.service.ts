@@ -55,7 +55,10 @@ export class UserSocketService {
         session: decodedSession,
       }
     } catch (e: any) {
-      Logger.error('Error while getting user from websocket', e.stack)
+      // Don't log errors during shutdown (Redis closure is expected)
+      if (!e?.message?.includes('closed') && !e?.message?.includes('The client is closed')) {
+        Logger.error('Error while getting user from websocket', e.stack)
+      }
       return undefined
     }
   }

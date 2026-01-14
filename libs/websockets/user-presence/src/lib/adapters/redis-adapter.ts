@@ -7,7 +7,15 @@ import { ServerOptions, Socket } from 'socket.io'
 import { UserSocketService } from '../services/user-socket.service'
 
 const createAuthMiddleware =
-  (userSocketService: UserSocketService, logger: Logger) => async (socket: Socket, next: (err?: any) => void) => {
+  (userSocketService: UserSocketService, logger: Logger, isShuttingDown: () => boolean) =>
+  async (socket: Socket, next: (err?: any) => void) => {
+    // Reject new connections during shutdown
+    if (isShuttingDown()) {
+      logger.debug('Rejecting new WebSocket connection during shutdown')
+      socket.disconnect(true)
+      return next(new Error('SERVER_SHUTTING_DOWN'))
+    }
+
     try {
       const data = await userSocketService.retrieveUserSessionFromSocket(socket)
 
@@ -18,6 +26,12 @@ const createAuthMiddleware =
       socket.session = data.session
       next()
     } catch (err: any) {
+      // Handle Redis closure gracefully during shutdown
+      if (err?.message?.includes('closed') || err?.message?.includes('The client is closed')) {
+        logger.debug('Redis closed during WebSocket authentication (shutdown in progress)')
+        socket.disconnect(true)
+        return next(new Error('SERVER_SHUTTING_DOWN'))
+      }
       logger.error('Authentication failed', err.stack)
       next(new Error('FORBIDDEN'))
     }
@@ -28,6 +42,8 @@ export class RedisIoAdapter extends IoAdapter {
 
   private adapterConstructor?: ReturnType<typeof createAdapter>
   private _namespaces = ['presence']
+  private _isShuttingDown = false
+  private _ioServer: any = null
 
   constructor(
     private app: INestApplicationContext,
@@ -37,6 +53,35 @@ export class RedisIoAdapter extends IoAdapter {
     if (namespaces) {
       this._namespaces = [...this._namespaces, ...namespaces]
     }
+  }
+
+  /**
+   * Mark adapter as shutting down and close all WebSocket connections
+   */
+  async shutdown(): Promise<void> {
+    if (this._isShuttingDown) {
+      return
+    }
+
+    this._isShuttingDown = true
+    this.logger.debug('RedisIoAdapter: Starting WebSocket shutdown')
+
+    if (this._ioServer) {
+      // Close all namespaces
+      this._namespaces.forEach((ns) => {
+        const namespace = this._ioServer.of(ns)
+        if (namespace) {
+          namespace.disconnectSockets(true)
+          this.logger.debug(`RedisIoAdapter: Disconnected all sockets in namespace: ${ns}`)
+        }
+      })
+    }
+
+    this.logger.debug('RedisIoAdapter: WebSocket shutdown complete')
+  }
+
+  private isShuttingDown(): boolean {
+    return this._isShuttingDown
   }
 
   async connectToRedis(): Promise<void> {
@@ -49,9 +94,10 @@ export class RedisIoAdapter extends IoAdapter {
 
   override createIOServer(port: number, options?: ServerOptions): any {
     const server = super.createIOServer(port, options)
+    this._ioServer = server
 
     const userSocketService = this.app.get(UserSocketService)
-    const authMiddleware = createAuthMiddleware(userSocketService, this.logger)
+    const authMiddleware = createAuthMiddleware(userSocketService, this.logger, () => this.isShuttingDown())
 
     this._namespaces.forEach((ns) => {
       server.of(ns).use(authMiddleware)
