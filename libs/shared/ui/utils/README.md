@@ -18,15 +18,7 @@ From `libs/shared/ui/utils/src/index.ts`:
 import { cn } from '@js-monorepo/ui-utils'
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn(
-        'rounded-lg border bg-card text-card-foreground shadow-sm',
-        className,
-      )}
-      {...props}
-    />
-  )
+  return <div className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)} {...props} />
 }
 ```
 
@@ -55,4 +47,3 @@ Notes:
 - Accepts either a `URLSearchParams` instance or a plain object
 - Automatically renames `pageIndex` → `page` in the resulting query string
 - URL‑encodes keys and values
-

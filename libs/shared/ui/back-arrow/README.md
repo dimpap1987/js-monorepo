@@ -1,7 +1,26 @@
-# back-arrow
+## `@js-monorepo/ui-back-arrow`
 
-This library was generated with [Nx](https://nx.dev).
+Small navigation helper component that renders a **back arrow label/button** for Next.js apps.
 
-## Running unit tests
+### Exports
 
-Run `nx test back-arrow` to execute the unit tests via [Jest](https://jestjs.io).
+From `libs/shared/ui/back-arrow/src/index.ts`:
+
+- `BackArrowLabel` (and/or related back arrow components) from `./lib/back-arrow-label`
+
+### Example Usage
+
+```tsx
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { BackArrowLabel } from '@js-monorepo/ui-back-arrow'
+
+export function BackToSettings() {
+  const router = useRouter()
+
+  return <BackArrowLabel onClick={() => router.back()}>Back to settings</BackArrowLabel>
+}
+```
+
+Ideal for consistent back navigation in nested settings or detail pages.

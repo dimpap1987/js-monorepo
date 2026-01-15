@@ -1,7 +1,41 @@
-# web-notification
+## `@js-monorepo/ui-web-notification`
 
-This library was generated with [Nx](https://nx.dev).
+Wrapper around the **Web Notifications API** with React‑friendly helpers.
 
-## Running unit tests
+### Exports
 
-Run `nx test web-notification` to execute the unit tests via [Jest](https://jestjs.io).
+From `libs/shared/ui/web-notification/src/index.ts`:
+
+- Utilities from `./lib/utils`
+- `WebNotificationProvider` and related hooks from `./lib/web-notification-provider`
+
+### Example Usage
+
+```tsx
+'use client'
+
+import { WebNotificationProvider, useWebNotification } from '@js-monorepo/ui-web-notification'
+
+export function AppWithWebNotifications({ children }: { children: React.ReactNode }) {
+  return <WebNotificationProvider>{children}</WebNotificationProvider>
+}
+
+export function NotifyButton() {
+  const { requestPermissionAndNotify } = useWebNotification()
+
+  return (
+    <button
+      onClick={() =>
+        requestPermissionAndNotify({
+          title: 'Workout reminder',
+          body: 'Time for your session at the gym.',
+        })
+      }
+    >
+      Enable reminders
+    </button>
+  )
+}
+```
+
+Use together with server‑side notifications (`@js-monorepo/notifications-*`) to provide richer UX when the tab is not focused.

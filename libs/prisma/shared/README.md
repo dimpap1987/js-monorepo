@@ -26,17 +26,13 @@ It provides DI tokens, a common `AbstractPrismaService` base class, module facto
 ```ts
 // libs/your-shared-lib/src/lib/your.repository.ts
 import { Inject, Injectable } from '@nestjs/common'
-import {
-  PRISMA_SERVICE,
-  BasePrismaService,
-  Prisma,
-} from '@js-monorepo/prisma-shared'
+import { PRISMA_SERVICE, BasePrismaService, Prisma } from '@js-monorepo/prisma-shared'
 
 @Injectable()
 export class YourRepository {
   constructor(
     @Inject(PRISMA_SERVICE)
-    private readonly prisma: BasePrismaService,
+    private readonly prisma: BasePrismaService
   ) {}
 
   async findUserById(id: number) {
@@ -47,10 +43,7 @@ export class YourRepository {
     try {
       return await this.prisma.authUser.create({ data })
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         // Handle unique constraint violation
       }
       throw error
@@ -74,4 +67,3 @@ When you create a new DB library, you extend the pieces from `@js-monorepo/prism
    - exposes `PRISMA_SERVICE` so shared libs stay database‑agnostic
 
 See `libs/prisma/core-db` and `libs/prisma/gym-db` for full examples.
-

@@ -40,7 +40,7 @@ import { createSiteConfigFromEnv, configureSite } from '@js-monorepo/seo'
 configureSite(
   createSiteConfigFromEnv({
     defaultLocale: 'en-US',
-  }),
+  })
 )
 ```
 
@@ -83,10 +83,7 @@ const productJsonLd = generateStructuredData({
 export default function PricingPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
       {/* ...rest of page */}
     </>
   )
@@ -94,4 +91,3 @@ export default function PricingPage() {
 ```
 
 Use this to improve search visibility for key pages like pricing, classes, and blog posts.
-

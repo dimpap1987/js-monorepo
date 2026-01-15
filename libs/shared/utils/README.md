@@ -50,4 +50,3 @@ function ensureActiveSubscription(isActive: boolean) {
 
 These utilities are meant to stay **generic and reusable**.  
 If you find yourself re‑implementing common date or error logic, prefer adding it here.
-

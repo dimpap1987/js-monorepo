@@ -1,4 +1,5 @@
-import jsonData from '../../data/README.json'
+import { notFound } from 'next/navigation'
+import { getDocByModule } from '../../lib/docs'
 import DocPage from './DocPage'
 
 interface PageProps {
@@ -7,10 +8,14 @@ interface PageProps {
   }
 }
 
-function Page({ params: { module } }: PageProps) {
-  const doc = jsonData.find((json) => json.module === module)
+async function Page({ params: { module } }: PageProps) {
+  const doc = await getDocByModule(module)
 
-  return doc && <DocPage data={doc.data} path={doc.path}></DocPage>
+  if (!doc) {
+    notFound()
+  }
+
+  return <DocPage data={doc.data} path={doc.path}></DocPage>
 }
 
 export default Page

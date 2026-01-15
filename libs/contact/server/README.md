@@ -73,4 +73,3 @@ The underlying Prisma model lives in the shared schema (see `libs/prisma/*/src/l
 
 - Stores metadata like `name`, `email`, `message`
 - Connected to the same Postgres database as the rest of the app (core or gym DB, depending on which Prisma module is imported)
-

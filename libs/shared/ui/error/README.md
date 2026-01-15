@@ -1,7 +1,30 @@
-# error-boundary
+## `@js-monorepo/ui-error`
 
-This library was generated with [Nx](https://nx.dev).
+Error boundary and error display components for React/Next.js apps.
 
-## Running unit tests
+### Exports
 
-Run `nx test error-boundary` to execute the unit tests via [Jest](https://jestjs.io).
+From `libs/shared/ui/error/src/index.ts`:
+
+- `ErrorBoundary` – React error boundary component
+- `ErrorComponent` / `ErrorView` – presentational error UI
+
+> Implementations live in `libs/shared/ui/error/src/lib/components/`.
+
+### Basic Usage – Error Boundary
+
+```tsx
+'use client'
+
+import { ErrorBoundary } from '@js-monorepo/ui-error'
+
+function Fallback() {
+  return <p>Something went wrong. Please try again.</p>
+}
+
+export function SafeSection({ children }: { children: React.ReactNode }) {
+  return <ErrorBoundary fallback={<Fallback />}>{children}</ErrorBoundary>
+}
+```
+
+Wrap any unstable part of the UI (heavy network components, experiments, etc.) with `ErrorBoundary` to avoid breaking the whole page.

@@ -22,9 +22,7 @@ export default function ContactPage() {
   return (
     <main className="container py-12">
       <h1 className="text-3xl font-semibold mb-4">Contact us</h1>
-      <p className="text-muted-foreground mb-8">
-        Send us a message and we’ll get back to you.
-      </p>
+      <p className="text-muted-foreground mb-8">Send us a message and we’ll get back to you.</p>
       <ContactForm />
     </main>
   )
@@ -56,9 +54,7 @@ export function CustomContactForm() {
       {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
 
       <textarea {...register('message')} placeholder="How can we help?" />
-      {errors.message && (
-        <p className="text-sm text-red-500">{errors.message.message}</p>
-      )}
+      {errors.message && <p className="text-sm text-red-500">{errors.message.message}</p>}
 
       <button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Sending…' : 'Send message'}
@@ -69,4 +65,3 @@ export function CustomContactForm() {
 ```
 
 > The exact field names and validation rules live in the implementation under `libs/shared/ui/contact-form/src/lib/`.
-
