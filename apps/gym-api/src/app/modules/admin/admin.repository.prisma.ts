@@ -91,7 +91,7 @@ export class AdminRepositoryPrisma implements AdminRepository {
         createdAt: true,
         username: true,
         email: true,
-        isActive: true,
+        status: true,
         userProfiles: {
           select: {
             id: true,

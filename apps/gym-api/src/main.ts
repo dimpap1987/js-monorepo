@@ -7,6 +7,8 @@ export const apiLogger = new Logger('GYM-API')
 import './otel'
 import { LOGGER_CONFIG, LoggerConfig, LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
+import { getAllowedOriginsFromEnv, isOriginAllowed as isOriginAllowedUtil } from '@js-monorepo/utils/common'
+import { TimeoutInterceptor } from '@js-monorepo/nest/interceptors'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
 import { NestFactory } from '@nestjs/core'
 import cookieParser from 'cookie-parser'
@@ -17,11 +19,52 @@ import { ClsService } from 'nestjs-cls'
 import { setupGracefulShutdown } from 'nestjs-graceful-shutdown'
 import { AppModule } from './app/app.module'
 import { NestExpressApplication } from '@nestjs/platform-express'
+import { validateEnv } from './config/env.schema'
+import { ZodError } from 'zod'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
 const port = process.env.PORT || 3333
 const globalPrefix = 'api'
+const allowedOrigins = getAllowedOriginsFromEnv(process.env)
+
+function validateEnvironmentVariables() {
+  try {
+    validateEnv(process.env)
+    apiLogger.log('Environment variables validation passed')
+
+    // Log warnings for optional OAuth variables if they're missing
+    const oauthVars = [
+      'GOOGLE_CLIENT_ID',
+      'GOOGLE_CLIENT_SECRET',
+      'GOOGLE_REDIRECT_URL',
+      'GITHUB_CLIENT_ID',
+      'GITHUB_CLIENT_SECRET',
+      'GITHUB_REDIRECT_URL',
+      'STRIPE_WEBHOOK_SECRET',
+    ]
+    const missingOauth = oauthVars.filter((varName) => !process.env[varName])
+
+    if (missingOauth.length > 0) {
+      apiLogger.warn(`Optional OAuth environment variables not set: ${missingOauth.join(', ')}`)
+      apiLogger.warn('OAuth authentication features will not be available')
+    }
+  } catch (error) {
+    if (error instanceof ZodError) {
+      // Zod validation error - format issues for better readability
+      const errorMessages = error.issues
+        .map((issue) => {
+          const path = issue.path.join('.')
+          return `${path}: ${issue.message}`
+        })
+        .join(', ')
+      const errorMessage = `Environment variable validation failed: ${errorMessages}`
+      apiLogger.error(errorMessage)
+      throw new Error(errorMessage)
+    }
+    throw error
+  }
+}
 
 function logServerMetadata() {
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
@@ -35,6 +78,8 @@ function logServerMetadata() {
 
 async function bootstrap() {
   apiLogger.log('Starting application...')
+  validateEnvironmentVariables()
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
     forceCloseConnections: true,
@@ -48,7 +93,14 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix)
   app.use(cookieParser())
   app.enableCors({
-    origin: process.env.APP_URL,
+    origin: (origin, callback) => {
+      const isAllowed = isOriginAllowedUtil(origin || undefined, allowedOrigins)
+      if (isAllowed) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
     credentials: true,
   })
   app.use(
@@ -56,7 +108,11 @@ async function bootstrap() {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'", process.env.APP_URL],
-          connectSrc: ["'self'", process.env.APP_URL],
+          scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://js.stripe.com'],
+          connectSrc: ["'self'", process.env.APP_URL, 'https://api.stripe.com'],
+          frameSrc: ["'self'", 'https://js.stripe.com', 'https://hooks.stripe.com'],
+          imgSrc: ["'self'", 'data:', 'blob:', 'https://*.stripe.com'],
+          styleSrc: ["'self'", "'unsafe-inline'"],
         },
       },
     })
@@ -71,6 +127,7 @@ async function bootstrap() {
       stopAtFirstError: true,
     })
   )
+  app.useGlobalInterceptors(new TimeoutInterceptor(30_000))
   app.set('trust proxy', 1)
 
   const redisIoAdapter = new RedisIoAdapter(app)

@@ -1,12 +1,12 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
+import { QueryValidationPipe } from '@js-monorepo/nest/pipes'
 import { UpdateUserSchemaType } from '@js-monorepo/schemas'
-import { AuthUserDto, AuthUserFullDto, SessionUserType, UserStatus } from '@js-monorepo/types/auth'
+import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types/auth'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
 import { OnlineUsersService } from '@js-monorepo/user-presence'
-import { CacheInterceptor } from '@nestjs/cache-manager'
 import {
   Body,
   Controller,
@@ -23,11 +23,11 @@ import {
   Query,
   Req,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common'
 import { Request } from 'express'
 import { AdminPaymentsService } from './admin-payments.service'
 import { AdminService } from './admin.service'
+import { SubscriptionFiltersSchema, SubscriptionFiltersType } from './dto/subscription-filters.schema'
 
 @UseGuards(RolesGuard)
 @HasRoles(RolesEnum.ADMIN)
@@ -43,7 +43,6 @@ export class AdminController {
   ) {}
 
   @Get('users')
-  @UseInterceptors(CacheInterceptor)
   async getUsers(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number
@@ -68,11 +67,8 @@ export class AdminController {
   async getAllSubscriptions(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number,
-    @Query('status') status?: string,
-    @Query('search') search?: string,
-    @Query('plan') plan?: string
+    @Query(new QueryValidationPipe(SubscriptionFiltersSchema)) filters?: SubscriptionFiltersType
   ): Promise<PaginationType<Subscription>> {
-    const filters = { status, search, plan }
     return this.adminPaymentsService.getAllSubscriptions(page, pageSize, filters)
   }
 

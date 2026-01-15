@@ -4,6 +4,8 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { IdempotencyInterceptor } from '@js-monorepo/nest/idempotency'
 import { SessionUserType } from '@js-monorepo/types/auth'
 import { tryCatch } from '@js-monorepo/utils/common'
+import { Type } from 'class-transformer'
+import { IsInt, IsPositive, IsString, IsUrl } from 'class-validator'
 import {
   Body,
   Controller,
@@ -21,6 +23,19 @@ import {
 import { RequestWithRawBody } from '../rawBody.middleware'
 import { PaymentsService } from '../service/payments.service'
 import { StripeService } from '../service/stripe.service'
+
+class PriceIdDto {
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  priceId!: number
+}
+
+class PortalSessionDto {
+  @IsString()
+  @IsUrl()
+  returnUrl!: string
+}
 
 @Controller('payments')
 export class PaymentsController {
@@ -60,7 +75,7 @@ export class PaymentsController {
   @Post('checkout')
   @UseGuards(LoggedInGuard)
   @UseInterceptors(IdempotencyInterceptor)
-  async createCheckoutSession(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
+  async createCheckoutSession(@Body() { priceId }: PriceIdDto, @SessionUser() sessionUser: SessionUserType) {
     const { session } = await this.stripeService.createCheckoutSession(priceId, sessionUser.id, sessionUser.email)
     return { sessionId: session.id }
   }
@@ -69,7 +84,7 @@ export class PaymentsController {
   @HttpCode(204)
   @UseGuards(LoggedInGuard)
   @UseInterceptors(IdempotencyInterceptor)
-  async cancelSubscription(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
+  async cancelSubscription(@Body() { priceId }: PriceIdDto, @SessionUser() sessionUser: SessionUserType) {
     const subscription = await this.paymentsService.findSubscriptionByPriceIdAndUserId(priceId, sessionUser.id)
 
     if (subscription.stripeSubscriptionId) {
@@ -89,7 +104,7 @@ export class PaymentsController {
   @HttpCode(204)
   @UseGuards(LoggedInGuard)
   @UseInterceptors(IdempotencyInterceptor)
-  async renewSubscription(@Body() { priceId }: { priceId: number }, @SessionUser() sessionUser: SessionUserType) {
+  async renewSubscription(@Body() { priceId }: PriceIdDto, @SessionUser() sessionUser: SessionUserType) {
     const subscription = await this.paymentsService.findSubscriptionByPriceIdAndUserId(priceId, sessionUser.id)
 
     const { error } = await tryCatch(() => this.stripeService.renewSubscription(subscription.stripeSubscriptionId))
@@ -101,7 +116,7 @@ export class PaymentsController {
 
   @Post('portal')
   @UseGuards(LoggedInGuard)
-  async createPortalSession(@Body() { returnUrl }: { returnUrl: string }, @SessionUser() sessionUser: SessionUserType) {
+  async createPortalSession(@Body() { returnUrl }: PortalSessionDto, @SessionUser() sessionUser: SessionUserType) {
     const paymentCustomer = await this.paymentsService.findPaymentCustomerById(sessionUser.id)
 
     if (!paymentCustomer?.stripeCustomerId) {

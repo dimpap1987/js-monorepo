@@ -1,5 +1,5 @@
 'use client'
-import { SessionProvider } from '@js-monorepo/auth/next/client'
+import { SessionProvider, type SessionContextType } from '@js-monorepo/auth/next/client'
 import { DpLoaderProvider } from '@js-monorepo/loader'
 import { QClientProvider } from '@js-monorepo/next/providers'
 import { DpNotificationProvider } from '@js-monorepo/notification'
@@ -13,7 +13,7 @@ import { WebSocketProviderWrapper } from './websocket-provider-wrapper'
 
 interface RootProvidersProps {
   readonly children: ReactNode
-  readonly session?: any
+  readonly session?: SessionContextType['session']
 }
 
 export default function ClientProviders({ children, session }: RootProvidersProps) {

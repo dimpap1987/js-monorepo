@@ -20,7 +20,42 @@ const nextConfig = {
     svgr: false,
   },
   async headers() {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || ''
+    const devBackendUrl = process.env.DEV_BACKEND_URL || ''
+
+    // Build connect-src with development allowances
+    const connectSrcParts = ["'self'"]
+    if (appUrl) connectSrcParts.push(appUrl)
+    connectSrcParts.push('https://api.stripe.com')
+    if (isDev) {
+      connectSrcParts.push('http://localhost:*', 'http://127.0.0.1:*', 'ws://localhost:*', 'ws://127.0.0.1:*')
+      if (devBackendUrl) connectSrcParts.push(devBackendUrl)
+    }
+
+    const cspDirectives = [
+      "default-src 'self'",
+      `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com${isDev ? ' http://localhost:* http://127.0.0.1:*' : ''}`,
+      `connect-src ${connectSrcParts.join(' ')}`,
+      `frame-src 'self' https://js.stripe.com https://hooks.stripe.com`,
+      `img-src 'self' data: blob: https://*.stripe.com https://avatars.githubusercontent.com https://lh3.googleusercontent.com`,
+      `style-src 'self' 'unsafe-inline'`,
+      `font-src 'self' data:`,
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+    ].join('; ')
+
     return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: cspDirectives,
+          },
+        ],
+      },
       {
         source: '/_next/static/:path*',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],

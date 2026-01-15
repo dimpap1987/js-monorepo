@@ -64,7 +64,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         GlobalExceptionFilter.name
       )
     } else {
-      Logger.error(`Unkown error happened - path: '${request.originalUrl}'`, exception, GlobalExceptionFilter.name)
+      Logger.error(`Unknown error happened - path: '${request.originalUrl}'`, exception, GlobalExceptionFilter.name)
     }
 
     return response.status(status).json({

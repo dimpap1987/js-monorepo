@@ -35,11 +35,11 @@ import { apiLogger } from '../main'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { AnnouncementsController } from './controllers/announcements'
 import { AppController } from './controllers/app.controller'
-import { ExceptionController } from './controllers/exception.controller'
 import { AdminProviderModule } from './modules/admin/admin.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { UserModule } from './modules/user/user.module'
+import { getContactMessage } from './notifications/contact-form'
 import {
   getSubscriptionActivatedMessage,
   getSubscriptionCanceledMessage,
@@ -48,7 +48,6 @@ import {
   getTrialExpiredMessage,
   getTrialStartedMessage,
 } from './notifications/subscription-notifications'
-import { getContactMessage } from './notifications/contact-form'
 
 @Module({
   imports: [
@@ -111,7 +110,7 @@ import { getContactMessage } from './notifications/contact-form'
           }
         }
       },
-      gracefulShutdownTimeout: Number(process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 3000),
+      gracefulShutdownTimeout: Number(process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 30000),
       keepNodeProcessAlive: true,
     }),
     HealthModule,
@@ -141,7 +140,7 @@ import { getContactMessage } from './notifications/contact-form'
         },
         csrf: {
           enabled: true,
-          middlewareExclusions: ['exceptions', 'admin/(.*)', 'health', 'payments/webhook', 'contact'],
+          middlewareExclusions: ['health', 'payments/webhook', 'contact'],
         },
         redirectUiUrl: configService.get('AUTH_LOGIN_REDIRECT'),
         skipOnboarding: true,
@@ -272,7 +271,7 @@ import { getContactMessage } from './notifications/contact-form'
           store: new KeyvRedis(redisClient, {
             keyPrefixSeparator: ':caches:',
           }),
-          ttl: 5000,
+          ttl: 2 * 60 * 1000, // Cache for 2 minutes
           useKeyPrefix: false,
           namespace: configService.get('REDIS_NAMESPACE'),
         })
@@ -282,7 +281,7 @@ import { getContactMessage } from './notifications/contact-form'
       },
     }),
   ],
-  controllers: [ExceptionController, AnnouncementsController, AppController],
+  controllers: [AnnouncementsController, AppController],
   providers: [LoggerMiddleware],
 })
 export class AppModule implements NestModule {

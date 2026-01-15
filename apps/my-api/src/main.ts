@@ -7,6 +7,7 @@ export const apiLogger = new Logger('API')
 import './otel'
 import { LOGGER_CONFIG, LoggerConfig, LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
+import { getAllowedOriginsFromEnv, isOriginAllowed as isOriginAllowedUtil } from '@js-monorepo/utils/common'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
 import { NestFactory } from '@nestjs/core'
 import cookieParser from 'cookie-parser'
@@ -22,6 +23,7 @@ expand(config()) // add functionality for .env to use interpolation and more
 
 const port = process.env.PORT || 3333
 const globalPrefix = 'api'
+const allowedOrigins = getAllowedOriginsFromEnv(process.env)
 
 function logServerMetadata() {
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
@@ -48,7 +50,14 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix)
   app.use(cookieParser())
   app.enableCors({
-    origin: process.env.APP_URL,
+    origin: (origin, callback) => {
+      const isAllowed = isOriginAllowedUtil(origin || undefined, allowedOrigins)
+      if (isAllowed) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
     credentials: true,
   })
   app.use(

@@ -148,3 +148,47 @@ export function removePathNameFromUrl(url: string) {
 
   return parsedUrl?.toString()
 }
+
+/**
+ * Build a normalized list of allowed origins from environment variables.
+ *
+ * Priority:
+ * - CORS_ALLOWED_ORIGINS (comma-separated)
+ * - APP_URL
+ */
+export function getAllowedOriginsFromEnv(env: Record<string, string | undefined>): string[] {
+  const raw = env.CORS_ALLOWED_ORIGINS ?? env.APP_URL ?? ''
+
+  return raw
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)
+}
+
+/**
+ * Validate if a given Origin header value matches one of the allowed origins.
+ *
+ * Expects `allowedOrigins` to contain full origins (e.g. https://app.example.com)
+ * and will compare against the `URL(origin).origin`.
+ */
+export function isOriginAllowed(origin: string | undefined, allowedOrigins: string[]): boolean {
+  // Allow non-browser requests (SSR, curl, internal services)
+  if (!origin) {
+    return true
+  }
+
+  try {
+    const originUrl = new URL(origin)
+
+    const isAllowed = allowedOrigins.some((allowed) => {
+      try {
+        return new URL(allowed).origin === originUrl.origin
+      } catch {
+        return false
+      }
+    })
+    return isAllowed
+  } catch (e) {
+    return false
+  }
+}
