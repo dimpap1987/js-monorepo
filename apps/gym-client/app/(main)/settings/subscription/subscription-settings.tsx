@@ -24,6 +24,7 @@ export function SubscriptionSettings() {
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)
+  const [subscriptionPlan, setSubscriptionPlan] = useState<PlanInfo | null>(null)
   const subscriptionIdRef = useRef<number | null>(null)
 
   const sessionSubscription = session?.subscription as SessionSubscription | undefined
@@ -40,6 +41,7 @@ export function SubscriptionSettings() {
         if (response.ok && response.data) {
           // Extract subscription from structured response
           const subData = response.data.subscription
+          const priceData = response.data.price
           setSubscription({
             id: subData.id,
             paymentCustomerId: subData.paymentCustomerId,
@@ -55,6 +57,18 @@ export function SubscriptionSettings() {
             createdAt: subData.createdAt,
             updatedAt: subData.updatedAt,
           })
+          if (priceData) {
+            setSubscriptionPlan({
+              name: priceData.product.name,
+              price: centsToAmount(priceData.unitAmount),
+              priceInCents: priceData.unitAmount,
+              currency: priceData.currency,
+              interval: priceData.interval,
+              // We don't have feature metadata on this response; fall back to empty.
+              features: {},
+              priceId: priceData.id,
+            })
+          }
         }
       })
     }
@@ -73,6 +87,7 @@ export function SubscriptionSettings() {
         if (response.ok && response.data) {
           // Extract subscription from structured response
           const subData = response.data.subscription
+          const priceData = response.data.price
           setSubscription({
             id: subData.id,
             paymentCustomerId: subData.paymentCustomerId,
@@ -88,6 +103,17 @@ export function SubscriptionSettings() {
             createdAt: subData.createdAt,
             updatedAt: subData.updatedAt,
           })
+          if (priceData) {
+            setSubscriptionPlan({
+              name: priceData.product.name,
+              price: centsToAmount(priceData.unitAmount),
+              priceInCents: priceData.unitAmount,
+              currency: priceData.currency,
+              interval: priceData.interval,
+              features: {},
+              priceId: priceData.id,
+            })
+          }
         }
       } catch (error) {
         console.error('Error fetching subscription:', error)
@@ -101,24 +127,9 @@ export function SubscriptionSettings() {
 
   // Get plan details from the plans list
   const planDetails = useMemo<PlanInfo | null>(() => {
-    if (!subscription || !plans.length) return null
-
-    for (const plan of plans) {
-      const price = plan.prices.find((p) => p.id === subscription.priceId)
-      if (price) {
-        return {
-          name: plan.name,
-          price: centsToAmount(price.unitAmount), // Convert cents to amount
-          priceInCents: price.unitAmount, // Keep original for formatting
-          currency: price.currency,
-          interval: price.interval,
-          features: (plan.metadata?.features as Record<string, string>) || {},
-          priceId: price.id,
-        }
-      }
-    }
-    return null
-  }, [subscription, plans])
+    if (!subscription) return null
+    return subscriptionPlan
+  }, [subscription, subscriptionPlan])
 
   const refetchSubscription = useCallback(() => {
     refreshSession()
@@ -127,6 +138,7 @@ export function SubscriptionSettings() {
         if (response.ok && response.data) {
           // Extract subscription from structured response
           const subData = response.data.subscription
+          const priceData = response.data.price
           setSubscription({
             id: subData.id,
             paymentCustomerId: subData.paymentCustomerId,
@@ -142,6 +154,17 @@ export function SubscriptionSettings() {
             createdAt: subData.createdAt,
             updatedAt: subData.updatedAt,
           })
+          if (priceData) {
+            setSubscriptionPlan({
+              name: priceData.product.name,
+              price: centsToAmount(priceData.unitAmount),
+              priceInCents: priceData.unitAmount,
+              currency: priceData.currency,
+              interval: priceData.interval,
+              features: {},
+              priceId: priceData.id,
+            })
+          }
         }
       })
     }

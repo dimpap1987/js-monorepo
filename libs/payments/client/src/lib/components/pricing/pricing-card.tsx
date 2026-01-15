@@ -213,9 +213,6 @@ export function PricingCard({
             Start {trialEligibility.trialDurationDays}-day Free Trial
           </DpButton>
         )}
-        {trialNotEligible && trialEligibility.reason && (
-          <p className="text-xs text-foreground-neutral text-center mt-1">{trialEligibility.reason}</p>
-        )}
       </CardFooter>
     </Card>
   )

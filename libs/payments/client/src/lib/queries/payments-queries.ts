@@ -56,7 +56,11 @@ export function useHasSubscriptionHistory() {
       }
       return response.data?.hasHistory ?? false
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    // We want this to reflect new purchases quickly when the user
+    // navigates to Settings, so avoid long caching here.
+    staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
     retry: false,
   })
 }

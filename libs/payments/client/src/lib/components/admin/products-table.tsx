@@ -41,6 +41,8 @@ import {
   PriceStatusBadge,
   StripeSyncBadge,
 } from './product-status-badge'
+import { formatPrice } from '@js-monorepo/currency'
+import { useLocale } from 'next-intl'
 
 interface ProductsTableProps {
   data: PaginationType<AdminProduct> | undefined
@@ -87,6 +89,7 @@ function PricesSubRow({
   verifyingPriceIds?: Set<number>
   syncingPriceIds?: Set<number>
 }) {
+  const locale = useLocale() as 'en' | 'el'
   if (product.prices.length === 0) {
     return (
       <TableRow>
@@ -147,10 +150,11 @@ function PricesSubRow({
                   >
                     <td className="py-2 font-medium">
                       <div className="flex flex-col">
-                        <span>{`${price.unitAmount} ${price.currency}`}</span>
+                        <span>{formatPrice(price.unitAmount, locale, price.currency.toUpperCase())}</span>
                         {replacedByPrice && (
                           <span className="text-xs text-muted-foreground">
-                            Replaced by: {replacedByPrice.unitAmount} {replacedByPrice.currency}
+                            Replaced by:{' '}
+                            {formatPrice(replacedByPrice.unitAmount, locale, replacedByPrice.currency.toUpperCase())}
                           </span>
                         )}
                       </div>
