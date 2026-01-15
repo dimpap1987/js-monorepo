@@ -41,6 +41,8 @@
       "@js-monorepo/navbar": ["libs/shared/ui/navbar/src/index.ts"],
       "@js-monorepo/nest/*": ["libs/nest-utils/src/lib/*"],
       "@js-monorepo/next/*": ["libs/next/src/lib/*"],
+      "@js-monorepo/feature-flags-server": ["libs/feature-flags/server/src/index.ts"],
+      "@js-monorepo/feature-flags-client": ["libs/feature-flags/client/src/index.ts"],
       "@js-monorepo/notification": ["libs/shared/ui/notification/src/index.ts"],
       "@js-monorepo/notifications-server": ["libs/notifications/server/src/index.ts"],
       "@js-monorepo/notifications-ui": ["libs/notifications/client/src/index.ts"],

@@ -1,6 +1,9 @@
 -- CreateExtension
 CREATE EXTENSION IF NOT EXISTS "citext";
 
+-- CreateEnum
+CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'DEACTIVATED', 'BANNED');
+
 -- CreateTable
 CREATE TABLE "auth_users" (
     "id" SERIAL NOT NULL,
@@ -9,6 +12,7 @@ CREATE TABLE "auth_users" (
     "username" CITEXT NOT NULL,
     "email" TEXT NOT NULL,
     "timezone" TEXT NOT NULL DEFAULT 'UTC',
+    "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
 
     CONSTRAINT "auth_users_pkey" PRIMARY KEY ("id")
 );
@@ -85,6 +89,19 @@ CREATE TABLE "contact_messages" (
 );
 
 -- CreateTable
+CREATE TABLE "feature_flags" (
+    "id" SERIAL NOT NULL,
+    "key" TEXT NOT NULL,
+    "description" TEXT,
+    "enabled" BOOLEAN NOT NULL DEFAULT false,
+    "rollout" INTEGER NOT NULL DEFAULT 100,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "feature_flags_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "stripe_customers" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
@@ -148,6 +165,8 @@ CREATE TABLE "prices" (
     "currency" TEXT NOT NULL,
     "interval" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
+    "status" TEXT NOT NULL DEFAULT 'active',
+    "replaced_by_price_id" INTEGER,
     "productId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -191,6 +210,9 @@ CREATE INDEX "auth_users_email_idx" ON "auth_users"("email");
 CREATE INDEX "auth_users_username_idx" ON "auth_users"("username");
 
 -- CreateIndex
+CREATE INDEX "auth_users_status_idx" ON "auth_users"("status");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "user_profiles_userId_providerId_key" ON "user_profiles"("userId", "providerId");
 
 -- CreateIndex
@@ -219,6 +241,9 @@ CREATE INDEX "contact_messages_created_at_idx" ON "contact_messages"("created_at
 
 -- CreateIndex
 CREATE INDEX "contact_messages_user_id_idx" ON "contact_messages"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "feature_flags_key_key" ON "feature_flags"("key");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "stripe_customers_userId_key" ON "stripe_customers"("userId");
@@ -265,6 +290,12 @@ CREATE UNIQUE INDEX "prices_stripeId_key" ON "prices"("stripeId");
 -- CreateIndex
 CREATE INDEX "prices_active_idx" ON "prices"("active");
 
+-- CreateIndex
+CREATE INDEX "prices_status_idx" ON "prices"("status");
+
+-- CreateIndex
+CREATE INDEX "prices_replaced_by_price_id_idx" ON "prices"("replaced_by_price_id");
+
 -- AddForeignKey
 ALTER TABLE "user_profiles" ADD CONSTRAINT "user_profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth_users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -291,6 +322,9 @@ ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_payment_customer_id_fk
 
 -- AddForeignKey
 ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_priceId_fkey" FOREIGN KEY ("priceId") REFERENCES "prices"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "prices" ADD CONSTRAINT "prices_replaced_by_price_id_fkey" FOREIGN KEY ("replaced_by_price_id") REFERENCES "prices"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "prices" ADD CONSTRAINT "prices_productId_fkey" FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;

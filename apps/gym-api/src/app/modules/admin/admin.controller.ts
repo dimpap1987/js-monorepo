@@ -7,6 +7,7 @@ import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/type
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
 import { OnlineUsersService } from '@js-monorepo/user-presence'
+import { FeatureFlagsService } from '@js-monorepo/feature-flags-server'
 import {
   Body,
   Controller,
@@ -39,7 +40,8 @@ export class AdminController {
     private readonly adminService: AdminService,
     private readonly οnlineUsersService: OnlineUsersService,
     private readonly adminPaymentsService: AdminPaymentsService,
-    private readonly authSessionCacheService: AuthSessionUserCacheService
+    private readonly authSessionCacheService: AuthSessionUserCacheService,
+    private readonly featureFlagsService: FeatureFlagsService
   ) {}
 
   @Get('users')
@@ -75,6 +77,27 @@ export class AdminController {
   @Get('subscriptions/stats')
   async getSubscriptionStats() {
     return this.adminPaymentsService.getSubscriptionStats()
+  }
+
+  // ===== Feature Flags Management =====
+
+  @Get('feature-flags')
+  async getFeatureFlags() {
+    return this.featureFlagsService.getAllFlags()
+  }
+
+  @Post('feature-flags')
+  async upsertFeatureFlag(
+    @Body()
+    body: {
+      key: string
+      enabled?: boolean
+      rollout?: number
+      description?: string
+    }
+  ) {
+    await this.featureFlagsService.upsertFlag(body)
+    return this.featureFlagsService.getAllFlags()
   }
 
   @Put('users/:id')

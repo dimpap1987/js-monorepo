@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server'
 import { LocaleSwitcher } from '../../components/locale-switcher'
 import { FeatureBadge } from '@js-monorepo/components/ui/feature-badge'
 import { ComingSoonWrapper } from '@js-monorepo/components/ui/coming-soon-wrapper'
+import { HomeBanner } from '../../components/home-banner'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Home',
@@ -21,6 +22,7 @@ export default async function HomePage() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
         <h1 className="text-4xl font-bold mb-4">{t('title')}</h1>
         <p className="text-lg text-foreground-muted mb-8">{t('subtitle')}</p>
+        <HomeBanner />
         <div className="flex gap-4">
           <a
             href="/workouts"

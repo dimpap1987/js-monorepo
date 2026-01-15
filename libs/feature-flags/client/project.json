@@ -1,0 +1,24 @@
+{
+  "name": "feature-flags-client",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/feature-flags/client/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/feature-flags/client/**/*.ts", "libs/feature-flags/client/**/*.tsx"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/feature-flags/client"],
+      "options": {
+        "jestConfig": "libs/feature-flags/client/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

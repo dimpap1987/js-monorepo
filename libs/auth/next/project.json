@@ -4,5 +4,6 @@
   "sourceRoot": "libs/auth/next/src",
   "projectType": "library",
   "tags": [],
+  "// targets": "to see all targets run: nx show project next-auth --web",
   "targets": {}
 }

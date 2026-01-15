@@ -7,6 +7,7 @@ import { NotificationProvider } from '@js-monorepo/notifications-ui'
 import { DpNextPageProgressBar } from '@js-monorepo/page-progress-bar'
 import { getEnabledThemeIds, ThemeProvider } from '@js-monorepo/theme-provider'
 import { WebNotificationProvider } from '@js-monorepo/web-notification'
+import { FeatureFlagsProvider } from '@js-monorepo/feature-flags-client'
 import { ReactNode } from 'react'
 import { AppConfig } from '../lib/app-config'
 import { WebSocketProviderWrapper } from './websocket-provider-wrapper'
@@ -17,6 +18,8 @@ interface RootProvidersProps {
 }
 
 export default function ClientProviders({ children, session }: RootProvidersProps) {
+  const featureFlags = (session as any)?.featureFlags ?? {}
+
   return (
     <ThemeProvider
       attribute="class"
@@ -28,13 +31,15 @@ export default function ClientProviders({ children, session }: RootProvidersProp
         <QClientProvider>
           <DpLoaderProvider>
             <DpNotificationProvider>
-              <SessionProvider value={session} endpoint="/session">
-                <WebSocketProviderWrapper>
-                  <NotificationProvider userId={session?.user?.id}>
-                    <WebNotificationProvider>{children}</WebNotificationProvider>
-                  </NotificationProvider>
-                </WebSocketProviderWrapper>
-              </SessionProvider>
+              <FeatureFlagsProvider flags={featureFlags}>
+                <SessionProvider value={session} endpoint="/session">
+                  <WebSocketProviderWrapper>
+                    <NotificationProvider userId={session?.user?.id}>
+                      <WebNotificationProvider>{children}</WebNotificationProvider>
+                    </NotificationProvider>
+                  </WebSocketProviderWrapper>
+                </SessionProvider>
+              </FeatureFlagsProvider>
             </DpNotificationProvider>
           </DpLoaderProvider>
         </QClientProvider>

@@ -1,7 +1,7 @@
 import { GrAnnounce } from 'react-icons/gr'
 import { HiMiniUsers } from 'react-icons/hi2'
 import { IoMdNotifications } from 'react-icons/io'
-import { MdOutlineContactMail, MdOutlineSubscriptions } from 'react-icons/md'
+import { MdOutlineContactMail, MdOutlineSubscriptions, MdOutlineToggleOn } from 'react-icons/md'
 import { RiUserSettingsFill } from 'react-icons/ri'
 import { FiPackage } from 'react-icons/fi'
 
@@ -46,6 +46,12 @@ export const ADMIN_NAV_LINKS = [
     href: '/admin/contact-messages',
     icon: MdOutlineContactMail,
     label: 'Contact Messages',
+    activeClassName: 'bg-primary text-primary-foreground',
+  },
+  {
+    href: '/admin/feature-flags',
+    icon: MdOutlineToggleOn,
+    label: 'Feature Flags',
     activeClassName: 'bg-primary text-primary-foreground',
   },
 ] as const

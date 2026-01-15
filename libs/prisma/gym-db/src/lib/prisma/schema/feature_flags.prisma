@@ -1,0 +1,12 @@
+model FeatureFlag {
+    id          Int      @id @default(autoincrement())
+    key         String   @unique
+    description String?
+    enabled     Boolean  @default(false)
+    rollout     Int      @default(100) // 0-100 percentage for gradual rollout
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@map("feature_flags")
+}
+

@@ -4,5 +4,6 @@
   "sourceRoot": "libs/shared/ui/contact-form/src",
   "projectType": "library",
   "tags": [],
+  "// targets": "to see all targets run: nx show project contact-form --web",
   "targets": {}
 }
