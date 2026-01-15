@@ -256,7 +256,7 @@ import {
               receiverIds: adminIds,
               message: getContactMessage(message),
               type: 'contact_message',
-              link: '/dashboard/contact-messages',
+              link: '/admin/contact-messages',
             })
             apiLogger.log(`Contact message notification sent to ${adminIds.length} admin(s)`)
           }

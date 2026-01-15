@@ -168,7 +168,7 @@ export function ContactForm({
               <FormItem>
                 <FormLabel className="text-sm font-medium text-foreground">Message</FormLabel>
                 <FormControl>
-                  <Textarea {...field} placeholder="Tell us how we can help..." className="min-h-[140px] resize-none" />
+                  <Textarea {...field} placeholder="Tell us how we can help..." className="h-40" />
                 </FormControl>
                 <FormErrorDisplay errors={form.formState.errors} fields={{ message: 'Message' }} />
               </FormItem>

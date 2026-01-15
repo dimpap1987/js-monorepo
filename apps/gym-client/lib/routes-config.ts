@@ -1,7 +1,7 @@
 import { MenuItem } from '@js-monorepo/types/menu'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdAccountCircle, MdPalette } from 'react-icons/md'
-import { RiSdCardLine, RiDashboardLine, RiPriceTag3Line } from 'react-icons/ri'
+import { RiSdCardLine, RiDashboardLine, RiPriceTag3Line, RiCustomerService2Line } from 'react-icons/ri'
 import { Role, type RouteRole } from './roles'
 
 export interface RouteConfig {
@@ -30,6 +30,10 @@ export const routes: RouteConfig[] = [
     path: '/pricing',
     roles: [Role.PUBLIC],
   },
+  {
+    path: '/contact',
+    roles: [Role.PUBLIC],
+  },
 ]
 
 // Navbar & Sidebar Menu navigation
@@ -46,6 +50,12 @@ export const navigationsMenuItems: MenuItem[] = [
     name: 'navigation.pricing',
     roles: [Role.PUBLIC],
     Icon: RiPriceTag3Line,
+  },
+  {
+    href: '/contact',
+    name: 'navigation.contact',
+    roles: [Role.PUBLIC],
+    Icon: RiCustomerService2Line,
   },
 ]
 

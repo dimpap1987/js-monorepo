@@ -8,12 +8,17 @@
     "subtitle": "Your fitness journey starts here.",
     "browseWorkouts": "Browse Workouts"
   },
+  "contact": {
+    "title": "Contact Us",
+    "description": "Have a question, feedback, or need support? Fill out the form below and we'll get back to you as soon as possible."
+  },
   "navigation": {
     "home": "Home",
     "about": "About",
     "settings": "Settings",
     "dashboard": "Dashboard",
     "pricing": "Plans",
+    "contact": "Contact",
     "alert": "Alert"
   },
   "metadata": {
