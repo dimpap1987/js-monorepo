@@ -1,26 +1,25 @@
-import * as z from 'zod'
+import {
+  CreateBookingSchema,
+  CancelBookingSchema,
+  MarkAttendanceSchema,
+  UpdateBookingNotesSchema,
+  type CreateBookingDto,
+  type CancelBookingDto,
+  type MarkAttendanceDto,
+  type UpdateBookingNotesDto,
+} from '@js-monorepo/schemas'
 
-export const CreateBookingSchema = z.object({
-  classScheduleId: z.number().int().positive('Schedule ID is required'),
-})
-
-export const CancelBookingSchema = z.object({
-  cancelReason: z.string().max(500).optional(),
-})
-
-export const MarkAttendanceSchema = z.object({
-  bookingIds: z.array(z.number().int().positive()).min(1, 'At least one booking ID required'),
-  status: z.enum(['ATTENDED', 'NO_SHOW']),
-})
-
-export const UpdateBookingNotesSchema = z.object({
-  organizerNotes: z.string().max(2000).optional().nullable(),
-})
-
-export type CreateBookingDto = z.infer<typeof CreateBookingSchema>
-export type CancelBookingDto = z.infer<typeof CancelBookingSchema>
-export type MarkAttendanceDto = z.infer<typeof MarkAttendanceSchema>
-export type UpdateBookingNotesDto = z.infer<typeof UpdateBookingNotesSchema>
+// Re-export for backward compatibility
+export {
+  CreateBookingSchema,
+  CancelBookingSchema,
+  MarkAttendanceSchema,
+  UpdateBookingNotesSchema,
+  type CreateBookingDto,
+  type CancelBookingDto,
+  type MarkAttendanceDto,
+  type UpdateBookingNotesDto,
+}
 
 export interface BookingResponseDto {
   id: number

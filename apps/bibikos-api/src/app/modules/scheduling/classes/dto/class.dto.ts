@@ -1,20 +1,7 @@
-import * as z from 'zod'
+import { CreateClassSchema, UpdateClassSchema, type CreateClassDto, type UpdateClassDto } from '@js-monorepo/schemas'
 
-export const CreateClassSchema = z.object({
-  locationId: z.number().int().positive('Location ID is required'),
-  title: z.string().min(1, 'Title is required').max(255),
-  description: z.string().max(5000).optional().nullable(),
-  capacity: z.number().int().positive('Capacity must be a positive number').optional().nullable(),
-  waitlistLimit: z.number().int().min(0, 'Waitlist limit cannot be negative').optional().nullable(),
-  isCapacitySoft: z.boolean().default(false),
-})
-
-export const UpdateClassSchema = CreateClassSchema.partial().extend({
-  isActive: z.boolean().optional(),
-})
-
-export type CreateClassDto = z.infer<typeof CreateClassSchema>
-export type UpdateClassDto = z.infer<typeof UpdateClassSchema>
+// Re-export for backward compatibility
+export { CreateClassSchema, UpdateClassSchema, type CreateClassDto, type UpdateClassDto }
 
 export interface ClassResponseDto {
   id: number

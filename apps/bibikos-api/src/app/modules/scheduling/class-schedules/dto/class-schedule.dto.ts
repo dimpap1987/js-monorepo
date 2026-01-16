@@ -1,34 +1,21 @@
-import * as z from 'zod'
+import {
+  CreateClassScheduleSchema,
+  UpdateClassScheduleSchema,
+  CancelClassScheduleSchema,
+  type CreateClassScheduleDto,
+  type UpdateClassScheduleDto,
+  type CancelClassScheduleDto,
+} from '@js-monorepo/schemas'
 
-// RRULE validation (RFC 5545)
-// Examples: "FREQ=WEEKLY;BYDAY=MO,WE,FR", "FREQ=WEEKLY;INTERVAL=2;BYDAY=TU"
-const rruleSchema = z
-  .string()
-  .max(500)
-  .regex(/^FREQ=(DAILY|WEEKLY|MONTHLY|YEARLY)/, 'Invalid RRULE format')
-  .optional()
-  .nullable()
-
-export const CreateClassScheduleSchema = z.object({
-  classId: z.number().int().positive('Class ID is required'),
-  startTimeUtc: z.string().datetime('Start time must be a valid ISO 8601 datetime'),
-  endTimeUtc: z.string().datetime('End time must be a valid ISO 8601 datetime'),
-  recurrenceRule: rruleSchema,
-})
-
-export const UpdateClassScheduleSchema = z.object({
-  startTimeUtc: z.string().datetime('Start time must be a valid ISO 8601 datetime').optional(),
-  endTimeUtc: z.string().datetime('End time must be a valid ISO 8601 datetime').optional(),
-  recurrenceRule: rruleSchema,
-})
-
-export const CancelClassScheduleSchema = z.object({
-  cancelReason: z.string().max(500).optional(),
-})
-
-export type CreateClassScheduleDto = z.infer<typeof CreateClassScheduleSchema>
-export type UpdateClassScheduleDto = z.infer<typeof UpdateClassScheduleSchema>
-export type CancelClassScheduleDto = z.infer<typeof CancelClassScheduleSchema>
+// Re-export for backward compatibility
+export {
+  CreateClassScheduleSchema,
+  UpdateClassScheduleSchema,
+  CancelClassScheduleSchema,
+  type CreateClassScheduleDto,
+  type UpdateClassScheduleDto,
+  type CancelClassScheduleDto,
+}
 
 export interface ClassScheduleResponseDto {
   id: number
