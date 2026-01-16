@@ -3,6 +3,7 @@ import { PaymentsService } from '@js-monorepo/payments-server'
 import { FeatureFlagsService } from '@js-monorepo/feature-flags-server'
 import { Controller, Get, Logger, Req } from '@nestjs/common'
 import { Request } from 'express'
+import { AppUserService } from '../modules/scheduling/app-users/app-user.service'
 
 @Controller()
 export class AppController {
@@ -10,7 +11,8 @@ export class AppController {
 
   constructor(
     private readonly paymentsService: PaymentsService,
-    private readonly featureFlagsService: FeatureFlagsService
+    private readonly featureFlagsService: FeatureFlagsService,
+    private readonly appUserService: AppUserService
   ) {}
 
   @Get('session')
@@ -19,21 +21,17 @@ export class AppController {
     if (!user) return null
     const { email, ...restUser } = user
 
-    const [{ result, error }, featureFlags] = await Promise.all([
+    const [{ result, error }, featureFlags, appUser] = await Promise.all([
       tryCatch(() => this.paymentsService.findUserSubscriptionStatus(user.id)),
       this.featureFlagsService.getEnabledFlagsForUser(user.id),
+      tryCatch(() => this.appUserService.getOrCreateAppUser(user.id)),
     ])
 
-    if (!error && result?.isSubscribed) {
-      return {
-        user: { ...restUser },
-        subscription: { ...result },
-        featureFlags,
-      }
-    }
     return {
       user: { ...restUser },
+      ...(result?.isSubscribed && { subscription: { ...result } }),
       featureFlags,
+      ...(appUser.result && { appUser: appUser.result }),
     }
   }
 }
