@@ -72,11 +72,7 @@ export class LocationService {
    * Update a location
    */
   @Transactional()
-  async updateLocation(
-    locationId: number,
-    organizerId: number,
-    dto: UpdateLocationDto
-  ): Promise<LocationResponseDto> {
+  async updateLocation(locationId: number, organizerId: number, dto: UpdateLocationDto): Promise<LocationResponseDto> {
     const location = await this.locationRepo.findById(locationId)
 
     if (!location) {

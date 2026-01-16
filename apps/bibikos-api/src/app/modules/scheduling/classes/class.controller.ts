@@ -49,10 +49,7 @@ export class ClassController {
    */
   @Get()
   @UseGuards(LoggedInGuard)
-  async listClasses(
-    @SessionUser() sessionUser: SessionUserType,
-    @Query('includeInactive') includeInactive?: string
-  ) {
+  async listClasses(@SessionUser() sessionUser: SessionUserType, @Query('includeInactive') includeInactive?: string) {
     const organizerId = await this.getOrganizerId(sessionUser)
     return this.classService.getClassesByOrganizer(organizerId, includeInactive === 'true')
   }
@@ -63,10 +60,7 @@ export class ClassController {
    */
   @Get(':id')
   @UseGuards(LoggedInGuard)
-  async getClass(
-    @Param('id', ParseIntPipe) id: number,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async getClass(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
     const organizerId = await this.getOrganizerId(sessionUser)
     return this.classService.getClass(id, organizerId)
   }
@@ -125,10 +119,7 @@ export class ClassController {
   @Delete(':id')
   @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteClass(
-    @Param('id', ParseIntPipe) id: number,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async deleteClass(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
     const organizerId = await this.getOrganizerId(sessionUser)
     await this.classService.deactivateClass(id, organizerId)
   }

@@ -1,21 +1,15 @@
 import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
 import { SessionUserType } from '@js-monorepo/types/auth'
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { AppUserService } from '../app-users/app-user.service'
-import { CreateOrganizerDto, CreateOrganizerSchema, UpdateOrganizerDto, UpdateOrganizerSchema } from './dto/organizer.dto'
+import {
+  CreateOrganizerDto,
+  CreateOrganizerSchema,
+  UpdateOrganizerDto,
+  UpdateOrganizerSchema,
+} from './dto/organizer.dto'
 import { OrganizerService } from './organizer.service'
 
 @Controller('scheduling/organizers')
@@ -79,10 +73,7 @@ export class OrganizerController {
    */
   @Get('slug-check')
   @UseGuards(LoggedInGuard)
-  async checkSlugAvailability(
-    @Query('slug') slug: string,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async checkSlugAvailability(@Query('slug') slug: string, @SessionUser() sessionUser: SessionUserType) {
     if (!slug || slug.length < 3) {
       return { available: false, reason: 'Slug must be at least 3 characters' }
     }

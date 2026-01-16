@@ -82,7 +82,7 @@ export class BookingService {
     } else if (waitlistLimit === null || waitlistedCount < waitlistLimit) {
       // No space but waitlist available
       status = BookingStatus.WAITLISTED
-      waitlistPosition = await this.bookingRepo.getMaxWaitlistPosition(scheduleId) + 1
+      waitlistPosition = (await this.bookingRepo.getMaxWaitlistPosition(scheduleId)) + 1
     } else {
       throw new ApiException(HttpStatus.CONFLICT, 'CLASS_FULL_AND_WAITLIST_FULL')
     }
@@ -127,7 +127,7 @@ export class BookingService {
     } else {
       status = BookingStatus.WAITLISTED
       const scheduleId = (await this.bookingRepo.findById(bookingId))!.classScheduleId
-      waitlistPosition = await this.bookingRepo.getMaxWaitlistPosition(scheduleId) + 1
+      waitlistPosition = (await this.bookingRepo.getMaxWaitlistPosition(scheduleId)) + 1
     }
 
     const updated = await this.bookingRepo.update(bookingId, {
@@ -188,11 +188,7 @@ export class BookingService {
    * Cancel a booking (by organizer)
    */
   @Transactional()
-  async cancelBookingByOrganizer(
-    bookingId: number,
-    organizerId: number,
-    dto?: CancelBookingDto
-  ): Promise<void> {
+  async cancelBookingByOrganizer(bookingId: number, organizerId: number, dto?: CancelBookingDto): Promise<void> {
     const booking = await this.bookingRepo.findByIdWithAll(bookingId)
 
     if (!booking) {
@@ -322,10 +318,7 @@ export class BookingService {
       }
 
       if (booking.status !== BookingStatus.BOOKED) {
-        throw new ApiException(
-          HttpStatus.BAD_REQUEST,
-          `BOOKING_NOT_IN_BOOKED_STATUS: ${bookingId}`
-        )
+        throw new ApiException(HttpStatus.BAD_REQUEST, `BOOKING_NOT_IN_BOOKED_STATUS: ${bookingId}`)
       }
     }
 

@@ -49,10 +49,7 @@ export class LocationController {
    * List all locations for current organizer
    */
   @Get()
-  async listLocations(
-    @SessionUser() sessionUser: SessionUserType,
-    @Query('includeInactive') includeInactive?: string
-  ) {
+  async listLocations(@SessionUser() sessionUser: SessionUserType, @Query('includeInactive') includeInactive?: string) {
     const organizerId = await this.getOrganizerId(sessionUser)
     return this.locationService.getLocationsByOrganizer(organizerId, includeInactive === 'true')
   }
@@ -62,10 +59,7 @@ export class LocationController {
    * Get a specific location
    */
   @Get(':id')
-  async getLocation(
-    @Param('id', ParseIntPipe) id: number,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async getLocation(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
     const organizerId = await this.getOrganizerId(sessionUser)
     return this.locationService.getLocation(id, organizerId)
   }
@@ -105,10 +99,7 @@ export class LocationController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteLocation(
-    @Param('id', ParseIntPipe) id: number,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async deleteLocation(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
     const organizerId = await this.getOrganizerId(sessionUser)
     await this.locationService.deactivateLocation(id, organizerId)
   }

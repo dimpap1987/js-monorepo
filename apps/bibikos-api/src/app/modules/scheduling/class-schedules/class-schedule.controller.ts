@@ -87,11 +87,7 @@ export class ClassScheduleController {
     @SessionUser() sessionUser?: SessionUserType
   ) {
     const organizerId = await this.getOrganizerId(sessionUser!)
-    return this.scheduleService.getUpcomingSchedules(
-      classId,
-      organizerId,
-      limit ? parseInt(limit, 10) : 10
-    )
+    return this.scheduleService.getUpcomingSchedules(classId, organizerId, limit ? parseInt(limit, 10) : 10)
   }
 
   /**
@@ -100,10 +96,7 @@ export class ClassScheduleController {
    */
   @Get(':id')
   @UseGuards(LoggedInGuard)
-  async getSchedule(
-    @Param('id', ParseIntPipe) id: number,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async getSchedule(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
     const organizerId = await this.getOrganizerId(sessionUser)
     return this.scheduleService.getSchedule(id, organizerId)
   }
@@ -179,10 +172,7 @@ export class ClassScheduleController {
   @Delete(':id/future')
   @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.OK)
-  async deleteFutureOccurrences(
-    @Param('id', ParseIntPipe) id: number,
-    @SessionUser() sessionUser: SessionUserType
-  ) {
+  async deleteFutureOccurrences(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
     const organizerId = await this.getOrganizerId(sessionUser)
     const deleted = await this.scheduleService.deleteFutureOccurrences(id, organizerId)
     return { deleted }

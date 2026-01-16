@@ -5,6 +5,7 @@
 A class-based scheduling system for individual instructors (Phase 1). This module enables instructors to create and manage recurring group classes, handle participant bookings with waitlist support, and track attendance.
 
 **Target Users (Phase 1):**
+
 - Individual instructors / solo professionals
 - NOT gyms or multi-staff organizations
 
@@ -16,25 +17,27 @@ A class-based scheduling system for individual instructors (Phase 1). This modul
 
 Location: `libs/prisma/bibikos-db/src/lib/prisma/schema/scheduling.prisma`
 
-| Model | Purpose |
-|-------|---------|
-| `AppUser` | Extended user profile linking to AuthUser, stores locale/timezone/country preferences |
-| `OrganizerProfile` | Instructor-specific data: display name, bio, public slug, activity label, cancellation policy |
-| `ParticipantProfile` | Participant profile for booking & attendance tracking |
-| `Location` | Physical or online venues with IANA timezone support |
-| `Class` | Class template defining title, description, capacity, waitlist limits |
-| `ClassSchedule` | Specific class occurrences with RFC 5545 RRULE recurrence support |
-| `Booking` | Participant registrations with status tracking (BOOKED, WAITLISTED, CANCELLED, ATTENDED, NO_SHOW) |
+| Model                | Purpose                                                                                           |
+| -------------------- | ------------------------------------------------------------------------------------------------- |
+| `AppUser`            | Extended user profile linking to AuthUser, stores locale/timezone/country preferences             |
+| `OrganizerProfile`   | Instructor-specific data: display name, bio, public slug, activity label, cancellation policy     |
+| `ParticipantProfile` | Participant profile for booking & attendance tracking                                             |
+| `Location`           | Physical or online venues with IANA timezone support                                              |
+| `Class`              | Class template defining title, description, capacity, waitlist limits                             |
+| `ClassSchedule`      | Specific class occurrences with RFC 5545 RRULE recurrence support                                 |
+| `Booking`            | Participant registrations with status tracking (BOOKED, WAITLISTED, CANCELLED, ATTENDED, NO_SHOW) |
 
 ### API Modules
 
 All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 
 #### 1. App Users (`/scheduling/app-users`)
+
 - `GET /me` - Get or create current user's app profile
 - `PATCH /me` - Update preferences (locale, timezone, countryCode)
 
 #### 2. Organizers (`/scheduling/organizers`)
+
 - `GET /me` - Get current user's organizer profile
 - `POST /` - Create organizer profile (become an instructor)
 - `PATCH /me` - Update organizer profile
@@ -42,9 +45,11 @@ All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 - `GET /public/:slug` - Get public organizer profile (no auth required)
 
 #### 3. Participants (`/scheduling/participants`)
+
 - `GET /me` - Get current user's participant profile
 
 #### 4. Locations (`/scheduling/locations`)
+
 - `GET /` - List all locations for current organizer
 - `GET /:id` - Get a specific location
 - `POST /` - Create a new location
@@ -52,6 +57,7 @@ All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 - `DELETE /:id` - Soft delete (deactivate) a location
 
 #### 5. Classes (`/scheduling/classes`)
+
 - `GET /` - List all classes for current organizer
 - `GET /:id` - Get a specific class
 - `GET /:id/public` - Get class for public view (no auth required)
@@ -60,6 +66,7 @@ All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 - `DELETE /:id` - Soft delete (deactivate) a class
 
 #### 6. Class Schedules (`/scheduling/schedules`)
+
 - `GET /calendar?startDate=&endDate=&classId=` - Get schedules for calendar view
 - `GET /class/:classId/upcoming?limit=` - Get upcoming schedules for a class
 - `GET /:id` - Get a specific schedule
@@ -70,6 +77,7 @@ All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 - `DELETE /:id/future` - Delete future occurrences of a recurring schedule
 
 #### 7. Bookings (`/scheduling/bookings`)
+
 - `POST /` - Book a class (auto-handles waitlist)
 - `GET /my` - Get current user's bookings (upcoming & past)
 - `POST /:id/cancel` - Cancel a booking (participant)
@@ -81,25 +89,30 @@ All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 ### Key Features Implemented
 
 1. **Waitlist Logic**
+
    - Automatic placement on waitlist when class is full
    - Auto-promotion when spots open (cancellations)
    - Waitlist position tracking and reordering
 
 2. **Recurring Schedules**
+
    - RFC 5545 RRULE support
    - Examples: `FREQ=WEEKLY;BYDAY=MO,WE,FR`, `FREQ=WEEKLY;INTERVAL=2;BYDAY=TU`
    - Auto-generates occurrences for 12 weeks ahead
    - Parent-child relationship for recurring instances
 
 3. **Soft Capacity**
+
    - Optional flexible limits (recommendation vs hard limit)
    - `isCapacitySoft` flag on classes
 
 4. **Public Pages Support**
+
    - Organizer public profile via slug (`/coach/:slug`)
    - Public class and schedule endpoints for booking pages
 
 5. **Ownership Verification**
+
    - All endpoints verify organizer ownership before mutations
    - Participants can only manage their own bookings
 
@@ -115,20 +128,22 @@ All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 
 #### High Priority
 
-  - [ ] **Notifications**
-  - [ ] Booking confirmation notification
-  - [ ] Cancellation notification (to participant when organizer cancels)
-  - [ ] Waitlist promotion notification
-  - [ ] Class reminder notifications (before class starts)
-  - [ ] Schedule change/cancellation notification to all booked participants
+- [ ] **Notifications**
+- [ ] Booking confirmation notification
+- [ ] Cancellation notification (to participant when organizer cancels)
+- [ ] Waitlist promotion notification
+- [ ] Class reminder notifications (before class starts)
+- [ ] Schedule change/cancellation notification to all booked participants
 
 #### Medium Priority
 
 - [ ] **Public Booking Flow**
+
   - [ ] Endpoint for listing public classes by organizer slug
   - [ ] Endpoint for listing upcoming schedules for a public class
 
 - [ ] **CSV Export**
+
   - [ ] Export attendance list for a schedule
   - [ ] Export participant list for an organizer
   - [ ] Export booking history
@@ -140,6 +155,7 @@ All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 #### Lower Priority
 
 - [ ] **Attendance Analytics** (simple list endpoints, no storage)
+
   - [ ] Attendance rate per class
   - [ ] No-show rate per participant
   - [ ] Class fill rate over time

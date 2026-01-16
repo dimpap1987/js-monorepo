@@ -2,12 +2,7 @@ import { Booking, BookingStatus, Prisma } from '@js-monorepo/bibikos-db'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
-import {
-  BookingRepository,
-  BookingWithAll,
-  BookingWithParticipant,
-  BookingWithSchedule,
-} from './booking.repository'
+import { BookingRepository, BookingWithAll, BookingWithParticipant, BookingWithSchedule } from './booking.repository'
 
 @Injectable()
 export class BookingRepositoryPrisma implements BookingRepository {
@@ -96,12 +91,8 @@ export class BookingRepositoryPrisma implements BookingRepository {
       where: {
         participantId,
         ...(options?.statuses ? { status: { in: options.statuses } } : {}),
-        ...(options?.upcoming
-          ? { classSchedule: { startTimeUtc: { gte: now } } }
-          : {}),
-        ...(options?.past
-          ? { classSchedule: { startTimeUtc: { lt: now } } }
-          : {}),
+        ...(options?.upcoming ? { classSchedule: { startTimeUtc: { gte: now } } } : {}),
+        ...(options?.past ? { classSchedule: { startTimeUtc: { lt: now } } } : {}),
       },
       include: {
         classSchedule: {

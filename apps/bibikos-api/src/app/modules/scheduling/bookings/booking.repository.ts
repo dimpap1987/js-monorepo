@@ -57,11 +57,14 @@ export interface BookingRepository {
   findById(id: number): Promise<Booking | null>
   findByIdWithAll(id: number): Promise<BookingWithAll | null>
   findByScheduleId(scheduleId: number, statuses?: BookingStatus[]): Promise<BookingWithParticipant[]>
-  findByParticipantId(participantId: number, options?: {
-    upcoming?: boolean
-    past?: boolean
-    statuses?: BookingStatus[]
-  }): Promise<BookingWithSchedule[]>
+  findByParticipantId(
+    participantId: number,
+    options?: {
+      upcoming?: boolean
+      past?: boolean
+      statuses?: BookingStatus[]
+    }
+  ): Promise<BookingWithSchedule[]>
   findByScheduleAndParticipant(scheduleId: number, participantId: number): Promise<Booking | null>
   countByScheduleId(scheduleId: number, statuses: BookingStatus[]): Promise<number>
   getMaxWaitlistPosition(scheduleId: number): Promise<number>

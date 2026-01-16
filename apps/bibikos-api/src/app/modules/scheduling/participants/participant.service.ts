@@ -58,11 +58,7 @@ export class ParticipantService {
     return this.toResponseDto(participant)
   }
 
-  private toResponseDto(participant: {
-    id: number
-    appUserId: number
-    createdAt: Date
-  }): ParticipantResponseDto {
+  private toResponseDto(participant: { id: number; appUserId: number; createdAt: Date }): ParticipantResponseDto {
     return {
       id: participant.id,
       appUserId: participant.appUserId,

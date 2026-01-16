@@ -173,12 +173,7 @@ export class ClassScheduleService {
       })
 
       // Generate future occurrences
-      const occurrences = this.generateOccurrences(
-        startTime,
-        endTime,
-        dto.recurrenceRule,
-        localTimezone
-      )
+      const occurrences = this.generateOccurrences(startTime, endTime, dto.recurrenceRule, localTimezone)
 
       if (occurrences.length > 0) {
         const occurrenceData = occurrences.map((occ) => ({
@@ -255,8 +250,8 @@ export class ClassScheduleService {
     }
 
     // Validate time range if both provided
-    const newStart = updates.startTimeUtc as Date || schedule.startTimeUtc
-    const newEnd = updates.endTimeUtc as Date || schedule.endTimeUtc
+    const newStart = (updates.startTimeUtc as Date) || schedule.startTimeUtc
+    const newEnd = (updates.endTimeUtc as Date) || schedule.endTimeUtc
     if (newEnd <= newStart) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'END_TIME_MUST_BE_AFTER_START')
     }
@@ -284,11 +279,7 @@ export class ClassScheduleService {
    * Cancel a schedule
    */
   @Transactional()
-  async cancelSchedule(
-    scheduleId: number,
-    organizerId: number,
-    dto?: CancelClassScheduleDto
-  ): Promise<void> {
+  async cancelSchedule(scheduleId: number, organizerId: number, dto?: CancelClassScheduleDto): Promise<void> {
     const schedule = await this.scheduleRepo.findByIdWithClass(scheduleId)
 
     if (!schedule) {

@@ -2,7 +2,12 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AppUserRepo, AppUserRepository } from '../app-users/app-user.repository'
-import { CreateOrganizerDto, OrganizerPublicProfileDto, OrganizerResponseDto, UpdateOrganizerDto } from './dto/organizer.dto'
+import {
+  CreateOrganizerDto,
+  OrganizerPublicProfileDto,
+  OrganizerResponseDto,
+  UpdateOrganizerDto,
+} from './dto/organizer.dto'
 import { OrganizerRepo, OrganizerRepository } from './organizer.repository'
 
 @Injectable()
@@ -93,7 +98,11 @@ export class OrganizerService {
    * Update organizer profile
    */
   @Transactional()
-  async updateOrganizer(organizerId: number, appUserId: number, dto: UpdateOrganizerDto): Promise<OrganizerResponseDto> {
+  async updateOrganizer(
+    organizerId: number,
+    appUserId: number,
+    dto: UpdateOrganizerDto
+  ): Promise<OrganizerResponseDto> {
     const organizer = await this.organizerRepo.findById(organizerId)
 
     if (!organizer) {
@@ -120,9 +129,7 @@ export class OrganizerService {
       ...(dto.activityLabel !== undefined && { activityLabel: dto.activityLabel }),
       ...(dto.cancellationPolicy !== undefined && { cancellationPolicy: dto.cancellationPolicy }),
       ...(dto.defaultLocationId !== undefined && {
-        defaultLocation: dto.defaultLocationId
-          ? { connect: { id: dto.defaultLocationId } }
-          : { disconnect: true },
+        defaultLocation: dto.defaultLocationId ? { connect: { id: dto.defaultLocationId } } : { disconnect: true },
       }),
     })
 

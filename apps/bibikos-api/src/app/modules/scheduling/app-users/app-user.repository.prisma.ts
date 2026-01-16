@@ -31,10 +31,7 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
     })
   }
 
-  async upsertByAuthUserId(
-    authUserId: number,
-    data: Omit<Prisma.AppUserCreateInput, 'authUser'>
-  ): Promise<AppUser> {
+  async upsertByAuthUserId(authUserId: number, data: Omit<Prisma.AppUserCreateInput, 'authUser'>): Promise<AppUser> {
     return this.txHost.tx.appUser.upsert({
       where: { authUserId },
       create: {
