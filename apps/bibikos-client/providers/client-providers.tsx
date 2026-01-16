@@ -11,6 +11,7 @@ import { FeatureFlagsProvider } from '@js-monorepo/feature-flags-client'
 import { ReactNode } from 'react'
 import { AppConfig } from '../lib/app-config'
 import { WebSocketProviderWrapper } from './websocket-provider-wrapper'
+import { SchedulingProvider } from '../lib/scheduling'
 
 interface RootProvidersProps {
   readonly children: ReactNode
@@ -35,7 +36,9 @@ export default function ClientProviders({ children, session }: RootProvidersProp
                 <SessionProvider value={session} endpoint="/session">
                   <WebSocketProviderWrapper>
                     <NotificationProvider userId={session?.user?.id}>
-                      <WebNotificationProvider>{children}</WebNotificationProvider>
+                      <SchedulingProvider>
+                        <WebNotificationProvider>{children}</WebNotificationProvider>
+                      </SchedulingProvider>
                     </NotificationProvider>
                   </WebSocketProviderWrapper>
                 </SessionProvider>

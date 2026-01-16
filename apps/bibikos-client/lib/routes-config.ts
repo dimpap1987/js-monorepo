@@ -1,7 +1,14 @@
 import { MenuItem } from '@js-monorepo/types/menu'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdAccountCircle, MdPalette } from 'react-icons/md'
-import { RiSdCardLine, RiDashboardLine, RiPriceTag3Line, RiCustomerService2Line } from 'react-icons/ri'
+import {
+  RiSdCardLine,
+  RiDashboardLine,
+  RiPriceTag3Line,
+  RiCustomerService2Line,
+  RiCalendarLine,
+  RiBookmarkLine,
+} from 'react-icons/ri'
 import { Role, type RouteRole } from './roles'
 
 export interface RouteConfig {
@@ -15,15 +22,35 @@ export const routes: RouteConfig[] = [
     roles: [Role.ADMIN],
   },
   {
+    path: '/onboarding',
+    roles: [Role.USER],
+  },
+  {
+    path: '/dashboard',
+    roles: [Role.USER],
+  },
+  {
+    path: '/calendar',
+    roles: [Role.USER],
+  },
+  {
+    path: '/classes',
+    roles: [Role.USER],
+  },
+  {
+    path: '/locations',
+    roles: [Role.USER],
+  },
+  {
+    path: '/bookings',
+    roles: [Role.USER],
+  },
+  {
     path: '/settings',
     roles: [Role.USER],
   },
   {
     path: '/notifications',
-    roles: [Role.USER],
-  },
-  {
-    path: '/settings',
     roles: [Role.USER],
   },
   {
@@ -34,11 +61,33 @@ export const routes: RouteConfig[] = [
     path: '/contact',
     roles: [Role.PUBLIC],
   },
+  {
+    path: '/coach',
+    roles: [Role.PUBLIC],
+  },
 ]
 
 // Navbar & Sidebar Menu navigation
 
 export const navigationsMenuItems: MenuItem[] = [
+  {
+    href: '/dashboard',
+    name: 'navigation.dashboard',
+    roles: [Role.USER],
+    Icon: RiDashboardLine,
+  },
+  {
+    href: '/calendar',
+    name: 'navigation.calendar',
+    roles: [Role.USER],
+    Icon: RiCalendarLine,
+  },
+  {
+    href: '/bookings',
+    name: 'navigation.bookings',
+    roles: [Role.USER],
+    Icon: RiBookmarkLine,
+  },
   {
     href: '/admin',
     name: 'navigation.dashboard',
