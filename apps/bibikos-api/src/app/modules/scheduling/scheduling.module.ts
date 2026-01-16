@@ -4,6 +4,7 @@ import { BookingModule } from './bookings/booking.module'
 import { ClassScheduleModule } from './class-schedules/class-schedule.module'
 import { ClassModule } from './classes/class.module'
 import { LocationModule } from './locations/location.module'
+import { OnboardingModule } from './onboarding/onboarding.module'
 import { OrganizerModule } from './organizers/organizer.module'
 import { ParticipantModule } from './participants/participant.module'
 
@@ -32,6 +33,7 @@ import { ParticipantModule } from './participants/participant.module'
     ParticipantModule,
     LocationModule,
     ClassModule,
+    OnboardingModule,
     ClassScheduleModule,
     BookingModule,
   ],

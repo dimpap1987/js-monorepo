@@ -2,7 +2,7 @@ import { AppUser, Prisma } from '@js-monorepo/bibikos-db'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
-import { AppUserRepository } from './app-user.repository'
+import { AppUserRepository, AppUserWithProfiles } from './app-user.repository'
 
 @Injectable()
 export class AppUserRepositoryPrisma implements AppUserRepository {
@@ -11,6 +11,16 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
   async findByAuthUserId(authUserId: number): Promise<AppUser | null> {
     return this.txHost.tx.appUser.findUnique({
       where: { authUserId },
+    })
+  }
+
+  async findByAuthUserIdWithProfiles(authUserId: number): Promise<AppUserWithProfiles | null> {
+    return this.txHost.tx.appUser.findUnique({
+      where: { authUserId },
+      include: {
+        organizerProfile: { select: { id: true } },
+        participantProfile: { select: { id: true } },
+      },
     })
   }
 

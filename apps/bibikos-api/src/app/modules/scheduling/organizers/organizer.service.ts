@@ -78,12 +78,17 @@ export class OrganizerService {
       }
     }
 
+    // activityLabel is required when creating an organizer
+    if (!dto?.activityLabel) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ACTIVITY_LABEL_REQUIRED')
+    }
+
     const organizer = await this.organizerRepo.create({
       appUser: { connect: { id: appUserId } },
       displayName: dto?.displayName ?? null,
       bio: dto?.bio ?? null,
       slug: dto?.slug ?? null,
-      activityLabel: dto?.activityLabel ?? null,
+      activityLabel: dto.activityLabel,
       cancellationPolicy: dto?.cancellationPolicy ?? null,
       ...(dto?.defaultLocationId && {
         defaultLocation: { connect: { id: dto.defaultLocationId } },

@@ -1,7 +1,7 @@
 import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
 import { SessionUserType } from '@js-monorepo/types/auth'
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs/common'
+import { Body, Controller, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs/common'
 import { AppUserService } from './app-user.service'
 import { UpdateAppUserDto, UpdateAppUserSchema } from './dto/app-user.dto'
 
@@ -11,17 +11,9 @@ export class AppUserController {
   constructor(private readonly appUserService: AppUserService) {}
 
   /**
-   * GET /scheduling/app-users/me
-   * Get or create the current user's AppUser profile
-   */
-  @Get('me')
-  async getOrCreateMe(@SessionUser() sessionUser: SessionUserType) {
-    return this.appUserService.getOrCreateAppUser(sessionUser.id)
-  }
-
-  /**
    * PATCH /scheduling/app-users/me
    * Update the current user's AppUser preferences
+   * Note: GET /me is not needed as AppUser data is included in the session response
    */
   @Patch('me')
   @HttpCode(HttpStatus.OK)

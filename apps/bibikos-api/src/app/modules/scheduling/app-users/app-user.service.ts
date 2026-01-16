@@ -1,7 +1,7 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { AppUserRepo, AppUserRepository } from './app-user.repository'
+import { AppUserRepo, AppUserRepository, AppUserWithProfiles } from './app-user.repository'
 import { AppUserResponseDto, UpdateAppUserDto } from './dto/app-user.dto'
 
 @Injectable()
@@ -14,33 +14,39 @@ export class AppUserService {
   ) {}
 
   /**
-   * Get or create an AppUser for the given auth user
+   * Get or create an AppUser for the given auth user (includes profile flags)
    * This is called automatically when a user accesses scheduling features
    */
   @Transactional()
   async getOrCreateAppUser(authUserId: number, defaults?: Partial<UpdateAppUserDto>): Promise<AppUserResponseDto> {
-    let appUser = await this.appUserRepo.findByAuthUserId(authUserId)
+    let appUser = await this.appUserRepo.findByAuthUserIdWithProfiles(authUserId)
 
     if (!appUser) {
       this.logger.log(`Creating AppUser for authUserId: ${authUserId}`)
-      appUser = await this.appUserRepo.create({
+      const created = await this.appUserRepo.create({
         authUser: { connect: { id: authUserId } },
         fullName: defaults?.fullName ?? null,
         locale: defaults?.locale ?? 'en-US',
         timezone: defaults?.timezone ?? 'UTC',
         countryCode: defaults?.countryCode ?? null,
       })
+      // New user won't have profiles yet
+      appUser = {
+        ...created,
+        organizerProfile: null,
+        participantProfile: null,
+      }
     }
 
-    return this.toResponseDto(appUser)
+    return this.toResponseDtoWithProfiles(appUser)
   }
 
   /**
-   * Get AppUser by auth user ID
+   * Get AppUser by auth user ID (includes profile flags)
    */
   async getAppUser(authUserId: number): Promise<AppUserResponseDto | null> {
-    const appUser = await this.appUserRepo.findByAuthUserId(authUserId)
-    return appUser ? this.toResponseDto(appUser) : null
+    const appUser = await this.appUserRepo.findByAuthUserIdWithProfiles(authUserId)
+    return appUser ? this.toResponseDtoWithProfiles(appUser) : null
   }
 
   /**
@@ -48,7 +54,7 @@ export class AppUserService {
    */
   @Transactional()
   async updateAppUser(authUserId: number, data: UpdateAppUserDto): Promise<AppUserResponseDto> {
-    const appUser = await this.appUserRepo.findByAuthUserId(authUserId)
+    const appUser = await this.appUserRepo.findByAuthUserIdWithProfiles(authUserId)
 
     if (!appUser) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'APP_USER_NOT_FOUND')
@@ -62,17 +68,15 @@ export class AppUserService {
     })
 
     this.logger.log(`Updated AppUser ${updated.id} for authUserId: ${authUserId}`)
-    return this.toResponseDto(updated)
+    // Return with current profile status
+    return this.toResponseDtoWithProfiles({
+      ...updated,
+      organizerProfile: appUser.organizerProfile,
+      participantProfile: appUser.participantProfile,
+    })
   }
 
-  private toResponseDto(appUser: {
-    id: number
-    fullName: string | null
-    locale: string
-    timezone: string
-    countryCode: string | null
-    createdAt: Date
-  }): AppUserResponseDto {
+  private toResponseDtoWithProfiles(appUser: AppUserWithProfiles): AppUserResponseDto {
     return {
       id: appUser.id,
       fullName: appUser.fullName,
@@ -80,9 +84,8 @@ export class AppUserService {
       timezone: appUser.timezone,
       countryCode: appUser.countryCode,
       createdAt: appUser.createdAt,
-      // These will be populated by joined queries when needed
-      hasOrganizerProfile: false,
-      hasParticipantProfile: false,
+      hasOrganizerProfile: !!appUser.organizerProfile,
+      hasParticipantProfile: !!appUser.participantProfile,
     }
   }
 }
