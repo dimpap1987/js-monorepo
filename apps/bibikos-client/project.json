@@ -1,0 +1,61 @@
+{
+  "name": "bibikos-client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/bibikos-client",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/bibikos-client"
+      },
+      "configurations": {
+        "development": {
+          "outputPath": "apps/bibikos-client"
+        },
+        "production": {
+          "generateLockfile": true
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "bibikos-client:build",
+        "dev": true,
+        "port": 4200,
+        "hostname": "0.0.0.0"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "bibikos-client:build:development",
+          "dev": true
+        },
+        "production": {
+          "buildTarget": "bibikos-client:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nx/next:export",
+      "options": {
+        "buildTarget": "bibikos-client:build:production"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/bibikos-client/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

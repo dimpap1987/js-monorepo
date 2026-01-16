@@ -39,9 +39,9 @@ function buildModuleSlugFromPath(readmePath: string): { module: string; relDir: 
   const withoutLibsPrefix = relDir.startsWith(`libs${path.sep}`) ? relDir.slice(`libs${path.sep}`.length) : relDir
 
   // Create a stable, unique slug like "shared-ui-button"
-  const module = withoutLibsPrefix.split(path.sep).join('-')
+  const moduleSlug = withoutLibsPrefix.split(path.sep).join('-')
 
-  return { module, relDir }
+  return { module: moduleSlug, relDir }
 }
 
 export async function getDocs(): Promise<DocEntry[]> {

@@ -62,4 +62,4 @@ export class UsersService {
 }
 ```
 
-Shared libs should **not** import `PrismaService` directly; instead they use the `PRISMA_SERVICE` token from `@js-monorepo/prisma-shared` so they can also work with `@js-monorepo/gym-db`.
+Shared libs should **not** import `PrismaService` directly; instead they use the `PRISMA_SERVICE` token from `@js-monorepo/prisma-shared` so they can also work with `@js-monorepo/bibikos-db`.

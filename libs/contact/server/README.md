@@ -1,13 +1,13 @@
 ## `@js-monorepo/contact-server`
 
-NestJS module that handles **contact / support messages** (e.g. from the public contact form in `gym-client`).  
+NestJS module that handles **contact / support messages** (e.g. from the public contact form in `bibikos-client`).  
 It uses Prisma (via the shared `PRISMA_SERVICE` token) to persist messages in the DB.
 
 ### Features
 
 - **NestJS module** to register contact message handling in an API
 - **Service + repository** abstraction over the `ContactMessage` Prisma model
-- Compatible with both `core-db` and `gym-db` through `@js-monorepo/prisma-shared`
+- Compatible with both `core-db` and `bibikos-db` through `@js-monorepo/prisma-shared`
 
 ### Exports
 
@@ -20,16 +20,16 @@ From `libs/contact/server/src/index.ts`:
 ### Installation
 
 ```ts
-// apps/gym-api/src/app/app.module.ts (example)
+// apps/bibikos-api/src/app/app.module.ts (example)
 import { Module } from '@nestjs/common'
-import { PrismaModule } from '@js-monorepo/gym-db'
+import { PrismaModule } from '@js-monorepo/bibikos-db'
 import { ContactModule } from '@js-monorepo/contact-server'
 
 @Module({
   imports: [
     PrismaModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
-        databaseUrl: config.get('GYM_DATABASE_URL'),
+        databaseUrl: config.get('BIBIKOS_DATABASE_URL'),
       }),
     }),
     ContactModule,
@@ -39,11 +39,11 @@ export class AppModule {}
 ```
 
 > **Note**  
-> `ContactModule` expects a Prisma service registered under the `PRISMA_SERVICE` token, provided by the active DB library (`core-db` or `gym-db`).
+> `ContactModule` expects a Prisma service registered under the `PRISMA_SERVICE` token, provided by the active DB library (`core-db` or `bibikos-db`).
 
 ### Typical Usage
 
-In a controller (e.g. `apps/gym-api/src/app/contact/contact.controller.ts`):
+In a controller (e.g. `apps/bibikos-api/src/app/contact/contact.controller.ts`):
 
 ```ts
 import { Body, Controller, Post } from '@nestjs/common'
@@ -72,4 +72,4 @@ export class ContactController {
 The underlying Prisma model lives in the shared schema (see `libs/prisma/*/src/lib/prisma/schema/contact.prisma`):
 
 - Stores metadata like `name`, `email`, `message`
-- Connected to the same Postgres database as the rest of the app (core or gym DB, depending on which Prisma module is imported)
+- Connected to the same Postgres database as the rest of the app (core or bibikos DB, depending on which Prisma module is imported)

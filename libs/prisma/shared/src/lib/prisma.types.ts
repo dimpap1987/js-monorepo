@@ -57,7 +57,7 @@ export type PrismaNamespace = typeof Prisma
 
 /**
  * Base interface for PrismaService that shared libraries depend on
- * Each app (my-api, gym-api) provides its own implementation
+ * Each app (my-api, bibikos-api) provides its own implementation
  *
  * Note: We use 'any' here intentionally to allow flexible usage across
  * different database implementations. The actual types come from each

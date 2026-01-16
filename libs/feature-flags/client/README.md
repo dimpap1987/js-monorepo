@@ -1,6 +1,6 @@
 # Feature Flags – Client Library (`@js-monorepo/feature-flags-client`)
 
-Client-side utilities for **reading and gating on feature flags** in `gym-client` and other Next.js apps.
+Client-side utilities for **reading and gating on feature flags** in `bibikos-client` and other Next.js apps.
 
 This library is designed to work with the server-side feature flag service (`@js-monorepo/feature-flags-server`) but can be used with any backend that returns a `Record<string, boolean>` map of flags.
 
@@ -23,7 +23,7 @@ import { FeatureFlagsProvider, useFeatureFlag, FeatureGate } from '@js-monorepo/
 
 ---
 
-## Wiring in `gym-client`
+## Wiring in `bibikos-client`
 
 ### 1. Ensure path alias
 
@@ -38,12 +38,12 @@ import { FeatureFlagsProvider, useFeatureFlag, FeatureGate } from '@js-monorepo/
 
 ### 2. Provide flags at the app root
 
-Typically you’ll attach a `featureFlags` map to the authenticated session on the server (e.g. in `gym-api`), then read it in `gym-client` and pass it into the provider.
+Typically you’ll attach a `featureFlags` map to the authenticated session on the server (e.g. in `bibikos-api`), then read it in `bibikos-client` and pass it into the provider.
 
 Example using `useSession` in `RootComponent`:
 
 ```tsx
-// apps/gym-client/components/root-component.tsx
+// apps/bibikos-client/components/root-component.tsx
 'use client'
 
 import { FeatureFlagsProvider } from '@js-monorepo/feature-flags-client'

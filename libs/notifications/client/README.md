@@ -35,7 +35,7 @@ From `libs/notifications/client/src/index.ts`:
 ### Basic Setup (App Provider)
 
 ```tsx
-// apps/gym-client/app/(main)/layout.tsx
+// apps/bibikos-client/app/(main)/layout.tsx
 'use client'
 
 import { NotificationProvider } from '@js-monorepo/notifications-client'
@@ -59,7 +59,7 @@ import {
 export function AppHeader() {
   return (
     <header className="flex items-center justify-between px-4 py-3 border-b">
-      <div className="font-semibold">Gym App</div>
+      <div className="font-semibold">Bibikos App</div>
       <NotificationDropdown trigger={<NotificationBellButton />} footer={<NotificationReadAllButton />} />
     </header>
   )
@@ -71,7 +71,7 @@ The dropdown automatically uses the underlying hooks to fetch and paginate notif
 ### Full Notifications Page
 
 ```tsx
-// apps/gym-client/app/(main)/notifications/page.tsx
+// apps/bibikos-client/app/(main)/notifications/page.tsx
 'use client'
 
 import { NotificationPage } from '@js-monorepo/notifications-client'

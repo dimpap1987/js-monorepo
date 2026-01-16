@@ -4,18 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-NX monorepo with Next.js 14 frontend (`apps/gym-client`), NestJS backend (`apps/gym-api`), and shared libraries (`libs/`). Uses pnpm as package manager.
+NX monorepo with Next.js 14 frontend (`apps/bibikos-client`), NestJS backend (`apps/bibikos-api`), and shared libraries (`libs/`). Uses pnpm as package manager.
 
 ## Common Commands
 
 ```bash
 # Development
-pnpm dev:gym-api            # Start NestJS dev server
-pnpm dev:gym-client            # Start NextJS dev server
+pnpm dev:bibikos-api            # Start NestJS dev server
+pnpm dev:bibikos-client            # Start NextJS dev server
 
 # Building
-pnpm build:gym-api          # Build NestJS (production)
-pnpm build:gym-client          # Build NextJS (production)
+pnpm build:bibikos-api          # Build NestJS (production)
+pnpm build:bibikos-client          # Build NextJS (production)
 
 # Code Quality
 pnpm lint                  # Lint affected files
@@ -28,12 +28,12 @@ pnpm test:all              # Test all
 # Run single test file
 npx nx test <project> --testFile=<filename>
 
-# Database (Prisma) - Gym DB (gym-api)
-pnpm db:gym:migrate        # Run migrations
-pnpm db:gym:deploy         # Deploy migrations to production
-pnpm db:gym:create         # Create new migration
-pnpm db:gym:generate       # Generate Prisma client
-pnpm db:gym:studio         # Open Prisma Studio
+# Database (Prisma) - Bibikos DB (bibikos-api)
+pnpm db:bibikos:migrate        # Run migrations
+pnpm db:bibikos:deploy         # Deploy migrations to production
+pnpm db:bibikos:create         # Create new migration
+pnpm db:bibikos:generate       # Generate Prisma client
+pnpm db:bibikos:studio         # Open Prisma Studio
 
 # Full CI locally
 pnpm ci:local              # Format check, lint, test, build
@@ -44,12 +44,12 @@ pnpm ci:local              # Format check, lint, test, build
 ### Directory Structure
 
 - `apps/my-api/` - NestJS backend API (uses core-db)
-- `apps/gym-api/` - NestJS gym API (uses gym-db)
+- `apps/bibikos-api/` - NestJS bibikos API (uses bibikos-db)
 - `apps/next-app/` - Next.js 14 frontend (App Router)
 - `libs/auth/` - Authentication (separate nest/next implementations)
 - `libs/prisma/shared/` - Shared Prisma types, tokens (PRISMA_SERVICE), and interfaces
 - `libs/prisma/core-db/` - Core Prisma schema (my-api) - uses DATABASE_URL
-- `libs/prisma/gym-db/` - Gym Prisma schema (gym-api) - uses GYM_DATABASE_URL
+- `libs/prisma/bibikos-db/` - Bibikos Prisma schema (bibikos-api) - uses BIBIKOS_DATABASE_URL
 - `libs/shared/ui/` - 23+ shadcn-based UI component libraries
 - `libs/shared/types/` - Shared TypeScript types
 - `libs/shared/schemas/` - Zod validation schemas
@@ -60,18 +60,17 @@ pnpm ci:local              # Format check, lint, test, build
 
 ### Key Entry Points
 
-- Backend (gym-api): `apps/gym-api/src/main.ts`
-- Frontend: `apps/gym-client/app/layout.tsx`
-- Gym Prisma schema: `libs/prisma/gym-db/src/lib/prisma/schema/`
+- Backend (bibikos-api): `apps/bibikos-api/src/main.ts`
+- Frontend: `apps/bibikos-client/app/layout.tsx`
+- Bibikos Prisma schema: `libs/prisma/bibikos-db/src/lib/prisma/schema/`
 
 ### Import Aliases
 
 All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.json`):
 
 - `@js-monorepo/prisma-shared` - Shared Prisma types, DI tokens (PRISMA_SERVICE)
-- `@js-monorepo/gym-db` - Core Prisma client (alias to core-db)
 - `@js-monorepo/core-db` - Core Prisma client (my-api)
-- `@js-monorepo/gym-db` - Gym Prisma client (gym-api)
+- `@js-monorepo/bibikos-db` - Bibikos Prisma client (bibikos-api)
 - `@js-monorepo/types` - Shared types
 - `@js-monorepo/ui/*` - UI components
 - `@js-monorepo/auth/*` - Auth libraries

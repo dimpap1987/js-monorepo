@@ -1,13 +1,13 @@
 # Feature Flags – Server Library (`@js-monorepo/feature-flags-server`)
 
-Server-side helpers for managing feature flags backed by the `gym-db` Prisma schema, using the same transactional pattern as the payments module.
+Server-side helpers for managing feature flags backed by the `bibikos-db` Prisma schema, using the same transactional pattern as the payments module.
 
 ## Overview
 
 This library provides a `FeatureFlagsService` that reads and writes to the `FeatureFlag` Prisma model:
 
 ```prisma
-// libs/prisma/gym-db/src/lib/prisma/schema/feature_flags.prisma
+// libs/prisma/bibikos-db/src/lib/prisma/schema/feature_flags.prisma
 model FeatureFlag {
   id          Int      @id @default(autoincrement())
   key         String   @unique
@@ -27,10 +27,10 @@ It uses `TransactionHost<TransactionalAdapterPrisma>` (same as `payments-server`
 
 1. **Ensure the Prisma model and migrations exist**
 
-   The `FeatureFlag` model is defined in `libs/prisma/gym-db/src/lib/prisma/schema/feature_flags.prisma`. Run migrations if you haven’t:
+   The `FeatureFlag` model is defined in `libs/prisma/bibikos-db/src/lib/prisma/schema/feature_flags.prisma`. Run migrations if you haven’t:
 
    ```bash
-   pnpm db:gym:migrate
+   pnpm db:bibikos:migrate
    ```
 
 2. **Make sure `tsconfig.base.json` has the path alias**
@@ -48,14 +48,14 @@ It uses `TransactionHost<TransactionalAdapterPrisma>` (same as `payments-server`
 
 3. **Register the service in your NestJS module**
 
-The service is designed to be used in any Nest module that already has `TransactionalAdapterPrusma` via `@nestjs-cls/transactional` (like `gym-api` does):
+The service is designed to be used in any Nest module that already has `TransactionalAdapterPrusma` via `@nestjs-cls/transactional` (like `bibikos-api` does):
 
 ```ts
-// apps/gym-api/src/app/modules/admin/admin.module.ts
+// apps/bibikos-api/src/app/modules/admin/admin.module.ts
 import { Module } from '@nestjs/common'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { FeatureFlagsService } from '@js-monorepo/feature-flags-server'
-import { PrismaModule, PrismaService } from '@js-monorepo/gym-db'
+import { PrismaModule, PrismaService } from '@js-monorepo/bibikos-db'
 
 @Module({
   imports: [PrismaModule /* ...other imports... */],

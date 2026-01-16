@@ -26,8 +26,8 @@ libs/prisma/
 │               ├── migrations/  # Database migrations
 │               └── generated/   # Generated Prisma client
 │
-├── gym-db/                      # Gym database (gym-api)
-│   ├── prisma.config.ts         # Prisma 7 configuration → GYM_DATABASE_URL
+├── bibikos-db/                      # Bibikos database (bibikos-api)
+│   ├── prisma.config.ts         # Prisma 7 configuration → BIBIKOS_DATABASE_URL
 │   └── src/                     # Same structure as core-db
 │       └── ...
 │
@@ -54,7 +54,7 @@ Each app can have its own database while sharing common libraries:
 ┌───────┴───────┐                         ┌────────┴────────┐
 │  Shared Libs  │                         │   DB Libraries   │
 │  - auth/nest  │                         │  - core-db       │
-│  - notifications                        │  - gym-db        │
+│  - notifications                        │  - bibikos-db        │
 │  - contact    │                         │                  │
 │  - payments   │                         │  Each provides:  │
 │               │                         │  PRISMA_SERVICE  │
@@ -66,25 +66,25 @@ Each app can have its own database while sharing common libraries:
               ┌────────────────────────┐
               │        Apps            │
               │  my-api → core-db      │
-              │  gym-api → gym-db      │
+              │  bibikos-api → bibikos-db      │
               └────────────────────────┘
 ```
 
 ### How It Works
 
 1. **Shared libraries** import `PRISMA_SERVICE` token and `Prisma` types from `@js-monorepo/prisma-shared`
-2. **Each app** imports `PrismaModule` from its database lib (core-db or gym-db)
+2. **Each app** imports `PrismaModule` from its database lib (core-db or bibikos-db)
 3. **PrismaModule** registers `PrismaService` AND provides it under `PRISMA_SERVICE` token
 4. **At runtime**, NestJS injects the correct PrismaService based on which module is registered
 
 ### Import Aliases
 
-| Alias                        | Points To             | Use For                      |
-| ---------------------------- | --------------------- | ---------------------------- |
-| `@js-monorepo/prisma-shared` | `libs/prisma/shared`  | Shared libs (tokens, types)  |
-| `@js-monorepo/db`            | `libs/prisma/core-db` | Backward compatibility alias |
-| `@js-monorepo/core-db`       | `libs/prisma/core-db` | my-api, next-app             |
-| `@js-monorepo/gym-db`        | `libs/prisma/gym-db`  | gym-api                      |
+| Alias                        | Points To                | Use For                      |
+| ---------------------------- | ------------------------ | ---------------------------- |
+| `@js-monorepo/prisma-shared` | `libs/prisma/shared`     | Shared libs (tokens, types)  |
+| `@js-monorepo/db`            | `libs/prisma/core-db`    | Backward compatibility alias |
+| `@js-monorepo/core-db`       | `libs/prisma/core-db`    | my-api, next-app             |
+| `@js-monorepo/bibikos-db`    | `libs/prisma/bibikos-db` | bibikos-api                  |
 
 ## Usage
 
@@ -139,20 +139,20 @@ import { PrismaModule } from '@js-monorepo/core-db' // or @js-monorepo/db
 export class AppModule {}
 ```
 
-### In Apps (gym-api)
+### In Apps (bibikos-api)
 
 ```typescript
 // app.module.ts
-import { PrismaModule } from '@js-monorepo/gym-db'
+import { PrismaModule } from '@js-monorepo/bibikos-db'
 
 @Module({
   imports: [
     PrismaModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
-        databaseUrl: config.get('GYM_DATABASE_URL'), // Different DB!
+        databaseUrl: config.get('BIBIKOS_DATABASE_URL'), // Different DB!
       }),
     }),
-    // Shared modules automatically receive gym-db's PrismaService
+    // Shared modules automatically receive bibikos-db's PrismaService
     AuthSessionModule,
     NotificationServerModule,
   ],
@@ -163,8 +163,8 @@ export class AppModule {}
 ### Importing Types (App-Specific Code)
 
 ```typescript
-// In gym-api specific code, import from gym-db
-import { PrismaService, AuthUser, Prisma } from '@js-monorepo/gym-db'
+// In bibikos-api specific code, import from bibikos-db
+import { PrismaService, AuthUser, Prisma } from '@js-monorepo/bibikos-db'
 
 // In my-api specific code, import from core-db
 import { PrismaService, AuthUser, Prisma } from '@js-monorepo/core-db'
@@ -182,14 +182,14 @@ pnpm db:core:deploy      # Deploy migrations (production)
 pnpm db:core:studio      # Open Prisma Studio
 ```
 
-### Gym Database (gym-api)
+### Gym Database (bibikos-api)
 
 ```bash
-pnpm db:gym:generate     # Generate Prisma client
-pnpm db:gym:create       # Create a new migration
-pnpm db:gym:migrate      # Run migrations (development)
-pnpm db:gym:deploy       # Deploy migrations (production)
-pnpm db:gym:studio       # Open Prisma Studio
+pnpm db:bibikos:generate     # Generate Prisma client
+pnpm db:bibikos:create       # Create a new migration
+pnpm db:bibikos:migrate      # Run migrations (development)
+pnpm db:bibikos:deploy       # Deploy migrations (production)
+pnpm db:bibikos:studio       # Open Prisma Studio
 ```
 
 ## Environment Variables
@@ -200,8 +200,8 @@ Add to your **root `.env`** file:
 # Core database (my-api, next-app)
 DATABASE_URL=postgresql://user:password@localhost:5432/core_db
 
-# Gym database (gym-api)
-GYM_DATABASE_URL=postgresql://user:password@localhost:5432/gym_db
+# Gym database (bibikos-api)
+BIBIKOS_DATABASE_URL=postgresql://user:password@localhost:5432/bibikos_db
 ```
 
 ## Adding a New Database
@@ -258,25 +258,25 @@ Each database has a multi-file schema in `src/lib/prisma/schema/`:
 
 ### Extending a Schema
 
-To add gym-specific models, create a new file in gym-db:
+To add bibikos-specific models, create a new file in bibikos-db:
 
 ```prisma
-// libs/prisma/gym-db/src/lib/prisma/schema/gym.prisma
+// libs/prisma/bibikos-db/src/lib/prisma/schema/bibikos.prisma
 
 model GymMember {
   id        Int      @id @default(autoincrement())
   userId    Int
   authUser  AuthUser @relation(fields: [userId], references: [id])
   membershipType String
-  // ... gym-specific fields
+  // ... bibikos-specific fields
 }
 ```
 
 Then run:
 
 ```bash
-pnpm db:gym:migrate
-pnpm db:gym:generate
+pnpm db:bibikos:migrate
+pnpm db:bibikos:generate
 ```
 
 ## Driver Adapter (Prisma 7)
@@ -322,7 +322,7 @@ Ensure your app module imports `PrismaModule.forRootAsync()` from the correct db
 ### Schema changes not reflected
 
 ```bash
-pnpm db:core:generate  # or db:gym:generate
+pnpm db:core:generate  # or db:bibikos:generate
 ```
 
 ### Type mismatches between databases

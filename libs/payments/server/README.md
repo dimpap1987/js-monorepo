@@ -32,7 +32,7 @@ From `libs/payments/server/src/index.ts`:
 ### Basic Setup (NestJS)
 
 ```ts
-// apps/gym-api/src/app/app.module.ts
+// apps/bibikos-api/src/app/app.module.ts
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PaymentsModule } from '@js-monorepo/payments-server'
@@ -122,7 +122,7 @@ Make sure the admin UI and backend agree on:
 import { Controller, Get, UseGuards } from '@nestjs/common'
 import { SubscriptionGuard } from '@js-monorepo/payments-server'
 
-@Controller('gym')
+@Controller('bibikos')
 @UseGuards(SubscriptionGuard)
 export class GymController {
   @Get('protected-resource')

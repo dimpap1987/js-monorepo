@@ -1,7 +1,7 @@
 ## `@js-monorepo/nest-utils`
 
 Shared NestJS utilities for decorators, interceptors, pipes, Redis helpers, vault secrets, idempotency, logging, and more.  
-These are used by multiple backend apps (`my-api`, `gym-api`, webhook server, etc.).
+These are used by multiple backend apps (`my-api`, `bibikos-api`, webhook server, etc.).
 
 ### Exports
 

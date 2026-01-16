@@ -1,6 +1,6 @@
 ## `@js-monorepo/prisma-shared`
 
-Shared Prisma 7 utilities used by all database libraries (`core-db`, `gym-db`, and any future DBs).  
+Shared Prisma 7 utilities used by all database libraries (`core-db`, `bibikos-db`, and any future DBs).  
 It provides DI tokens, a common `AbstractPrismaService` base class, module factory helpers, and shared Prisma types/errors.
 
 ### Exports
@@ -18,8 +18,8 @@ It provides DI tokens, a common `AbstractPrismaService` base class, module facto
 ### When to Use This Library
 
 - **Shared NestJS modules** (auth, notifications, payments, contact, etc.) that should be **database‑agnostic**
-- Code that needs **Prisma types** or **error classes** but must not depend on a specific DB (`core-db` vs `gym-db`)
-- Creating a **new Prisma DB library** with the same patterns as `core-db` / `gym-db`
+- Code that needs **Prisma types** or **error classes** but must not depend on a specific DB (`core-db` vs `bibikos-db`)
+- Creating a **new Prisma DB library** with the same patterns as `core-db` / `bibikos-db`
 
 ### Basic Usage (Shared Module)
 
@@ -55,7 +55,7 @@ export class YourRepository {
 The **app** decides which concrete Prisma service to inject by importing the correct DB module:
 
 - `@js-monorepo/core-db` for `my-api` / `next-app`
-- `@js-monorepo/gym-db` for `gym-api`
+- `@js-monorepo/bibikos-db` for `bibikos-api`
 
 ### Creating a New Prisma DB Library
 
@@ -66,4 +66,4 @@ When you create a new DB library, you extend the pieces from `@js-monorepo/prism
    - wires up the Prisma 7 driver adapter
    - exposes `PRISMA_SERVICE` so shared libs stay database‑agnostic
 
-See `libs/prisma/core-db` and `libs/prisma/gym-db` for full examples.
+See `libs/prisma/core-db` and `libs/prisma/bibikos-db` for full examples.

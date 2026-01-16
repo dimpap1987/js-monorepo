@@ -35,11 +35,11 @@ import { constructURIQueryString } from '@js-monorepo/ui-utils'
 
 const query = constructURIQueryString({
   pageIndex: 2, // will be mapped to `page`
-  search: 'gym classes',
+  search: 'bibikos classes',
   sort: 'price',
 })
 
-// query === '?page=2&search=gym%20classes&sort=price'
+// query === '?page=2&search=bibikos%20classes&sort=price'
 ```
 
 Notes:

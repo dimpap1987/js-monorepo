@@ -15,7 +15,7 @@ From `libs/notifications/server/src/index.ts`:
 ### Basic Setup (NestJS)
 
 ```ts
-// apps/gym-api/src/app/app.module.ts
+// apps/bibikos-api/src/app/app.module.ts
 import { Module } from '@nestjs/common'
 import { NotificationsModule } from '@js-monorepo/notifications-server'
 

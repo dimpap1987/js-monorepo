@@ -1,6 +1,6 @@
 ## `@js-monorepo/ui-contact-form`
 
-Shared **contact form** UI used in the Next.js apps (e.g. `gym-client` contact page).  
+Shared **contact form** UI used in the Next.js apps (e.g. `bibikos-client` contact page).  
 Includes a ready‑made form component and hook for managing submission and validation.
 
 ### Exports
@@ -13,7 +13,7 @@ From `libs/shared/ui/contact-form/src/index.ts`:
 ### Basic Usage
 
 ```tsx
-// apps/gym-client/app/(main)/contact/page.tsx
+// apps/bibikos-client/app/(main)/contact/page.tsx
 'use client'
 
 import { ContactForm } from '@js-monorepo/ui-contact-form'

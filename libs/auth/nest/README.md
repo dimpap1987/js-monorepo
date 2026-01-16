@@ -16,12 +16,12 @@ Key concepts (see `libs/auth/nest/src/` for full details):
   - `WsLoginGuard`
   - `WsRolesGuard`
 - **Modules**:
-  - Session/auth modules used by `my-api` and `gym-api`
+  - Session/auth modules used by `my-api` and `bibikos-api`
 
 ### Typical Usage
 
 ```ts
-// apps/gym-api/src/app/app.module.ts
+// apps/bibikos-api/src/app/app.module.ts
 import { Module } from '@nestjs/common'
 import { AuthSessionModule } from '@js-monorepo/auth-nest'
 
@@ -66,4 +66,4 @@ export class NotificationsGateway {
 }
 ```
 
-All auth code is designed to work with the shared Prisma models from `@js-monorepo/core-db` / `@js-monorepo/gym-db`.
+All auth code is designed to work with the shared Prisma models from `@js-monorepo/core-db` / `@js-monorepo/bibikos-db`.

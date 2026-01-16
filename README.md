@@ -73,13 +73,13 @@ To get started, create a `.env` file in the root of each application that requir
 
 - `apps/next-app/.env`
 - `apps/my-api/.env`
-- `apps/gym-api/.env`
+- `apps/bibikos-api/.env`
 - `apps/webhook-server/.env`
 - `libs/prisma/run_migrations/.env`
 
 Refer to the `.env.example` file (if available in the respective app's directory or the root for general guidance) for a list of necessary variables.
 
-**Note**: When using `dotenv-expand` (e.g., in `apps/my-api` or `apps/gym-api`), variable interpolation within these local `.env` files is supported.
+**Note**: When using `dotenv-expand` (e.g., in `apps/my-api` or `apps/bibikos-api`), variable interpolation within these local `.env` files is supported.
 
 HOSTNAME=localhost
 API_PORT=3333

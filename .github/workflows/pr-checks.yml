@@ -129,13 +129,13 @@ jobs:
           - app: my-api
             prisma-config: libs/prisma/core-db/prisma.config.ts
             build-cmd: pnpm build:my-api
-          - app: gym-api
-            prisma-config: libs/prisma/gym-db/prisma.config.ts
-            build-cmd: pnpm build:gym-api
+          - app: bibikos-api
+            prisma-config: libs/prisma/bibikos-db/prisma.config.ts
+            build-cmd: pnpm build:bibikos-api
           - app: next-app
             build-cmd: pnpm build:next
-          - app: gym-client
-            build-cmd: npx nx build gym-client --prod
+          - app: bibikos-client
+            build-cmd: npx nx build bibikos-client --prod
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -161,13 +161,13 @@ jobs:
         if: matrix.prisma-config != ''
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-          GYM_DATABASE_URL: ${{ secrets.GYM_DATABASE_URL_PROD }}
+          BIBIKOS_DATABASE_URL: ${{ secrets.BIBIKOS_DATABASE_URL_PROD }}
         run: pnpm prisma generate --config=${{ matrix.prisma-config }}
 
       - name: Build ${{ matrix.app }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
-          GYM_DATABASE_URL: ${{ secrets.GYM_DATABASE_URL_PROD }}
+          BIBIKOS_DATABASE_URL: ${{ secrets.BIBIKOS_DATABASE_URL_PROD }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_PROD }}
           NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY_PROD }}
         run: ${{ matrix.build-cmd }}

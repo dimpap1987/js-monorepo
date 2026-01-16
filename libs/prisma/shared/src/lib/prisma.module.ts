@@ -23,7 +23,7 @@ export interface PrismaModuleClass {
 
 /**
  * Factory for creating Prisma modules with consistent configuration.
- * Each database module (core-db, gym-db) uses this to create their module.
+ * Each database module (core-db, bibikos-db) uses this to create their module.
  *
  * @example
  * ```typescript

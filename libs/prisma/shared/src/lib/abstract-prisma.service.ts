@@ -23,7 +23,7 @@ const delay = (ms: number) => new Promise((resolve) => globalThis.setTimeout(res
  * Abstract base class for PrismaService implementations.
  * Handles connection management, retry logic, and event handling.
  *
- * Each database module (core-db, gym-db) should extend this class
+ * Each database module (core-db, bibikos-db) should extend this class
  * and provide their specific PrismaClient via createPrismaClient().
  *
  * @example

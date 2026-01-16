@@ -35,7 +35,7 @@ From `libs/payments/client/src/index.ts`:
 Typically used inside a Next.js app with React Query and your auth/session context:
 
 ```tsx
-// apps/gym-client/app/(main)/settings/subscription/subscription-settings.tsx
+// apps/bibikos-client/app/(main)/settings/subscription/subscription-settings.tsx
 'use client'
 
 import { Subscription } from '@js-monorepo/payments-ui'
@@ -105,7 +105,7 @@ export function BillingActions() {
 
 ### Admin Products Management UI
 
-The admin section (e.g. `apps/gym-client/app/(admin)/admin/products`) uses:
+The admin section (e.g. `apps/bibikos-client/app/(admin)/admin/products`) uses:
 
 - `AdminProductsTable`, dialogs, etc. from `./lib/components/admin`
 - `useAdminProducts` & related hooks from `admin-products-queries`

@@ -1,0 +1,56 @@
+{
+  "name": "bibikos-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/bibikos-api/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/bibikos-api",
+        "main": "apps/bibikos-api/src/main.ts",
+        "generatePackageJson": true,
+        "tsConfig": "apps/bibikos-api/tsconfig.app.json",
+        "assets": [],
+        "webpackConfig": "apps/bibikos-api/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "bibikos-api:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "bibikos-api:build:development"
+        },
+        "production": {
+          "buildTarget": "bibikos-api:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["{projectRoot}/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/bibikos-api/jest.config.ts"
+      }
+    }
+  }
+}

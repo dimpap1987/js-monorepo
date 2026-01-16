@@ -24,7 +24,7 @@ From `libs/websockets/user-presence/src/index.ts`:
 ### Basic Setup (NestJS Gateway)
 
 ```ts
-// apps/gym-api/src/app/app.module.ts
+// apps/bibikos-api/src/app/app.module.ts
 import { Module } from '@nestjs/common'
 import { UserPresenceModule } from '@js-monorepo/user-presence'
 

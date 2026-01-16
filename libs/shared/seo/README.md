@@ -20,7 +20,7 @@ From `libs/shared/seo/src/index.ts`:
 Configure the site once on app bootstrap (commonly in `app/layout.tsx` or a config module):
 
 ```ts
-// apps/gym-client/app/config/seo.ts
+// apps/bibikos-client/app/config/seo.ts
 import { configureSite } from '@js-monorepo/seo'
 
 configureSite({
@@ -47,7 +47,7 @@ configureSite(
 ### Using With Next.js `generateMetadata`
 
 ```ts
-// apps/gym-client/app/(main)/page.tsx
+// apps/bibikos-client/app/(main)/page.tsx
 import { generateMetadata } from '@js-monorepo/seo'
 import type { Metadata } from 'next'
 
@@ -67,7 +67,7 @@ You can override per‑page settings (title, description, canonical URL, Open Gr
 ### Structured Data (JSON‑LD)
 
 ```tsx
-// apps/gym-client/app/(main)/pricing/page.tsx
+// apps/bibikos-client/app/(main)/pricing/page.tsx
 import { generateStructuredData, StructuredDataType } from '@js-monorepo/seo'
 
 const productJsonLd = generateStructuredData({
