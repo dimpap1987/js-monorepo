@@ -56,6 +56,38 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   /**
+   * Gets the client name from the main Redis client (set by RedisModule)
+   * Falls back to 'api' if not available
+   */
+  private async getClientName(pubClient: RedisClientType): Promise<string> {
+    try {
+      const mainClientName = (await pubClient.sendCommand(['CLIENT', 'GETNAME'])) as string | null
+      if (mainClientName && mainClientName !== '(nil)' && mainClientName !== '') {
+        return mainClientName.toString().trim()
+      }
+    } catch {
+      this.logger.warn('Failed to get Redis client name from pubClient')
+    }
+
+    return 'api'
+  }
+
+  /**
+   * Sets the client name for the subClient connection for tracking
+   */
+  private async setSubClientName(
+    subClient: { sendCommand: (command: string[]) => Promise<unknown> },
+    clientName: string
+  ): Promise<void> {
+    try {
+      await subClient.sendCommand(['CLIENT', 'SETNAME', `${clientName}-websocket-sub`])
+      this.logger.debug(`Redis subClient name set: ${clientName}-websocket-sub`)
+    } catch (error: any) {
+      this.logger.warn(`Failed to set Redis subClient name: ${error?.message}`)
+    }
+  }
+
+  /**
    * Mark adapter as shutting down and close all WebSocket connections
    */
   async shutdown(): Promise<void> {
@@ -88,6 +120,11 @@ export class RedisIoAdapter extends IoAdapter {
     const pubClient = this.app.get<RedisClientType>(REDIS)
     const subClient = pubClient.duplicate()
     await subClient.connect()
+
+    // Get the name from pubClient (set by RedisModule) and use it as base for subClient name
+    // Don't rename pubClient - it already has a name from RedisModule (e.g., 'bibikos-api')
+    const clientName = await this.getClientName(pubClient)
+    await this.setSubClientName(subClient, clientName)
 
     this.adapterConstructor = createAdapter(pubClient, subClient)
   }

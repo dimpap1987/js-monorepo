@@ -100,6 +100,7 @@ import { getContactMessage } from './notifications/contact-form'
         url: configService.get('REDIS_URL'),
       }),
       isGlobal: true,
+      clientName: 'my-api',
     }),
     DistributedLockModule,
     IdempotencyModule,

@@ -122,6 +122,7 @@ import {
         url: configService.get('REDIS_URL'),
       }),
       isGlobal: true,
+      clientName: 'bibikos-api',
     }),
     DistributedLockModule,
     IdempotencyModule,
