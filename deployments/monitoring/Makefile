@@ -39,8 +39,16 @@ dev-network:
 	@docker network inspect super-network >/dev/null 2>&1 || \
 		docker network create super-network
 
+# Check if .env.dev exists, create from example if missing
+check-env-dev:
+	@if [ ! -f .env.dev ]; then \
+		echo "Warning: .env.dev not found. Creating from example.env.dev..."; \
+		cp example.env.dev .env.dev; \
+		echo "Please edit .env.dev with your actual credentials before starting."; \
+	fi
+
 # Start development monitoring stack
-dev: dev-network
+dev: dev-network check-env-dev
 	@echo "Starting monitoring stack for LOCAL development..."
 	@echo "Your local apps should use OTEL_HOSTNAME=localhost"
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev up -d
@@ -75,8 +83,16 @@ prod-network:
 	@docker network inspect super-network >/dev/null 2>&1 || \
 		(echo "Error: super-network does not exist. Start my-api_next-app first." && exit 1)
 
+# Check if .env.prod exists, create from example if missing
+check-env-prod:
+	@if [ ! -f .env.prod ]; then \
+		echo "Warning: .env.prod not found. Creating from example.env.prod..."; \
+		cp example.env.prod .env.prod; \
+		echo "Please edit .env.prod with your actual credentials before starting."; \
+	fi
+
 # Start production monitoring stack
-prod: prod-network
+prod: prod-network check-env-prod
 	@echo "Starting monitoring stack for PRODUCTION..."
 	docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d
 	@echo ""

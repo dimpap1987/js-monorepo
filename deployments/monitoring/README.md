@@ -227,6 +227,13 @@ The dev config uses `host.docker.internal` which works on:
 
 On Linux, you may need to use the host's actual IP address.
 
+**What is `host.docker.internal`?**
+
+- It's a special DNS name that resolves to the host machine's IP from inside Docker containers
+- Allows containers to connect to services running on your local machine (outside Docker)
+- Example: Container → `host.docker.internal:5432` → Your local Postgres on port 5432
+- **Development only**: Not recommended for production environments
+
 ## Directory Structure
 
 ```

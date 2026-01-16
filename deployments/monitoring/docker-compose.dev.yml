@@ -51,6 +51,18 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
 
+  redis-client-name-exporter:
+    container_name: redis_client_name_exporter_dev
+    build:
+      context: .
+      dockerfile: Dockerfile.redis-client-exporter
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - '9122:9122'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
   cadvisor:
     container_name: cadvisor_dev
     ports:

@@ -34,11 +34,11 @@ scrape_configs:
         action: drop
 
   # Nginx Exporter
+  # Note: host.docker.internal is configured via Docker Compose extra_hosts
+  # This allows Prometheus container to resolve host.docker.internal to the host machine
   - job_name: 'nginx-exporter'
     static_configs:
       - targets: ['host.docker.internal:9113'] # Scrape exporter running on host
-    extra_hosts:
-      - 'host.docker.internal:host-gateway' # Ensure host.docker.internal is resolved
 
   # PostgreSQL metrics - connects to LOCAL postgres on host
   - job_name: 'postgres-exporter'
@@ -63,6 +63,15 @@ scrape_configs:
   - job_name: 'redis_exporter'
     static_configs:
       - targets: ['redis_exporter:9121']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: environment
+        replacement: 'development'
+
+  # Redis client name metrics - shows connections by application name
+  - job_name: 'redis-client-name-exporter'
+    static_configs:
+      - targets: ['redis-client-name-exporter:9122']
     relabel_configs:
       - source_labels: [__address__]
         target_label: environment

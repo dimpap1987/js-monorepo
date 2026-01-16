@@ -62,6 +62,11 @@ scrape_configs:
     static_configs:
       - targets: ['redis_exporter:9121']
 
+  # Redis client name metrics - shows connections by application name
+  - job_name: 'redis-client-name-exporter'
+    static_configs:
+      - targets: ['redis-client-name-exporter:9122']
+
   # Alertmanager metrics (self-monitoring)
   - job_name: 'alertmanager'
     static_configs:

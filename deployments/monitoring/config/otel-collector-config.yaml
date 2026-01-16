@@ -58,7 +58,9 @@ exporters:
     tls:
       insecure: true
   otlphttp/logs:
-    endpoint: loki:3100
+    # OTLP HTTP endpoint for Loki
+    # Note: Ensure Loki has OTLP receiver enabled, or use lokiexporter instead
+    endpoint: http://loki:3100/otlp/v1/logs
     tls:
       insecure: true
     headers:
