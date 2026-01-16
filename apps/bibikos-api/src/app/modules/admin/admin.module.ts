@@ -1,5 +1,5 @@
 import { AuthSessionUserCacheService } from '@js-monorepo/auth/nest/session'
-import { FeatureFlagsService } from '@js-monorepo/feature-flags-server'
+import { FeatureFlagsModule } from '@js-monorepo/feature-flags-server'
 import { PaymentsModule } from '@js-monorepo/payments-server'
 import { UserPresenceModule } from '@js-monorepo/user-presence'
 import { Global, Module, Provider } from '@nestjs/common'
@@ -16,13 +16,12 @@ const providers: Provider[] = [
   },
   AdminService,
   AdminPaymentsService,
-  FeatureFlagsService,
 ]
 
 @Global()
 @Module({
   controllers: [AdminController],
-  imports: [UserPresenceModule, PaymentsModule],
+  imports: [UserPresenceModule, PaymentsModule, FeatureFlagsModule],
   providers: [...providers, AuthSessionUserCacheService],
   exports: [...providers],
 })

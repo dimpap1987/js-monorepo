@@ -1,4 +1,5 @@
 import { ContactServerModule } from '@js-monorepo/contact-server'
+import { FeatureFlagsModule } from '@js-monorepo/feature-flags-server'
 import { VaultModule } from '@js-monorepo/nest/vault'
 import { PaymentsModule } from '@js-monorepo/payments-server'
 import KeyvRedis, { Keyv } from '@keyv/redis'
@@ -156,6 +157,7 @@ import {
     FilterProviderModule,
     AdminProviderModule,
     UserModule,
+    FeatureFlagsModule,
     SchedulingModule,
     NotificationServerModule.forRootAsync({
       imports: [UserPresenceModule],
@@ -271,10 +273,10 @@ import {
       useFactory: async (redisClient: RedisClientType, configService: ConfigService) => {
         const redisStore = new Keyv({
           store: new KeyvRedis(redisClient, {
-            keyPrefixSeparator: ':caches:',
+            keyPrefixSeparator: ':',
           }),
           ttl: 2 * 60 * 1000, // Cache for 2 minutes
-          useKeyPrefix: false,
+          useKeyPrefix: false, // Disable Keyv's automatic prefixing to avoid double prefixing
           namespace: configService.get('REDIS_NAMESPACE'),
         })
         return {

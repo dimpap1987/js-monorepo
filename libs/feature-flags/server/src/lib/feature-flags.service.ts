@@ -1,4 +1,7 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import { Cache } from 'cache-manager'
+import { ConfigService } from '@nestjs/config'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 
@@ -11,14 +14,31 @@ export interface FeatureFlagConfig {
   description?: string | null
 }
 
+const FEATURE_FLAGS_CACHE_KEY = 'feature-flags:all'
+
 @Injectable()
 export class FeatureFlagsService {
-  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly configService: ConfigService
+  ) {}
 
   async getAllFlags(): Promise<Record<FeatureFlagKey, FeatureFlagConfig>> {
-    const records = await this.txHost.tx.featureFlag.findMany()
+    const cacheKey = FEATURE_FLAGS_CACHE_KEY
+    const cacheTtl = 86400 * 1000 // 1 day in milliseconds
 
-    return records.reduce<Record<FeatureFlagKey, FeatureFlagConfig>>((acc, flag) => {
+    // Check cache first
+    const cached = await this.cacheManager.get<Record<FeatureFlagKey, FeatureFlagConfig>>(cacheKey)
+    if (cached) {
+      return cached
+    }
+
+    const records = await this.txHost.tx.featureFlag.findMany({
+      orderBy: { key: 'asc' },
+    })
+
+    const result = records.reduce<Record<FeatureFlagKey, FeatureFlagConfig>>((acc, flag) => {
       acc[flag.key] = {
         key: flag.key,
         enabled: flag.enabled,
@@ -27,6 +47,10 @@ export class FeatureFlagsService {
       }
       return acc
     }, {})
+
+    // Cache for 1 day
+    await this.cacheManager.set(cacheKey, result, cacheTtl)
+    return result
   }
 
   async isEnabled(key: FeatureFlagKey, userId?: number): Promise<boolean> {
@@ -44,6 +68,7 @@ export class FeatureFlagsService {
   }
 
   async getEnabledFlagsForUser(userId?: number): Promise<Record<FeatureFlagKey, boolean>> {
+    // getAllFlags() is cached, so this will use cached data if available
     const configs = await this.getAllFlags()
     const result: Record<FeatureFlagKey, boolean> = {}
 
@@ -79,6 +104,9 @@ export class FeatureFlagsService {
         description: input.description ?? undefined,
       },
     })
+
+    // Invalidate cache when flags are updated
+    await this.cacheManager.del(FEATURE_FLAGS_CACHE_KEY)
   }
 
   private hashToBucket(userId: number, seed: string): number {
