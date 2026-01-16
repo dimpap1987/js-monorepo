@@ -38,6 +38,7 @@ import { AppController } from './controllers/app.controller'
 import { AdminProviderModule } from './modules/admin/admin.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
+import { SchedulingModule } from './modules/scheduling/scheduling.module'
 import { UserModule } from './modules/user/user.module'
 import { getContactMessage } from './notifications/contact-form'
 import {
@@ -155,6 +156,7 @@ import {
     FilterProviderModule,
     AdminProviderModule,
     UserModule,
+    SchedulingModule,
     NotificationServerModule.forRootAsync({
       imports: [UserPresenceModule],
       inject: [UserPresenceWebsocketService],

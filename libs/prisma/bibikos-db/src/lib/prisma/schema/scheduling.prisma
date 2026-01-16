@@ -1,0 +1,272 @@
+// =============================================================================
+// SCHEDULING DOMAIN
+// =============================================================================
+// Phase 1: Individual instructors (no gyms, no staff, no payments)
+// Future: Can evolve to support organizations (Phase 3)
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// AppUser - Extended user profile for the scheduling app
+// -----------------------------------------------------------------------------
+// Links to AuthUser for authentication, holds app-specific preferences
+// A user can be both Organizer and Participant simultaneously
+
+model AppUser {
+    id         Int      @id @default(autoincrement())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    authUserId Int      @unique
+
+    // Profile information
+    fullName String?
+
+    // Localization preferences
+    locale      String @default("en-US") @db.VarChar(10) // Language & formatting
+    timezone    String @default("UTC") @db.VarChar(50) // User viewing preference
+    countryCode String? @db.Char(2) // ISO-3166 country code
+
+    // Relations
+    authUser           AuthUser            @relation(fields: [authUserId], references: [id], onDelete: Cascade)
+    organizerProfile   OrganizerProfile?
+    participantProfile ParticipantProfile?
+
+    @@index([authUserId])
+    @@map("app_users")
+}
+
+// -----------------------------------------------------------------------------
+// OrganizerProfile - Instructor-specific data
+// -----------------------------------------------------------------------------
+// Optional per AppUser - a user becomes an organizer when they create classes
+// Phase 1: Organizer = Instructor (no staff separation)
+// Phase 3: Can split into Organizer vs Instructor roles
+
+model OrganizerProfile {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    appUserId Int      @unique
+
+    // Public profile
+    displayName String?
+    bio         String? @db.Text
+    slug        String? @unique @db.VarChar(100) // For public URL: /coach/john-doe
+
+    // Optional self-description (free text, does NOT affect logic or permissions)
+    activityLabel String? @db.VarChar(255)
+
+    // Policies
+    cancellationPolicy String? @db.Text
+
+    // Default location for new classes
+    defaultLocationId Int?
+
+    // Relations
+    appUser         AppUser   @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+    defaultLocation Location? @relation("DefaultLocation", fields: [defaultLocationId], references: [id], onDelete: SetNull)
+    classes         Class[]
+    locations       Location[] @relation("OrganizerLocations")
+
+    @@index([appUserId])
+    @@index([slug])
+    @@map("organizer_profiles")
+}
+
+// -----------------------------------------------------------------------------
+// ParticipantProfile - Attendance & booking tracking
+// -----------------------------------------------------------------------------
+// Optional per AppUser - a user becomes a participant when they book a class
+// Extensible later: credits, notes, tags
+
+model ParticipantProfile {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    appUserId Int      @unique
+
+    // Relations
+    appUser  AppUser   @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+    bookings Booking[]
+
+    @@index([appUserId])
+    @@map("participant_profiles")
+}
+
+// -----------------------------------------------------------------------------
+// Location - Physical or online venue
+// -----------------------------------------------------------------------------
+// Everything happens somewhere - even online classes have a timezone anchor
+// Owned by organizers, can be shared across multiple classes
+
+model Location {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Ownership
+    organizerId Int
+
+    // Location details
+    name        String  @db.VarChar(255)
+    countryCode String  @db.Char(2) // ISO-3166
+    city        String? @db.VarChar(255)
+    address     String? @db.Text
+    timezone    String  @db.VarChar(50) // IANA timezone (e.g., "Europe/Athens")
+
+    // Online support
+    isOnline    Boolean @default(false)
+    onlineUrl   String? @db.VarChar(500) // Zoom/Meet link for online classes
+
+    isActive Boolean @default(true)
+
+    // Relations
+    organizer                    OrganizerProfile   @relation("OrganizerLocations", fields: [organizerId], references: [id], onDelete: Cascade)
+    classes                      Class[]
+    defaultForOrganizerProfiles  OrganizerProfile[] @relation("DefaultLocation")
+
+    @@index([organizerId])
+    @@index([countryCode])
+    @@index([isOnline])
+    @@map("locations")
+}
+
+// -----------------------------------------------------------------------------
+// Class - Class template (not a specific occurrence)
+// -----------------------------------------------------------------------------
+// Defines what the class is (title, description, capacity)
+// ClassSchedule defines when it happens
+
+model Class {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Ownership
+    organizerId Int
+    locationId  Int
+
+    // Class details
+    title       String  @db.VarChar(255)
+    description String? @db.Text
+
+    // Capacity & limits
+    capacity       Int? // Max participants (null = unlimited)
+    waitlistLimit  Int? // Max waitlist size (null = unlimited)
+
+    // Soft limits support (recommendation vs hard limit)
+    isCapacitySoft Boolean @default(false) // If true, capacity is a recommendation
+
+    isActive Boolean @default(true)
+
+    // Relations
+    organizer OrganizerProfile @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+    location  Location         @relation(fields: [locationId], references: [id], onDelete: Restrict)
+    schedules ClassSchedule[]
+
+    @@index([organizerId])
+    @@index([locationId])
+    @@index([isActive])
+    @@map("classes")
+}
+
+// -----------------------------------------------------------------------------
+// ClassSchedule - Specific class occurrence (date/time + optional recurrence)
+// -----------------------------------------------------------------------------
+// Can be a one-time class or part of a recurring series
+// All times stored in UTC, displayed using location timezone
+
+model ClassSchedule {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    classId   Int
+
+    // Time (always UTC)
+    startTimeUtc DateTime @db.Timestamptz()
+    endTimeUtc   DateTime @db.Timestamptz()
+
+    // Local timezone (copied from location at creation for DST handling)
+    localTimezone String @db.VarChar(50)
+
+    // Recurrence (RFC 5545 RRULE format)
+    // Examples:
+    // - "FREQ=WEEKLY;BYDAY=MO,WE,FR" (every Mon/Wed/Fri)
+    // - "FREQ=WEEKLY;INTERVAL=2;BYDAY=TU" (every other Tuesday)
+    // - null = one-time class
+    recurrenceRule String? @db.VarChar(500)
+
+    // For recurring classes, tracks which occurrence this is
+    // null for one-time classes, date string (YYYY-MM-DD) for recurring
+    occurrenceDate String? @db.VarChar(10)
+
+    // If this schedule was generated from a parent recurring schedule
+    parentScheduleId Int?
+
+    // Status
+    isCancelled   Boolean   @default(false)
+    cancelledAt   DateTime?
+    cancelReason  String?   @db.VarChar(500)
+
+    // Relations
+    class          Class           @relation(fields: [classId], references: [id], onDelete: Cascade)
+    parentSchedule ClassSchedule?  @relation("RecurrenceParent", fields: [parentScheduleId], references: [id], onDelete: SetNull)
+    childSchedules ClassSchedule[] @relation("RecurrenceParent")
+    bookings       Booking[]
+
+    @@index([classId])
+    @@index([startTimeUtc])
+    @@index([parentScheduleId])
+    @@index([isCancelled])
+    @@map("class_schedules")
+}
+
+// -----------------------------------------------------------------------------
+// Booking - Participant registration for a class schedule
+// -----------------------------------------------------------------------------
+// Core interaction: links participants to class schedules
+// Handles: attendance, no-shows, cancellations, waitlist
+
+enum BookingStatus {
+    BOOKED // Confirmed booking
+    WAITLISTED // On waitlist, waiting for spot
+    CANCELLED // Cancelled by participant or organizer
+    ATTENDED // Marked as attended
+    NO_SHOW // Did not show up
+}
+
+model Booking {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    classScheduleId Int
+    participantId   Int
+
+    status BookingStatus @default(BOOKED)
+
+    // Timestamps for status changes
+    bookedAt    DateTime  @default(now())
+    cancelledAt DateTime?
+    attendedAt  DateTime?
+
+    // Waitlist position (null if not on waitlist)
+    waitlistPosition Int?
+
+    // Cancellation details
+    cancelledByOrganizer Boolean @default(false)
+    cancelReason         String? @db.VarChar(500)
+
+    // Notes (for organizer)
+    organizerNotes String? @db.Text
+
+    // Relations
+    classSchedule ClassSchedule      @relation(fields: [classScheduleId], references: [id], onDelete: Cascade)
+    participant   ParticipantProfile @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+    @@unique([classScheduleId, participantId]) // One booking per participant per schedule
+    @@index([classScheduleId])
+    @@index([participantId])
+    @@index([status])
+    @@index([waitlistPosition])
+    @@map("bookings")
+}

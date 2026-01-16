@@ -18,6 +18,7 @@ model AuthUser {
     userRole              UserRole[]
     paymentCustomer       PaymentCustomer?
     contactMessages       ContactMessage[]
+    appUser               AppUser?
 
     @@index([email])
     @@index([username])
