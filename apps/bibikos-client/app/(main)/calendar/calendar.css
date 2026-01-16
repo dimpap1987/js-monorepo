@@ -1,0 +1,612 @@
+/* ============================================
+   CALENDAR STYLES - Using Theme Variables
+   ============================================
+   Professional calendar styling that integrates
+   with the OKLCH-based theme system.
+   ============================================ */
+
+/* ============================================
+   BASE FULLCALENDAR OVERRIDES
+   ============================================ */
+
+.fc-custom-styles .fc {
+  /* Core colors mapped to theme */
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: var(--background-secondary);
+  --fc-today-bg-color: color-mix(in oklch, var(--primary) 8%, transparent);
+
+  /* Button colors */
+  --fc-button-bg-color: var(--primary);
+  --fc-button-border-color: var(--primary);
+  --fc-button-text-color: var(--primary-foreground);
+  --fc-button-hover-bg-color: color-mix(in oklch, var(--primary) 90%, black);
+  --fc-button-hover-border-color: color-mix(in oklch, var(--primary) 90%, black);
+  --fc-button-active-bg-color: color-mix(in oklch, var(--primary) 80%, black);
+  --fc-button-active-border-color: color-mix(in oklch, var(--primary) 80%, black);
+
+  /* Event defaults */
+  --fc-event-bg-color: var(--primary);
+  --fc-event-border-color: var(--primary);
+  --fc-event-text-color: var(--primary-foreground);
+
+  /* List view */
+  --fc-list-event-hover-bg-color: var(--background-secondary);
+
+  font-family: inherit;
+}
+
+/* ============================================
+   TOOLBAR STYLING
+   ============================================ */
+
+.fc-custom-styles .fc-toolbar {
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem !important;
+}
+
+.fc-custom-styles .fc-toolbar-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: var(--foreground);
+  letter-spacing: -0.025em;
+}
+
+@media (max-width: 640px) {
+  .fc-custom-styles .fc-toolbar-title {
+    font-size: 1.125rem !important;
+  }
+}
+
+/* Button Groups */
+.fc-custom-styles .fc-button-group {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.fc-custom-styles .fc-button {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  padding: 0.5rem 1rem !important;
+  border: none !important;
+  transition: all 0.15s ease;
+  text-transform: capitalize;
+}
+
+.fc-custom-styles .fc-button:focus {
+  box-shadow: 0 0 0 2px var(--ring) !important;
+  outline: none !important;
+}
+
+.fc-custom-styles .fc-button-primary:not(:disabled).fc-button-active,
+.fc-custom-styles .fc-button-primary:not(:disabled):active {
+  background-color: color-mix(in oklch, var(--primary) 85%, black) !important;
+}
+
+/* Today button special styling */
+.fc-custom-styles .fc-today-button {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.fc-custom-styles .fc-today-button:hover:not(:disabled) {
+  background-color: var(--accent) !important;
+}
+
+.fc-custom-styles .fc-today-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .fc-custom-styles .fc-button {
+    font-size: 0.75rem !important;
+    padding: 0.375rem 0.625rem !important;
+  }
+}
+
+/* ============================================
+   DAY GRID (MONTH VIEW)
+   ============================================ */
+
+.fc-custom-styles .fc-daygrid {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* Header cells (day names) */
+.fc-custom-styles .fc-col-header-cell {
+  background-color: var(--background-secondary);
+  padding: 0.75rem 0.5rem !important;
+}
+
+.fc-custom-styles .fc-col-header-cell-cushion {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--foreground-muted);
+}
+
+@media (max-width: 640px) {
+  .fc-custom-styles .fc-col-header-cell-cushion {
+    font-size: 0.625rem;
+    padding: 0.25rem;
+  }
+}
+
+/* Day cells */
+.fc-custom-styles .fc-daygrid-day {
+  transition: background-color 0.15s ease;
+  min-height: 6rem;
+}
+
+.fc-custom-styles .fc-daygrid-day:hover:not(.fc-day-past) {
+  background-color: var(--background-secondary);
+}
+
+.fc-custom-styles .fc-daygrid-day-frame {
+  padding: 0.25rem;
+}
+
+/* Day numbers */
+.fc-custom-styles .fc-daygrid-day-number {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground-secondary);
+  padding: 0.5rem !important;
+  width: 2rem;
+  height: 2rem;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: all 0.15s ease;
+}
+
+.fc-custom-styles .fc-daygrid-day:hover:not(.fc-day-past) .fc-daygrid-day-number {
+  background-color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .fc-custom-styles .fc-daygrid-day {
+    min-height: 4rem;
+  }
+
+  .fc-custom-styles .fc-daygrid-day-number {
+    font-size: 0.75rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0.25rem !important;
+  }
+}
+
+/* Today highlighting */
+.fc-custom-styles .fc-day-today {
+  background-color: color-mix(in oklch, var(--primary) 10%, transparent) !important;
+}
+
+.fc-custom-styles .fc-day-today .fc-daygrid-day-number {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  font-weight: 700;
+}
+
+/* Past dates */
+.fc-custom-styles .fc-day-past:not(.fc-day-today) {
+  opacity: 0.4;
+}
+
+.fc-custom-styles .fc-day-past:not(.fc-day-today) .fc-daygrid-day-number {
+  color: var(--foreground-muted);
+}
+
+/* Other month days */
+.fc-custom-styles .fc-day-other {
+  background-color: color-mix(in oklch, var(--background-secondary) 50%, transparent);
+}
+
+.fc-custom-styles .fc-day-other .fc-daygrid-day-number {
+  opacity: 0.5;
+}
+
+/* Weekend styling */
+.fc-custom-styles .fc-day-sat,
+.fc-custom-styles .fc-day-sun {
+  background-color: color-mix(in oklch, var(--background-secondary) 30%, transparent);
+}
+
+/* ============================================
+   EVENTS STYLING
+   ============================================ */
+
+.fc-custom-styles .fc-event {
+  border-radius: 0.375rem !important;
+  border: none !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+}
+
+.fc-custom-styles .fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.fc-custom-styles .fc-daygrid-event {
+  margin: 1px 2px !important;
+  padding: 2px 4px !important;
+}
+
+.fc-custom-styles .fc-daygrid-block-event .fc-event-time {
+  font-weight: 600;
+  font-size: 0.625rem;
+}
+
+.fc-custom-styles .fc-daygrid-block-event .fc-event-title {
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+/* Event dot indicator */
+.fc-custom-styles .fc-daygrid-event-dot {
+  border: none !important;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* More events link */
+.fc-custom-styles .fc-daygrid-more-link {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.15s ease;
+}
+
+.fc-custom-styles .fc-daygrid-more-link:hover {
+  background-color: var(--accent);
+}
+
+/* ============================================
+   TIME GRID (WEEK/DAY VIEW)
+   ============================================ */
+
+.fc-custom-styles .fc-timegrid {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.fc-custom-styles .fc-timegrid-slot {
+  height: 3rem;
+  border-bottom: 1px dashed color-mix(in oklch, var(--border) 50%, transparent);
+}
+
+.fc-custom-styles .fc-timegrid-slot-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--foreground-muted);
+  padding-right: 0.5rem !important;
+}
+
+.fc-custom-styles .fc-timegrid-event {
+  border-radius: 0.375rem !important;
+  border-left: 3px solid !important;
+}
+
+.fc-custom-styles .fc-timegrid-event .fc-event-main {
+  padding: 0.375rem 0.5rem;
+}
+
+.fc-custom-styles .fc-timegrid-event .fc-event-time {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.fc-custom-styles .fc-timegrid-event .fc-event-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* Now indicator */
+.fc-custom-styles .fc-timegrid-now-indicator-line {
+  border-color: var(--destructive) !important;
+  border-width: 2px;
+}
+
+.fc-custom-styles .fc-timegrid-now-indicator-arrow {
+  border-color: var(--destructive) !important;
+  border-width: 6px;
+}
+
+/* ============================================
+   LIST VIEW
+   ============================================ */
+
+.fc-custom-styles .fc-list {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.fc-custom-styles .fc-list-day-cushion {
+  background-color: var(--background-secondary) !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.fc-custom-styles .fc-list-day-text,
+.fc-custom-styles .fc-list-day-side-text {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+
+.fc-custom-styles .fc-list-event {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.fc-custom-styles .fc-list-event:hover td {
+  background-color: var(--accent) !important;
+}
+
+.fc-custom-styles .fc-list-event-dot {
+  border: none !important;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.fc-custom-styles .fc-list-event-time {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground-secondary);
+  padding: 0.75rem 1rem !important;
+  width: auto;
+}
+
+.fc-custom-styles .fc-list-event-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  padding: 0.75rem 1rem !important;
+}
+
+@media (max-width: 640px) {
+  .fc-custom-styles .fc-list-event-time,
+  .fc-custom-styles .fc-list-event-title {
+    font-size: 0.8125rem;
+    padding: 0.625rem 0.75rem !important;
+  }
+}
+
+/* Empty state for list view */
+.fc-custom-styles .fc-list-empty {
+  background-color: var(--background);
+  color: var(--foreground-muted);
+  font-size: 0.875rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* ============================================
+   POPOVER (More Events)
+   ============================================ */
+
+.fc-custom-styles .fc-popover {
+  background-color: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.5rem !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+}
+
+.fc-custom-styles .fc-popover-header {
+  background-color: var(--background-secondary) !important;
+  padding: 0.5rem 0.75rem !important;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--foreground);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.fc-custom-styles .fc-popover-body {
+  padding: 0.5rem !important;
+}
+
+.fc-custom-styles .fc-popover-close {
+  color: var(--foreground-muted);
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.fc-custom-styles .fc-popover-close:hover {
+  opacity: 1;
+}
+
+/* ============================================
+   SELECTION STYLES
+   ============================================ */
+
+.fc-custom-styles .fc-highlight {
+  background-color: color-mix(in oklch, var(--primary) 15%, transparent) !important;
+  border-radius: 0.25rem;
+}
+
+.fc-custom-styles .fc-selecting .fc-daygrid-day {
+  cursor: crosshair;
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+.fc-custom-styles .fc-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.fc-custom-styles .fc-scroller::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.fc-custom-styles .fc-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fc-custom-styles .fc-scroller::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 4px;
+}
+
+.fc-custom-styles .fc-scroller::-webkit-scrollbar-thumb:hover {
+  background-color: var(--foreground-muted);
+}
+
+/* ============================================
+   RESPONSIVE TABLE BORDERS
+   ============================================ */
+
+.fc-custom-styles .fc-scrollgrid {
+  border: 1px solid var(--border) !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+}
+
+.fc-custom-styles .fc-scrollgrid td,
+.fc-custom-styles .fc-scrollgrid th {
+  border-color: var(--border) !important;
+}
+
+/* Remove outer borders for cleaner look */
+.fc-custom-styles .fc-scrollgrid > thead > tr > th:first-child,
+.fc-custom-styles .fc-scrollgrid > tbody > tr > td:first-child {
+  border-left: none !important;
+}
+
+.fc-custom-styles .fc-scrollgrid > thead > tr > th:last-child,
+.fc-custom-styles .fc-scrollgrid > tbody > tr > td:last-child {
+  border-right: none !important;
+}
+
+.fc-custom-styles .fc-scrollgrid > tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+/* ============================================
+   EVENT COLOR CLASSES
+   ============================================ */
+
+/* Default event style */
+.fc-event-default {
+  --event-color: var(--primary);
+}
+
+/* Class-specific colors using oklch */
+.fc-event-blue {
+  background-color: oklch(0.6 0.2 250) !important;
+  border-left-color: oklch(0.5 0.25 250) !important;
+}
+
+.fc-event-green {
+  background-color: oklch(0.65 0.18 150) !important;
+  border-left-color: oklch(0.55 0.22 150) !important;
+}
+
+.fc-event-purple {
+  background-color: oklch(0.6 0.2 300) !important;
+  border-left-color: oklch(0.5 0.25 300) !important;
+}
+
+.fc-event-amber {
+  background-color: oklch(0.75 0.18 80) !important;
+  border-left-color: oklch(0.65 0.22 80) !important;
+}
+
+.fc-event-rose {
+  background-color: oklch(0.65 0.2 15) !important;
+  border-left-color: oklch(0.55 0.25 15) !important;
+}
+
+.fc-event-cyan {
+  background-color: oklch(0.7 0.15 200) !important;
+  border-left-color: oklch(0.6 0.2 200) !important;
+}
+
+.fc-event-orange {
+  background-color: oklch(0.7 0.18 50) !important;
+  border-left-color: oklch(0.6 0.22 50) !important;
+}
+
+.fc-event-teal {
+  background-color: oklch(0.65 0.15 175) !important;
+  border-left-color: oklch(0.55 0.2 175) !important;
+}
+
+/* Cancelled event style */
+.fc-event-cancelled {
+  background-color: var(--muted) !important;
+  border-left-color: var(--foreground-muted) !important;
+  opacity: 0.6;
+}
+
+.fc-event-cancelled .fc-event-title {
+  text-decoration: line-through;
+}
+
+/* Near capacity indicator */
+.fc-event-near-capacity {
+  box-shadow: 0 0 0 2px oklch(0.75 0.18 80 / 0.5) !important;
+}
+
+/* Full capacity indicator */
+.fc-event-full {
+  box-shadow: 0 0 0 2px oklch(0.577 0.245 27.325 / 0.5) !important;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.fc-event-loading {
+  animation: pulse-soft 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .fc-custom-styles .fc-toolbar {
+    display: none !important;
+  }
+
+  .fc-custom-styles .fc-event {
+    box-shadow: none !important;
+  }
+
+  .fc-custom-styles .fc-scrollgrid {
+    border: 1px solid #000 !important;
+  }
+}

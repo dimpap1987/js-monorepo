@@ -1,0 +1,6 @@
+export { OnboardingHeader } from './onboarding-header'
+export { OnboardingProgress, type Step } from './onboarding-progress'
+export { OnboardingStepCard } from './onboarding-step-card'
+export { ProfileStepForm, type ProfileFormData } from './profile-step-form'
+export { LocationStepForm } from './location-step-form'
+export { ClassStepForm, type ClassFormData } from './class-step-form'

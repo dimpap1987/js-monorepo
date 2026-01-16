@@ -1,0 +1,26 @@
+import { DpButton } from '@js-monorepo/button'
+import { Card, CardContent } from '@js-monorepo/components/ui/card'
+import { useTranslations } from 'next-intl'
+import { CalendarOff, Plus } from 'lucide-react'
+
+interface ClassesEmptyStateProps {
+  onAddClick: () => void
+}
+
+export function ClassesEmptyState({ onAddClick }: ClassesEmptyStateProps) {
+  const t = useTranslations('scheduling.classes')
+
+  return (
+    <Card className="border-border/50">
+      <CardContent className="py-16 text-center">
+        <CalendarOff className="w-12 h-12 mx-auto mb-4 text-foreground-muted opacity-50" />
+        <h3 className="text-lg font-semibold mb-2">{t('empty')}</h3>
+        <p className="text-foreground-muted mb-6">{t('emptyDescription')}</p>
+        <DpButton onClick={onAddClick} className="gap-2">
+          <Plus className="w-4 h-4" />
+          {t('add')}
+        </DpButton>
+      </CardContent>
+    </Card>
+  )
+}
