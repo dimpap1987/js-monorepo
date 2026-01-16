@@ -1,12 +1,78 @@
 {
   "common": {
     "learnMore": "Learn More",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "success": "Success",
+    "confirm": "Confirm",
+    "search": "Search",
+    "noResults": "No results found",
+    "viewAll": "View All"
   },
   "home": {
-    "title": "Welcome to ClassOps!",
-    "subtitle": "Your fitness journey starts here.",
-    "browseWorkouts": "Browse Workouts"
+    "hero": {
+      "title": "Simplify Your Class Scheduling",
+      "subtitle": "The all-in-one platform for fitness instructors, yoga teachers, and wellness coaches to manage classes, bookings, and participants.",
+      "cta": "Start Teaching Today",
+      "ctaSecondary": "Book a Class"
+    },
+    "features": {
+      "title": "Everything You Need",
+      "subtitle": "Powerful tools designed for individual instructors",
+      "scheduling": {
+        "title": "Smart Scheduling",
+        "description": "Create recurring classes with flexible scheduling. Set weekly, bi-weekly, or custom patterns."
+      },
+      "bookings": {
+        "title": "Easy Bookings",
+        "description": "Participants book instantly via your personal link. Automatic waitlist management included."
+      },
+      "attendance": {
+        "title": "Attendance Tracking",
+        "description": "Mark attendance with one tap. Track no-shows and analyze class performance."
+      },
+      "calendar": {
+        "title": "Calendar View",
+        "description": "See all your classes at a glance. Drag and drop to reschedule."
+      },
+      "notifications": {
+        "title": "Smart Notifications",
+        "description": "Automatic reminders for participants. Instant alerts for cancellations."
+      },
+      "profile": {
+        "title": "Public Profile",
+        "description": "Your own branded page to showcase classes and accept bookings."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Get started in minutes",
+      "step1": {
+        "title": "Create Your Profile",
+        "description": "Set up your instructor profile with your bio, activity type, and booking link."
+      },
+      "step2": {
+        "title": "Add Your Classes",
+        "description": "Create classes with details, capacity limits, and recurring schedules."
+      },
+      "step3": {
+        "title": "Share & Book",
+        "description": "Share your profile link. Participants book directly, you manage everything."
+      }
+    },
+    "cta": {
+      "title": "Ready to Simplify Your Teaching?",
+      "subtitle": "Join thousands of instructors who save hours every week with ClassOps.",
+      "button": "Get Started Free"
+    }
   },
   "contact": {
     "title": "Contact Us",
@@ -19,11 +85,14 @@
     "dashboard": "Dashboard",
     "pricing": "Plans",
     "contact": "Contact",
-    "alert": "Alert"
+    "alert": "Alert",
+    "myClasses": "My Classes",
+    "calendar": "Calendar",
+    "bookings": "My Bookings"
   },
   "metadata": {
     "title": "ClassOps",
-    "description": "Your fitness journey starts here"
+    "description": "Simplify your class scheduling. The all-in-one platform for fitness instructors."
   },
   "settings": {
     "nav": {
@@ -49,6 +118,150 @@
       "description": "Manage your subscription",
       "currentPlan": "Current Plan",
       "invoiceHistory": "Invoice History"
+    }
+  },
+  "scheduling": {
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Welcome back",
+      "quickActions": "Quick Actions",
+      "createClass": "Create Class",
+      "addSchedule": "Add Schedule",
+      "viewCalendar": "View Calendar",
+      "upcomingClasses": "Upcoming Classes",
+      "noUpcoming": "No upcoming classes",
+      "todayClasses": "Today's Classes",
+      "thisWeek": "This Week",
+      "totalBookings": "Total Bookings",
+      "stats": {
+        "classes": "Active Classes",
+        "locations": "Locations",
+        "bookings": "This Week"
+      }
+    },
+    "onboarding": {
+      "welcome": "Welcome",
+      "title": "Welcome to ClassOps!",
+      "subtitle": "Let's set up your instructor profile",
+      "step1Title": "About You",
+      "step1Subtitle": "Tell us about yourself and your classes",
+      "step2Title": "Your First Location",
+      "step2Subtitle": "Where do you teach?",
+      "step3Title": "Create a Class",
+      "step3Subtitle": "Add your first class",
+      "displayName": "Display Name",
+      "displayNamePlaceholder": "How participants will see you",
+      "activityLabel": "What kind of classes do you run?",
+      "activityLabelPlaceholder": "e.g., Yoga, Pilates, CrossFit, Dance",
+      "bio": "Bio (optional)",
+      "bioPlaceholder": "Tell participants about yourself...",
+      "slug": "Your Profile URL",
+      "slugPlaceholder": "your-name",
+      "slugPreview": "classops.com/coach/",
+      "venueName": "Venue Name",
+      "venueNamePlaceholder": "e.g., Main Studio, Downtown Gym, Online Classes",
+      "venueNameDescription": "Where you teach (e.g., your studio, gym, or online platform). You can use this same venue for multiple classes.",
+      "onlineLocationDescription": "Zoom, Google Meet, etc.",
+      "physicalLocationDescription": "Physical studio or gym",
+      "skipForNow": "Skip for now",
+      "completeSetup": "Complete Setup"
+    },
+    "locations": {
+      "title": "Locations",
+      "subtitle": "Manage where you teach",
+      "add": "Add Location",
+      "edit": "Edit Location",
+      "empty": "No locations yet",
+      "emptyDescription": "Add your first location to start creating classes",
+      "name": "Location Name",
+      "namePlaceholder": "e.g., Downtown Studio, Zoom",
+      "city": "City",
+      "cityPlaceholder": "e.g., Athens",
+      "country": "Country",
+      "timezone": "Timezone",
+      "address": "Address (optional)",
+      "addressPlaceholder": "Street address",
+      "isOnline": "This is an online location",
+      "onlineUrl": "Meeting URL",
+      "onlineUrlPlaceholder": "e.g., https://zoom.us/j/..."
+    },
+    "classes": {
+      "title": "Classes",
+      "subtitle": "Manage your class templates",
+      "add": "Create Class",
+      "edit": "Edit Class",
+      "empty": "No classes yet",
+      "emptyDescription": "Create your first class to start scheduling",
+      "classTitle": "Class Title",
+      "titlePlaceholder": "e.g., Morning Yoga, HIIT Training",
+      "classTitleDescription": "What you teach (the class type or activity name). This is what participants will see when booking.",
+      "description": "Description",
+      "descriptionPlaceholder": "What participants can expect...",
+      "location": "Location",
+      "selectLocation": "Select a location",
+      "capacity": "Max Capacity",
+      "capacityPlaceholder": "Leave empty for unlimited",
+      "waitlistLimit": "Waitlist Limit",
+      "waitlistPlaceholder": "Leave empty for unlimited",
+      "softCapacity": "Soft capacity (allow overbooking)"
+    },
+    "schedules": {
+      "title": "Schedule",
+      "add": "Add Schedule",
+      "edit": "Edit Schedule",
+      "cancel": "Cancel Schedule",
+      "selectClass": "Select Class",
+      "date": "Date",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "duration": "Duration",
+      "recurring": "Recurring",
+      "recurrenceRule": "Repeat",
+      "once": "One time",
+      "weekly": "Weekly",
+      "biweekly": "Every 2 weeks",
+      "custom": "Custom",
+      "daysOfWeek": "Days of Week",
+      "cancelReason": "Reason for cancellation",
+      "cancelReasonPlaceholder": "Optional message to participants"
+    },
+    "calendar": {
+      "title": "Calendar",
+      "today": "Today",
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "list": "List"
+    },
+    "bookings": {
+      "title": "Bookings",
+      "myBookings": "My Bookings",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "empty": "No bookings yet",
+      "emptyDescription": "Your booked classes will appear here",
+      "book": "Book Now",
+      "cancelBooking": "Cancel Booking",
+      "booked": "Booked",
+      "waitlisted": "On Waitlist",
+      "cancelled": "Cancelled",
+      "attended": "Attended",
+      "noShow": "No Show",
+      "position": "Position",
+      "spotsLeft": "spots left",
+      "full": "Full",
+      "waitlistAvailable": "Waitlist available",
+      "participants": "Participants",
+      "markAttendance": "Mark Attendance",
+      "markAsAttended": "Mark Attended",
+      "markAsNoShow": "Mark No-Show"
+    },
+    "profile": {
+      "title": "Your Profile",
+      "publicPage": "Public Page",
+      "viewProfile": "View Public Profile",
+      "copyLink": "Copy Link",
+      "linkCopied": "Link copied!"
     }
   }
 }

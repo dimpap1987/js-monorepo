@@ -50,5 +50,58 @@
       "currentPlan": "Τρέχον Plan",
       "invoiceHistory": "Ιστορικό Τιμολογίων"
     }
+  },
+  "scheduling": {
+    "onboarding": {
+      "welcome": "Καλώς ήρθατε",
+      "title": "Καλώς ήρθατε στο ClassOps!",
+      "subtitle": "Ας ρυθμίσουμε το προφίλ εκπαιδευτή σας",
+      "step1Title": "Σχετικά με εσάς",
+      "step1Subtitle": "Πείτε μας για εσάς και τις τάξεις σας",
+      "step2Title": "Η πρώτη σας τοποθεσία",
+      "step2Subtitle": "Πού διδάσκετε;",
+      "step3Title": "Δημιουργήστε μια τάξη",
+      "step3Subtitle": "Προσθέστε την πρώτη σας τάξη",
+      "displayName": "Εμφανιζόμενο Όνομα",
+      "displayNamePlaceholder": "Πώς θα σας βλέπουν οι συμμετέχοντες",
+      "activityLabel": "Τι είδους τάξεις διδάσκετε;",
+      "activityLabelPlaceholder": "π.χ., Yoga, Pilates, CrossFit, Χορός",
+      "bio": "Βιογραφικό (προαιρετικό)",
+      "bioPlaceholder": "Πείτε στους συμμετέχοντες για εσάς...",
+      "slug": "Το URL του Προφίλ σας",
+      "slugPlaceholder": "το-όνομα-σας",
+      "slugPreview": "classops.com/coach/",
+      "venueName": "Όνομα Χώρου",
+      "venueNamePlaceholder": "π.χ., Κύριο Studio, Κεντρικό Γυμναστήριο, Online Τάξεις",
+      "venueNameDescription": "Πού διδάσκετε (π.χ., το studio, το γυμναστήριο ή η online πλατφόρμα σας). Μπορείτε να χρησιμοποιήσετε τον ίδιο χώρο για πολλές τάξεις.",
+      "onlineLocationDescription": "Zoom, Google Meet, κ.λπ.",
+      "physicalLocationDescription": "Φυσικό studio ή γυμναστήριο",
+      "skipForNow": "Παράλειψη προς το παρόν",
+      "completeSetup": "Ολοκλήρωση Ρυθμίσεων"
+    },
+    "locations": {
+      "name": "Όνομα Τοποθεσίας",
+      "namePlaceholder": "π.χ., Κεντρικό Studio, Zoom",
+      "city": "Πόλη",
+      "cityPlaceholder": "π.χ., Αθήνα",
+      "country": "Χώρα",
+      "timezone": "Ζώνη Ώρας",
+      "address": "Διεύθυνση (προαιρετικό)",
+      "addressPlaceholder": "Οδική διεύθυνση",
+      "isOnline": "Αυτή είναι μια online τοποθεσία",
+      "onlineUrl": "URL Συνάντησης",
+      "onlineUrlPlaceholder": "π.χ., https://zoom.us/j/..."
+    },
+    "classes": {
+      "classTitle": "Τίτλος Τάξης",
+      "titlePlaceholder": "π.χ., Πρωινό Yoga, HIIT Προπόνηση",
+      "classTitleDescription": "Τι διδάσκετε (ο τύπος τάξης ή το όνομα της δραστηριότητας). Αυτό θα βλέπουν οι συμμετέχοντες κατά την κράτηση.",
+      "description": "Περιγραφή",
+      "descriptionPlaceholder": "Τι μπορούν να περιμένουν οι συμμετέχοντες...",
+      "capacity": "Μέγιστη Χωρητικότητα",
+      "capacityPlaceholder": "Αφήστε κενό για απεριόριστο",
+      "waitlistLimit": "Όριο Λίστας Αναμονής",
+      "waitlistPlaceholder": "Αφήστε κενό για απεριόριστο"
+    }
   }
 }
