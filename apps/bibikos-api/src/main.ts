@@ -8,7 +8,7 @@ import './otel'
 import { LOGGER_CONFIG, LoggerConfig, LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
 import { getAllowedOriginsFromEnv, isOriginAllowed as isOriginAllowedUtil } from '@js-monorepo/utils/common'
-import { TimeoutInterceptor } from '@js-monorepo/nest/interceptors'
+import { RemoveEmptyInterceptor, TimeoutInterceptor } from '@js-monorepo/nest/interceptors'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
 import { NestFactory } from '@nestjs/core'
 import cookieParser from 'cookie-parser'
@@ -127,7 +127,7 @@ async function bootstrap() {
       stopAtFirstError: true,
     })
   )
-  app.useGlobalInterceptors(new TimeoutInterceptor(30_000))
+  app.useGlobalInterceptors(new TimeoutInterceptor(30_000), new RemoveEmptyInterceptor())
   app.set('trust proxy', 1)
 
   const redisIoAdapter = new RedisIoAdapter(app)
