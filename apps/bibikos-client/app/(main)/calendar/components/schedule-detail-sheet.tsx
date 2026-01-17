@@ -37,11 +37,11 @@ export function ScheduleDetailSheet({ schedule, classInfo, location, onCancel, o
   const tBookings = useTranslations('scheduling.bookings')
   const { addNotification } = useNotifications()
 
-  if (!schedule) return null
-
-  // Fetch bookings for this schedule
-  const { data: bookingsData, isLoading: isBookingsLoading } = useBookingsForSchedule(schedule.id)
+  // Hooks must be called unconditionally (before any returns)
+  const { data: bookingsData, isLoading: isBookingsLoading } = useBookingsForSchedule(schedule?.id ?? 0)
   const markAttendanceMutation = useMarkAttendance()
+
+  if (!schedule) return null
 
   const handleMarkAttendance = async (bookingIds: number[], status: 'ATTENDED' | 'NO_SHOW') => {
     try {

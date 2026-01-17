@@ -130,23 +130,21 @@ useDeleteFutureSchedules()
 
 ---
 
-## Known Issues / Bugs
+## Known Issues / Bugs (Fixed)
 
-### 1. Schedules Not Appearing After Creation
+### 1. Schedules Not Appearing - Missing startTimeUtc/endTimeUtc (FIXED)
 
-**Symptom**: User creates a schedule but it doesn't show on the calendar.
+**Symptom**: User creates a schedule, API returns schedules, but calendar shows nothing.
 
-**Potential Causes**:
+**Root Cause**: The `RemoveEmptyInterceptor` was treating `Date` objects as regular objects. Since `Object.entries(new Date())` returns `[]`, Date values were being removed from the API response.
 
-- Query invalidation timing
-- Date range mismatch (schedule outside visible range)
-- Class not active
+**Fix Applied**: `libs/nest-utils/src/lib/interceptors/remove-empty.interceptor.ts` now checks for `Date` instances and returns them as-is.
 
-**Debug Steps**:
+**Debug Steps** (if issue recurs):
 
 1. Check browser Network tab for `/scheduling/schedules/calendar` response
-2. Verify the schedule's `startTimeUtc` falls within the visible date range
-3. Check if the class has `isActive: true`
+2. Verify the response includes `startTimeUtc` and `endTimeUtc` fields
+3. If missing, check the `RemoveEmptyInterceptor`
 
 ### 2. Timezone Handling
 

@@ -45,7 +45,7 @@ export function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-3xl opacity-30" />
 
-        <div className="container relative mx-auto px-4 py-20 sm:py-32">
+        <div className="container relative mx-auto px-4 py-10 sm:py-22">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
@@ -94,7 +94,7 @@ export function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 sm:py-32 bg-background-secondary/30">
+      <section className="py-10 sm:py-22 bg-background-secondary/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t('features.title')}</h2>
@@ -130,7 +130,7 @@ export function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 sm:py-32">
+      <section className="py-10 sm:py-22">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t('howItWorks.title')}</h2>
@@ -163,19 +163,19 @@ export function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 sm:py-32">
+      <section className="py-10 sm:py-22">
         <div className="container mx-auto px-4">
           <div className="relative max-w-4xl mx-auto">
             {/* Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80 rounded-3xl" />
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 rounded-3xl" />
 
-            <div className="relative px-8 py-16 sm:px-16 sm:py-20 text-center">
+            <div className="relative px-8 py-16 sm:px-16 sm:py-10 text-center">
               <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">{t('cta.title')}</h2>
               <p className="text-lg text-primary-foreground/80 max-w-xl mx-auto mb-8">{t('cta.subtitle')}</p>
               <DpNextNavLink href={isLoggedIn ? '/dashboard' : '/auth/login'}>
                 <DpButton
-                  size="lg"
+                  size="large"
                   variant="secondary"
                   className="text-lg px-8 py-6 gap-2 bg-white text-primary hover:bg-white/90"
                 >

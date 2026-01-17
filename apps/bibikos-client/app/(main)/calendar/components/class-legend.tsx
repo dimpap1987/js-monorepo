@@ -17,6 +17,81 @@ import { Filter, Eye, EyeOff, Layers } from 'lucide-react'
 import { Class } from '../../../../lib/scheduling'
 import { CLASS_COLOR_PALETTE, getClassColor } from '../hooks/use-calendar-events'
 
+interface ClassFilterDropdownProps {
+  legendItems: Array<{
+    id: number
+    title: string
+    colorName: string
+    colorBg: string
+    isVisible: boolean
+  }>
+  visibleCount: number
+  isAllVisible: boolean
+  onToggleClass: (classId: number) => void
+  onShowAll: () => void
+  onHideAll: () => void
+}
+
+function ClassFilterDropdown({
+  legendItems,
+  visibleCount,
+  isAllVisible,
+  onToggleClass,
+  onShowAll,
+  onHideAll,
+}: ClassFilterDropdownProps) {
+  const t = useTranslations('scheduling.calendar')
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Layers className="w-4 h-4" />
+          <span className="hidden sm:inline">Classes</span>
+          {!isAllVisible && (
+            <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+              {visibleCount}/{legendItems.length}
+            </Badge>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel className="flex items-center justify-between">
+          <span>Filter Classes</span>
+          <div className="flex gap-1">
+            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={onShowAll} disabled={isAllVisible}>
+              <Eye className="w-3 h-3 mr-1" />
+              All
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-xs"
+              onClick={onHideAll}
+              disabled={visibleCount === 0}
+            >
+              <EyeOff className="w-3 h-3 mr-1" />
+              None
+            </Button>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {legendItems.map((item) => (
+          <DropdownMenuCheckboxItem
+            key={item.id}
+            checked={item.isVisible}
+            onCheckedChange={() => onToggleClass(item.id)}
+            className="gap-2"
+          >
+            <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.colorBg }} />
+            <span className="truncate">{item.title}</span>
+          </DropdownMenuCheckboxItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 interface ClassLegendProps {
   classes: Class[]
   visibleClassIds: Set<number> | null // null means show all
@@ -107,80 +182,5 @@ export function ClassLegend({ classes, visibleClassIds, onToggleClass, onShowAll
         />
       </div>
     </>
-  )
-}
-
-interface ClassFilterDropdownProps {
-  legendItems: Array<{
-    id: number
-    title: string
-    colorName: string
-    colorBg: string
-    isVisible: boolean
-  }>
-  visibleCount: number
-  isAllVisible: boolean
-  onToggleClass: (classId: number) => void
-  onShowAll: () => void
-  onHideAll: () => void
-}
-
-function ClassFilterDropdown({
-  legendItems,
-  visibleCount,
-  isAllVisible,
-  onToggleClass,
-  onShowAll,
-  onHideAll,
-}: ClassFilterDropdownProps) {
-  const t = useTranslations('scheduling.calendar')
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Layers className="w-4 h-4" />
-          <span className="hidden sm:inline">Classes</span>
-          {!isAllVisible && (
-            <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
-              {visibleCount}/{legendItems.length}
-            </Badge>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="flex items-center justify-between">
-          <span>Filter Classes</span>
-          <div className="flex gap-1">
-            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={onShowAll} disabled={isAllVisible}>
-              <Eye className="w-3 h-3 mr-1" />
-              All
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 px-2 text-xs"
-              onClick={onHideAll}
-              disabled={visibleCount === 0}
-            >
-              <EyeOff className="w-3 h-3 mr-1" />
-              None
-            </Button>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {legendItems.map((item) => (
-          <DropdownMenuCheckboxItem
-            key={item.id}
-            checked={item.isVisible}
-            onCheckedChange={() => onToggleClass(item.id)}
-            className="gap-2"
-          >
-            <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: item.colorBg }} />
-            <span className="truncate">{item.title}</span>
-          </DropdownMenuCheckboxItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
   )
 }

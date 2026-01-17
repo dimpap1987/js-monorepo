@@ -42,6 +42,46 @@ import {
   BOOKING_STATUS_COLORS,
 } from '../../../../lib/scheduling'
 
+function ProfileSkeleton() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background to-background-secondary/30">
+      <div className="relative bg-primary/5 border-b border-border/50">
+        <div className="container mx-auto px-4 py-12 sm:py-16">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
+            <Skeleton className="w-24 h-24 sm:w-32 sm:h-32 rounded-full" />
+            <div className="text-center sm:text-left space-y-4">
+              <Skeleton className="h-10 w-64" />
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-20 w-full max-w-2xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="border-border/50">
+              <CardContent className="p-6">
+                <div className="flex gap-4">
+                  <Skeleton className="w-16 h-20 rounded-lg" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-40" />
+                  </div>
+                  <Skeleton className="h-10 w-28" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 interface CoachProfileContentProps {
   slug: string
 }
@@ -88,7 +128,7 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
       if (booking.status === 'WAITLISTED') {
         addNotification({
           message: `Added to waitlist (position #${booking.waitlistPosition})`,
-          type: 'info',
+          type: 'information',
         })
       } else {
         addNotification({
@@ -118,7 +158,7 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
         <AlertCircle className="w-16 h-16 mx-auto mb-4 text-foreground-muted opacity-50" />
         <h1 className="text-2xl font-bold mb-2">Coach not found</h1>
         <p className="text-foreground-muted mb-6">
-          The coach profile you're looking for doesn't exist or has been removed.
+          The coach profile you&apos;re looking for doesn&apos;t exist or has been removed.
         </p>
         <DpButton onClick={() => router.push('/')}>Go Home</DpButton>
       </div>
@@ -166,8 +206,8 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
               <Calendar className="w-12 h-12 mx-auto mb-4 text-foreground-muted opacity-50" />
               <h3 className="text-lg font-semibold mb-2">Class Schedule Coming Soon</h3>
               <p className="text-foreground-muted max-w-md mx-auto">
-                This coach's class schedule will be available here. Check back soon or contact them directly to book a
-                class.
+                This coach&apos;s class schedule will be available here. Check back soon or contact them directly to
+                book a class.
               </p>
             </CardContent>
           </Card>
@@ -285,45 +325,5 @@ function ScheduleCard({ schedule, onBook }: { schedule: ClassSchedule; onBook: (
         </div>
       </CardContent>
     </Card>
-  )
-}
-
-function ProfileSkeleton() {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background-secondary/30">
-      <div className="relative bg-primary/5 border-b border-border/50">
-        <div className="container mx-auto px-4 py-12 sm:py-16">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
-            <Skeleton className="w-24 h-24 sm:w-32 sm:h-32 rounded-full" />
-            <div className="text-center sm:text-left space-y-4">
-              <Skeleton className="h-10 w-64" />
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-20 w-full max-w-2xl" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <Skeleton className="h-8 w-48 mb-6" />
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="border-border/50">
-              <CardContent className="p-6">
-                <div className="flex gap-4">
-                  <Skeleton className="w-16 h-20 rounded-lg" />
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-6 w-48" />
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-4 w-40" />
-                  </div>
-                  <Skeleton className="h-10 w-28" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
   )
 }

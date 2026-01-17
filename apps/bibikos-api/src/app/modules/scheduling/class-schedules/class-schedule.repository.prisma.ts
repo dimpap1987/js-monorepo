@@ -108,10 +108,29 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
       countsMap.set(count.classScheduleId, existing)
     }
 
-    return schedules.map((schedule) => ({
-      ...schedule,
-      bookingCounts: countsMap.get(schedule.id) || { booked: 0, waitlisted: 0 },
-    }))
+    // Explicitly map all fields to ensure they're included in the response
+    // Prisma models may have non-enumerable properties that don't spread correctly
+    return schedules.map((schedule) => {
+      const result = {
+        id: schedule.id,
+        classId: schedule.classId,
+        startTimeUtc: schedule.startTimeUtc,
+        endTimeUtc: schedule.endTimeUtc,
+        localTimezone: schedule.localTimezone,
+        recurrenceRule: schedule.recurrenceRule,
+        occurrenceDate: schedule.occurrenceDate,
+        parentScheduleId: schedule.parentScheduleId,
+        isCancelled: schedule.isCancelled,
+        cancelledAt: schedule.cancelledAt,
+        cancelReason: schedule.cancelReason,
+        createdAt: schedule.createdAt,
+        updatedAt: schedule.updatedAt,
+        class: schedule.class,
+        _count: schedule._count,
+        bookingCounts: countsMap.get(schedule.id) || { booked: 0, waitlisted: 0 },
+      }
+      return result
+    })
   }
 
   async findUpcomingByClassId(classId: number, limit = 10): Promise<ClassSchedule[]> {

@@ -28,7 +28,7 @@ function LoginDialog() {
         setLoaderState({ show: false })
       }
     }
-  }, [])
+  }, [state.show, setLoaderState])
 
   useEffect(() => {
     pathnameRef.current = pathname // Update the ref with the latest pathname
