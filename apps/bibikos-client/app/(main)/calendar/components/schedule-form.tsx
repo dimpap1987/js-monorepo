@@ -82,6 +82,19 @@ export function ScheduleForm({
     const startDayOfWeek = getDay(start)
     const dayCode = DAY_MAP[startDayOfWeek]
 
+    // Get all unique day codes in the selected range
+    const allDayCodes: string[] = []
+    const seenDays = new Set<number>()
+    for (let i = 0; i < daysDiff && i < 7; i++) {
+      const currentDate = new Date(start)
+      currentDate.setDate(start.getDate() + i)
+      const dayOfWeek = getDay(currentDate)
+      if (!seenDays.has(dayOfWeek)) {
+        seenDays.add(dayOfWeek)
+        allDayCodes.push(DAY_MAP[dayOfWeek])
+      }
+    }
+
     // Determine suggested recurrence
     let suggestedRecurrence: 'daily' | 'weekly' | 'biweekly' = 'weekly'
     let suggestedCount = daysDiff
@@ -105,6 +118,7 @@ export function ScheduleForm({
       weeksDiff,
       startDayOfWeek,
       dayCode,
+      allDayCodes,
       suggestedRecurrence,
       suggestedCount,
       startDateFormatted: format(start, 'MMM d'),
@@ -120,9 +134,11 @@ export function ScheduleForm({
       form.setValue('recurrenceCount', rangeInfo.daysDiff)
       form.setValue('recurrenceDays', [])
     } else if (recurrence === 'weekly') {
+      // Use all day codes from the selected range
+      form.setValue('recurrenceDays', rangeInfo.allDayCodes)
+      // Set initial weeks count (buildRecurrenceRule will multiply by days)
       const weeksCount = Math.ceil(rangeInfo.daysDiff / 7) + 1
       form.setValue('recurrenceCount', weeksCount)
-      form.setValue('recurrenceDays', [rangeInfo.dayCode])
     }
   }, [recurrence, rangeInfo, form])
 
@@ -138,7 +154,7 @@ export function ScheduleForm({
         // If it's a range, set smart recurrence
         if (initialDateRange.isRange && rangeInfo) {
           form.setValue('recurrence', rangeInfo.suggestedRecurrence)
-          form.setValue('recurrenceDays', [rangeInfo.dayCode])
+          form.setValue('recurrenceDays', rangeInfo.allDayCodes)
           form.setValue('recurrenceCount', rangeInfo.suggestedCount)
         }
       }
@@ -212,13 +228,24 @@ export function ScheduleForm({
                 {tCommon('cancel')}
               </Button>
               <Button type="submit" loading={isSubmitting} disabled={!form.formState.isValid}>
-                {rangeInfo
-                  ? recurrence === 'daily'
-                    ? `Create ${rangeInfo.daysDiff} Sessions`
-                    : `Create ${Math.ceil(rangeInfo.daysDiff / 7) + 1} Sessions`
-                  : recurrence === 'weekly'
-                    ? `Create ${form.watch('recurrenceCount')} Sessions`
-                    : tCommon('create')}
+                {(() => {
+                  const recurrenceCount = form.watch('recurrenceCount')
+                  const recurrenceDays = form.watch('recurrenceDays')
+
+                  if (rangeInfo) {
+                    if (recurrence === 'daily') {
+                      return `Create ${rangeInfo.daysDiff} Sessions`
+                    } else if (recurrence === 'weekly' && recurrenceDays.length > 0) {
+                      // weeks × days per week
+                      const totalSessions = recurrenceCount * recurrenceDays.length
+                      return `Create ${totalSessions} Sessions`
+                    }
+                  } else if (recurrence === 'weekly') {
+                    return `Create ${recurrenceCount} Sessions`
+                  }
+
+                  return tCommon('create')
+                })()}
               </Button>
             </div>
           </form>

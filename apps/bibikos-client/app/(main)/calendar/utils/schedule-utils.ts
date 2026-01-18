@@ -28,12 +28,21 @@ export function buildRecurrenceRule(data: ScheduleFormData): string | null {
   }
 
   // Add days of week for weekly/biweekly recurrence
-  if ((data.recurrence === 'weekly' || data.recurrence === 'biweekly') && data.recurrenceDays.length > 0) {
+  const hasMultipleDays =
+    (data.recurrence === 'weekly' || data.recurrence === 'biweekly') && data.recurrenceDays.length > 0
+  if (hasMultipleDays) {
     parts.push(`BYDAY=${data.recurrenceDays.join(',')}`)
   }
 
-  // Add count
-  parts.push(`COUNT=${data.recurrenceCount}`)
+  // Calculate total occurrences
+  // For weekly with multiple BYDAY values, COUNT = weeks × days per week
+  // e.g., 4 weeks of Mon/Tue/Wed = COUNT of 12
+  let totalCount = data.recurrenceCount
+  if (hasMultipleDays && data.recurrenceDays.length > 1) {
+    totalCount = data.recurrenceCount * data.recurrenceDays.length
+  }
+
+  parts.push(`COUNT=${totalCount}`)
 
   return parts.join(';')
 }
