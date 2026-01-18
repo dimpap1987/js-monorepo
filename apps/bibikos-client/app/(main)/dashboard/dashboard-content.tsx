@@ -164,9 +164,9 @@ export function DashboardContent() {
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 -mt-4">
         <div>
-          <h1>
+          <h2>
             {t('welcome')}, {organizer.displayName || user?.username}!
-          </h1>
+          </h2>
           <p className="text-foreground-muted mt-1">{format(today, 'EEEE, MMMM d, yyyy')}</p>
         </div>
         <DpNextNavLink href="/calendar">

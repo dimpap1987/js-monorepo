@@ -69,6 +69,10 @@ export const routes: RouteConfig[] = [
     path: '/discover',
     roles: [Role.PUBLIC],
   },
+  {
+    path: '/my-bookings',
+    roles: [Role.USER],
+  },
 ]
 
 // Navbar & Sidebar Menu navigation
@@ -109,6 +113,12 @@ export const navigationsMenuItems: MenuItem[] = [
     name: 'navigation.contact',
     roles: [Role.PUBLIC],
     Icon: RiCustomerService2Line,
+  },
+  {
+    href: '/my-bookings',
+    name: 'navigation.bookings',
+    roles: [Role.USER],
+    Icon: RiBookmarkLine,
   },
 ]
 
