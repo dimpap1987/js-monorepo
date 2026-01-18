@@ -20,6 +20,8 @@ import type {
   CreateSchedulePayload,
   UpdateSchedulePayload,
   CancelSchedulePayload,
+  DiscoverSchedule,
+  DiscoverFilters,
   Booking,
   BookingListResponse,
   MyBookingsResponse,
@@ -53,6 +55,16 @@ export const schedulingKeys = {
   bookings: () => [...schedulingKeys.all, 'bookings'] as const,
   bookingsForSchedule: (scheduleId: number) => [...schedulingKeys.all, 'bookings', 'schedule', scheduleId] as const,
   myBookings: () => [...schedulingKeys.all, 'bookings', 'my'] as const,
+  discover: (filters: DiscoverFilters) =>
+    [
+      ...schedulingKeys.all,
+      'discover',
+      filters.startDate,
+      filters.endDate,
+      filters.activity,
+      filters.timeOfDay,
+      filters.search,
+    ] as const,
 }
 
 // =============================================================================
@@ -172,6 +184,38 @@ export function useOrganizerPublicProfile(slug: string) {
       return handleQueryResponse(response)
     },
     enabled: !!slug,
+  })
+}
+
+export function useOrganizerPublicSchedules(slug: string, startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: [...schedulingKeys.organizerPublic(slug), 'schedules', startDate, endDate] as const,
+    queryFn: async () => {
+      const response = await apiClient.get<ClassSchedule[]>(
+        `/scheduling/organizers/public/${slug}/schedules?startDate=${startDate}&endDate=${endDate}`
+      )
+      return handleQueryResponse(response)
+    },
+    enabled: !!slug && !!startDate && !!endDate,
+  })
+}
+
+export function useDiscoverSchedules(filters: DiscoverFilters) {
+  const params = new URLSearchParams({
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+  })
+  if (filters.activity) params.append('activity', filters.activity)
+  if (filters.timeOfDay) params.append('timeOfDay', filters.timeOfDay)
+  if (filters.search) params.append('search', filters.search)
+
+  return useQuery({
+    queryKey: schedulingKeys.discover(filters),
+    queryFn: async () => {
+      const response = await apiClient.get<DiscoverSchedule[]>(`/scheduling/schedules/discover?${params.toString()}`)
+      return handleQueryResponse(response)
+    },
+    enabled: !!filters.startDate && !!filters.endDate,
   })
 }
 

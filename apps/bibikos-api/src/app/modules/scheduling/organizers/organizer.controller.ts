@@ -4,6 +4,7 @@ import { SessionUserType } from '@js-monorepo/types/auth'
 import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { AppUserService } from '../app-users/app-user.service'
+import { ClassScheduleService } from '../class-schedules/class-schedule.service'
 import {
   CreateOrganizerDto,
   CreateOrganizerSchema,
@@ -16,7 +17,8 @@ import { OrganizerService } from './organizer.service'
 export class OrganizerController {
   constructor(
     private readonly organizerService: OrganizerService,
-    private readonly appUserService: AppUserService
+    private readonly appUserService: AppUserService,
+    private readonly scheduleService: ClassScheduleService
   ) {}
 
   /**
@@ -99,5 +101,23 @@ export class OrganizerController {
     }
 
     return profile
+  }
+
+  /**
+   * GET /scheduling/organizers/public/:slug/schedules
+   * Get public schedules for an organizer (for /coach/:slug booking page)
+   * No auth required
+   */
+  @Get('public/:slug/schedules')
+  async getPublicSchedules(
+    @Param('slug') slug: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string
+  ) {
+    if (!startDate || !endDate) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'START_AND_END_DATE_REQUIRED')
+    }
+
+    return this.scheduleService.getPublicSchedulesBySlug(slug, startDate, endDate)
   }
 }

@@ -65,6 +65,10 @@ export const routes: RouteConfig[] = [
     path: '/coach',
     roles: [Role.PUBLIC],
   },
+  {
+    path: '/discover',
+    roles: [Role.PUBLIC],
+  },
 ]
 
 // Navbar & Sidebar Menu navigation
@@ -90,7 +94,7 @@ export const navigationsMenuItems: MenuItem[] = [
   },
   {
     href: '/admin',
-    name: 'Admin',
+    name: 'navigation.admin',
     roles: [Role.ADMIN],
     Icon: RiDashboardLine,
   },

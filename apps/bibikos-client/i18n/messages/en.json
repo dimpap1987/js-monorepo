@@ -88,7 +88,8 @@
     "alert": "Alert",
     "myClasses": "My Classes",
     "calendar": "Calendar",
-    "bookings": "My Bookings"
+    "bookings": "My Bookings",
+    "admin": "Admin"
   },
   "metadata": {
     "title": "ClassOps",

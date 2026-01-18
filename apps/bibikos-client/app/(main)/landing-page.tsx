@@ -73,7 +73,7 @@ export function LandingPage() {
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </DpNextNavLink>
-              <DpNextNavLink href="/bookings">
+              <DpNextNavLink href="/discover">
                 <Button variant="outline" size="lg" className="text-lg px-8 py-6">
                   {t('hero.ctaSecondary')}
                 </Button>

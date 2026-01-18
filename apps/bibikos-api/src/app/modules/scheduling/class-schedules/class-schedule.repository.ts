@@ -23,6 +23,23 @@ export interface ClassScheduleWithBookingCounts extends ClassScheduleWithClass {
   }
 }
 
+export interface DiscoverScheduleResult extends ClassScheduleWithBookingCounts {
+  organizer: {
+    id: number
+    displayName: string | null
+    slug: string | null
+    activityLabel: string | null
+  }
+}
+
+export interface DiscoverFilters {
+  startDate: Date
+  endDate: Date
+  activity?: string
+  timeOfDay?: 'morning' | 'afternoon' | 'evening'
+  search?: string
+}
+
 export interface ClassScheduleRepository {
   findById(id: number): Promise<ClassSchedule | null>
   findByIdWithClass(id: number): Promise<ClassScheduleWithClass | null>
@@ -33,7 +50,13 @@ export interface ClassScheduleRepository {
     endDate: Date,
     classId?: number
   ): Promise<ClassScheduleWithBookingCounts[]>
+  findPublicByOrganizerIdInRange(
+    organizerId: number,
+    startDate: Date,
+    endDate: Date
+  ): Promise<ClassScheduleWithBookingCounts[]>
   findUpcomingByClassId(classId: number, limit?: number): Promise<ClassSchedule[]>
+  findPublicForDiscover(filters: DiscoverFilters): Promise<DiscoverScheduleResult[]>
   create(data: Prisma.ClassScheduleCreateInput): Promise<ClassSchedule>
   createMany(data: Prisma.ClassScheduleCreateManyInput[]): Promise<number>
   update(id: number, data: Prisma.ClassScheduleUpdateInput): Promise<ClassSchedule>

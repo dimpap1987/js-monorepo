@@ -37,6 +37,32 @@ export class ClassScheduleController {
   ) {}
 
   /**
+   * GET /scheduling/schedules/discover
+   * Public endpoint to discover classes across all organizers
+   * No auth required
+   */
+  @Get('discover')
+  async discoverSchedules(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Query('activity') activity?: string,
+    @Query('timeOfDay') timeOfDay?: 'morning' | 'afternoon' | 'evening',
+    @Query('search') search?: string
+  ) {
+    if (!startDate || !endDate) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'START_AND_END_DATE_REQUIRED')
+    }
+
+    return this.scheduleService.discoverSchedules({
+      startDate,
+      endDate,
+      activity,
+      timeOfDay,
+      search,
+    })
+  }
+
+  /**
    * Helper to get organizer ID for current user
    */
   private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {

@@ -4,6 +4,7 @@ import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { ClassRepo, ClassRepository } from '../classes/class.repository'
 import { LocationRepo, LocationRepository } from '../locations/location.repository'
 import { ClassScheduleRepo, ClassScheduleRepository } from './class-schedule.repository'
+import { OrganizerRepo, OrganizerRepository } from '../organizers/organizer.repository'
 import {
   CancelClassScheduleDto,
   ClassScheduleResponseDto,
@@ -34,7 +35,9 @@ export class ClassScheduleService {
     @Inject(ClassRepo)
     private readonly classRepo: ClassRepository,
     @Inject(LocationRepo)
-    private readonly locationRepo: LocationRepository
+    private readonly locationRepo: LocationRepository,
+    @Inject(OrganizerRepo)
+    private readonly organizerRepo: OrganizerRepository
   ) {}
 
   /**
@@ -118,6 +121,65 @@ export class ClassScheduleService {
     }
 
     return this.toResponseDto(schedule)
+  }
+
+  /**
+   * Get public schedules by organizer slug (for /coach/:slug page)
+   */
+  async getPublicSchedulesBySlug(
+    slug: string,
+    startDate: string,
+    endDate: string
+  ): Promise<ClassScheduleResponseDto[]> {
+    const organizer = await this.organizerRepo.findBySlug(slug)
+    if (!organizer) {
+      return []
+    }
+
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+
+    // Validate date range (max 3 months)
+    const maxRange = 92 * 24 * 60 * 60 * 1000
+    if (end.getTime() - start.getTime() > maxRange) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'DATE_RANGE_TOO_LARGE')
+    }
+
+    const schedules = await this.scheduleRepo.findPublicByOrganizerIdInRange(organizer.id, start, end)
+    return schedules.map(this.toResponseDto)
+  }
+
+  /**
+   * Discover public schedules across all organizers (for /discover page)
+   */
+  async discoverSchedules(filters: {
+    startDate: string
+    endDate: string
+    activity?: string
+    timeOfDay?: 'morning' | 'afternoon' | 'evening'
+    search?: string
+  }) {
+    const start = new Date(filters.startDate)
+    const end = new Date(filters.endDate)
+
+    // Validate date range (max 3 months)
+    const maxRange = 92 * 24 * 60 * 60 * 1000
+    if (end.getTime() - start.getTime() > maxRange) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'DATE_RANGE_TOO_LARGE')
+    }
+
+    const schedules = await this.scheduleRepo.findPublicForDiscover({
+      startDate: start,
+      endDate: end,
+      activity: filters.activity,
+      timeOfDay: filters.timeOfDay,
+      search: filters.search,
+    })
+
+    return schedules.map((schedule) => ({
+      ...this.toResponseDto(schedule),
+      organizer: schedule.organizer,
+    }))
   }
 
   /**

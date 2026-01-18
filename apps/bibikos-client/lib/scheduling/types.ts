@@ -162,6 +162,24 @@ export interface CancelSchedulePayload {
   cancelReason?: string
 }
 
+// Discover Schedule (includes organizer info for public discovery)
+export interface DiscoverSchedule extends ClassSchedule {
+  organizer: {
+    id: number
+    displayName: string | null
+    slug: string | null
+    activityLabel: string | null
+  }
+}
+
+export interface DiscoverFilters {
+  startDate: string
+  endDate: string
+  activity?: string
+  timeOfDay?: 'morning' | 'afternoon' | 'evening'
+  search?: string
+}
+
 // Booking
 export type BookingStatus = 'BOOKED' | 'WAITLISTED' | 'CANCELLED' | 'ATTENDED' | 'NO_SHOW'
 
