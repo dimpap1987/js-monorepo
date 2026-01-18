@@ -127,9 +127,6 @@ export function useCompleteOnboarding() {
 
 export function useOrganizer() {
   const { session } = useSession()
-
-  // Get organizer from session if available
-  const organizerFromSession = session?.appUser?.organizer as OrganizerProfile | null | undefined
   const hasOrganizerProfile = session?.appUser?.hasOrganizerProfile ?? false
 
   return useQuery({
@@ -138,14 +135,7 @@ export function useOrganizer() {
       const response = await apiClient.get<OrganizerProfile | null>('/scheduling/organizers/me')
       return handleQueryResponse(response)
     },
-    // Only fetch if:
-    // 1. User has an organizer profile (hasOrganizerProfile === true)
-    // 2. AND organizer data is not already in session
-    enabled: hasOrganizerProfile && organizerFromSession === undefined,
-    // Use session data directly - no API call needed when available
-    initialData: organizerFromSession,
-    // Return session data immediately when available
-    placeholderData: organizerFromSession,
+    enabled: hasOrganizerProfile,
   })
 }
 
