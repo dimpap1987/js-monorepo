@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
@@ -160,7 +160,7 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
         <p className="text-foreground-muted mb-6">
           The coach profile you&apos;re looking for doesn&apos;t exist or has been removed.
         </p>
-        <DpButton onClick={() => router.push('/')}>Go Home</DpButton>
+        <Button onClick={() => router.push('/')}>Go Home</Button>
       </div>
     )
   }
@@ -318,10 +318,10 @@ function ScheduleCard({ schedule, onBook }: { schedule: ClassSchedule; onBook: (
           </div>
 
           {/* Book Button */}
-          <DpButton onClick={onBook} disabled={isFull && !hasWaitlist} className="gap-2">
+          <Button onClick={onBook} disabled={isFull && !hasWaitlist} className="gap-2">
             {isFull ? (hasWaitlist ? 'Join Waitlist' : 'Full') : 'Book Now'}
             <ChevronRight className="w-4 h-4" />
-          </DpButton>
+          </Button>
         </div>
       </CardContent>
     </Card>

@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { formatPrice } from '@js-monorepo/currency'
 import { Card, CardContent, CardFooter, CardHeader } from '@js-monorepo/components/ui/card'
 import { UsageBar } from '@js-monorepo/components/ui/usage-bar'
@@ -189,9 +189,9 @@ export function PricingCard({
       </CardContent>
 
       <CardFooter className="flex-col gap-2">
-        <DpButton
+        <Button
           className="w-full"
-          size="large"
+          size="lg"
           variant={
             isCurrentTrial ? 'primary' : isCurrentPlan ? 'outline' : isPopular && !anySubscribed ? 'primary' : 'outline'
           }
@@ -200,18 +200,18 @@ export function PricingCard({
           onClick={() => onSelect(id)}
         >
           {getButtonContent()}
-        </DpButton>
+        </Button>
         {canTrial && (
-          <DpButton
+          <Button
             className="w-full"
-            size="large"
+            size="lg"
             variant="ghost"
             disabled={isTrialLoading}
             loading={isTrialLoading}
             onClick={() => onStartTrial?.(id)}
           >
             Start {trialEligibility.trialDurationDays}-day Free Trial
-          </DpButton>
+          </Button>
         )}
       </CardFooter>
     </Card>

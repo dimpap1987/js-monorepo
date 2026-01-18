@@ -1,5 +1,5 @@
 'use client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Input } from '@js-monorepo/components/ui/form'
 import { useNotifications } from '@js-monorepo/notification'
 import Image from 'next/image'
@@ -70,9 +70,9 @@ function AiGeneratorImageSuspense({
         <form className="w-full sm:w-[40ch] gap-2">
           <Input placeholder="Enter your prompt" value={prompt} onChange={(event) => setPrompt(event.target?.value)} />
 
-          <DpButton
+          <Button
             className="mt-3 w-full"
-            size="large"
+            size="lg"
             type="submit"
             loading={loading}
             onClick={(event) => {
@@ -83,7 +83,7 @@ function AiGeneratorImageSuspense({
             }}
           >
             Generate Image
-          </DpButton>
+          </Button>
         </form>
       </div>
 

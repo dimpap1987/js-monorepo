@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -137,13 +137,13 @@ export function UserEditDialog({ user, open, onOpenChange, onSave, isSaving }: U
             </div>
 
             <DialogFooter className="gap-2">
-              <DpButton type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSaving}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSaving}>
                 Cancel
-              </DpButton>
+              </Button>
 
-              <DpButton type="submit" loading={isSaving} disabled={!form.formState.isDirty}>
+              <Button type="submit" loading={isSaving} disabled={!form.formState.isDirty}>
                 Save
-              </DpButton>
+              </Button>
             </DialogFooter>
           </form>
         </Form>

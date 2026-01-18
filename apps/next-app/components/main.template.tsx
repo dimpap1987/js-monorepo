@@ -74,13 +74,13 @@ export default function MainTemplate({ children }: Readonly<PropsWithChildren>) 
       <div className="p-3">
         {!user && (
           <DpNextNavLink href="/auth/login">
-            <DpLoginButton size="large"></DpLoginButton>
+            <DpLoginButton size="lg"></DpLoginButton>
           </DpNextNavLink>
         )}
         {!!user && (
           <DpLogoutButton
             className="mb-6 justify-center"
-            size="large"
+            size="lg"
             onClick={() => authClient.logout()}
           ></DpLogoutButton>
         )}

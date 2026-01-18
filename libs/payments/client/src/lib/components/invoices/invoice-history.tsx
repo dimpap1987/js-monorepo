@@ -1,7 +1,7 @@
 'use client'
 
 import { formatPrice } from '@js-monorepo/currency'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { ChevronDown, Download, ExternalLink, FileText, Receipt } from 'lucide-react'
 import { useLocale } from 'next-intl'
@@ -65,28 +65,28 @@ function InvoiceRow({
 
         <div className="flex items-center gap-1">
           {invoice.hostedInvoiceUrl && (
-            <DpButton
+            <Button
               variant="ghost"
-              size="small"
+              size="sm"
               onClick={handleViewOnline}
               className="text-foreground-muted hover:text-foreground"
               title="View invoice online"
             >
               <ExternalLink className="h-4 w-4" />
               <span className="sr-only">View</span>
-            </DpButton>
+            </Button>
           )}
           {invoice.pdfUrl && (
-            <DpButton
+            <Button
               variant="ghost"
-              size="small"
+              size="sm"
               onClick={handleDownload}
               className="text-foreground-muted hover:text-foreground"
               title="Download PDF"
             >
               <Download className="h-4 w-4" />
               <span className="sr-only">Download</span>
-            </DpButton>
+            </Button>
           )}
         </div>
       </div>
@@ -206,10 +206,10 @@ export function InvoiceHistory() {
       </div>
       {hasMore && (
         <div className="pt-4 flex justify-center">
-          <DpButton variant="outline" size="small" onClick={loadMore} loading={isLoadingMore}>
+          <Button variant="outline" size="sm" onClick={loadMore} loading={isLoadingMore}>
             <ChevronDown className="h-4 w-4 mr-2" />
             Load More
-          </DpButton>
+          </Button>
         </div>
       )}
     </div>

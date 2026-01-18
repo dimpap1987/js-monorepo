@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Switch } from '@js-monorepo/components/ui/switch'
@@ -60,14 +60,9 @@ function FlagRow({ flag, onSave }: { flag: EditableFlag; onSave: (flag: Editable
         />
       </TableCell>
       <TableCell>
-        <DpButton
-          size="small"
-          variant={isDirty ? 'accent' : 'outline'}
-          disabled={!isDirty}
-          onClick={() => onSave(local)}
-        >
+        <Button size="sm" variant={isDirty ? 'accent' : 'outline'} disabled={!isDirty} onClick={() => onSave(local)}>
           Save
-        </DpButton>
+        </Button>
       </TableCell>
     </TableRow>
   )
@@ -195,9 +190,9 @@ export function FeatureFlagsTable() {
                 />
               </TableCell>
               <TableCell>
-                <DpButton size="small" onClick={handleCreateFlag} disabled={upsertMutation.isPending}>
+                <Button size="sm" onClick={handleCreateFlag} disabled={upsertMutation.isPending}>
                   Add
-                </DpButton>
+                </Button>
               </TableCell>
             </TableRow>
           </TableBody>

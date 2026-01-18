@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import {
   Form,
   FormControl,
@@ -96,9 +96,9 @@ export default function ContactForm() {
           )}
         />
 
-        <DpButton className="w-full" type="submit" size="large" disabled={!form.formState.isValid}>
+        <Button className="w-full" type="submit" size="lg" disabled={!form.formState.isValid}>
           Send Message
-        </DpButton>
+        </Button>
       </form>
     </Form>
   )

@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { useTranslations } from 'next-intl'
 import { Plus, CalendarDays } from 'lucide-react'
 import { Class } from '../../../../lib/scheduling'
@@ -50,11 +50,11 @@ export function CalendarHeader({
               onHideAll={onHideAllClasses}
             />
           )}
-          <DpButton onClick={onAddClick} className="gap-2 shadow-sm" disabled={!hasClasses}>
+          <Button onClick={onAddClick} className="gap-2 shadow-sm" disabled={!hasClasses}>
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">{tSchedules('add')}</span>
             <span className="sm:hidden">Add</span>
-          </DpButton>
+          </Button>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
 import {
   DropdownMenu,
@@ -172,9 +172,9 @@ function PricesSubRow({
                       <StripeSyncBadge verifiedStatus={priceVerifiedStatus} isVerifying={isPriceVerifying} />
                     </td>
                     <td className="py-2 text-center">
-                      <DpButton
+                      <Button
                         variant="outline"
-                        size="small"
+                        size="sm"
                         onClick={() => onSyncPrice?.(product.id, price.id)}
                         disabled={!canSyncPrice || isPriceSyncing}
                         className="h-7 px-2 text-xs"
@@ -190,7 +190,7 @@ function PricesSubRow({
                             Sync
                           </>
                         )}
-                      </DpButton>
+                      </Button>
                     </td>
                     <td className="py-2 text-right">
                       <DropdownMenu modal={false}>
@@ -274,38 +274,38 @@ function TablePagination({
         Page {currentPage} of {pageCount || 1}
       </div>
       <div className="flex items-center gap-2">
-        <DpButton
+        <Button
           variant="outline"
-          size="small"
+          size="sm"
           onClick={() => onPaginationChange({ ...pagination, page: 1 })}
           disabled={!canGoPrevious}
         >
           <ChevronsLeft className="w-4 h-4" />
-        </DpButton>
-        <DpButton
+        </Button>
+        <Button
           variant="outline"
-          size="small"
+          size="sm"
           onClick={() => onPaginationChange({ ...pagination, page: currentPage - 1 })}
           disabled={!canGoPrevious}
         >
           <ChevronLeft className="w-4 h-4" />
-        </DpButton>
-        <DpButton
+        </Button>
+        <Button
           variant="outline"
-          size="small"
+          size="sm"
           onClick={() => onPaginationChange({ ...pagination, page: currentPage + 1 })}
           disabled={!canGoNext}
         >
           <ChevronRight className="w-4 h-4" />
-        </DpButton>
-        <DpButton
+        </Button>
+        <Button
           variant="outline"
-          size="small"
+          size="sm"
           onClick={() => onPaginationChange({ ...pagination, page: pageCount })}
           disabled={!canGoNext}
         >
           <ChevronsRight className="w-4 h-4" />
-        </DpButton>
+        </Button>
       </div>
     </div>
   )

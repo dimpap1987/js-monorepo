@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { cn } from '@js-monorepo/ui/util'
 
 interface NotificationReadAllButtonProps extends React.ComponentPropsWithoutRef<'button'> {
@@ -9,9 +9,9 @@ interface NotificationReadAllButtonProps extends React.ComponentPropsWithoutRef<
 
 export function NotificationReadAllButton({ onReadAll, ...props }: NotificationReadAllButtonProps) {
   return (
-    <DpButton
+    <Button
       {...props}
-      size="small"
+      size="sm"
       variant="outline"
       className={cn(
         'h-7 px-3 text-xs font-medium',
@@ -25,6 +25,6 @@ export function NotificationReadAllButton({ onReadAll, ...props }: NotificationR
       }}
     >
       Mark all read
-    </DpButton>
+    </Button>
   )
 }

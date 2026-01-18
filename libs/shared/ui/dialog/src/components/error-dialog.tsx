@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Dialog, DialogFooter, DialogHeader, DialogTitle, DpDialogContent } from '@js-monorepo/components/ui/dialog'
 import { TiWarning } from 'react-icons/ti'
 export type ErrorDialogProps = {
@@ -43,14 +43,14 @@ export const ErrorDialog = ({
           <DialogFooter>{footer}</DialogFooter>
         ) : (
           <DialogFooter className="justify-end gap-2">
-            <DpButton
+            <Button
               variant="primary"
               onClick={() => {
                 onClose?.()
               }}
             >
               Close
-            </DpButton>
+            </Button>
           </DialogFooter>
         )}
       </DpDialogContent>

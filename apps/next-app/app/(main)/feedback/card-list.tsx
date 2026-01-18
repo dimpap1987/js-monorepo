@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 
 function CardList({ className }: { className: string }) {
@@ -18,13 +18,13 @@ function CardList({ className }: { className: string }) {
           <p> Please help us fix it by submitting an issue!</p>
         </CardContent>
         <CardFooter>
-          <DpButton
+          <Button
             className="w-full"
-            size="large"
+            size="lg"
             onClick={() => window.open('https://github.com/dimpap1987/js-monorepo/issues/new/choose', '_blank')}
           >
             Report
-          </DpButton>
+          </Button>
         </CardFooter>
       </Card>
 
@@ -40,13 +40,13 @@ function CardList({ className }: { className: string }) {
           <p>Click below to submit it!</p>
         </CardContent>
         <CardFooter>
-          <DpButton
-            size="large"
+          <Button
+            size="lg"
             className="w-full"
             onClick={() => window.open('https://github.com/dimpap1987/js-monorepo/issues/new/choose', '_blank')}
           >
             Make Request
-          </DpButton>
+          </Button>
         </CardFooter>
       </Card>
     </div>

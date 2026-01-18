@@ -1,6 +1,7 @@
 'use client'
 
-import { ButtonVariant, DpButton } from '@js-monorepo/button'
+import { Button, buttonVariants } from '@js-monorepo/components/ui/button'
+import type { VariantProps } from 'class-variance-authority'
 import {
   Dialog,
   DialogContent,
@@ -9,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@js-monorepo/components/ui/dialog'
+
+type ButtonVariant = VariantProps<typeof buttonVariants>['variant']
 
 interface ConfirmDialogProps {
   open: boolean
@@ -41,12 +44,12 @@ export function ConfirmDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DpButton variant="secondary" onClick={() => onOpenChange(false)} disabled={isLoading}>
+          <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={isLoading}>
             {cancelLabel}
-          </DpButton>
-          <DpButton variant={variant} onClick={onConfirm} disabled={isLoading}>
+          </Button>
+          <Button variant={variant} onClick={onConfirm} disabled={isLoading}>
             {isLoading ? 'Processing...' : confirmLabel}
-          </DpButton>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

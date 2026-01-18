@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { formatForUser } from '@js-monorepo/utils/date'
 import { useTimezone } from '@js-monorepo/next/hooks'
 import { Subscription } from '../../types'
@@ -61,9 +61,9 @@ export function PaidSubscriptionCard({
           )}
         </div>
         {isActive && (
-          <DpButton variant="ghost" className="text-status-error hover:text-status-error" onClick={onCancelClick}>
+          <Button variant="ghost" className="text-status-error hover:text-status-error" onClick={onCancelClick}>
             Cancel {planName}
-          </DpButton>
+          </Button>
         )}
       </div>
     </div>

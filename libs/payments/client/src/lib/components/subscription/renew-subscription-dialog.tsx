@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import {
   Dialog,
   DialogDescription,
@@ -55,12 +55,12 @@ export function RenewSubscriptionDialog({
         </DialogHeader>
 
         <DialogFooter className="flex-col gap-2 sm:flex sm:justify-center border-t-0">
-          <DpButton variant="primary" onClick={onConfirm} className="w-full" loading={isLoading} disabled={isLoading}>
+          <Button variant="primary" onClick={onConfirm} className="w-full" loading={isLoading} disabled={isLoading}>
             Renew
-          </DpButton>
-          <DpButton variant="outline" onClick={onClose} className="w-full" disabled={isLoading}>
+          </Button>
+          <Button variant="outline" onClick={onClose} className="w-full" disabled={isLoading}>
             Go back
-          </DpButton>
+          </Button>
         </DialogFooter>
       </DpDialogContent>
     </Dialog>

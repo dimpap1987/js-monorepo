@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { MapPin, Plus } from 'lucide-react'
@@ -15,10 +15,10 @@ export function ClassesNoLocationsWarning() {
               You need at least one location before you can create classes.
             </p>
             <DpNextNavLink href="/locations">
-              <DpButton variant="outline" size="small" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2">
                 <Plus className="w-4 h-4" />
                 Add Location
-              </DpButton>
+              </Button>
             </DpNextNavLink>
           </div>
         </div>

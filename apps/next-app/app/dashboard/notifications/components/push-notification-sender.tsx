@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card } from '@js-monorepo/components/ui/card'
 import { useNotifications } from '@js-monorepo/notification'
 import { SelectUsersComponent } from '@next-app/components/select-users'
@@ -71,15 +71,15 @@ export const PushNotificationSender = () => {
         />
       </div>
 
-      <DpButton
-        size="large"
+      <Button
+        size="lg"
         className="w-full"
         variant="accent"
         onClick={handleSendMessage}
         disabled={title.trim().length === 0 || message.trim().length === 0 || selectedUserIds.length === 0}
       >
         Send Push Notification
-      </DpButton>
+      </Button>
     </Card>
   )
 }

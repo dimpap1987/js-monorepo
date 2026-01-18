@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import {
   Dialog,
   DialogDescription,
@@ -79,12 +79,12 @@ export function CancelSubscriptionDialog({
         )}
 
         <DialogFooter className="mt-6 flex-col gap-2 sm:flex-col">
-          <DpButton variant="outline" onClick={onClose} className="w-full" disabled={isLoading}>
+          <Button variant="outline" onClick={onClose} className="w-full" disabled={isLoading}>
             Keep My Subscription
-          </DpButton>
-          <DpButton variant="danger" onClick={onConfirm} className="w-full" loading={isLoading} disabled={isLoading}>
+          </Button>
+          <Button variant="danger" onClick={onConfirm} className="w-full" loading={isLoading} disabled={isLoading}>
             Cancel Subscription
-          </DpButton>
+          </Button>
         </DialogFooter>
       </DpDialogContent>
     </Dialog>

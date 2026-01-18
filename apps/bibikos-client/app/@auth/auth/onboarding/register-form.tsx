@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, Input } from '@js-monorepo/components/ui/form'
 import { useNotifications } from '@js-monorepo/notification'
 import { RegisterUserSchema } from '@js-monorepo/schemas'
@@ -145,14 +145,14 @@ const RegisterForm = ({ formInput }: RegisterDialogType) => {
             />
           </div>
           <div className="mt-6">
-            <DpButton
+            <Button
               disabled={!form.formState.isValid || form.formState.isSubmitting || form.formState.isSubmitSuccessful}
               loading={form.formState.isSubmitting}
               className="w-full"
-              size="large"
+              size="lg"
             >
               Complete Sign Up
-            </DpButton>
+            </Button>
           </div>
         </form>
       </Form>

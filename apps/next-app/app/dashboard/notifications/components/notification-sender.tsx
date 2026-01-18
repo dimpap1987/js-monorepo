@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card } from '@js-monorepo/components/ui/card'
 import { useNotifications } from '@js-monorepo/notification'
 import { SelectUsersComponent } from '@next-app/components/select-users'
@@ -63,15 +63,15 @@ export const NotificationSender = () => {
         />
       </div>
 
-      <DpButton
-        size="large"
+      <Button
+        size="lg"
         variant="accent"
         className="w-full"
         onClick={handleSendMessage}
         disabled={message?.trim()?.length === 0 || !(selectedUserIds?.length > 0)}
       >
         Send Notification
-      </DpButton>
+      </Button>
     </Card>
   )
 }

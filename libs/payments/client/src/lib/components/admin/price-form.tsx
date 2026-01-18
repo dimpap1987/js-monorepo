@@ -1,7 +1,7 @@
 'use client'
 
 import { amountToCents, centsToAmount } from '@js-monorepo/currency'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
@@ -260,13 +260,13 @@ export function PriceForm({ price, products, defaultProductId, onSubmit, onCance
 
         <div className="flex justify-end gap-3 pt-4">
           {onCancel && (
-            <DpButton type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
+            <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
               Cancel
-            </DpButton>
+            </Button>
           )}
-          <DpButton type="submit" variant="accent" disabled={isLoading || !form.formState.isValid}>
+          <Button type="submit" variant="accent" disabled={isLoading || !form.formState.isValid}>
             {isLoading ? 'Saving...' : isEditMode ? 'Update Price' : 'Create Price'}
-          </DpButton>
+          </Button>
         </div>
       </form>
     </Form>

@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { DataTable, DataTableColumnHeader } from '@js-monorepo/components/table'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
@@ -475,10 +475,10 @@ function SubscriptionsPageContent() {
             </div>
           </div>
           <DialogFooter>
-            <DpButton variant="secondary" onClick={() => setExtendTrialDialog({ open: false })}>
+            <Button variant="secondary" onClick={() => setExtendTrialDialog({ open: false })}>
               Cancel
-            </DpButton>
-            <DpButton
+            </Button>
+            <Button
               variant="accent"
               onClick={() => {
                 if (extendTrialDialog.subscriptionId) {
@@ -492,7 +492,7 @@ function SubscriptionsPageContent() {
               loading={extendTrialMutation.isPending}
             >
               Extend Trial
-            </DpButton>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -507,10 +507,10 @@ function SubscriptionsPageContent() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <DpButton variant="secondary" onClick={() => setDeactivateTrialDialog({ open: false })}>
+            <Button variant="secondary" onClick={() => setDeactivateTrialDialog({ open: false })}>
               Cancel
-            </DpButton>
-            <DpButton
+            </Button>
+            <Button
               variant="danger"
               onClick={() => {
                 if (deactivateTrialDialog.subscriptionId) {
@@ -521,7 +521,7 @@ function SubscriptionsPageContent() {
               loading={deactivateTrialMutation.isPending}
             >
               Deactivate Trial
-            </DpButton>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

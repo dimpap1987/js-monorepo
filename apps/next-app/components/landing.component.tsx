@@ -1,5 +1,5 @@
 'use client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import {
@@ -105,25 +105,25 @@ export default function LandingComponent({ children, className }: MainProps) {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <DpNextNavLink href="/auth/login">
-              <DpButton size="large" variant="primary" className="w-full sm:w-auto">
+              <Button size="lg" variant="primary" className="w-full sm:w-auto">
                 Get Started
-              </DpButton>
+              </Button>
             </DpNextNavLink>
             <DpNextNavLink href="/pricing">
-              <DpButton size="large" variant="outline" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 View Pricing
-              </DpButton>
+              </Button>
             </DpNextNavLink>
           </div>
         </div>
       </div>
       <div className="flex flex-col justify-center align-items gap-2">
-        <DpButton variant="accent" onClick={loadForTwoSecond}>
+        <Button variant="accent" onClick={loadForTwoSecond}>
           Trigger loading
-        </DpButton>
+        </Button>
 
         <div className="flex gap-2 flex-wrap">
-          <DpButton
+          <Button
             className="flex-1"
             variant="outline"
             onClick={() => {
@@ -136,9 +136,9 @@ export default function LandingComponent({ children, className }: MainProps) {
             }}
           >
             Success notification
-          </DpButton>
+          </Button>
           {/* Error  */}
-          <DpButton
+          <Button
             className="flex-1"
             variant="danger"
             onClick={() => {
@@ -150,9 +150,9 @@ export default function LandingComponent({ children, className }: MainProps) {
             }}
           >
             Error notification
-          </DpButton>
+          </Button>
           {/* Spinner */}
-          <DpButton
+          <Button
             className="flex-1"
             variant="secondary"
             onClick={() => {
@@ -164,10 +164,10 @@ export default function LandingComponent({ children, className }: MainProps) {
             }}
           >
             Spinner notification
-          </DpButton>
+          </Button>
         </div>
         {/* Success */}
-        <DpButton
+        <Button
           loading={loading}
           onClick={() => {
             setLoading((prev) => !prev)
@@ -177,7 +177,7 @@ export default function LandingComponent({ children, className }: MainProps) {
           }}
         >
           Disable when Clicked
-        </DpButton>
+        </Button>
       </div>
 
       {/* Component Showcase Section */}
@@ -266,7 +266,7 @@ export default function LandingComponent({ children, className }: MainProps) {
           <CardContent>
             <Drawer>
               <DrawerTrigger asChild>
-                <DpButton variant="outline">Open Drawer</DpButton>
+                <Button variant="outline">Open Drawer</Button>
               </DrawerTrigger>
               <DrawerContent>
                 <div className="mx-auto w-full max-w-sm">
@@ -291,9 +291,9 @@ export default function LandingComponent({ children, className }: MainProps) {
                     </div>
                   </div>
                   <DrawerFooter>
-                    <DpButton>Save Changes</DpButton>
+                    <Button>Save Changes</Button>
                     <DrawerClose asChild>
-                      <DpButton variant="outline">Cancel</DpButton>
+                      <Button variant="outline">Cancel</Button>
                     </DrawerClose>
                   </DrawerFooter>
                 </div>
@@ -322,13 +322,13 @@ export default function LandingComponent({ children, className }: MainProps) {
               })
             }
           >
-            <DpButton
+            <Button
               variant="secondary"
               loading={isOpenCheckoutDialog}
               className="w-full"
             >
               Donate 6 &euro;
-            </DpButton>
+            </Button>
           </DonationDialogComponent>
         </div>
       )} */}

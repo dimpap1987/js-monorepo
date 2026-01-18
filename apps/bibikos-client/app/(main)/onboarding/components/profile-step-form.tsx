@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Textarea } from '@js-monorepo/components/ui/textarea'
@@ -100,10 +100,10 @@ export function ProfileStepForm({
         />
 
         <div className="flex justify-end pt-4">
-          <DpButton type="submit" loading={isLoading} disabled={!form.formState.isValid} className="gap-2">
+          <Button type="submit" loading={isLoading} disabled={!form.formState.isValid} className="gap-2">
             {tCommon('next')}
             <ArrowRight className="w-4 h-4" />
-          </DpButton>
+          </Button>
         </div>
       </form>
     </Form>

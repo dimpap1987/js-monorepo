@@ -1,7 +1,7 @@
 import { cn } from '@js-monorepo/ui/util'
+import { Button, ButtonProps } from '@js-monorepo/components/ui/button'
 import { forwardRef } from 'react'
 import { BiLogOutCircle } from 'react-icons/bi'
-import { ButtonProps, DpButton } from './button'
 
 export interface DpLogoutButtonProps extends ButtonProps {
   readonly className?: string
@@ -9,10 +9,10 @@ export interface DpLogoutButtonProps extends ButtonProps {
 
 const DpLogoutButton = forwardRef<HTMLButtonElement, DpLogoutButtonProps>(({ className, ...props }, ref) => {
   return (
-    <DpButton variant="primary" title="Sign out" className={cn('w-full rounded-xl', className)} ref={ref} {...props}>
+    <Button variant="primary" title="Sign out" className={cn('w-full rounded-xl', className)} ref={ref} {...props}>
       <BiLogOutCircle className="text-xl flex-shrink-0" />
       <span className="font-medium">Sign out</span>
-    </DpButton>
+    </Button>
   )
 })
 

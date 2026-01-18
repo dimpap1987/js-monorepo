@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@js-monorepo/components/ui/card'
 import { useNotifications } from '@js-monorepo/notification'
@@ -160,10 +160,10 @@ export function PlanGateShowcase() {
           <div className="flex flex-wrap gap-3">
             {/* Default: redirect to pricing */}
             <PlanGateInline plan="pro">
-              <DpButton variant="outline">
+              <Button variant="outline">
                 <Download className="w-4 h-4 mr-2" />
                 Redirect (default)
-              </DpButton>
+              </Button>
             </PlanGateInline>
 
             {/* Block: silently intercept with custom handler */}
@@ -178,18 +178,18 @@ export function PlanGateShowcase() {
                 })
               }
             >
-              <DpButton variant="secondary">
+              <Button variant="secondary">
                 <Zap className="w-4 h-4 mr-2" />
                 Block + Toast
-              </DpButton>
+              </Button>
             </PlanGateInline>
 
             {/* Disable: traditional disabled state */}
             <PlanGateInline plan="enterprise" behavior="disable">
-              <DpButton variant="accent">
+              <Button variant="accent">
                 <Settings className="w-4 h-4 mr-2" />
                 Disabled
-              </DpButton>
+              </Button>
             </PlanGateInline>
           </div>
           <div className="text-xs text-muted-foreground space-y-1">

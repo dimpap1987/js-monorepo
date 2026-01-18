@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
 import { loadStripe } from '@stripe/stripe-js/pure'
@@ -130,7 +130,7 @@ export function Checkout() {
       <div className="text-center py-12">
         <h2 className="text-xl font-semibold text-foreground mb-4">No plan selected</h2>
         <DpNextNavLink href="/pricing">
-          <DpButton>View Plans</DpButton>
+          <Button>View Plans</Button>
         </DpNextNavLink>
       </div>
     )
@@ -167,9 +167,9 @@ export function Checkout() {
 
           {/* Continue Button (desktop) */}
           <div className="hidden lg:block">
-            <DpButton className="w-full" size="large" loading={isProcessing} onClick={handleCheckout}>
+            <Button className="w-full" size="lg" loading={isProcessing} onClick={handleCheckout}>
               Continue to Payment
-            </DpButton>
+            </Button>
           </div>
         </div>
 
@@ -185,9 +185,9 @@ export function Checkout() {
 
       {/* Mobile Continue Button */}
       <div className="lg:hidden mt-8 sticky bottom-4">
-        <DpButton className="w-full shadow-lg" size="large" loading={isProcessing} onClick={handleCheckout}>
+        <Button className="w-full shadow-lg" size="lg" loading={isProcessing} onClick={handleCheckout}>
           Continue to Payment
-        </DpButton>
+        </Button>
       </div>
     </div>
   )

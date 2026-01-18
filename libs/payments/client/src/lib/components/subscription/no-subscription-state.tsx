@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { CreditCard } from 'lucide-react'
 
@@ -15,7 +15,7 @@ export function NoSubscriptionState() {
         You're currently on the free plan. Upgrade to unlock premium features.
       </p>
       <DpNextNavLink href="/pricing">
-        <DpButton>View Plans</DpButton>
+        <Button>View Plans</Button>
       </DpNextNavLink>
     </div>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { BackButton } from '@js-monorepo/back-arrow'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
@@ -170,10 +170,10 @@ export function DashboardContent() {
           <p className="text-foreground-muted mt-1">{format(today, 'EEEE, MMMM d, yyyy')}</p>
         </div>
         <DpNextNavLink href="/calendar">
-          <DpButton className="gap-2">
+          <Button className="gap-2">
             <Calendar className="w-4 h-4" />
             {t('viewCalendar')}
-          </DpButton>
+          </Button>
         </DpNextNavLink>
       </div>
 
@@ -276,10 +276,10 @@ export function DashboardContent() {
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>{t('noUpcoming')}</p>
                 <DpNextNavLink href="/calendar?action=new">
-                  <DpButton variant="outline" size="small" className="mt-4 gap-2">
+                  <Button variant="outline" size="sm" className="mt-4 gap-2">
                     <Plus className="w-4 h-4" />
                     {t('addSchedule')}
-                  </DpButton>
+                  </Button>
                 </DpNextNavLink>
               </div>
             )}

@@ -5,7 +5,7 @@ import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -198,12 +198,12 @@ export function AssignTrialDialog({ user, open, onOpenChange, onAssign, isLoadin
             </div>
 
             <DialogFooter>
-              <DpButton type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={isLoading}>
+              <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={isLoading}>
                 Cancel
-              </DpButton>
-              <DpButton type="submit" variant="accent" disabled={isLoading} loading={isLoading}>
+              </Button>
+              <Button type="submit" variant="accent" disabled={isLoading} loading={isLoading}>
                 Assign Trial
-              </DpButton>
+              </Button>
             </DialogFooter>
           </form>
         </Form>

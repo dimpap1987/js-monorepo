@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { useTranslations } from 'next-intl'
 import { Plus } from 'lucide-react'
 
@@ -16,10 +16,10 @@ export function ClassesHeader({ onAddClick, hasLocations }: ClassesHeaderProps) 
         <h1>{t('title')}</h1>
         <p className="text-foreground-muted mt-1">{t('subtitle')}</p>
       </div>
-      <DpButton onClick={onAddClick} className="gap-2" disabled={!hasLocations}>
+      <Button onClick={onAddClick} className="gap-2" disabled={!hasLocations}>
         <Plus className="w-4 h-4" />
         {t('add')}
-      </DpButton>
+      </Button>
     </div>
   )
 }

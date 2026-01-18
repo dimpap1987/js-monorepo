@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { ErrorComponent } from '@js-monorepo/error'
 import { ThemeProvider } from '@js-monorepo/theme-provider'
 import { isObjectDefinedOrEmpty } from '@js-monorepo/utils/common'
@@ -38,12 +38,12 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
         >
           <ErrorComponent type="global" className="container">
             <div className="flex flex-wrap gap-5 mt-5">
-              <DpButton className="flex-grow flex-shrink basis-0 min-w-[180px]:" onClick={() => reset()}>
+              <Button className="flex-grow flex-shrink basis-0 min-w-[180px]:" onClick={() => reset()}>
                 Try again
-              </DpButton>
-              <DpButton className="flex-grow flex-shrink basis-0" onClick={() => (window.location.href = '/')}>
+              </Button>
+              <Button className="flex-grow flex-shrink basis-0" onClick={() => (window.location.href = '/')}>
                 Go to Welcome Page
-              </DpButton>
+              </Button>
             </div>
           </ErrorComponent>
         </body>

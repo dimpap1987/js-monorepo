@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Progress } from '@js-monorepo/components/ui/progress'
 import { Separator } from '@js-monorepo/components/ui/separator'
@@ -273,10 +273,10 @@ export function ScheduleDetailSheet({ schedule, classInfo, location, onCancel, o
           {/* Actions */}
           {!schedule.isCancelled && !isClassPast && (
             <div className="pt-4 border-t border-border">
-              <DpButton variant="danger" onClick={onCancel} className="w-full gap-2">
+              <Button variant="danger" onClick={onCancel} className="w-full gap-2">
                 <Trash2 className="w-4 h-4" />
                 Cancel Schedule
-              </DpButton>
+              </Button>
             </div>
           )}
         </div>

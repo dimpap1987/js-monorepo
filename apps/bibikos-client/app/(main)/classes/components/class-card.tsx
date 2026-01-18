@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import {
   DropdownMenu,
@@ -37,9 +37,9 @@ export function ClassCard({ classItem, locations, onEdit, onDelete }: ClassCardP
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <DpButton variant="ghost" size="small" className="h-8 w-8 p-0">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                 <MoreVertical className="h-4 w-4" />
-              </DpButton>
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>

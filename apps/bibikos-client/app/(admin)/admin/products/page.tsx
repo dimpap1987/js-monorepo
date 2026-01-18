@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
@@ -325,7 +325,7 @@ function ProductsPageContent() {
           <h1 className="text-2xl font-bold">Products & Prices</h1>
           <p className="text-muted-foreground">Manage subscription products and pricing tiers</p>
         </div>
-        <DpButton
+        <Button
           variant="accent"
           onClick={() => {
             setSelectedProduct(null)
@@ -334,7 +334,7 @@ function ProductsPageContent() {
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Product
-        </DpButton>
+        </Button>
       </div>
 
       {/* Stats Cards */}

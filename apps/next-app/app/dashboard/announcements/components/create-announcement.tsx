@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card } from '@js-monorepo/components/ui/card'
 import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
 import { Input } from '@js-monorepo/components/ui/form'
@@ -127,9 +127,9 @@ const CreateAnnouncement = () => {
           )}
 
           {/* Submit Button */}
-          <DpButton type="submit" size="large" className="w-full" variant="accent" disabled={!form.formState.isValid}>
+          <Button type="submit" size="lg" className="w-full" variant="accent" disabled={!form.formState.isValid}>
             Send Announcement
-          </DpButton>
+          </Button>
         </form>
       </Form>
     </Card>

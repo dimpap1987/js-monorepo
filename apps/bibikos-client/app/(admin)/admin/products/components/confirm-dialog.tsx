@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -41,12 +41,12 @@ export function ConfirmDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DpButton variant="secondary" onClick={() => onOpenChange(false)} disabled={isLoading}>
+          <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={isLoading}>
             {cancelLabel}
-          </DpButton>
-          <DpButton variant={variant === 'destructive' ? 'danger' : 'accent'} onClick={onConfirm} disabled={isLoading}>
+          </Button>
+          <Button variant={variant === 'destructive' ? 'danger' : 'accent'} onClick={onConfirm} disabled={isLoading}>
             {isLoading ? 'Processing...' : confirmLabel}
-          </DpButton>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

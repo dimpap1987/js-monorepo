@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from '@js-monorepo/auth/next/client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
@@ -308,14 +308,14 @@ export function AccountSettings() {
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     {isEditing ? (
                       <>
-                        <DpButton
+                        <Button
                           onClick={handleCancel}
                           variant="outline"
                           className="w-full sm:w-auto order-2 sm:order-1"
                         >
                           Cancel
-                        </DpButton>
-                        <DpButton
+                        </Button>
+                        <Button
                           disabled={!form.formState.isValid || !form.formState.isDirty}
                           variant="primary"
                           type="submit"
@@ -323,10 +323,10 @@ export function AccountSettings() {
                           loading={updateUserAccountMutation.isPending}
                         >
                           Save Changes
-                        </DpButton>
+                        </Button>
                       </>
                     ) : (
-                      <DpButton
+                      <Button
                         type="button"
                         onClick={(e) => {
                           e.preventDefault()
@@ -336,7 +336,7 @@ export function AccountSettings() {
                         className="w-full sm:w-auto"
                       >
                         Edit Profile
-                      </DpButton>
+                      </Button>
                     )}
                   </div>
                 </div>

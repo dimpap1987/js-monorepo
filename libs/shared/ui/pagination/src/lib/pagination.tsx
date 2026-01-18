@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Pageable } from '@js-monorepo/types/pagination'
 import { Dispatch, SetStateAction } from 'react'
 import {
@@ -20,7 +20,7 @@ export function PaginationComponent({
   return (
     <div className="flex justify-around p-2 pb-0 gap-2 border-t border-border">
       <div className="flex gap-2">
-        <DpButton
+        <Button
           variant="primary"
           onClick={() =>
             onChange((prev) => ({
@@ -32,9 +32,9 @@ export function PaginationComponent({
           className={`px-2 py-1 rounded ${pagination.page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <MdOutlineKeyboardDoubleArrowLeft />
-        </DpButton>
+        </Button>
 
-        <DpButton
+        <Button
           variant="primary"
           onClick={() =>
             onChange((prev) => ({
@@ -46,7 +46,7 @@ export function PaginationComponent({
           className={`px-2 py-1 rounded ${pagination.page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <MdOutlineNavigateBefore />
-        </DpButton>
+        </Button>
       </div>
 
       <span className="text-xs sm:text-md font-semibold self-center">
@@ -54,7 +54,7 @@ export function PaginationComponent({
       </span>
 
       <div className="flex gap-2">
-        <DpButton
+        <Button
           variant="primary"
           onClick={() =>
             onChange((prev) => ({
@@ -66,8 +66,8 @@ export function PaginationComponent({
           className={`px-2 py-1 rounded ${pagination.page === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <MdOutlineNavigateNext />
-        </DpButton>
-        <DpButton
+        </Button>
+        <Button
           variant="primary"
           onClick={() =>
             onChange((prev) => ({
@@ -79,7 +79,7 @@ export function PaginationComponent({
           className={`px-2 py-1 rounded ${pagination.page === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <MdOutlineKeyboardDoubleArrowRight />
-        </DpButton>
+        </Button>
       </div>
     </div>
   )

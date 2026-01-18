@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card } from '@js-monorepo/components/ui/card'
 import {
   Form,
@@ -176,9 +176,9 @@ export function ContactForm({
           />
         </div>
 
-        <DpButton
+        <Button
           type="submit"
-          size="large"
+          size="lg"
           className="w-full gap-2"
           variant="accent"
           disabled={isSubmitting || !form.formState.isValid}
@@ -191,7 +191,7 @@ export function ContactForm({
               Send Message
             </>
           )}
-        </DpButton>
+        </Button>
       </form>
     </Form>
   )

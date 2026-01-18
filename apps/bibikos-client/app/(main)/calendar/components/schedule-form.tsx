@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@js-monorepo/components/ui/dialog'
 import { Form } from '@js-monorepo/components/ui/form'
@@ -208,10 +208,10 @@ export function ScheduleForm({
             />
 
             <div className="flex justify-end gap-3 pt-4">
-              <DpButton type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 {tCommon('cancel')}
-              </DpButton>
-              <DpButton type="submit" loading={isSubmitting} disabled={!form.formState.isValid}>
+              </Button>
+              <Button type="submit" loading={isSubmitting} disabled={!form.formState.isValid}>
                 {rangeInfo
                   ? recurrence === 'daily'
                     ? `Create ${rangeInfo.daysDiff} Sessions`
@@ -219,7 +219,7 @@ export function ScheduleForm({
                   : recurrence === 'weekly'
                     ? `Create ${form.watch('recurrenceCount')} Sessions`
                     : tCommon('create')}
-              </DpButton>
+              </Button>
             </div>
           </form>
         </Form>

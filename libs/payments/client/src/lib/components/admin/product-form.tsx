@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Switch } from '@js-monorepo/components/ui/switch'
@@ -164,13 +164,13 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading }: ProductF
 
         <div className="flex justify-end gap-3 pt-4">
           {onCancel && (
-            <DpButton type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
+            <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>
               Cancel
-            </DpButton>
+            </Button>
           )}
-          <DpButton type="submit" variant="accent" disabled={isLoading || !form.formState.isValid}>
+          <Button type="submit" variant="accent" disabled={isLoading || !form.formState.isValid}>
             {isLoading ? 'Saving...' : isEditMode ? 'Update Product' : 'Create Product'}
-          </DpButton>
+          </Button>
         </div>
       </form>
     </Form>

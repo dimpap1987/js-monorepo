@@ -1,4 +1,4 @@
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { AlertTriangle, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -16,10 +16,10 @@ export function CalendarNoClassesWarning() {
             <p className="text-foreground-muted text-sm mb-4">
               You need at least one class before you can create schedules.
             </p>
-            <DpButton variant="outline" size="small" onClick={() => router.push('/classes')} className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => router.push('/classes')} className="gap-2">
               <Plus className="w-4 h-4" />
               Create Class
-            </DpButton>
+            </Button>
           </div>
         </div>
       </CardContent>

@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from './button'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './form'
@@ -45,9 +45,9 @@ export function TextareaForm({ submitCallBack }: { submitCallBack: (data: z.infe
             </FormItem>
           )}
         />
-        <DpButton type="submit" className="w-full">
+        <Button type="submit" className="w-full">
           Send
-        </DpButton>
+        </Button>
       </form>
     </Form>
   )

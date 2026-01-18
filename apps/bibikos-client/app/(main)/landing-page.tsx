@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
@@ -62,15 +62,15 @@ export function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <DpNextNavLink href={isLoggedIn ? '/dashboard' : '/auth/login'}>
-                <DpButton size="large" className="text-lg px-8 py-6 gap-2">
+                <Button size="lg" className="text-lg px-8 py-6 gap-2">
                   {t('hero.cta')}
                   <ArrowRight className="w-5 h-5" />
-                </DpButton>
+                </Button>
               </DpNextNavLink>
               <DpNextNavLink href="/bookings">
-                <DpButton variant="outline" size="large" className="text-lg px-8 py-6">
+                <Button variant="outline" size="lg" className="text-lg px-8 py-6">
                   {t('hero.ctaSecondary')}
-                </DpButton>
+                </Button>
               </DpNextNavLink>
             </div>
 
@@ -174,14 +174,14 @@ export function LandingPage() {
               <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">{t('cta.title')}</h2>
               <p className="text-lg text-primary-foreground/80 max-w-xl mx-auto mb-8">{t('cta.subtitle')}</p>
               <DpNextNavLink href={isLoggedIn ? '/dashboard' : '/auth/login'}>
-                <DpButton
-                  size="large"
+                <Button
+                  size="lg"
                   variant="secondary"
                   className="text-lg px-8 py-6 gap-2 bg-white text-primary hover:bg-white/90"
                 >
                   {t('cta.button')}
                   <ArrowRight className="w-5 h-5" />
-                </DpButton>
+                </Button>
               </DpNextNavLink>
             </div>
           </div>

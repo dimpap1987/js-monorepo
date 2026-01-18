@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { AlertTriangle, CheckCircle, Cloud, CloudOff, Download, Link2Off, RefreshCw, Upload } from 'lucide-react'
 import { useState } from 'react'
@@ -138,10 +138,10 @@ export function ReconciliationPanel({ onReconciliationComplete }: Reconciliation
             </CardTitle>
             <CardDescription>Verify and sync products/prices between your database and Stripe</CardDescription>
           </div>
-          <DpButton onClick={fetchReport} disabled={isLoading} variant="outline">
+          <Button onClick={fetchReport} disabled={isLoading} variant="outline">
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             {isLoading ? 'Checking...' : 'Check Sync Status'}
-          </DpButton>
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -216,44 +216,44 @@ export function ReconciliationPanel({ onReconciliationComplete }: Reconciliation
                       <div className="flex items-center gap-2">
                         {(product.status === SyncStatus.LOCAL_ONLY || product.status === SyncStatus.ORPHANED) &&
                           product.localId && (
-                            <DpButton
-                              size="small"
+                            <Button
+                              size="sm"
                               variant="outline"
                               onClick={() => handleProductAction('push', product.localId!)}
                             >
                               <Upload className="h-4 w-4 mr-1" />
                               Push
-                            </DpButton>
+                            </Button>
                           )}
                         {product.status === SyncStatus.DRIFT && product.localId && (
-                          <DpButton
-                            size="small"
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => handleProductAction('pull', product.localId!)}
                           >
                             <Download className="h-4 w-4 mr-1" />
                             Pull
-                          </DpButton>
+                          </Button>
                         )}
                         {product.status === SyncStatus.STRIPE_ONLY && product.stripeId && (
-                          <DpButton
-                            size="small"
+                          <Button
+                            size="sm"
                             variant="outline"
                             onClick={() => handleProductAction('import', undefined, product.stripeId!)}
                           >
                             <Download className="h-4 w-4 mr-1" />
                             Import
-                          </DpButton>
+                          </Button>
                         )}
                         {product.status === SyncStatus.ORPHANED && product.localId && (
-                          <DpButton
-                            size="small"
+                          <Button
+                            size="sm"
                             variant="ghost"
                             onClick={() => handleProductAction('unlink', product.localId!)}
                           >
                             <Link2Off className="h-4 w-4 mr-1" />
                             Unlink
-                          </DpButton>
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -263,30 +263,30 @@ export function ReconciliationPanel({ onReconciliationComplete }: Reconciliation
 
             {/* Bulk Actions */}
             <div className="flex flex-wrap gap-2 pt-4 border-t">
-              <DpButton
+              <Button
                 variant="outline"
                 onClick={() => handleBulkAction('push_all_local')}
                 disabled={isBulkLoading || report.products.localOnly + report.products.orphaned === 0}
               >
                 <Upload className="h-4 w-4 mr-2" />
                 Push All Local to Stripe
-              </DpButton>
-              <DpButton
+              </Button>
+              <Button
                 variant="outline"
                 onClick={() => handleBulkAction('pull_all_stripe')}
                 disabled={isBulkLoading || report.products.stripeOnly === 0}
               >
                 <Download className="h-4 w-4 mr-2" />
                 Import All from Stripe
-              </DpButton>
-              <DpButton
+              </Button>
+              <Button
                 variant="outline"
                 onClick={() => handleBulkAction('sync_missing')}
                 disabled={isBulkLoading || report.products.localOnly + report.products.stripeOnly === 0}
               >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Sync All Missing
-              </DpButton>
+              </Button>
             </div>
 
             {/* Bulk Result */}

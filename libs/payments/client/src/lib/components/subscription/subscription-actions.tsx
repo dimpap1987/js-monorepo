@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { RefreshCw } from 'lucide-react'
 import { SubscriptionStatus as SubscriptionStatusEnum } from '@js-monorepo/types/subscription'
 import { Subscription } from '../../types'
@@ -32,20 +32,20 @@ export function SubscriptionActions({
   return (
     <div className="flex flex-wrap gap-3 pt-2 justify-end">
       {!isTrial && (
-        <DpButton variant="outline" onClick={onManageClick} loading={isPortalLoading}>
+        <Button variant="outline" onClick={onManageClick} loading={isPortalLoading}>
           Manage
-        </DpButton>
+        </Button>
       )}
       {!isTrial && status === 'canceling' && (
-        <DpButton variant="primary" onClick={onRenewClick}>
+        <Button variant="primary" onClick={onRenewClick}>
           <RefreshCw className="h-4 w-4 mr-2" />
           Renew
-        </DpButton>
+        </Button>
       )}
       {canCancel && (
-        <DpButton variant="ghost" className="text-status-error hover:text-status-error" onClick={onCancelClick}>
+        <Button variant="ghost" className="text-status-error hover:text-status-error" onClick={onCancelClick}>
           Cancel Subscription
-        </DpButton>
+        </Button>
       )}
     </div>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@js-monorepo/components/ui/tabs'
 import { Badge } from '@js-monorepo/components/ui/badge'
@@ -126,15 +126,15 @@ function BookingCard({
 
           {/* Actions */}
           {showCancel && (booking.status === 'BOOKED' || booking.status === 'WAITLISTED') && (
-            <DpButton
+            <Button
               variant="outline"
-              size="small"
+              size="sm"
               onClick={onCancel}
               className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
             >
               <X className="w-4 h-4" />
               Cancel
-            </DpButton>
+            </Button>
           )}
         </div>
       </CardContent>

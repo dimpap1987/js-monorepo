@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from '@js-monorepo/auth/next/client'
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
 import { Input } from '@js-monorepo/components/ui/form'
@@ -172,20 +172,20 @@ export function AccountSettings() {
                 <div className="flex gap-3 justify-center sm:justify-end flex-wrap">
                   {isEditing ? (
                     <>
-                      <DpButton onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
+                      <Button onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
                         Cancel
-                      </DpButton>
-                      <DpButton
+                      </Button>
+                      <Button
                         disabled={!form.formState.isValid || !form.formState.isDirty}
                         variant="primary"
                         type="submit"
                         className="w-full sm:w-auto"
                       >
                         Save Changes
-                      </DpButton>
+                      </Button>
                     </>
                   ) : (
-                    <DpButton
+                    <Button
                       type="button"
                       onClick={(e) => {
                         e.preventDefault()
@@ -194,7 +194,7 @@ export function AccountSettings() {
                       className="w-full sm:w-auto "
                     >
                       Edit Profile
-                    </DpButton>
+                    </Button>
                   )}
                 </div>
               </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@js-monorepo/components/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import {
@@ -84,38 +84,38 @@ function TablePagination({
         Page {currentPage} of {pageCount || 1}
       </div>
       <div className="flex items-center gap-2">
-        <DpButton
+        <Button
           variant="outline"
-          size="small"
+          size="sm"
           onClick={() => onPaginationChange({ ...pagination, page: 1 })}
           disabled={!canGoPrevious}
         >
           <ChevronsLeft className="w-4 h-4" />
-        </DpButton>
-        <DpButton
+        </Button>
+        <Button
           variant="outline"
-          size="small"
+          size="sm"
           onClick={() => onPaginationChange({ ...pagination, page: currentPage - 1 })}
           disabled={!canGoPrevious}
         >
           <ChevronLeft className="w-4 h-4" />
-        </DpButton>
-        <DpButton
+        </Button>
+        <Button
           variant="outline"
-          size="small"
+          size="sm"
           onClick={() => onPaginationChange({ ...pagination, page: currentPage + 1 })}
           disabled={!canGoNext}
         >
           <ChevronRight className="w-4 h-4" />
-        </DpButton>
-        <DpButton
+        </Button>
+        <Button
           variant="outline"
-          size="small"
+          size="sm"
           onClick={() => onPaginationChange({ ...pagination, page: pageCount })}
           disabled={!canGoNext}
         >
           <ChevronsRight className="w-4 h-4" />
-        </DpButton>
+        </Button>
       </div>
     </div>
   )

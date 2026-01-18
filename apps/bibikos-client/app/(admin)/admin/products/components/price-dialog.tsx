@@ -1,6 +1,6 @@
 'use client'
 
-import { DpButton } from '@js-monorepo/button'
+import { Button } from '@js-monorepo/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -200,17 +200,17 @@ export function PriceDialog({
         {(showSyncButton || (isEditMode && canSync)) && (
           <DialogFooter className="flex-col sm:flex-row gap-2">
             {showSyncButton && (
-              <DpButton
+              <Button
                 type="button"
                 variant="outline"
                 onClick={() => handleOpenChange(false)}
                 disabled={syncPriceToStripe.isPending}
               >
                 Close
-              </DpButton>
+              </Button>
             )}
             {canSync && (
-              <DpButton
+              <Button
                 type="button"
                 variant="accent"
                 onClick={handleManualSync}
@@ -227,7 +227,7 @@ export function PriceDialog({
                     {isEditMode ? 'Sync to Stripe' : 'Sync to Stripe Now'}
                   </>
                 )}
-              </DpButton>
+              </Button>
             )}
           </DialogFooter>
         )}
