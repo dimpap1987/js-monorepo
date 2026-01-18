@@ -90,7 +90,7 @@ export const navigationsMenuItems: MenuItem[] = [
   },
   {
     href: '/admin',
-    name: 'navigation.dashboard',
+    name: 'Admin',
     roles: [Role.ADMIN],
     Icon: RiDashboardLine,
   },

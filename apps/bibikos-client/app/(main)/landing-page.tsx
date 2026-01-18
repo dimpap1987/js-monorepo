@@ -35,7 +35,13 @@ const steps = [
 
 export function LandingPage() {
   const t = useTranslations('home')
-  const { isLoggedIn } = useSession()
+  const { isLoggedIn, session } = useSession()
+  const hasOrganizerProfile = session?.appUser?.hasOrganizerProfile === true
+
+  const getCtaHref = () => {
+    if (!isLoggedIn) return '/auth/login'
+    return hasOrganizerProfile ? '/dashboard' : '/onboarding'
+  }
 
   return (
     <div className="flex flex-col">
@@ -61,7 +67,7 @@ export function LandingPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <DpNextNavLink href={isLoggedIn ? '/dashboard' : '/auth/login'}>
+              <DpNextNavLink href={getCtaHref()}>
                 <Button size="lg" className="text-lg px-8 py-6 gap-2">
                   {t('hero.cta')}
                   <ArrowRight className="w-5 h-5" />
@@ -173,7 +179,7 @@ export function LandingPage() {
             <div className="relative px-8 py-16 sm:px-16 sm:py-10 text-center">
               <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">{t('cta.title')}</h2>
               <p className="text-lg text-primary-foreground/80 max-w-xl mx-auto mb-8">{t('cta.subtitle')}</p>
-              <DpNextNavLink href={isLoggedIn ? '/dashboard' : '/auth/login'}>
+              <DpNextNavLink href={getCtaHref()}>
                 <Button
                   size="lg"
                   variant="secondary"

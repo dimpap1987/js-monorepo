@@ -2,8 +2,9 @@ import { compose } from '@js-monorepo/next/middlewares'
 import { NextResponse } from 'next/server'
 import { withAuth } from './middlewares/withAuth'
 import { withLocale } from './middlewares/withLocale'
+import { withOnboarding } from './middlewares/withOnboarding'
 
-const composedMiddlewares = compose(withLocale, withAuth)
+const composedMiddlewares = compose(withLocale, withAuth, withOnboarding)
 
 export const middleware = composedMiddlewares(() => {
   return NextResponse.next()
