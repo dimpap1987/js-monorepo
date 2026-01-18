@@ -21,12 +21,12 @@ export function useOnboardingSubmission() {
     step1Data: ProfileFormData,
     locationData: CreateLocationDto, // Location (step 3 in UI, but created before class)
     classData: ClassFormData // Class (step 2 in UI) - now required
-  ) => {
+  ): Promise<boolean> => {
     const slug = generateSlug()
 
     if (!slug) {
       addNotification({ message: 'Username is required', type: 'error' })
-      return
+      return false
     }
 
     try {
@@ -70,11 +70,14 @@ export function useOnboardingSubmission() {
       setTimeout(() => {
         router.push('/dashboard')
       }, 100)
+
+      return true
     } catch (error: any) {
       addNotification({
         message: error?.message || 'Failed to complete setup',
         type: 'error',
       })
+      return false
     }
   }
 

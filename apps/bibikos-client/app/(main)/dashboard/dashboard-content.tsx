@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Calendar, MapPin, Users, Plus, CalendarPlus, ArrowRight, Clock, TrendingUp } from 'lucide-react'
-import { useOrganizer, useClasses, useLocations, useSchedulesCalendar } from '../../../lib/scheduling'
+import { useOrganizer, useClasses, useLocations, useSchedulesCalendar, ClassSchedule } from '../../../lib/scheduling'
 import { format, startOfWeek, endOfWeek, startOfDay, endOfDay } from 'date-fns'
 
 function DashboardSkeleton() {
@@ -90,7 +90,7 @@ export function DashboardContent() {
   // Get today's schedules
   const todayStart = startOfDay(today)
   const todayEnd = endOfDay(today)
-  const todaySchedules = weekSchedules?.filter((s) => {
+  const todaySchedules = weekSchedules?.filter((s: ClassSchedule) => {
     const scheduleDate = new Date(s.startTimeUtc)
     return scheduleDate >= todayStart && scheduleDate <= todayEnd
   })
@@ -131,7 +131,7 @@ export function DashboardContent() {
     },
     {
       label: t('stats.bookings'),
-      value: weekSchedules?.reduce((acc, s) => acc + (s.bookingCounts?.booked ?? 0), 0) ?? 0,
+      value: weekSchedules?.reduce((acc: number, s: ClassSchedule) => acc + (s.bookingCounts?.booked ?? 0), 0) ?? 0,
       icon: Users,
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/10',
@@ -248,7 +248,7 @@ export function DashboardContent() {
               </div>
             ) : todaySchedules && todaySchedules.length > 0 ? (
               <div className="space-y-3">
-                {todaySchedules.slice(0, 5).map((schedule) => (
+                {todaySchedules.slice(0, 5).map((schedule: ClassSchedule) => (
                   <DpNextNavLink key={schedule.id} href={`/calendar?scheduleId=${schedule.id}`} className="block">
                     <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all">
                       <div>
@@ -276,7 +276,7 @@ export function DashboardContent() {
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>{t('noUpcoming')}</p>
                 <DpNextNavLink href="/calendar?action=new">
-                  <DpButton variant="outline" size="sm" className="mt-4 gap-2">
+                  <DpButton variant="outline" size="small" className="mt-4 gap-2">
                     <Plus className="w-4 h-4" />
                     {t('addSchedule')}
                   </DpButton>

@@ -62,13 +62,13 @@ export function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <DpNextNavLink href={isLoggedIn ? '/dashboard' : '/auth/login'}>
-                <DpButton size="lg" className="text-lg px-8 py-6 gap-2">
+                <DpButton size="large" className="text-lg px-8 py-6 gap-2">
                   {t('hero.cta')}
                   <ArrowRight className="w-5 h-5" />
                 </DpButton>
               </DpNextNavLink>
               <DpNextNavLink href="/bookings">
-                <DpButton variant="outline" size="lg" className="text-lg px-8 py-6">
+                <DpButton variant="outline" size="large" className="text-lg px-8 py-6">
                   {t('hero.ctaSecondary')}
                 </DpButton>
               </DpNextNavLink>

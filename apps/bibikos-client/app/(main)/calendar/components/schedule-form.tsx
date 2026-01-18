@@ -112,6 +112,20 @@ export function ScheduleForm({
     }
   }, [initialDateRange])
 
+  // Update recurrence values when user changes pattern (for range selection)
+  useEffect(() => {
+    if (!rangeInfo) return
+
+    if (recurrence === 'daily') {
+      form.setValue('recurrenceCount', rangeInfo.daysDiff)
+      form.setValue('recurrenceDays', [])
+    } else if (recurrence === 'weekly') {
+      const weeksCount = Math.ceil(rangeInfo.daysDiff / 7) + 1
+      form.setValue('recurrenceCount', weeksCount)
+      form.setValue('recurrenceDays', [rangeInfo.dayCode])
+    }
+  }, [recurrence, rangeInfo, form])
+
   // Set initial values when dialog opens
   useEffect(() => {
     if (open && !hasSetInitialValues.current) {
@@ -190,6 +204,7 @@ export function ScheduleForm({
               locations={locations}
               recurrence={recurrence}
               isRangeSelection={!!rangeInfo}
+              rangeInfo={rangeInfo}
             />
 
             <div className="flex justify-end gap-3 pt-4">
@@ -197,7 +212,13 @@ export function ScheduleForm({
                 {tCommon('cancel')}
               </DpButton>
               <DpButton type="submit" loading={isSubmitting} disabled={!form.formState.isValid}>
-                {rangeInfo ? `Create ${rangeInfo.suggestedCount} Schedules` : tCommon('create')}
+                {rangeInfo
+                  ? recurrence === 'daily'
+                    ? `Create ${rangeInfo.daysDiff} Sessions`
+                    : `Create ${Math.ceil(rangeInfo.daysDiff / 7) + 1} Sessions`
+                  : recurrence === 'weekly'
+                    ? `Create ${form.watch('recurrenceCount')} Sessions`
+                    : tCommon('create')}
               </DpButton>
             </div>
           </form>

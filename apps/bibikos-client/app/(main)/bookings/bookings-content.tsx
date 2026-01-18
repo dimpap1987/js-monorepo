@@ -214,7 +214,7 @@ export function BookingsContent() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {upcomingBookings.map((booking) => (
+              {upcomingBookings.map((booking: Booking) => (
                 <BookingCard
                   key={booking.id}
                   booking={booking}
@@ -238,7 +238,7 @@ export function BookingsContent() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {pastBookings.map((booking) => (
+              {pastBookings.map((booking: Booking) => (
                 <BookingCard key={booking.id} booking={booking} showCancel={false} />
               ))}
             </div>

@@ -7,6 +7,7 @@ import { Input } from '@js-monorepo/components/ui/form'
 import { Textarea } from '@js-monorepo/components/ui/textarea'
 import { useTranslations } from 'next-intl'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { CreateClassSchema, type CreateClassDto } from '@js-monorepo/schemas'
 import { z } from 'zod'
@@ -22,12 +23,13 @@ const classSchema = CreateClassSchema.omit({ locationId: true }).extend({
 export type ClassFormData = z.infer<typeof classSchema>
 
 interface ClassStepFormProps {
+  initialData?: ClassFormData | null
   onSubmit: (data: ClassFormData) => void
   onBack: () => void
   isLoading?: boolean
 }
 
-export function ClassStepForm({ onSubmit, onBack, isLoading = false }: ClassStepFormProps) {
+export function ClassStepForm({ initialData, onSubmit, onBack, isLoading = false }: ClassStepFormProps) {
   const tClasses = useTranslations('scheduling.classes')
   const tOnboarding = useTranslations('scheduling.onboarding')
   const tCommon = useTranslations('common')
@@ -35,13 +37,20 @@ export function ClassStepForm({ onSubmit, onBack, isLoading = false }: ClassStep
   const form = useForm<ClassFormData>({
     resolver: zodResolver(classSchema),
     mode: 'onChange',
-    defaultValues: {
+    defaultValues: initialData || {
       title: '',
       description: '',
       capacity: '',
       waitlistLimit: '',
     },
   })
+
+  // Reset form when initialData becomes available (after hydration from localStorage)
+  useEffect(() => {
+    if (initialData) {
+      form.reset(initialData)
+    }
+  }, [initialData, form])
 
   return (
     <Form {...form}>

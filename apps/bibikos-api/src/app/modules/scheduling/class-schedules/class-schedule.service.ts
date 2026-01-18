@@ -343,7 +343,8 @@ export class ClassScheduleService {
 
     const occurrences: Array<{ start: Date; end: Date }> = []
     const duration = endTime.getTime() - startTime.getTime()
-    const maxOccurrences = components.count || this.DEFAULT_OCCURRENCE_WEEKS * 7
+    // COUNT includes the parent schedule, so we generate COUNT - 1 children
+    const maxOccurrences = components.count ? components.count - 1 : this.DEFAULT_OCCURRENCE_WEEKS * 7
     const endDate = components.until || new Date(Date.now() + this.DEFAULT_OCCURRENCE_WEEKS * 7 * 24 * 60 * 60 * 1000)
 
     let currentDate = new Date(startTime)

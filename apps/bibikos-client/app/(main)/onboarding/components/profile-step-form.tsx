@@ -7,6 +7,7 @@ import { Input } from '@js-monorepo/components/ui/form'
 import { Textarea } from '@js-monorepo/components/ui/textarea'
 import { useTranslations } from 'next-intl'
 import { ArrowRight } from 'lucide-react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { CreateOrganizerSchema } from '@js-monorepo/schemas'
 import { z } from 'zod'
@@ -18,22 +19,35 @@ export type ProfileFormData = z.infer<typeof profileSchema>
 
 interface ProfileStepFormProps {
   defaultDisplayName?: string
+  initialData?: ProfileFormData | null
   onSubmit: (data: ProfileFormData) => void
   isLoading?: boolean
 }
 
-export function ProfileStepForm({ defaultDisplayName = '', onSubmit, isLoading = false }: ProfileStepFormProps) {
+export function ProfileStepForm({
+  defaultDisplayName = '',
+  initialData,
+  onSubmit,
+  isLoading = false,
+}: ProfileStepFormProps) {
   const t = useTranslations('scheduling.onboarding')
   const tCommon = useTranslations('common')
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       displayName: defaultDisplayName,
       activityLabel: '',
       bio: '',
     },
   })
+
+  // Reset form when initialData becomes available (after hydration from localStorage)
+  useEffect(() => {
+    if (initialData) {
+      form.reset(initialData)
+    }
+  }, [initialData, form])
 
   return (
     <Form {...form}>

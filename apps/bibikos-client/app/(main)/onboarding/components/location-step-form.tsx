@@ -14,23 +14,24 @@ import { CreateLocationSchema, type CreateLocationDto } from '@js-monorepo/schem
 import { GREEK_CITIES } from '../../../../lib/scheduling/constants'
 
 interface LocationStepFormProps {
+  initialData?: CreateLocationDto | null
   onSubmit: (data: CreateLocationDto) => void
   onBack: () => void
   isLoading?: boolean
 }
 
-export function LocationStepForm({ onSubmit, onBack, isLoading = false }: LocationStepFormProps) {
+const GREEK_COUNTRY_CODE = 'GR'
+const GREEK_TIMEZONE = 'Europe/Athens'
+
+export function LocationStepForm({ initialData, onSubmit, onBack, isLoading = false }: LocationStepFormProps) {
   const tLocations = useTranslations('scheduling.locations')
   const tOnboarding = useTranslations('scheduling.onboarding')
   const tCommon = useTranslations('common')
 
-  const GREEK_COUNTRY_CODE = 'GR'
-  const GREEK_TIMEZONE = 'Europe/Athens'
-
   const form = useForm<CreateLocationDto>({
     resolver: zodResolver(CreateLocationSchema),
     mode: 'onChange',
-    defaultValues: {
+    defaultValues: initialData || {
       name: '',
       countryCode: GREEK_COUNTRY_CODE,
       city: null,
@@ -41,11 +42,17 @@ export function LocationStepForm({ onSubmit, onBack, isLoading = false }: Locati
     },
   })
 
-  /** ✅ Safe subscription */
   const isOnline = useWatch({
     control: form.control,
     name: 'isOnline',
   })
+
+  // Reset form when initialData becomes available (after hydration from localStorage)
+  useEffect(() => {
+    if (initialData) {
+      form.reset(initialData)
+    }
+  }, [initialData, form])
 
   // Handle form state when switching between online/offline
   useEffect(() => {
@@ -66,34 +73,6 @@ export function LocationStepForm({ onSubmit, onBack, isLoading = false }: Locati
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Online / In-Person Toggle */}
-        <FormField
-          control={form.control}
-          name="isOnline"
-          render={({ field }) => (
-            <FormItem className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-background-secondary/30">
-              <div className="flex items-center gap-3">
-                {field.value ? (
-                  <Video className="w-5 h-5 text-primary" />
-                ) : (
-                  <Building className="w-5 h-5 text-primary" />
-                )}
-                <div>
-                  <FormLabel className="text-base">{tLocations('isOnline')}</FormLabel>
-                  <p className="text-sm text-foreground-muted">
-                    {field.value
-                      ? tOnboarding('onlineLocationDescription')
-                      : tOnboarding('physicalLocationDescription')}
-                  </p>
-                </div>
-              </div>
-              <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
         {/* Location Name */}
         <FormField
           control={form.control}
@@ -177,6 +156,34 @@ export function LocationStepForm({ onSubmit, onBack, isLoading = false }: Locati
             )}
           />
         </div>
+
+        {/* Online / In-Person Toggle */}
+        <FormField
+          control={form.control}
+          name="isOnline"
+          render={({ field }) => (
+            <FormItem className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-background-secondary/30">
+              <div className="flex items-center gap-3">
+                {field.value ? (
+                  <Video className="w-5 h-5 text-primary" />
+                ) : (
+                  <Building className="w-5 h-5 text-primary" />
+                )}
+                <div>
+                  <FormLabel className="text-base">{tLocations('isOnline')}</FormLabel>
+                  <p className="text-sm text-foreground-muted">
+                    {field.value
+                      ? tOnboarding('onlineLocationDescription')
+                      : tOnboarding('physicalLocationDescription')}
+                  </p>
+                </div>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         {/* Actions */}
         <div className="flex justify-between pt-4">

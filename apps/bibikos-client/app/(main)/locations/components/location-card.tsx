@@ -43,7 +43,7 @@ export function LocationCard({ location, onEdit, onDelete }: LocationCardProps) 
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <DpButton variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <DpButton variant="ghost" size="small" className="h-8 w-8 p-0">
                 <MoreVertical className="h-4 w-4" />
               </DpButton>
             </DropdownMenuTrigger>

@@ -3,7 +3,8 @@
 import { useSession } from '@js-monorepo/auth/next/client'
 import type { CreateLocationDto } from '@js-monorepo/schemas'
 import { useRouter } from 'next/navigation'
-import { startTransition, useEffect, useState } from 'react'
+import { startTransition, useEffect } from 'react'
+import { usePersistedState, clearPersistedStates } from '../../../lib/hooks'
 import { useOrganizer } from '../../../lib/scheduling'
 import { ClassStepForm, type ClassFormData } from './components/class-step-form'
 import { LocationStepForm } from './components/location-step-form'
@@ -11,17 +12,25 @@ import { OnboardingHeader } from './components/onboarding-header'
 import { OnboardingProgress } from './components/onboarding-progress'
 import { OnboardingStepCard } from './components/onboarding-step-card'
 import { ProfileStepForm, type ProfileFormData } from './components/profile-step-form'
-import { ONBOARDING_STEPS } from './constants'
+import { ONBOARDING_STEPS, ONBOARDING_STORAGE_KEYS, ALL_ONBOARDING_KEYS } from './constants'
 import { useOnboardingSubmission } from './hooks/use-onboarding-submission'
 
 export function OnboardingContent() {
   const { session } = useSession()
   const router = useRouter()
 
-  const [currentStep, setCurrentStep] = useState(1)
-  const [step1Data, setStep1Data] = useState<ProfileFormData | null>(null)
-  const [step2Data, setStep2Data] = useState<CreateLocationDto | null>(null) // Location is step 2
-  const [step3Data, setStep3Data] = useState<ClassFormData | null>(null) // Class is step 3
+  const [currentStep, setCurrentStep] = usePersistedState(1, {
+    key: ONBOARDING_STORAGE_KEYS.STEP,
+  })
+  const [step1Data, setStep1Data] = usePersistedState<ProfileFormData | null>(null, {
+    key: ONBOARDING_STORAGE_KEYS.PROFILE_DATA,
+  })
+  const [step2Data, setStep2Data] = usePersistedState<CreateLocationDto | null>(null, {
+    key: ONBOARDING_STORAGE_KEYS.LOCATION_DATA,
+  })
+  const [step3Data, setStep3Data] = usePersistedState<ClassFormData | null>(null, {
+    key: ONBOARDING_STORAGE_KEYS.CLASS_DATA,
+  })
 
   const { data: organizer, isLoading: isOrganizerLoading } = useOrganizer()
   const { submitAllSteps, isSubmitting } = useOnboardingSubmission()
@@ -35,26 +44,27 @@ export function OnboardingContent() {
     }
   }, [isOrganizerLoading, organizer, router])
 
-  // Handle Step 1 Submit - store data and move to next step
   const handleStep1Submit = (data: ProfileFormData) => {
     setStep1Data(data)
     setCurrentStep(2)
   }
 
-  // Handle Step 2 Submit (Location) - store data and move to next step
   const handleStep2Submit = (data: CreateLocationDto) => {
     setStep2Data(data)
     setCurrentStep(3)
   }
 
-  // Handle Step 3 Submit (Class) - create everything at once
   const handleStep3Submit = async (data: ClassFormData) => {
     if (!step1Data || !step2Data) {
       return
     }
-    // Create: Organizer → Location → Class (location needed for class)
-    // Location is required, so step2Data will always be present
-    await submitAllSteps(step1Data, step2Data, data)
+
+    const success = await submitAllSteps(step1Data, step2Data, data)
+
+    // Clear all persisted onboarding data on success
+    if (success) {
+      clearPersistedStates(ALL_ONBOARDING_KEYS)
+    }
   }
 
   if (isOrganizerLoading) {
@@ -74,17 +84,28 @@ export function OnboardingContent() {
           {currentStep === 1 && (
             <ProfileStepForm
               defaultDisplayName={session?.user?.username || ''}
+              initialData={step1Data}
               onSubmit={handleStep1Submit}
               isLoading={isSubmitting}
             />
           )}
 
           {currentStep === 2 && (
-            <LocationStepForm onSubmit={handleStep2Submit} onBack={() => setCurrentStep(1)} isLoading={isSubmitting} />
+            <LocationStepForm
+              initialData={step2Data}
+              onSubmit={handleStep2Submit}
+              onBack={() => setCurrentStep(1)}
+              isLoading={isSubmitting}
+            />
           )}
 
           {currentStep === 3 && (
-            <ClassStepForm onSubmit={handleStep3Submit} onBack={() => setCurrentStep(2)} isLoading={isSubmitting} />
+            <ClassStepForm
+              initialData={step3Data}
+              onSubmit={handleStep3Submit}
+              onBack={() => setCurrentStep(2)}
+              isLoading={isSubmitting}
+            />
           )}
         </OnboardingStepCard>
       </div>
