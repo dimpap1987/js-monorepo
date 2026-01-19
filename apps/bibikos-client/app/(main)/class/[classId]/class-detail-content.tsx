@@ -1,17 +1,17 @@
 'use client'
 
-import { useBibikosSession } from '../../../../lib/auth'
+import { useSession } from '@js-monorepo/auth/next/client'
 import { useNotifications } from '@js-monorepo/notification'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useClassView, useCreateBooking, ClassViewSchedule } from '../../../../lib/scheduling'
+import { ClassViewSchedule, useClassView, useCreateBooking } from '../../../../lib/scheduling'
 import {
-  ClassDetailSkeleton,
-  ClassDetailHero,
-  ClassSchedulesList,
-  ClassAccessDenied,
-  ClassNotFound,
   BookingConfirmationDialog,
+  ClassAccessDenied,
+  ClassDetailHero,
+  ClassDetailSkeleton,
+  ClassNotFound,
+  ClassSchedulesList,
 } from './components'
 
 interface ClassDetailContentProps {
@@ -19,7 +19,7 @@ interface ClassDetailContentProps {
 }
 
 export function ClassDetailContent({ classId }: ClassDetailContentProps) {
-  const { isLoggedIn } = useBibikosSession()
+  const { isLoggedIn } = useSession()
   const router = useRouter()
   const { addNotification } = useNotifications()
 
@@ -61,8 +61,8 @@ export function ClassDetailContent({ classId }: ClassDetailContentProps) {
       setConfirmBooking(false)
       setSelectedSchedule(null)
       router.push('/bookings')
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to book class'
+    } catch (er: unknown) {
+      const errorMessage = er instanceof Error ? er.message : 'Failed to book class'
       addNotification({
         message: errorMessage,
         type: 'error',
