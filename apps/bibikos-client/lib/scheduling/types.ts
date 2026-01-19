@@ -234,6 +234,7 @@ export interface BookingListResponse {
 export interface MyBookingsResponse {
   upcoming: Booking[]
   past: Booking[]
+  cancelled: Booking[]
 }
 
 export interface CreateBookingPayload {

@@ -67,4 +67,5 @@ export interface BookingListResponseDto {
 export interface MyBookingsResponseDto {
   upcoming: BookingResponseDto[]
   past: BookingResponseDto[]
+  cancelled: BookingResponseDto[]
 }

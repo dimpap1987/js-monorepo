@@ -7,10 +7,17 @@ interface BookingSectionProps {
   title: string
   bookings: Booking[]
   isPast?: boolean
+  isCancelled?: boolean
   emptyMessage?: string
 }
 
-export function BookingSection({ title, bookings, isPast = false, emptyMessage }: BookingSectionProps) {
+export function BookingSection({
+  title,
+  bookings,
+  isPast = false,
+  isCancelled = false,
+  emptyMessage,
+}: BookingSectionProps) {
   if (bookings.length === 0 && emptyMessage) {
     return (
       <div className="space-y-4">
@@ -32,7 +39,7 @@ export function BookingSection({ title, bookings, isPast = false, emptyMessage }
       </div>
       <div className="space-y-3">
         {bookings.map((booking) => (
-          <BookingCard key={booking.id} booking={booking} isPastBooking={isPast} />
+          <BookingCard key={booking.id} booking={booking} isPastBooking={isPast} isCancelledSection={isCancelled} />
         ))}
       </div>
     </div>

@@ -69,9 +69,19 @@ interface BookingInfoProps {
   endTime: Date
   status: BookingStatus
   waitlistPosition: number | null
+  cancelledByOrganizer?: boolean
+  cancelReason?: string | null
 }
 
-function BookingInfo({ title, startTime, endTime, status, waitlistPosition }: BookingInfoProps) {
+function BookingInfo({
+  title,
+  startTime,
+  endTime,
+  status,
+  waitlistPosition,
+  cancelledByOrganizer,
+  cancelReason,
+}: BookingInfoProps) {
   const statusConfig = STATUS_CONFIG[status]
 
   return (
@@ -82,6 +92,11 @@ function BookingInfo({ title, startTime, endTime, status, waitlistPosition }: Bo
           {statusConfig.label}
           {status === 'WAITLISTED' && waitlistPosition && ` #${waitlistPosition}`}
         </Badge>
+        {status === 'CANCELLED' && cancelledByOrganizer && (
+          <Badge variant="outline" className="text-xs">
+            By instructor
+          </Badge>
+        )}
       </div>
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-1.5">
@@ -95,6 +110,9 @@ function BookingInfo({ title, startTime, endTime, status, waitlistPosition }: Bo
           </span>
         </div>
       </div>
+      {status === 'CANCELLED' && cancelReason && (
+        <p className="text-xs text-muted-foreground italic">Reason: {cancelReason}</p>
+      )}
     </div>
   )
 }
@@ -102,9 +120,10 @@ function BookingInfo({ title, startTime, endTime, status, waitlistPosition }: Bo
 interface BookingCardProps {
   booking: Booking
   isPastBooking?: boolean
+  isCancelledSection?: boolean
 }
 
-export function BookingCard({ booking, isPastBooking = false }: BookingCardProps) {
+export function BookingCard({ booking, isPastBooking = false, isCancelledSection = false }: BookingCardProps) {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
 
   const schedule = booking.classSchedule
@@ -112,21 +131,24 @@ export function BookingCard({ booking, isPastBooking = false }: BookingCardProps
 
   const startTime = parseISO(schedule.startTimeUtc)
   const endTime = parseISO(schedule.endTimeUtc)
-  const canCancel = !isPastBooking && booking.status !== 'CANCELLED' && !isPast(startTime)
+  const canCancel = !isPastBooking && !isCancelledSection && booking.status !== 'CANCELLED' && !isPast(startTime)
+  const isInactive = isPastBooking || isCancelledSection
 
   return (
     <>
-      <Card className={`border-border/50 ${isPastBooking ? 'opacity-75' : 'hover:shadow-md'} transition-all`}>
+      <Card className={`border-border/50 ${isInactive ? 'opacity-75' : 'hover:shadow-md'} transition-all`}>
         <CardContent className="p-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0">
-              <DateBadge date={startTime} isPastBooking={isPastBooking} />
+              <DateBadge date={startTime} isPastBooking={isInactive} />
               <BookingInfo
                 title={schedule.class?.title || 'Class'}
                 startTime={startTime}
                 endTime={endTime}
                 status={booking.status}
                 waitlistPosition={booking.waitlistPosition}
+                cancelledByOrganizer={booking.cancelledByOrganizer}
+                cancelReason={booking.cancelReason}
               />
             </div>
             {canCancel && (

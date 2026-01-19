@@ -301,11 +301,19 @@ export class BookingService {
 
     const past = await this.bookingRepo.findByParticipantId(participantId, {
       past: true,
+      statuses: [BookingStatus.BOOKED, BookingStatus.WAITLISTED, BookingStatus.ATTENDED, BookingStatus.NO_SHOW],
+    })
+
+    // Get recently cancelled bookings (upcoming schedules that were cancelled)
+    const cancelled = await this.bookingRepo.findByParticipantId(participantId, {
+      upcoming: true,
+      statuses: [BookingStatus.CANCELLED],
     })
 
     return {
       upcoming: upcoming.map(this.toScheduleResponseDto),
       past: past.slice(0, 20).map(this.toScheduleResponseDto), // Limit past bookings
+      cancelled: cancelled.map(this.toScheduleResponseDto),
     }
   }
 

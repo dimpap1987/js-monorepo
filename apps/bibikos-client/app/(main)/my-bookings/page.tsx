@@ -59,7 +59,7 @@ export default function MyBookingsPage() {
         <div className="text-center py-12 text-destructive">
           <p>Failed to load bookings. Please try again.</p>
         </div>
-      ) : !data || (data.upcoming.length === 0 && data.past.length === 0) ? (
+      ) : !data || (data.upcoming.length === 0 && data.past.length === 0 && data.cancelled.length === 0) ? (
         <MyBookingsEmpty />
       ) : (
         <div className="space-y-10">
@@ -69,6 +69,9 @@ export default function MyBookingsPage() {
             bookings={data.upcoming}
             emptyMessage="No upcoming bookings. Discover new classes to attend!"
           />
+
+          {/* Cancelled Bookings */}
+          {data.cancelled.length > 0 && <BookingSection title="Cancelled" bookings={data.cancelled} isCancelled />}
 
           {/* Past Bookings */}
           {data.past.length > 0 && <BookingSection title="Past" bookings={data.past} isPast />}
