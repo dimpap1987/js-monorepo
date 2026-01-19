@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
+import { useBibikosSession } from '../../auth'
 import { useEffect, useRef } from 'react'
 import { useUpdateAppUser } from '../queries'
 
@@ -13,7 +13,7 @@ import { useUpdateAppUser } from '../queries'
  * Should be called once in the app layout or a global provider.
  */
 export function useTimezoneSync() {
-  const { session, isLoggedIn } = useSession()
+  const { session, isLoggedIn } = useBibikosSession()
   const updateAppUser = useUpdateAppUser()
   const hasSynced = useRef(false)
 

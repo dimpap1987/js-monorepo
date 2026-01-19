@@ -1,6 +1,5 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
 import { BackButton } from '@js-monorepo/back-arrow'
 import { useNotifications } from '@js-monorepo/notification'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -25,7 +24,6 @@ import { InviteDialog } from './components/invite-dialog'
 import { ClassFormData } from './schemas'
 
 export function ClassesContent() {
-  const { session } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
   const { addNotification } = useNotifications()

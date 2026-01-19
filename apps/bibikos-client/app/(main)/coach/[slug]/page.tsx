@@ -9,7 +9,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   return baseGenerateMetadata({
-    title: `Coach Profile`,
+    title: `Coach Profile - ${slug}`,
     description: `Book classes with this instructor`,
   })
 }

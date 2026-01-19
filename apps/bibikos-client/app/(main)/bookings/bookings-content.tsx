@@ -1,11 +1,5 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
-import { Button } from '@js-monorepo/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@js-monorepo/components/ui/tabs'
-import { Badge } from '@js-monorepo/components/ui/badge'
-import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,13 +10,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@js-monorepo/components/ui/alert-dialog'
+import { Badge } from '@js-monorepo/components/ui/badge'
+import { Button } from '@js-monorepo/components/ui/button'
+import { Card, CardContent } from '@js-monorepo/components/ui/card'
+import { Skeleton } from '@js-monorepo/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@js-monorepo/components/ui/tabs'
 import { useNotifications } from '@js-monorepo/notification'
 import { cn } from '@js-monorepo/ui/util'
+import { format, isFuture, parseISO } from 'date-fns'
+import { Calendar, CalendarOff, Clock, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
-import { Calendar, Clock, MapPin, Video, Building, X, CalendarOff, Users } from 'lucide-react'
-import { format, parseISO, isPast, isFuture } from 'date-fns'
-import { useMyBookings, useCancelBooking, Booking, BOOKING_STATUS_COLORS } from '../../../lib/scheduling'
+import { Booking, BOOKING_STATUS_COLORS, useCancelBooking, useMyBookings } from '../../../lib/scheduling'
 
 function BookingsSkeleton() {
   return (
@@ -145,7 +144,6 @@ function BookingCard({
 export function BookingsContent() {
   const t = useTranslations('scheduling.bookings')
   const tCommon = useTranslations('common')
-  const { session } = useSession()
   const { addNotification } = useNotifications()
 
   const [cancelBookingId, setCancelBookingId] = useState<number | null>(null)

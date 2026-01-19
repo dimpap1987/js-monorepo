@@ -22,10 +22,10 @@ export type UpdateAppUserDto = z.infer<typeof UpdateAppUserSchema>
 // Response DTO
 export interface AppUserResponseDto {
   id: number
-  fullName: string | null
+  authUserId: number
   locale: string
   timezone: string
-  countryCode: string | null
+  countryCode?: string | null
   createdAt: Date
   hasOrganizerProfile: boolean
   hasParticipantProfile: boolean

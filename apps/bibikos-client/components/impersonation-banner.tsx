@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
+import { useBibikosSession } from '../lib/auth'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@js-monorepo/utils/http'
 import { FaUserSecret } from 'react-icons/fa'
@@ -39,7 +39,7 @@ function useStopImpersonation() {
 }
 
 export function ImpersonationBanner() {
-  const { session } = useSession()
+  const { session } = useBibikosSession()
   const isLoggedIn = !!session?.user
   const { data: status } = useImpersonationStatus(isLoggedIn)
   const stopMutation = useStopImpersonation()

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse } from '@js-monorepo/utils/http/queries'
-import { useSession } from '@js-monorepo/auth/next/client'
+// eslint-disable-next-line import/extensions
 import type {
   AppUser,
   UpdateAppUserPayload,
@@ -34,6 +34,7 @@ import type {
   SendInvitationPayload,
   RespondToInvitationPayload,
 } from './types'
+import { useBibikosSession } from '../auth'
 
 // =============================================================================
 // Query Keys
@@ -78,7 +79,7 @@ export const schedulingKeys = {
 // =============================================================================
 // App User Hooks
 // Note: AppUser data is now included in the session response (session.appUser)
-// Use useSession() from @js-monorepo/auth/next/client to access it
+// Use useBibikosSession() from @/lib/auth to access typed session with appUser
 // =============================================================================
 
 export function useUpdateAppUser() {
@@ -134,7 +135,7 @@ export function useCompleteOnboarding() {
 // =============================================================================
 
 export function useOrganizer() {
-  const { session } = useSession()
+  const { session } = useBibikosSession()
   const hasOrganizerProfile = session?.appUser?.hasOrganizerProfile ?? false
 
   return useQuery({
@@ -624,7 +625,7 @@ export function useUpdateBookingNotes() {
  * Get pending invitations for the current user
  */
 export function usePendingInvitations() {
-  const { session } = useSession()
+  const { session } = useBibikosSession()
   return useQuery({
     queryKey: schedulingKeys.invitationsPending(),
     queryFn: async () => {
@@ -640,7 +641,7 @@ export function usePendingInvitations() {
  * Get all invitations sent by organizer (for dashboard)
  */
 export function useSentInvitations() {
-  const { session } = useSession()
+  const { session } = useBibikosSession()
   return useQuery({
     queryKey: schedulingKeys.invitationsSent(),
     queryFn: async () => {
@@ -656,7 +657,7 @@ export function useSentInvitations() {
  * Get invitations for a specific class (organizer view)
  */
 export function useInvitationsForClass(classId: number) {
-  const { session } = useSession()
+  const { session } = useBibikosSession()
   return useQuery({
     queryKey: schedulingKeys.invitationsForClass(classId),
     queryFn: async () => {

@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Button } from '@js-monorepo/components/ui/button'
 import {
@@ -13,7 +12,8 @@ import {
 } from '@js-monorepo/components/ui/dialog'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { format, parseISO } from 'date-fns'
-import { Calendar, Clock, User, MapPin, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle, Calendar, CheckCircle2, Clock, Loader2, User } from 'lucide-react'
+import { useState } from 'react'
 import type { DiscoverSchedule } from '../../../../lib/scheduling'
 import { useCreateBooking } from '../../../../lib/scheduling'
 

@@ -13,64 +13,6 @@ import { useInvitationWebSocket } from '../../../lib/scheduling/hooks/use-invita
 import { usePendingInvitations, useRespondToInvitation } from '../../../lib/scheduling/queries'
 import type { PendingInvitation } from '../../../lib/scheduling/types'
 
-export default function MyInvitationsPage() {
-  const { data: invitations, isLoading, refetch } = usePendingInvitations()
-  const respondMutation = useRespondToInvitation()
-  const [respondingId, setRespondingId] = useState<number | null>(null)
-
-  useInvitationWebSocket()
-
-  const handleRespond = async (invitationId: number, status: 'ACCEPTED' | 'DECLINED') => {
-    setRespondingId(invitationId)
-    try {
-      await respondMutation.mutateAsync({ invitationId, status })
-      toast.success(status === 'ACCEPTED' ? 'Invitation accepted! You can now book sessions.' : 'Invitation declined')
-      refetch()
-    } catch (error) {
-      toast.error('Failed to respond to invitation')
-    } finally {
-      setRespondingId(null)
-    }
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">My Invitations</h1>
-          <p className="text-muted-foreground">View and respond to private class invitations</p>
-        </div>
-        <DpNextNavLink href="/discover">
-          <Button variant="outline">
-            <Search className="w-4 h-4 mr-2" />
-            Discover Classes
-          </Button>
-        </DpNextNavLink>
-      </div>
-
-      {/* Content */}
-      {isLoading ? (
-        <InvitationsSkeleton />
-      ) : !invitations || invitations.length === 0 ? (
-        <InvitationsEmpty />
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {invitations.map((invitation: PendingInvitation) => (
-            <InvitationCard
-              key={invitation.id}
-              invitation={invitation}
-              onAccept={() => handleRespond(invitation.id, 'ACCEPTED')}
-              onDecline={() => handleRespond(invitation.id, 'DECLINED')}
-              isResponding={respondingId === invitation.id}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
 function InvitationsSkeleton() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -150,7 +92,7 @@ function InvitationCard({ invitation, onAccept, onDecline, isResponding }: Invit
           {invitation.message && (
             <div className="p-3 rounded-lg bg-muted/50 text-sm">
               <p className="text-xs text-muted-foreground mb-1">Personal message:</p>
-              <p className="italic">"{invitation.message}"</p>
+              <p className="italic">&ldquo;{invitation.message}&rdquo;</p>
             </div>
           )}
 
@@ -172,5 +114,63 @@ function InvitationCard({ invitation, onAccept, onDecline, isResponding }: Invit
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+export default function MyInvitationsPage() {
+  const { data: invitations, isLoading, refetch } = usePendingInvitations()
+  const respondMutation = useRespondToInvitation()
+  const [respondingId, setRespondingId] = useState<number | null>(null)
+
+  useInvitationWebSocket()
+
+  const handleRespond = async (invitationId: number, status: 'ACCEPTED' | 'DECLINED') => {
+    setRespondingId(invitationId)
+    try {
+      await respondMutation.mutateAsync({ invitationId, status })
+      toast.success(status === 'ACCEPTED' ? 'Invitation accepted! You can now book sessions.' : 'Invitation declined')
+      refetch()
+    } catch (error) {
+      toast.error('Failed to respond to invitation')
+    } finally {
+      setRespondingId(null)
+    }
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">My Invitations</h1>
+          <p className="text-muted-foreground">View and respond to private class invitations</p>
+        </div>
+        <DpNextNavLink href="/discover">
+          <Button variant="outline">
+            <Search className="w-4 h-4 mr-2" />
+            Discover Classes
+          </Button>
+        </DpNextNavLink>
+      </div>
+
+      {/* Content */}
+      {isLoading ? (
+        <InvitationsSkeleton />
+      ) : !invitations || invitations.length === 0 ? (
+        <InvitationsEmpty />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {invitations.map((invitation: PendingInvitation) => (
+            <InvitationCard
+              key={invitation.id}
+              invitation={invitation}
+              onAccept={() => handleRespond(invitation.id, 'ACCEPTED')}
+              onDecline={() => handleRespond(invitation.id, 'DECLINED')}
+              isResponding={respondingId === invitation.id}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

@@ -63,7 +63,7 @@ export function UserEditDialog({ user, open, onOpenChange, onSave, isSaving }: U
       username: user.username,
       roles: roleIds,
     })
-  }, [user, roles])
+  }, [user, roles, form])
 
   const onSubmit = (values: UpdateUserSchemaType) => {
     // Only include fields that have changed

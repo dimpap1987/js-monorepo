@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback } from 'react'
-import { useSession } from '@js-monorepo/auth/next/client'
+import { useBibikosSession } from '../../../lib/auth'
 import { Button } from '@js-monorepo/components/ui/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
@@ -11,7 +11,7 @@ import { MyBookingsSkeleton, MyBookingsEmpty, BookingSection } from './component
 import { useScheduleCancellationUpdates } from './hooks/use-schedule-cancellation-updates'
 
 export default function MyBookingsPage() {
-  const { session } = useSession()
+  const { session } = useBibikosSession()
   const { addNotification } = useNotifications()
   const { data: participant } = useParticipant()
   const { data, isLoading, error, refetch } = useMyBookings()

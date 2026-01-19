@@ -1,7 +1,7 @@
 'use client'
 
 import { centsToAmount } from '@js-monorepo/currency'
-import { useSession } from '@js-monorepo/auth/next/client'
+import { useBibikosSession } from '../../../../lib/auth'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { useWebSocketEvent } from '@js-monorepo/next/providers'
 import {
@@ -20,7 +20,7 @@ import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 
 export function SubscriptionSettings() {
   const t = useTranslations()
-  const { session, refreshSession } = useSession()
+  const { session, refreshSession } = useBibikosSession()
   const { data: plans = [], isLoading: isLoadingPlans } = usePlans()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)

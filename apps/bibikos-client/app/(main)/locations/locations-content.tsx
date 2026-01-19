@@ -1,6 +1,5 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
 import { BackButton } from '@js-monorepo/back-arrow'
 import { useNotifications } from '@js-monorepo/notification'
 import { useRouter } from 'next/navigation'
@@ -22,7 +21,6 @@ import { LocationsSkeleton } from './components/locations-skeleton'
 import { LocationFormData } from './schemas'
 
 export function LocationsContent() {
-  const { session } = useSession()
   const router = useRouter()
   const { addNotification } = useNotifications()
 

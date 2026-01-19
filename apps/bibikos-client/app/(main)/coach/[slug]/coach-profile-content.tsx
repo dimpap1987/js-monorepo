@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
+import { useBibikosSession } from '../../../../lib/auth'
 import { Button } from '@js-monorepo/components/ui/button'
 import { useNotifications } from '@js-monorepo/notification'
 import { useRouter } from 'next/navigation'
@@ -33,7 +33,7 @@ interface CoachProfileContentProps {
 }
 
 export function CoachProfileContent({ slug }: CoachProfileContentProps) {
-  const { isLoggedIn } = useSession()
+  const { isLoggedIn } = useBibikosSession()
   const router = useRouter()
   const { addNotification } = useNotifications()
 

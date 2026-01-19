@@ -40,6 +40,7 @@ import { AdminProviderModule } from './modules/admin/admin.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { SchedulingModule } from './modules/scheduling/scheduling.module'
+import { AppUserService } from './modules/scheduling/app-users/app-user.service'
 import { UserModule } from './modules/user/user.module'
 import { getContactMessage } from './notifications/contact-form'
 import {
@@ -128,9 +129,13 @@ import {
     IdempotencyModule,
     UserPresenceModule,
     AuthSessionModule.forRootAsync({
-      imports: [UserPresenceModule],
-      inject: [UserPresenceWebsocketService],
-      useFactory: async (userPresenceWebsocketService: UserPresenceWebsocketService, configService: ConfigService) => ({
+      imports: [UserPresenceModule, SchedulingModule],
+      inject: [UserPresenceWebsocketService, AppUserService, ConfigService],
+      useFactory: async (
+        userPresenceWebsocketService: UserPresenceWebsocketService,
+        appUserService: AppUserService,
+        configService: ConfigService
+      ) => ({
         google: {
           clientId: configService.get('GOOGLE_CLIENT_ID'),
           clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
@@ -148,9 +153,22 @@ import {
         redirectUiUrl: configService.get('AUTH_LOGIN_REDIRECT'),
         skipOnboarding: true,
         onRegister: async (user: AuthUserDto) => {
+          // Create AppUser when user registers
+          try {
+            await appUserService.getOrCreateAppUser(user.id)
+            apiLogger.log(`Created AppUser for new user: ${user.username} (authUserId: ${user.id})`)
+          } catch (error: any) {
+            apiLogger.error(`Failed to create AppUser for user ${user.id}: ${error.message}`, error.stack)
+          }
           userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' has joined 🚀`])
         },
         onLogin: async (user) => {
+          // Ensure AppUser exists when user logs in (handles edge cases where creation failed during registration)
+          try {
+            await appUserService.getOrCreateAppUser(user.id)
+          } catch (error: any) {
+            apiLogger.error(`Failed to ensure AppUser exists for user ${user.id}: ${error.message}`, error.stack)
+          }
           userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' is online 😎`])
         },
       }),
@@ -323,7 +341,7 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware) // Apply LoggerMiddleware
       .forRoutes('*')
       .apply(AuthSessionMiddleware)
-      .exclude('health', 'payments/(.*)', 'contact')
+      .exclude('health', 'payments/(.*)', 'contact', 'scheduling/organizers/public/(.*)')
       .forRoutes('*')
   }
 }

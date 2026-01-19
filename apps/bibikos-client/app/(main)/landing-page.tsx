@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from '@js-monorepo/auth/next/client'
+import { useBibikosSession } from '../../lib/auth'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
@@ -35,7 +35,7 @@ const steps = [
 
 export function LandingPage() {
   const t = useTranslations('home')
-  const { isLoggedIn, session } = useSession()
+  const { isLoggedIn, session } = useBibikosSession()
   const hasOrganizerProfile = session?.appUser?.hasOrganizerProfile === true
 
   const getCtaHref = () => {
