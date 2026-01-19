@@ -40,7 +40,7 @@ export class InvitationController {
    * Helper to get AppUser ID from session (authUserId -> appUserId)
    */
   private async getAppUserId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     return appUser.id
   }
 
@@ -119,7 +119,7 @@ export class InvitationController {
   }
 
   private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
 
     if (!organizer) {

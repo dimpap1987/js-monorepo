@@ -43,7 +43,7 @@ export class BookingController {
    * Helper to get participant ID (creates if needed)
    */
   private async getOrCreateParticipantId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     const participant = await this.participantService.getOrCreateParticipant(appUser.id)
     return participant.id
   }
@@ -52,7 +52,7 @@ export class BookingController {
    * Helper to get organizer ID
    */
   private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
 
     if (!organizer) {
@@ -86,7 +86,7 @@ export class BookingController {
    */
   @Get('my')
   async getMyBookings(@SessionUser() sessionUser: SessionUserType) {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     const participant = await this.participantService.getParticipantByAppUserId(appUser.id)
 
     if (!participant) {

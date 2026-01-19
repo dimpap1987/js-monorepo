@@ -2,20 +2,20 @@
 
 import { apiClientBase } from '@js-monorepo/utils/http'
 import { AxiosInstance } from 'axios'
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 export interface SessionContextType {
   session: Record<string, any> | null
   isLoggedIn: boolean
   isAdmin: boolean
-  refreshSession: () => void
+  refreshSession: () => Promise<void>
 }
 
 const SessionContext = createContext<SessionContextType>({
   session: null,
   isLoggedIn: false,
   isAdmin: false,
-  refreshSession: () => {},
+  refreshSession: async () => {},
 })
 
 const fetchSession = async (clientBuilder: AxiosInstance, endpoint: string) => {

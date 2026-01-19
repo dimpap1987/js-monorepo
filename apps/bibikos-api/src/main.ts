@@ -21,6 +21,7 @@ import { AppModule } from './app/app.module'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { validateEnv } from './config/env.schema'
 import { ZodError } from 'zod'
+import { registerApp } from './app/modules/scheduling/app-users/decorators/app-user.decorator'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
@@ -134,6 +135,9 @@ async function bootstrap() {
   await redisIoAdapter.connectToRedis()
 
   app.useWebSocketAdapter(redisIoAdapter)
+
+  registerApp(app)
+
   await app.listen(port, '0.0.0.0')
   logServerMetadata()
 }

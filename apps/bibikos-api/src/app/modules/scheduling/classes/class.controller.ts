@@ -33,7 +33,7 @@ export class ClassController {
    * Helper to get organizer ID for current user
    */
   private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
 
     if (!organizer) {
@@ -93,7 +93,7 @@ export class ClassController {
     // Get user ID if logged in
     if (sessionUser?.id) {
       try {
-        const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+        const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
         userId = appUser.id
       } catch {
         // User not found, continue without user ID

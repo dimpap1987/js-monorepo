@@ -28,7 +28,7 @@ export class OrganizerController {
   @Get('me')
   @UseGuards(LoggedInGuard)
   async getMyOrganizerProfile(@SessionUser() sessionUser: SessionUserType) {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     return this.organizerService.getOrganizerByAppUserId(appUser.id)
   }
 
@@ -44,7 +44,7 @@ export class OrganizerController {
     @Body(new ZodPipe(CreateOrganizerSchema)) dto: CreateOrganizerDto,
     @SessionUser() sessionUser: SessionUserType
   ) {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     return this.organizerService.createOrGetOrganizer(appUser.id, dto)
   }
 
@@ -59,7 +59,7 @@ export class OrganizerController {
     @Body(new ZodPipe(UpdateOrganizerSchema)) dto: UpdateOrganizerDto,
     @SessionUser() sessionUser: SessionUserType
   ) {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
 
     if (!organizer) {
@@ -80,7 +80,7 @@ export class OrganizerController {
       return { available: false, reason: 'Slug must be at least 3 characters' }
     }
 
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
 
     const available = await this.organizerService.checkSlugAvailability(slug, organizer?.id)

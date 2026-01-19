@@ -24,7 +24,7 @@ export class OnboardingController {
     @Body(new ZodPipe(CompleteOnboardingSchema)) dto: CompleteOnboardingDto,
     @SessionUser() sessionUser: SessionUserType
   ) {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     return this.onboardingService.completeOnboarding(appUser.id, dto)
   }
 }

@@ -60,7 +60,7 @@ export class ClassScheduleController {
     let participantId: number | undefined
     let appUserId: number | undefined
     if (sessionUser?.id) {
-      const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+      const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
       appUserId = appUser.id
       const participant = await this.participantService.getParticipantByAppUserId(appUser.id)
       participantId = participant?.id
@@ -83,7 +83,7 @@ export class ClassScheduleController {
    * Helper to get organizer ID for current user
    */
   private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
 
     if (!organizer) {

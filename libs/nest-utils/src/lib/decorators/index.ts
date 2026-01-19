@@ -1,3 +1,5 @@
+export * from './cache-invalidate'
+export * from './cacheable'
 export * from './catch'
 export * from './cookies'
 export * from './measure-performance'

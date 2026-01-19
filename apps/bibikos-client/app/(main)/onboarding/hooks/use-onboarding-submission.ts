@@ -1,15 +1,26 @@
 import { useSession } from '@js-monorepo/auth/next/client'
 import { useNotifications } from '@js-monorepo/notification'
-import { useRouter } from 'next/navigation'
 import { useCompleteOnboarding } from '../../../../lib/scheduling'
 import type { ProfileFormData } from '../components/profile-step-form'
 import type { CreateLocationDto } from '@js-monorepo/schemas'
 import type { ClassFormData } from '../components/class-step-form'
+import { useLoader } from '@js-monorepo/loader'
+import { useRouter } from 'next-nprogress-bar'
+import { useEffect } from 'react'
 
 export function useOnboardingSubmission() {
   const { session, refreshSession } = useSession()
   const router = useRouter()
   const { addNotification } = useNotifications()
+  const { setLoaderState } = useLoader()
+
+  useEffect(() => {
+    return () => {
+      setLoaderState({
+        show: false,
+      })
+    }
+  }, [setLoaderState])
 
   const completeOnboardingMutation = useCompleteOnboarding()
 
@@ -30,6 +41,10 @@ export function useOnboardingSubmission() {
     }
 
     try {
+      setLoaderState({
+        show: true,
+      })
+
       // Single API call to create organizer, location, and class
       await completeOnboardingMutation.mutateAsync({
         organizer: {
@@ -55,24 +70,22 @@ export function useOnboardingSubmission() {
         },
       })
 
-      // Refresh session to get updated organizer data
       await refreshSession()
 
-      // Refresh server components
-      router.refresh()
-
       addNotification({
-        message: 'Setup complete! Welcome to ClassOps.',
+        message: 'Onboarding successfully complete!',
         type: 'success',
+        duration: 7000,
       })
 
-      // Small delay to ensure session is updated before redirect
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 100)
+      router.push('/dashboard')
 
       return true
     } catch (error: any) {
+      setLoaderState({
+        show: false,
+      })
+
       addNotification({
         message: error?.message || 'Failed to complete setup',
         type: 'error',

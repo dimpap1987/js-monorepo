@@ -1,4 +1,4 @@
-import { NotificationDto } from '../notifications/index.js'
+import { NotificationDto } from '../notifications'
 
 export type SessionUserType = {
   id: number

@@ -9,6 +9,7 @@ import {
   UpdateOrganizerDto,
 } from './dto/organizer.dto'
 import { OrganizerRepo, OrganizerRepository } from './organizer.repository'
+import { CacheInvalidate } from '@js-monorepo/nest/decorators'
 
 @Injectable()
 export class OrganizerService {
@@ -57,6 +58,12 @@ export class OrganizerService {
    * A user becomes an organizer when they want to create classes
    */
   @Transactional()
+  @CacheInvalidate({
+    keyPrefix: 'app-user',
+    namespace: process.env['REDIS_NAMESPACE'],
+    keyGenerator: (authUserId: number) => String(authUserId),
+    when: 'after', // Invalidate after update so we can cache the new result
+  })
   async createOrGetOrganizer(appUserId: number, dto?: CreateOrganizerDto): Promise<OrganizerResponseDto> {
     // Check if already an organizer
     const existing = await this.organizerRepo.findByAppUserId(appUserId)

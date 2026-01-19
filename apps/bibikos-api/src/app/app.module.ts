@@ -155,7 +155,7 @@ import {
         onRegister: async (user: AuthUserDto) => {
           // Create AppUser when user registers
           try {
-            await appUserService.getOrCreateAppUser(user.id)
+            await appUserService.getOrCreateAppUserByAuthId(user.id)
             apiLogger.log(`Created AppUser for new user: ${user.username} (authUserId: ${user.id})`)
           } catch (error: any) {
             apiLogger.error(`Failed to create AppUser for user ${user.id}: ${error.message}`, error.stack)
@@ -165,7 +165,7 @@ import {
         onLogin: async (user) => {
           // Ensure AppUser exists when user logs in (handles edge cases where creation failed during registration)
           try {
-            await appUserService.getOrCreateAppUser(user.id)
+            await appUserService.getOrCreateAppUserByAuthId(user.id)
           } catch (error: any) {
             apiLogger.error(`Failed to ensure AppUser exists for user ${user.id}: ${error.message}`, error.stack)
           }

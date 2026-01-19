@@ -32,7 +32,6 @@ interface ClassStepFormProps {
 
 export function ClassStepForm({ initialData, onSubmit, onBack, isLoading = false }: ClassStepFormProps) {
   const tClasses = useTranslations('scheduling.classes')
-  const tOnboarding = useTranslations('scheduling.onboarding')
   const tCommon = useTranslations('common')
 
   const form = useForm<ClassFormData>({

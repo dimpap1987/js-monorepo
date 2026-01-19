@@ -1,4 +1,4 @@
-import { SessionUserType, UserStatus } from '../auth/index.js'
+import { SessionUserType, UserStatus } from '../auth'
 
 /**
  * AppUser data as returned in the session
@@ -82,4 +82,4 @@ export interface BibikosSessionContext {
 }
 
 // Re-export for convenience
-export { UserStatus } from '../auth/index.js'
+export { UserStatus } from '../auth'

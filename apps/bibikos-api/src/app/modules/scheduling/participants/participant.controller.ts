@@ -18,7 +18,7 @@ export class ParticipantController {
    */
   @Get('me')
   async getMyParticipantProfile(@SessionUser() sessionUser: SessionUserType) {
-    const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
     return this.participantService.getParticipantByAppUserId(appUser.id)
   }
 }
