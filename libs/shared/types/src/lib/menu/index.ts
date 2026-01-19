@@ -1,5 +1,7 @@
 export type AuthRole = 'ADMIN' | 'USER'
 
+export type MenuItemPosition = 'main' | 'secondary'
+
 export type MenuItem = {
   name: string
   href: string
@@ -9,6 +11,10 @@ export type MenuItem = {
   // Optional flags for additional visibility conditions
   requiresOrganizer?: boolean
   requiresParticipant?: boolean
+  // Position: 'main' = left in navbar / top in sidebar, 'secondary' = right in navbar / bottom in sidebar
+  position?: MenuItemPosition
+  // Admin-only items get special styling
+  isAdmin?: boolean
 }
 
 /**

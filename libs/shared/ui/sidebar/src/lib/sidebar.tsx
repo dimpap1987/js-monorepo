@@ -15,6 +15,7 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { UserMetadata } from '@js-monorepo/navbar'
 import { AuthRole, SessionUserType } from '@js-monorepo/types/auth'
 import { MenuItem, hasRoleAccess } from '@js-monorepo/types/menu'
+import { cn } from '@js-monorepo/ui/util'
 import { X } from 'lucide-react'
 import { memo, ReactNode, useMemo } from 'react'
 
@@ -35,9 +36,12 @@ const MenuSideBarItem = memo(({ item, onClose }: { item: MenuItem; onClose: () =
       <DpNextNavLink
         href={item.href}
         onClick={onClose}
-        className="flex items-end flex-row-reverse gap-3 text-base p-3 px-5 w-full h-full tracking-wide"
+        className={cn(
+          'flex items-end flex-row-reverse gap-3 text-base p-3 px-5 w-full h-full tracking-wide transition-colors',
+          item.isAdmin && 'text-primary font-bold hover:text-primary/80'
+        )}
       >
-        {item.Icon && <item.Icon className="h-5 w-5 self-center" />}
+        {item.Icon && <item.Icon className={cn('h-5 w-5 self-center', item.isAdmin && 'text-primary')} />}
         <span>{item.name}</span>
       </DpNextNavLink>
     </SidebarMenuButton>
@@ -49,8 +53,13 @@ MenuSideBarItem.displayName = 'MenuSideBarItem'
 const DpNextSidebarBase = ({ children, user, plan, items = [], header, className }: DpNextSidebarProps) => {
   const { setOpenMobile } = useSidebar()
 
-  const filteredItems = useMemo(() => {
-    return items.filter((item) => hasRoleAccess(item.roles, user?.roles as AuthRole[]))
+  // Split items by position and filter by role access
+  const { mainItems, secondaryItems } = useMemo(() => {
+    const accessible = items.filter((item) => hasRoleAccess(item.roles, user?.roles as AuthRole[]))
+    return {
+      mainItems: accessible.filter((item) => item.position !== 'secondary'),
+      secondaryItems: accessible.filter((item) => item.position === 'secondary'),
+    }
   }, [items, user?.roles])
 
   return (
@@ -79,17 +88,32 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
         </Button>
       </SidebarHeader>
 
-      <SidebarContent className="flex-none">
+      {/* Main Items (top) */}
+      <SidebarContent className="flex-1">
         <SidebarMenu>
-          {filteredItems.map((item) => (
-            <MenuSideBarItem key={item.name} item={item} onClose={() => setOpenMobile(false)} />
+          {mainItems.map((item) => (
+            <MenuSideBarItem key={item.href} item={item} onClose={() => setOpenMobile(false)} />
           ))}
         </SidebarMenu>
       </SidebarContent>
 
+      {/* Secondary Items (bottom) */}
+      {secondaryItems.length > 0 && (
+        <>
+          <Separator className="my-2" />
+          <SidebarContent className="flex-none pb-2">
+            <SidebarMenu>
+              {secondaryItems.map((item) => (
+                <MenuSideBarItem key={item.href} item={item} onClose={() => setOpenMobile(false)} />
+              ))}
+            </SidebarMenu>
+          </SidebarContent>
+        </>
+      )}
+
       {children && (
         <>
-          <Separator className="my-4"></Separator>
+          <Separator className="my-4" />
           <SidebarFooter>
             <div className="w-full text-center">{children}</div>
           </SidebarFooter>

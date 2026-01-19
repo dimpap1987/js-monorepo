@@ -85,6 +85,7 @@ export const navigationsMenuItems: MenuItem[] = [
     roles: [Role.USER],
     Icon: RiDashboardLine,
     requiresOrganizer: true,
+    position: 'main',
   },
   {
     href: '/calendar',
@@ -92,6 +93,7 @@ export const navigationsMenuItems: MenuItem[] = [
     roles: [Role.USER],
     Icon: RiCalendarLine,
     requiresOrganizer: true,
+    position: 'main',
   },
   {
     href: '/bookings',
@@ -99,6 +101,7 @@ export const navigationsMenuItems: MenuItem[] = [
     roles: [Role.USER],
     Icon: RiUserLine,
     requiresOrganizer: true,
+    position: 'main',
   },
   {
     href: '/my-bookings',
@@ -106,24 +109,29 @@ export const navigationsMenuItems: MenuItem[] = [
     roles: [Role.USER],
     Icon: RiBookmarkLine,
     requiresParticipant: true,
+    position: 'main',
   },
   {
     href: '/admin',
     name: 'navigation.admin',
     roles: [Role.ADMIN],
     Icon: RiDashboardLine,
+    position: 'main',
+    isAdmin: true,
   },
   {
     href: '/pricing',
     name: 'navigation.pricing',
     roles: [Role.PUBLIC],
     Icon: RiPriceTag3Line,
+    position: 'secondary',
   },
   {
     href: '/contact',
     name: 'navigation.contact',
     roles: [Role.PUBLIC],
     Icon: RiCustomerService2Line,
+    position: 'secondary',
   },
 ]
 
