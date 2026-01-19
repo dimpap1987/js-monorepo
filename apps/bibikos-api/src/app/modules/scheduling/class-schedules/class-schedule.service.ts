@@ -1,5 +1,6 @@
 import { BookingStatus } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { BookingRepo, BookingRepository } from '../bookings/booking.repository'
@@ -41,7 +42,8 @@ export class ClassScheduleService {
     @Inject(OrganizerRepo)
     private readonly organizerRepo: OrganizerRepository,
     @Inject(BookingRepo)
-    private readonly bookingRepo: BookingRepository
+    private readonly bookingRepo: BookingRepository,
+    private readonly wsService: UserPresenceWebsocketService
   ) {}
 
   /**
@@ -384,6 +386,13 @@ export class ClassScheduleService {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'SCHEDULE_ALREADY_CANCELLED')
     }
 
+    // Get participants to notify before cancelling bookings
+    const activeBookings = await this.bookingRepo.findByScheduleId(scheduleId, [
+      BookingStatus.BOOKED,
+      BookingStatus.WAITLISTED,
+    ])
+    const participantIds = activeBookings.map((b) => b.participantId)
+
     // Cancel the schedule
     await this.scheduleRepo.update(scheduleId, {
       isCancelled: true,
@@ -399,7 +408,32 @@ export class ClassScheduleService {
 
     this.logger.log(`Cancelled schedule ${scheduleId} and ${cancelledBookings} booking(s)`)
 
-    // TODO: Notify participants about cancellation
+    // Notify participants about cancellation via WebSocket
+    this.notifyParticipantsOfScheduleCancellation(participantIds, scheduleId, schedule.class.title)
+  }
+
+  /**
+   * Notify participants about schedule cancellation via WebSocket
+   */
+  private notifyParticipantsOfScheduleCancellation(
+    participantIds: number[],
+    scheduleId: number,
+    classTitle: string
+  ): void {
+    const payload = {
+      scheduleId,
+      classTitle,
+      timestamp: new Date().toISOString(),
+    }
+
+    for (const participantId of participantIds) {
+      try {
+        this.wsService.sendToRoom(Rooms.participant(participantId), Events.scheduleCancelled, payload)
+        this.logger.debug(`Notified participant ${participantId} of schedule cancellation`)
+      } catch (error) {
+        this.logger.warn(`Failed to notify participant ${participantId} of schedule cancellation: ${error}`)
+      }
+    }
   }
 
   /**

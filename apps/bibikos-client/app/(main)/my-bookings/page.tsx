@@ -1,15 +1,35 @@
 'use client'
 
+import { useCallback } from 'react'
 import { useSession } from '@js-monorepo/auth/next/client'
 import { Button } from '@js-monorepo/components/ui/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { useNotifications } from '@js-monorepo/notification'
 import { CalendarCheck, Search } from 'lucide-react'
-import { useMyBookings } from '../../../lib/scheduling'
+import { useMyBookings, useParticipant } from '../../../lib/scheduling'
 import { MyBookingsSkeleton, MyBookingsEmpty, BookingSection } from './components'
+import { useScheduleCancellationUpdates } from './hooks/use-schedule-cancellation-updates'
 
 export default function MyBookingsPage() {
   const { session } = useSession()
-  const { data, isLoading, error } = useMyBookings()
+  const { addNotification } = useNotifications()
+  const { data: participant } = useParticipant()
+  const { data, isLoading, error, refetch } = useMyBookings()
+
+  // Subscribe to schedule cancellation updates via WebSocket
+  useScheduleCancellationUpdates({
+    participantId: participant?.id,
+    onScheduleCancelled: useCallback(
+      (payload) => {
+        refetch()
+        addNotification({
+          message: `Class "${payload.classTitle}" has been cancelled`,
+          type: 'information',
+        })
+      },
+      [refetch, addNotification]
+    ),
+  })
 
   const hasParticipantProfile = session?.appUser?.hasParticipantProfile
 

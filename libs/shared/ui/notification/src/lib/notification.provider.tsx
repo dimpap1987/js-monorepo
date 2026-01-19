@@ -83,7 +83,7 @@ export const DpNotificationProvider: React.FC<PropsWithChildren> = ({ children }
       // Only set timeout if notification has a duration or defaults to 3000ms
       const timeoutId = setTimeout(() => {
         setNotifications((prev) => prev.filter((p) => p.id !== notification.id))
-      }, notification?.duration ?? 3000)
+      }, notification?.duration ?? 5000)
 
       timeoutsRef.current[notification.id] = timeoutId
     })

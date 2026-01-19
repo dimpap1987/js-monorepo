@@ -118,6 +118,28 @@ export class UserPresenceGateway implements OnGatewayConnection, OnGatewayDiscon
     this.logger.debug(`User ${client.user?.id} left organizer room: ${room}`)
   }
 
+  @SubscribeMessage('subscribe:join-participant-room')
+  async joinParticipantRoom(@ConnectedSocket() client: Socket, @MessageBody() participantId: number) {
+    if (!participantId || typeof participantId !== 'number') {
+      this.logger.warn(`Invalid participantId provided for room subscription: ${participantId}`)
+      return
+    }
+    const room = Rooms.participant(participantId)
+    client.join(room)
+    this.logger.debug(`User ${client.user?.id} joined participant room: ${room}`)
+    client.emit('message', `Joined participant room: ${room}`)
+  }
+
+  @SubscribeMessage('subscribe:leave-participant-room')
+  async leaveParticipantRoom(@ConnectedSocket() client: Socket, @MessageBody() participantId: number) {
+    if (!participantId || typeof participantId !== 'number') {
+      return
+    }
+    const room = Rooms.participant(participantId)
+    client.leave(room)
+    this.logger.debug(`User ${client.user?.id} left participant room: ${room}`)
+  }
+
   private async saveUserSocketAndOnlineList(socket: Socket) {
     if (!socket?.user?.id) {
       socket.disconnect()
