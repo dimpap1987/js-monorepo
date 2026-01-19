@@ -105,9 +105,9 @@ export default function DiscoverPage() {
       setScheduleToCancel(null)
       // Refetch to update the UI
       refetch()
-    } catch (error: unknown) {
+    } catch (er: unknown) {
       addNotification({
-        message: error instanceof Error ? error.message : 'Failed to cancel booking',
+        message: er instanceof Error ? er.message : 'Failed to cancel booking',
         type: 'error',
       })
     }

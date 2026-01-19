@@ -493,6 +493,22 @@ export function useDeleteFutureSchedules() {
   })
 }
 
+export function useCancelSeriesSchedules() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...payload }: CancelSchedulePayload & { id: number }) => {
+      const response = await apiClient.post<{ cancelled: number }>(`/scheduling/schedules/${id}/cancel-series`, payload)
+      return handleQueryResponse(response)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['scheduling', 'schedules'],
+        refetchType: 'all',
+      })
+    },
+  })
+}
+
 // =============================================================================
 // Booking Hooks
 // =============================================================================

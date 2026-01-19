@@ -79,4 +79,6 @@ export interface BookingRepository {
   getNextWaitlistedBooking(scheduleId: number): Promise<Booking | null>
   decrementWaitlistPositions(scheduleId: number, abovePosition: number): Promise<number>
   cancelAllByScheduleId(scheduleId: number, cancelReason?: string): Promise<number>
+  findByScheduleIds(scheduleIds: number[], statuses?: BookingStatus[]): Promise<Booking[]>
+  cancelAllByScheduleIds(scheduleIds: number[], cancelReason?: string): Promise<number>
 }

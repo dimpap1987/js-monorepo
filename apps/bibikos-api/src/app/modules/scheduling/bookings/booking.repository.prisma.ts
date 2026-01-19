@@ -225,4 +225,34 @@ export class BookingRepositoryPrisma implements BookingRepository {
     })
     return result.count
   }
+
+  async findByScheduleIds(scheduleIds: number[], statuses?: BookingStatus[]): Promise<Booking[]> {
+    if (scheduleIds.length === 0) return []
+
+    return this.txHost.tx.booking.findMany({
+      where: {
+        classScheduleId: { in: scheduleIds },
+        ...(statuses ? { status: { in: statuses } } : {}),
+      },
+    })
+  }
+
+  async cancelAllByScheduleIds(scheduleIds: number[], cancelReason?: string): Promise<number> {
+    if (scheduleIds.length === 0) return 0
+
+    const result = await this.txHost.tx.booking.updateMany({
+      where: {
+        classScheduleId: { in: scheduleIds },
+        status: { in: [BookingStatus.BOOKED, BookingStatus.WAITLISTED] },
+      },
+      data: {
+        status: BookingStatus.CANCELLED,
+        cancelledAt: new Date(),
+        cancelledByOrganizer: true,
+        cancelReason: cancelReason ?? 'Class schedule cancelled',
+        waitlistPosition: null,
+      },
+    })
+    return result.count
+  }
 }

@@ -374,4 +374,47 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
     })
     return result.count
   }
+
+  async findFutureInSeries(scheduleId: number, fromDate: Date): Promise<ClassSchedule[]> {
+    // First, get the schedule to determine if it's a parent or child
+    const schedule = await this.txHost.tx.classSchedule.findUnique({
+      where: { id: scheduleId },
+    })
+
+    if (!schedule) return []
+
+    // Determine the parent schedule ID
+    // If schedule has parentScheduleId, it's a child; otherwise it might be a parent
+    const parentId = schedule.parentScheduleId ?? schedule.id
+
+    // Find all schedules in the series (parent + children) that are:
+    // 1. Not cancelled
+    // 2. Start from the given date onwards
+    return this.txHost.tx.classSchedule.findMany({
+      where: {
+        OR: [
+          { id: parentId }, // Include the parent
+          { parentScheduleId: parentId }, // Include all children
+        ],
+        startTimeUtc: { gte: fromDate },
+        isCancelled: false,
+      },
+      orderBy: { startTimeUtc: 'asc' },
+    })
+  }
+
+  async cancelMany(ids: number[], cancelReason: string | null): Promise<number> {
+    const result = await this.txHost.tx.classSchedule.updateMany({
+      where: {
+        id: { in: ids },
+        isCancelled: false,
+      },
+      data: {
+        isCancelled: true,
+        cancelledAt: new Date(),
+        cancelReason,
+      },
+    })
+    return result.count
+  }
 }

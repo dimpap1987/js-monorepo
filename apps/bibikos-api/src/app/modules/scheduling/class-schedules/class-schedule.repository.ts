@@ -61,4 +61,13 @@ export interface ClassScheduleRepository {
   createMany(data: Prisma.ClassScheduleCreateManyInput[]): Promise<number>
   update(id: number, data: Prisma.ClassScheduleUpdateInput): Promise<ClassSchedule>
   deleteByParentScheduleId(parentScheduleId: number, afterDate?: Date): Promise<number>
+  /**
+   * Find all future schedules in a recurring series (including the given schedule)
+   * Works from any schedule in the series (parent or child)
+   */
+  findFutureInSeries(scheduleId: number, fromDate: Date): Promise<ClassSchedule[]>
+  /**
+   * Cancel multiple schedules by IDs
+   */
+  cancelMany(ids: number[], cancelReason: string | null): Promise<number>
 }

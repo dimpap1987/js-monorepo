@@ -187,7 +187,7 @@ export class ClassScheduleService {
     })
 
     // If user is logged in, fetch their bookings for these schedules
-    let userBookingsMap: Map<number, { id: number; status: string; waitlistPosition: number | null }> = new Map()
+    const userBookingsMap: Map<number, { id: number; status: string; waitlistPosition: number | null }> = new Map()
     if (participantId) {
       const scheduleIds = schedules.map((s) => s.id)
       const userBookings = await this.bookingRepo.findByParticipantAndScheduleIds(participantId, scheduleIds, [
@@ -457,6 +457,74 @@ export class ClassScheduleService {
     this.logger.log(`Deleted ${deleted} future occurrences for parent schedule ${parentScheduleId}`)
 
     return deleted
+  }
+
+  /**
+   * Cancel this schedule and all future schedules in the recurring series
+   * Works from any schedule in the series (parent or child)
+   * Notifies all affected participants
+   */
+  @Transactional()
+  async cancelFutureSchedules(
+    scheduleId: number,
+    organizerId: number,
+    dto?: CancelClassScheduleDto
+  ): Promise<{ cancelled: number }> {
+    const schedule = await this.scheduleRepo.findByIdWithClass(scheduleId)
+
+    if (!schedule) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'SCHEDULE_NOT_FOUND')
+    }
+
+    // Verify ownership
+    if (schedule.class.organizerId !== organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'SCHEDULE_ACCESS_DENIED')
+    }
+
+    // Check if this is part of a recurring series
+    const isRecurring = schedule.parentScheduleId !== null || schedule.recurrenceRule !== null
+
+    if (!isRecurring) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'SCHEDULE_NOT_RECURRING')
+    }
+
+    // Find all future schedules in the series (including this one)
+    const futureSchedules = await this.scheduleRepo.findFutureInSeries(scheduleId, schedule.startTimeUtc)
+
+    if (futureSchedules.length === 0) {
+      return { cancelled: 0 }
+    }
+
+    const scheduleIds = futureSchedules.map((s) => s.id)
+    const cancelReason = dto?.cancelReason ?? 'Series cancelled by organizer'
+
+    // Get all participants across all schedules to notify
+    const activeBookings = await this.bookingRepo.findByScheduleIds(scheduleIds, [
+      BookingStatus.BOOKED,
+      BookingStatus.WAITLISTED,
+    ])
+
+    // Group participants by schedule for targeted notifications
+    const participantsBySchedule = new Map<number, number[]>()
+    for (const booking of activeBookings) {
+      const participants = participantsBySchedule.get(booking.classScheduleId) || []
+      participants.push(booking.participantId)
+      participantsBySchedule.set(booking.classScheduleId, participants)
+    }
+
+    // Cancel all schedules
+    const cancelledCount = await this.scheduleRepo.cancelMany(scheduleIds, cancelReason)
+
+    // Cancel all bookings for these schedules
+    await this.bookingRepo.cancelAllByScheduleIds(scheduleIds, cancelReason)
+
+    this.logger.log(`Cancelled ${cancelledCount} schedules in series and their bookings`)
+
+    // Notify all participants
+    const allParticipantIds = [...new Set(activeBookings.map((b) => b.participantId))]
+    this.notifyParticipantsOfScheduleCancellation(allParticipantIds, scheduleId, schedule.class.title)
+
+    return { cancelled: cancelledCount }
   }
 
   /**

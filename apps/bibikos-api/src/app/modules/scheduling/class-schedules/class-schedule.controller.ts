@@ -217,4 +217,21 @@ export class ClassScheduleController {
     const deleted = await this.scheduleService.deleteFutureOccurrences(id, organizerId)
     return { deleted }
   }
+
+  /**
+   * POST /scheduling/schedules/:id/cancel-series
+   * Cancel this schedule and all future schedules in the recurring series
+   * Notifies all affected participants
+   */
+  @Post(':id/cancel-series')
+  @UseGuards(LoggedInGuard)
+  @HttpCode(HttpStatus.OK)
+  async cancelFutureSchedules(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ZodPipe(CancelClassScheduleSchema)) dto: CancelClassScheduleDto,
+    @SessionUser() sessionUser: SessionUserType
+  ) {
+    const organizerId = await this.getOrganizerId(sessionUser)
+    return this.scheduleService.cancelFutureSchedules(id, organizerId, dto)
+  }
 }

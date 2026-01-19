@@ -10,6 +10,7 @@ import {
   ClassSchedule,
   Location,
   useCancelSchedule,
+  useCancelSeriesSchedules,
   useClasses,
   useCreateSchedule,
   useLocations,
@@ -20,7 +21,7 @@ import { CalendarHeader } from './components/calendar-header'
 import { CalendarNoClassesWarning } from './components/calendar-no-classes-warning'
 import { CalendarSkeleton } from './components/calendar-skeleton'
 import { CalendarView, DateSelection } from './components/calendar-view'
-import { CancelScheduleDialog } from './components/cancel-schedule-dialog'
+import { CancelScheduleDialog, CancelMode } from './components/cancel-schedule-dialog'
 import { ScheduleDetailSheet } from './components/schedule-detail-sheet'
 import { ScheduleForm } from './components/schedule-form'
 import { useCalendarEvents } from './hooks/use-calendar-events'
@@ -36,7 +37,7 @@ export function CalendarContent() {
   // State
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [selectedSchedule, setSelectedSchedule] = useState<ClassSchedule | null>(null)
-  const [cancelScheduleId, setCancelScheduleId] = useState<number | null>(null)
+  const [scheduleToCancel, setScheduleToCancel] = useState<ClassSchedule | null>(null)
   const [dateRange, setDateRange] = useState({
     start: format(startOfMonth(new Date()), 'yyyy-MM-dd'),
     end: format(endOfMonth(new Date()), 'yyyy-MM-dd'),
@@ -61,6 +62,7 @@ export function CalendarContent() {
   // Mutations
   const createScheduleMutation = useCreateSchedule()
   const cancelScheduleMutation = useCancelSchedule()
+  const cancelSeriesMutation = useCancelSeriesSchedules()
 
   // Track last update to debounce multiple rapid updates
   const lastUpdateRef = useRef<number>(0)
@@ -230,14 +232,23 @@ export function CalendarContent() {
   }
 
   // Cancel schedule
-  const handleCancelSchedule = async () => {
-    if (!cancelScheduleId) return
+  const handleCancelSchedule = async (mode: CancelMode) => {
+    if (!scheduleToCancel) return
 
     try {
-      await cancelScheduleMutation.mutateAsync({ id: cancelScheduleId })
-      await refetchSchedules()
-      addNotification({ message: 'Schedule cancelled', type: 'success' })
-      setCancelScheduleId(null)
+      if (mode === 'series') {
+        const result = await cancelSeriesMutation.mutateAsync({ id: scheduleToCancel.id })
+        await refetchSchedules()
+        addNotification({
+          message: `${result.cancelled} schedule${result.cancelled !== 1 ? 's' : ''} cancelled`,
+          type: 'success',
+        })
+      } else {
+        await cancelScheduleMutation.mutateAsync({ id: scheduleToCancel.id })
+        await refetchSchedules()
+        addNotification({ message: 'Schedule cancelled', type: 'success' })
+      }
+      setScheduleToCancel(null)
       setSelectedSchedule(null)
     } catch (error: any) {
       addNotification({
@@ -313,14 +324,15 @@ export function CalendarContent() {
               )
             : undefined
         }
-        onCancel={() => selectedSchedule && setCancelScheduleId(selectedSchedule.id)}
+        onCancel={() => selectedSchedule && setScheduleToCancel(selectedSchedule)}
         onClose={handleCloseDetail}
       />
 
       <CancelScheduleDialog
-        open={!!cancelScheduleId}
-        onOpenChange={(open) => !open && setCancelScheduleId(null)}
+        open={!!scheduleToCancel}
+        onOpenChange={(open) => !open && setScheduleToCancel(null)}
         onConfirm={handleCancelSchedule}
+        schedule={scheduleToCancel}
       />
     </div>
   )
