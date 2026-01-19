@@ -170,6 +170,12 @@ export interface DiscoverSchedule extends ClassSchedule {
     slug: string | null
     activityLabel: string | null
   }
+  // User's booking for this schedule (if logged in)
+  myBooking: {
+    id: number
+    status: BookingStatus
+    waitlistPosition: number | null
+  } | null
 }
 
 export interface DiscoverFilters {

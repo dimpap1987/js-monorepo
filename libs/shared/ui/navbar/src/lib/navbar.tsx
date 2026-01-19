@@ -3,7 +3,7 @@
 import { DpLoginButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { AuthRole } from '@js-monorepo/types/auth'
-import { MenuItem } from '@js-monorepo/types/menu'
+import { MenuItem, hasRoleAccess } from '@js-monorepo/types/menu'
 import { cn } from '@js-monorepo/ui/util'
 import { ReactNode, forwardRef } from 'react'
 import './navbar.css'
@@ -46,10 +46,7 @@ const Navbar = forwardRef<HTMLDivElement, NavbarProps>(
           {/* Menu Items */}
           <ul className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center gap-1 self-stretch">
             {menuItems.map((item, index) => {
-              const hasAccess =
-                item.roles?.includes('PUBLIC') || item.roles?.some((role) => user?.roles.includes(role as AuthRole))
-
-              if (!hasAccess) return null
+              if (!hasRoleAccess(item.roles, user?.roles as AuthRole[])) return null
 
               return (
                 <li

@@ -44,13 +44,24 @@ export default function RootComponent({ children }: PropsWithChildren) {
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
   useOfflineIndicator()
 
-  // 1. Translate the main navigation items for Navbar and Sidebar
+  // 1. Filter and translate the main navigation items for Navbar and Sidebar
   const translatedMenuItems = useMemo(() => {
-    return navigationsMenuItems.map((item) => ({
-      ...item,
-      name: t(item.name as any),
-    }))
-  }, [t])
+    const hasOrganizerProfile = session?.appUser?.hasOrganizerProfile
+    const hasParticipantProfile = session?.appUser?.hasParticipantProfile
+
+    return navigationsMenuItems
+      .filter((item) => {
+        // Filter by organizer requirement
+        if (item.requiresOrganizer && !hasOrganizerProfile) return false
+        // Filter by participant requirement
+        if (item.requiresParticipant && !hasParticipantProfile) return false
+        return true
+      })
+      .map((item) => ({
+        ...item,
+        name: t(item.name as any),
+      }))
+  }, [t, session?.appUser?.hasOrganizerProfile, session?.appUser?.hasParticipantProfile])
 
   // 2. Memoize the Settings Link (navUserOptionsChildren)
   const settingsNavLink = useMemo(() => {

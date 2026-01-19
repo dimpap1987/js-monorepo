@@ -66,6 +66,11 @@ export interface BookingRepository {
     }
   ): Promise<BookingWithSchedule[]>
   findByScheduleAndParticipant(scheduleId: number, participantId: number): Promise<Booking | null>
+  findByParticipantAndScheduleIds(
+    participantId: number,
+    scheduleIds: number[],
+    statuses?: BookingStatus[]
+  ): Promise<Booking[]>
   countByScheduleId(scheduleId: number, statuses: BookingStatus[]): Promise<number>
   getMaxWaitlistPosition(scheduleId: number): Promise<number>
   create(data: Prisma.BookingCreateInput): Promise<Booking>
@@ -73,4 +78,5 @@ export interface BookingRepository {
   updateMany(ids: number[], data: Prisma.BookingUpdateInput): Promise<number>
   getNextWaitlistedBooking(scheduleId: number): Promise<Booking | null>
   decrementWaitlistPositions(scheduleId: number, abovePosition: number): Promise<number>
+  cancelAllByScheduleId(scheduleId: number, cancelReason?: string): Promise<number>
 }

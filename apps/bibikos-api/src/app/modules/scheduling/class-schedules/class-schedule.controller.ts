@@ -18,6 +18,7 @@ import {
 } from '@nestjs/common'
 import { AppUserService } from '../app-users/app-user.service'
 import { OrganizerService } from '../organizers/organizer.service'
+import { ParticipantService } from '../participants/participant.service'
 import { ClassScheduleService } from './class-schedule.service'
 import {
   CancelClassScheduleDto,
@@ -33,13 +34,14 @@ export class ClassScheduleController {
   constructor(
     private readonly scheduleService: ClassScheduleService,
     private readonly organizerService: OrganizerService,
-    private readonly appUserService: AppUserService
+    private readonly appUserService: AppUserService,
+    private readonly participantService: ParticipantService
   ) {}
 
   /**
    * GET /scheduling/schedules/discover
    * Public endpoint to discover classes across all organizers
-   * No auth required
+   * No auth required, but if logged in shows user's booking status
    */
   @Get('discover')
   async discoverSchedules(
@@ -47,19 +49,31 @@ export class ClassScheduleController {
     @Query('endDate') endDate: string,
     @Query('activity') activity?: string,
     @Query('timeOfDay') timeOfDay?: 'morning' | 'afternoon' | 'evening',
-    @Query('search') search?: string
+    @Query('search') search?: string,
+    @SessionUser() sessionUser?: SessionUserType
   ) {
     if (!startDate || !endDate) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'START_AND_END_DATE_REQUIRED')
     }
 
-    return this.scheduleService.discoverSchedules({
-      startDate,
-      endDate,
-      activity,
-      timeOfDay,
-      search,
-    })
+    // Get participant ID if user is logged in
+    let participantId: number | undefined
+    if (sessionUser?.id) {
+      const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+      const participant = await this.participantService.getParticipantByAppUserId(appUser.id)
+      participantId = participant?.id
+    }
+
+    return this.scheduleService.discoverSchedules(
+      {
+        startDate,
+        endDate,
+        activity,
+        timeOfDay,
+        search,
+      },
+      participantId
+    )
   }
 
   /**

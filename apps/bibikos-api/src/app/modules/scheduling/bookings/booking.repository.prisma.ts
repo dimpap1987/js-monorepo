@@ -126,6 +126,22 @@ export class BookingRepositoryPrisma implements BookingRepository {
     })
   }
 
+  async findByParticipantAndScheduleIds(
+    participantId: number,
+    scheduleIds: number[],
+    statuses?: BookingStatus[]
+  ): Promise<Booking[]> {
+    if (scheduleIds.length === 0) return []
+
+    return this.txHost.tx.booking.findMany({
+      where: {
+        participantId,
+        classScheduleId: { in: scheduleIds },
+        ...(statuses ? { status: { in: statuses } } : {}),
+      },
+    })
+  }
+
   async countByScheduleId(scheduleId: number, statuses: BookingStatus[]): Promise<number> {
     return this.txHost.tx.booking.count({
       where: {
@@ -188,6 +204,23 @@ export class BookingRepositoryPrisma implements BookingRepository {
       },
       data: {
         waitlistPosition: { decrement: 1 },
+      },
+    })
+    return result.count
+  }
+
+  async cancelAllByScheduleId(scheduleId: number, cancelReason?: string): Promise<number> {
+    const result = await this.txHost.tx.booking.updateMany({
+      where: {
+        classScheduleId: scheduleId,
+        status: { in: [BookingStatus.BOOKED, BookingStatus.WAITLISTED] },
+      },
+      data: {
+        status: BookingStatus.CANCELLED,
+        cancelledAt: new Date(),
+        cancelledByOrganizer: true,
+        cancelReason: cancelReason ?? 'Class schedule cancelled',
+        waitlistPosition: null,
       },
     })
     return result.count

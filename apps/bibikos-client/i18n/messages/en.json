@@ -89,6 +89,8 @@
     "myClasses": "My Classes",
     "calendar": "Calendar",
     "bookings": "My Bookings",
+    "classBookings": "Class Bookings",
+    "myBookings": "My Bookings",
     "admin": "Admin"
   },
   "metadata": {

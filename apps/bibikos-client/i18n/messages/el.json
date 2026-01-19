@@ -89,6 +89,8 @@
     "myClasses": "Οι Τάξεις μου",
     "calendar": "Ημερολόγιο",
     "bookings": "Οι Κρατήσεις μου",
+    "classBookings": "Κρατήσεις Τάξεων",
+    "myBookings": "Οι Κρατήσεις μου",
     "admin": "Διαχείριση"
   },
   "metadata": {

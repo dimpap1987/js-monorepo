@@ -3,7 +3,7 @@
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { Badge } from '@js-monorepo/components/ui/badge'
-import { Clock, Users, ChevronRight, User } from 'lucide-react'
+import { Clock, Users, ChevronRight, User, CheckCircle2, X } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import type { DiscoverSchedule } from '../../../../lib/scheduling'
@@ -117,10 +117,46 @@ function ScheduleInfo({
 interface BookButtonProps {
   isFull: boolean
   hasWaitlist: boolean
+  isBooked: boolean
+  isWaitlisted: boolean
   onBook: () => void
+  onCancel: () => void
 }
 
-function BookButton({ isFull, hasWaitlist, onBook }: BookButtonProps) {
+function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCancel }: BookButtonProps) {
+  // User is already booked
+  if (isBooked) {
+    return (
+      <div className="flex items-center gap-4 flex-shrink-0 justify-end">
+        <Badge variant="default" className="bg-green-600 hover:bg-green-600 gap-1">
+          <CheckCircle2 className="w-3 h-3" />
+          Booked
+        </Badge>
+        <Button variant="outline" onClick={onCancel} className="gap-1 text-destructive hover:text-destructive">
+          <X className="w-3 h-3" />
+          Cancel
+        </Button>
+      </div>
+    )
+  }
+
+  // User is on waitlist
+  if (isWaitlisted) {
+    return (
+      <div className="flex items-center gap-4 flex-shrink-0 justify-end">
+        <Badge variant="secondary" className="gap-1">
+          <Clock className="w-3 h-3" />
+          Waitlisted
+        </Badge>
+        <Button variant="outline" onClick={onCancel} className="gap-1 text-destructive hover:text-destructive">
+          <X className="w-3 h-3" />
+          Leave
+        </Button>
+      </div>
+    )
+  }
+
+  // Default: show book button
   const isDisabled = isFull && !hasWaitlist
   const label = isFull ? (hasWaitlist ? 'Join Waitlist' : 'Full') : 'Book Now'
 
@@ -135,9 +171,10 @@ function BookButton({ isFull, hasWaitlist, onBook }: BookButtonProps) {
 interface DiscoverScheduleCardProps {
   schedule: DiscoverSchedule
   onBook: (schedule: DiscoverSchedule) => void
+  onCancel: (schedule: DiscoverSchedule) => void
 }
 
-export function DiscoverScheduleCard({ schedule, onBook }: DiscoverScheduleCardProps) {
+export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverScheduleCardProps) {
   const startTime = parseISO(schedule.startTimeUtc)
   const endTime = parseISO(schedule.endTimeUtc)
   const classInfo = schedule.class
@@ -148,6 +185,10 @@ export function DiscoverScheduleCard({ schedule, onBook }: DiscoverScheduleCardP
   const isFull = capacity !== null ? bookedCount >= capacity : false
   const hasWaitlist = Boolean(classInfo?.waitlistLimit && classInfo.waitlistLimit > 0)
   const spotsLeft = capacity !== null ? capacity - bookedCount : null
+
+  // Check user's booking status
+  const isBooked = schedule.myBooking?.status === 'BOOKED'
+  const isWaitlisted = schedule.myBooking?.status === 'WAITLISTED'
 
   return (
     <Card className="border-border/50 hover:shadow-md transition-all">
@@ -168,7 +209,14 @@ export function DiscoverScheduleCard({ schedule, onBook }: DiscoverScheduleCardP
               spotsLeft={spotsLeft}
             />
           </div>
-          <BookButton isFull={isFull} hasWaitlist={hasWaitlist} onBook={() => onBook(schedule)} />
+          <BookButton
+            isFull={isFull}
+            hasWaitlist={hasWaitlist}
+            isBooked={isBooked}
+            isWaitlisted={isWaitlisted}
+            onBook={() => onBook(schedule)}
+            onCancel={() => onCancel(schedule)}
+          />
         </div>
       </CardContent>
     </Card>

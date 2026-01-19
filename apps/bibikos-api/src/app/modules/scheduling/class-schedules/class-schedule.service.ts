@@ -1,6 +1,8 @@
+import { BookingStatus } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { BookingRepo, BookingRepository } from '../bookings/booking.repository'
 import { ClassRepo, ClassRepository } from '../classes/class.repository'
 import { LocationRepo, LocationRepository } from '../locations/location.repository'
 import { ClassScheduleRepo, ClassScheduleRepository } from './class-schedule.repository'
@@ -37,7 +39,9 @@ export class ClassScheduleService {
     @Inject(LocationRepo)
     private readonly locationRepo: LocationRepository,
     @Inject(OrganizerRepo)
-    private readonly organizerRepo: OrganizerRepository
+    private readonly organizerRepo: OrganizerRepository,
+    @Inject(BookingRepo)
+    private readonly bookingRepo: BookingRepository
   ) {}
 
   /**
@@ -151,14 +155,18 @@ export class ClassScheduleService {
 
   /**
    * Discover public schedules across all organizers (for /discover page)
+   * If participantId is provided, includes user's booking status for each schedule
    */
-  async discoverSchedules(filters: {
-    startDate: string
-    endDate: string
-    activity?: string
-    timeOfDay?: 'morning' | 'afternoon' | 'evening'
-    search?: string
-  }) {
+  async discoverSchedules(
+    filters: {
+      startDate: string
+      endDate: string
+      activity?: string
+      timeOfDay?: 'morning' | 'afternoon' | 'evening'
+      search?: string
+    },
+    participantId?: number
+  ) {
     const start = new Date(filters.startDate)
     const end = new Date(filters.endDate)
 
@@ -176,9 +184,27 @@ export class ClassScheduleService {
       search: filters.search,
     })
 
+    // If user is logged in, fetch their bookings for these schedules
+    let userBookingsMap: Map<number, { id: number; status: string; waitlistPosition: number | null }> = new Map()
+    if (participantId) {
+      const scheduleIds = schedules.map((s) => s.id)
+      const userBookings = await this.bookingRepo.findByParticipantAndScheduleIds(participantId, scheduleIds, [
+        BookingStatus.BOOKED,
+        BookingStatus.WAITLISTED,
+      ])
+      for (const booking of userBookings) {
+        userBookingsMap.set(booking.classScheduleId, {
+          id: booking.id,
+          status: booking.status,
+          waitlistPosition: booking.waitlistPosition,
+        })
+      }
+    }
+
     return schedules.map((schedule) => ({
       ...this.toResponseDto(schedule),
       organizer: schedule.organizer,
+      myBooking: userBookingsMap.get(schedule.id) || null,
     }))
   }
 
@@ -339,6 +365,7 @@ export class ClassScheduleService {
 
   /**
    * Cancel a schedule
+   * Also cancels all active bookings for this schedule
    */
   @Transactional()
   async cancelSchedule(scheduleId: number, organizerId: number, dto?: CancelClassScheduleDto): Promise<void> {
@@ -357,13 +384,20 @@ export class ClassScheduleService {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'SCHEDULE_ALREADY_CANCELLED')
     }
 
+    // Cancel the schedule
     await this.scheduleRepo.update(scheduleId, {
       isCancelled: true,
       cancelledAt: new Date(),
       cancelReason: dto?.cancelReason ?? null,
     })
 
-    this.logger.log(`Cancelled schedule ${scheduleId}`)
+    // Cancel all active bookings for this schedule
+    const cancelledBookings = await this.bookingRepo.cancelAllByScheduleId(
+      scheduleId,
+      dto?.cancelReason ?? 'Class schedule cancelled by organizer'
+    )
+
+    this.logger.log(`Cancelled schedule ${scheduleId} and ${cancelledBookings} booking(s)`)
 
     // TODO: Notify participants about cancellation
   }

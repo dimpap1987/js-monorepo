@@ -2,30 +2,31 @@
 
 import { BackButton } from '@js-monorepo/back-arrow'
 import { useNotifications } from '@js-monorepo/notification'
+import { endOfMonth, format, startOfMonth } from 'date-fns'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { format, startOfMonth, endOfMonth } from 'date-fns'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  useSchedulesCalendar,
-  useClasses,
-  useLocations,
-  useCreateSchedule,
-  useCancelSchedule,
-  useOrganizer,
-  ClassSchedule,
   Class,
+  ClassSchedule,
   Location,
+  useCancelSchedule,
+  useClasses,
+  useCreateSchedule,
+  useLocations,
+  useOrganizer,
+  useSchedulesCalendar,
 } from '../../../lib/scheduling'
-import { ScheduleFormData } from './schemas'
-import { buildRecurrenceRule, calculateEndTime } from './utils/schedule-utils'
-import { useCalendarEvents } from './hooks/use-calendar-events'
-import { CalendarSkeleton } from './components/calendar-skeleton'
 import { CalendarHeader } from './components/calendar-header'
 import { CalendarNoClassesWarning } from './components/calendar-no-classes-warning'
+import { CalendarSkeleton } from './components/calendar-skeleton'
 import { CalendarView, DateSelection } from './components/calendar-view'
-import { ScheduleForm } from './components/schedule-form'
-import { ScheduleDetailSheet } from './components/schedule-detail-sheet'
 import { CancelScheduleDialog } from './components/cancel-schedule-dialog'
+import { ScheduleDetailSheet } from './components/schedule-detail-sheet'
+import { ScheduleForm } from './components/schedule-form'
+import { useCalendarEvents } from './hooks/use-calendar-events'
+import { ScheduleFormData } from './schemas'
+import { buildRecurrenceRule, calculateEndTime } from './utils/schedule-utils'
+import { useBookingUpdates } from './hooks/use-booking-updates'
 
 export function CalendarContent() {
   const router = useRouter()
@@ -60,6 +61,32 @@ export function CalendarContent() {
   // Mutations
   const createScheduleMutation = useCreateSchedule()
   const cancelScheduleMutation = useCancelSchedule()
+
+  // Track last update to debounce multiple rapid updates
+  const lastUpdateRef = useRef<number>(0)
+
+  // Subscribe to real-time booking updates via WebSocket
+  useBookingUpdates({
+    organizerId: organizer?.id,
+    onBookingUpdate: useCallback(
+      (payload) => {
+        // Debounce rapid updates (e.g., multiple bookings in quick succession)
+        const now = Date.now()
+        if (now - lastUpdateRef.current < 1000) return
+        lastUpdateRef.current = now
+
+        // Refetch schedules to get updated booking counts
+        refetchSchedules()
+
+        // Show notification to organizer
+        addNotification({
+          message: payload.action === 'created' ? 'New booking received!' : 'Booking cancelled',
+          type: payload.action === 'created' ? 'success' : 'information',
+        })
+      },
+      [refetchSchedules, addNotification]
+    ),
+  })
 
   // Calendar events
   const allCalendarEvents = useCalendarEvents(schedules, classes)

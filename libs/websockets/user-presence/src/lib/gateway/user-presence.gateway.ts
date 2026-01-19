@@ -1,6 +1,7 @@
 import { Logger, OnModuleDestroy, UseGuards } from '@nestjs/common'
 import {
   ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
@@ -93,6 +94,28 @@ export class UserPresenceGateway implements OnGatewayConnection, OnGatewayDiscon
   async joinAdminGroup(@ConnectedSocket() client: Socket) {
     client.join(Rooms.admin)
     client.emit('message', 'You have successfully joined the admin room')
+  }
+
+  @SubscribeMessage('subscribe:join-organizer-room')
+  async joinOrganizerRoom(@ConnectedSocket() client: Socket, @MessageBody() organizerId: number) {
+    if (!organizerId || typeof organizerId !== 'number') {
+      this.logger.warn(`Invalid organizerId provided for room subscription: ${organizerId}`)
+      return
+    }
+    const room = Rooms.organizer(organizerId)
+    client.join(room)
+    this.logger.debug(`User ${client.user?.id} joined organizer room: ${room}`)
+    client.emit('message', `Joined organizer room: ${room}`)
+  }
+
+  @SubscribeMessage('subscribe:leave-organizer-room')
+  async leaveOrganizerRoom(@ConnectedSocket() client: Socket, @MessageBody() organizerId: number) {
+    if (!organizerId || typeof organizerId !== 'number') {
+      return
+    }
+    const room = Rooms.organizer(organizerId)
+    client.leave(room)
+    this.logger.debug(`User ${client.user?.id} left organizer room: ${room}`)
   }
 
   private async saveUserSocketAndOnlineList(socket: Socket) {

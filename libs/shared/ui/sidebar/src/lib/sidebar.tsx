@@ -14,7 +14,7 @@ import {
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { UserMetadata } from '@js-monorepo/navbar'
 import { AuthRole, SessionUserType } from '@js-monorepo/types/auth'
-import { MenuItem } from '@js-monorepo/types/menu'
+import { MenuItem, hasRoleAccess } from '@js-monorepo/types/menu'
 import { X } from 'lucide-react'
 import { memo, ReactNode, useMemo } from 'react'
 
@@ -50,9 +50,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
   const { setOpenMobile } = useSidebar()
 
   const filteredItems = useMemo(() => {
-    return items.filter(
-      (item) => item.roles.includes('PUBLIC') || item.roles.some((role) => user?.roles?.includes(role as AuthRole))
-    )
+    return items.filter((item) => hasRoleAccess(item.roles, user?.roles as AuthRole[]))
   }, [items, user?.roles])
 
   return (

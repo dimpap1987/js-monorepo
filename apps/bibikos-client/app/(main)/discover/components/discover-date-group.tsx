@@ -7,9 +7,10 @@ interface DiscoverDateGroupProps {
   title: string
   schedules: DiscoverSchedule[]
   onBook: (schedule: DiscoverSchedule) => void
+  onCancel: (schedule: DiscoverSchedule) => void
 }
 
-export function DiscoverDateGroup({ title, schedules, onBook }: DiscoverDateGroupProps) {
+export function DiscoverDateGroup({ title, schedules, onBook, onCancel }: DiscoverDateGroupProps) {
   if (schedules.length === 0) return null
 
   return (
@@ -17,7 +18,7 @@ export function DiscoverDateGroup({ title, schedules, onBook }: DiscoverDateGrou
       <h2 className="text-xl font-semibold text-foreground">{title}</h2>
       <div className="space-y-3">
         {schedules.map((schedule) => (
-          <DiscoverScheduleCard key={schedule.id} schedule={schedule} onBook={onBook} />
+          <DiscoverScheduleCard key={schedule.id} schedule={schedule} onBook={onBook} onCancel={onCancel} />
         ))}
       </div>
     </div>

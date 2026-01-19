@@ -1,5 +1,6 @@
 import { BookingStatus } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { ClassScheduleRepo, ClassScheduleRepository } from '../class-schedules/class-schedule.repository'
@@ -30,7 +31,8 @@ export class BookingService {
     @Inject(ClassScheduleRepo)
     private readonly scheduleRepo: ClassScheduleRepository,
     @Inject(ParticipantRepo)
-    private readonly participantRepo: ParticipantRepository
+    private readonly participantRepo: ParticipantRepository,
+    private readonly wsService: UserPresenceWebsocketService
   ) {}
 
   /**
@@ -98,7 +100,8 @@ export class BookingService {
       `Created booking ${booking.id} for participant ${participantId} on schedule ${scheduleId} with status ${status}`
     )
 
-    // TODO: Send confirmation notification
+    // Notify organizer about new booking via WebSocket
+    this.notifyOrganizerOfBookingUpdate(schedule.class.organizerId, scheduleId, 'created')
 
     return this.toBasicResponseDto(booking)
   }
@@ -175,6 +178,9 @@ export class BookingService {
 
     this.logger.log(`Cancelled booking ${bookingId} by participant`)
 
+    // Notify organizer about cancellation via WebSocket
+    this.notifyOrganizerOfBookingUpdate(booking.classSchedule.class.organizerId, booking.classScheduleId, 'cancelled')
+
     // If was booked (not waitlisted), promote next waitlisted person
     if (wasBooked) {
       await this.promoteFromWaitlist(booking.classScheduleId)
@@ -216,6 +222,9 @@ export class BookingService {
     })
 
     this.logger.log(`Cancelled booking ${bookingId} by organizer`)
+
+    // Notify organizer about their own cancellation action (for multi-device sync)
+    this.notifyOrganizerOfBookingUpdate(booking.classSchedule.class.organizerId, booking.classScheduleId, 'cancelled')
 
     // TODO: Notify participant about cancellation
 
@@ -438,6 +447,26 @@ export class BookingService {
           title: booking.classSchedule.class.title,
         },
       },
+    }
+  }
+
+  /**
+   * Notify organizer about booking updates via WebSocket
+   */
+  private notifyOrganizerOfBookingUpdate(
+    organizerId: number,
+    scheduleId: number,
+    action: 'created' | 'cancelled'
+  ): void {
+    try {
+      this.wsService.sendToRoom(Rooms.organizer(organizerId), Events.bookingUpdate, {
+        scheduleId,
+        action,
+        timestamp: new Date().toISOString(),
+      })
+      this.logger.debug(`Notified organizer ${organizerId} of booking ${action} for schedule ${scheduleId}`)
+    } catch (error) {
+      this.logger.warn(`Failed to notify organizer ${organizerId} of booking update: ${error}`)
     }
   }
 }

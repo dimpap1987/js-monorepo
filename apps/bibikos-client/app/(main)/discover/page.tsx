@@ -2,10 +2,17 @@
 
 import { useState, useMemo } from 'react'
 import { format, addDays, startOfDay, endOfDay, isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns'
-import { Search } from 'lucide-react'
+import { useNotifications } from '@js-monorepo/notification'
 import type { DiscoverSchedule, DiscoverFilters as DiscoverFiltersType } from '../../../lib/scheduling'
-import { useDiscoverSchedules } from '../../../lib/scheduling'
-import { DiscoverFilters, DiscoverDateGroup, DiscoverSkeleton, DiscoverEmptyState, BookingDialog } from './components'
+import { useDiscoverSchedules, useCancelBooking } from '../../../lib/scheduling'
+import {
+  DiscoverFilters,
+  DiscoverDateGroup,
+  DiscoverSkeleton,
+  DiscoverEmptyState,
+  BookingDialog,
+  CancelBookingDialog,
+} from './components'
 
 function getDefaultFilters(): DiscoverFiltersType {
   const today = startOfDay(new Date())
@@ -53,8 +60,12 @@ export default function DiscoverPage() {
   const [filters, setFilters] = useState<DiscoverFiltersType>(getDefaultFilters)
   const [selectedSchedule, setSelectedSchedule] = useState<DiscoverSchedule | null>(null)
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [scheduleToCancel, setScheduleToCancel] = useState<DiscoverSchedule | null>(null)
 
-  const { data: schedules, isLoading, error } = useDiscoverSchedules(filters)
+  const { addNotification } = useNotifications()
+  const { data: schedules, isLoading, error, refetch } = useDiscoverSchedules(filters)
+  const cancelBookingMutation = useCancelBooking()
 
   const groupedSchedules = useMemo(() => {
     if (!schedules) return null
@@ -74,6 +85,32 @@ export default function DiscoverPage() {
   const handleBook = (schedule: DiscoverSchedule) => {
     setSelectedSchedule(schedule)
     setBookingDialogOpen(true)
+  }
+
+  const handleCancelRequest = (schedule: DiscoverSchedule) => {
+    setScheduleToCancel(schedule)
+    setCancelDialogOpen(true)
+  }
+
+  const handleCancelConfirm = async () => {
+    if (!scheduleToCancel?.myBooking) return
+
+    try {
+      await cancelBookingMutation.mutateAsync({ id: scheduleToCancel.myBooking.id })
+      addNotification({
+        message: 'Booking cancelled successfully',
+        type: 'success',
+      })
+      setCancelDialogOpen(false)
+      setScheduleToCancel(null)
+      // Refetch to update the UI
+      refetch()
+    } catch (error: unknown) {
+      addNotification({
+        message: error instanceof Error ? error.message : 'Failed to cancel booking',
+        type: 'error',
+      })
+    }
   }
 
   const totalSchedules = schedules?.length || 0
@@ -110,10 +147,30 @@ export default function DiscoverPage() {
           {/* Grouped schedules */}
           {groupedSchedules && (
             <>
-              <DiscoverDateGroup title="Today" schedules={groupedSchedules.today} onBook={handleBook} />
-              <DiscoverDateGroup title="Tomorrow" schedules={groupedSchedules.tomorrow} onBook={handleBook} />
-              <DiscoverDateGroup title="This Week" schedules={groupedSchedules.thisWeek} onBook={handleBook} />
-              <DiscoverDateGroup title="Upcoming" schedules={groupedSchedules.later} onBook={handleBook} />
+              <DiscoverDateGroup
+                title="Today"
+                schedules={groupedSchedules.today}
+                onBook={handleBook}
+                onCancel={handleCancelRequest}
+              />
+              <DiscoverDateGroup
+                title="Tomorrow"
+                schedules={groupedSchedules.tomorrow}
+                onBook={handleBook}
+                onCancel={handleCancelRequest}
+              />
+              <DiscoverDateGroup
+                title="This Week"
+                schedules={groupedSchedules.thisWeek}
+                onBook={handleBook}
+                onCancel={handleCancelRequest}
+              />
+              <DiscoverDateGroup
+                title="Upcoming"
+                schedules={groupedSchedules.later}
+                onBook={handleBook}
+                onCancel={handleCancelRequest}
+              />
             </>
           )}
         </div>
@@ -121,6 +178,15 @@ export default function DiscoverPage() {
 
       {/* Booking Dialog */}
       <BookingDialog schedule={selectedSchedule} open={bookingDialogOpen} onOpenChange={setBookingDialogOpen} />
+
+      {/* Cancel Booking Dialog */}
+      <CancelBookingDialog
+        schedule={scheduleToCancel}
+        open={cancelDialogOpen}
+        onOpenChange={setCancelDialogOpen}
+        onConfirm={handleCancelConfirm}
+        isLoading={cancelBookingMutation.isPending}
+      />
     </div>
   )
 }

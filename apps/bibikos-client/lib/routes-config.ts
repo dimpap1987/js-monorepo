@@ -8,6 +8,7 @@ import {
   RiCustomerService2Line,
   RiCalendarLine,
   RiBookmarkLine,
+  RiUserLine,
 } from 'react-icons/ri'
 import { Role, type RouteRole } from './roles'
 
@@ -83,18 +84,28 @@ export const navigationsMenuItems: MenuItem[] = [
     name: 'navigation.dashboard',
     roles: [Role.USER],
     Icon: RiDashboardLine,
+    requiresOrganizer: true,
   },
   {
     href: '/calendar',
     name: 'navigation.calendar',
     roles: [Role.USER],
     Icon: RiCalendarLine,
+    requiresOrganizer: true,
   },
   {
     href: '/bookings',
-    name: 'navigation.bookings',
+    name: 'navigation.classBookings',
+    roles: [Role.USER],
+    Icon: RiUserLine,
+    requiresOrganizer: true,
+  },
+  {
+    href: '/my-bookings',
+    name: 'navigation.myBookings',
     roles: [Role.USER],
     Icon: RiBookmarkLine,
+    requiresParticipant: true,
   },
   {
     href: '/admin',
@@ -113,12 +124,6 @@ export const navigationsMenuItems: MenuItem[] = [
     name: 'navigation.contact',
     roles: [Role.PUBLIC],
     Icon: RiCustomerService2Line,
-  },
-  {
-    href: '/my-bookings',
-    name: 'navigation.bookings',
-    roles: [Role.USER],
-    Icon: RiBookmarkLine,
   },
 ]
 
