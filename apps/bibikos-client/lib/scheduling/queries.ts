@@ -29,6 +29,10 @@ import type {
   CancelBookingPayload,
   MarkAttendancePayload,
   UpdateBookingNotesPayload,
+  ClassInvitation,
+  PendingInvitation,
+  SendInvitationPayload,
+  RespondToInvitationPayload,
 } from './types'
 
 // =============================================================================
@@ -65,6 +69,10 @@ export const schedulingKeys = {
       filters.timeOfDay,
       filters.search,
     ] as const,
+  invitations: () => [...schedulingKeys.all, 'invitations'] as const,
+  invitationsPending: () => [...schedulingKeys.all, 'invitations', 'pending'] as const,
+  invitationsSent: () => [...schedulingKeys.all, 'invitations', 'sent'] as const,
+  invitationsForClass: (classId: number) => [...schedulingKeys.all, 'invitations', 'class', classId] as const,
 }
 
 // =============================================================================
@@ -604,6 +612,108 @@ export function useUpdateBookingNotes() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: schedulingKeys.bookings() })
+    },
+  })
+}
+
+// =============================================================================
+// Invitation Hooks
+// =============================================================================
+
+/**
+ * Get pending invitations for the current user
+ */
+export function usePendingInvitations() {
+  const { session } = useSession()
+  return useQuery({
+    queryKey: schedulingKeys.invitationsPending(),
+    queryFn: async () => {
+      const response = await apiClient.get<PendingInvitation[]>('/scheduling/invitations/pending')
+      return handleQueryResponse(response)
+    },
+    enabled: !!session?.user,
+    staleTime: 1000 * 60, // 1 minute
+  })
+}
+
+/**
+ * Get all invitations sent by organizer (for dashboard)
+ */
+export function useSentInvitations() {
+  const { session } = useSession()
+  return useQuery({
+    queryKey: schedulingKeys.invitationsSent(),
+    queryFn: async () => {
+      const response = await apiClient.get<ClassInvitation[]>('/scheduling/invitations/sent')
+      return handleQueryResponse(response)
+    },
+    enabled: !!session?.user,
+    staleTime: 1000 * 60, // 1 minute
+  })
+}
+
+/**
+ * Get invitations for a specific class (organizer view)
+ */
+export function useInvitationsForClass(classId: number) {
+  const { session } = useSession()
+  return useQuery({
+    queryKey: schedulingKeys.invitationsForClass(classId),
+    queryFn: async () => {
+      const response = await apiClient.get<ClassInvitation[]>(`/scheduling/invitations/class/${classId}`)
+      return handleQueryResponse(response)
+    },
+    enabled: !!session?.user && classId > 0,
+  })
+}
+
+/**
+ * Send an invitation to a user for a private class
+ */
+export function useSendInvitation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: SendInvitationPayload) => {
+      const response = await apiClient.post<ClassInvitation>('/scheduling/invitations', payload)
+      return handleQueryResponse(response)
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: schedulingKeys.invitationsForClass(variables.classId) })
+    },
+  })
+}
+
+/**
+ * Respond to an invitation (accept/decline)
+ */
+export function useRespondToInvitation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ invitationId, ...payload }: RespondToInvitationPayload & { invitationId: number }) => {
+      const response = await apiClient.patch<ClassInvitation>(
+        `/scheduling/invitations/${invitationId}/respond`,
+        payload
+      )
+      return handleQueryResponse(response)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: schedulingKeys.invitationsPending() })
+      queryClient.invalidateQueries({ queryKey: schedulingKeys.invitations() })
+    },
+  })
+}
+
+/**
+ * Cancel/delete an invitation (organizer only)
+ */
+export function useCancelInvitation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (invitationId: number) => {
+      await apiClient.delete(`/scheduling/invitations/${invitationId}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: schedulingKeys.invitations() })
     },
   })
 }

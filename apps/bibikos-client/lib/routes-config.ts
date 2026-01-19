@@ -9,6 +9,7 @@ import {
   RiCalendarLine,
   RiBookmarkLine,
   RiUserLine,
+  RiMailLine,
 } from 'react-icons/ri'
 import { Role, type RouteRole } from './roles'
 
@@ -74,6 +75,10 @@ export const routes: RouteConfig[] = [
     path: '/my-bookings',
     roles: [Role.USER],
   },
+  {
+    path: '/my-invitations',
+    roles: [Role.USER],
+  },
 ]
 
 // Navbar & Sidebar Menu navigation
@@ -109,6 +114,13 @@ export const navigationsMenuItems: MenuItem[] = [
     roles: [Role.USER],
     Icon: RiBookmarkLine,
     requiresParticipant: true,
+    position: 'main',
+  },
+  {
+    href: '/my-invitations',
+    name: 'navigation.myInvitations',
+    roles: [Role.USER],
+    Icon: RiMailLine,
     position: 'main',
   },
   {

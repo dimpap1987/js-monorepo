@@ -6,9 +6,10 @@ interface ClassesListProps {
   locations: Location[]
   onEdit: (classItem: Class) => void
   onDelete: (classId: number) => void
+  onInvite: (classItem: Class) => void
 }
 
-export function ClassesList({ classes, locations, onEdit, onDelete }: ClassesListProps) {
+export function ClassesList({ classes, locations, onEdit, onDelete, onInvite }: ClassesListProps) {
   const activeClasses = classes.filter((c) => c.isActive)
   const inactiveClasses = classes.filter((c) => !c.isActive)
 
@@ -24,6 +25,7 @@ export function ClassesList({ classes, locations, onEdit, onDelete }: ClassesLis
               locations={locations}
               onEdit={() => onEdit(classItem)}
               onDelete={() => onDelete(classItem.id)}
+              onInvite={classItem.isPrivate ? () => onInvite(classItem) : undefined}
             />
           ))}
         </div>
@@ -41,6 +43,7 @@ export function ClassesList({ classes, locations, onEdit, onDelete }: ClassesLis
                 locations={locations}
                 onEdit={() => onEdit(classItem)}
                 onDelete={() => onDelete(classItem.id)}
+                onInvite={classItem.isPrivate ? () => onInvite(classItem) : undefined}
               />
             ))}
           </div>

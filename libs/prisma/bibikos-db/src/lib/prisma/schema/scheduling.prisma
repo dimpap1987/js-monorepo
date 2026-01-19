@@ -29,6 +29,7 @@ model AppUser {
     authUser           AuthUser            @relation(fields: [authUserId], references: [id], onDelete: Cascade)
     organizerProfile   OrganizerProfile?
     participantProfile ParticipantProfile?
+    classInvitations   ClassInvitation[]
 
     @@index([authUserId])
     @@map("app_users")
@@ -62,10 +63,11 @@ model OrganizerProfile {
     defaultLocationId Int?
 
     // Relations
-    appUser         AppUser   @relation(fields: [appUserId], references: [id], onDelete: Cascade)
-    defaultLocation Location? @relation("DefaultLocation", fields: [defaultLocationId], references: [id], onDelete: SetNull)
-    classes         Class[]
-    locations       Location[] @relation("OrganizerLocations")
+    appUser          AppUser           @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+    defaultLocation  Location?         @relation("DefaultLocation", fields: [defaultLocationId], references: [id], onDelete: SetNull)
+    classes          Class[]
+    locations        Location[]        @relation("OrganizerLocations")
+    classInvitations ClassInvitation[]
 
     @@index([appUserId])
     @@index([slug])
@@ -160,9 +162,10 @@ model Class {
     isPrivate Boolean @default(false) // If true, class is hidden from discover and only bookable by invitation
 
     // Relations
-    organizer OrganizerProfile @relation(fields: [organizerId], references: [id], onDelete: Cascade)
-    location  Location         @relation(fields: [locationId], references: [id], onDelete: Restrict)
-    schedules ClassSchedule[]
+    organizer   OrganizerProfile  @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+    location    Location          @relation(fields: [locationId], references: [id], onDelete: Restrict)
+    schedules   ClassSchedule[]
+    invitations ClassInvitation[]
 
     @@index([organizerId])
     @@index([locationId])
@@ -271,4 +274,62 @@ model Booking {
     @@index([status])
     @@index([waitlistPosition])
     @@map("bookings")
+}
+
+// -----------------------------------------------------------------------------
+// ClassInvitation - Invitation to join a private class
+// -----------------------------------------------------------------------------
+// Allows organizers to invite users to private classes via username or email
+// Users can accept or decline invitations
+
+enum InvitationStatus {
+    PENDING // Waiting for user response
+    ACCEPTED // User accepted the invitation
+    DECLINED // User declined the invitation
+    EXPIRED // Invitation expired
+}
+
+model ClassInvitation {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // The class being invited to
+    classId Int
+
+    // The organizer who sent the invitation
+    organizerId Int
+
+    // The invited user (resolved from username/email)
+    invitedUserId Int?
+
+    // Original invitation target (for tracking even if user doesn't exist yet)
+    invitedUsername String? @db.VarChar(100)
+    invitedEmail    String? @db.VarChar(255)
+
+    // Invitation status
+    status InvitationStatus @default(PENDING)
+
+    // Optional message from organizer
+    message String? @db.Text
+
+    // When the user responded
+    respondedAt DateTime?
+
+    // Expiration (optional)
+    expiresAt DateTime?
+
+    // Relations
+    class       Class            @relation(fields: [classId], references: [id], onDelete: Cascade)
+    organizer   OrganizerProfile @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+    invitedUser AppUser?         @relation(fields: [invitedUserId], references: [id], onDelete: Cascade)
+
+    @@unique([classId, invitedUserId]) // One invitation per user per class
+    @@index([classId])
+    @@index([organizerId])
+    @@index([invitedUserId])
+    @@index([invitedEmail])
+    @@index([invitedUsername])
+    @@index([status])
+    @@map("class_invitations")
 }

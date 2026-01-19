@@ -274,3 +274,45 @@ export interface CalendarEvent {
   borderColor?: string
   textColor?: string
 }
+
+// Class Invitations
+export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'EXPIRED'
+
+export interface ClassInvitation {
+  id: number
+  classId: number
+  className: string
+  organizerId: number
+  organizerName: string | null
+  invitedUserId: number | null
+  invitedUsername: string | null
+  invitedEmail: string | null
+  status: InvitationStatus
+  message: string | null
+  createdAt: string
+  respondedAt: string | null
+  expiresAt: string | null
+}
+
+export interface PendingInvitation {
+  id: number
+  classId: number
+  className: string
+  classDescription: string | null
+  organizerName: string | null
+  organizerSlug: string | null
+  message: string | null
+  createdAt: string
+  expiresAt: string | null
+}
+
+export interface SendInvitationPayload {
+  classId: number
+  username?: string
+  email?: string
+  message?: string
+}
+
+export interface RespondToInvitationPayload {
+  status: 'ACCEPTED' | 'DECLINED'
+}

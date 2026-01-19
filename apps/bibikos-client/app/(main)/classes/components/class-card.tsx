@@ -10,7 +10,19 @@ import {
 } from '@js-monorepo/components/ui/dropdown'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
-import { Calendar, Users, Edit, Trash2, MoreVertical, Video, Building, CalendarPlus, Lock, Globe } from 'lucide-react'
+import {
+  Calendar,
+  Users,
+  Edit,
+  Trash2,
+  MoreVertical,
+  Video,
+  Building,
+  CalendarPlus,
+  Lock,
+  Globe,
+  UserPlus,
+} from 'lucide-react'
 import { Class, Location } from '../../../../lib/scheduling'
 
 interface ClassCardProps {
@@ -18,9 +30,10 @@ interface ClassCardProps {
   locations: Location[]
   onEdit: () => void
   onDelete: () => void
+  onInvite?: () => void
 }
 
-export function ClassCard({ classItem, locations, onEdit, onDelete }: ClassCardProps) {
+export function ClassCard({ classItem, locations, onEdit, onDelete, onInvite }: ClassCardProps) {
   const location = locations.find((l) => l.id === classItem.locationId)
 
   return (
@@ -66,6 +79,14 @@ export function ClassCard({ classItem, locations, onEdit, onDelete }: ClassCardP
                   Add Schedule
                 </DpNextNavLink>
               </DropdownMenuItem>
+              {classItem.isPrivate && onInvite && (
+                <>
+                  <DropdownMenuItem onClick={onInvite}>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Invite Users
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onEdit}>
                 <Edit className="w-4 h-4 mr-2" />

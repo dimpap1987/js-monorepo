@@ -3,6 +3,7 @@ import { AppUserModule } from './app-users/app-user.module'
 import { BookingModule } from './bookings/booking.module'
 import { ClassScheduleModule } from './class-schedules/class-schedule.module'
 import { ClassModule } from './classes/class.module'
+import { InvitationModule } from './invitations/invitation.module'
 import { LocationModule } from './locations/location.module'
 import { OnboardingModule } from './onboarding/onboarding.module'
 import { OrganizerModule } from './organizers/organizer.module'
@@ -16,6 +17,7 @@ import { ParticipantModule } from './participants/participant.module'
  * - Recurring schedules (RRULE)
  * - Participant booking & waitlist
  * - Attendance tracking
+ * - Private class invitations
  *
  * Module Order (dependency-based):
  * 1. AppUserModule - Base user profiles
@@ -25,6 +27,7 @@ import { ParticipantModule } from './participants/participant.module'
  * 5. ClassModule - Class templates (depends on Organizer, Location)
  * 6. ClassScheduleModule - Specific occurrences (depends on Class, Location)
  * 7. BookingModule - Registrations (depends on Schedule, Participant)
+ * 8. InvitationModule - Private class invitations (depends on Class, Organizer, AppUser)
  */
 @Module({
   imports: [
@@ -36,6 +39,7 @@ import { ParticipantModule } from './participants/participant.module'
     OnboardingModule,
     ClassScheduleModule,
     BookingModule,
+    InvitationModule,
   ],
 })
 export class SchedulingModule {}

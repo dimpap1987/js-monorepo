@@ -21,6 +21,7 @@ import { ClassesList } from './components/classes-list'
 import { ClassesNoLocationsWarning } from './components/classes-no-locations-warning'
 import { ClassesSkeleton } from './components/classes-skeleton'
 import { DeleteClassDialog } from './components/delete-class-dialog'
+import { InviteDialog } from './components/invite-dialog'
 import { ClassFormData } from './schemas'
 
 export function ClassesContent() {
@@ -32,6 +33,7 @@ export function ClassesContent() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingClass, setEditingClass] = useState<Class | null>(null)
   const [deleteClassId, setDeleteClassId] = useState<number | null>(null)
+  const [inviteClass, setInviteClass] = useState<Class | null>(null)
 
   // Check if user has organizer profile
   const { data: organizer, isLoading: isOrganizerLoading } = useOrganizer()
@@ -154,6 +156,7 @@ export function ClassesContent() {
               locations={locations || []}
               onEdit={handleOpenDialog}
               onDelete={setDeleteClassId}
+              onInvite={setInviteClass}
             />
           )
         )}
@@ -173,6 +176,14 @@ export function ClassesContent() {
         onOpenChange={(open) => !open && setDeleteClassId(null)}
         onConfirm={handleDelete}
       />
+
+      {inviteClass && (
+        <InviteDialog
+          classItem={inviteClass}
+          open={!!inviteClass}
+          onOpenChange={(open) => !open && setInviteClass(null)}
+        />
+      )}
     </div>
   )
 }

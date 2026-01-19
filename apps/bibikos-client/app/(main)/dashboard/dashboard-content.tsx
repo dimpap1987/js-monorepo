@@ -13,6 +13,7 @@ import { useEffect } from 'react'
 import { Calendar, MapPin, Users, Plus, CalendarPlus, ArrowRight, Clock, TrendingUp } from 'lucide-react'
 import { useOrganizer, useClasses, useLocations, useSchedulesCalendar, ClassSchedule } from '../../../lib/scheduling'
 import { format, startOfWeek, endOfWeek, startOfDay, endOfDay } from 'date-fns'
+import { SentInvitationsCard } from './components/sent-invitations-card'
 
 function DashboardSkeleton() {
   return (
@@ -64,6 +65,23 @@ function DashboardSkeleton() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Sent Invitations Skeleton */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <Skeleton className="h-6 w-36" />
+          <Skeleton className="h-4 w-52 mt-1" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-3 gap-3">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-16 w-full rounded-lg" />
+            ))}
+          </div>
+          <Skeleton className="h-10 w-full rounded-lg" />
+          <Skeleton className="h-10 w-full rounded-lg" />
+        </CardContent>
+      </Card>
     </div>
   )
 }
@@ -286,6 +304,9 @@ export function DashboardContent() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Sent Invitations - only shows if organizer has sent any */}
+      <SentInvitationsCard />
     </div>
   )
 }
