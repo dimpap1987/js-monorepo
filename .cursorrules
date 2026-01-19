@@ -151,6 +151,34 @@ Each application now manages its own environment variables using a local `.env` 
 - ❌ Missing error handling
 - ❌ Hardcoded values (use configuration)
 
+### React Hook Form: Avoid `useWatch` with `FormField`
+
+**Problem:** Using `useWatch` in a component that also contains `FormField` (or `Controller`) causes the error: "Cannot update a component while rendering a different component". This happens because `useWatch` triggers **synchronous** re-renders while the `Controller` is still in its render phase.
+
+**Solution:** Use the subscription pattern with `form.watch()` instead:
+
+```tsx
+// ❌ BAD - causes render conflict
+function MyComponent({ control }) {
+  const value = useWatch({ control, name: 'field' }) // Synchronous!
+  return <FormField control={control} name="field" ... />
+}
+
+// ✅ GOOD - async state update via subscription
+function MyComponent({ form }) {
+  const [value, setValue] = useState(form.getValues('field'))
+  
+  useEffect(() => {
+    const subscription = form.watch((values) => setValue(values.field))
+    return () => subscription.unsubscribe()
+  }, [form])
+  
+  return <FormField control={form.control} name="field" ... />
+}
+```
+
+The subscription callback fires **after** the render cycle, avoiding conflicts.
+
 ### Design Principles
 
 - **User Experience**: Prioritize user needs, intuitive interfaces, clear feedback

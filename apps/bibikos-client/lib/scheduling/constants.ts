@@ -133,14 +133,47 @@ export const DAYS_OF_WEEK = [
   { value: 'SU', label: 'Sunday', short: 'Sun' },
 ]
 
+// Recurrence type constants
+export const RECURRENCE_TYPE = {
+  NONE: 'none',
+  DAILY: 'daily',
+  WEEKLY: 'weekly',
+  BIWEEKLY: 'biweekly',
+  MONTHLY: 'monthly',
+} as const
+
+export type RecurrenceType = (typeof RECURRENCE_TYPE)[keyof typeof RECURRENCE_TYPE]
+
 // Recurrence frequency options
 export const RECURRENCE_OPTIONS = [
-  { value: 'none', label: 'Does not repeat' },
-  { value: 'daily', label: 'Daily' },
-  { value: 'weekly', label: 'Weekly' },
-  { value: 'biweekly', label: 'Every 2 weeks' },
-  { value: 'monthly', label: 'Monthly' },
+  { value: RECURRENCE_TYPE.NONE, label: 'Does not repeat' },
+  { value: RECURRENCE_TYPE.DAILY, label: 'Daily' },
+  { value: RECURRENCE_TYPE.WEEKLY, label: 'Weekly' },
+  { value: RECURRENCE_TYPE.BIWEEKLY, label: 'Every 2 weeks' },
+  { value: RECURRENCE_TYPE.MONTHLY, label: 'Monthly' },
 ]
+
+// Schedule form defaults
+export const SCHEDULE_FORM_DEFAULTS = {
+  DEFAULT_START_TIME: '09:00',
+  EMPTY_TIME: '00:00',
+  DEFAULT_DURATION: 60,
+  DEFAULT_RECURRENCE_COUNT: 10,
+  MIN_RECURRENCE_COUNT: 2,
+  MAX_RECURRENCE_COUNT: 52,
+  DAYS_IN_WEEK: 7,
+} as const
+
+// Day number (0=Sunday) to RRULE day code mapping
+export const DAY_NUMBER_TO_RRULE: Record<number, string> = {
+  0: 'SU',
+  1: 'MO',
+  2: 'TU',
+  3: 'WE',
+  4: 'TH',
+  5: 'FR',
+  6: 'SA',
+}
 
 // Duration options in minutes
 export const DURATION_OPTIONS = [
