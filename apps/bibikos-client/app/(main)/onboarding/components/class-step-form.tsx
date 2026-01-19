@@ -2,9 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@js-monorepo/components/ui/button'
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Textarea } from '@js-monorepo/components/ui/textarea'
+import { Switch } from '@js-monorepo/components/ui/switch'
 import { useTranslations } from 'next-intl'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useEffect } from 'react'
@@ -42,6 +43,7 @@ export function ClassStepForm({ initialData, onSubmit, onBack, isLoading = false
       description: '',
       capacity: '',
       waitlistLimit: '',
+      isPrivate: false,
     },
   })
 
@@ -117,6 +119,22 @@ export function ClassStepForm({ initialData, onSubmit, onBack, isLoading = false
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="isPrivate"
+          render={({ field }) => (
+            <FormItem className="flex items-center justify-between p-4 rounded-lg border border-border/50">
+              <div>
+                <FormLabel className="text-base">Private Class</FormLabel>
+                <FormDescription>Hidden from discover. Only bookable by invitation.</FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         <div className="flex justify-between pt-4">
           <Button type="button" variant="ghost" onClick={onBack} className="gap-2">

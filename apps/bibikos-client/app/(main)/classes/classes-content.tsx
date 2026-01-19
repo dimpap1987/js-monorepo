@@ -84,6 +84,7 @@ export function ClassesContent() {
           capacity: data.capacity ? Number(data.capacity) : null,
           waitlistLimit: data.waitlistLimit ? Number(data.waitlistLimit) : null,
           isCapacitySoft: data.isCapacitySoft,
+          isPrivate: data.isPrivate,
           isActive: data.isActive,
         })
         addNotification({ message: 'Class updated', type: 'success' })
@@ -95,6 +96,7 @@ export function ClassesContent() {
           capacity: data.capacity ? Number(data.capacity) : null,
           waitlistLimit: data.waitlistLimit ? Number(data.waitlistLimit) : null,
           isCapacitySoft: data.isCapacitySoft,
+          isPrivate: data.isPrivate,
         })
         addNotification({ message: 'Class created', type: 'success' })
       }

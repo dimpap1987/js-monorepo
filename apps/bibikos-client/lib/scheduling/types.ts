@@ -97,6 +97,7 @@ export interface Class {
   waitlistLimit: number | null
   isCapacitySoft: boolean
   isActive: boolean
+  isPrivate: boolean
   createdAt: string
   location?: {
     id: number
@@ -113,6 +114,7 @@ export interface CreateClassPayload {
   capacity?: number | null
   waitlistLimit?: number | null
   isCapacitySoft?: boolean
+  isPrivate?: boolean
 }
 
 export interface UpdateClassPayload extends Partial<CreateClassPayload> {

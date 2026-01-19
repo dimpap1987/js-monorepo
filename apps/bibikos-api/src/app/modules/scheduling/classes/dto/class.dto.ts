@@ -13,6 +13,7 @@ export interface ClassResponseDto {
   waitlistLimit: number | null
   isCapacitySoft: boolean
   isActive: boolean
+  isPrivate: boolean
   createdAt: Date
   location?: {
     id: number

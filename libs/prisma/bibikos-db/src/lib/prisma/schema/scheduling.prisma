@@ -156,7 +156,8 @@ model Class {
     // Soft limits support (recommendation vs hard limit)
     isCapacitySoft Boolean @default(false) // If true, capacity is a recommendation
 
-    isActive Boolean @default(true)
+    isActive  Boolean @default(true)
+    isPrivate Boolean @default(false) // If true, class is hidden from discover and only bookable by invitation
 
     // Relations
     organizer OrganizerProfile @relation(fields: [organizerId], references: [id], onDelete: Cascade)
@@ -166,6 +167,7 @@ model Class {
     @@index([organizerId])
     @@index([locationId])
     @@index([isActive])
+    @@index([isPrivate])
     @@map("classes")
 }
 

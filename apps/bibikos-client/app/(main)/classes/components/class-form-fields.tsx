@@ -112,7 +112,7 @@ export function ClassFormFields({ control, locations, editingClass }: ClassFormF
       </div>
 
       {/* Soft Capacity */}
-      <FormField
+      {/* <FormField
         control={control}
         name="isCapacitySoft"
         render={({ field }) => (
@@ -120,6 +120,23 @@ export function ClassFormFields({ control, locations, editingClass }: ClassFormF
             <div>
               <FormLabel className="text-base">{t('softCapacity')}</FormLabel>
               <FormDescription>Allow overbooking beyond the capacity limit</FormDescription>
+            </div>
+            <FormControl>
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItem>
+        )}
+      /> */}
+
+      {/* Private Class */}
+      <FormField
+        control={control}
+        name="isPrivate"
+        render={({ field }) => (
+          <FormItem className="flex items-center justify-between p-4 rounded-lg border border-border/50">
+            <div>
+              <FormLabel className="text-base">Private Class</FormLabel>
+              <FormDescription>Hidden from discover. Only bookable by invitation.</FormDescription>
             </div>
             <FormControl>
               <Switch checked={field.value} onCheckedChange={field.onChange} />

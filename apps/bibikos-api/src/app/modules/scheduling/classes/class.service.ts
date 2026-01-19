@@ -87,6 +87,7 @@ export class ClassService {
       capacity: dto.capacity ?? null,
       waitlistLimit: dto.waitlistLimit ?? null,
       isCapacitySoft: dto.isCapacitySoft ?? false,
+      isPrivate: dto.isPrivate ?? false,
     })
 
     this.logger.log(`Created class ${classEntity.id} for organizer ${organizerId}`)
@@ -131,6 +132,7 @@ export class ClassService {
       ...(dto.waitlistLimit !== undefined && { waitlistLimit: dto.waitlistLimit }),
       ...(dto.isCapacitySoft !== undefined && { isCapacitySoft: dto.isCapacitySoft }),
       ...(dto.isActive !== undefined && { isActive: dto.isActive }),
+      ...(dto.isPrivate !== undefined && { isPrivate: dto.isPrivate }),
     })
 
     this.logger.log(`Updated class ${classId}`)
@@ -171,6 +173,7 @@ export class ClassService {
       waitlistLimit: classEntity.waitlistLimit,
       isCapacitySoft: classEntity.isCapacitySoft,
       isActive: classEntity.isActive,
+      isPrivate: classEntity.isPrivate,
       createdAt: classEntity.createdAt,
       location: classEntity.location,
     }

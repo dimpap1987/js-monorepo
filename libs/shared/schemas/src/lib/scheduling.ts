@@ -79,6 +79,7 @@ export const CreateClassSchema = z.object({
   capacity: z.number().int().positive('Capacity must be a positive number').optional().nullable(),
   waitlistLimit: z.number().int().min(0, 'Waitlist limit cannot be negative').optional().nullable(),
   isCapacitySoft: z.boolean().default(false),
+  isPrivate: z.boolean().default(false),
 })
 
 export const UpdateClassSchema = CreateClassSchema.partial().extend({

@@ -7,6 +7,7 @@ export const classSchema = z.object({
   capacity: z.coerce.number().min(1).optional().or(z.literal('')),
   waitlistLimit: z.coerce.number().min(0).optional().or(z.literal('')),
   isCapacitySoft: z.boolean().default(false),
+  isPrivate: z.boolean().default(false),
   isActive: z.boolean().default(true),
 })
 

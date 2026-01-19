@@ -8,7 +8,7 @@ export interface DpNextNavLinkProps {
   readonly href: string
   readonly children: React.ReactNode
   readonly className?: string
-  readonly onClick?: () => void
+  readonly onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
   readonly activeClassName?: string
 }
 
@@ -29,7 +29,7 @@ const DpNextNavLink = forwardRef(
         onClick={(e) => {
           e.preventDefault()
           router.push(href, undefined, { disableSameURL: true })
-          onClick?.()
+          onClick?.(e)
         }}
       >
         {children}

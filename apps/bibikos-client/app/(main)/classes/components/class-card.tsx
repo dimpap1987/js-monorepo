@@ -1,3 +1,4 @@
+import { Badge } from '@js-monorepo/components/ui/badge'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import {
@@ -9,7 +10,7 @@ import {
 } from '@js-monorepo/components/ui/dropdown'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
-import { Calendar, Users, Edit, Trash2, MoreVertical, Video, Building, CalendarPlus } from 'lucide-react'
+import { Calendar, Users, Edit, Trash2, MoreVertical, Video, Building, CalendarPlus, Lock, Globe } from 'lucide-react'
 import { Class, Location } from '../../../../lib/scheduling'
 
 interface ClassCardProps {
@@ -30,9 +31,26 @@ export function ClassCard({ classItem, locations, onEdit, onDelete }: ClassCardP
             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
               <Calendar className="w-5 h-5 text-primary" />
             </div>
-            <div>
+            <div className="space-y-1">
               <CardTitle className="text-lg">{classItem.title}</CardTitle>
-              {!classItem.isActive && <span className="text-xs text-foreground-muted">(Inactive)</span>}
+              <div className="flex items-center gap-1.5">
+                {classItem.isPrivate ? (
+                  <Badge variant="secondary" className="text-xs px-1.5 py-0 h-5 gap-1">
+                    <Lock className="w-3 h-3" />
+                    Private
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 gap-1 text-foreground-muted">
+                    <Globe className="w-3 h-3" />
+                    Public
+                  </Badge>
+                )}
+                {!classItem.isActive && (
+                  <Badge variant="destructive" className="text-xs px-1.5 py-0 h-5">
+                    Inactive
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
           <DropdownMenu>

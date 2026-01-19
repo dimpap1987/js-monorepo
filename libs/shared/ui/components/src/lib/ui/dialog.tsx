@@ -31,10 +31,19 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+>(({ className, children, onCloseAutoFocus, ...props }, ref) => {
   // Fix for Radix Dialog not properly removing pointer-events: none from body on close
+  const handleCloseAutoFocus = React.useCallback(
+    (e: Event) => {
+      document.body.style.pointerEvents = ''
+      onCloseAutoFocus?.(e)
+    },
+    [onCloseAutoFocus]
+  )
+
   React.useEffect(() => {
     return () => {
+      // Also clear on unmount
       setTimeout(() => {
         document.body.style.pointerEvents = ''
       }, 0)
@@ -46,6 +55,7 @@ const DialogContent = React.forwardRef<
       <DialogOverlay />
       <DialogPrimitive.Content
         ref={ref}
+        onCloseAutoFocus={handleCloseAutoFocus}
         className={cn(
           'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-2 xs:p-5 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg',
           className
@@ -102,12 +112,17 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 const DpDialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+>(({ className, children, onCloseAutoFocus, ...props }, ref) => {
   // Fix for Radix Dialog not properly removing pointer-events: none from body on close
-  React.useEffect(() => {
-    setTimeout(() => {
+  const handleCloseAutoFocus = React.useCallback(
+    (e: Event) => {
       document.body.style.pointerEvents = ''
-    }, 200)
+      onCloseAutoFocus?.(e)
+    },
+    [onCloseAutoFocus]
+  )
+
+  React.useEffect(() => {
     return () => {
       setTimeout(() => {
         document.body.style.pointerEvents = ''
@@ -120,6 +135,7 @@ const DpDialogContent = React.forwardRef<
       <DialogOverlay />
       <DialogPrimitive.Content
         ref={ref}
+        onCloseAutoFocus={handleCloseAutoFocus}
         className={cn(
           `fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-50 w-[95%] max-w-lg border 
           bg-transparent p-2 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out 

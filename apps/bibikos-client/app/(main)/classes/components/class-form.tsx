@@ -33,6 +33,7 @@ export function ClassForm({ open, onOpenChange, editingClass, locations, onSubmi
       capacity: '',
       waitlistLimit: '',
       isCapacitySoft: false,
+      isPrivate: false,
       isActive: true,
     },
   })
@@ -47,6 +48,7 @@ export function ClassForm({ open, onOpenChange, editingClass, locations, onSubmi
         capacity: editingClass.capacity ?? '',
         waitlistLimit: editingClass.waitlistLimit ?? '',
         isCapacitySoft: editingClass.isCapacitySoft,
+        isPrivate: editingClass.isPrivate,
         isActive: editingClass.isActive,
       })
     } else {
@@ -57,6 +59,7 @@ export function ClassForm({ open, onOpenChange, editingClass, locations, onSubmi
         capacity: '',
         waitlistLimit: '',
         isCapacitySoft: false,
+        isPrivate: false,
         isActive: true,
       })
     }

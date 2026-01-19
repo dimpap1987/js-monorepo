@@ -145,6 +145,7 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
         class: {
           organizerId,
           isActive: true,
+          isPrivate: false, // Exclude private classes from public view
         },
         startTimeUtc: {
           gte: startDate,
@@ -244,6 +245,7 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
       where: {
         class: {
           isActive: true,
+          isPrivate: false, // Exclude private classes from discover
           ...(activity ? { organizer: { activityLabel: { equals: activity, mode: 'insensitive' } } } : {}),
         },
         startTimeUtc: {
