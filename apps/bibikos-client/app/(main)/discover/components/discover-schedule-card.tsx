@@ -1,8 +1,10 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { Badge } from '@js-monorepo/components/ui/badge'
+import { cn } from '@js-monorepo/ui/util'
 import { Clock, Users, ChevronRight, User, CheckCircle2, X } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
@@ -124,6 +126,18 @@ interface BookButtonProps {
 }
 
 function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCancel }: BookButtonProps) {
+  const handleBookClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onBook()
+  }
+
+  const handleCancelClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onCancel()
+  }
+
   // User is already booked
   if (isBooked) {
     return (
@@ -132,7 +146,12 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
           <CheckCircle2 className="w-3 h-3" />
           Booked
         </Badge>
-        <Button variant="outline" onClick={onCancel} className="gap-1 text-destructive hover:text-destructive">
+        <Button
+          variant="outline"
+          onClick={handleCancelClick}
+          className="gap-1 text-destructive hover:text-destructive"
+          type="button"
+        >
           <X className="w-3 h-3" />
           Cancel
         </Button>
@@ -148,7 +167,12 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
           <Clock className="w-3 h-3" />
           Waitlisted
         </Badge>
-        <Button variant="outline" onClick={onCancel} className="gap-1 text-destructive hover:text-destructive">
+        <Button
+          variant="outline"
+          onClick={handleCancelClick}
+          className="gap-1 text-destructive hover:text-destructive"
+          type="button"
+        >
           <X className="w-3 h-3" />
           Leave
         </Button>
@@ -161,7 +185,7 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
   const label = isFull ? (hasWaitlist ? 'Join Waitlist' : 'Full') : 'Book Now'
 
   return (
-    <Button onClick={onBook} disabled={isDisabled} className="gap-2 flex-shrink-0">
+    <Button onClick={handleBookClick} disabled={isDisabled} className="gap-2 flex-shrink-0" type="button">
       {label}
       <ChevronRight className="w-4 h-4" />
     </Button>
@@ -175,6 +199,7 @@ interface DiscoverScheduleCardProps {
 }
 
 export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverScheduleCardProps) {
+  const router = useRouter()
   const startTime = parseISO(schedule.startTimeUtc)
   const endTime = parseISO(schedule.endTimeUtc)
   const classInfo = schedule.class
@@ -190,8 +215,23 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
   const isBooked = schedule.myBooking?.status === 'BOOKED'
   const isWaitlisted = schedule.myBooking?.status === 'WAITLISTED'
 
+  const classId = schedule.classId
+  const hasClassLink = !!classId
+
+  const handleCardClick = () => {
+    if (hasClassLink) {
+      router.push(`/class/${classId}`)
+    }
+  }
+
   return (
-    <Card className="border-border/50 hover:shadow-md transition-all">
+    <Card
+      className={cn(
+        'border-border transition-all',
+        hasClassLink && 'cursor-pointer hover:shadow-md hover:border-primary hover:bg-accent'
+      )}
+      onClick={hasClassLink ? handleCardClick : undefined}
+    >
       <CardContent className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-4 min-w-0">
