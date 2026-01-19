@@ -38,4 +38,5 @@ export interface InvitationRepository {
   linkUserToInvitation(invitationId: number, userId: number): Promise<ClassInvitation>
   findPendingByEmail(email: string): Promise<InvitationWithDetails[]>
   findPendingByUsername(username: string): Promise<InvitationWithDetails[]>
+  hasAcceptedInvitation(classId: number, userId: number): Promise<boolean>
 }

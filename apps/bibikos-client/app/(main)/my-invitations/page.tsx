@@ -7,6 +7,7 @@ import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { formatDistanceToNow } from 'date-fns'
 import { Check, Loader2, Mail, MailOpen, Search, User, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useInvitationWebSocket } from '../../../lib/scheduling/hooks/use-invitation-websocket'
@@ -121,15 +122,22 @@ export default function MyInvitationsPage() {
   const { data: invitations, isLoading, refetch } = usePendingInvitations()
   const respondMutation = useRespondToInvitation()
   const [respondingId, setRespondingId] = useState<number | null>(null)
+  const router = useRouter()
 
   useInvitationWebSocket()
 
-  const handleRespond = async (invitationId: number, status: 'ACCEPTED' | 'DECLINED') => {
-    setRespondingId(invitationId)
+  const handleRespond = async (invitation: PendingInvitation, status: 'ACCEPTED' | 'DECLINED') => {
+    setRespondingId(invitation.id)
     try {
-      await respondMutation.mutateAsync({ invitationId, status })
-      toast.success(status === 'ACCEPTED' ? 'Invitation accepted! You can now book sessions.' : 'Invitation declined')
-      refetch()
+      await respondMutation.mutateAsync({ invitationId: invitation.id, status })
+
+      if (status === 'ACCEPTED') {
+        toast.success('Invitation accepted! Redirecting to class...')
+        router.push(`/class/${invitation.classId}`)
+      } else {
+        toast.success('Invitation declined')
+        refetch()
+      }
     } catch (error) {
       toast.error('Failed to respond to invitation')
     } finally {
@@ -164,8 +172,8 @@ export default function MyInvitationsPage() {
             <InvitationCard
               key={invitation.id}
               invitation={invitation}
-              onAccept={() => handleRespond(invitation.id, 'ACCEPTED')}
-              onDecline={() => handleRespond(invitation.id, 'DECLINED')}
+              onAccept={() => handleRespond(invitation, 'ACCEPTED')}
+              onDecline={() => handleRespond(invitation, 'DECLINED')}
               isResponding={respondingId === invitation.id}
             />
           ))}

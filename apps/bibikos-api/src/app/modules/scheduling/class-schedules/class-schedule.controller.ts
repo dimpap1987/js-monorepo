@@ -41,7 +41,7 @@ export class ClassScheduleController {
   /**
    * GET /scheduling/schedules/discover
    * Public endpoint to discover classes across all organizers
-   * No auth required, but if logged in shows user's booking status
+   * No auth required, but if logged in shows user's booking status and private classes with accepted invitations
    */
   @Get('discover')
   async discoverSchedules(
@@ -56,10 +56,12 @@ export class ClassScheduleController {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'START_AND_END_DATE_REQUIRED')
     }
 
-    // Get participant ID if user is logged in
+    // Get participant ID and app user ID if user is logged in
     let participantId: number | undefined
+    let appUserId: number | undefined
     if (sessionUser?.id) {
       const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+      appUserId = appUser.id
       const participant = await this.participantService.getParticipantByAppUserId(appUser.id)
       participantId = participant?.id
     }
@@ -72,7 +74,8 @@ export class ClassScheduleController {
         timeOfDay,
         search,
       },
-      participantId
+      participantId,
+      appUserId
     )
   }
 

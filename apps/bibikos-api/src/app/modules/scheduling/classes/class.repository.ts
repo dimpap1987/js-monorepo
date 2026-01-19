@@ -11,9 +11,19 @@ export interface ClassWithLocation extends Class {
   }
 }
 
+export interface ClassWithLocationAndOrganizer extends ClassWithLocation {
+  organizer: {
+    id: number
+    displayName: string | null
+    slug: string | null
+    activityLabel: string | null
+  }
+}
+
 export interface ClassRepository {
   findById(id: number): Promise<Class | null>
   findByIdWithLocation(id: number): Promise<ClassWithLocation | null>
+  findByIdWithLocationAndOrganizer(id: number): Promise<ClassWithLocationAndOrganizer | null>
   findByOrganizerId(organizerId: number, includeInactive?: boolean): Promise<ClassWithLocation[]>
   create(data: Prisma.ClassCreateInput): Promise<Class>
   update(id: number, data: Prisma.ClassUpdateInput): Promise<Class>

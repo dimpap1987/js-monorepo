@@ -1,10 +1,13 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { ClassScheduleRepo, ClassScheduleRepository } from '../class-schedules/class-schedule.repository'
+import { InvitationRepo, InvitationRepository } from '../invitations/invitation.repository'
 import { LocationRepo, LocationRepository } from '../locations/location.repository'
 import { OrganizerRepo, OrganizerRepository } from '../organizers/organizer.repository'
 import { ClassRepo, ClassRepository, ClassWithLocation } from './class.repository'
 import { ClassResponseDto, CreateClassDto, UpdateClassDto } from './dto/class.dto'
+import { ClassViewResponseDto } from './dto/class-view.dto'
 
 @Injectable()
 export class ClassService {
@@ -16,7 +19,11 @@ export class ClassService {
     @Inject(OrganizerRepo)
     private readonly organizerRepo: OrganizerRepository,
     @Inject(LocationRepo)
-    private readonly locationRepo: LocationRepository
+    private readonly locationRepo: LocationRepository,
+    @Inject(ClassScheduleRepo)
+    private readonly scheduleRepo: ClassScheduleRepository,
+    @Inject(InvitationRepo)
+    private readonly invitationRepo: InvitationRepository
   ) {}
 
   /**
@@ -57,6 +64,50 @@ export class ClassService {
     }
 
     return this.toResponseDto(classEntity)
+  }
+
+  /**
+   * Get class view with schedules for booking
+   * For private classes, user must have accepted invitation
+   */
+  async getClassView(classId: number, userId?: number): Promise<ClassViewResponseDto> {
+    const classEntity = await this.classRepo.findByIdWithLocationAndOrganizer(classId)
+
+    if (!classEntity || !classEntity.isActive) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'CLASS_NOT_FOUND')
+    }
+
+    // For private classes, check if user has accepted invitation
+    if (classEntity.isPrivate) {
+      if (!userId) {
+        throw new ApiException(HttpStatus.FORBIDDEN, 'CLASS_ACCESS_DENIED')
+      }
+
+      const hasAccess = await this.invitationRepo.hasAcceptedInvitation(classId, userId)
+      if (!hasAccess) {
+        throw new ApiException(HttpStatus.FORBIDDEN, 'CLASS_ACCESS_DENIED')
+      }
+    }
+
+    // Get upcoming schedules with booking counts
+    const schedules = await this.scheduleRepo.findUpcomingByClassIdWithBookingCounts(classId, 20)
+
+    return {
+      id: classEntity.id,
+      title: classEntity.title,
+      description: classEntity.description,
+      capacity: classEntity.capacity,
+      isPrivate: classEntity.isPrivate,
+      location: classEntity.location,
+      organizer: classEntity.organizer,
+      schedules: schedules.map((schedule) => ({
+        id: schedule.id,
+        startTimeUtc: schedule.startTimeUtc,
+        endTimeUtc: schedule.endTimeUtc,
+        localTimezone: schedule.localTimezone,
+        bookingCounts: schedule.bookingCounts || { booked: 0, waitlisted: 0 },
+      })),
+    }
   }
 
   /**

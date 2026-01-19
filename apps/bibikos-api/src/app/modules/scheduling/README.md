@@ -2,7 +2,7 @@
 
 ## Overview
 
-The scheduling module provides a complete class booking system for individual instructors/coaches. It supports class management, schedule creation (one-time and recurring), and participant bookings.
+The scheduling module provides a complete class booking system for individual instructors/coaches. It supports class management, schedule creation (one-time and recurring), participant bookings, private class invitations, and real-time notifications.
 
 ---
 
@@ -18,7 +18,8 @@ scheduling/
 ├── locations/                    # Physical/online venues
 ├── classes/                      # Class templates
 ├── class-schedules/              # Schedule occurrences
-└── bookings/                     # Participant registrations
+├── bookings/                     # Participant registrations
+└── invitations/                  # Private class invitations
 ```
 
 ---
@@ -60,27 +61,31 @@ scheduling/
 
 ### Classes
 
-| Method | Endpoint                         | Description               |
-| ------ | -------------------------------- | ------------------------- |
-| GET    | `/scheduling/classes`            | List organizer's classes  |
-| GET    | `/scheduling/classes/:id`        | Get single class          |
-| GET    | `/scheduling/classes/:id/public` | Get class for public view |
-| POST   | `/scheduling/classes`            | Create class              |
-| PATCH  | `/scheduling/classes/:id`        | Update class              |
-| DELETE | `/scheduling/classes/:id`        | Deactivate class          |
+| Method | Endpoint                         | Description                                                      |
+| ------ | -------------------------------- | ---------------------------------------------------------------- |
+| GET    | `/scheduling/classes`            | List organizer's classes                                         |
+| GET    | `/scheduling/classes/:id`        | Get single class (organizer view)                                |
+| GET    | `/scheduling/classes/:id/public` | Get class for public view                                        |
+| GET    | `/scheduling/classes/:id/view`   | Get class with schedules for booking (checks access for private) |
+| POST   | `/scheduling/classes`            | Create class                                                     |
+| PATCH  | `/scheduling/classes/:id`        | Update class                                                     |
+| DELETE | `/scheduling/classes/:id`        | Deactivate class (soft delete)                                   |
 
 ### Class Schedules
 
-| Method | Endpoint                                               | Description                             |
-| ------ | ------------------------------------------------------ | --------------------------------------- |
-| GET    | `/scheduling/schedules/calendar?startDate=X&endDate=Y` | Get schedules for date range            |
-| GET    | `/scheduling/schedules/:id`                            | Get single schedule                     |
-| GET    | `/scheduling/schedules/:id/public`                     | Get schedule for public view            |
-| GET    | `/scheduling/schedules/class/:classId/upcoming`        | Get upcoming schedules                  |
-| POST   | `/scheduling/schedules`                                | Create schedule (one-time or recurring) |
-| PATCH  | `/scheduling/schedules/:id`                            | Update schedule                         |
-| POST   | `/scheduling/schedules/:id/cancel`                     | Cancel schedule                         |
-| DELETE | `/scheduling/schedules/:id/future`                     | Delete future occurrences               |
+| Method | Endpoint                                               | Description                                 |
+| ------ | ------------------------------------------------------ | ------------------------------------------- |
+| GET    | `/scheduling/schedules/discover`                       | Discover public + private (invited) classes |
+| GET    | `/scheduling/schedules/calendar?startDate=X&endDate=Y` | Get schedules for date range (organizer)    |
+| GET    | `/scheduling/schedules/public/:slug`                   | Get public schedules by organizer slug      |
+| GET    | `/scheduling/schedules/:id`                            | Get single schedule (organizer view)        |
+| GET    | `/scheduling/schedules/:id/public`                     | Get schedule for public view                |
+| GET    | `/scheduling/schedules/class/:classId/upcoming`        | Get upcoming schedules for class            |
+| POST   | `/scheduling/schedules`                                | Create schedule (one-time or recurring)     |
+| PATCH  | `/scheduling/schedules/:id`                            | Update schedule                             |
+| POST   | `/scheduling/schedules/:id/cancel`                     | Cancel single schedule                      |
+| POST   | `/scheduling/schedules/:id/cancel-series`              | Cancel entire recurring series              |
+| DELETE | `/scheduling/schedules/:id/future`                     | Delete future occurrences                   |
 
 ### Bookings
 
@@ -94,6 +99,17 @@ scheduling/
 | POST   | `/scheduling/bookings/attendance`              | Mark attendance (batch)         |
 | PATCH  | `/scheduling/bookings/:id/notes`               | Update organizer notes          |
 
+### Invitations (Private Classes)
+
+| Method | Endpoint                                 | Description                        |
+| ------ | ---------------------------------------- | ---------------------------------- |
+| POST   | `/scheduling/invitations`                | Send invitation to private class   |
+| GET    | `/scheduling/invitations/pending`        | Get pending invitations for user   |
+| GET    | `/scheduling/invitations/sent`           | Get invitations sent by organizer  |
+| GET    | `/scheduling/invitations/class/:classId` | Get invitations for specific class |
+| PATCH  | `/scheduling/invitations/:id/respond`    | Accept or decline invitation       |
+| DELETE | `/scheduling/invitations/:id`            | Cancel/revoke invitation           |
+
 ---
 
 ## Data Models
@@ -106,11 +122,47 @@ AppUser (1) ─────────┬──────────── O
 
 OrganizerProfile (1) ────────────── Location (*)
                      └──────────── Class (*)
+                     └──────────── ClassInvitation (*)
 
 Class (1) ───────────────────────── ClassSchedule (*)
+          └──────────────────────── ClassInvitation (*)
 
 ClassSchedule (1) ───────────────── Booking (*)
 ParticipantProfile (1) ──────────── Booking (*)
+AppUser (1) ─────────────────────── ClassInvitation (*) [as invitee]
+```
+
+### Class Model
+
+```typescript
+interface Class {
+  id: number
+  organizerId: number
+  locationId: number
+  title: string
+  description: string | null
+  capacity: number | null // Max participants (null = unlimited)
+  waitlistLimit: number | null // Max waitlist size
+  isCapacitySoft: boolean // Soft = recommendation only
+  isPrivate: boolean // Requires invitation to book
+  isActive: boolean // Soft delete flag
+}
+```
+
+### Invitation Model
+
+```typescript
+interface ClassInvitation {
+  id: number
+  classId: number
+  organizerId: number
+  invitedUserId: number | null // Resolved AppUser ID
+  invitedUsername: string | null // Original target
+  invitedEmail: string | null // Email target
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'EXPIRED'
+  message: string | null // Personal message
+  expiresAt: Date | null // Optional expiration
+}
 ```
 
 ### Recurrence Model
@@ -157,24 +209,68 @@ FREQ=MONTHLY;UNTIL=2026-06-01
 
 ### Completed ✅
 
-- [x] App user profile management
-- [x] Organizer profile CRUD
-- [x] Location CRUD
-- [x] Class CRUD
+**User & Profile Management**
+
+- [x] App user profile management (locale, timezone)
+- [x] Organizer profile CRUD with public slug
+- [x] Participant profile management
+- [x] Streamlined onboarding flow
+
+**Class Management**
+
+- [x] Class CRUD operations
+- [x] Capacity management (hard/soft limits)
+- [x] Waitlist support with configurable limits
+- [x] Private class flag
+- [x] Soft deletion (deactivation)
+
+**Scheduling**
+
 - [x] One-time schedule creation
-- [x] Recurring schedule creation (generates child occurrences)
-- [x] Schedule cancellation
+- [x] Recurring schedule creation (RFC 5545 RRULE)
 - [x] Calendar view endpoint (date range query)
+- [x] Single schedule cancellation
+- [x] Series cancellation (cancel all future)
+- [x] Delete future occurrences
+- [x] Public discovery endpoint with filters
+
+**Bookings**
+
 - [x] Booking creation with capacity checking
-- [x] Waitlist support
-- [x] Attendance marking
+- [x] Waitlist with position tracking
+- [x] Waitlist auto-promotion on cancellation
+- [x] Attendance marking (ATTENDED/NO_SHOW)
+- [x] Participant and organizer cancellations
+- [x] Organizer notes on bookings
+- [x] Rebooking support
+
+**Invitations (Private Classes)**
+
+- [x] Send invitations by username or email
+- [x] Accept/decline invitations
+- [x] Access control for private class booking
+- [x] Private classes in discover (for invited users)
+- [x] Redirect to class page after accepting
+
+**Real-time Features**
+
+- [x] WebSocket notifications for bookings
+- [x] WebSocket notifications for invitations
+- [x] Schedule cancellation notifications
+- [x] Push notifications for invitations
+
+**Location Management**
+
+- [x] Location CRUD
+- [x] Online vs physical venues
+- [x] Timezone support (IANA format)
+- [x] Default location per organizer
 
 ### Pending ❌
 
-- [ ] Waitlist auto-promotion on cancellation
 - [ ] Schedule conflict detection
 - [ ] Bulk schedule operations
-- [ ] Email notifications
+- [ ] Email notifications (reminders, confirmations)
 - [ ] Schedule templates
 - [ ] Recurring schedule editing (edit all vs single)
 
@@ -196,6 +292,50 @@ FREQ=MONTHLY;UNTIL=2026-06-01
 2. If available → status = BOOKED
 3. If full and waitlist enabled → status = WAITLISTED, assign position
 4. If full and no waitlist → reject booking
+
+// On cancellation
+1. Mark booking as CANCELLED
+2. Find first WAITLISTED booking for same schedule
+3. Promote to BOOKED, clear waitlistPosition
+4. Decrement positions for remaining waitlisted
+5. Notify promoted participant via WebSocket
+```
+
+### Private Class Access
+
+```typescript
+// Creating private class
+1. Create class with isPrivate = true
+2. Send invitations to specific users
+
+// Invitation flow
+1. Organizer sends invitation (by username or email)
+2. System resolves to AppUser if exists
+3. User receives notification (WebSocket + push)
+4. User accepts/declines at /my-invitations
+5. On accept → redirect to /class/:id
+
+// Booking private class
+1. User tries to view/book private class
+2. System checks if user has ACCEPTED invitation
+3. If yes → allow booking
+4. If no → return 403 CLASS_ACCESS_DENIED
+```
+
+### Discovery Filters
+
+```typescript
+// GET /scheduling/schedules/discover
+{
+  startDate: string,           // Required: ISO date
+  endDate: string,             // Required: ISO date (max 92 days range)
+  activity?: string,           // Filter by organizer's activity label
+  timeOfDay?: 'morning' | 'afternoon' | 'evening',
+  search?: string              // Search class title or organizer name
+}
+
+// Returns: public classes + private classes with accepted invitation
+// Includes user's booking status if logged in
 ```
 
 ### Recurring Schedule Generation
@@ -278,22 +418,70 @@ curl "http://localhost:3000/scheduling/schedules/calendar?startDate=2026-01-01&e
 
 ---
 
-## Next Steps
+## Future Enhancements
 
-### High Priority
+### Phase 2 - Payments & Credits
 
-1. **Real-time updates** - WebSocket events for schedule changes
-2. **Email notifications** - Booking confirmations, reminders, cancellations
-3. **Schedule conflicts** - Detect overlapping schedules for same class
+| Feature            | Priority | Description                       |
+| ------------------ | -------- | --------------------------------- |
+| Session Pricing    | High     | Set price per class/schedule      |
+| Payment Processing | High     | Stripe integration for bookings   |
+| Credit Packages    | High     | Buy X sessions, use over time     |
+| Refund Handling    | Medium   | Automatic refunds on cancellation |
+| Revenue Reports    | Medium   | Organizer earnings dashboard      |
 
-### Medium Priority
+### Phase 3 - Communication
 
-4. **Bulk operations** - Update/cancel multiple schedules at once
-5. **Waitlist auto-promotion** - Auto-book when spot opens
-6. **Audit logging** - Track all schedule/booking changes
+| Feature               | Priority | Description                                  |
+| --------------------- | -------- | -------------------------------------------- |
+| Email Reminders       | High     | Automated booking reminders (24h, 1h before) |
+| Booking Confirmations | High     | Email on successful booking                  |
+| SMS Notifications     | Medium   | Text message reminders                       |
+| Class Announcements   | Medium   | Broadcast to all participants                |
 
-### Future Phases
+### Phase 4 - Advanced Scheduling
 
-- Phase 2: Staff management (instructors separate from organizers)
-- Phase 3: Organization support (gyms, studios with multiple organizers)
-- Phase 4: Payment integration
+| Feature               | Priority | Description                      |
+| --------------------- | -------- | -------------------------------- |
+| Schedule Conflicts    | High     | Detect overlapping schedules     |
+| Bulk Operations       | Medium   | Update/cancel multiple schedules |
+| Schedule Templates    | Medium   | Save and reuse configurations    |
+| Edit Recurring Series | Medium   | Edit all vs single occurrence    |
+| Substitution System   | Low      | Replace instructor for a session |
+
+### Phase 5 - Analytics & Reporting
+
+| Feature             | Priority | Description                     |
+| ------------------- | -------- | ------------------------------- |
+| Attendance Reports  | High     | Track attendance rates by class |
+| Booking Analytics   | High     | Popular times, fill rates       |
+| No-show Tracking    | Medium   | Identify frequent no-shows      |
+| Revenue Analytics   | Medium   | Earnings over time              |
+| Export Capabilities | Low      | CSV/PDF report exports          |
+
+### Phase 6 - Enhanced Discovery
+
+| Feature               | Priority | Description                        |
+| --------------------- | -------- | ---------------------------------- |
+| Location-based Search | Medium   | Find classes near user             |
+| Recommendations       | Low      | Suggested classes based on history |
+| Reviews/Ratings       | Low      | Participant feedback system        |
+| Favorites             | Low      | Save favorite classes/organizers   |
+
+### Phase 7 - Organization Support
+
+| Feature               | Priority | Description                           |
+| --------------------- | -------- | ------------------------------------- |
+| Multi-instructor      | Medium   | Multiple organizers per class         |
+| Staff Management      | Medium   | Instructors separate from owners      |
+| Organization Accounts | Low      | Gyms/studios with multiple organizers |
+| Resource Booking      | Low      | Equipment reservation with bookings   |
+
+### Technical Improvements
+
+| Feature        | Priority | Description                      |
+| -------------- | -------- | -------------------------------- |
+| Caching Layer  | Medium   | Redis caching for discovery      |
+| Rate Limiting  | Medium   | Protect against abuse            |
+| Audit Logging  | Low      | Track all changes for compliance |
+| API Versioning | Low      | Version API for backwards compat |

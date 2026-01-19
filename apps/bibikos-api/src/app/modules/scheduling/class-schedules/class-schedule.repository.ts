@@ -56,7 +56,9 @@ export interface ClassScheduleRepository {
     endDate: Date
   ): Promise<ClassScheduleWithBookingCounts[]>
   findUpcomingByClassId(classId: number, limit?: number): Promise<ClassSchedule[]>
+  findUpcomingByClassIdWithBookingCounts(classId: number, limit?: number): Promise<ClassScheduleWithBookingCounts[]>
   findPublicForDiscover(filters: DiscoverFilters): Promise<DiscoverScheduleResult[]>
+  findPrivateForDiscoverByUserId(userId: number, filters: DiscoverFilters): Promise<DiscoverScheduleResult[]>
   create(data: Prisma.ClassScheduleCreateInput): Promise<ClassSchedule>
   createMany(data: Prisma.ClassScheduleCreateManyInput[]): Promise<number>
   update(id: number, data: Prisma.ClassScheduleUpdateInput): Promise<ClassSchedule>

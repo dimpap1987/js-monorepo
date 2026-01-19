@@ -316,3 +316,36 @@ export interface SendInvitationPayload {
 export interface RespondToInvitationPayload {
   status: 'ACCEPTED' | 'DECLINED'
 }
+
+// Class View Response (for class detail page)
+export interface ClassViewSchedule {
+  id: number
+  startTimeUtc: string
+  endTimeUtc: string
+  localTimezone: string
+  bookingCounts: {
+    booked: number
+    waitlisted: number
+  }
+}
+
+export interface ClassViewResponse {
+  id: number
+  title: string
+  description: string | null
+  capacity: number | null
+  isPrivate: boolean
+  location: {
+    id: number
+    name: string
+    timezone: string
+    isOnline: boolean
+  }
+  organizer: {
+    id: number
+    displayName: string | null
+    slug: string | null
+    activityLabel: string | null
+  }
+  schedules: ClassViewSchedule[]
+}

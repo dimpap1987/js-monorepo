@@ -149,4 +149,15 @@ export class InvitationRepositoryPrisma implements InvitationRepository {
       orderBy: { createdAt: 'desc' },
     })
   }
+
+  async hasAcceptedInvitation(classId: number, userId: number): Promise<boolean> {
+    const invitation = await this.txHost.tx.classInvitation.findFirst({
+      where: {
+        classId,
+        invitedUserId: userId,
+        status: InvitationStatus.ACCEPTED,
+      },
+    })
+    return invitation !== null
+  }
 }

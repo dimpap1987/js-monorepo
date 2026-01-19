@@ -33,6 +33,7 @@ import type {
   PendingInvitation,
   SendInvitationPayload,
   RespondToInvitationPayload,
+  ClassViewResponse,
 } from './types'
 import { useBibikosSession } from '../auth'
 
@@ -51,6 +52,7 @@ export const schedulingKeys = {
   classes: () => [...schedulingKeys.all, 'classes'] as const,
   class: (id: number) => [...schedulingKeys.all, 'classes', id] as const,
   classPublic: (id: number) => [...schedulingKeys.all, 'classes', 'public', id] as const,
+  classView: (id: number) => [...schedulingKeys.all, 'classes', 'view', id] as const,
   schedules: () => [...schedulingKeys.all, 'schedules'] as const,
   schedulesCalendar: (startDate: string, endDate: string, classId?: number) =>
     [...schedulingKeys.all, 'schedules', 'calendar', startDate, endDate, classId] as const,
@@ -341,6 +343,17 @@ export function useClassPublic(id: number) {
       return handleQueryResponse(response)
     },
     enabled: !!id,
+  })
+}
+
+export function useClassView(classId: number) {
+  return useQuery({
+    queryKey: schedulingKeys.classView(classId),
+    queryFn: async () => {
+      const response = await apiClient.get<ClassViewResponse>(`/scheduling/classes/${classId}/view`)
+      return handleQueryResponse(response)
+    },
+    enabled: !!classId,
   })
 }
 

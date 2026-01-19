@@ -82,6 +82,28 @@ export class ClassController {
   }
 
   /**
+   * GET /scheduling/classes/:id/view
+   * Get class with schedules for booking page
+   * No auth required for public classes, but requires accepted invitation for private classes
+   */
+  @Get(':id/view')
+  async getClassView(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser?: SessionUserType) {
+    let userId: number | undefined
+
+    // Get user ID if logged in
+    if (sessionUser?.id) {
+      try {
+        const appUser = await this.appUserService.getOrCreateAppUser(sessionUser.id)
+        userId = appUser.id
+      } catch {
+        // User not found, continue without user ID
+      }
+    }
+
+    return this.classService.getClassView(id, userId)
+  }
+
+  /**
    * POST /scheduling/classes
    * Create a new class
    */

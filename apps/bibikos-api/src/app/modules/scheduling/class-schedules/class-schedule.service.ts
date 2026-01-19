@@ -156,7 +156,8 @@ export class ClassScheduleService {
   }
 
   /**
-   * Discover public schedules across all organizers (for /discover page)
+   * Discover schedules across all organizers (for /discover page)
+   * Includes public schedules and private schedules where user has accepted invitation
    * If participantId is provided, includes user's booking status for each schedule
    */
   async discoverSchedules(
@@ -167,7 +168,8 @@ export class ClassScheduleService {
       timeOfDay?: 'morning' | 'afternoon' | 'evening'
       search?: string
     },
-    participantId?: number
+    participantId?: number,
+    appUserId?: number
   ) {
     const start = new Date(filters.startDate)
     const end = new Date(filters.endDate)
@@ -178,13 +180,38 @@ export class ClassScheduleService {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'DATE_RANGE_TOO_LARGE')
     }
 
-    const schedules = await this.scheduleRepo.findPublicForDiscover({
+    const repoFilters = {
       startDate: start,
       endDate: end,
       activity: filters.activity,
       timeOfDay: filters.timeOfDay,
       search: filters.search,
-    })
+    }
+
+    // Get public schedules
+    const publicSchedules = await this.scheduleRepo.findPublicForDiscover(repoFilters)
+
+    // Get private schedules where user has accepted invitation (if logged in)
+    let privateSchedules: typeof publicSchedules = []
+    if (appUserId) {
+      privateSchedules = await this.scheduleRepo.findPrivateForDiscoverByUserId(appUserId, repoFilters)
+    }
+
+    // Combine and deduplicate (in case of overlap, though there shouldn't be any)
+    const scheduleMap = new Map<number, (typeof publicSchedules)[0]>()
+    for (const schedule of publicSchedules) {
+      scheduleMap.set(schedule.id, schedule)
+    }
+    for (const schedule of privateSchedules) {
+      if (!scheduleMap.has(schedule.id)) {
+        scheduleMap.set(schedule.id, schedule)
+      }
+    }
+
+    // Convert to array and sort by start time
+    const schedules = Array.from(scheduleMap.values()).sort(
+      (a, b) => a.startTimeUtc.getTime() - b.startTimeUtc.getTime()
+    )
 
     // If user is logged in, fetch their bookings for these schedules
     const userBookingsMap: Map<number, { id: number; status: string; waitlistPosition: number | null }> = new Map()
