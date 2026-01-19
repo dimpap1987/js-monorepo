@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { Badge } from '@js-monorepo/components/ui/badge'
+import { cn } from '@js-monorepo/ui/util'
 import { format, parseISO, isPast } from 'date-fns'
-import { Calendar, Clock, X } from 'lucide-react'
+import { Calendar, Clock, X, ExternalLink } from 'lucide-react'
 import type { Booking, BookingStatus } from '../../../../lib/scheduling'
 import { CancelBookingDialog } from './cancel-booking-dialog'
 
@@ -125,6 +127,7 @@ interface BookingCardProps {
 
 export function BookingCard({ booking, isPastBooking = false, isCancelledSection = false }: BookingCardProps) {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const router = useRouter()
 
   const schedule = booking.classSchedule
   if (!schedule) return null
@@ -133,13 +136,34 @@ export function BookingCard({ booking, isPastBooking = false, isCancelledSection
   const endTime = parseISO(schedule.endTimeUtc)
   const canCancel = !isPastBooking && !isCancelledSection && booking.status !== 'CANCELLED' && !isPast(startTime)
   const isInactive = isPastBooking || isCancelledSection
+  const classId = schedule.class?.id
+  const hasClassLink = !!classId
+
+  const handleCardClick = () => {
+    if (hasClassLink) {
+      router.push(`/class/${classId}`)
+    }
+  }
+
+  const handleCancelClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setCancelDialogOpen(true)
+  }
 
   return (
     <>
-      <Card className={`border-border/50 ${isInactive ? 'opacity-75' : 'hover:shadow-md'} transition-all`}>
+      <Card
+        className={cn(
+          'border-border transition-all',
+          hasClassLink && !isInactive && 'cursor-pointer hover:shadow-md hover:border-primary hover:bg-accent',
+          isInactive && 'opacity-75'
+        )}
+        onClick={hasClassLink ? handleCardClick : undefined}
+      >
         <CardContent className="p-4">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4 min-w-0">
+            <div className="flex items-center gap-4 min-w-0 flex-1 group">
               <DateBadge date={startTime} isPastBooking={isInactive} />
               <BookingInfo
                 title={schedule.class?.title || 'Class'}
@@ -151,17 +175,20 @@ export function BookingCard({ booking, isPastBooking = false, isCancelledSection
                 cancelReason={booking.cancelReason}
               />
             </div>
-            {canCancel && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-destructive"
-                onClick={() => setCancelDialogOpen(true)}
-              >
-                <X className="w-4 h-4 mr-1" />
-                Cancel
-              </Button>
-            )}
+            <div className="flex items-center gap-2 shrink-0">
+              {canCancel && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={handleCancelClick}
+                  type="button"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Cancel
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
