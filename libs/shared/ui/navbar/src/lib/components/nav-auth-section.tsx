@@ -3,11 +3,10 @@
 import { DpLoginButton } from '@js-monorepo/button'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { ReactNode } from 'react'
-import { NavUserOptions, NavUserOptionsProps } from './nav-user-options'
 import { UserNavProps } from '../navbar'
+import { NavUserOptions, NavUserOptionsProps } from './nav-user-options'
 
 interface NavAuthSectionProps {
-  isLoggedIn: boolean
   user?: UserNavProps
   plan?: string | null
   onLogout?: () => void
@@ -15,21 +14,14 @@ interface NavAuthSectionProps {
   rightActions?: ReactNode
 }
 
-export const NavAuthSection = ({
-  isLoggedIn,
-  user,
-  plan,
-  onLogout,
-  navUserOptionsChildren,
-  rightActions,
-}: NavAuthSectionProps) => {
+export const NavAuthSection = ({ user, plan, onLogout, navUserOptionsChildren, rightActions }: NavAuthSectionProps) => {
   return (
     <>
       {/* Custom Navbar Items */}
       {rightActions}
 
       {/* Auth Buttons */}
-      {!isLoggedIn ? (
+      {!user ? (
         <DpNextNavLink href="/auth/login">
           <DpLoginButton />
         </DpNextNavLink>

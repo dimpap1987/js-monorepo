@@ -37,7 +37,6 @@ export const NavRightSection = ({
         />
 
         <NavAuthSection
-          isLoggedIn={!!user}
           user={user}
           plan={plan}
           onLogout={onLogout}
