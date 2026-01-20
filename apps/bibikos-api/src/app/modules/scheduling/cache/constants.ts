@@ -1,1 +1,8 @@
 export const APP_USER_KEY = 'app-user'
+export const ORGANIZER_KEY = 'organizer'
+export const CLASS_KEY = 'class'
+export const LOCATION_KEY = 'location'
+export const SCHEDULE_KEY = 'schedule'
+export const BOOKING_KEY = 'booking'
+export const PARTICIPANT_KEY = 'participant'
+export const INVITATION_KEY = 'invitation'

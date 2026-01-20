@@ -50,8 +50,8 @@ import { SessionService } from './services/session.service'
       provide: RedisSessionKey,
       useFactory: (configService: ConfigService) => {
         return configService.get<string>('REDIS_NAMESPACE')
-          ? `${configService.get<string>('REDIS_NAMESPACE')}:sessions:`
-          : 'sessions:'
+          ? `${configService.get<string>('REDIS_NAMESPACE')}:session:`
+          : 'session:'
       },
       inject: [ConfigService],
     },

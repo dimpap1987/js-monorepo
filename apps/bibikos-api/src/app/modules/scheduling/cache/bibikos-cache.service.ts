@@ -2,7 +2,16 @@ import { REDIS } from '@js-monorepo/nest/redis'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { RedisClientType } from 'redis'
-import { APP_USER_KEY } from './constants'
+import {
+  APP_USER_KEY,
+  BOOKING_KEY,
+  CLASS_KEY,
+  INVITATION_KEY,
+  LOCATION_KEY,
+  ORGANIZER_KEY,
+  PARTICIPANT_KEY,
+  SCHEDULE_KEY,
+} from './constants'
 
 @Injectable()
 export class BibikosCacheService {
@@ -205,83 +214,85 @@ export class BibikosCacheService {
   /**
    * Organizer cache operations
    */
-  async getOrganizer(key: string | number) {
-    return this.get('organizer', key)
+  async getOrSetOrganizer<T>(organizerId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
+    return this.getOrSet<T>(ORGANIZER_KEY, [organizerId], fetchFn, ttl)
   }
 
-  async setOrganizer(key: string | number, value: any, ttl = 300) {
-    return this.set('organizer', key, value, ttl)
-  }
-
-  async invalidateOrganizer(key: string | number) {
-    return this.invalidate('organizer', key)
+  async invalidateOrganizer(organizerId: number) {
+    return this.invalidate(ORGANIZER_KEY, organizerId)
   }
 
   async invalidateAllOrganizers() {
-    return this.invalidatePattern('organizer:*')
+    return this.invalidatePattern(`${ORGANIZER_KEY}:*`)
   }
 
   /**
    * Class cache operations
    */
-  async getClass(classId: number) {
-    return this.get('class', classId)
-  }
-
-  async setClass(classId: number, value: any, ttl = 300) {
-    return this.set('class', classId, value, ttl)
+  async getOrSetClass<T>(classId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
+    return this.getOrSet<T>(CLASS_KEY, [classId], fetchFn, ttl)
   }
 
   async invalidateClass(classId: number) {
-    return this.invalidate('class', classId)
+    return this.invalidate(CLASS_KEY, classId)
   }
 
   async invalidateAllClasses() {
-    return this.invalidatePattern('class:*')
+    return this.invalidatePattern(`${CLASS_KEY}:*`)
   }
 
   /**
    * Location cache operations
    */
-  async getLocation(locationId: number) {
-    return this.get('location', locationId)
-  }
-
-  async setLocation(locationId: number, value: any, ttl = 300) {
-    return this.set('location', locationId, value, ttl)
+  async getOrSetLocation<T>(locationId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
+    return this.getOrSet<T>(LOCATION_KEY, [locationId], fetchFn, ttl)
   }
 
   async invalidateLocation(locationId: number) {
-    return this.invalidate('location', locationId)
+    return this.invalidate(LOCATION_KEY, locationId)
   }
 
   /**
    * Schedule cache operations
    */
-  async getSchedule(scheduleId: number) {
-    return this.get('schedule', scheduleId)
-  }
-
-  async setSchedule(scheduleId: number, value: any, ttl = 300) {
-    return this.set('schedule', scheduleId, value, ttl)
+  async getOrSetSchedule<T>(scheduleId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
+    return this.getOrSet<T>(SCHEDULE_KEY, [scheduleId], fetchFn, ttl)
   }
 
   async invalidateSchedule(scheduleId: number) {
-    return this.invalidate('schedule', scheduleId)
+    return this.invalidate(SCHEDULE_KEY, scheduleId)
   }
 
   /**
    * Booking cache operations
    */
-  async getBooking(bookingId: number) {
-    return this.get('booking', bookingId)
-  }
-
-  async setBooking(bookingId: number, value: any, ttl = 300) {
-    return this.set('booking', bookingId, value, ttl)
+  async getOrSetBooking<T>(bookingId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
+    return this.getOrSet<T>(BOOKING_KEY, [bookingId], fetchFn, ttl)
   }
 
   async invalidateBooking(bookingId: number) {
-    return this.invalidate('booking', bookingId)
+    return this.invalidate(BOOKING_KEY, bookingId)
+  }
+
+  /**
+   * Participant cache operations
+   */
+  async getOrSetParticipant<T>(participantId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
+    return this.getOrSet<T>(PARTICIPANT_KEY, [participantId], fetchFn, ttl)
+  }
+
+  async invalidateParticipant(participantId: number) {
+    return this.invalidate(PARTICIPANT_KEY, participantId)
+  }
+
+  /**
+   * Invitation cache operations
+   */
+  async getOrSetInvitation<T>(invitationId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
+    return this.getOrSet<T>(INVITATION_KEY, [invitationId], fetchFn, ttl)
+  }
+
+  async invalidateInvitation(invitationId: number) {
+    return this.invalidate(INVITATION_KEY, invitationId)
   }
 }

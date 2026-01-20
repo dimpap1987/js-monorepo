@@ -1,9 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { CACHE_MANAGER } from '@nestjs/cache-manager'
-import { Cache } from 'cache-manager'
-import { ConfigService } from '@nestjs/config'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
+import { Inject, Injectable } from '@nestjs/common'
+import { Cache } from 'cache-manager'
 
 export type FeatureFlagKey = string
 
@@ -14,14 +13,13 @@ export interface FeatureFlagConfig {
   description?: string | null
 }
 
-const FEATURE_FLAGS_CACHE_KEY = 'feature-flags:all'
+const FEATURE_FLAGS_CACHE_KEY = 'feature-flag:all'
 
 @Injectable()
 export class FeatureFlagsService {
   constructor(
     private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-    private readonly configService: ConfigService
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
   ) {}
 
   async getAllFlags(): Promise<Record<FeatureFlagKey, FeatureFlagConfig>> {
