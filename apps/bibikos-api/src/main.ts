@@ -129,7 +129,7 @@ async function bootstrap() {
     })
   )
   app.useGlobalInterceptors(new TimeoutInterceptor(30_000), new RemoveEmptyInterceptor())
-  app.set('trust proxy', 1)
+  app.set('trust proxy', true)
 
   const redisIoAdapter = new RedisIoAdapter(app)
   await redisIoAdapter.connectToRedis()

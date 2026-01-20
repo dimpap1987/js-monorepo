@@ -43,7 +43,7 @@ const Navbar = forwardRef<HTMLDivElement, NavbarProps>(
     return (
       <header>
         <nav
-          className="border-b border-border-glass navbar-height overflow-hidden flex items-center shadow-sm w-full px-4 sm:px-6 gap-3 justify-between"
+          className="border-b text-sm border-border-glass navbar-height overflow-hidden flex items-center shadow-sm w-full px-4 sm:px-6 gap-3 justify-between"
           ref={ref}
         >
           <NavLeftSection logo={logo} mainItems={mainItems} user={user} />

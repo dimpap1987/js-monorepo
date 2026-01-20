@@ -1,0 +1,32 @@
+services:
+  bibikos-api:
+    image: bibikos-api:dev
+    container_name: bibikos-api_container
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - super-network
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3333/api/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  bibikos-app:
+    image: bibikos-app:dev
+    container_name: bibikos-app_container
+    env_file:
+      - .env
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - super-network
+
+networks:
+  super-network:
+    external: true

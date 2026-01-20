@@ -5,9 +5,9 @@ services:
   nginx:
     image: nginx:1.25.4
     container_name: nginx_prod
-    ports:
-      - '8000:80'
-      # - '443:443'
+    # ports:
+    #   - '8000:80'
+    #   - '443:443'
 
     restart: unless-stopped
     healthcheck:
@@ -23,8 +23,8 @@ services:
       - ../shared/cloudflare-ips.conf:/etc/nginx/cloudflare-ips.conf:ro
       - ./nginx_status.conf.template:/etc/nginx/conf.d/nginx_status.conf:ro
       # SSL certificates - adjust paths
-      # - /etc/letsencrypt/live/${NGINX_SERVER_NAME}/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
-      # - /etc/letsencrypt/live/${NGINX_SERVER_NAME}/privkey.pem:/etc/ssl/private/key.pem:ro
+      - ./certs/cloudflare.crt:/etc/ssl/certs/cloudflare.crt:ro
+      - ./certs/cloudflare.key:/etc/ssl/private/cloudflare.key:ro
     networks:
       - super-network
     environment:

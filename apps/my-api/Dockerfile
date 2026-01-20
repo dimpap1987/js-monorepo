@@ -12,7 +12,7 @@ RUN pnpm install --frozen-lockfile
 
 # Copy source and generate Prisma
 COPY . .
-RUN pnpm prisma generate --schema=libs/prisma/db/src/lib/prisma/schema
+RUN pnpm prisma generate --config=libs/prisma/core-db/prisma.config.ts
 
 # Build the API (this also generates the pruned package.json)
 RUN pnpm build:my-api
@@ -47,7 +47,7 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nestjs -u 1001
 # Copy the PRUNED node_modules (which now includes the generated .prisma folder)
 COPY --chown=nestjs:nodejs --from=pruner /usr/src/app/node_modules ./node_modules
 COPY --chown=nestjs:nodejs --from=builder /usr/src/app/dist/apps/my-api ./
-COPY --chown=nestjs:nodejs --from=builder /usr/src/app/libs/prisma/db/src/lib/prisma ./prisma
+COPY --chown=nestjs:nodejs --from=builder /usr/src/app/libs/prisma/core-db/src/lib/prisma ./prisma
 
 ENV NODE_ENV=production
 

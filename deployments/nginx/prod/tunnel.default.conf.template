@@ -1,24 +1,19 @@
+# --- HTTPS server with Cloudflare Origin Cert ---
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
 
     server_name super-duper.space www.super-duper.space;
 
+    # SSL (Cloudflare Origin Cert)
+    ssl_certificate     /etc/ssl/certs/cloudflare.crt;
+    ssl_certificate_key /etc/ssl/private/cloudflare.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-
-    # 1. BOT & SCANNER PROTECTION
-    # Immediately drop connections for known malicious paths
-    location ~* /(wp-admin|wp-login|setup-config\.php|wp-content|xmlrpc\.php) {
-        access_log off; 
-        log_not_found off;
-        return 444; 
-    }
-
-    # Block suspicious User-Agents
-    if ($http_user_agent ~* (Baiduspider|sqlmap|curl|Wget|Python)) {
-        return 403;
-    }
 
     # Security headers
     add_header X-Content-Type-Options nosniff;
@@ -27,7 +22,6 @@ server {
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     server_tokens off;
-
     client_body_timeout 60s;
     client_header_timeout 60s;
     send_timeout 60s;
@@ -46,7 +40,7 @@ server {
     }
 
     location / {
-        set $ui_upstream http://next-app:3000;
+        set $ui_upstream http://bibikos-app:3000;
         proxy_pass $ui_upstream;
         include /etc/nginx/proxy_params.conf;
         proxy_intercept_errors on;
@@ -54,33 +48,30 @@ server {
 
     location /api {
         limit_req zone=mylimit burst=15 nodelay;
-        set $api_upstream http://my-api:3333;
+        set $api_upstream http://bibikos-api:3333;
         proxy_pass $api_upstream;
         include /etc/nginx/proxy_params.conf;
     }
 
     location /ws {
-        set $ws_upstream http://my-api:3333;
+        set $ws_upstream http://bibikos-api:3333;
         proxy_pass $ws_upstream;
 
+        # Force WebSocket headers
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         
-        # Standard Headers
+        # Ensure Host and IP are passed correctly
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        # WebSocket Stability Settings
-        proxy_buffering off;         # Essential for real-time latency
-        proxy_cache_bypass $http_upgrade;
-        
-        # Extended timeouts to prevent disconnects
+        # Critical for WebSockets to stay alive
         proxy_read_timeout 86400s;
         proxy_send_timeout 86400s;
-        proxy_connect_timeout 60s;
+        proxy_buffering off;
     }
 
     location /grafana {

@@ -7,13 +7,24 @@ RUN corepack enable && corepack prepare pnpm@10 --activate
 WORKDIR /usr/src/app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY . .
 
-ENV NEXT_TELEMETRY_DISABLED=1
+# Run postinstall scripts after source files are copied
+RUN pnpm run postinstall
 
-RUN pnpm nx build bibikos-client --prod
+ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_VAPID_PUBLIC_KEY
+ARG NEXT_PUBLIC_EN_DOMAIN
+ARG NEXT_PUBLIC_EL_DOMAIN
+ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY} \
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY=${NEXT_PUBLIC_VAPID_PUBLIC_KEY} \
+    NEXT_PUBLIC_EL_DOMAIN=${NEXT_PUBLIC_EL_DOMAIN} \
+    NEXT_PUBLIC_EN_DOMAIN=${NEXT_PUBLIC_EN_DOMAIN} \
+    NEXT_TELEMETRY_DISABLED=1
+
+RUN pnpm build:bibikos-client
 
 # Delete the webpack/swc cache after the build is done
 RUN rm -rf dist/apps/bibikos-client/.next/cache
@@ -49,16 +60,6 @@ WORKDIR /usr/src/app
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
-
-ENV NODE_ENV=production \
-    PORT=3000 \
-    NEXT_TELEMETRY_DISABLED=1 \
-    NEXT_PUBLIC_SITE_NAME="FitGym" \
-    NEXT_PUBLIC_SITE_URL="http://localhost:4200" \
-    NEXT_PUBLIC_SITE_DESCRIPTION="Your fitness journey starts here" \
-    NEXT_PUBLIC_EN_DOMAIN="fitgym.com" \
-    NEXT_PUBLIC_EL_DOMAIN="fitgym.gr" \
-    ANALYZE=false
 
 COPY --chown=nextjs:nodejs --from=pruner /usr/src/app/node_modules ./node_modules
 COPY --chown=nextjs:nodejs --from=builder /usr/src/app/dist/apps/bibikos-client ./
