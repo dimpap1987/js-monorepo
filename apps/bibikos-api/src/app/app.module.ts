@@ -41,6 +41,8 @@ import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
 import { SchedulingModule } from './modules/scheduling/scheduling.module'
 import { AppUserService } from './modules/scheduling/app-users/app-user.service'
+import { BibikosCacheService } from './modules/scheduling/cache'
+import { SUBSCRIPTION_STATUS_KEY } from './modules/scheduling/cache/constants'
 import { UserModule } from './modules/user/user.module'
 import { getContactMessage } from './notifications/contact-form'
 import {
@@ -198,11 +200,12 @@ import {
       }),
     }),
     PaymentsModule.forRootAsync({
-      imports: [UserPresenceModule, NotificationServerModule],
-      inject: [UserPresenceWebsocketService, NotificationService],
+      imports: [UserPresenceModule, NotificationServerModule, SchedulingModule],
+      inject: [UserPresenceWebsocketService, NotificationService, BibikosCacheService],
       useFactory: async (
         userPresenceWebsocketService: UserPresenceWebsocketService,
-        notificationService: NotificationService
+        notificationService: NotificationService,
+        cacheService: BibikosCacheService
       ) => ({
         onSubscriptionCreateSuccess: (userId, subscription) => {
           notificationService.createNotification({
@@ -210,8 +213,9 @@ import {
             message: getSubscriptionActivatedMessage({ planName: subscription.name }),
           })
         },
-        onSubscriptionEvent: (userId, event) => {
+        onSubscriptionEvent: async (userId, event) => {
           apiLogger.log(`Subscription event callback received with event: '${event}' and userId: ${userId}`)
+          await cacheService.invalidate(SUBSCRIPTION_STATUS_KEY, userId)
           userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
         },
         onSubscriptionUpdateSuccess: () => {
@@ -239,19 +243,21 @@ import {
             message: getSubscriptionExpiredMessage({ planName: subscription.name }),
           })
         },
-        onTrialStarted: (userId, subscription) => {
+        onTrialStarted: async (userId, subscription) => {
           notificationService.createNotification({
             receiverIds: [userId],
             message: getTrialStartedMessage({ planName: subscription.name }),
           })
           userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+          await cacheService.invalidate(SUBSCRIPTION_STATUS_KEY, userId)
         },
-        onTrialExpired: (userId, subscription) => {
+        onTrialExpired: async (userId, subscription) => {
           notificationService.createNotification({
             receiverIds: [userId],
             message: getTrialExpiredMessage({ planName: subscription.name }),
           })
           userPresenceWebsocketService.sendToUsers([userId], Events.refreshSession, true)
+          await cacheService.invalidate(SUBSCRIPTION_STATUS_KEY, userId)
         },
       }),
     }),

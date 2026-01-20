@@ -5,7 +5,7 @@ import { BibikosSession, SessionSubscription } from '@js-monorepo/types/session'
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
 import { BibikosCacheService } from '../../cache'
-import { FEATURE_FLAGS_KEY } from '../../cache/constants'
+import { FEATURE_FLAGS_KEY, SUBSCRIPTION_STATUS_KEY } from '../../cache/constants'
 import { AppUserService } from '../app-user.service'
 
 // Store a reference to the NestJS application for service resolution
@@ -88,7 +88,13 @@ export const AppUser = createParamDecorator(
 
     // Fetch all data in parallel
     const [{ result }, featureFlags, appUser] = await Promise.all([
-      tryCatch(() => paymentsService.findUserSubscriptionStatus(user.id)),
+      // Cache subscription status per user for 5 minutes (300 seconds)
+      cacheService.getOrSet(
+        SUBSCRIPTION_STATUS_KEY,
+        user.id,
+        () => paymentsService.findUserSubscriptionStatus(user.id),
+        300
+      ),
       // Cache feature flags per user for 1 hour (3600 seconds)
       cacheService.getOrSet(
         FEATURE_FLAGS_KEY,
