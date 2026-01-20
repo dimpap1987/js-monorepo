@@ -45,7 +45,7 @@ export const NavItemDropdown = ({ item, user }: NavItemDropdownProps) => {
           {item.name}
           <ChevronDown className="h-4 w-4" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="min-w-[200px]">
+        <DropdownMenuContent align="start" className="min-w-[200px] p-2">
           {/* Parent link */}
           <DropdownMenuItem asChild className="cursor-pointer hover:bg-secondary focus:bg-secondary">
             <DpNextNavLink href={item.href} className="flex items-center gap-2 w-full" onClick={() => setOpen(false)}>
@@ -55,7 +55,11 @@ export const NavItemDropdown = ({ item, user }: NavItemDropdownProps) => {
           </DropdownMenuItem>
           {/* Children links */}
           {accessibleChildren.map((child) => (
-            <DropdownMenuItem key={child.href} asChild className="cursor-pointer hover:bg-secondary focus:bg-secondary">
+            <DropdownMenuItem
+              key={child.href}
+              asChild
+              className="cursor-pointer hover:bg-secondary focus:bg-secondary p-2"
+            >
               <DpNextNavLink
                 href={child.href}
                 className="flex items-center gap-2 w-full"

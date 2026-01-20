@@ -1,10 +1,9 @@
 'use client'
 
+import { Badge } from '@js-monorepo/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
-import { Badge } from '@js-monorepo/components/ui/badge'
-import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { Mail, Check, X, Clock, ArrowRight } from 'lucide-react'
+import { Check, Clock, Mail, X } from 'lucide-react'
 import { useSentInvitations } from '../../../../lib/scheduling/queries'
 import type { ClassInvitation } from '../../../../lib/scheduling/types'
 

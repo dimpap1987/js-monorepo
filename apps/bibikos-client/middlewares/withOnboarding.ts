@@ -1,7 +1,7 @@
 import { getCurrentSession } from '@js-monorepo/auth/next/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-const ONBOARDING_REQUIRED_ROUTES = ['/dashboard', '/calendar', '/classes', '/locations', '/bookings']
+const ONBOARDING_REQUIRED_ROUTES = ['/dashboard']
 
 export function withOnboarding(
   nextMiddleware: (request: NextRequest) => Promise<NextResponse<unknown>> | NextResponse<unknown>

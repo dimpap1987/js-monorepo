@@ -1,18 +1,18 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { Button } from '@js-monorepo/components/ui/button'
 import { BackButton } from '@js-monorepo/back-arrow'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
+import { endOfDay, endOfWeek, format, startOfDay, startOfWeek } from 'date-fns'
+import { ArrowRight, Calendar, CalendarPlus, Clock, MapPin, Plus, TrendingUp, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { Calendar, MapPin, Users, Plus, CalendarPlus, ArrowRight, Clock, TrendingUp } from 'lucide-react'
-import { useOrganizer, useClasses, useLocations, useSchedulesCalendar, ClassSchedule } from '../../../lib/scheduling'
-import { format, startOfWeek, endOfWeek, startOfDay, endOfDay } from 'date-fns'
+import { ClassSchedule, useClasses, useLocations, useOrganizer, useSchedulesCalendar } from '../../../lib/scheduling'
 import { SentInvitationsCard } from './components/sent-invitations-card'
 
 function DashboardSkeleton() {
@@ -137,7 +137,7 @@ export function DashboardContent() {
       icon: Calendar,
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
-      href: '/classes',
+      href: '/dashboard/classes',
     },
     {
       label: t('stats.locations'),
@@ -145,7 +145,7 @@ export function DashboardContent() {
       icon: MapPin,
       color: 'text-green-500',
       bgColor: 'bg-green-500/10',
-      href: '/locations',
+      href: '/dashboard/locations',
     },
     {
       label: t('stats.bookings'),
@@ -153,24 +153,24 @@ export function DashboardContent() {
       icon: Users,
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/10',
-      href: '/bookings',
+      href: '/dashboard/bookings',
     },
   ]
 
   const quickActions = [
     {
       label: t('createClass'),
-      href: '/classes?action=create',
+      href: '/dashboard/classes?action=create',
       icon: Plus,
     },
     {
       label: t('addSchedule'),
-      href: '/calendar?action=new',
+      href: '/dashboard/calendar?action=new',
       icon: CalendarPlus,
     },
     {
       label: t('viewCalendar'),
-      href: '/calendar',
+      href: '/dashboard/calendar',
       icon: Calendar,
     },
   ]
@@ -187,7 +187,7 @@ export function DashboardContent() {
           </h2>
           <p className="text-foreground-muted mt-1">{format(today, 'EEEE, MMMM d, yyyy')}</p>
         </div>
-        <DpNextNavLink href="/calendar">
+        <DpNextNavLink href="/dashboard/calendar">
           <Button className="gap-2">
             <Calendar className="w-4 h-4" />
             {t('viewCalendar')}
@@ -267,7 +267,11 @@ export function DashboardContent() {
             ) : todaySchedules && todaySchedules.length > 0 ? (
               <div className="space-y-3">
                 {todaySchedules.slice(0, 5).map((schedule: ClassSchedule) => (
-                  <DpNextNavLink key={schedule.id} href={`/calendar?scheduleId=${schedule.id}`} className="block">
+                  <DpNextNavLink
+                    key={schedule.id}
+                    href={`/dashboard/calendar?scheduleId=${schedule.id}`}
+                    className="block"
+                  >
                     <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all">
                       <div>
                         <p className="font-medium">{schedule.class?.title}</p>
@@ -293,7 +297,7 @@ export function DashboardContent() {
               <div className="text-center py-8 text-foreground-muted">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>{t('noUpcoming')}</p>
-                <DpNextNavLink href="/calendar?action=new">
+                <DpNextNavLink href="/dashboard/calendar?action=new">
                   <Button variant="outline" size="sm" className="mt-4 gap-2">
                     <Plus className="w-4 h-4" />
                     {t('addSchedule')}

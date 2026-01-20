@@ -81,7 +81,7 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
 
       setConfirmBooking(false)
       setSelectedSchedule(null)
-      router.push('/bookings')
+      router.push('/dashboard/bookings')
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to book class'
       addNotification({

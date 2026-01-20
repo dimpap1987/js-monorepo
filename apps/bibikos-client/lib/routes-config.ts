@@ -35,22 +35,6 @@ export const routes: RouteConfig[] = [
     roles: [Role.USER],
   },
   {
-    path: '/calendar',
-    roles: [Role.USER],
-  },
-  {
-    path: '/classes',
-    roles: [Role.USER],
-  },
-  {
-    path: '/locations',
-    roles: [Role.USER],
-  },
-  {
-    path: '/bookings',
-    roles: [Role.USER],
-  },
-  {
     path: '/settings',
     roles: [Role.USER],
   },
@@ -103,25 +87,25 @@ export const navigationsMenuItems: MenuItem[] = [
     position: 'main',
     children: [
       {
-        href: '/calendar',
+        href: '/dashboard/calendar',
         name: 'navigation.calendar',
         roles: [Role.USER],
         Icon: RiCalendarLine,
       },
       {
-        href: '/classes',
+        href: '/dashboard/classes',
         name: 'navigation.classes',
         roles: [Role.USER],
         Icon: RiBookOpenLine,
       },
       {
-        href: '/locations',
+        href: '/dashboard/locations',
         name: 'navigation.locations',
         roles: [Role.USER],
         Icon: RiMapPinLine,
       },
       {
-        href: '/bookings',
+        href: '/dashboard/bookings',
         name: 'navigation.classBookings',
         roles: [Role.USER],
         Icon: RiUserLine,

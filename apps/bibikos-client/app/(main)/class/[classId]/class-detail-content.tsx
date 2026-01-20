@@ -60,7 +60,7 @@ export function ClassDetailContent({ classId }: ClassDetailContentProps) {
 
       setConfirmBooking(false)
       setSelectedSchedule(null)
-      router.push('/bookings')
+      router.push('/dashboard/bookings')
     } catch (er: unknown) {
       const errorMessage = er instanceof Error ? er.message : 'Failed to book class'
       addNotification({
