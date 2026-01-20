@@ -9,6 +9,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   useSidebar,
 } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
@@ -16,8 +19,8 @@ import { UserMetadata } from '@js-monorepo/navbar'
 import { AuthRole, SessionUserType } from '@js-monorepo/types/auth'
 import { MenuItem, hasRoleAccess } from '@js-monorepo/types/menu'
 import { cn } from '@js-monorepo/ui/util'
-import { X } from 'lucide-react'
-import { memo, ReactNode, useMemo } from 'react'
+import { ChevronRight, X } from 'lucide-react'
+import { memo, ReactNode, useMemo, useState } from 'react'
 
 export type SidebarPositionType = 'right' | 'left'
 
@@ -30,23 +33,80 @@ export interface DpNextSidebarProps {
   readonly className?: string
 }
 
-const MenuSideBarItem = memo(({ item, onClose }: { item: MenuItem; onClose: () => void }) => (
-  <SidebarMenuItem>
-    <SidebarMenuButton asChild>
-      <DpNextNavLink
-        href={item.href}
-        onClick={onClose}
-        className={cn(
-          'flex items-end flex-row-reverse gap-3 text-base p-3 px-5 w-full h-full tracking-wide transition-colors',
-          item.isAdmin && 'text-primary font-bold hover:text-primary/80'
-        )}
-      >
-        {item.Icon && <item.Icon className={cn('h-5 w-5 self-center', item.isAdmin && 'text-primary')} />}
-        <span>{item.name}</span>
-      </DpNextNavLink>
-    </SidebarMenuButton>
-  </SidebarMenuItem>
-))
+const MenuSideBarItem = memo(
+  ({ item, onClose, user }: { item: MenuItem; onClose: () => void; user?: Partial<SessionUserType> }) => {
+    const [isOpen, setIsOpen] = useState(false)
+
+    // Filter children by role access
+    const accessibleChildren = useMemo(() => {
+      if (!item.children) return []
+      return item.children.filter((child) => hasRoleAccess(child.roles, user?.roles as AuthRole[]))
+    }, [item.children, user?.roles])
+
+    // If item has children, render collapsible item
+    if (item.children && accessibleChildren.length > 0) {
+      return (
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            onClick={() => setIsOpen(!isOpen)}
+            className={cn(
+              'flex items-end flex-row-reverse gap-3 text-base p-3 px-5 w-full h-full tracking-wide transition-colors',
+              item.isAdmin && 'text-primary font-bold hover:text-primary/80'
+            )}
+            data-state={isOpen ? 'open' : 'closed'}
+          >
+            {item.Icon && <item.Icon className={cn('h-5 w-5 self-center', item.isAdmin && 'text-primary')} />}
+            <span className="flex-1">{item.name}</span>
+            <ChevronRight className={cn('h-4 w-4 transition-transform duration-200', isOpen && 'rotate-90')} />
+          </SidebarMenuButton>
+          {isOpen && (
+            <SidebarMenuSub>
+              {/* Parent link */}
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild>
+                  <DpNextNavLink href={item.href} onClick={onClose}>
+                    {item.Icon && <item.Icon className="h-4 w-4" />}
+                    <span>{item.name}</span>
+                  </DpNextNavLink>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+              {/* Children links */}
+              {accessibleChildren.map((child) => (
+                <SidebarMenuSubItem key={child.href}>
+                  <SidebarMenuSubButton asChild>
+                    <DpNextNavLink href={child.href} onClick={onClose}>
+                      {child.Icon && <child.Icon className="h-4 w-4" />}
+                      <span>{child.name}</span>
+                    </DpNextNavLink>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              ))}
+            </SidebarMenuSub>
+          )}
+        </SidebarMenuItem>
+      )
+    }
+
+    // Regular sidebar item without children
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild>
+          <DpNextNavLink
+            href={item.href}
+            onClick={onClose}
+            className={cn(
+              'flex items-end flex-row-reverse gap-3 text-base p-3 px-5 w-full h-full tracking-wide transition-colors',
+              item.isAdmin && 'text-primary font-bold hover:text-primary/80'
+            )}
+          >
+            {item.Icon && <item.Icon className={cn('h-5 w-5 self-center', item.isAdmin && 'text-primary')} />}
+            <span>{item.name}</span>
+          </DpNextNavLink>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    )
+  }
+)
 
 MenuSideBarItem.displayName = 'MenuSideBarItem'
 
@@ -92,7 +152,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
       <SidebarContent className="flex-1">
         <SidebarMenu>
           {mainItems.map((item) => (
-            <MenuSideBarItem key={item.href} item={item} onClose={() => setOpenMobile(false)} />
+            <MenuSideBarItem key={item.href} item={item} onClose={() => setOpenMobile(false)} user={user} />
           ))}
         </SidebarMenu>
       </SidebarContent>
@@ -104,7 +164,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
           <SidebarContent className="flex-none pb-2">
             <SidebarMenu>
               {secondaryItems.map((item) => (
-                <MenuSideBarItem key={item.href} item={item} onClose={() => setOpenMobile(false)} />
+                <MenuSideBarItem key={item.href} item={item} onClose={() => setOpenMobile(false)} user={user} />
               ))}
             </SidebarMenu>
           </SidebarContent>

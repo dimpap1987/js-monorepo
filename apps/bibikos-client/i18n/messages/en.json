@@ -92,7 +92,10 @@
     "classBookings": "Class Bookings",
     "myBookings": "My Bookings",
     "myInvitations": "Invitations",
-    "admin": "Admin"
+    "admin": "Admin",
+    "discover": "Discover",
+    "classes": "Classes",
+    "locations": "Locations"
   },
   "metadata": {
     "title": "ClassOps",

@@ -6,6 +6,7 @@ import { NotificationBellButton } from '@js-monorepo/notifications-ui'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { AiFillHome } from 'react-icons/ai'
+import { RiCompassDiscoverLine } from 'react-icons/ri'
 
 export const MobileNavbar = () => {
   const { deviceType } = useDeviceType()
@@ -22,6 +23,7 @@ export const MobileNavbar = () => {
   return (
     <BottomNavbar>
       <BottomNavbarOptions Icon={AiFillHome} href="/" label={t('navigation.home')} />
+      <BottomNavbarOptions Icon={RiCompassDiscoverLine} href="/discover" label={t('navigation.discover')} />
       <BottomNavbarAlert href="/notifications" label={t('navigation.alert')}>
         <NotificationBellButton className="shrink-0 text-xl" />
       </BottomNavbarAlert>

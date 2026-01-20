@@ -15,6 +15,8 @@ export type MenuItem = {
   position?: MenuItemPosition
   // Admin-only items get special styling
   isAdmin?: boolean
+  // Children items for dropdown/submenu support
+  children?: MenuItem[]
 }
 
 /**

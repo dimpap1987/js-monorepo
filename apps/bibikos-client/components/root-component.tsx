@@ -60,6 +60,11 @@ export default function RootComponent({ children }: PropsWithChildren) {
       .map((item) => ({
         ...item,
         name: t(item.name as any),
+        // Translate children items if they exist
+        children: item.children?.map((child) => ({
+          ...child,
+          name: t(child.name as any),
+        })),
       }))
   }, [t, session?.appUser?.hasOrganizerProfile, session?.appUser?.hasParticipantProfile])
 

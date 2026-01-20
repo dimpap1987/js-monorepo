@@ -10,6 +10,9 @@ import {
   RiBookmarkLine,
   RiUserLine,
   RiMailLine,
+  RiCompassDiscoverLine,
+  RiBookOpenLine,
+  RiMapPinLine,
 } from 'react-icons/ri'
 import { Role, type RouteRole } from './roles'
 
@@ -85,28 +88,45 @@ export const routes: RouteConfig[] = [
 
 export const navigationsMenuItems: MenuItem[] = [
   {
+    href: '/discover',
+    name: 'navigation.discover',
+    roles: [Role.PUBLIC],
+    Icon: RiCompassDiscoverLine,
+    position: 'main',
+  },
+  {
     href: '/dashboard',
     name: 'navigation.dashboard',
     roles: [Role.USER],
     Icon: RiDashboardLine,
     requiresOrganizer: true,
     position: 'main',
-  },
-  {
-    href: '/calendar',
-    name: 'navigation.calendar',
-    roles: [Role.USER],
-    Icon: RiCalendarLine,
-    requiresOrganizer: true,
-    position: 'main',
-  },
-  {
-    href: '/bookings',
-    name: 'navigation.classBookings',
-    roles: [Role.USER],
-    Icon: RiUserLine,
-    requiresOrganizer: true,
-    position: 'main',
+    children: [
+      {
+        href: '/calendar',
+        name: 'navigation.calendar',
+        roles: [Role.USER],
+        Icon: RiCalendarLine,
+      },
+      {
+        href: '/classes',
+        name: 'navigation.classes',
+        roles: [Role.USER],
+        Icon: RiBookOpenLine,
+      },
+      {
+        href: '/locations',
+        name: 'navigation.locations',
+        roles: [Role.USER],
+        Icon: RiMapPinLine,
+      },
+      {
+        href: '/bookings',
+        name: 'navigation.classBookings',
+        roles: [Role.USER],
+        Icon: RiUserLine,
+      },
+    ],
   },
   {
     href: '/my-bookings',

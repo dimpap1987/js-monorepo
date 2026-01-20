@@ -92,7 +92,10 @@
     "classBookings": "Κρατήσεις Τάξεων",
     "myBookings": "Οι Κρατήσεις μου",
     "myInvitations": "Προσκλήσεις",
-    "admin": "Διαχείριση"
+    "admin": "Διαχείριση",
+    "discover": "Ανακαλύψτε",
+    "classes": "Τάξεις",
+    "locations": "Τοποθεσίες"
   },
   "metadata": {
     "title": "ClassOps",
