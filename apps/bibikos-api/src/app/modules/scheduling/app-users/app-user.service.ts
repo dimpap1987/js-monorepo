@@ -1,17 +1,18 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { BibikosCacheService } from '../cache'
 import { AppUserRepo, AppUserRepository, AppUserWithProfiles } from './app-user.repository'
 import { AppUserResponseDto, UpdateAppUserDto } from './dto/app-user.dto'
 
 @Injectable()
 export class AppUserService {
   private readonly logger = new Logger(AppUserService.name)
-  private readonly redisNamespace: string
 
   constructor(
     @Inject(AppUserRepo)
-    private readonly appUserRepo: AppUserRepository
+    private readonly appUserRepo: AppUserRepository,
+    private readonly cacheService: BibikosCacheService
   ) {}
 
   @Transactional()
@@ -43,10 +44,11 @@ export class AppUserService {
   }
 
   async getAppUserByAuthId(authUserId: number): Promise<AppUserResponseDto | null> {
-    const appUser = await this.appUserRepo.findByAuthUserIdWithProfiles(authUserId)
-    if (!appUser) return null
-
-    return this.toResponseDtoWithProfiles(appUser)
+    return this.cacheService.getOrSetAppUser<AppUserResponseDto | null>(authUserId, async () => {
+      const appUser = await this.appUserRepo.findByAuthUserIdWithProfiles(authUserId)
+      if (!appUser) return null
+      return this.toResponseDtoWithProfiles(appUser)
+    })
   }
 
   async updateAppUser(authUserId: number, data: UpdateAppUserDto): Promise<AppUserResponseDto> {
@@ -60,6 +62,9 @@ export class AppUserService {
       ...(data.timezone !== undefined && { timezone: data.timezone }),
       ...(data.countryCode !== undefined && { countryCode: data.countryCode }),
     })
+
+    // Invalidate cache after update
+    await this.cacheService.invalidateAppUser(authUserId)
 
     this.logger.log(`Updated AppUser ${updated.id} for authUserId: ${authUserId}`)
 

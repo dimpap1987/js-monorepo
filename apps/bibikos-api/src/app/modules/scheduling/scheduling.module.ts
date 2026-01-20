@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { BibikosCacheModule } from './cache/bibikos-cache.module'
 import { AppUserModule } from './app-users/app-user.module'
 import { BookingModule } from './bookings/booking.module'
 import { ClassScheduleModule } from './class-schedules/class-schedule.module'
@@ -31,6 +32,7 @@ import { ParticipantModule } from './participants/participant.module'
  */
 @Module({
   imports: [
+    BibikosCacheModule, // Global cache service for all scheduling services
     AppUserModule,
     OrganizerModule,
     ParticipantModule,

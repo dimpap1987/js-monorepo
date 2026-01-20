@@ -2,6 +2,7 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AppUserRepo, AppUserRepository } from '../app-users/app-user.repository'
+import { BibikosCacheService } from '../cache'
 import { ParticipantResponseDto } from './dto/participant.dto'
 import { ParticipantRepo, ParticipantRepository } from './participant.repository'
 
@@ -13,7 +14,8 @@ export class ParticipantService {
     @Inject(ParticipantRepo)
     private readonly participantRepo: ParticipantRepository,
     @Inject(AppUserRepo)
-    private readonly appUserRepo: AppUserRepository
+    private readonly appUserRepo: AppUserRepository,
+    private readonly cacheService: BibikosCacheService
   ) {}
 
   /**
@@ -53,6 +55,9 @@ export class ParticipantService {
     const participant = await this.participantRepo.create({
       appUser: { connect: { id: appUserId } },
     })
+
+    // Invalidate AppUser cache since hasParticipantProfile changed
+    await this.cacheService.invalidateAppUser(appUser.authUserId)
 
     this.logger.log(`Created participant profile ${participant.id} for appUser ${appUserId}`)
     return this.toResponseDto(participant)

@@ -2,6 +2,7 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { AppUserRepo, AppUserRepository } from '../app-users/app-user.repository'
+import { BibikosCacheService } from '../cache'
 import {
   CreateOrganizerDto,
   OrganizerPublicProfileDto,
@@ -9,7 +10,6 @@ import {
   UpdateOrganizerDto,
 } from './dto/organizer.dto'
 import { OrganizerRepo, OrganizerRepository } from './organizer.repository'
-import { CacheInvalidate } from '@js-monorepo/nest/decorators'
 
 @Injectable()
 export class OrganizerService {
@@ -19,7 +19,8 @@ export class OrganizerService {
     @Inject(OrganizerRepo)
     private readonly organizerRepo: OrganizerRepository,
     @Inject(AppUserRepo)
-    private readonly appUserRepo: AppUserRepository
+    private readonly appUserRepo: AppUserRepository,
+    private readonly cacheService: BibikosCacheService
   ) {}
 
   /**
@@ -58,12 +59,6 @@ export class OrganizerService {
    * A user becomes an organizer when they want to create classes
    */
   @Transactional()
-  @CacheInvalidate({
-    keyPrefix: 'app-user',
-    namespace: process.env['REDIS_NAMESPACE'],
-    keyGenerator: (authUserId: number) => String(authUserId),
-    when: 'after', // Invalidate after update so we can cache the new result
-  })
   async createOrGetOrganizer(appUserId: number, dto?: CreateOrganizerDto): Promise<OrganizerResponseDto> {
     // Check if already an organizer
     const existing = await this.organizerRepo.findByAppUserId(appUserId)
@@ -101,6 +96,9 @@ export class OrganizerService {
         defaultLocation: { connect: { id: dto.defaultLocationId } },
       }),
     })
+
+    // Invalidate AppUser cache since hasOrganizerProfile changed
+    await this.cacheService.invalidateAppUser(appUser.authUserId)
 
     this.logger.log(`Created organizer profile ${organizer.id} for appUser ${appUserId}`)
     return this.toResponseDto(organizer)
@@ -144,6 +142,12 @@ export class OrganizerService {
         defaultLocation: dto.defaultLocationId ? { connect: { id: dto.defaultLocationId } } : { disconnect: true },
       }),
     })
+
+    // Invalidate AppUser cache to reflect any changes
+    const appUser = await this.appUserRepo.findById(appUserId)
+    if (appUser) {
+      await this.cacheService.invalidateAppUser(appUser.authUserId)
+    }
 
     this.logger.log(`Updated organizer profile ${organizerId}`)
     return this.toResponseDto(updated)
