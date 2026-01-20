@@ -10,7 +10,7 @@ A complete scheduling system for fitness/wellness organizers (coaches, instructo
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         Frontend                                 │
+│                         Frontend                                │
 │  (bibikos-client - Next.js 14 App Router)                       │
 ├─────────────────────────────────────────────────────────────────┤
 │  /calendar      → Calendar view, create/manage schedules        │
@@ -18,28 +18,28 @@ A complete scheduling system for fitness/wellness organizers (coaches, instructo
 │  /locations     → Manage locations (online/in-person)           │
 │  /bookings      → Participant booking management                │
 │  /dashboard     → Organizer dashboard overview                  │
-│  /onboarding    → New organizer setup flow                      │
-│  /coach/[slug]  → Public organizer profile page                 │
+│  /onboarding    → New organizer setup flow                       │
+│  /coach/[slug]  → Public organizer profile page                  │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                          Backend                                 │
+│                          Backend                                │
 │  (bibikos-api - NestJS)                                         │
 ├─────────────────────────────────────────────────────────────────┤
-│  /scheduling/app-users     → App user profile management        │
+│  /scheduling/app-users     → App user profile management         │
 │  /scheduling/organizers    → Organizer CRUD                     │
 │  /scheduling/participants  → Participant management             │
 │  /scheduling/locations     → Location CRUD                      │
 │  /scheduling/classes       → Class type CRUD                    │
 │  /scheduling/schedules     → Schedule management & calendar     │
 │  /scheduling/bookings      → Booking & attendance               │
-│  /scheduling/onboarding    → Onboarding status & flow           │
+│  /scheduling/onboarding    → Onboarding status & flow            │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                         Database                                 │
+│                         Database                                │
 │  (PostgreSQL via Prisma)                                        │
 ├─────────────────────────────────────────────────────────────────┤
 │  AppUser, Organizer, Participant, Location, Class,              │

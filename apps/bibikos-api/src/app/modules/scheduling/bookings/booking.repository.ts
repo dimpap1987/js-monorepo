@@ -7,11 +7,22 @@ export interface BookingWithParticipant extends Booking {
     id: number
     appUser: {
       id: number
-      fullName: string | null
       authUser: {
-        email: string
         username: string
+        userProfiles: Array<{
+          firstName: string | null
+          lastName: string | null
+        }>
       }
+    }
+  }
+  classSchedule: {
+    id: number
+    startTimeUtc: Date
+    endTimeUtc: Date
+    class: {
+      id: number
+      title: string
     }
   }
 }

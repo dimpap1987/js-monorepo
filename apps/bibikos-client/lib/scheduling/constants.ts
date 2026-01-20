@@ -185,13 +185,26 @@ export const DURATION_OPTIONS = [
   { value: 120, label: '2 hours' },
 ]
 
+import { BookingStatus } from '@js-monorepo/types/scheduling'
+
+// Booking status constants (matching Prisma BookingStatus enum)
+export const BOOKING_STATUS = {
+  BOOKED: 'BOOKED' as BookingStatus,
+  WAITLISTED: 'WAITLISTED' as BookingStatus,
+  CANCELLED: 'CANCELLED' as BookingStatus,
+  ATTENDED: 'ATTENDED' as BookingStatus,
+  NO_SHOW: 'NO_SHOW' as BookingStatus,
+} as const
+
+export type BookingStatusValue = (typeof BOOKING_STATUS)[keyof typeof BOOKING_STATUS]
+
 // Booking status colors
 export const BOOKING_STATUS_COLORS = {
-  BOOKED: { bg: 'bg-green-500/10', text: 'text-green-600', border: 'border-green-500/30' },
-  WAITLISTED: { bg: 'bg-yellow-500/10', text: 'text-yellow-600', border: 'border-yellow-500/30' },
-  CANCELLED: { bg: 'bg-red-500/10', text: 'text-red-600', border: 'border-red-500/30' },
-  ATTENDED: { bg: 'bg-blue-500/10', text: 'text-blue-600', border: 'border-blue-500/30' },
-  NO_SHOW: { bg: 'bg-gray-500/10', text: 'text-gray-600', border: 'border-gray-500/30' },
+  [BOOKING_STATUS.BOOKED]: { bg: 'bg-green-500/10', text: 'text-green-600', border: 'border-green-500/30' },
+  [BOOKING_STATUS.WAITLISTED]: { bg: 'bg-yellow-500/10', text: 'text-yellow-600', border: 'border-yellow-500/30' },
+  [BOOKING_STATUS.CANCELLED]: { bg: 'bg-red-500/10', text: 'text-red-600', border: 'border-red-500/30' },
+  [BOOKING_STATUS.ATTENDED]: { bg: 'bg-blue-500/10', text: 'text-blue-600', border: 'border-blue-500/30' },
+  [BOOKING_STATUS.NO_SHOW]: { bg: 'bg-gray-500/10', text: 'text-gray-600', border: 'border-gray-500/30' },
 }
 
 // Class colors for calendar

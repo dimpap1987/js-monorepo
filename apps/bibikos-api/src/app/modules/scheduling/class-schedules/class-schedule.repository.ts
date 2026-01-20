@@ -48,7 +48,8 @@ export interface ClassScheduleRepository {
     organizerId: number,
     startDate: Date,
     endDate: Date,
-    classId?: number
+    classId?: number,
+    includeCancelledWithBookings?: boolean
   ): Promise<ClassScheduleWithBookingCounts[]>
   findPublicByOrganizerIdInRange(
     organizerId: number,

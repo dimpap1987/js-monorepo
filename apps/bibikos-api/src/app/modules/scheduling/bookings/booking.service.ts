@@ -3,7 +3,11 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { ClassScheduleRepo, ClassScheduleRepository } from '../class-schedules/class-schedule.repository'
+import {
+  ClassScheduleRepo,
+  ClassScheduleRepository,
+  ClassScheduleWithClass,
+} from '../class-schedules/class-schedule.repository'
 import { ParticipantRepo, ParticipantRepository } from '../participants/participant.repository'
 import {
   BookingRepo,
@@ -59,10 +63,34 @@ export class BookingService {
     // Check if already booked
     const existing = await this.bookingRepo.findByScheduleAndParticipant(scheduleId, participantId)
     if (existing) {
-      if (existing.status === BookingStatus.CANCELLED) {
-        // Allow rebooking if previously cancelled
+      this.logger.log(
+        `Found existing booking ${existing.id} for participant ${participantId} on schedule ${scheduleId} with status: ${existing.status} (${typeof existing.status}), cancelledAt: ${existing.cancelledAt}`
+      )
+
+      // Allow rebooking if booking is in a "completed" state:
+      // - CANCELLED: User cancelled or organizer cancelled
+      // - NO_SHOW: User didn't attend (organizer marked as no-show)
+      // - ATTENDED: User already attended (can book again for another session)
+      const canRebook =
+        existing.status === BookingStatus.CANCELLED ||
+        existing.status === BookingStatus.NO_SHOW ||
+        existing.status === BookingStatus.ATTENDED ||
+        existing.cancelledAt !== null ||
+        String(existing.status) === 'CANCELLED' ||
+        String(existing.status) === 'NO_SHOW' ||
+        String(existing.status) === 'ATTENDED'
+
+      if (canRebook) {
+        this.logger.log(
+          `Booking ${existing.id} is in rebookable state (status: ${existing.status}, cancelledAt: ${existing.cancelledAt}), allowing rebook for participant ${participantId} on schedule ${scheduleId}`
+        )
         return this.rebookCancelledBooking(existing.id, schedule)
       }
+
+      // If booking exists with any other status, user is already booked/waitlisted
+      this.logger.warn(
+        `Participant ${participantId} already has booking ${existing.id} on schedule ${scheduleId} with status ${existing.status} (expected CANCELLED for rebooking). Cannot rebook.`
+      )
       throw new ApiException(HttpStatus.CONFLICT, 'ALREADY_BOOKED')
     }
 
@@ -107,30 +135,56 @@ export class BookingService {
   }
 
   /**
-   * Rebook a previously cancelled booking
+   * Rebook a previously cancelled/completed booking
+   * Handles CANCELLED, NO_SHOW, and ATTENDED statuses
    */
   @Transactional()
   private async rebookCancelledBooking(
     bookingId: number,
-    schedule: { class: { capacity: number | null; waitlistLimit: number | null; isCapacitySoft: boolean } }
+    schedule: ClassScheduleWithClass
   ): Promise<BookingResponseDto> {
-    const bookedCount = await this.bookingRepo.countByScheduleId(
-      (await this.bookingRepo.findById(bookingId))!.classScheduleId,
-      [BookingStatus.BOOKED]
-    )
+    // Verify the booking exists and is in a rebookable state
+    const existingBooking = await this.bookingRepo.findById(bookingId)
+    if (!existingBooking) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'BOOKING_NOT_FOUND')
+    }
+
+    const isRebookable =
+      existingBooking.status === BookingStatus.CANCELLED ||
+      existingBooking.status === BookingStatus.NO_SHOW ||
+      existingBooking.status === BookingStatus.ATTENDED ||
+      existingBooking.cancelledAt !== null ||
+      String(existingBooking.status) === 'CANCELLED' ||
+      String(existingBooking.status) === 'NO_SHOW' ||
+      String(existingBooking.status) === 'ATTENDED'
+
+    if (!isRebookable) {
+      this.logger.error(
+        `Attempted to rebook booking ${bookingId} but status is ${existingBooking.status}, which is not rebookable`
+      )
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'BOOKING_NOT_REBOOKABLE')
+    }
+
+    const scheduleId = schedule.id
+    const bookedCount = await this.bookingRepo.countByScheduleId(scheduleId, [BookingStatus.BOOKED])
+    const waitlistedCount = await this.bookingRepo.countByScheduleId(scheduleId, [BookingStatus.WAITLISTED])
 
     const capacity = schedule.class.capacity
+    const waitlistLimit = schedule.class.waitlistLimit
     const isCapacitySoft = schedule.class.isCapacitySoft
 
     let status: BookingStatus
     let waitlistPosition: number | null = null
 
     if (capacity === null || bookedCount < capacity || isCapacitySoft) {
+      // Has space (or soft capacity) - book directly
       status = BookingStatus.BOOKED
-    } else {
+    } else if (waitlistLimit === null || waitlistedCount < waitlistLimit) {
+      // No space but waitlist available
       status = BookingStatus.WAITLISTED
-      const scheduleId = (await this.bookingRepo.findById(bookingId))!.classScheduleId
       waitlistPosition = (await this.bookingRepo.getMaxWaitlistPosition(scheduleId)) + 1
+    } else {
+      throw new ApiException(HttpStatus.CONFLICT, 'CLASS_FULL_AND_WAITLIST_FULL')
     }
 
     const updated = await this.bookingRepo.update(bookingId, {
@@ -141,6 +195,13 @@ export class BookingService {
       cancelReason: null,
       cancelledByOrganizer: false,
     })
+
+    this.logger.log(
+      `Rebooked cancelled booking ${bookingId} for schedule ${scheduleId} with status ${status}${waitlistPosition ? ` (waitlist position ${waitlistPosition})` : ''}`
+    )
+
+    // Notify organizer about rebooking via WebSocket
+    this.notifyOrganizerOfBookingUpdate(schedule.class.organizerId, scheduleId, 'created')
 
     return this.toBasicResponseDto(updated)
   }
@@ -168,7 +229,7 @@ export class BookingService {
     const wasBooked = booking.status === BookingStatus.BOOKED
     const waitlistPosition = booking.waitlistPosition
 
-    await this.bookingRepo.update(bookingId, {
+    const updated = await this.bookingRepo.update(bookingId, {
       status: BookingStatus.CANCELLED,
       cancelledAt: new Date(),
       cancelReason: dto?.cancelReason ?? null,
@@ -176,7 +237,9 @@ export class BookingService {
       waitlistPosition: null,
     })
 
-    this.logger.log(`Cancelled booking ${bookingId} by participant`)
+    this.logger.log(
+      `Cancelled booking ${bookingId} by participant. New status: ${updated.status} (${typeof updated.status})`
+    )
 
     // Notify organizer about cancellation via WebSocket
     this.notifyOrganizerOfBookingUpdate(booking.classSchedule.class.organizerId, booking.classScheduleId, 'cancelled')
@@ -277,14 +340,24 @@ export class BookingService {
       throw new ApiException(HttpStatus.FORBIDDEN, 'SCHEDULE_ACCESS_DENIED')
     }
 
-    const bookings = await this.bookingRepo.findByScheduleId(scheduleId)
+    // Get all bookings for the schedule (including cancelled, attended, no-show for historical record)
+    const allBookings = await this.bookingRepo.findByScheduleId(scheduleId)
 
-    const booked = bookings.filter((b) => b.status === BookingStatus.BOOKED).length
-    const waitlisted = bookings.filter((b) => b.status === BookingStatus.WAITLISTED).length
+    // Filter out cancelled/completed bookings from the main list (they're in a completed state)
+    // But keep them in the total count for historical purposes
+    const activeBookings = allBookings.filter(
+      (b) =>
+        b.status !== BookingStatus.CANCELLED &&
+        b.status !== BookingStatus.ATTENDED &&
+        b.status !== BookingStatus.NO_SHOW
+    )
+
+    const booked = allBookings.filter((b) => b.status === BookingStatus.BOOKED).length
+    const waitlisted = allBookings.filter((b) => b.status === BookingStatus.WAITLISTED).length
 
     return {
-      bookings: bookings.map(this.toParticipantResponseDto),
-      total: bookings.length,
+      bookings: activeBookings.map(this.toParticipantResponseDto),
+      total: allBookings.length,
       booked,
       waitlisted,
     }
@@ -334,8 +407,16 @@ export class BookingService {
         throw new ApiException(HttpStatus.FORBIDDEN, `BOOKING_ACCESS_DENIED: ${bookingId}`)
       }
 
-      if (booking.status !== BookingStatus.BOOKED) {
-        throw new ApiException(HttpStatus.BAD_REQUEST, `BOOKING_NOT_IN_BOOKED_STATUS: ${bookingId}`)
+      // Only allow marking attendance for active bookings (BOOKED or WAITLISTED)
+      // Prevent marking cancelled, already attended, or no-show bookings
+      if (booking.status !== BookingStatus.BOOKED && booking.status !== BookingStatus.WAITLISTED) {
+        this.logger.warn(
+          `Attempted to mark attendance for booking ${bookingId} with status ${booking.status}. Only BOOKED or WAITLISTED bookings can be marked.`
+        )
+        throw new ApiException(
+          HttpStatus.BAD_REQUEST,
+          `BOOKING_NOT_IN_BOOKED_STATUS: ${bookingId} (current status: ${booking.status})`
+        )
       }
     }
 
@@ -425,10 +506,24 @@ export class BookingService {
         id: booking.participant.id,
         appUser: {
           id: booking.participant.appUser.id,
-          fullName: booking.participant.appUser.fullName,
-          authUser: booking.participant.appUser.authUser,
+          authUser: {
+            username: booking.participant.appUser.authUser.username,
+            firstName: booking.participant.appUser.authUser.userProfiles[0]?.firstName || null,
+            lastName: booking.participant.appUser.authUser.userProfiles[0]?.lastName || null,
+          },
         },
       },
+      classSchedule: booking.classSchedule
+        ? {
+            id: booking.classSchedule.id,
+            startTimeUtc: booking.classSchedule.startTimeUtc,
+            endTimeUtc: booking.classSchedule.endTimeUtc,
+            class: {
+              id: booking.classSchedule.class.id,
+              title: booking.classSchedule.class.title,
+            },
+          }
+        : undefined,
     }
   }
 

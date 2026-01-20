@@ -1,267 +1,228 @@
 'use client'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@js-monorepo/components/ui/alert-dialog'
-import { Badge } from '@js-monorepo/components/ui/badge'
-import { Button } from '@js-monorepo/components/ui/button'
-import { Card, CardContent } from '@js-monorepo/components/ui/card'
-import { Skeleton } from '@js-monorepo/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@js-monorepo/components/ui/tabs'
+import { BackButton } from '@js-monorepo/back-arrow'
 import { useNotifications } from '@js-monorepo/notification'
-import { cn } from '@js-monorepo/ui/util'
-import { format, isFuture, parseISO } from 'date-fns'
-import { Calendar, CalendarOff, Clock, X } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useState } from 'react'
-import { Booking, BOOKING_STATUS_COLORS, useCancelBooking, useMyBookings } from '../../../../lib/scheduling'
-
-function BookingsSkeleton() {
-  return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      <div>
-        <Skeleton className="h-9 w-48" />
-        <Skeleton className="h-5 w-64 mt-2" />
-      </div>
-
-      <Skeleton className="h-10 w-full max-w-md" />
-
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="border-border/50">
-            <CardContent className="p-6">
-              <div className="flex gap-4">
-                <Skeleton className="w-16 h-20 rounded-lg" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-6 w-48" />
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-4 w-40" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function BookingCard({
-  booking,
-  onCancel,
-  showCancel = false,
-}: {
-  booking: Booking
-  onCancel?: () => void
-  showCancel?: boolean
-}) {
-  const t = useTranslations('scheduling.bookings')
-  const colors = BOOKING_STATUS_COLORS[booking.status]
-
-  const schedule = booking.classSchedule
-  const classInfo = schedule?.class
-
-  if (!schedule) return null
-
-  const startTime = parseISO(schedule.startTimeUtc)
-  const endTime = parseISO(schedule.endTimeUtc)
-  const isUpcoming = isFuture(startTime)
-
-  return (
-    <Card className={cn('border-border/50 transition-all', !isUpcoming && 'opacity-75')}>
-      <CardContent className="p-6">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          {/* Class Info */}
-          <div className="flex gap-4">
-            {/* Date Badge */}
-            <div className="flex-shrink-0 w-16 text-center">
-              <div className="bg-primary/10 rounded-lg p-2">
-                <div className="text-xs text-primary font-medium uppercase">{format(startTime, 'MMM')}</div>
-                <div className="text-2xl font-bold text-primary">{format(startTime, 'd')}</div>
-              </div>
-            </div>
-
-            {/* Details */}
-            <div className="space-y-2">
-              <div>
-                <h3 className="font-semibold text-lg">{classInfo?.title}</h3>
-                <p className="text-foreground-muted text-sm">{format(startTime, 'EEEE')}</p>
-              </div>
-
-              <div className="flex flex-wrap gap-4 text-sm text-foreground-muted">
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4" />
-                  <span>
-                    {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
-                  </span>
-                </div>
-              </div>
-
-              {/* Status Badge */}
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={cn('text-xs', colors.text, colors.border, colors.bg)}>
-                  {booking.status === 'BOOKED' && t('booked')}
-                  {booking.status === 'WAITLISTED' && t('waitlisted')}
-                  {booking.status === 'CANCELLED' && t('cancelled')}
-                  {booking.status === 'ATTENDED' && t('attended')}
-                  {booking.status === 'NO_SHOW' && t('noShow')}
-                </Badge>
-
-                {booking.status === 'WAITLISTED' && booking.waitlistPosition && (
-                  <span className="text-xs text-foreground-muted">
-                    {t('position')} #{booking.waitlistPosition}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Actions */}
-          {showCancel && (booking.status === 'BOOKED' || booking.status === 'WAITLISTED') && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onCancel}
-              className="gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
-            >
-              <X className="w-4 h-4" />
-              Cancel
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
+import { Card, CardContent } from '@js-monorepo/components/ui/card'
+import { format, startOfMonth, endOfMonth } from 'date-fns'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Booking,
+  BOOKING_STATUS,
+  ClassSchedule,
+  useBookingsForSchedule,
+  useCancelBookingByOrganizer,
+  useClasses,
+  useMarkAttendance,
+  useSchedulesCalendar,
+  useUpdateBookingNotes,
+} from '../../../../lib/scheduling'
+import { BookingDetailDialog } from './components/booking-detail-dialog'
+import { BookingsList } from './components/bookings-list'
+import { BookingsSkeleton } from './components/bookings-skeleton'
+import { ScheduleSelector } from './components/schedule-selector'
+import type { DateRange } from './types'
 
 export function BookingsContent() {
-  const t = useTranslations('scheduling.bookings')
-  const tCommon = useTranslations('common')
   const { addNotification } = useNotifications()
 
-  const [cancelBookingId, setCancelBookingId] = useState<number | null>(null)
+  // State
+  const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null)
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [selectedClassId, setSelectedClassId] = useState<string>('all')
+  const [dateRange, setDateRange] = useState<DateRange>({
+    start: format(startOfMonth(new Date()), 'yyyy-MM-dd'),
+    end: format(endOfMonth(new Date()), 'yyyy-MM-dd'),
+  })
 
-  // Fetch my bookings
-  const { data: bookingsData, isLoading } = useMyBookings()
-  const cancelBookingMutation = useCancelBooking()
+  // Fetch data
+  // Include cancelled schedules with bookings so organizers can see all bookings
+  const { data: schedulesData, isLoading: schedulesLoading } = useSchedulesCalendar(
+    dateRange.start,
+    dateRange.end,
+    undefined,
+    true // includeCancelledWithBookings = true
+  )
+  const { data: classesData } = useClasses()
+  const { data: bookingsData, isLoading: bookingsLoading } = useBookingsForSchedule(selectedScheduleId || 0)
+  const cancelBookingMutation = useCancelBookingByOrganizer()
+  const markAttendanceMutation = useMarkAttendance()
+  const updateNotesMutation = useUpdateBookingNotes()
 
-  const handleCancelBooking = async () => {
-    if (!cancelBookingId) return
+  // Get schedules and classes
+  // useSchedulesCalendar returns ClassSchedule[] directly, not an object with schedules property
+  const schedules = useMemo(() => (Array.isArray(schedulesData) ? schedulesData : []), [schedulesData])
+  const classes = classesData || []
+  const bookings = useMemo(() => bookingsData?.bookings || [], [bookingsData?.bookings])
 
-    try {
-      await cancelBookingMutation.mutateAsync({ id: cancelBookingId })
-      addNotification({ message: 'Booking cancelled', type: 'success' })
-      setCancelBookingId(null)
-    } catch (error: any) {
-      addNotification({
-        message: error?.message || 'Failed to cancel booking',
-        type: 'error',
+  // Filter schedules by class and only show schedules with bookings
+  const filteredSchedules = useMemo(() => {
+    let filtered = schedules
+
+    // Filter by class
+    if (selectedClassId !== 'all') {
+      filtered = filtered.filter((s: ClassSchedule) => s.class?.id === parseInt(selectedClassId))
+    }
+
+    // Only show schedules with at least one booking (booked or waitlisted)
+    filtered = filtered.filter((s: ClassSchedule) => {
+      const booked = s.bookingCounts?.booked || 0
+      const waitlisted = s.bookingCounts?.waitlisted || 0
+      return booked + waitlisted > 0
+    })
+
+    return filtered
+  }, [schedules, selectedClassId])
+
+  // Auto-select first schedule if none selected and schedules are available
+  useEffect(() => {
+    if (!selectedScheduleId && filteredSchedules.length > 0) {
+      setSelectedScheduleId(filteredSchedules[0].id)
+    }
+  }, [filteredSchedules, selectedScheduleId])
+
+  // Filter bookings
+  const filteredBookings = useMemo(() => {
+    let filtered = bookings
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((b: Booking) => b.status === statusFilter)
+    }
+
+    // Filter by search query (participant name or username)
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter((b: Booking) => {
+        const firstName = b.participant?.appUser?.authUser?.firstName?.toLowerCase() || ''
+        const lastName = b.participant?.appUser?.authUser?.lastName?.toLowerCase() || ''
+        const combinedName = firstName && lastName ? `${firstName} ${lastName}`.toLowerCase() : ''
+        const username = b.participant?.appUser?.authUser?.username?.toLowerCase() || ''
+        return (
+          combinedName.includes(query) ||
+          firstName.includes(query) ||
+          lastName.includes(query) ||
+          username.includes(query)
+        )
       })
+    }
+
+    // Sort: Booked first, then Waitlisted, then others
+    return filtered.sort((a: Booking, b: Booking) => {
+      if (a.status === BOOKING_STATUS.BOOKED && b.status !== BOOKING_STATUS.BOOKED) return -1
+      if (a.status !== BOOKING_STATUS.BOOKED && b.status === BOOKING_STATUS.BOOKED) return 1
+      if (a.status === BOOKING_STATUS.WAITLISTED && b.status !== BOOKING_STATUS.WAITLISTED) return -1
+      if (a.status !== BOOKING_STATUS.WAITLISTED && b.status === BOOKING_STATUS.WAITLISTED) return 1
+      return 0
+    })
+  }, [bookings, statusFilter, searchQuery])
+
+  // Handlers
+  const handleUpdateNotes = async (bookingId: number, notes: string) => {
+    try {
+      await updateNotesMutation.mutateAsync({ id: bookingId, organizerNotes: notes })
+      addNotification({ message: 'Notes updated successfully', type: 'success' })
+      // Update the selected booking in the dialog to show the new notes immediately
+      if (selectedBooking && selectedBooking.id === bookingId) {
+        setSelectedBooking({ ...selectedBooking, organizerNotes: notes })
+      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update notes'
+      addNotification({ message: errorMessage, type: 'error' })
     }
   }
 
-  if (isLoading) {
+  const handleCancelBooking = async (bookingId: number, reason?: string) => {
+    try {
+      await cancelBookingMutation.mutateAsync({ id: bookingId, cancelReason: reason })
+      addNotification({ message: 'Booking cancelled successfully', type: 'success' })
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to cancel booking'
+      addNotification({ message: errorMessage, type: 'error' })
+    }
+  }
+
+  const handleToggleAttendance = async (bookingId: number, attended: boolean) => {
+    try {
+      await markAttendanceMutation.mutateAsync({
+        bookingIds: [bookingId],
+        status: attended ? 'ATTENDED' : 'NO_SHOW',
+      })
+      addNotification({ message: attended ? 'Marked as attended' : 'Marked as no-show', type: 'success' })
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update attendance'
+      addNotification({ message: errorMessage, type: 'error' })
+    }
+  }
+
+  if (schedulesLoading) {
     return <BookingsSkeleton />
   }
 
-  const upcomingBookings = bookingsData?.upcoming || []
-  const pastBookings = bookingsData?.past || []
-
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
+      <BackButton />
+
       {/* Header */}
       <div>
-        <h1>{t('myBookings')}</h1>
-        <p className="text-foreground-muted mt-1">View and manage your class bookings</p>
+        <h1>Class Bookings</h1>
+        <p className="text-foreground-muted mt-1">View and manage bookings for your classes</p>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="upcoming" className="gap-2">
-            <Calendar className="w-4 h-4" />
-            {t('upcoming')}
-            {upcomingBookings.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
-                {upcomingBookings.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="past" className="gap-2">
-            <Clock className="w-4 h-4" />
-            {t('past')}
-          </TabsTrigger>
-        </TabsList>
+      {/* Schedule Selection */}
+      <ScheduleSelector
+        schedules={filteredSchedules}
+        classes={classes}
+        selectedScheduleId={selectedScheduleId}
+        selectedClassId={selectedClassId}
+        dateRange={dateRange}
+        onScheduleSelect={setSelectedScheduleId}
+        onClassFilterChange={setSelectedClassId}
+        onDateRangeChange={setDateRange}
+      />
 
-        {/* Upcoming Bookings */}
-        <TabsContent value="upcoming" className="mt-6">
-          {upcomingBookings.length === 0 ? (
-            <Card className="border-border/50">
-              <CardContent className="py-16 text-center">
-                <CalendarOff className="w-12 h-12 mx-auto mb-4 text-foreground-muted opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">{t('empty')}</h3>
-                <p className="text-foreground-muted">{t('emptyDescription')}</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {upcomingBookings.map((booking: Booking) => (
-                <BookingCard
-                  key={booking.id}
-                  booking={booking}
-                  onCancel={() => setCancelBookingId(booking.id)}
-                  showCancel
-                />
-              ))}
+      {/* Bookings List - Show when a schedule is selected */}
+      {selectedScheduleId ? (
+        bookingsData ? (
+          <BookingsList
+            bookings={filteredBookings}
+            isLoading={bookingsLoading}
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+            onViewDetails={setSelectedBooking}
+            onToggleAttendance={handleToggleAttendance}
+            isMarkingAttendance={markAttendanceMutation.isPending}
+            onSearchChange={setSearchQuery}
+            onStatusFilterChange={setStatusFilter}
+          />
+        ) : (
+          <Card>
+            <CardContent className="py-12">
+              <div className="text-center text-foreground-muted">
+                <p>Loading bookings...</p>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      ) : (
+        <Card>
+          <CardContent className="py-12">
+            <div className="text-center text-foreground-muted">
+              <p>Select a schedule above to view bookings</p>
             </div>
-          )}
-        </TabsContent>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Past Bookings */}
-        <TabsContent value="past" className="mt-6">
-          {pastBookings.length === 0 ? (
-            <Card className="border-border/50">
-              <CardContent className="py-16 text-center">
-                <Clock className="w-12 h-12 mx-auto mb-4 text-foreground-muted opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">No past bookings</h3>
-                <p className="text-foreground-muted">Your booking history will appear here</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {pastBookings.map((booking: Booking) => (
-                <BookingCard key={booking.id} booking={booking} showCancel={false} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {/* Cancel Confirmation */}
-      <AlertDialog open={!!cancelBookingId} onOpenChange={() => setCancelBookingId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('cancelBooking')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to cancel this booking? If there&apos;s a waitlist, your spot will be given to the
-              next person.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCancelBooking} className="bg-red-600 hover:bg-red-700">
-              Cancel Booking
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Booking Detail Dialog */}
+      <BookingDetailDialog
+        booking={selectedBooking}
+        isOpen={!!selectedBooking}
+        onClose={() => setSelectedBooking(null)}
+        onUpdateNotes={handleUpdateNotes}
+        onCancel={handleCancelBooking}
+      />
     </div>
   )
 }

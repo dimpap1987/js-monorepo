@@ -48,12 +48,14 @@ export class ClassScheduleService {
 
   /**
    * Get schedules for calendar view (date range query)
+   * For bookings view, include cancelled schedules that have bookings
    */
   async getSchedulesForCalendar(
     organizerId: number,
     startDate: string,
     endDate: string,
-    classId?: number
+    classId?: number,
+    includeCancelledWithBookings = false
   ): Promise<ClassScheduleResponseDto[]> {
     const start = new Date(startDate)
     const end = new Date(endDate)
@@ -64,7 +66,13 @@ export class ClassScheduleService {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'DATE_RANGE_TOO_LARGE')
     }
 
-    const schedules = await this.scheduleRepo.findByOrganizerIdInRange(organizerId, start, end, classId)
+    const schedules = await this.scheduleRepo.findByOrganizerIdInRange(
+      organizerId,
+      start,
+      end,
+      classId,
+      includeCancelledWithBookings
+    )
     return schedules.map(this.toResponseDto)
   }
 

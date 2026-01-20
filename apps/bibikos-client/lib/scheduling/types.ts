@@ -188,56 +188,8 @@ export interface DiscoverFilters {
   search?: string
 }
 
-// Booking
-export type BookingStatus = 'BOOKED' | 'WAITLISTED' | 'CANCELLED' | 'ATTENDED' | 'NO_SHOW'
-
-export interface Booking {
-  id: number
-  classScheduleId: number
-  participantId: number
-  status: BookingStatus
-  bookedAt: string
-  cancelledAt: string | null
-  attendedAt: string | null
-  waitlistPosition: number | null
-  cancelledByOrganizer: boolean
-  cancelReason: string | null
-  organizerNotes: string | null
-  createdAt: string
-  participant?: {
-    id: number
-    appUser: {
-      id: number
-      fullName: string | null
-      authUser: {
-        email: string
-        username: string
-      }
-    }
-  }
-  classSchedule?: {
-    id: number
-    startTimeUtc: string
-    endTimeUtc: string
-    class: {
-      id: number
-      title: string
-    }
-  }
-}
-
-export interface BookingListResponse {
-  bookings: Booking[]
-  total: number
-  booked: number
-  waitlisted: number
-}
-
-export interface MyBookingsResponse {
-  upcoming: Booking[]
-  past: Booking[]
-  cancelled: Booking[]
-}
+// Re-export shared booking types from @js-monorepo/types
+export type { BookingStatus, Booking, BookingListResponse, MyBookingsResponse } from '@js-monorepo/types/scheduling'
 
 export interface CreateBookingPayload {
   classScheduleId: number

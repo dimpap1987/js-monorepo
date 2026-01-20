@@ -54,8 +54,16 @@ export const schedulingKeys = {
   classPublic: (id: number) => [...schedulingKeys.all, 'classes', 'public', id] as const,
   classView: (id: number) => [...schedulingKeys.all, 'classes', 'view', id] as const,
   schedules: () => [...schedulingKeys.all, 'schedules'] as const,
-  schedulesCalendar: (startDate: string, endDate: string, classId?: number) =>
-    [...schedulingKeys.all, 'schedules', 'calendar', startDate, endDate, classId] as const,
+  schedulesCalendar: (startDate: string, endDate: string, classId?: number, includeCancelledWithBookings?: boolean) =>
+    [
+      ...schedulingKeys.all,
+      'schedules',
+      'calendar',
+      startDate,
+      endDate,
+      classId,
+      includeCancelledWithBookings,
+    ] as const,
   schedulesUpcoming: (classId: number) => [...schedulingKeys.all, 'schedules', 'upcoming', classId] as const,
   schedule: (id: number) => [...schedulingKeys.all, 'schedules', id] as const,
   schedulePublic: (id: number) => [...schedulingKeys.all, 'schedules', 'public', id] as const,
@@ -401,12 +409,18 @@ export function useDeleteClass() {
 // Schedule Hooks
 // =============================================================================
 
-export function useSchedulesCalendar(startDate: string, endDate: string, classId?: number) {
+export function useSchedulesCalendar(
+  startDate: string,
+  endDate: string,
+  classId?: number,
+  includeCancelledWithBookings = false
+) {
   return useQuery({
-    queryKey: schedulingKeys.schedulesCalendar(startDate, endDate, classId),
+    queryKey: schedulingKeys.schedulesCalendar(startDate, endDate, classId, includeCancelledWithBookings),
     queryFn: async () => {
       let url = `/scheduling/schedules/calendar?startDate=${startDate}&endDate=${endDate}`
       if (classId) url += `&classId=${classId}`
+      if (includeCancelledWithBookings) url += `&includeCancelledWithBookings=true`
       const response = await apiClient.get<ClassSchedule[]>(url)
       return handleQueryResponse(response)
     },
@@ -624,8 +638,12 @@ export function useUpdateBookingNotes() {
       const response = await apiClient.patch<Booking>(`/scheduling/bookings/${id}/notes`, payload)
       return handleQueryResponse(response)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: schedulingKeys.bookings() })
+      // Invalidate bookings for the specific schedule to refresh the list
+      if (data.classSchedule?.id) {
+        queryClient.invalidateQueries({ queryKey: schedulingKeys.bookingsForSchedule(data.classSchedule.id) })
+      }
     },
   })
 }

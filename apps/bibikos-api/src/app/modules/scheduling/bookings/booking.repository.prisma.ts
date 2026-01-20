@@ -57,13 +57,30 @@ export class BookingRepositoryPrisma implements BookingRepository {
         participant: {
           include: {
             appUser: {
-              include: {
+              select: {
+                id: true,
                 authUser: {
                   select: {
-                    email: true,
                     username: true,
+                    userProfiles: {
+                      select: {
+                        firstName: true,
+                        lastName: true,
+                      },
+                      take: 1, // Get the first profile (usually the primary one)
+                    },
                   },
                 },
+              },
+            },
+          },
+        },
+        classSchedule: {
+          include: {
+            class: {
+              select: {
+                id: true,
+                title: true,
               },
             },
           },

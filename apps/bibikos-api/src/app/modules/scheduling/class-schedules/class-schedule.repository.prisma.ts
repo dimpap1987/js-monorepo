@@ -52,8 +52,11 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
     organizerId: number,
     startDate: Date,
     endDate: Date,
-    classId?: number
+    classId?: number,
+    includeCancelledWithBookings = false
   ): Promise<ClassScheduleWithBookingCounts[]> {
+    // If includeCancelledWithBookings is true, we need to include cancelled schedules that have bookings
+    // We'll filter them after fetching if needed
     const schedules = await this.txHost.tx.classSchedule.findMany({
       where: {
         class: {
@@ -65,7 +68,9 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
           gte: startDate,
           lte: endDate,
         },
-        isCancelled: false,
+        ...(includeCancelledWithBookings
+          ? {} // Include all schedules (cancelled and non-cancelled)
+          : { isCancelled: false }), // Only non-cancelled schedules
       },
       include: {
         class: {

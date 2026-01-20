@@ -96,6 +96,7 @@ export class ClassScheduleController {
   /**
    * GET /scheduling/schedules/calendar
    * Get schedules for calendar view
+   * For bookings view, include cancelled schedules that have bookings
    */
   @Get('calendar')
   @UseGuards(LoggedInGuard)
@@ -103,6 +104,7 @@ export class ClassScheduleController {
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
     @Query('classId') classId?: string,
+    @Query('includeCancelledWithBookings') includeCancelledWithBookings?: string,
     @SessionUser() sessionUser?: SessionUserType
   ) {
     if (!startDate || !endDate) {
@@ -114,7 +116,8 @@ export class ClassScheduleController {
       organizerId,
       startDate,
       endDate,
-      classId ? parseInt(classId, 10) : undefined
+      classId ? parseInt(classId, 10) : undefined,
+      includeCancelledWithBookings === 'true'
     )
   }
 
