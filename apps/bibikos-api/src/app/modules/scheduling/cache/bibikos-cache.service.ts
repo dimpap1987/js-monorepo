@@ -1,6 +1,8 @@
 import { REDIS } from '@js-monorepo/nest/redis'
+import { CACHE_MANAGER } from '@nestjs/cache-manager'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { Cache } from 'cache-manager'
 import { RedisClientType } from 'redis'
 import {
   APP_USER_KEY,
@@ -19,6 +21,8 @@ export class BibikosCacheService {
   private readonly namespace: string
 
   constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
     @Inject(REDIS)
     private readonly redis: RedisClientType,
     private readonly configService: ConfigService
@@ -27,95 +31,31 @@ export class BibikosCacheService {
   }
 
   /**
-   * Generate a cache key with namespace and prefix
+   * Generate a cache key with prefix
+   * Note: Namespace is handled by CacheModule/Keyv configuration, so we don't add it here
    */
   private getKey(prefix: string, ...parts: (string | number)[]): string {
     const keyParts = parts.map((part) => String(part))
-    return `${this.namespace}:${prefix}:${keyParts.join(':')}`
+    return `${prefix}:${keyParts.join(':')}`
   }
 
-  /**
-   * Get a cached value by key
-   */
-  async get<T>(prefix: string, ...keyParts: (string | number)[]): Promise<T | null> {
-    try {
-      const key = this.getKey(prefix, ...keyParts)
-      const cached = await this.redis.get(key)
-
-      if (!cached) {
-        this.logger.debug(`Cache MISS: ${key}`)
-        return null
-      }
-
-      this.logger.debug(`Cache HIT: ${key}`)
-      return JSON.parse(cached) as T
-    } catch (error: any) {
-      this.logger.error(`Error reading cache for ${prefix}: ${error.message}`, error.stack)
-      return null
-    }
+  async get<T>(prefix: string, ...keyParts: (string | number)[]): Promise<T | undefined> {
+    const key = this.getKey(prefix, ...keyParts)
+    return this.cacheManager.get<T>(key)
   }
 
-  /**
-   * Set a cached value with TTL (default: 5 minutes)
-   *
-   * @example
-   * await cacheService.set(APP_USER_KEY, authUserId, appUser)
-   * await cacheService.set(APP_USER_KEY, authUserId, appUser, 600)
-   */
-  async set<T>(
-    prefix: string,
-    ...args: [...keyParts: (string | number)[], value: T, ttl: number] | [...keyParts: (string | number)[], value: T]
-  ): Promise<void> {
-    try {
-      // Last argument might be TTL (number) or value (T)
-      // If second-to-last is definitely the value, last could be TTL
-      const lastArg = args[args.length - 1]
-      const secondToLastArg = args.length >= 2 ? args[args.length - 2] : undefined
-
-      let ttl: number | undefined
-      let value: T
-      let keyParts: (string | number)[]
-
-      // Check if last arg is a number (TTL) and second-to-last is not a number (value)
-      if (typeof lastArg === 'number' && secondToLastArg !== undefined && typeof secondToLastArg !== 'number') {
-        // Last is TTL, second-to-last is value
-        ttl = lastArg
-        value = secondToLastArg as T
-        keyParts = args.slice(0, -2) as (string | number)[]
-      } else {
-        // Last is value, no TTL provided
-        value = lastArg as T
-        keyParts = args.slice(0, -1) as (string | number)[]
-        ttl = undefined
-      }
-
-      const key = this.getKey(prefix, ...keyParts)
-      const serialized = JSON.stringify(value)
-      const expiration = ttl ?? 300 // Default 5 minutes
-
-      await this.redis.set(key, serialized, {
-        EX: expiration,
-      })
-
-      this.logger.debug(`Cached: ${key} (TTL: ${expiration}s)`)
-    } catch (error: any) {
-      this.logger.error(`Error setting cache for ${prefix}: ${error.message}`, error.stack)
-      // Don't throw - caching failures shouldn't break the request
-    }
+  private async set<T>(prefix: string, key: string | number, value: T, ttl?: number): Promise<T> {
+    const cacheKey = this.getKey(prefix, key)
+    const expirationMs = (ttl ?? 300) * 1000 // Convert seconds to milliseconds
+    return this.cacheManager.set(cacheKey, value, expirationMs)
   }
 
   /**
    * Delete a specific cache entry
    */
-  async invalidate(prefix: string, ...keyParts: (string | number)[]): Promise<void> {
-    try {
-      const key = this.getKey(prefix, ...keyParts)
-      await this.redis.del(key)
-      this.logger.debug(`Invalidated cache: ${key}`)
-    } catch (error: any) {
-      this.logger.error(`Error invalidating cache for ${prefix}: ${error.message}`, error.stack)
-      // Don't throw - cache invalidation failures shouldn't break the request
-    }
+  async invalidate(prefix: string, ...keyParts: (string | number)[]): Promise<boolean> {
+    const key = this.getKey(prefix, ...keyParts)
+    return this.cacheManager.del(key)
   }
 
   /**
@@ -158,34 +98,22 @@ export class BibikosCacheService {
    * Check if a cache entry exists
    */
   async exists(prefix: string, ...keyParts: (string | number)[]): Promise<boolean> {
-    try {
-      const key = this.getKey(prefix, ...keyParts)
-      const result = await this.redis.exists(key)
-      return result === 1
-    } catch (error: any) {
-      this.logger.error(`Error checking cache existence for ${prefix}: ${error.message}`, error.stack)
-      return false
-    }
+    const key = this.getKey(prefix, ...keyParts)
+    const value = await this.cacheManager.get(key)
+    return value !== null && value !== undefined
   }
 
   /**
    * Get or set a cached value (cache-aside pattern)
    */
-  async getOrSet<T>(
-    prefix: string,
-    keyParts: (string | number)[],
-    fetchFn: () => Promise<T>,
-    ttl?: number
-  ): Promise<T> {
-    // Try to get from cache
-    const cached = await this.get<T>(prefix, ...keyParts)
-    if (cached !== null) {
+  async getOrSet<T>(prefix: string, key: string | number, fetchFn: () => Promise<T>, ttl?: number): Promise<T> {
+    const cached = await this.get<T>(prefix, key)
+    if (cached !== undefined && cached !== null) {
       return cached
     }
 
-    // Cache miss - fetch and cache
     const value = await fetchFn()
-    await this.set(prefix, ...keyParts, value, ttl)
+    await this.set(prefix, key, value, ttl)
     return value
   }
 
@@ -204,7 +132,7 @@ export class BibikosCacheService {
    * AppUser cache operations
    */
   async getOrSetAppUser<T>(authUserId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
-    return this.getOrSet<T>(APP_USER_KEY, [authUserId], fetchFn, ttl)
+    return this.getOrSet<T>(APP_USER_KEY, authUserId, fetchFn, ttl)
   }
 
   async invalidateAppUser(authUserId: number) {
@@ -215,7 +143,7 @@ export class BibikosCacheService {
    * Organizer cache operations
    */
   async getOrSetOrganizer<T>(organizerId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
-    return this.getOrSet<T>(ORGANIZER_KEY, [organizerId], fetchFn, ttl)
+    return this.getOrSet<T>(ORGANIZER_KEY, organizerId, fetchFn, ttl)
   }
 
   async invalidateOrganizer(organizerId: number) {
@@ -230,7 +158,7 @@ export class BibikosCacheService {
    * Class cache operations
    */
   async getOrSetClass<T>(classId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
-    return this.getOrSet<T>(CLASS_KEY, [classId], fetchFn, ttl)
+    return this.getOrSet<T>(CLASS_KEY, classId, fetchFn, ttl)
   }
 
   async invalidateClass(classId: number) {
@@ -245,7 +173,7 @@ export class BibikosCacheService {
    * Location cache operations
    */
   async getOrSetLocation<T>(locationId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
-    return this.getOrSet<T>(LOCATION_KEY, [locationId], fetchFn, ttl)
+    return this.getOrSet<T>(LOCATION_KEY, locationId, fetchFn, ttl)
   }
 
   async invalidateLocation(locationId: number) {
@@ -256,7 +184,7 @@ export class BibikosCacheService {
    * Schedule cache operations
    */
   async getOrSetSchedule<T>(scheduleId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
-    return this.getOrSet<T>(SCHEDULE_KEY, [scheduleId], fetchFn, ttl)
+    return this.getOrSet<T>(SCHEDULE_KEY, scheduleId, fetchFn, ttl)
   }
 
   async invalidateSchedule(scheduleId: number) {
@@ -267,7 +195,7 @@ export class BibikosCacheService {
    * Booking cache operations
    */
   async getOrSetBooking<T>(bookingId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
-    return this.getOrSet<T>(BOOKING_KEY, [bookingId], fetchFn, ttl)
+    return this.getOrSet<T>(BOOKING_KEY, bookingId, fetchFn, ttl)
   }
 
   async invalidateBooking(bookingId: number) {
@@ -278,7 +206,7 @@ export class BibikosCacheService {
    * Participant cache operations
    */
   async getOrSetParticipant<T>(participantId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
-    return this.getOrSet<T>(PARTICIPANT_KEY, [participantId], fetchFn, ttl)
+    return this.getOrSet<T>(PARTICIPANT_KEY, participantId, fetchFn, ttl)
   }
 
   async invalidateParticipant(participantId: number) {
@@ -289,7 +217,7 @@ export class BibikosCacheService {
    * Invitation cache operations
    */
   async getOrSetInvitation<T>(invitationId: number, fetchFn: () => Promise<T>, ttl = 300): Promise<T> {
-    return this.getOrSet<T>(INVITATION_KEY, [invitationId], fetchFn, ttl)
+    return this.getOrSet<T>(INVITATION_KEY, invitationId, fetchFn, ttl)
   }
 
   async invalidateInvitation(invitationId: number) {

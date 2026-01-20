@@ -4,6 +4,8 @@ import { FeatureFlagsService } from '@js-monorepo/feature-flags-server'
 import { BibikosSession, SessionSubscription } from '@js-monorepo/types/session'
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
+import { BibikosCacheService } from '../../cache'
+import { FEATURE_FLAGS_KEY } from '../../cache/constants'
 import { AppUserService } from '../app-user.service'
 
 // Store a reference to the NestJS application for service resolution
@@ -76,17 +78,24 @@ export const AppUser = createParamDecorator(
     const paymentsService = moduleRef.get(PaymentsService, { strict: false })
     const featureFlagsService = moduleRef.get(FeatureFlagsService, { strict: false })
     const appUserService = moduleRef.get(AppUserService, { strict: false })
+    const cacheService = moduleRef.get(BibikosCacheService, { strict: false })
 
-    if (!paymentsService || !featureFlagsService || !appUserService) {
+    if (!paymentsService || !featureFlagsService || !appUserService || !cacheService) {
       throw new Error(
-        'Required services not found. Ensure PaymentsService, FeatureFlagsService, and AppUserService are available in the module.'
+        'Required services not found. Ensure PaymentsService, FeatureFlagsService, AppUserService, and BibikosCacheService are available in the module.'
       )
     }
 
     // Fetch all data in parallel
     const [{ result }, featureFlags, appUser] = await Promise.all([
       tryCatch(() => paymentsService.findUserSubscriptionStatus(user.id)),
-      featureFlagsService.getEnabledFlagsForUser(user.id),
+      // Cache feature flags per user for 1 hour (3600 seconds)
+      cacheService.getOrSet(
+        FEATURE_FLAGS_KEY,
+        `user:${user.id}`,
+        () => featureFlagsService.getEnabledFlagsForUser(user.id),
+        3600
+      ),
       tryCatch(() => appUserService.getAppUserByAuthId(user.id)),
     ])
 

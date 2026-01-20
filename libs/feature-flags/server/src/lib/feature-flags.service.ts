@@ -1,8 +1,6 @@
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
-import { CACHE_MANAGER } from '@nestjs/cache-manager'
-import { Inject, Injectable } from '@nestjs/common'
-import { Cache } from 'cache-manager'
+import { Injectable } from '@nestjs/common'
 
 export type FeatureFlagKey = string
 
@@ -13,30 +11,16 @@ export interface FeatureFlagConfig {
   description?: string | null
 }
 
-const FEATURE_FLAGS_CACHE_KEY = 'feature-flag:all'
-
 @Injectable()
 export class FeatureFlagsService {
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache
-  ) {}
+  constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async getAllFlags(): Promise<Record<FeatureFlagKey, FeatureFlagConfig>> {
-    const cacheKey = FEATURE_FLAGS_CACHE_KEY
-    const cacheTtl = 86400 * 1000 // 1 day in milliseconds
-
-    // Check cache first
-    const cached = await this.cacheManager.get<Record<FeatureFlagKey, FeatureFlagConfig>>(cacheKey)
-    if (cached) {
-      return cached
-    }
-
     const records = await this.txHost.tx.featureFlag.findMany({
       orderBy: { key: 'asc' },
     })
 
-    const result = records.reduce<Record<FeatureFlagKey, FeatureFlagConfig>>((acc, flag) => {
+    return records.reduce<Record<FeatureFlagKey, FeatureFlagConfig>>((acc, flag) => {
       acc[flag.key] = {
         key: flag.key,
         enabled: flag.enabled,
@@ -45,10 +29,6 @@ export class FeatureFlagsService {
       }
       return acc
     }, {})
-
-    // Cache for 1 day
-    await this.cacheManager.set(cacheKey, result, cacheTtl)
-    return result
   }
 
   async isEnabled(key: FeatureFlagKey, userId?: number): Promise<boolean> {
@@ -102,9 +82,6 @@ export class FeatureFlagsService {
         description: input.description ?? undefined,
       },
     })
-
-    // Invalidate cache when flags are updated
-    await this.cacheManager.del(FEATURE_FLAGS_CACHE_KEY)
   }
 
   private hashToBucket(userId: number, seed: string): number {

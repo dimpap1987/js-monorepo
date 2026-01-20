@@ -5,8 +5,9 @@ import { UpdateUserSchemaType, UserUpdateUserSchema } from '@js-monorepo/schemas
 import { AuthUserDto, AuthUserFullDto, UserStatus } from '@js-monorepo/types/auth'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
-import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager'
-import { HttpStatus, Inject, Injectable, Logger, UseInterceptors } from '@nestjs/common'
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { BibikosCacheService } from '../scheduling/cache'
+import { ROLES_KEY } from '../scheduling/cache/constants'
 import { AdminRepo, AdminRepository } from './admin.repository'
 
 @Injectable()
@@ -17,7 +18,8 @@ export class AdminService {
     @Inject(AdminRepo)
     private readonly adminRepository: AdminRepository,
     private readonly authSessionUserCacheService: AuthSessionUserCacheService,
-    private readonly userPresenceWebsocketService: UserPresenceWebsocketService
+    private readonly userPresenceWebsocketService: UserPresenceWebsocketService,
+    private readonly cacheService: BibikosCacheService
   ) {}
 
   async getUsers(page?: number, pageSize?: number): Promise<PaginationType<AuthUserFullDto>> {
@@ -54,11 +56,9 @@ export class AdminService {
     }
   }
 
-  @CacheKey('admin-service:user_roles')
-  @CacheTTL(10 * 60 * 1000) // Cache for 10 minutes (600,000 milliseconds)
-  @UseInterceptors(CacheInterceptor)
-  getRoles() {
-    return this.adminRepository.getRoles()
+  async getRoles() {
+    // Cache for 10 minutes (600 seconds)
+    return this.cacheService.getOrSet(ROLES_KEY, 'all', () => this.adminRepository.getRoles(), 600)
   }
 
   async handleUserDisconnection(userId: number) {
