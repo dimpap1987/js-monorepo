@@ -1,7 +1,5 @@
-import { getCurrentSession } from '@js-monorepo/auth/next/server'
 import { generateMetadata } from '@js-monorepo/seo'
 import { Metadata } from 'next/types'
-import { redirect } from 'next/navigation'
 import { OnboardingContent } from './onboarding-content'
 
 export const metadata: Metadata = generateMetadata({
@@ -10,11 +8,5 @@ export const metadata: Metadata = generateMetadata({
 })
 
 export default async function OnboardingPage() {
-  const session = await getCurrentSession()
-
-  if (!session?.user) {
-    redirect('/auth/login')
-  }
-
   return <OnboardingContent />
 }

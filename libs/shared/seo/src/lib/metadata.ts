@@ -52,7 +52,7 @@ export function generateMetadata({
   const metaDescription = description || config.description
 
   return {
-    title: pageTitle,
+    title: fullTitle,
     description: metaDescription,
     keywords,
     robots: {
