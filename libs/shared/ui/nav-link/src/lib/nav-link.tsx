@@ -25,7 +25,10 @@ const DpNextNavLink = forwardRef(
       <a
         ref={ref}
         href={href}
-        className={cn(`cursor-pointer`, ` ${className} ${activeClassName && isSamePath ? activeClassName : ''}`)}
+        className={cn(
+          `cursor-pointer h-full content-center`,
+          ` ${className} ${activeClassName && isSamePath ? activeClassName : ''}`
+        )}
         onClick={(e) => {
           e.preventDefault()
           router.push(href, undefined, { disableSameURL: true })

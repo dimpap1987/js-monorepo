@@ -17,7 +17,7 @@ import {
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { UserMetadata } from '@js-monorepo/navbar'
 import { AuthRole, SessionUserType } from '@js-monorepo/types/auth'
-import { MenuItem, hasRoleAccess } from '@js-monorepo/types/menu'
+import { hasRoleAccess, MenuItem } from '@js-monorepo/types/menu'
 import { cn } from '@js-monorepo/ui/util'
 import { ChevronRight, X } from 'lucide-react'
 import { memo, ReactNode, useMemo, useState } from 'react'
@@ -90,7 +90,7 @@ const MenuSideBarItem = memo(
     // Regular sidebar item without children
     return (
       <SidebarMenuItem className="w-full min-w-0 py-2">
-        <SidebarMenuButton asChild>
+        <SidebarMenuButton asChild className="h-full">
           <DpNextNavLink
             href={item.href}
             onClick={onClose}
@@ -125,8 +125,13 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
   return (
     <Sidebar side="right" variant="inset" collapsible="offcanvas" className={className}>
       <SidebarHeader>
-        <div className="flex items-center justify-between my-4 py-2 px-2 border-b border-border min-h-[80px]">
-          {user?.username && (
+        <div
+          className={cn(
+            'flex items-center justify-between my-4 py-2 px-2 border-b border-border',
+            !!user ? 'min-h-[80px]' : 'min-h-[40px]'
+          )}
+        >
+          {user && (
             <UserMetadata
               profileImage={user.profile?.image}
               username={user.username}
@@ -135,8 +140,8 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
               className="select-none text-sm"
             />
           )}
-          {header && <span className="text-sm font-semibold">{header}</span>}
         </div>
+        {header && <span className="text-sm font-semibold">dadsad</span>}
         <Button
           variant="ghost"
           size="sm"
@@ -161,7 +166,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
       {secondaryItems.length > 0 && (
         <>
           <Separator className="my-2" />
-          <SidebarContent className="flex-none pb-2">
+          <SidebarContent className="flex-none">
             <SidebarMenu>
               {secondaryItems.map((item) => (
                 <MenuSideBarItem key={item.href} item={item} onClose={() => setOpenMobile(false)} user={user} />
@@ -174,7 +179,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
       {children && (
         <>
           <Separator className="my-4" />
-          <SidebarFooter>
+          <SidebarFooter className="mb-3">
             <div className="w-full text-center">{children}</div>
           </SidebarFooter>
         </>
