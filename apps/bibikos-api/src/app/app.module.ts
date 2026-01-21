@@ -347,7 +347,13 @@ export class AppModule implements NestModule {
       .apply(LoggerMiddleware) // Apply LoggerMiddleware
       .forRoutes('*')
       .apply(AuthSessionMiddleware)
-      .exclude('health', 'payments/(.*)', 'contact', 'scheduling/organizers/public/(.*)')
+      .exclude(
+        'health',
+        'payments/(.*)',
+        'contact',
+        'scheduling/organizers/public/(.*)',
+        'scheduling/schedules/discover(.*)'
+      )
       .forRoutes('*')
   }
 }

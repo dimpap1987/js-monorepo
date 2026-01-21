@@ -19,7 +19,7 @@ export const NavItemLink = ({ item }: NavItemLinkProps) => {
         activeClassName="border-primary"
         href={item.href}
       >
-        {item.Icon && <item.Icon className="h-4 w-4" />}
+        {item.Icon && <item.Icon className="h-4 w-4 hidden md:block" />}
         {item.name}
       </DpNextNavLink>
     </li>
