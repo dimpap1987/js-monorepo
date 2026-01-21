@@ -45,11 +45,19 @@ function CapacityInfo({ bookedCount, capacity, isFull, hasWaitlist, spotsLeft }:
         </span>
       </div>
       {isFull ? (
-        <Badge variant="secondary" className="text-xs">
+        <Badge
+          variant="outline"
+          className={cn(
+            'text-xs',
+            hasWaitlist
+              ? 'border-status-info/20 bg-status-info-bg text-status-info'
+              : 'border-destructive/20 bg-destructive/10 text-destructive'
+          )}
+        >
           {hasWaitlist ? 'Waitlist available' : 'Full'}
         </Badge>
       ) : spotsLeft !== null && spotsLeft <= 3 ? (
-        <Badge variant="secondary" className="text-xs text-orange-600">
+        <Badge variant="outline" className="text-xs border-status-warning/20 bg-status-warning-bg text-status-warning">
           {spotsLeft} {spotsLeft === 1 ? 'spot' : 'spots'} left
         </Badge>
       ) : null}
@@ -141,18 +149,21 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
   // User is already booked
   if (isBooked) {
     return (
-      <div className="flex items-center gap-4 flex-shrink-0 justify-between px-2">
-        <Badge variant="default" className="bg-green-600 hover:bg-green-600 gap-1">
+      <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+        <Badge
+          variant="outline"
+          className="border-status-success/20 bg-status-success-bg text-status-success gap-1 h-10 flex-1 justify-center"
+        >
           <CheckCircle2 className="w-3 h-3" />
           Booked
         </Badge>
         <Button
-          variant="outline"
+          variant="ghost"
           onClick={handleCancelClick}
-          className="gap-1 text-destructive hover:text-destructive"
+          className="gap-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-1 h-10"
           type="button"
         >
-          <X className="w-3 h-3" />
+          <X className="w-4 h-4" />
           Cancel
         </Button>
       </div>
@@ -162,18 +173,21 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
   // User is on waitlist
   if (isWaitlisted) {
     return (
-      <div className="flex items-center gap-4 flex-shrink-0 justify-end">
-        <Badge variant="secondary" className="gap-1">
+      <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
+        <Badge
+          variant="outline"
+          className="border-status-warning/20 bg-status-warning-bg text-status-warning gap-1 h-10 flex-1 justify-center"
+        >
           <Clock className="w-3 h-3" />
           Waitlisted
         </Badge>
         <Button
-          variant="outline"
+          variant="ghost"
           onClick={handleCancelClick}
-          className="gap-1 text-destructive hover:text-destructive"
+          className="gap-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-1 h-10"
           type="button"
         >
-          <X className="w-3 h-3" />
+          <X className="w-4 h-4" />
           Leave
         </Button>
       </div>
@@ -185,9 +199,15 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
   const label = isFull ? (hasWaitlist ? 'Join Waitlist' : 'Full') : 'Book Now'
 
   return (
-    <Button onClick={handleBookClick} disabled={isDisabled} className="gap-2 flex-shrink-0" type="button">
+    <Button
+      onClick={handleBookClick}
+      disabled={isDisabled}
+      variant={isFull && hasWaitlist ? 'secondary' : 'default'}
+      className="gap-2 flex-shrink-0 w-full sm:w-auto"
+      type="button"
+    >
       {label}
-      <ChevronRight className="w-4 h-4" />
+      {!isDisabled && <ChevronRight className="w-4 h-4" />}
     </Button>
   )
 }
@@ -228,7 +248,7 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
     <Card
       className={cn(
         'border-border transition-all',
-        hasClassLink && 'cursor-pointer hover:shadow-md hover:border-primary hover:bg-accent'
+        hasClassLink && 'cursor-pointer hover:shadow-md hover:border-primary/40 hover:bg-accent/80'
       )}
       onClick={hasClassLink ? handleCardClick : undefined}
     >
@@ -249,14 +269,16 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
               spotsLeft={spotsLeft}
             />
           </div>
-          <BookButton
-            isFull={isFull}
-            hasWaitlist={hasWaitlist}
-            isBooked={isBooked}
-            isWaitlisted={isWaitlisted}
-            onBook={() => onBook(schedule)}
-            onCancel={() => onCancel(schedule)}
-          />
+          <div className="w-full sm:w-auto">
+            <BookButton
+              isFull={isFull}
+              hasWaitlist={hasWaitlist}
+              isBooked={isBooked}
+              isWaitlisted={isWaitlisted}
+              onBook={() => onBook(schedule)}
+              onCancel={() => onCancel(schedule)}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

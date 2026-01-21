@@ -163,30 +163,19 @@ useMarkAttendance()
 
 Protected routes are defined in `lib/routes-config.ts`:
 
-| Route           | Role   | Description               |
-| --------------- | ------ | ------------------------- |
-| `/dashboard`    | USER   | Organizer dashboard       |
-| `/onboarding`   | USER   | New organizer setup       |
-| `/calendar`     | USER   | Schedule management       |
-| `/classes`      | USER   | Class templates           |
-| `/locations`    | USER   | Location management       |
-| `/bookings`     | USER   | Participant bookings      |
-| `/coach/[slug]` | PUBLIC | Public instructor profile |
+| Route                  | Role   | Description               |
+| ---------------------- | ------ | ------------------------- |
+| `/dashboard`           | USER   | Organizer dashboard       |
+| `/onboarding`          | USER   | New organizer setup       |
+| `/dashboard/calendar`  | USER   | Schedule management       |
+| `/dashboard/classes`   | USER   | Class templates           |
+| `/dashboard/locations` | USER   | Location management       |
+| `/my-bookings`         | USER   | Participant bookings      |
+| `/coach/[slug]`        | PUBLIC | Public instructor profile |
 
 ## Translations
 
-All UI text is externalized in `i18n/messages/en.json` under the `scheduling` namespace:
-
-- `scheduling.dashboard.*`
-- `scheduling.onboarding.*`
-- `scheduling.locations.*`
-- `scheduling.classes.*`
-- `scheduling.schedules.*`
-- `scheduling.calendar.*`
-- `scheduling.bookings.*`
-- `scheduling.profile.*`
-
----
+## All UI text is externalized in `i18n/messages/en.json` under the `scheduling` namespace:
 
 ## Future Features (Phase 2+)
 
@@ -271,12 +260,6 @@ All UI text is externalized in `i18n/messages/en.json` under the `scheduling` na
 4. Create page components following existing patterns
 5. Update routes in `lib/routes-config.ts` if needed
 
-### Testing
-
-- Unit tests for utility functions
-- Integration tests for API hooks
-- E2E tests for critical user flows (onboarding, booking)
-
 ### Performance Considerations
 
 - React Query caching reduces API calls
@@ -288,5 +271,5 @@ All UI text is externalized in `i18n/messages/en.json` under the `scheduling` na
 
 ## Related Documentation
 
-- Backend Implementation: `apps/bibikos-api/src/app/modules/scheduling/IMPLEMENTATION.md`
+- Backend Implementation: `./IMPLEMENTATION.md`
 - Database Schema: `libs/prisma/bibikos-db/src/lib/prisma/schema/scheduling.prisma`

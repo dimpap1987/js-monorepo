@@ -47,7 +47,7 @@ function BottomNavbarItem({ href, label, children, isActiveCheck, className }: B
         )}
       >
         {/* Icon with color transition */}
-        <div className={cn('text-[22px] leading-none', 'transition-colors duration-150')}>{children}</div>
+        <div className={cn('w-full h-full', 'transition-colors duration-150')}>{children}</div>
       </div>
 
       {/* Label */}
@@ -76,7 +76,7 @@ function BottomNavbarItem({ href, label, children, isActiveCheck, className }: B
 function BottomNavbarOptions({ href, Icon, label }: { href: string; Icon: IconType; label: string }) {
   return (
     <BottomNavbarItem href={href} label={label}>
-      <Icon />
+      <Icon className="w-full h-full" />
     </BottomNavbarItem>
   )
 }

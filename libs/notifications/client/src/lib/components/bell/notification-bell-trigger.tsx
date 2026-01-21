@@ -21,7 +21,7 @@ export const NotificationBellButton = forwardRef<
     <button
       className={cn(
         'relative outline-none rounded-lg',
-        'text-2xl text-foreground',
+        'text-foreground',
         'transition-all duration-200 ease-in-out',
         'hover:bg-background-secondary active:bg-accent',
         'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -34,8 +34,12 @@ export const NotificationBellButton = forwardRef<
       {...props}
     >
       {/* Bell icon */}
-      <div className="relative">
-        {isRinging ? <MdNotificationsActive className="animate-notification-pulse" /> : <IoMdNotifications />}
+      <div className="relative w-full h-full">
+        {isRinging ? (
+          <MdNotificationsActive className="w-full h-full animate-notification-pulse" />
+        ) : (
+          <IoMdNotifications className="w-full h-full" />
+        )}
       </div>
 
       {/* Badge */}

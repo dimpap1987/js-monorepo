@@ -50,7 +50,7 @@ const MenuSideBarItem = memo(
           <SidebarMenuButton
             onClick={() => setIsOpen(!isOpen)}
             className={cn(
-              'flex items-center gap-3 text-base py-3 px-6 w-full h-full min-w-0 max-w-full tracking-wide transition-colors',
+              'flex items-center gap-3 text-base py-2 px-4 w-full h-full min-w-0 max-w-full tracking-wide transition-colors',
               item.isAdmin && 'text-primary font-bold hover:text-primary/80',
               isOpen ? 'h-auto' : 'h-full'
             )}
@@ -96,7 +96,7 @@ const MenuSideBarItem = memo(
             href={item.href}
             onClick={onClose}
             className={cn(
-              'flex items-center gap-3 text-base py-3 px-6 w-full min-w-0 max-w-full tracking-wide transition-colors',
+              'flex items-center gap-3 text-base py-2 px-4 w-full min-w-0 max-w-full tracking-wide transition-colors',
               item.isAdmin && 'text-primary font-bold hover:text-primary/80'
             )}
           >
@@ -161,8 +161,8 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
       {/* Secondary Items (bottom) */}
       {secondaryItems.length > 0 && (
         <>
-          <Separator className="my-2" />
-          <SidebarContent className="flex-none">
+          <Separator />
+          <SidebarContent className="flex-none mb-0">
             <SidebarMenu>
               {secondaryItems.map((item) => (
                 <MenuSideBarItem key={item.href} item={item} onClose={() => setOpenMobile(false)} user={user} />
@@ -174,8 +174,8 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
 
       {children && (
         <>
-          <Separator className="my-4" />
-          <SidebarFooter className="mb-3">
+          <Separator className="mb-1" />
+          <SidebarFooter className="mb-1 px-2">
             <div className="w-full text-center">{children}</div>
           </SidebarFooter>
         </>

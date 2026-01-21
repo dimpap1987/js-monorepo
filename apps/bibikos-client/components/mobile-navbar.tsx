@@ -25,7 +25,7 @@ export const MobileNavbar = () => {
       <BottomNavbarOptions Icon={AiFillHome} href="/" label={t('navigation.home')} />
       <BottomNavbarOptions Icon={RiCompassDiscoverLine} href="/discover" label={t('navigation.discover')} />
       <BottomNavbarAlert href="/notifications" label={t('navigation.alert')}>
-        <NotificationBellButton className="shrink-0 text-xl" />
+        <NotificationBellButton className="w-full h-full" />
       </BottomNavbarAlert>
     </BottomNavbar>
   )

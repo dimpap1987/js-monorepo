@@ -11,13 +11,14 @@ export function BottomNavbar({ children, className }: PropsWithChildren & { clas
     const handleScroll = () => {
       const currentScrollY = window.scrollY
       const shouldBeVisible = currentScrollY < lastScrollY.current || currentScrollY < 10
-      setIsVisible((prev) => (prev !== shouldBeVisible ? shouldBeVisible : prev))
+
+      setIsVisible(shouldBeVisible)
+
+      lastScrollY.current = currentScrollY
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
