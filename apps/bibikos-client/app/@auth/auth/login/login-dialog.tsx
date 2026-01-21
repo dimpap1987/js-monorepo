@@ -46,6 +46,13 @@ function LoginDialog() {
 
   const socials: UserNavSocial[] = [
     {
+      type: 'google',
+      onLogin: async () => {
+        triggerLoading()
+        authClient.login('google', callbackUrl)
+      },
+    },
+    {
       type: 'github',
       onLogin: async () => {
         triggerLoading()
@@ -53,10 +60,15 @@ function LoginDialog() {
       },
     },
     {
-      type: 'google',
+      type: 'facebook',
       onLogin: async () => {
-        triggerLoading()
-        authClient.login('google', callbackUrl)
+        alert('Not provided yet')
+      },
+    },
+    {
+      type: 'apple',
+      onLogin: async () => {
+        alert('Not provided yet')
       },
     },
   ]

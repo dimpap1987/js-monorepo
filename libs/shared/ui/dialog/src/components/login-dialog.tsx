@@ -42,9 +42,10 @@ const DpLoginDialogComponent = forwardRef<HTMLDivElement, DpLoginDialogProps>(
                 key={social.type}
                 provider={social.type}
                 loading={social.loading}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault()
                   social.onLogin()
-                  sethasOpen(false)
+                  // sethasOpen(false)
                 }}
               />
             ))}
