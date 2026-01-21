@@ -8,12 +8,13 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { Navbar } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
-import { MenuItem } from '@js-monorepo/types/menu'
+import { MenuItem, MenuItemPosition } from '@js-monorepo/types/menu'
 import { useTranslations } from 'next-intl'
 import { PropsWithChildren, ReactNode, useMemo } from 'react'
 import { IoIosSettings } from 'react-icons/io'
 import { useWebSocketConfig } from '../hooks/useWebsocketConfig'
 import { AppConfig } from '../lib/app-config'
+import { Role } from '../lib/roles'
 import { navigationsMenuItems } from '../lib/routes-config'
 import { ImpersonationBanner } from './impersonation-banner'
 import { MobileNavbar } from './mobile-navbar'
@@ -44,7 +45,6 @@ export default function RootComponent({ children }: PropsWithChildren) {
   useWebSocketConfig(isLoggedIn, isAdmin, refreshSession)
   useOfflineIndicator()
 
-  // 1. Filter and translate the main navigation items for Navbar and Sidebar
   const translatedMenuItems = useMemo(() => {
     const hasOrganizerProfile = session?.appUser?.hasOrganizerProfile
     const hasParticipantProfile = session?.appUser?.hasParticipantProfile
@@ -68,6 +68,19 @@ export default function RootComponent({ children }: PropsWithChildren) {
       }))
   }, [t, session?.appUser?.hasOrganizerProfile, session?.appUser?.hasParticipantProfile])
 
+  const sidebarMenuItems = useMemo(() => {
+    return [
+      {
+        href: '/settings',
+        name: t('navigation.settings'),
+        roles: [Role.USER],
+        Icon: IoIosSettings,
+        position: 'secondary' as MenuItemPosition,
+      },
+      ...translatedMenuItems,
+    ]
+  }, [t, translatedMenuItems])
+
   const settingsNavLink = (
     <DpNextNavLink
       href="/settings"
@@ -87,7 +100,7 @@ export default function RootComponent({ children }: PropsWithChildren) {
   )
 
   return (
-    <SidebarWrapper user={user} items={translatedMenuItems} plan={plan} sidebarChildren={loginLogoutButton}>
+    <SidebarWrapper user={user} items={sidebarMenuItems} plan={plan} sidebarChildren={loginLogoutButton}>
       <section className="flex min-h-screen flex-col">
         {/* Navbar */}
         <Navbar
@@ -107,7 +120,7 @@ export default function RootComponent({ children }: PropsWithChildren) {
         {/* Announcements */}
         <AnnouncementsComponent className="fixed top-[calc(var(--navbar-height)_+_5px)] h-5 z-20" />
         {/* Main */}
-        <main className="flex-1 mt-6">{children}</main>
+        <main className="flex-1 mt-6 px-1">{children}</main>
         <ImpersonationBanner />
         {user?.id && <MobileNavbar />}
       </section>

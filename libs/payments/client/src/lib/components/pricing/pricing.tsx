@@ -1,16 +1,17 @@
 'use client'
 
 import { buildLoginUrl, useSession } from '@js-monorepo/auth/next/client'
-import { centsToAmount } from '@js-monorepo/currency'
 import { SnapCarousel } from '@js-monorepo/components/ui/snap-carousel'
+import { centsToAmount } from '@js-monorepo/currency'
 import { ConfirmDialog, ErrorDialog } from '@js-monorepo/dialog'
 import { useNotifications } from '@js-monorepo/notification'
+import { queryKeys } from '@js-monorepo/utils/http/queries'
+import { useQueryClient } from '@tanstack/react-query'
+import { useLocale } from 'next-intl'
 import { useRouter } from 'next-nprogress-bar'
 import { useSearchParams } from 'next/navigation'
-import { useLocale } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { queryKeys } from '@js-monorepo/utils/http/queries'
+import { AiOutlineInfoCircle } from 'react-icons/ai'
 import { usePlans } from '../../queries/payments-queries'
 import { POPULAR_PLAN_NAME, SessionSubscription, Subscription } from '../../types'
 import { apiCreatePortalSession, apiGetSubscription, apiStartTrial } from '../../utils/api'
@@ -19,7 +20,26 @@ import { PricingCardSkeleton } from './pricing-card-skeleton'
 import { PricingFAQ } from './pricing-faq'
 import { PricingHero } from './pricing-hero'
 import { PricingTrustSignals } from './pricing-trust-signals'
-import { SubscriptionStatusIndication } from './subscription-status-indication'
+
+export default function NoPricing() {
+  return (
+    <section className="flex flex-col items-center justify-center space-y-5 px-4 mt-9 text-center">
+      {/* Icon */}
+      <div className="flex items-center justify-center rounded-full text-primary">
+        <AiOutlineInfoCircle className="w-16 h-16" />
+      </div>
+
+      {/* Heading */}
+      <h2 className="mb-2">No Pricing Plans Available</h2>
+
+      {/* Description */}
+      <p className="text-muted-foreground">
+        We’re currently updating our pricing plans. Please check back later or contact our support team for more
+        information.
+      </p>
+    </section>
+  )
+}
 
 export function Pricing() {
   const locale = useLocale() as 'en' | 'el'
@@ -204,6 +224,10 @@ export function Pricing() {
     newSearchParams.delete('success')
     router.replace(`${window.location.pathname}?${newSearchParams.toString()}`)
     setHasErrors(false)
+  }
+
+  if (!isPlansLoading && pricingCards?.length === 0) {
+    return <NoPricing />
   }
 
   return (

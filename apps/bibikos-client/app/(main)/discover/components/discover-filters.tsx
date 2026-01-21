@@ -34,9 +34,9 @@ export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: Dis
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between">
         {/* Search */}
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 w-full sm:max-w-sm ">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Search classes or coaches..."
@@ -46,44 +46,47 @@ export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: Dis
           />
         </div>
 
-        {/* Activity Filter */}
-        <Select
-          value={filters.activity || 'all'}
-          onValueChange={(value) => onFilterChange({ activity: value === 'all' ? undefined : value })}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Activity type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All activities</SelectItem>
-            {ACTIVITY_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap gap-2">
+          {/* Activity Filter */}
+          <Select
+            value={filters.activity || 'all'}
+            onValueChange={(value) => onFilterChange({ activity: value === 'all' ? undefined : value })}
+          >
+            <SelectTrigger className="w-[180px] flex-1">
+              <SelectValue placeholder="Activity type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All activities</SelectItem>
+              {ACTIVITY_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        {/* Time of Day Filter */}
-        <Select
-          value={filters.timeOfDay || 'all'}
-          onValueChange={(value) =>
-            onFilterChange({ timeOfDay: value === 'all' ? undefined : (value as 'morning' | 'afternoon' | 'evening') })
-          }
-        >
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Time of day" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Any time</SelectItem>
-            {TIME_OF_DAY_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
+          {/* Time of Day Filter */}
+          <Select
+            value={filters.timeOfDay || 'all'}
+            onValueChange={(value) =>
+              onFilterChange({
+                timeOfDay: value === 'all' ? undefined : (value as 'morning' | 'afternoon' | 'evening'),
+              })
+            }
+          >
+            <SelectTrigger className="w-[200px] flex-1">
+              <SelectValue placeholder="Time of day" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Any time</SelectItem>
+              {TIME_OF_DAY_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         {/* Clear Filters */}
         {hasActiveFilters && (
           <Button variant="ghost" size="icon" onClick={onClearFilters} title="Clear filters">

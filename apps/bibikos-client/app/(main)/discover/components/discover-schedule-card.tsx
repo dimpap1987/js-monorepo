@@ -141,7 +141,7 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
   // User is already booked
   if (isBooked) {
     return (
-      <div className="flex items-center gap-4 flex-shrink-0 justify-end">
+      <div className="flex items-center gap-4 flex-shrink-0 justify-between px-2">
         <Badge variant="default" className="bg-green-600 hover:bg-green-600 gap-1">
           <CheckCircle2 className="w-3 h-3" />
           Booked
