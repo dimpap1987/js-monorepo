@@ -2,22 +2,22 @@
 
 import { AnnouncementsComponent } from '@js-monorepo/announcements'
 import { authClient, useSession } from '@js-monorepo/auth/next/client'
-import { DpLogoutButton } from '@js-monorepo/button'
+import { DpLoginButton, DpLogoutButton } from '@js-monorepo/button'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@js-monorepo/components/ui/sidebar'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { Navbar } from '@js-monorepo/navbar'
 import useOfflineIndicator from '@js-monorepo/next/hooks/offline-indicator'
 import { DpNextSidebar } from '@js-monorepo/sidebar'
 import { MenuItem } from '@js-monorepo/types/menu'
+import { useTranslations } from 'next-intl'
 import { PropsWithChildren, ReactNode, useMemo } from 'react'
 import { IoIosSettings } from 'react-icons/io'
 import { useWebSocketConfig } from '../hooks/useWebsocketConfig'
 import { AppConfig } from '../lib/app-config'
 import { navigationsMenuItems } from '../lib/routes-config'
+import { ImpersonationBanner } from './impersonation-banner'
 import { MobileNavbar } from './mobile-navbar'
 import { NotificationBellContainerVirtual } from './notification-bell-container-virtual'
-import { useTranslations } from 'next-intl'
-import { ImpersonationBanner } from './impersonation-banner'
 
 function SidebarWrapper({
   children,
@@ -68,26 +68,26 @@ export default function RootComponent({ children }: PropsWithChildren) {
       }))
   }, [t, session?.appUser?.hasOrganizerProfile, session?.appUser?.hasParticipantProfile])
 
-  // 2. Memoize the Settings Link (navUserOptionsChildren)
-  const settingsNavLink = useMemo(() => {
-    return (
-      <DpNextNavLink
-        href="/settings"
-        className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-secondary"
-      >
-        <IoIosSettings className="text-xl flex-shrink-0" />
-        <span className="text-sm">{t('navigation.settings' as any)}</span>
-      </DpNextNavLink>
-    )
-  }, [t])
+  const settingsNavLink = (
+    <DpNextNavLink
+      href="/settings"
+      className="flex items-center gap-3 justify-start px-4 py-2.5 rounded-xl w-full select-none group transition-all duration-200 hover:bg-secondary"
+    >
+      <IoIosSettings className="text-xl flex-shrink-0" />
+      <span className="text-sm">{t('navigation.settings' as any)}</span>
+    </DpNextNavLink>
+  )
 
-  // 3. Memoize the Logout Button for Sidebar
-  const logoutButton = useMemo(() => {
-    return <DpLogoutButton onClick={() => authClient.logout()} className="px-4" />
-  }, [])
+  const loginLogoutButton = user ? (
+    <DpLogoutButton onClick={() => authClient.logout()} className="px-4" />
+  ) : (
+    <DpNextNavLink href="/auth/login">
+      <DpLoginButton />
+    </DpNextNavLink>
+  )
 
   return (
-    <SidebarWrapper user={user} items={translatedMenuItems} plan={plan} sidebarChildren={logoutButton}>
+    <SidebarWrapper user={user} items={translatedMenuItems} plan={plan} sidebarChildren={loginLogoutButton}>
       <section className="flex min-h-screen flex-col">
         {/* Navbar */}
         <Navbar

@@ -28,6 +28,7 @@ import { useBookingUpdates } from './hooks/use-booking-updates'
 import { useCalendarEvents } from './hooks/use-calendar-events'
 import { ScheduleFormData } from './schemas'
 import { buildRecurrenceRule, calculateEndTime } from './utils/schedule-utils'
+import { ContainerTemplate } from '@js-monorepo/templates'
 
 export function CalendarContent() {
   const router = useRouter()
@@ -273,9 +274,9 @@ export function CalendarContent() {
   const initialClassId = searchParams.get('classId') ? Number(searchParams.get('classId')) : undefined
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
-      <BackButton href="/dashboard" className="mb-3" />
-      <div className="space-y-4 sm:space-y-6">
+    <ContainerTemplate>
+      <BackButton />
+      <div className="space-y-4 sm:space-y-6 mt-4">
         <CalendarHeader
           onAddClick={() => setIsCreateDialogOpen(true)}
           hasClasses={!!hasClasses}
@@ -334,6 +335,6 @@ export function CalendarContent() {
         onConfirm={handleCancelSchedule}
         schedule={scheduleToCancel}
       />
-    </div>
+    </ContainerTemplate>
   )
 }

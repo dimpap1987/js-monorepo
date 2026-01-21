@@ -2,6 +2,7 @@
 
 import { BackButton } from '@js-monorepo/back-arrow'
 import { useNotifications } from '@js-monorepo/notification'
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
@@ -138,9 +139,9 @@ export function ClassesContent() {
   const isSubmitting = createClassMutation.isPending || updateClassMutation.isPending
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <BackButton href="/dashboard" className="mb-3" />
-      <div className="space-y-6">
+    <ContainerTemplate>
+      <BackButton />
+      <div className="space-y-6 mt-4">
         <ClassesHeader onAddClick={() => handleOpenDialog()} hasLocations={!!hasLocations} />
 
         {!hasLocations && <ClassesNoLocationsWarning />}
@@ -182,6 +183,6 @@ export function ClassesContent() {
           onOpenChange={(open) => !open && setInviteClass(null)}
         />
       )}
-    </div>
+    </ContainerTemplate>
   )
 }

@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { ClassSchedule, useClasses, useLocations, useOrganizer, useSchedulesCalendar } from '../../../lib/scheduling'
 import { SentInvitationsCard } from './components/sent-invitations-card'
+import { ContainerTemplate } from '@js-monorepo/templates'
 
 function DashboardSkeleton() {
   return (
@@ -176,7 +177,7 @@ export function DashboardContent() {
   ]
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-2 sm:space-y-4">
+    <ContainerTemplate className="space-y-2 sm:space-y-4">
       <BackButton />
 
       {/* Welcome Header */}
@@ -311,6 +312,6 @@ export function DashboardContent() {
 
       {/* Sent Invitations - only shows if organizer has sent any */}
       <SentInvitationsCard />
-    </div>
+    </ContainerTemplate>
   )
 }

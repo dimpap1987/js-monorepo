@@ -2,6 +2,7 @@
 
 import { BackButton } from '@js-monorepo/back-arrow'
 import { useNotifications } from '@js-monorepo/notification'
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
@@ -120,9 +121,9 @@ export function LocationsContent() {
   const isSubmitting = createLocationMutation.isPending || updateLocationMutation.isPending
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <BackButton href="/dashboard" className="mb-3" />
-      <div className="space-y-6">
+    <ContainerTemplate>
+      <BackButton />
+      <div className="space-y-6 mt-4">
         <LocationsHeader onAddClick={() => handleOpenDialog()} />
 
         {locations && locations.length === 0 ? (
@@ -146,6 +147,6 @@ export function LocationsContent() {
         onOpenChange={(open) => !open && setDeleteLocationId(null)}
         onConfirm={handleDelete}
       />
-    </div>
+    </ContainerTemplate>
   )
 }

@@ -21,6 +21,7 @@ import { BookingsList } from './components/bookings-list'
 import { BookingsSkeleton } from './components/bookings-skeleton'
 import { ScheduleSelector } from './components/schedule-selector'
 import type { DateRange } from './types'
+import { ContainerTemplate } from '@js-monorepo/templates'
 
 export function BookingsContent() {
   const { addNotification } = useNotifications()
@@ -161,68 +162,70 @@ export function BookingsContent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
+    <ContainerTemplate>
       <BackButton />
 
-      {/* Header */}
-      <div>
-        <h1>Class Bookings</h1>
-        <p className="text-foreground-muted mt-1">View and manage bookings for your classes</p>
-      </div>
+      <div className="space-y-6 mt-4">
+        {/* Header */}
+        <div>
+          <h1>Class Bookings</h1>
+          <p className="text-foreground-muted mt-1">View and manage bookings for your classes</p>
+        </div>
 
-      {/* Schedule Selection */}
-      <ScheduleSelector
-        schedules={filteredSchedules}
-        classes={classes}
-        selectedScheduleId={selectedScheduleId}
-        selectedClassId={selectedClassId}
-        dateRange={dateRange}
-        onScheduleSelect={setSelectedScheduleId}
-        onClassFilterChange={setSelectedClassId}
-        onDateRangeChange={setDateRange}
-      />
+        {/* Schedule Selection */}
+        <ScheduleSelector
+          schedules={filteredSchedules}
+          classes={classes}
+          selectedScheduleId={selectedScheduleId}
+          selectedClassId={selectedClassId}
+          dateRange={dateRange}
+          onScheduleSelect={setSelectedScheduleId}
+          onClassFilterChange={setSelectedClassId}
+          onDateRangeChange={setDateRange}
+        />
 
-      {/* Bookings List - Show when a schedule is selected */}
-      {selectedScheduleId ? (
-        bookingsData ? (
-          <BookingsList
-            bookings={filteredBookings}
-            isLoading={bookingsLoading}
-            searchQuery={searchQuery}
-            statusFilter={statusFilter}
-            onViewDetails={setSelectedBooking}
-            onToggleAttendance={handleToggleAttendance}
-            isMarkingAttendance={markAttendanceMutation.isPending}
-            onSearchChange={setSearchQuery}
-            onStatusFilterChange={setStatusFilter}
-          />
+        {/* Bookings List - Show when a schedule is selected */}
+        {selectedScheduleId ? (
+          bookingsData ? (
+            <BookingsList
+              bookings={filteredBookings}
+              isLoading={bookingsLoading}
+              searchQuery={searchQuery}
+              statusFilter={statusFilter}
+              onViewDetails={setSelectedBooking}
+              onToggleAttendance={handleToggleAttendance}
+              isMarkingAttendance={markAttendanceMutation.isPending}
+              onSearchChange={setSearchQuery}
+              onStatusFilterChange={setStatusFilter}
+            />
+          ) : (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center text-foreground-muted">
+                  <p>Loading bookings...</p>
+                </div>
+              </CardContent>
+            </Card>
+          )
         ) : (
           <Card>
             <CardContent className="py-12">
               <div className="text-center text-foreground-muted">
-                <p>Loading bookings...</p>
+                <p>Select a schedule above to view bookings</p>
               </div>
             </CardContent>
           </Card>
-        )
-      ) : (
-        <Card>
-          <CardContent className="py-12">
-            <div className="text-center text-foreground-muted">
-              <p>Select a schedule above to view bookings</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        )}
 
-      {/* Booking Detail Dialog */}
-      <BookingDetailDialog
-        booking={selectedBooking}
-        isOpen={!!selectedBooking}
-        onClose={() => setSelectedBooking(null)}
-        onUpdateNotes={handleUpdateNotes}
-        onCancel={handleCancelBooking}
-      />
-    </div>
+        {/* Booking Detail Dialog */}
+        <BookingDetailDialog
+          booking={selectedBooking}
+          isOpen={!!selectedBooking}
+          onClose={() => setSelectedBooking(null)}
+          onUpdateNotes={handleUpdateNotes}
+          onCancel={handleCancelBooking}
+        />
+      </div>
+    </ContainerTemplate>
   )
 }

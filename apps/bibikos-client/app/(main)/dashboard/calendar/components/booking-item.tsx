@@ -17,8 +17,7 @@ export function BookingItem({ booking, onMarkAttendance, isPastClass, isCancelle
   return (
     <div className={cn('flex items-center justify-between p-3 rounded-lg border', colors.bg, colors.border)}>
       <div>
-        <p className="font-medium text-sm">{participant?.fullName || participant?.authUser?.username || 'Unknown'}</p>
-        <p className="text-xs text-foreground-muted">{participant?.authUser?.email}</p>
+        <p className="font-medium text-sm">{participant?.authUser?.username || 'Unknown'}</p>
         {booking.status === 'WAITLISTED' && booking.waitlistPosition && (
           <p className="text-xs text-foreground-muted">Waitlist #{booking.waitlistPosition}</p>
         )}

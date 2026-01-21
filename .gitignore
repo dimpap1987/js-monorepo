@@ -57,3 +57,4 @@ libs/prisma/db/src/lib/prisma/generated/
 libs/prisma/bibikos-db/src/lib/prisma/generated/
 libs/prisma/core-db/src/lib/prisma/generated/
 libs/prisma/bibikos-db/src/lib/prisma/generated/
+deployments/nginx/prod/certs/*

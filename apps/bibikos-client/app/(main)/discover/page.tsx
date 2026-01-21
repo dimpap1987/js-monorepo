@@ -13,6 +13,7 @@ import {
   BookingDialog,
   CancelBookingDialog,
 } from './components'
+import { ContainerTemplate } from '@js-monorepo/templates'
 
 function getDefaultFilters(): DiscoverFiltersType {
   const today = startOfDay(new Date())
@@ -116,7 +117,7 @@ export default function DiscoverPage() {
   const totalSchedules = schedules?.length || 0
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <ContainerTemplate>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Discover Classes</h1>
@@ -187,6 +188,6 @@ export default function DiscoverPage() {
         onConfirm={handleCancelConfirm}
         isLoading={cancelBookingMutation.isPending}
       />
-    </div>
+    </ContainerTemplate>
   )
 }
