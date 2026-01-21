@@ -10,8 +10,8 @@ export function BottomNavbar({ children, className }: PropsWithChildren & { clas
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      setIsVisible(currentScrollY < lastScrollY.current || currentScrollY < 10)
-      lastScrollY.current = currentScrollY
+      const shouldBeVisible = currentScrollY < lastScrollY.current || currentScrollY < 10
+      setIsVisible((prev) => (prev !== shouldBeVisible ? shouldBeVisible : prev))
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })

@@ -1,6 +1,7 @@
 'use client'
 
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { useDeviceType } from '@js-monorepo/next/hooks'
 import { AdminTemplateContent, AdminTemplateSideBar, ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
 import { PropsWithChildren } from 'react'
@@ -30,14 +31,18 @@ function SidebarOpts() {
 }
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
+  const { deviceType } = useDeviceType()
+  const isMobile = deviceType === 'mobile'
+
+  const content = <ContainerTemplate>{children}</ContainerTemplate>
+
   return (
     <section>
       <AdminTemplateSideBar>
         <SidebarOpts />
       </AdminTemplateSideBar>
-      <AdminTemplateContent>
-        <ContainerTemplate>{children}</ContainerTemplate>
-      </AdminTemplateContent>
+
+      {isMobile ? content : <AdminTemplateContent>{content}</AdminTemplateContent>}
     </section>
   )
 }

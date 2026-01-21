@@ -23,7 +23,7 @@ const BackArrowWithLabel = React.forwardRef<HTMLDivElement, BackArrowWithLabelPr
 
     return (
       <div ref={ref} className={cn('flex flex-col gap-2', className)} {...props}>
-        {showArrow && <BackButton href={href} showLabel={false} className={arrowClassName} />}
+        {showArrow && <BackButton href={href} className={arrowClassName} />}
         <div className={cn('flex-1', textAlignClass)}>{children}</div>
       </div>
     )
