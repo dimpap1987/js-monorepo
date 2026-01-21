@@ -2,6 +2,8 @@
 // Scheduling Types for Frontend
 // =============================================================================
 
+import { BookingStatus } from '@js-monorepo/types/scheduling'
+
 // App User
 export interface AppUser {
   id: number

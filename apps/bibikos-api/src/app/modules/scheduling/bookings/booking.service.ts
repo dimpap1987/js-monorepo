@@ -374,7 +374,13 @@ export class BookingService {
 
     const past = await this.bookingRepo.findByParticipantId(participantId, {
       past: true,
-      statuses: [BookingStatus.BOOKED, BookingStatus.WAITLISTED, BookingStatus.ATTENDED, BookingStatus.NO_SHOW],
+      statuses: [
+        BookingStatus.BOOKED,
+        BookingStatus.WAITLISTED,
+        BookingStatus.ATTENDED,
+        BookingStatus.NO_SHOW,
+        BookingStatus.CANCELLED,
+      ],
     })
 
     // Get recently cancelled bookings (upcoming schedules that were cancelled)

@@ -7,8 +7,9 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
 import { CalendarCheck, Search } from 'lucide-react'
 import { useMyBookings, useParticipant } from '../../../lib/scheduling'
-import { MyBookingsSkeleton, MyBookingsEmpty, BookingSection } from './components'
+import { MyBookingsSkeleton, BookingsGroupedView } from './components'
 import { useScheduleCancellationUpdates } from './hooks/use-schedule-cancellation-updates'
+import { Card, CardContent } from '@js-monorepo/components/ui/card'
 
 export default function MyBookingsPage() {
   const { session } = useBibikosSession()
@@ -59,7 +60,7 @@ export default function MyBookingsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-start justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold mb-2">My Bookings</h1>
           <p className="text-muted-foreground">View and manage your class bookings</p>
@@ -80,22 +81,22 @@ export default function MyBookingsPage() {
           <p>Failed to load bookings. Please try again.</p>
         </div>
       ) : !data || (data.upcoming.length === 0 && data.past.length === 0 && data.cancelled.length === 0) ? (
-        <MyBookingsEmpty />
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+              <CalendarCheck className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No bookings yet</h3>
+            <p className="text-muted-foreground max-w-sm mb-6">
+              You haven&apos;t booked any classes yet. Discover classes from instructors and start your fitness journey!
+            </p>
+            <DpNextNavLink href="/discover">
+              <Button>Discover Classes</Button>
+            </DpNextNavLink>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="space-y-10">
-          {/* Upcoming Bookings */}
-          <BookingSection
-            title="Upcoming"
-            bookings={data.upcoming}
-            emptyMessage="No upcoming bookings. Discover new classes to attend!"
-          />
-
-          {/* Cancelled Bookings */}
-          {data.cancelled.length > 0 && <BookingSection title="Cancelled" bookings={data.cancelled} isCancelled />}
-
-          {/* Past Bookings */}
-          {data.past.length > 0 && <BookingSection title="Past" bookings={data.past} isPast />}
-        </div>
+        <BookingsGroupedView bookings={data} />
       )}
     </div>
   )

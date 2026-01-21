@@ -108,8 +108,10 @@ export class BookingRepositoryPrisma implements BookingRepository {
       where: {
         participantId,
         ...(options?.statuses ? { status: { in: options.statuses } } : {}),
-        ...(options?.upcoming ? { classSchedule: { startTimeUtc: { gte: now } } } : {}),
-        ...(options?.past ? { classSchedule: { startTimeUtc: { lt: now } } } : {}),
+        // Use endTimeUtc for more accurate upcoming/past determination
+        // A class is "upcoming" if it hasn't ended yet, and "past" if it has ended
+        ...(options?.upcoming ? { classSchedule: { endTimeUtc: { gte: now } } } : {}),
+        ...(options?.past ? { classSchedule: { endTimeUtc: { lt: now } } } : {}),
       },
       include: {
         classSchedule: {
