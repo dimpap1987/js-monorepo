@@ -232,7 +232,7 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
         data-sidebar="trigger"
         variant="ghost"
         size="icon"
-        className={cn('h-7 w-7', className)}
+        className={cn('h-11 w-11', className)}
         onClick={(event) => {
           onClick?.(event)
           toggleSidebar()
@@ -345,7 +345,7 @@ const SidebarContent = React.forwardRef<HTMLDivElement, React.ComponentProps<'di
       ref={ref}
       data-sidebar="content"
       className={cn(
-        'flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden',
+        'flex min-h-0 flex-1 p-2 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden',
         className
       )}
       {...props}

@@ -50,8 +50,9 @@ const MenuSideBarItem = memo(
           <SidebarMenuButton
             onClick={() => setIsOpen(!isOpen)}
             className={cn(
-              'flex items-center gap-3 text-base py-3.5 px-6 w-full min-w-0 max-w-full tracking-wide transition-colors',
-              item.isAdmin && 'text-primary font-bold hover:text-primary/80'
+              'flex items-center gap-3 text-base py-3 px-6 w-full h-full min-w-0 max-w-full tracking-wide transition-colors',
+              item.isAdmin && 'text-primary font-bold hover:text-primary/80',
+              isOpen ? 'h-auto' : 'h-full'
             )}
             data-state={isOpen ? 'open' : 'closed'}
           >
@@ -89,13 +90,13 @@ const MenuSideBarItem = memo(
 
     // Regular sidebar item without children
     return (
-      <SidebarMenuItem className="w-full min-w-0 py-2">
+      <SidebarMenuItem className="w-full min-w-0">
         <SidebarMenuButton asChild className="h-full">
           <DpNextNavLink
             href={item.href}
             onClick={onClose}
             className={cn(
-              'flex items-center gap-3 text-base py-3.5 px-6 w-full min-w-0 max-w-full tracking-wide transition-colors',
+              'flex items-center gap-3 text-base py-3 px-6 w-full min-w-0 max-w-full tracking-wide transition-colors',
               item.isAdmin && 'text-primary font-bold hover:text-primary/80'
             )}
           >
@@ -124,20 +125,15 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
 
   return (
     <Sidebar side="right" variant="inset" collapsible="offcanvas" className={className}>
-      <SidebarHeader>
-        <div
-          className={cn(
-            'flex items-center justify-between my-4 py-2 px-2 border-b border-border',
-            !!user ? 'min-h-[80px]' : 'min-h-[40px]'
-          )}
-        >
+      <SidebarHeader className="border-b border-border">
+        <div className={cn('flex items-center justify-between mt-4 py-2 px-2')}>
           {user && (
             <UserMetadata
               profileImage={user.profile?.image}
               username={user.username}
               createdAt={user.createdAt}
               plan={plan}
-              className="select-none text-sm"
+              className="select-none text-sm p-0"
             />
           )}
         </div>

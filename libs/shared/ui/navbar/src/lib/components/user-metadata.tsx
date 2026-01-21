@@ -22,7 +22,7 @@ export function UserMetadata({
 }) {
   const userTimezone = useTimezone()
   return (
-    <div className={cn('px-1 py-4 flex gap-3 items-center w-full', className)}>
+    <div className={cn('px-1 py-3 flex gap-3 items-center w-full', className)}>
       <Avatar className="h-10 w-10">
         {profileImage && <AvatarImage src={profileImage} alt={`${username} picture`}></AvatarImage>}
         <AvatarFallback className="text-sm font-semibold">{username?.slice(0, 2)?.toUpperCase() || 'A'}</AvatarFallback>
