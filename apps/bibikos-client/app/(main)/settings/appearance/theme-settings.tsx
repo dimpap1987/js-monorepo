@@ -3,12 +3,20 @@
 import { getEnabledThemes } from '@js-monorepo/theme-provider'
 import { cn } from '@js-monorepo/ui/util'
 import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 import { SettingsItem } from '../settings-items'
 
 const themes = getEnabledThemes()
 
 export function ThemeSettings() {
   const { theme, setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   const currentTheme = theme === 'system' ? 'system' : resolvedTheme || theme || 'light'
 
