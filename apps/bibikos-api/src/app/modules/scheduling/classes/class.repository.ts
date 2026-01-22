@@ -1,4 +1,4 @@
-import { Class, Prisma } from '@js-monorepo/bibikos-db'
+import { Class, ClassTag, Prisma } from '@js-monorepo/bibikos-db'
 
 export const ClassRepo = Symbol('ClassRepo')
 
@@ -9,6 +9,7 @@ export interface ClassWithLocation extends Class {
     timezone: string
     isOnline: boolean
   }
+  tags: ClassTag[]
 }
 
 export interface ClassWithLocationAndOrganizer extends ClassWithLocation {

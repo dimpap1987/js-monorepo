@@ -166,12 +166,29 @@ model Class {
     location    Location          @relation(fields: [locationId], references: [id], onDelete: Restrict)
     schedules   ClassSchedule[]
     invitations ClassInvitation[]
+    tags        ClassTag[]
 
     @@index([organizerId])
     @@index([locationId])
     @@index([isActive])
     @@index([isPrivate])
     @@map("classes")
+}
+
+// -----------------------------------------------------------------------------
+// ClassTag - Tags for categorizing classes
+// -----------------------------------------------------------------------------
+// Global list of tags that can be assigned to classes
+model ClassTag {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String   @unique @db.VarChar(50)
+
+    // Relations
+    classes Class[]
+
+    @@map("class_tags")
 }
 
 // -----------------------------------------------------------------------------

@@ -1,5 +1,6 @@
-import { CreateClassSchema, CreateLocationSchema, CreateOrganizerSchema } from '@js-monorepo/schemas'
+import { CreateLocationSchema, CreateOrganizerSchema } from '@js-monorepo/schemas'
 import { z } from 'zod'
+import { CreateClassSchema } from '../../classes/dto/class.dto'
 
 export const CompleteOnboardingSchema = z.object({
   organizer: CreateOrganizerSchema,

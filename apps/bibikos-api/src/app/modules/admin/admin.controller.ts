@@ -1,13 +1,13 @@
 import { HasRoles } from '@js-monorepo/auth/nest/common'
 import { RolesEnum } from '@js-monorepo/auth/nest/common/types'
 import { AuthSessionUserCacheService, RolesGuard, SessionUser } from '@js-monorepo/auth/nest/session'
-import { QueryValidationPipe } from '@js-monorepo/nest/pipes'
+import { FeatureFlagsService } from '@js-monorepo/feature-flags-server'
+import { QueryValidationPipe, ZodPipe } from '@js-monorepo/nest/pipes'
 import { UpdateUserSchemaType } from '@js-monorepo/schemas'
 import { AuthUserDto, AuthUserFullDto, SessionUserType } from '@js-monorepo/types/auth'
 import { PaginationType } from '@js-monorepo/types/pagination'
 import { Subscription } from '@js-monorepo/types/subscription'
 import { OnlineUsersService } from '@js-monorepo/user-presence'
-import { FeatureFlagsService } from '@js-monorepo/feature-flags-server'
 import {
   Body,
   Controller,
@@ -19,6 +19,7 @@ import {
   Logger,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -26,6 +27,8 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { Request } from 'express'
+import { ClassTagService } from '../scheduling/tags'
+import { CreateTagDto, CreateTagSchema, UpdateTagDto, UpdateTagSchema } from '../scheduling/tags/dto/tag.dto'
 import { AdminPaymentsService } from './admin-payments.service'
 import { AdminService } from './admin.service'
 import { SubscriptionFiltersSchema, SubscriptionFiltersType } from './dto/subscription-filters.schema'
@@ -41,7 +44,8 @@ export class AdminController {
     private readonly οnlineUsersService: OnlineUsersService,
     private readonly adminPaymentsService: AdminPaymentsService,
     private readonly authSessionCacheService: AuthSessionUserCacheService,
-    private readonly featureFlagsService: FeatureFlagsService
+    private readonly featureFlagsService: FeatureFlagsService,
+    private readonly tagService: ClassTagService
   ) {}
 
   @Get('users')
@@ -184,5 +188,32 @@ export class AdminController {
     )
 
     return { success: true, user: targetUser }
+  }
+
+  // Tags
+
+  @Get()
+  async getAllTags() {
+    return this.tagService.getAllTags()
+  }
+
+  @Post()
+  @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.CREATED)
+  async createTag(@Body(new ZodPipe(CreateTagSchema)) dto: CreateTagDto) {
+    return this.tagService.createTag(dto)
+  }
+
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  async updateTag(@Param('id', ParseIntPipe) id: number, @Body(new ZodPipe(UpdateTagSchema)) dto: UpdateTagDto) {
+    return this.tagService.updateTag(id, dto)
+  }
+
+  @Delete(':id')
+  @UseGuards(RolesGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTag(@Param('id', ParseIntPipe) id: number) {
+    return this.tagService.deleteTag(id)
   }
 }

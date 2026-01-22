@@ -26,6 +26,7 @@ export class ClassRepositoryPrisma implements ClassRepository {
             isOnline: true,
           },
         },
+        tags: true,
       },
     })
   }
@@ -50,6 +51,7 @@ export class ClassRepositoryPrisma implements ClassRepository {
             activityLabel: true,
           },
         },
+        tags: true,
       },
     })
   }
@@ -69,6 +71,7 @@ export class ClassRepositoryPrisma implements ClassRepository {
             isOnline: true,
           },
         },
+        tags: true,
       },
       orderBy: { title: 'asc' },
     })

@@ -19,7 +19,8 @@ scheduling/
 ├── classes/                      # Class templates
 ├── class-schedules/              # Schedule occurrences
 ├── bookings/                     # Participant registrations
-└── invitations/                  # Private class invitations
+├── invitations/                  # Private class invitations
+└── tags/                         # Class tags/labels
 ```
 
 ---
@@ -110,6 +111,12 @@ scheduling/
 | PATCH  | `/scheduling/invitations/:id/respond`    | Accept or decline invitation       |
 | DELETE | `/scheduling/invitations/:id`            | Cancel/revoke invitation           |
 
+### Tags
+
+| Method | Endpoint           | Description                  |
+| ------ | ------------------ | ---------------------------- |
+| GET    | `/scheduling/tags` | Get all available class tags |
+
 ---
 
 ## Data Models
@@ -126,6 +133,7 @@ OrganizerProfile (1) ────────────── Location (*)
 
 Class (1) ───────────────────────── ClassSchedule (*)
           └──────────────────────── ClassInvitation (*)
+          └──────────────────────── ClassTag (*)
 
 ClassSchedule (1) ───────────────── Booking (*)
 ParticipantProfile (1) ──────────── Booking (*)
@@ -146,6 +154,7 @@ interface Class {
   isCapacitySoft: boolean // Soft = recommendation only
   isPrivate: boolean // Requires invitation to book
   isActive: boolean // Soft delete flag
+  tags: { id: number; name: string }[]
 }
 ```
 
@@ -223,6 +232,7 @@ FREQ=MONTHLY;UNTIL=2026-06-01
 - [x] Waitlist support with configurable limits
 - [x] Private class flag
 - [x] Soft deletion (deactivation)
+- [x] Class tags/labels
 
 **Scheduling**
 
@@ -374,7 +384,7 @@ curl -X POST http://localhost:3000/scheduling/locations \
 # Create class
 curl -X POST http://localhost:3000/scheduling/classes \
   -H "Content-Type: application/json" \
-  -d '{"locationId": 1, "title": "Morning Yoga", "capacity": 10}'
+  -d '{"locationId": 1, "title": "Morning Yoga", "capacity": 10, "tagIds": [1, 2]}'
 
 # Create one-time schedule
 curl -X POST http://localhost:3000/scheduling/schedules \

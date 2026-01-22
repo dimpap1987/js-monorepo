@@ -139,13 +139,16 @@ export class ClassService {
       waitlistLimit: dto.waitlistLimit ?? null,
       isCapacitySoft: dto.isCapacitySoft ?? false,
       isPrivate: dto.isPrivate ?? false,
+      tags: {
+        connect: dto.tagIds.map((id) => ({ id })),
+      },
     })
 
     this.logger.log(`Created class ${classEntity.id} for organizer ${organizerId}`)
 
     // Fetch with location for response
     const created = await this.classRepo.findByIdWithLocation(classEntity.id)
-    return this.toResponseDto(created!)
+    return this.toResponseDto(created)
   }
 
   /**
@@ -184,13 +187,18 @@ export class ClassService {
       ...(dto.isCapacitySoft !== undefined && { isCapacitySoft: dto.isCapacitySoft }),
       ...(dto.isActive !== undefined && { isActive: dto.isActive }),
       ...(dto.isPrivate !== undefined && { isPrivate: dto.isPrivate }),
+      ...(dto.tagIds && {
+        tags: {
+          set: dto.tagIds.map((id) => ({ id })),
+        },
+      }),
     })
 
     this.logger.log(`Updated class ${classId}`)
 
     // Fetch updated with location
     const updated = await this.classRepo.findByIdWithLocation(classId)
-    return this.toResponseDto(updated!)
+    return this.toResponseDto(updated)
   }
 
   /**
@@ -227,6 +235,7 @@ export class ClassService {
       isPrivate: classEntity.isPrivate,
       createdAt: classEntity.createdAt,
       location: classEntity.location,
+      tags: classEntity.tags.map((tag) => ({ id: tag.id, name: tag.name })),
     }
   }
 }
