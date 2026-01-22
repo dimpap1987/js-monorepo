@@ -1,7 +1,8 @@
-import { compose, withPathName } from '@js-monorepo/next/middlewares'
+import { compose, createWithPathname } from '@js-monorepo/next/middlewares'
 import { NextResponse } from 'next/server'
 import { withAuth } from './app/middlewares/withAuth'
 
+const withPathName = createWithPathname()
 const composedMiddlewares = compose(withPathName, withAuth)
 // TODO: add withCSP
 
