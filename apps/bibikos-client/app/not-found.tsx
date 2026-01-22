@@ -1,6 +1,13 @@
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { getServerPathname } from '@js-monorepo/next/server'
+import { logger } from '../lib/logger'
 
 export default function NotFound() {
+  const pathname = getServerPathname()
+  if (pathname) {
+    logger.warn({ pathname }, '404 page rendered')
+  }
+
   return (
     <main className="min-h-[70vh] flex items-center justify-center bg-background px-6">
       <div className="max-w-md w-full text-center space-y-6">
