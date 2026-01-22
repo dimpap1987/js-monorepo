@@ -194,12 +194,12 @@ export function AccountSettings() {
                         <FormControl>
                           {isEditing ? (
                             <div className="relative">
-                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-foreground-muted font-medium">
+                              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted font-medium">
                                 @
                               </span>
                               <Input
                                 id="username"
-                                className="h-11 sm:h-12 text-base pl-7"
+                                className="h-11 sm:h-12 text-base pl-9"
                                 placeholder="Enter your username"
                                 {...field}
                               />
@@ -242,7 +242,7 @@ export function AccountSettings() {
                                 {isEditing ? (
                                   <Input
                                     id="firstName"
-                                    className="h-11 sm:h-12 text-base w-full min-w-0"
+                                    className="h-11 sm:h-12 text-base w-full min-w-0 pl-4"
                                     placeholder="Enter your first name"
                                     required
                                     {...field}
@@ -272,7 +272,7 @@ export function AccountSettings() {
                                 {isEditing ? (
                                   <Input
                                     id="lastName"
-                                    className="h-11 sm:h-12 text-base w-full min-w-0"
+                                    className="h-11 sm:h-12 text-base w-full min-w-0 pl-4"
                                     placeholder="Enter your last name"
                                     required
                                     {...field}
