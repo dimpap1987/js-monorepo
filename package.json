@@ -186,6 +186,7 @@
     "passport-oauth2": "^1.8.0",
     "pg": "^8.16.3",
     "prismjs": "^1.29.0",
+    "radix-ui": "^1.4.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.49.3",

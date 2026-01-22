@@ -1,5 +1,6 @@
 'use client'
 import { Button } from '@js-monorepo/components/ui/button'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@js-monorepo/components/ui/collapsible'
 import { Separator } from '@js-monorepo/components/ui/separator'
 import {
   Sidebar,
@@ -10,7 +11,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
 } from '@js-monorepo/components/ui/sidebar'
@@ -46,45 +46,38 @@ const MenuSideBarItem = memo(
     // If item has children, render collapsible item
     if (item.children && accessibleChildren.length > 0) {
       return (
-        <SidebarMenuItem className="w-full min-w-0">
-          <SidebarMenuButton
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              'flex items-center gap-3 text-base py-2 px-4 w-full h-full min-w-0 max-w-full tracking-wide transition-colors',
-              item.isAdmin && 'text-primary font-bold hover:text-primary/80',
-              isOpen ? 'h-auto' : 'h-full'
-            )}
-            data-state={isOpen ? 'open' : 'closed'}
-          >
-            {item.Icon && <item.Icon className={cn('h-5 w-5 shrink-0', item.isAdmin && 'text-primary')} />}
-            <span className="flex-1 text-left min-w-0 truncate">{item.name}</span>
-            <ChevronRight className={cn('h-4 w-4 shrink-0 transition-transform duration-200', isOpen && 'rotate-90')} />
-          </SidebarMenuButton>
-          {isOpen && (
-            <SidebarMenuSub className="w-full min-w-0 mt-1">
-              {/* Parent link */}
-              <SidebarMenuSubItem>
-                <SidebarMenuSubButton asChild>
-                  <DpNextNavLink href={item.href} onClick={onClose}>
+        <Collapsible className="group/collapsible">
+          <SidebarMenuItem>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton className="h-full text-base py-2 px-4">
+                {item.Icon && <item.Icon className={cn('h-5 w-5 shrink-0', item.isAdmin && 'text-primary')} />}
+                <span className="flex-1 text-left min-w-0 truncate">{item.name}</span>
+                <ChevronRight
+                  className={cn('h-4 w-4 shrink-0 transition-transform duration-200', isOpen && 'rotate-90')}
+                />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarMenuSub>
+                {/* Keep the parent as well */}
+                <SidebarMenuSubItem key={item.name} className="hover:bg-secondary py-1">
+                  <DpNextNavLink href={item.href} onClick={onClose} className="flex gap-3">
                     {item.Icon && <item.Icon className="h-4 w-4" />}
                     <span>{item.name}</span>
                   </DpNextNavLink>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-              {/* Children links */}
-              {accessibleChildren.map((child) => (
-                <SidebarMenuSubItem key={child.href} className="py-1">
-                  <SidebarMenuSubButton asChild>
-                    <DpNextNavLink href={child.href} onClick={onClose}>
+                </SidebarMenuSubItem>
+                {accessibleChildren.map((child) => (
+                  <SidebarMenuSubItem key={child.name} className="hover:bg-secondary py-1">
+                    <DpNextNavLink href={child.href} onClick={onClose} className="flex gap-3">
                       {child.Icon && <child.Icon className="h-4 w-4" />}
                       <span>{child.name}</span>
                     </DpNextNavLink>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
-            </SidebarMenuSub>
-          )}
-        </SidebarMenuItem>
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            </CollapsibleContent>
+          </SidebarMenuItem>
+        </Collapsible>
       )
     }
 
@@ -97,7 +90,7 @@ const MenuSideBarItem = memo(
             onClick={onClose}
             className={cn(
               'flex items-center gap-3 text-base py-2 px-4 w-full min-w-0 max-w-full tracking-wide transition-colors',
-              item.isAdmin && 'text-primary font-bold hover:text-primary/80'
+              item.isAdmin && 'text-primary font-bold hover:text-primary'
             )}
           >
             {item.Icon && <item.Icon className={cn('h-5 w-5 shrink-0', item.isAdmin && 'text-primary')} />}

@@ -5,7 +5,15 @@ import { useSession } from '@js-monorepo/auth/next/client'
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
-import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel, Input } from '@js-monorepo/components/ui/form'
+import {
+  Form,
+  FormControl,
+  FormErrorDisplay,
+  FormField,
+  FormItem,
+  FormLabel,
+  Input,
+} from '@js-monorepo/components/ui/form'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Menu } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '@js-monorepo/ui/util'
+import { Menu } from 'lucide-react'
 import { useIsMobile } from '../hooks/use-mobile'
 import { Button } from './button'
 import { Input } from './form'
@@ -16,7 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tool
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = '16rem'
-const SIDEBAR_WIDTH_MOBILE = '18rem'
+const SIDEBAR_WIDTH_MOBILE = '21rem'
 const SIDEBAR_WIDTH_ICON = '3rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
 
@@ -228,8 +228,8 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
 
     return (
       <Button
-        ref={ref}
         data-sidebar="trigger"
+        data-slot="sidebar-trigger"
         variant="ghost"
         size="icon"
         className={cn('h-11 w-11', className)}
