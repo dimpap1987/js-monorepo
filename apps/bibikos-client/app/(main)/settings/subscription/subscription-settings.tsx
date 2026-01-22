@@ -177,12 +177,6 @@ export function SubscriptionSettings() {
 
   return (
     <section className="space-y-6">
-      {/* Page Header */}
-      <BackArrowWithLabel>
-        <h2 className="mb-2">{t('settings.subscription.title')}</h2>
-        <p className="text-sm text-foreground-muted">{t('settings.subscription.description')}</p>
-      </BackArrowWithLabel>
-
       {/* Subscription Management */}
       <SettingsItem label={t('settings.subscription.currentPlan')}>
         {isLoading ? (

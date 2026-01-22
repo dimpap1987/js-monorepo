@@ -1,6 +1,5 @@
 'use client'
 
-import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 import { getEnabledThemes } from '@js-monorepo/theme-provider'
 import { cn } from '@js-monorepo/ui/util'
 import { useTheme } from 'next-themes'
@@ -15,12 +14,6 @@ export function ThemeSettings() {
 
   return (
     <section className="space-y-6 text-foreground">
-      {/* Page Header */}
-      <BackArrowWithLabel>
-        <h2 className="mb-2">Appearance</h2>
-        <p className="text-sm text-foreground-muted">Customize how the app looks and feels</p>
-      </BackArrowWithLabel>
-
       <SettingsItem label="Theme">
         <p className="text-xs font-semibold sm:text-sm mt-1 mb-4 text-foreground-neutral">
           Choose how the app looks to you. You can select a theme or match your system settings.

@@ -2,7 +2,6 @@
 
 import { useWebPushNotification } from '@js-monorepo/web-notification'
 import { SettingsItem } from '../settings-items'
-import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
 
 const NotificationPermissionComponent = () => {
   const { permission, requestPermission } = useWebPushNotification()
@@ -44,12 +43,6 @@ const NotificationPermissionComponent = () => {
 
   return (
     <section className="space-y-6">
-      {/* Page Header */}
-      <BackArrowWithLabel>
-        <h2 className="mb-2">Notification Settings</h2>
-        <p className="text-sm text-foreground-muted">Control how you receive notifications</p>
-      </BackArrowWithLabel>
-
       <SettingsItem label="Push Notifications">
         <p className="text-xs font-semibold sm:text-sm mt-1 flex gap-1 flex-wrap">
           <span>Control how you receive </span> <span>push notifications.</span>

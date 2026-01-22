@@ -2,23 +2,21 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from '@js-monorepo/auth/next/client'
-import { Button } from '@js-monorepo/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
+import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
-import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
-import { Input } from '@js-monorepo/components/ui/form'
+import { Form, FormControl, FormErrorDisplay, FormField, FormItem, FormLabel, Input } from '@js-monorepo/components/ui/form'
+import { Skeleton } from '@js-monorepo/components/ui/skeleton'
+import { useTimezone } from '@js-monorepo/next/hooks'
 import { useNotifications } from '@js-monorepo/notification'
 import { EditUserSchema } from '@js-monorepo/schemas'
+import { cn } from '@js-monorepo/ui/util'
 import { compressAvatar } from '@js-monorepo/utils/common'
 import { formatForUser } from '@js-monorepo/utils/date'
-import { useTimezone } from '@js-monorepo/next/hooks'
+import { Calendar, Camera, Shield, User } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useUpdateUserAccount, useUserProfile } from '../queries'
-import { BackArrowWithLabel } from '@js-monorepo/back-arrow'
-import { Camera, User, Calendar, Shield } from 'lucide-react'
-import { cn } from '@js-monorepo/ui/util'
-import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 
 export function AccountSettings() {
   const { session, refreshSession, isAdmin } = useSession()
@@ -103,14 +101,6 @@ export function AccountSettings() {
 
   return (
     <div className="space-y-4 sm:space-y-6 pb-6">
-      {/* Page Header */}
-      <div className="px-1">
-        <BackArrowWithLabel>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-1.5">Account Settings</h1>
-          <p className="text-sm sm:text-base text-foreground-muted">Manage your profile information</p>
-        </BackArrowWithLabel>
-      </div>
-
       {/* Profile Section */}
       <Form {...form}>
         <Card className="border-border shadow-sm">
@@ -305,7 +295,7 @@ export function AccountSettings() {
                   />
 
                   {/* Edit/Save Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
                     {isEditing ? (
                       <>
                         <Button

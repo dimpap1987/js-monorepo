@@ -1,11 +1,11 @@
 'use client'
 
-import { useMemo, useEffect, useRef } from 'react'
-import { usePathname } from 'next/navigation'
-import { useTranslations } from 'next-intl'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
-import { SETTINGS_NAV_ITEMS } from '../../../lib/routes-config'
 import { useHasSubscriptionHistory } from '@js-monorepo/payments-ui'
+import { useTranslations } from 'next-intl'
+import { usePathname } from 'next/navigation'
+import { useEffect, useMemo, useRef } from 'react'
+import { SETTINGS_NAV_ITEMS } from '../../../lib/routes-config'
 
 export function SettingsMobileTabs() {
   const pathname = usePathname()
@@ -39,7 +39,7 @@ export function SettingsMobileTabs() {
   }, [pathname])
 
   return (
-    <nav className="sm:hidden border-b border-border mb-6">
+    <nav className="border-b border-border mb-6">
       <div className="flex items-center overflow-x-auto whitespace-nowrap no-scrollbar scroll-smooth">
         {translatedTabs.map((item) => {
           const isActive = pathname.startsWith(item.href)
