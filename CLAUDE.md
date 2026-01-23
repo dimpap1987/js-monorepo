@@ -193,4 +193,4 @@ The subscription callback fires **after** the render cycle, avoiding conflicts.
   Service-to-Repository: A Service can only inject its own corresponding Repository.
   Cross-Repository Restriction: If a Service needs data managed by another domain, it must call that domain's Service, not its Repository directly.
 - Rule: Use @AppUserContext() appUserContext: AppUserContext to access authenticated user data.
-**CRITICAL: Only senior-level code and best practices are acceptable.**
+  **CRITICAL: Only senior-level code and best practices are acceptable.**

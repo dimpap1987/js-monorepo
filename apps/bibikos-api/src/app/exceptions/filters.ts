@@ -1,3 +1,4 @@
+import { Prisma } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import {
   ArgumentsHost,
@@ -8,8 +9,6 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common'
-import { BaseExceptionFilter } from '@nestjs/core'
-import { Prisma } from '@js-monorepo/bibikos-db'
 import { ZodError } from 'zod'
 
 const INTERNAL_ERROR = 'Internal server error'
@@ -33,7 +32,6 @@ export class ApiExceptionFilter implements ExceptionFilter {
       createdBy: 'ApiExceptionFilter',
       errorCode: exception.getErrorCode(),
       path: request.originalUrl,
-      message: exception.message,
     })
   }
 }
@@ -81,22 +79,70 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 }
 
 @Catch(Prisma.PrismaClientKnownRequestError)
-export class PrismaClientExceptionFilter extends BaseExceptionFilter {
-  override catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
-    Logger.error(
-      `Exception of type: 'PrismaClientKnownRequestError' - message: '${exception.message}' - code: '${exception.code}'`,
-      exception.stack,
-      PrismaClientExceptionFilter.name
-    )
-
+export class PrismaClientExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(PrismaClientExceptionFilter.name)
+  catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()
     const request = ctx.getRequest()
 
-    return response.status(400).json({
+    let status = HttpStatus.INTERNAL_SERVER_ERROR
+    let message = 'Internal server error'
+    let errorCode = 'DATABASE_ERROR'
+
+    // 1. Extract metadata for logging
+    const model = exception.meta?.modelName || 'UnknownModel'
+    const target = (exception.meta?.target as string[])?.join(', ') || 'fields'
+
+    switch (exception.code) {
+      case 'P2002':
+        status = HttpStatus.CONFLICT
+        message = `Unique constraint failed on ${model} (${target})`
+        errorCode = 'UNIQUE_CONSTRAINT_VIOLATION'
+        break
+      case 'P2025':
+        status = HttpStatus.NOT_FOUND
+        message = `${model} record not found`
+        errorCode = 'RECORD_NOT_FOUND'
+        break
+      case 'P2003':
+        status = HttpStatus.BAD_REQUEST
+        message = `Foreign key constraint failed on ${model}`
+        errorCode = 'INVALID_RELATION'
+        break
+      case 'P2014':
+        status = HttpStatus.BAD_REQUEST
+        message = `The change you are trying to make would violate the required relation for ${model}`
+        errorCode = 'RELATION_VIOLATION'
+        break
+    }
+    const logContext = {
+      model,
+      errorCode,
+      prismaCode: exception.code,
+      path: request.url,
+      method: request.method,
+      meta: exception.meta,
+    }
+
+    if (status >= 500) {
+      this.logger.error(`[Prisma Error] ${exception.message}`, exception.stack, logContext)
+    } else {
+      this.logger.warn(`[Prisma Client Error] ${message}`, logContext)
+    }
+
+    response.status(status).json({
       createdBy: 'PrismaClientKnownRequestError',
-      path: request.originalUrl,
-      errors: [{ message: exception.message }],
+      statusCode: status,
+      errorCode: errorCode,
+      message: message,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      errors: [
+        {
+          message: message ?? 'Something went wrong',
+        },
+      ],
     })
   }
 }
@@ -120,7 +166,7 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
       path: request.originalUrl,
       errors: [
         {
-          message: errorMessage ?? 'Something went wrong',
+          message: 'Something went wrong',
         },
       ],
     })

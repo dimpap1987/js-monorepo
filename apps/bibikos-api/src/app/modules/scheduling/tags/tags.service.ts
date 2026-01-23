@@ -1,8 +1,8 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { Prisma } from '@js-monorepo/prisma-shared'
 import { HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { CreateTagDto, TagResponseDto, UpdateTagDto } from './dto/tag.dto'
 import { ClassTagRepo, ClassTagRepository } from './tags.repository'
-import { Prisma } from '@js-monorepo/prisma-shared'
 
 @Injectable()
 export class ClassTagService {
@@ -37,36 +37,11 @@ export class ClassTagService {
   }
 
   async updateTag(id: number, dto: UpdateTagDto): Promise<TagResponseDto> {
-    try {
-      const updatedTag = await this.tagRepo.update(id, dto)
-
-      return { id: updatedTag.id, name: updatedTag.name }
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new ApiException(HttpStatus.NOT_FOUND, 'TAG_NOT_FOUND')
-        }
-        if (error.code === 'P2002') {
-          const target = (error.meta as { target?: string[] })?.target
-          if (target?.includes('name')) {
-            throw new ApiException(HttpStatus.CONFLICT, 'TAG_NAME_ALREADY_EXISTS')
-          }
-        }
-      }
-      throw error // rethrow unexpected errors
-    }
+    const updatedTag = await this.tagRepo.update(id, dto)
+    return { id: updatedTag.id, name: updatedTag.name }
   }
 
   async deleteTag(id: number): Promise<void> {
-    try {
-      await this.tagRepo.delete(id)
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new ApiException(HttpStatus.NOT_FOUND, 'TAG_NOT_FOUND')
-        }
-      }
-      throw error
-    }
+    return this.tagRepo.delete(id)
   }
 }
