@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@js-monorepo/components/ui/dialog'
+import { Drawer, DrawerContent } from '@js-monorepo/components/ui/drawer'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { format, parseISO } from 'date-fns'
 import { AlertCircle, Calendar, CheckCircle2, Clock, Loader2, User } from 'lucide-react'
@@ -18,7 +19,7 @@ import type { DiscoverSchedule } from '../../../../lib/scheduling'
 import { useCreateBooking } from '../../../../lib/scheduling'
 
 interface BookingDialogProps {
-  schedule: DiscoverSchedule | null
+  schedule: DiscoverSchedule
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -32,7 +33,7 @@ function LoginPrompt({ schedule }: { schedule: DiscoverSchedule }) {
         <DialogTitle>Sign in to book</DialogTitle>
         <DialogDescription>You need to sign in to book this class.</DialogDescription>
       </DialogHeader>
-      <div className="py-4 space-y-3">
+      <div className="p-4 space-y-3">
         <div className="flex items-center gap-3 text-sm">
           <Calendar className="w-4 h-4 text-muted-foreground" />
           <span>{format(startTime, 'EEEE, MMMM d, yyyy')}</span>
@@ -111,7 +112,7 @@ function BookingForm({ schedule, onClose }: BookingFormProps) {
           </DialogTitle>
           <DialogDescription>You&apos;re all set for your class.</DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-3">
+        <div className="p-4 space-y-3">
           <div className="flex items-center gap-3 text-sm">
             <Calendar className="w-4 h-4 text-muted-foreground" />
             <span>{format(startTime, 'EEEE, MMMM d, yyyy')}</span>
@@ -141,7 +142,7 @@ function BookingForm({ schedule, onClose }: BookingFormProps) {
             : 'Review the details below and confirm your booking.'}
         </DialogDescription>
       </DialogHeader>
-      <div className="py-4 space-y-3">
+      <div className="p-4 space-y-3">
         <div className="flex items-center gap-3 text-sm">
           <Calendar className="w-4 h-4 text-muted-foreground" />
           <span>{format(startTime, 'EEEE, MMMM d, yyyy')}</span>
@@ -183,11 +184,9 @@ function BookingForm({ schedule, onClose }: BookingFormProps) {
 export function BookingDialog({ schedule, open, onOpenChange }: BookingDialogProps) {
   const { isLoggedIn } = useSession()
 
-  if (!schedule) return null
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md p-5">
         {isLoggedIn ? (
           <BookingForm schedule={schedule} onClose={() => onOpenChange(false)} />
         ) : (
@@ -195,5 +194,21 @@ export function BookingDialog({ schedule, open, onOpenChange }: BookingDialogPro
         )}
       </DialogContent>
     </Dialog>
+  )
+}
+
+export function BookingDrawer({ schedule, open, onOpenChange }: BookingDialogProps) {
+  const { isLoggedIn } = useSession()
+
+  return (
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="p-5">
+        {isLoggedIn ? (
+          <BookingForm schedule={schedule} onClose={() => onOpenChange(false)} />
+        ) : (
+          <LoginPrompt schedule={schedule} />
+        )}
+      </DrawerContent>
+    </Drawer>
   )
 }

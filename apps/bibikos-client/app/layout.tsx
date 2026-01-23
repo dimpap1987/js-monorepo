@@ -8,6 +8,8 @@ import { ReactNode } from 'react'
 import RootComponent from '../components/root-component'
 import RootProviders from '../providers/root.providers'
 import './global.css'
+import { isMobileDevice } from '@js-monorepo/next/server'
+import { DeviceStoreInitializer } from '../components/device-store-initializer'
 
 const poppins = Poppins({
   subsets: ['latin', 'latin-ext'],
@@ -31,10 +33,12 @@ export default async function RootLayout(props: { readonly children: ReactNode; 
   const locale = await getLocale()
   const messages = await getMessages()
   const session = await getCurrentSession()
+  const isMobile = await isMobileDevice()
 
   return (
     <html lang={locale} suppressHydrationWarning={true}>
       <BodyTemplate className={poppins.className}>
+        <DeviceStoreInitializer isMobile={isMobile ?? false} />
         <NextIntlClientProvider messages={messages}>
           <RootProviders session={session}>
             <RootComponent>

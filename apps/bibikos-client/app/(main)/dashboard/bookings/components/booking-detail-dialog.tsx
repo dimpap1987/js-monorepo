@@ -17,9 +17,8 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@js-monorepo/components/ui/dialog'
 import { Label } from '@js-monorepo/components/ui/label'
 import { Separator } from '@js-monorepo/components/ui/separator'

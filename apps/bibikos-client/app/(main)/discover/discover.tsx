@@ -1,20 +1,23 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useNotifications } from '@js-monorepo/notification'
+import { ContainerTemplate } from '@js-monorepo/templates'
+import { useDeviceStore } from 'apps/bibikos-client/stores/deviceStore'
 import { Loader2 } from 'lucide-react'
-import type { DiscoverSchedule, DiscoverFilters as DiscoverFiltersType } from '../../../lib/scheduling'
-import { useDiscoverSchedules, useCancelBooking } from '../../../lib/scheduling'
-import { toScheduleDisplayTimes, getDateGroup, type DateGroup } from '../../../lib/datetime'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { getDateGroup, toScheduleDisplayTimes, type DateGroup } from '../../../lib/datetime'
+import type { DiscoverFilters as DiscoverFiltersType, DiscoverSchedule } from '../../../lib/scheduling'
+import { useCancelBooking, useDiscoverSchedules } from '../../../lib/scheduling'
 import {
-  DiscoverFilters,
-  DiscoverDateGroup,
-  DiscoverSkeleton,
-  DiscoverEmptyState,
   BookingDialog,
   CancelBookingDialog,
+  DiscoverDateGroup,
+  DiscoverEmptyState,
+  DiscoverFilters,
+  DiscoverSkeleton,
 } from './components'
-import { ContainerTemplate } from '@js-monorepo/templates'
+import { BookingDrawer } from './components/booking-dialog'
+import { CancelBookingDrawer } from './components/cancel-booking-dialog'
 
 function getDefaultFilters(): DiscoverFiltersType {
   return {}
@@ -51,7 +54,7 @@ export default function DiscoverComponent() {
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [scheduleToCancel, setScheduleToCancel] = useState<DiscoverSchedule | null>(null)
-
+  const isMobile = useDeviceStore((state) => state.isMobile)
   const { addNotification } = useNotifications()
   const { data, isLoading, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useDiscoverSchedules(filters)
@@ -210,17 +213,32 @@ export default function DiscoverComponent() {
         </div>
       )}
 
-      {/* Booking Dialog */}
-      <BookingDialog schedule={selectedSchedule} open={bookingDialogOpen} onOpenChange={setBookingDialogOpen} />
+      {selectedSchedule &&
+        (isMobile ? (
+          <BookingDrawer schedule={selectedSchedule} open={bookingDialogOpen} onOpenChange={setBookingDialogOpen} />
+        ) : (
+          <BookingDialog schedule={selectedSchedule} open={bookingDialogOpen} onOpenChange={setBookingDialogOpen} />
+        ))}
 
+      {scheduleToCancel &&
+        (isMobile ? (
+          <CancelBookingDrawer
+            schedule={scheduleToCancel}
+            open={cancelDialogOpen}
+            onOpenChange={setCancelDialogOpen}
+            onConfirm={handleCancelConfirm}
+            isLoading={cancelBookingMutation.isPending}
+          />
+        ) : (
+          <CancelBookingDialog
+            schedule={scheduleToCancel}
+            open={cancelDialogOpen}
+            onOpenChange={setCancelDialogOpen}
+            onConfirm={handleCancelConfirm}
+            isLoading={cancelBookingMutation.isPending}
+          />
+        ))}
       {/* Cancel Booking Dialog */}
-      <CancelBookingDialog
-        schedule={scheduleToCancel}
-        open={cancelDialogOpen}
-        onOpenChange={setCancelDialogOpen}
-        onConfirm={handleCancelConfirm}
-        isLoading={cancelBookingMutation.isPending}
-      />
     </ContainerTemplate>
   )
 }
