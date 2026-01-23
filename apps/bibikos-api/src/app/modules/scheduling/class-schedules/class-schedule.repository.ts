@@ -32,12 +32,15 @@ export interface DiscoverScheduleResult extends ClassScheduleWithBookingCounts {
   }
 }
 
-export interface DiscoverFilters {
-  startDate: Date
-  endDate: Date
+export interface DiscoverCursorFilters {
   activity?: string
   timeOfDay?: 'morning' | 'afternoon' | 'evening'
   search?: string
+}
+
+export interface DiscoverCursorResult {
+  schedules: DiscoverScheduleResult[]
+  hasMore: boolean
 }
 
 export interface ClassScheduleRepository {
@@ -58,8 +61,17 @@ export interface ClassScheduleRepository {
   ): Promise<ClassScheduleWithBookingCounts[]>
   findUpcomingByClassId(classId: number, limit?: number): Promise<ClassSchedule[]>
   findUpcomingByClassIdWithBookingCounts(classId: number, limit?: number): Promise<ClassScheduleWithBookingCounts[]>
-  findPublicForDiscover(filters: DiscoverFilters): Promise<DiscoverScheduleResult[]>
-  findPrivateForDiscoverByUserId(userId: number, filters: DiscoverFilters): Promise<DiscoverScheduleResult[]>
+  /**
+   * Cursor-based pagination for discover page
+   * Returns public schedules + private schedules where user has accepted invitation
+   * Ordered by startTimeUtc ASC, id ASC for stable cursor pagination
+   */
+  findForDiscoverByCursor(
+    filters: DiscoverCursorFilters,
+    cursor: number | null,
+    limit: number,
+    appUserId?: number
+  ): Promise<DiscoverCursorResult>
   create(data: Prisma.ClassScheduleCreateInput): Promise<ClassSchedule>
   createMany(data: Prisma.ClassScheduleCreateManyInput[]): Promise<number>
   update(id: number, data: Prisma.ClassScheduleUpdateInput): Promise<ClassSchedule>

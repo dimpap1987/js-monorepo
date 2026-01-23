@@ -6,8 +6,8 @@ import {
   ClassScheduleRepository,
   ClassScheduleWithBookingCounts,
   ClassScheduleWithClass,
-  DiscoverFilters,
-  DiscoverScheduleResult,
+  DiscoverCursorFilters,
+  DiscoverCursorResult,
 } from './class-schedule.repository'
 
 @Injectable()
@@ -300,10 +300,14 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
     }))
   }
 
-  async findPublicForDiscover(filters: DiscoverFilters): Promise<DiscoverScheduleResult[]> {
-    const { startDate, endDate, activity, timeOfDay, search } = filters
-
-    // Note: timeOfDay filter is applied in memory after fetching since it depends on local timezone
+  async findForDiscoverByCursor(
+    filters: DiscoverCursorFilters,
+    cursor: number | null,
+    limit: number,
+    appUserId?: number
+  ): Promise<DiscoverCursorResult> {
+    const { activity, timeOfDay, search } = filters
+    const now = new Date()
 
     // Build search filter
     const searchFilter: Prisma.ClassScheduleWhereInput = search
@@ -315,18 +319,71 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
         }
       : {}
 
+    // Build activity filter
+    const activityFilter = activity
+      ? { organizer: { activityLabel: { equals: activity, mode: 'insensitive' as const } } }
+      : {}
+
+    // Build cursor condition
+    // Use endTimeUtc >= now to include schedules that haven't ended yet (shows "today" schedules that started earlier)
+    let cursorCondition: Prisma.ClassScheduleWhereInput = { endTimeUtc: { gte: now } }
+    if (cursor !== null) {
+      // Fetch cursor schedule to get its startTimeUtc
+      const cursorSchedule = await this.txHost.tx.classSchedule.findUnique({
+        where: { id: cursor },
+        select: { startTimeUtc: true },
+      })
+
+      if (cursorSchedule) {
+        // Get schedules after cursor: (startTimeUtc > cursorTime) OR (startTimeUtc = cursorTime AND id > cursorId)
+        cursorCondition = {
+          AND: [
+            { endTimeUtc: { gte: now } },
+            {
+              OR: [
+                { startTimeUtc: { gt: cursorSchedule.startTimeUtc } },
+                {
+                  AND: [{ startTimeUtc: cursorSchedule.startTimeUtc }, { id: { gt: cursor } }],
+                },
+              ],
+            },
+          ],
+        }
+      }
+    }
+
+    // Build visibility filter: public classes OR private classes with accepted invitation
+    const visibilityFilter: Prisma.ClassScheduleWhereInput = appUserId
+      ? {
+          OR: [
+            // Public classes
+            { class: { isPrivate: false } },
+            // Private classes where user has accepted invitation
+            {
+              class: {
+                isPrivate: true,
+                invitations: {
+                  some: {
+                    invitedUserId: appUserId,
+                    status: InvitationStatus.ACCEPTED,
+                  },
+                },
+              },
+            },
+          ],
+        }
+      : { class: { isPrivate: false } }
+
+    // Fetch limit + 1 to determine hasMore
     const schedules = await this.txHost.tx.classSchedule.findMany({
       where: {
         class: {
           isActive: true,
-          isPrivate: false, // Exclude private classes from discover
-          ...(activity ? { organizer: { activityLabel: { equals: activity, mode: 'insensitive' } } } : {}),
-        },
-        startTimeUtc: {
-          gte: startDate,
-          lte: endDate,
+          ...activityFilter,
         },
         isCancelled: false,
+        ...cursorCondition,
+        ...visibilityFilter,
         ...searchFilter,
       },
       include: {
@@ -354,61 +411,18 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
           },
         },
       },
-      orderBy: { startTimeUtc: 'asc' },
-      take: 100, // Limit results
+      orderBy: [{ startTimeUtc: 'asc' }, { id: 'asc' }],
+      take: limit + 1,
     })
 
-    // Get booking counts
-    const scheduleIds = schedules.map((s) => s.id)
-    const bookingCounts = await this.txHost.tx.booking.groupBy({
-      by: ['classScheduleId', 'status'],
-      where: {
-        classScheduleId: { in: scheduleIds },
-        status: { in: [BookingStatus.BOOKED, BookingStatus.WAITLISTED] },
-      },
-      _count: true,
-    })
+    const hasMore = schedules.length > limit
+    const resultSchedules = hasMore ? schedules.slice(0, limit) : schedules
 
-    const countsMap = new Map<number, { booked: number; waitlisted: number }>()
-    for (const count of bookingCounts) {
-      const existing = countsMap.get(count.classScheduleId) || { booked: 0, waitlisted: 0 }
-      if (count.status === BookingStatus.BOOKED) {
-        existing.booked = count._count
-      } else if (count.status === BookingStatus.WAITLISTED) {
-        existing.waitlisted = count._count
-      }
-      countsMap.set(count.classScheduleId, existing)
-    }
-
-    // Map and filter by time of day if specified
-    let results = schedules.map((schedule) => {
-      const { organizer, ...classWithoutOrganizer } = schedule.class
-      return {
-        id: schedule.id,
-        classId: schedule.classId,
-        startTimeUtc: schedule.startTimeUtc,
-        endTimeUtc: schedule.endTimeUtc,
-        localTimezone: schedule.localTimezone,
-        recurrenceRule: schedule.recurrenceRule,
-        occurrenceDate: schedule.occurrenceDate,
-        parentScheduleId: schedule.parentScheduleId,
-        isCancelled: schedule.isCancelled,
-        cancelledAt: schedule.cancelledAt,
-        cancelReason: schedule.cancelReason,
-        createdAt: schedule.createdAt,
-        updatedAt: schedule.updatedAt,
-        class: classWithoutOrganizer,
-        _count: schedule._count,
-        bookingCounts: countsMap.get(schedule.id) || { booked: 0, waitlisted: 0 },
-        organizer,
-      }
-    })
-
-    // Filter by time of day in memory (based on local timezone)
+    // Filter by time of day in memory (based on UTC hours approximation)
+    let filteredSchedules = resultSchedules
     if (timeOfDay) {
-      results = results.filter((schedule) => {
+      filteredSchedules = resultSchedules.filter((schedule) => {
         const hour = schedule.startTimeUtc.getUTCHours()
-        // Approximate time of day in UTC (could be improved with timezone conversion)
         switch (timeOfDay) {
           case 'morning':
             return hour >= 5 && hour < 12
@@ -422,74 +436,8 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
       })
     }
 
-    return results
-  }
-
-  async findPrivateForDiscoverByUserId(userId: number, filters: DiscoverFilters): Promise<DiscoverScheduleResult[]> {
-    const { startDate, endDate, activity, timeOfDay, search } = filters
-
-    // Build search filter
-    const searchFilter: Prisma.ClassScheduleWhereInput = search
-      ? {
-          OR: [
-            { class: { title: { contains: search, mode: 'insensitive' } } },
-            { class: { organizer: { displayName: { contains: search, mode: 'insensitive' } } } },
-          ],
-        }
-      : {}
-
-    // Find private classes where user has accepted invitation
-    const schedules = await this.txHost.tx.classSchedule.findMany({
-      where: {
-        class: {
-          isActive: true,
-          isPrivate: true, // Only private classes
-          invitations: {
-            some: {
-              invitedUserId: userId,
-              status: InvitationStatus.ACCEPTED,
-            },
-          },
-          ...(activity ? { organizer: { activityLabel: { equals: activity, mode: 'insensitive' } } } : {}),
-        },
-        startTimeUtc: {
-          gte: startDate,
-          lte: endDate,
-        },
-        isCancelled: false,
-        ...searchFilter,
-      },
-      include: {
-        class: {
-          select: {
-            id: true,
-            title: true,
-            capacity: true,
-            waitlistLimit: true,
-            isCapacitySoft: true,
-            organizerId: true,
-            organizer: {
-              select: {
-                id: true,
-                displayName: true,
-                slug: true,
-                activityLabel: true,
-              },
-            },
-          },
-        },
-        _count: {
-          select: {
-            bookings: true,
-          },
-        },
-      },
-      orderBy: { startTimeUtc: 'asc' },
-      take: 100,
-    })
-
     // Get booking counts
-    const scheduleIds = schedules.map((s) => s.id)
+    const scheduleIds = filteredSchedules.map((s) => s.id)
     const bookingCounts = await this.txHost.tx.booking.groupBy({
       by: ['classScheduleId', 'status'],
       where: {
@@ -511,7 +459,7 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
     }
 
     // Map results
-    let results = schedules.map((schedule) => {
+    const results = filteredSchedules.map((schedule) => {
       const { organizer, ...classWithoutOrganizer } = schedule.class
       return {
         id: schedule.id,
@@ -534,24 +482,10 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
       }
     })
 
-    // Filter by time of day in memory
-    if (timeOfDay) {
-      results = results.filter((schedule) => {
-        const hour = schedule.startTimeUtc.getUTCHours()
-        switch (timeOfDay) {
-          case 'morning':
-            return hour >= 5 && hour < 12
-          case 'afternoon':
-            return hour >= 12 && hour < 17
-          case 'evening':
-            return hour >= 17 || hour < 5
-          default:
-            return true
-        }
-      })
+    return {
+      schedules: results,
+      hasMore,
     }
-
-    return results
   }
 
   async create(data: Prisma.ClassScheduleCreateInput): Promise<ClassSchedule> {

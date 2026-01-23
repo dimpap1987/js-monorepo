@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse } from '@js-monorepo/utils/http/queries'
 // eslint-disable-next-line import/extensions
@@ -20,8 +20,8 @@ import type {
   CreateSchedulePayload,
   UpdateSchedulePayload,
   CancelSchedulePayload,
-  DiscoverSchedule,
   DiscoverFilters,
+  DiscoverSchedulesResponse,
   Booking,
   BookingListResponse,
   MyBookingsResponse,
@@ -71,15 +71,7 @@ export const schedulingKeys = {
   bookingsForSchedule: (scheduleId: number) => [...schedulingKeys.all, 'bookings', 'schedule', scheduleId] as const,
   myBookings: () => [...schedulingKeys.all, 'bookings', 'my'] as const,
   discover: (filters: DiscoverFilters) =>
-    [
-      ...schedulingKeys.all,
-      'discover',
-      filters.startDate,
-      filters.endDate,
-      filters.activity,
-      filters.timeOfDay,
-      filters.search,
-    ] as const,
+    [...schedulingKeys.all, 'discover', filters.activity, filters.timeOfDay, filters.search] as const,
   invitations: () => [...schedulingKeys.all, 'invitations'] as const,
   invitationsPending: () => [...schedulingKeys.all, 'invitations', 'pending'] as const,
   invitationsSent: () => [...schedulingKeys.all, 'invitations', 'sent'] as const,
@@ -209,22 +201,26 @@ export function useOrganizerPublicSchedules(slug: string, startDate: string, end
   })
 }
 
-export function useDiscoverSchedules(filters: DiscoverFilters) {
-  const params = new URLSearchParams({
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-  })
-  if (filters.activity) params.append('activity', filters.activity)
-  if (filters.timeOfDay) params.append('timeOfDay', filters.timeOfDay)
-  if (filters.search) params.append('search', filters.search)
+const DEFAULT_DISCOVER_LIMIT = 15
 
-  return useQuery({
+export function useDiscoverSchedules(filters: DiscoverFilters, limit = DEFAULT_DISCOVER_LIMIT) {
+  return useInfiniteQuery({
     queryKey: schedulingKeys.discover(filters),
-    queryFn: async () => {
-      const response = await apiClient.get<DiscoverSchedule[]>(`/scheduling/schedules/discover?${params.toString()}`)
+    queryFn: async ({ pageParam }) => {
+      const params = new URLSearchParams()
+      params.append('limit', String(limit))
+      if (pageParam) params.append('cursor', String(pageParam))
+      if (filters.activity) params.append('activity', filters.activity)
+      if (filters.timeOfDay) params.append('timeOfDay', filters.timeOfDay)
+      if (filters.search) params.append('search', filters.search)
+
+      const response = await apiClient.get<DiscoverSchedulesResponse>(
+        `/scheduling/schedules/discover?${params.toString()}`
+      )
       return handleQueryResponse(response)
     },
-    enabled: !!filters.startDate && !!filters.endDate,
+    initialPageParam: null as number | null,
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
   })
 }
 

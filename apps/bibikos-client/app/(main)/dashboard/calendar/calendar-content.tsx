@@ -138,13 +138,6 @@ export function CalendarContent() {
     setVisibleClassIds(new Set())
   }, [])
 
-  // Redirect to onboarding if no organizer profile
-  useEffect(() => {
-    if (!isOrganizerLoading && !organizer) {
-      router.push('/onboarding')
-    }
-  }, [isOrganizerLoading, organizer, router])
-
   // Check URL params for actions
   useEffect(() => {
     const action = searchParams.get('action')

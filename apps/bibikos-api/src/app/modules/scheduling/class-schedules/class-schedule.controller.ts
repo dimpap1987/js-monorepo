@@ -31,28 +31,39 @@ export class ClassScheduleController {
   /**
    * GET /scheduling/schedules/discover
    * Public endpoint to discover classes across all organizers
+   * Uses cursor-based pagination for virtual scrolling
    * No auth required, but if logged in shows user's booking status and private classes with accepted invitations
    */
   @Get('discover')
   async discoverSchedules(
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
+    @Query('cursor') cursor?: string,
+    @Query('limit') limit?: string,
     @Query('activity') activity?: string,
     @Query('timeOfDay') timeOfDay?: 'morning' | 'afternoon' | 'evening',
     @Query('search') search?: string,
     @AppUserContext() appUserContext?: AppUserContextType
   ) {
-    if (!startDate || !endDate) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'START_AND_END_DATE_REQUIRED')
+    const parsedCursor = cursor ? parseInt(cursor, 10) : null
+    const parsedLimit = limit ? parseInt(limit, 10) : 15
+
+    // Validate cursor if provided
+    if (cursor && (isNaN(parsedCursor!) || parsedCursor! < 1)) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'INVALID_CURSOR')
     }
-    return this.scheduleService.discoverSchedules(
+
+    // Validate limit
+    if (isNaN(parsedLimit) || parsedLimit < 1) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'INVALID_LIMIT')
+    }
+
+    return this.scheduleService.discoverSchedulesByCursor(
       {
-        startDate,
-        endDate,
         activity,
         timeOfDay,
         search,
       },
+      parsedCursor,
+      parsedLimit,
       appUserContext?.participantId,
       appUserContext?.appUserId
     )

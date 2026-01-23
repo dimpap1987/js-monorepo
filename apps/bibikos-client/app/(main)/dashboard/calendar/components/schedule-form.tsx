@@ -10,6 +10,7 @@ import { CalendarDays, CalendarRange } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm, UseFormReturn } from 'react-hook-form'
+import { useDateLocale } from '../../../../../lib/locale/use-date-locale'
 import {
   Class,
   DAY_NUMBER_TO_RRULE,
@@ -127,6 +128,7 @@ function ScheduleFormContent({
   initialDateRange,
 }: ScheduleFormContentProps) {
   const tSchedules = useTranslations('scheduling.schedules')
+  const dateLocale = useDateLocale()
 
   const rangeInfo = useMemo((): RangeInfo | null => {
     if (!initialDateRange?.isRange) return null
@@ -173,10 +175,10 @@ function ScheduleFormContent({
       allDayCodes,
       suggestedRecurrence,
       suggestedCount,
-      startDateFormatted: format(start, 'MMM d'),
-      endDateFormatted: format(end, 'MMM d, yyyy'),
+      startDateFormatted: format(start, 'PPP', { locale: dateLocale }),
+      endDateFormatted: format(end, 'PPP', { locale: dateLocale }),
     }
-  }, [initialDateRange])
+  }, [initialDateRange, dateLocale])
 
   const initialValues = useMemo((): ScheduleFormData => {
     const startTime =

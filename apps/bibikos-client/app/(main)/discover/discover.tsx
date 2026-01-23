@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { format, addDays, startOfDay, endOfDay, isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns'
+import { toZonedTime } from 'date-fns-tz'
 import { useNotifications } from '@js-monorepo/notification'
+import { Loader2 } from 'lucide-react'
 import type { DiscoverSchedule, DiscoverFilters as DiscoverFiltersType } from '../../../lib/scheduling'
 import { useDiscoverSchedules, useCancelBooking } from '../../../lib/scheduling'
 import {
@@ -16,13 +18,7 @@ import {
 import { ContainerTemplate } from '@js-monorepo/templates'
 
 function getDefaultFilters(): DiscoverFiltersType {
-  const today = startOfDay(new Date())
-  const twoWeeksLater = endOfDay(addDays(today, 14))
-
-  return {
-    startDate: format(today, 'yyyy-MM-dd'),
-    endDate: format(twoWeeksLater, 'yyyy-MM-dd'),
-  }
+  return {}
 }
 
 interface GroupedSchedules {
@@ -41,13 +37,16 @@ function groupSchedulesByDate(schedules: DiscoverSchedule[]): GroupedSchedules {
   }
 
   for (const schedule of schedules) {
-    const date = parseISO(schedule.startTimeUtc)
+    // Parse UTC time and convert to schedule's local timezone for date grouping
+    const utcDate = parseISO(schedule.startTimeUtc)
+    const localDate = toZonedTime(utcDate, schedule.localTimezone)
+    console.log(localDate)
 
-    if (isToday(date)) {
+    if (isToday(localDate)) {
       groups.today.push(schedule)
-    } else if (isTomorrow(date)) {
+    } else if (isTomorrow(localDate)) {
       groups.tomorrow.push(schedule)
-    } else if (isThisWeek(date)) {
+    } else if (isThisWeek(localDate)) {
       groups.thisWeek.push(schedule)
     } else {
       groups.later.push(schedule)
@@ -65,15 +64,49 @@ export default function DiscoverComponent() {
   const [scheduleToCancel, setScheduleToCancel] = useState<DiscoverSchedule | null>(null)
 
   const { addNotification } = useNotifications()
-  const { data: schedules, isLoading, error, refetch } = useDiscoverSchedules(filters)
+  const { data, isLoading, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useDiscoverSchedules(filters)
   const cancelBookingMutation = useCancelBooking()
 
+  // Flatten all pages into a single array of schedules
+  const schedules = useMemo(() => {
+    if (!data?.pages) return []
+    return data.pages.flatMap((page) => page.content)
+  }, [data?.pages])
+
   const groupedSchedules = useMemo(() => {
-    if (!schedules) return null
+    if (schedules.length === 0) return null
     return groupSchedulesByDate(schedules)
   }, [schedules])
 
   const hasActiveFilters = Boolean(filters.activity || filters.timeOfDay || filters.search)
+
+  // Intersection observer for infinite scroll
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage()
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  )
+
+  useEffect(() => {
+    const element = loadMoreRef.current
+    if (!element) return
+
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: '100px',
+      threshold: 0,
+    })
+
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [handleObserver])
 
   const handleFilterChange = (newFilters: Partial<DiscoverFiltersType>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }))
@@ -114,7 +147,7 @@ export default function DiscoverComponent() {
     }
   }
 
-  const totalSchedules = schedules?.length || 0
+  const totalSchedules = schedules.length
 
   return (
     <ContainerTemplate>
@@ -143,6 +176,7 @@ export default function DiscoverComponent() {
           {/* Results count */}
           <p className="text-sm text-muted-foreground">
             {totalSchedules} {totalSchedules === 1 ? 'class' : 'classes'} found
+            {hasNextPage && ' (scroll for more)'}
           </p>
 
           {/* Grouped schedules */}
@@ -174,6 +208,16 @@ export default function DiscoverComponent() {
               />
             </>
           )}
+
+          {/* Load more trigger / Loading indicator */}
+          <div ref={loadMoreRef} className="flex justify-center py-4">
+            {isFetchingNextPage && (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm">Loading more classes...</span>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

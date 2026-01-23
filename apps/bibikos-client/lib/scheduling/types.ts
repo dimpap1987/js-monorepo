@@ -183,11 +183,16 @@ export interface DiscoverSchedule extends ClassSchedule {
 }
 
 export interface DiscoverFilters {
-  startDate: string
-  endDate: string
   activity?: string
   timeOfDay?: 'morning' | 'afternoon' | 'evening'
   search?: string
+}
+
+export interface DiscoverSchedulesResponse {
+  content: DiscoverSchedule[]
+  nextCursor: number | null
+  hasMore: boolean
+  limit: number
 }
 
 // Re-export shared booking types from @js-monorepo/types

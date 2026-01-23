@@ -14,9 +14,9 @@ export function DiscoverDateGroup({ title, schedules, onBook, onCancel }: Discov
   if (schedules.length === 0) return null
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h2 className="text-xl font-semibold text-foreground">{title}</h2>
-      <div className="space-y-3">
+      <div className="space-y-5">
         {schedules.map((schedule) => (
           <DiscoverScheduleCard key={schedule.id} schedule={schedule} onBook={onBook} onCancel={onCancel} />
         ))}

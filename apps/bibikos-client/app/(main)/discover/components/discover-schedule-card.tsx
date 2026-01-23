@@ -1,25 +1,26 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { Badge } from '@js-monorepo/components/ui/badge'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
-import { Badge } from '@js-monorepo/components/ui/badge'
-import { cn } from '@js-monorepo/ui/util'
-import { Clock, Users, ChevronRight, User, CheckCircle2, X } from 'lucide-react'
-import { format, parseISO } from 'date-fns'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { cn } from '@js-monorepo/ui/util'
+import type { Locale } from 'date-fns'
+import { format, isAfter, isBefore, parseISO } from 'date-fns'
+import { ArrowUpRight, CheckCircle2, ChevronRight, Clock, Radio, User, Users, X } from 'lucide-react'
+import { useDateLocale } from '../../../../lib/locale'
 import type { DiscoverSchedule } from '../../../../lib/scheduling'
 
 interface TimeBadgeProps {
   startTime: Date
-  endTime: Date
+  locale: Locale
 }
 
-function TimeBadge({ startTime, endTime }: TimeBadgeProps) {
+function TimeBadge({ startTime, locale }: TimeBadgeProps) {
   return (
-    <div className="flex-shrink-0 w-16 text-center">
+    <div className="flex-shrink-0 w-16 text-center self-center">
       <div className="bg-primary/10 rounded-lg p-2">
-        <div className="text-xs text-primary font-medium uppercase">{format(startTime, 'MMM')}</div>
+        <div className="text-xs text-primary font-medium uppercase">{format(startTime, 'MMM', { locale })}</div>
         <div className="text-2xl font-bold text-primary">{format(startTime, 'd')}</div>
       </div>
     </div>
@@ -76,6 +77,9 @@ interface ScheduleInfoProps {
   isFull: boolean
   hasWaitlist: boolean
   spotsLeft: number | null
+  isHappeningNow: boolean
+  locale: Locale
+  classId: number
 }
 
 function ScheduleInfo({
@@ -89,15 +93,35 @@ function ScheduleInfo({
   isFull,
   hasWaitlist,
   spotsLeft,
+  isHappeningNow,
+  locale,
+  classId,
 }: ScheduleInfoProps) {
   return (
-    <div className="space-y-1 min-w-0">
-      <h3 className="font-semibold text-lg truncate">{title}</h3>
+    <div className="space-y-2 min-w-0">
+      <div className="flex items-center gap-2 justify-between">
+        <DpNextNavLink
+          href={`/class/${classId}`}
+          className="group flex items-center gap-3 rounded-md py-1 px-2 hover:bg-muted cursor-pointer"
+        >
+          <h3 className="truncate group-hover:underline">{title}</h3>
+          <ArrowUpRight className="w-4 h-4 bg-muted" />
+        </DpNextNavLink>
+        {isHappeningNow && (
+          <Badge
+            variant="outline"
+            className="border-status-success/30 bg-status-success/10 text-status-success gap-1 animate-pulse"
+          >
+            <Radio className="w-5 h-5" />
+            Live
+          </Badge>
+        )}
+      </div>
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <Clock className="w-4 h-4 flex-shrink-0" />
           <span>
-            {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
+            {format(startTime, 'p', { locale })} - {format(endTime, 'p', { locale })}
           </span>
         </div>
         {organizerName && (
@@ -219,7 +243,7 @@ interface DiscoverScheduleCardProps {
 }
 
 export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverScheduleCardProps) {
-  const router = useRouter()
+  const dateLocale = useDateLocale()
   const startTime = parseISO(schedule.startTimeUtc)
   const endTime = parseISO(schedule.endTimeUtc)
   const classInfo = schedule.class
@@ -231,45 +255,36 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
   const hasWaitlist = Boolean(classInfo?.waitlistLimit && classInfo.waitlistLimit > 0)
   const spotsLeft = capacity !== null ? capacity - bookedCount : null
 
+  // Check if class is happening now
+  const now = new Date()
+  const isHappeningNow = isAfter(now, startTime) && isBefore(now, endTime)
   // Check user's booking status
   const isBooked = schedule.myBooking?.status === 'BOOKED'
   const isWaitlisted = schedule.myBooking?.status === 'WAITLISTED'
 
-  const classId = schedule.classId
-  const hasClassLink = !!classId
-
-  const handleCardClick = () => {
-    if (hasClassLink) {
-      router.push(`/class/${classId}`)
-    }
-  }
-
   return (
-    <Card
-      className={cn(
-        'border-border transition-all',
-        hasClassLink && 'cursor-pointer hover:shadow-md hover:border-primary/40 hover:bg-accent/80'
-      )}
-      onClick={hasClassLink ? handleCardClick : undefined}
-    >
-      <CardContent className="p-4 sm:p-6">
+    <Card className={cn('border-border transition-all hover:shadow-md hover:border-primary/40 hover:bg-accent/80')}>
+      <CardContent className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-4 min-w-0">
-            <TimeBadge startTime={startTime} endTime={endTime} />
+            <TimeBadge startTime={startTime} locale={dateLocale} />
             <ScheduleInfo
+              classId={schedule.classId}
               title={classInfo?.title || 'Class'}
               startTime={startTime}
               endTime={endTime}
-              organizerName={schedule.organizer?.displayName}
-              organizerSlug={schedule.organizer?.slug}
+              organizerName={schedule.organizer.displayName}
+              organizerSlug={schedule.organizer.slug}
               bookedCount={bookedCount}
               capacity={capacity}
               isFull={isFull}
               hasWaitlist={hasWaitlist}
               spotsLeft={spotsLeft}
+              isHappeningNow={isHappeningNow}
+              locale={dateLocale}
             />
           </div>
-          <div className="w-full sm:w-auto">
+          <div className="w-full sm:w-auto px-5 mt-3">
             <BookButton
               isFull={isFull}
               hasWaitlist={hasWaitlist}
