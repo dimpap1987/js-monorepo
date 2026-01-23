@@ -40,6 +40,7 @@ export interface BookingBase<TDate = Date | string> {
     id: number
     startTimeUtc: TDate
     endTimeUtc: TDate
+    localTimezone: string
     class: {
       id: number
       title: string

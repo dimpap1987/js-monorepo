@@ -4,6 +4,7 @@ import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { useNotifications } from '@js-monorepo/notification'
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { CalendarCheck, Search } from 'lucide-react'
 import { useCallback } from 'react'
 import { useBibikosSession } from '../../../lib/auth'
@@ -37,7 +38,7 @@ export default function MyBookingsComponent() {
   // Show message if user doesn't have participant profile
   if (!hasParticipantProfile && !isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <ContainerTemplate>
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
             <CalendarCheck className="w-8 h-8 text-muted-foreground" />
@@ -53,12 +54,12 @@ export default function MyBookingsComponent() {
             </Button>
           </DpNextNavLink>
         </div>
-      </div>
+      </ContainerTemplate>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <ContainerTemplate>
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
@@ -98,6 +99,6 @@ export default function MyBookingsComponent() {
       ) : (
         <BookingsGroupedView bookings={data} />
       )}
-    </div>
+    </ContainerTemplate>
   )
 }

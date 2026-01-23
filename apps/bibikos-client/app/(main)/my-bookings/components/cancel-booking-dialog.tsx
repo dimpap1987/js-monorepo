@@ -11,10 +11,10 @@ import {
   DialogTitle,
 } from '@js-monorepo/components/ui/dialog'
 import { Textarea } from '@js-monorepo/components/ui/textarea'
-import { format, parseISO } from 'date-fns'
 import { AlertTriangle, Calendar, Loader2 } from 'lucide-react'
 import type { Booking } from '../../../../lib/scheduling'
 import { useCancelBooking } from '../../../../lib/scheduling'
+import { useScheduleTime, useDateTimeContext, formatDateTime } from '../../../../lib/datetime'
 
 interface CancelBookingDialogProps {
   booking: Booking
@@ -27,9 +27,12 @@ export function CancelBookingDialog({ booking, open, onOpenChange }: CancelBooki
   const cancelBooking = useCancelBooking()
 
   const schedule = booking.classSchedule
+  const { times } = useScheduleTime(schedule)
+  const { dateLocale } = useDateTimeContext()
+
   if (!schedule) return null
 
-  const startTime = parseISO(schedule.startTimeUtc)
+  const dateTimeFormatted = formatDateTime(times.start.date, dateLocale)
 
   const handleCancel = async () => {
     try {
@@ -62,7 +65,7 @@ export function CancelBookingDialog({ booking, open, onOpenChange }: CancelBooki
             <p className="font-medium">{schedule.class?.title}</p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="w-4 h-4" />
-              <span>{format(startTime, 'EEEE, MMMM d, yyyy • h:mm a')}</span>
+              <span>{dateTimeFormatted}</span>
             </div>
           </div>
 

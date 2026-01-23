@@ -5,12 +5,19 @@ import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardHeader } from '@js-monorepo/components/ui/card'
 import { Separator } from '@js-monorepo/components/ui/separator'
 import { cn } from '@js-monorepo/ui/util'
-import { format, parseISO } from 'date-fns'
+import { parseISO } from 'date-fns'
 import { Calendar, Clock, Info, MessageSquare, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import type { Booking, BookingStatus } from '../../../../lib/scheduling'
 import { BOOKING_STATUS, BOOKING_STATUS_COLORS } from '../../../../lib/scheduling'
+import {
+  useScheduleTime,
+  useDateTimeContext,
+  formatDateMediumWithDay,
+  DATE_FORMATS,
+  formatDate,
+} from '../../../../lib/datetime'
 import { CancelBookingDialog } from './cancel-booking-dialog'
 
 interface BookingCardEnhancedProps {
@@ -46,17 +53,19 @@ export function BookingCardEnhanced({
   const router = useRouter()
 
   const schedule = booking.classSchedule
+  const { times, timeRange, dateParts } = useScheduleTime(schedule)
+  const { dateLocale } = useDateTimeContext()
+
   if (!schedule) return null
 
-  const startTime = parseISO(schedule.startTimeUtc)
-  const endTime = parseISO(schedule.endTimeUtc)
   const now = new Date()
-  const isUpcoming = endTime >= now // Match backend logic: upcoming if class hasn't ended
+  const isUpcoming = times.end.date >= now // Match backend logic: upcoming if class hasn't ended
   const canCancel = !isPastBooking && !isCancelledSection && booking.status === BOOKING_STATUS.BOOKED && isUpcoming
   const isInactive = isPastBooking || isCancelledSection
   const classId = schedule.class?.id
   const hasClassLink = !!classId
   const hasNotes = !!booking.organizerNotes
+  const dateWithDayFull = formatDateMediumWithDay(times.start.date, dateLocale)
 
   const colors = BOOKING_STATUS_COLORS[booking.status]
   const statusLabel = getStatusLabel(booking.status)
@@ -94,13 +103,13 @@ export function BookingCardEnhanced({
                     isInactive ? 'text-muted-foreground' : 'text-primary'
                   )}
                 >
-                  {format(startTime, 'MMM')}
+                  {dateParts.month}
                 </div>
                 <div className={cn('text-2xl font-bold', isInactive ? 'text-muted-foreground' : 'text-primary')}>
-                  {format(startTime, 'd')}
+                  {dateParts.day}
                 </div>
                 <div className={cn('text-xs mt-1', isInactive ? 'text-muted-foreground' : 'text-primary/70')}>
-                  {format(startTime, 'EEE')}
+                  {dateParts.dayOfWeek}
                 </div>
               </div>
             </div>
@@ -134,13 +143,11 @@ export function BookingCardEnhanced({
               <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                 <div className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />
-                  <span>{format(startTime, 'EEEE, MMM d, yyyy')}</span>
+                  <span>{dateWithDayFull}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4" />
-                  <span>
-                    {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
-                  </span>
+                  <span>{timeRange}</span>
                 </div>
               </div>
 
@@ -192,7 +199,7 @@ export function BookingCardEnhanced({
           <Separator className="mb-3" />
           <div className="flex items-center justify-between">
             <div className="text-xs text-muted-foreground">
-              Booked on {format(parseISO(booking.bookedAt), 'MMM d, yyyy')}
+              Booked on {formatDate(parseISO(booking.bookedAt), DATE_FORMATS.DATE_MEDIUM, dateLocale)}
             </div>
             {canCancel && (
               <Button

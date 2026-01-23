@@ -9,9 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@js-monorepo/components/ui/dialog'
-import { format, parseISO } from 'date-fns'
 import { Calendar, Clock, AlertTriangle, Loader2 } from 'lucide-react'
 import type { DiscoverSchedule } from '../../../../lib/scheduling'
+import { useScheduleTime } from '../../../../lib/datetime'
 
 interface CancelBookingDialogProps {
   schedule: DiscoverSchedule | null
@@ -22,11 +22,10 @@ interface CancelBookingDialogProps {
 }
 
 export function CancelBookingDialog({ schedule, open, onOpenChange, onConfirm, isLoading }: CancelBookingDialogProps) {
-  if (!schedule) return null
+  const { fullDate, timeRange } = useScheduleTime(schedule)
+  const isWaitlisted = schedule?.myBooking?.status === 'WAITLISTED'
 
-  const startTime = parseISO(schedule.startTimeUtc)
-  const endTime = parseISO(schedule.endTimeUtc)
-  const isWaitlisted = schedule.myBooking?.status === 'WAITLISTED'
+  if (!schedule) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,13 +44,11 @@ export function CancelBookingDialog({ schedule, open, onOpenChange, onConfirm, i
         <div className="py-4 space-y-3">
           <div className="flex items-center gap-3 text-sm">
             <Calendar className="w-4 h-4 text-muted-foreground" />
-            <span>{format(startTime, 'EEEE, MMMM d, yyyy')}</span>
+            <span>{fullDate}</span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <Clock className="w-4 h-4 text-muted-foreground" />
-            <span>
-              {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
-            </span>
+            <span>{timeRange}</span>
           </div>
           <div className="text-sm font-medium">{schedule.class?.title}</div>
         </div>

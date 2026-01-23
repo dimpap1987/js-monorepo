@@ -1,9 +1,10 @@
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
+import { ContainerTemplate } from '@js-monorepo/templates'
 
 export function CoachProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background-secondary/30">
+    <ContainerTemplate>
       <div className="relative bg-primary/5 border-b border-border/50">
         <div className="container mx-auto px-4 py-12 sm:py-16">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
@@ -17,7 +18,7 @@ export function CoachProfileSkeleton() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <ContainerTemplate>
         <Skeleton className="h-8 w-48 mb-6" />
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -36,7 +37,7 @@ export function CoachProfileSkeleton() {
             </Card>
           ))}
         </div>
-      </div>
-    </div>
+      </ContainerTemplate>
+    </ContainerTemplate>
   )
 }

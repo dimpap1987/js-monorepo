@@ -1,16 +1,18 @@
+'use client'
+
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Clock, Users, ChevronRight } from 'lucide-react'
-import { format, parseISO } from 'date-fns'
 import type { ClassViewSchedule } from '../../../../../lib/scheduling'
+import { useScheduleTime, type ScheduleDateParts } from '../../../../../lib/datetime'
 
-function DateBadge({ date }: { date: Date }) {
+function DateBadge({ dateParts }: { dateParts: ScheduleDateParts }) {
   return (
     <div className="flex-shrink-0 w-16 text-center">
       <div className="bg-primary/10 rounded-lg p-2">
-        <div className="text-xs text-primary font-medium uppercase">{format(date, 'MMM')}</div>
-        <div className="text-2xl font-bold text-primary">{format(date, 'd')}</div>
+        <div className="text-xs text-primary font-medium uppercase">{dateParts.month}</div>
+        <div className="text-2xl font-bold text-primary">{dateParts.day}</div>
       </div>
     </div>
   )
@@ -48,23 +50,21 @@ function CapacityBadge({ bookedCount, capacity, isFull, spotsLeft }: CapacityBad
 }
 
 interface ScheduleInfoProps {
-  startTime: Date
-  endTime: Date
+  fullDate: string
+  timeRange: string
   bookedCount: number
   capacity: number | null
   isFull: boolean
   spotsLeft: number | null
 }
 
-function ScheduleInfo({ startTime, endTime, bookedCount, capacity, isFull, spotsLeft }: ScheduleInfoProps) {
+function ScheduleInfo({ fullDate, timeRange, bookedCount, capacity, isFull, spotsLeft }: ScheduleInfoProps) {
   return (
     <div className="space-y-1">
-      <h3 className="font-semibold text-lg">{format(startTime, 'EEEE, MMMM d, yyyy')}</h3>
+      <h3 className="font-semibold text-lg">{fullDate}</h3>
       <div className="flex items-center gap-1.5 text-sm text-foreground-muted">
         <Clock className="w-4 h-4" />
-        <span>
-          {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
-        </span>
+        <span>{timeRange}</span>
       </div>
       <CapacityBadge bookedCount={bookedCount} capacity={capacity} isFull={isFull} spotsLeft={spotsLeft} />
     </div>
@@ -94,8 +94,7 @@ interface ClassScheduleCardProps {
 }
 
 export function ClassScheduleCard({ schedule, capacity, onBook }: ClassScheduleCardProps) {
-  const startTime = parseISO(schedule.startTimeUtc)
-  const endTime = parseISO(schedule.endTimeUtc)
+  const { timeRange, fullDate, dateParts } = useScheduleTime(schedule)
 
   const bookedCount = schedule.bookingCounts?.booked || 0
   const isFull = capacity ? bookedCount >= capacity : false
@@ -106,10 +105,10 @@ export function ClassScheduleCard({ schedule, capacity, onBook }: ClassScheduleC
       <CardContent className="p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-4">
-            <DateBadge date={startTime} />
+            <DateBadge dateParts={dateParts} />
             <ScheduleInfo
-              startTime={startTime}
-              endTime={endTime}
+              fullDate={fullDate}
+              timeRange={timeRange}
               bookedCount={bookedCount}
               capacity={capacity}
               isFull={isFull}

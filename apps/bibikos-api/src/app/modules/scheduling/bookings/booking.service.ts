@@ -525,6 +525,7 @@ export class BookingService {
             id: booking.classSchedule.id,
             startTimeUtc: booking.classSchedule.startTimeUtc,
             endTimeUtc: booking.classSchedule.endTimeUtc,
+            localTimezone: booking.classSchedule.localTimezone,
             class: {
               id: booking.classSchedule.class.id,
               title: booking.classSchedule.class.title,
@@ -552,6 +553,7 @@ export class BookingService {
         id: booking.classSchedule.id,
         startTimeUtc: booking.classSchedule.startTimeUtc,
         endTimeUtc: booking.classSchedule.endTimeUtc,
+        localTimezone: booking.classSchedule.localTimezone,
         class: {
           id: booking.classSchedule.class.id,
           title: booking.classSchedule.class.title,

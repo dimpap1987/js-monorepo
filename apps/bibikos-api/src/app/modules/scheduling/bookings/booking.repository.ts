@@ -20,6 +20,7 @@ export interface BookingWithParticipant extends Booking {
     id: number
     startTimeUtc: Date
     endTimeUtc: Date
+    localTimezone: string
     class: {
       id: number
       title: string
@@ -32,6 +33,7 @@ export interface BookingWithSchedule extends Booking {
     id: number
     startTimeUtc: Date
     endTimeUtc: Date
+    localTimezone: string
     class: {
       id: number
       title: string

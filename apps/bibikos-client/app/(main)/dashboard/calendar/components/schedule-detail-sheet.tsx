@@ -7,10 +7,11 @@ import { Separator } from '@js-monorepo/components/ui/separator'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@js-monorepo/components/ui/sheet'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { useNotifications } from '@js-monorepo/notification'
-import { differenceInMinutes, format, isPast, parseISO } from 'date-fns'
+import { differenceInMinutes, isPast } from 'date-fns'
 import { AlertTriangle, CalendarX, CheckCircle2, Clock, MapPin, Timer, Trash2, Users, Video } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Booking, Class, ClassSchedule, useBookingsForSchedule, useMarkAttendance } from '../../../../../lib/scheduling'
+import { useScheduleTime } from '../../../../../lib/datetime'
 import { getClassColor } from '../hooks/use-calendar-events'
 import { BookingItem } from './booking-item'
 
@@ -30,6 +31,9 @@ export function ScheduleDetailSheet({ schedule, classInfo, location, onCancel, o
   const { data: bookingsData, isLoading: isBookingsLoading } = useBookingsForSchedule(schedule?.id ?? 0)
   const markAttendanceMutation = useMarkAttendance()
 
+  // Get schedule display times using the datetime hook
+  const { times, timeRange, fullDate } = useScheduleTime(schedule)
+
   if (!schedule) return null
 
   const handleMarkAttendance = async (bookingIds: number[], status: 'ATTENDED' | 'NO_SHOW') => {
@@ -47,11 +51,9 @@ export function ScheduleDetailSheet({ schedule, classInfo, location, onCancel, o
     }
   }
 
-  const startTime = parseISO(schedule.startTimeUtc)
-  const endTime = parseISO(schedule.endTimeUtc)
-  const duration = differenceInMinutes(endTime, startTime)
-  const isClassPast = isPast(endTime)
-  const isClassInProgress = isPast(startTime) && !isClassPast
+  const duration = differenceInMinutes(times.end.date, times.start.date)
+  const isClassPast = isPast(times.end.date)
+  const isClassInProgress = isPast(times.start.date) && !isClassPast
 
   // Calculate capacity utilization
   const booked = schedule.bookingCounts?.booked || 0
@@ -85,7 +87,7 @@ export function ScheduleDetailSheet({ schedule, classInfo, location, onCancel, o
                   )}
                   {classInfo?.title || 'Class'}
                 </SheetTitle>
-                <SheetDescription className="text-base">{format(startTime, 'EEEE, MMMM d, yyyy')}</SheetDescription>
+                <SheetDescription className="text-base">{fullDate}</SheetDescription>
               </div>
 
               <div className="flex flex-col items-end gap-1">
@@ -119,9 +121,7 @@ export function ScheduleDetailSheet({ schedule, classInfo, location, onCancel, o
                   <Clock className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <div className="font-semibold">
-                    {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
-                  </div>
+                  <div className="font-semibold">{timeRange}</div>
                   <div className="text-xs text-foreground-muted">Local time</div>
                 </div>
               </div>

@@ -116,6 +116,58 @@ Each application now manages its own environment variables using a local `.env` 
 - Place reusable code in appropriate `libs/` directory
 - Follow existing patterns in the codebase (Repository pattern, DI, etc.)
 
+### DateTime Handling (bibikos-client)
+
+**Key principle**: Always display times in the schedule's local timezone (where the class happens).
+
+**Location**: `apps/bibikos-client/lib/datetime/`
+
+**Schedule display** (all pages - Discover, My Bookings, Coach, Class):
+
+```typescript
+import { useScheduleTime } from '@/lib/datetime'
+
+function ScheduleCard({ schedule }) {
+  const { times, timeRange, dateParts, fullDate } = useScheduleTime(schedule)
+  // times.start.date = Date in schedule's timezone
+  // timeRange = "10:00 AM - 11:00 AM"
+  // dateParts = { month: "Jan", day: "15", dayOfWeek: "Mon" }
+  // fullDate = "Monday, January 15, 2024"
+}
+```
+
+**Getting locale context** (for direct formatting):
+
+```typescript
+import { useDateTimeContext, formatDate, DATE_FORMATS } from '@/lib/datetime'
+
+const { dateLocale, userTimezone, appLocale } = useDateTimeContext()
+formatDate(myDate, DATE_FORMATS.DATE_FULL, dateLocale)
+```
+
+**Converting UTC to schedule timezone** (for custom logic):
+
+```typescript
+import { toScheduleDisplayTimes } from '@/lib/datetime'
+
+const { start, end } = toScheduleDisplayTimes(schedule)
+// start.date and end.date are Date objects in schedule's timezone
+```
+
+**Date grouping** (for schedule lists):
+
+```typescript
+import { getDateGroup, toScheduleDisplayTimes } from '@/lib/datetime'
+
+const { start } = toScheduleDisplayTimes(schedule)
+const group = getDateGroup(start.date) // 'today' | 'tomorrow' | 'thisWeek' | 'later'
+```
+
+**Never use**:
+
+- Raw `format()` from date-fns without locale
+- `parseISO()` without timezone conversion for display
+
 #### Architecture & Design
 
 - **SOLID Principles**: Follow Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion

@@ -6,9 +6,15 @@ import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { cn } from '@js-monorepo/ui/util'
-import { format, parseISO, isPast } from 'date-fns'
-import { Calendar, Clock, X, ExternalLink } from 'lucide-react'
+import { isPast } from 'date-fns'
+import { Calendar, Clock, X } from 'lucide-react'
 import type { Booking, BookingStatus } from '../../../../lib/scheduling'
+import {
+  useScheduleTime,
+  useDateTimeContext,
+  formatDateWithDay,
+  type ScheduleDateParts,
+} from '../../../../lib/datetime'
 import { CancelBookingDialog } from './cancel-booking-dialog'
 
 interface StatusConfig {
@@ -46,19 +52,19 @@ const STATUS_CONFIG: Record<BookingStatus, StatusConfig> = {
 }
 
 interface DateBadgeProps {
-  date: Date
+  dateParts: ScheduleDateParts
   isPastBooking: boolean
 }
 
-function DateBadge({ date, isPastBooking }: DateBadgeProps) {
+function DateBadge({ dateParts, isPastBooking }: DateBadgeProps) {
   return (
     <div className="flex-shrink-0 w-14 text-center">
       <div className={`rounded-lg p-2 ${isPastBooking ? 'bg-muted' : 'bg-primary/10'}`}>
         <div className={`text-xs font-medium uppercase ${isPastBooking ? 'text-muted-foreground' : 'text-primary'}`}>
-          {format(date, 'MMM')}
+          {dateParts.month}
         </div>
         <div className={`text-xl font-bold ${isPastBooking ? 'text-muted-foreground' : 'text-primary'}`}>
-          {format(date, 'd')}
+          {dateParts.day}
         </div>
       </div>
     </div>
@@ -67,8 +73,8 @@ function DateBadge({ date, isPastBooking }: DateBadgeProps) {
 
 interface BookingInfoProps {
   title: string
-  startTime: Date
-  endTime: Date
+  dateWithDay: string
+  timeRange: string
   status: BookingStatus
   waitlistPosition: number | null
   cancelledByOrganizer?: boolean
@@ -77,8 +83,8 @@ interface BookingInfoProps {
 
 function BookingInfo({
   title,
-  startTime,
-  endTime,
+  dateWithDay,
+  timeRange,
   status,
   waitlistPosition,
   cancelledByOrganizer,
@@ -103,13 +109,11 @@ function BookingInfo({
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <Calendar className="w-4 h-4" />
-          <span>{format(startTime, 'EEEE, MMM d')}</span>
+          <span>{dateWithDay}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Clock className="w-4 h-4" />
-          <span>
-            {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
-          </span>
+          <span>{timeRange}</span>
         </div>
       </div>
       {status === 'CANCELLED' && cancelReason && (
@@ -130,14 +134,18 @@ export function BookingCard({ booking, isPastBooking = false, isCancelledSection
   const router = useRouter()
 
   const schedule = booking.classSchedule
+
+  // Use the schedule time hook - must be called before any early returns
+  const { times, timeRange, dateParts } = useScheduleTime(schedule)
+  const { dateLocale } = useDateTimeContext()
+
   if (!schedule) return null
 
-  const startTime = parseISO(schedule.startTimeUtc)
-  const endTime = parseISO(schedule.endTimeUtc)
-  const canCancel = !isPastBooking && !isCancelledSection && booking.status !== 'CANCELLED' && !isPast(startTime)
+  const canCancel = !isPastBooking && !isCancelledSection && booking.status !== 'CANCELLED' && !isPast(times.start.date)
   const isInactive = isPastBooking || isCancelledSection
   const classId = schedule.class?.id
   const hasClassLink = !!classId
+  const dateWithDay = formatDateWithDay(times.start.date, dateLocale)
 
   const handleCardClick = () => {
     if (hasClassLink) {
@@ -164,11 +172,11 @@ export function BookingCard({ booking, isPastBooking = false, isCancelledSection
         <CardContent className="p-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0 flex-1 group">
-              <DateBadge date={startTime} isPastBooking={isInactive} />
+              <DateBadge dateParts={dateParts} isPastBooking={isInactive} />
               <BookingInfo
                 title={schedule.class?.title || 'Class'}
-                startTime={startTime}
-                endTime={endTime}
+                dateWithDay={dateWithDay}
+                timeRange={timeRange}
                 status={booking.status}
                 waitlistPosition={booking.waitlistPosition}
                 cancelledByOrganizer={booking.cancelledByOrganizer}

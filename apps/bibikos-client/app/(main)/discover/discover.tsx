@@ -1,12 +1,11 @@
 'use client'
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { isToday, isTomorrow, isThisWeek, parseISO } from 'date-fns'
-import { toZonedTime } from 'date-fns-tz'
 import { useNotifications } from '@js-monorepo/notification'
 import { Loader2 } from 'lucide-react'
 import type { DiscoverSchedule, DiscoverFilters as DiscoverFiltersType } from '../../../lib/scheduling'
 import { useDiscoverSchedules, useCancelBooking } from '../../../lib/scheduling'
+import { toScheduleDisplayTimes, getDateGroup, type DateGroup } from '../../../lib/datetime'
 import {
   DiscoverFilters,
   DiscoverDateGroup,
@@ -37,19 +36,10 @@ function groupSchedulesByDate(schedules: DiscoverSchedule[]): GroupedSchedules {
   }
 
   for (const schedule of schedules) {
-    // Parse UTC time and convert to schedule's local timezone for date grouping
-    const utcDate = parseISO(schedule.startTimeUtc)
-    const localDate = toZonedTime(utcDate, schedule.localTimezone)
-
-    if (isToday(localDate)) {
-      groups.today.push(schedule)
-    } else if (isTomorrow(localDate)) {
-      groups.tomorrow.push(schedule)
-    } else if (isThisWeek(localDate)) {
-      groups.thisWeek.push(schedule)
-    } else {
-      groups.later.push(schedule)
-    }
+    // Convert UTC time to schedule's local timezone for date grouping
+    const { start } = toScheduleDisplayTimes(schedule)
+    const group: DateGroup = getDateGroup(start.date)
+    groups[group].push(schedule)
   }
 
   return groups

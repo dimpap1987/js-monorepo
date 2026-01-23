@@ -5,23 +5,23 @@ import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
-import type { Locale } from 'date-fns'
-import { format, isAfter, isBefore, parseISO } from 'date-fns'
+import { isAfter, isBefore } from 'date-fns'
 import { ArrowUpRight, CheckCircle2, ChevronRight, Clock, Radio, User, Users, X } from 'lucide-react'
-import { useDateLocale } from '../../../../lib/locale'
 import type { DiscoverSchedule } from '../../../../lib/scheduling'
+import { useScheduleTime, type ScheduleDateParts } from '../../../../lib/datetime'
 
 interface TimeBadgeProps {
-  startTime: Date
-  locale: Locale
+  dateParts: ScheduleDateParts
+  className?: string
 }
 
-function TimeBadge({ startTime, locale }: TimeBadgeProps) {
+function TimeBadge({ dateParts, className }: TimeBadgeProps) {
   return (
-    <div className="flex-shrink-0 w-16 text-center self-center">
-      <div className="bg-primary/10 rounded-lg p-2">
-        <div className="text-xs text-primary font-medium uppercase">{format(startTime, 'MMM', { locale })}</div>
-        <div className="text-2xl font-bold text-primary">{format(startTime, 'd')}</div>
+    <div className={cn('flex-shrink-0 w-16 text-center self-center', className)}>
+      <div className="bg-primary/10 rounded-lg p-2 text-primary">
+        <div className="text-xs font-medium uppercase">{dateParts.month}</div>
+        <div className="text-2xl font-bold">{dateParts.day}</div>
+        <div className="text-xs uppercase">{dateParts.dayOfWeek}</div>
       </div>
     </div>
   )
@@ -68,8 +68,7 @@ function CapacityInfo({ bookedCount, capacity, isFull, hasWaitlist, spotsLeft }:
 
 interface ScheduleInfoProps {
   title: string
-  startTime: Date
-  endTime: Date
+  timeRange: string
   organizerName: string | null
   organizerSlug: string | null
   bookedCount: number
@@ -78,14 +77,12 @@ interface ScheduleInfoProps {
   hasWaitlist: boolean
   spotsLeft: number | null
   isHappeningNow: boolean
-  locale: Locale
   classId: number
 }
 
 function ScheduleInfo({
   title,
-  startTime,
-  endTime,
+  timeRange,
   organizerName,
   organizerSlug,
   bookedCount,
@@ -94,7 +91,6 @@ function ScheduleInfo({
   hasWaitlist,
   spotsLeft,
   isHappeningNow,
-  locale,
   classId,
 }: ScheduleInfoProps) {
   return (
@@ -120,9 +116,7 @@ function ScheduleInfo({
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <Clock className="w-4 h-4 flex-shrink-0" />
-          <span>
-            {format(startTime, 'p', { locale })} - {format(endTime, 'p', { locale })}
-          </span>
+          <span>{timeRange}</span>
         </div>
         {organizerName && (
           <div className="flex items-center gap-1.5 text-sm">
@@ -243,9 +237,7 @@ interface DiscoverScheduleCardProps {
 }
 
 export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverScheduleCardProps) {
-  const dateLocale = useDateLocale()
-  const startTime = parseISO(schedule.startTimeUtc)
-  const endTime = parseISO(schedule.endTimeUtc)
+  const { times, timeRange, dateParts } = useScheduleTime(schedule)
   const classInfo = schedule.class
   const bookingCounts = schedule.bookingCounts
 
@@ -255,9 +247,9 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
   const hasWaitlist = Boolean(classInfo?.waitlistLimit && classInfo.waitlistLimit > 0)
   const spotsLeft = capacity !== null ? capacity - bookedCount : null
 
-  // Check if class is happening now
+  // Check if class is happening now (using converted times)
   const now = new Date()
-  const isHappeningNow = isAfter(now, startTime) && isBefore(now, endTime)
+  const isHappeningNow = isAfter(now, times.start.date) && isBefore(now, times.end.date)
   // Check user's booking status
   const isBooked = schedule.myBooking?.status === 'BOOKED'
   const isWaitlisted = schedule.myBooking?.status === 'WAITLISTED'
@@ -267,12 +259,11 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
       <CardContent className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-4 min-w-0">
-            <TimeBadge startTime={startTime} locale={dateLocale} />
+            <TimeBadge dateParts={dateParts} />
             <ScheduleInfo
               classId={schedule.classId}
               title={classInfo?.title || 'Class'}
-              startTime={startTime}
-              endTime={endTime}
+              timeRange={timeRange}
               organizerName={schedule.organizer.displayName}
               organizerSlug={schedule.organizer.slug}
               bookedCount={bookedCount}
@@ -281,7 +272,6 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
               hasWaitlist={hasWaitlist}
               spotsLeft={spotsLeft}
               isHappeningNow={isHappeningNow}
-              locale={dateLocale}
             />
           </div>
           <div className="w-full sm:w-auto px-5 mt-3">

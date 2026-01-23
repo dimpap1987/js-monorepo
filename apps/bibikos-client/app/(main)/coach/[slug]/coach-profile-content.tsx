@@ -14,17 +14,18 @@ import {
   ClassSchedule,
 } from '../../../../lib/scheduling'
 import { CoachProfileSkeleton, CoachProfileHero, CoachSchedulesList, BookingConfirmationDialog } from './components'
+import { ContainerTemplate } from '@js-monorepo/templates'
 
 function CoachNotFound({ onGoHome }: { onGoHome: () => void }) {
   return (
-    <div className="container mx-auto px-4 py-16 text-center">
+    <ContainerTemplate>
       <AlertCircle className="w-16 h-16 mx-auto mb-4 text-foreground-muted opacity-50" />
       <h1 className="text-2xl font-bold mb-2">Coach not found</h1>
       <p className="text-foreground-muted mb-6">
         The coach profile you&apos;re looking for doesn&apos;t exist or has been removed.
       </p>
       <Button onClick={onGoHome}>Go Home</Button>
-    </div>
+    </ContainerTemplate>
   )
 }
 
@@ -100,12 +101,12 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background-secondary/30">
+    <ContainerTemplate className="space-y-5">
       <CoachProfileHero profile={profile} />
 
-      <div className="container mx-auto px-4 py-8">
+      <ContainerTemplate>
         <CoachSchedulesList schedules={schedules} isLoading={isSchedulesLoading} onBookSchedule={handleBookSchedule} />
-      </div>
+      </ContainerTemplate>
 
       <BookingConfirmationDialog
         open={confirmBooking}
@@ -114,6 +115,6 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
         onConfirm={handleConfirmBooking}
         isPending={createBookingMutation.isPending}
       />
-    </div>
+    </ContainerTemplate>
   )
 }

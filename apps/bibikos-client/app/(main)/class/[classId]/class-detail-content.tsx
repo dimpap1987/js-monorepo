@@ -13,6 +13,7 @@ import {
   ClassNotFound,
   ClassSchedulesList,
 } from './components'
+import { ContainerTemplate } from '@js-monorepo/templates'
 
 interface ClassDetailContentProps {
   classId: number
@@ -89,12 +90,12 @@ export function ClassDetailContent({ classId }: ClassDetailContentProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background-secondary/30">
+    <ContainerTemplate className="space-y-5">
       <ClassDetailHero classData={classData} />
 
-      <div className="container mx-auto px-4 py-8">
+      <ContainerTemplate>
         <ClassSchedulesList classData={classData} onBookSchedule={handleBookSchedule} />
-      </div>
+      </ContainerTemplate>
 
       <BookingConfirmationDialog
         open={confirmBooking}
@@ -104,6 +105,6 @@ export function ClassDetailContent({ classId }: ClassDetailContentProps) {
         onConfirm={handleConfirmBooking}
         isPending={createBookingMutation.isPending}
       />
-    </div>
+    </ContainerTemplate>
   )
 }

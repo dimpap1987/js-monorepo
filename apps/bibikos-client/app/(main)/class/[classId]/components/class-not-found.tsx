@@ -1,10 +1,11 @@
 import { Button } from '@js-monorepo/components/ui/button'
-import { AlertCircle, Search } from 'lucide-react'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { ContainerTemplate } from '@js-monorepo/templates'
+import { AlertCircle, Search } from 'lucide-react'
 
 export function ClassNotFound() {
   return (
-    <div className="container mx-auto px-4 py-16 text-center">
+    <ContainerTemplate>
       <AlertCircle className="w-16 h-16 mx-auto mb-4 text-foreground-muted opacity-50" />
       <h1 className="text-2xl font-bold mb-2">Class Not Found</h1>
       <p className="text-foreground-muted mb-6 max-w-md mx-auto">
@@ -16,6 +17,6 @@ export function ClassNotFound() {
           Discover Classes
         </Button>
       </DpNextNavLink>
-    </div>
+    </ContainerTemplate>
   )
 }

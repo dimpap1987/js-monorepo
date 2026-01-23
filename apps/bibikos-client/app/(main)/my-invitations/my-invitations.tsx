@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { useInvitationWebSocket } from '../../../lib/scheduling/hooks/use-invitation-websocket'
 import { usePendingInvitations, useRespondToInvitation } from '../../../lib/scheduling/queries'
 import type { PendingInvitation } from '../../../lib/scheduling/types'
+import { ContainerTemplate } from '@js-monorepo/templates'
 
 function InvitationsSkeleton() {
   return (
@@ -146,7 +147,7 @@ export default function MyInvitationsComponent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <ContainerTemplate>
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -179,6 +180,6 @@ export default function MyInvitationsComponent() {
           ))}
         </div>
       )}
-    </div>
+    </ContainerTemplate>
   )
 }

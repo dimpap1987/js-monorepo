@@ -1,3 +1,5 @@
+'use client'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,9 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@js-monorepo/components/ui/alert-dialog'
-import { format, parseISO } from 'date-fns'
 import { useTranslations } from 'next-intl'
 import type { ClassViewSchedule, ClassViewResponse } from '../../../../../lib/scheduling'
+import { useScheduleTime } from '../../../../../lib/datetime'
 
 interface BookingConfirmationDialogProps {
   open: boolean
@@ -30,6 +32,7 @@ export function BookingConfirmationDialog({
   isPending,
 }: BookingConfirmationDialogProps) {
   const tCommon = useTranslations('common')
+  const { fullDate, timeRange } = useScheduleTime(schedule)
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -41,11 +44,8 @@ export function BookingConfirmationDialog({
               {schedule && classData && (
                 <div className="space-y-2 mt-4">
                   <p className="font-medium text-foreground">{classData.title}</p>
-                  <p className="text-sm">{format(parseISO(schedule.startTimeUtc), 'EEEE, MMMM d, yyyy')}</p>
-                  <p className="text-sm">
-                    {format(parseISO(schedule.startTimeUtc), 'h:mm a')} -{' '}
-                    {format(parseISO(schedule.endTimeUtc), 'h:mm a')}
-                  </p>
+                  <p className="text-sm">{fullDate}</p>
+                  <p className="text-sm">{timeRange}</p>
                   <p className="text-sm text-foreground-muted mt-2">{classData.location.name}</p>
                 </div>
               )}
