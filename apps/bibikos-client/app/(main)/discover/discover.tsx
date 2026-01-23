@@ -40,7 +40,6 @@ function groupSchedulesByDate(schedules: DiscoverSchedule[]): GroupedSchedules {
     // Parse UTC time and convert to schedule's local timezone for date grouping
     const utcDate = parseISO(schedule.startTimeUtc)
     const localDate = toZonedTime(utcDate, schedule.localTimezone)
-    console.log(localDate)
 
     if (isToday(localDate)) {
       groups.today.push(schedule)

@@ -231,6 +231,27 @@
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
 }
 
+/* ============================================
+   PAST EVENTS
+   ============================================ */
+
+.fc-custom-styles .fc-event.fc-event-past {
+  opacity: 0.45;
+  filter: grayscale(40%);
+}
+
+/* Optional: soften text */
+.fc-custom-styles .fc-event.fc-event-past .fc-event-title,
+.fc-custom-styles .fc-event.fc-event-past .fc-event-time {
+  color: var(--foreground-muted) !important;
+}
+
+/* Optional: prevent hover lift on past events */
+.fc-custom-styles .fc-event.fc-event-past:hover {
+  transform: none;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
 .fc-custom-styles .fc-event:hover {
   transform: translateY(-1px);
   box-shadow:

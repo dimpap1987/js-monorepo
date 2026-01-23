@@ -1,8 +1,8 @@
 'use client'
 
+import { Button } from '@js-monorepo/components/ui/button'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@js-monorepo/components/ui/select'
-import { Button } from '@js-monorepo/components/ui/button'
 import { Search, X } from 'lucide-react'
 import type { DiscoverFilters as DiscoverFiltersType } from '../../../../lib/scheduling'
 
@@ -36,14 +36,28 @@ export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: Dis
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3 justify-between">
         {/* Search */}
-        <div className="relative flex-1 w-full sm:max-w-sm ">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search classes or coaches..."
-            value={filters.search || ''}
-            onChange={(e) => onFilterChange({ search: e.target.value || undefined })}
-            className="pl-9"
-          />
+        <div className="relative flex-1 w-full sm:max-w-sm">
+          <div className="">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search classes or coaches..."
+              value={filters.search || ''}
+              onChange={(e) => onFilterChange({ search: e.target.value || undefined })}
+              className="pl-9"
+            />
+          </div>
+          {/* Clear Filters */}
+          {hasActiveFilters && (
+            <Button
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7"
+              variant="ghost"
+              size="icon"
+              onClick={onClearFilters}
+              title="Clear filters"
+            >
+              <X />
+            </Button>
+          )}
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -87,12 +101,6 @@ export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: Dis
             </SelectContent>
           </Select>
         </div>
-        {/* Clear Filters */}
-        {hasActiveFilters && (
-          <Button variant="ghost" size="icon" onClick={onClearFilters} title="Clear filters">
-            <X className="w-4 h-4" />
-          </Button>
-        )}
       </div>
     </div>
   )

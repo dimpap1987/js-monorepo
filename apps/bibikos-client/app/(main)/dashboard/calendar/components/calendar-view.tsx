@@ -222,6 +222,18 @@ export function CalendarView({
         <div className={`fc-custom-styles ${isLoading ? 'opacity-60 pointer-events-none' : ''}`}>
           <FullCalendar
             ref={calendarRef}
+            eventClassNames={(arg) => {
+              const now = new Date()
+              const eventStart = arg.event.start // could be null
+              const eventEnd = arg.event.end || eventStart // fallback to start if end is missing
+
+              if (eventEnd && eventEnd < now) return ['fc-event-past'] // finished events
+
+              if (eventStart && eventEnd && eventStart <= now && eventEnd >= now) {
+                return ['fc-event-ongoing'] // currently happening
+              }
+              return []
+            }}
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
             initialView={initialView}
             headerToolbar={headerToolbar}
