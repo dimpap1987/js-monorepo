@@ -104,31 +104,27 @@ export class OrganizerService {
    * Update organizer profile
    */
   @Transactional()
-  async updateOrganizer(
-    organizerId: number,
-    appUserId: number,
-    dto: UpdateOrganizerDto
-  ): Promise<OrganizerResponseDto> {
-    const organizer = await this.organizerRepo.findById(organizerId)
+  async updateOrganizer(appUserContext: AppUserContextType, dto: UpdateOrganizerDto): Promise<OrganizerResponseDto> {
+    const organizer = await this.organizerRepo.findById(appUserContext.organizerId)
 
     if (!organizer) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ORGANIZER_NOT_FOUND')
     }
 
     // Verify ownership
-    if (organizer.appUserId !== appUserId) {
+    if (organizer.appUserId !== appUserContext.appUserId) {
       throw new ApiException(HttpStatus.FORBIDDEN, 'ORGANIZER_ACCESS_DENIED')
     }
 
     // Validate slug uniqueness if changing
     if (dto.slug && dto.slug !== organizer.slug) {
-      const isAvailable = await this.organizerRepo.isSlugAvailable(dto.slug, organizerId)
+      const isAvailable = await this.organizerRepo.isSlugAvailable(dto.slug, appUserContext.organizerId)
       if (!isAvailable) {
         throw new ApiException(HttpStatus.CONFLICT, 'SLUG_ALREADY_TAKEN')
       }
     }
 
-    const updated = await this.organizerRepo.update(organizerId, {
+    const updated = await this.organizerRepo.update(appUserContext.organizerId, {
       ...(dto.displayName !== undefined && { displayName: dto.displayName }),
       ...(dto.bio !== undefined && { bio: dto.bio }),
       ...(dto.slug !== undefined && { slug: dto.slug }),
@@ -139,7 +135,8 @@ export class OrganizerService {
       }),
     })
 
-    this.logger.log(`Updated organizer profile ${organizerId}`)
+    this.cacheService.invalidateUserByAuthId(appUserContext.user.id)
+    this.logger.log(`Updated organizer profile ${appUserContext.organizerId}`)
     return this.toResponseDto(updated)
   }
 

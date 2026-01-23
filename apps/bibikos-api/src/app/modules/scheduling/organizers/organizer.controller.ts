@@ -68,7 +68,7 @@ export class OrganizerController {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ORGANIZER_PROFILE_NOT_FOUND')
     }
 
-    return this.organizerService.updateOrganizer(appUserContext.organizerId, appUserContext.appUserId, dto)
+    return this.organizerService.updateOrganizer(appUserContext, dto)
   }
 
   /**

@@ -93,6 +93,10 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
         timezone: userDto?.timezone ?? DATE_CONFIG.DEFAULT_USER_TIMEZONE,
         countryCode: userDto?.countryCode ?? DEFAULT_COUNTRY,
       },
+      include: {
+        organizerProfile: { select: { id: true } },
+        participantProfile: { select: { id: true } },
+      },
     })
   }
 }

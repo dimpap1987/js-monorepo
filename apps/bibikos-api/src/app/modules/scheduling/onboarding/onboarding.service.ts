@@ -34,7 +34,7 @@ export class OnboardingService {
     })
 
     // Step 4: Set this location as default for the organizer
-    await this.organizerService.updateOrganizer(organizer.id, appUserContext.appUserId, {
+    await this.organizerService.updateOrganizer(appUserContext, {
       defaultLocationId: location.id,
     })
 
