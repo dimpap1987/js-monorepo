@@ -187,10 +187,10 @@ The subscription callback fires **after** the render cycle, avoiding conflicts.
 - **Responsive Design**: Mobile-first approach, test on multiple screen sizes
 - **Consistency**: Follow design system patterns, consistent spacing, typography, colors
 - **Maintainability**: Code should be easy to understand and modify by other developers
-
+- **Service Layer Dependencies**:
+  To maintain proper encapsulation and prevent circular dependencies, follow these injection rules:
+  Service-to-Service: Services may inject other Services to reuse business logic.
+  Service-to-Repository: A Service can only inject its own corresponding Repository.
+  Cross-Repository Restriction: If a Service needs data managed by another domain, it must call that domain's Service, not its Repository directly.
+- Rule: Use @AppUserContext() appUserContext: AppUserContext to access authenticated user data.
 **CRITICAL: Only senior-level code and best practices are acceptable.**
-
-# TODO and keep in mind
-
-Price and Locale Rule:
-Each product in Stripe will have a separate price for EUR (existing) and USD (new). In the app, the price displayed to the user will match their locale: users with el locale will see the EUR price, while users with en locale will see the USD price. Always ensure the displayed price corresponds to the Stripe price in that currency for consistency during checkout.åç
