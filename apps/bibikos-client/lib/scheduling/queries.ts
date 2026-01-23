@@ -339,17 +339,6 @@ export function useClass(id: number) {
   })
 }
 
-export function useClassPublic(id: number) {
-  return useQuery({
-    queryKey: schedulingKeys.classPublic(id),
-    queryFn: async () => {
-      const response = await apiClient.get<Class>(`/scheduling/classes/${id}/public`)
-      return handleQueryResponse(response)
-    },
-    enabled: !!id,
-  })
-}
-
 export function useClassView(classId: number) {
   return useQuery({
     queryKey: schedulingKeys.classView(classId),

@@ -55,22 +55,6 @@ export class ClassController {
   }
 
   /**
-   * GET /scheduling/classes/:id/public
-   * Get class for public view (booking page)
-   * No auth required
-   */
-  @Get(':id/public')
-  async getClassPublic(@Param('id', ParseIntPipe) id: number) {
-    const classEntity = await this.classService.getClassPublic(id)
-
-    if (!classEntity) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'CLASS_NOT_FOUND')
-    }
-
-    return classEntity
-  }
-
-  /**
    * GET /scheduling/classes/:id/view
    * Get class with schedules for booking page
    * No auth required for public classes, but requires accepted invitation for private classes
