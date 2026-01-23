@@ -57,7 +57,7 @@ export class AppController {
         () => this.featureFlagsService.getEnabledFlagsForUser(appUserContext.user.id),
         3600
       ),
-      tryCatch(() => this.appUserService.findByAuthId(appUserContext.user.id)),
+      tryCatch(() => this.appUserService.findByAuthUserId(appUserContext.user.id)),
     ])
 
     const subscription = normalizeSubscription(subscriptionResult)

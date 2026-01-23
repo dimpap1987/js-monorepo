@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config'
 import { Cache } from 'cache-manager'
 import { RedisClientType } from 'redis'
 import {
-  APP_USER_CONTEXT_KEY,
   APP_USER_KEY,
   BOOKING_KEY,
   CLASS_KEY,
@@ -138,7 +137,6 @@ export class BibikosCacheService {
 
   async invalidateUserByAuthId(authUserId: number) {
     this.invalidate(APP_USER_KEY, authUserId)
-    this.invalidate(APP_USER_CONTEXT_KEY, authUserId)
   }
 
   /**

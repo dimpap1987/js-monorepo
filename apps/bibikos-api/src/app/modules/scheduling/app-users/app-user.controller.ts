@@ -1,16 +1,12 @@
 import { ZodPipe } from '@js-monorepo/nest/pipes'
 import { Body, Controller, HttpCode, HttpStatus, Patch } from '@nestjs/common'
 import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
-import { BibikosCacheService } from '../cache'
 import { AppUserService } from './app-user.service'
 import { UpdateAppUserDto, UpdateAppUserSchema } from './dto/app-user.dto'
 
 @Controller('scheduling/app-users')
 export class AppUserController {
-  constructor(
-    private readonly appUserService: AppUserService,
-    private readonly cacheService: BibikosCacheService
-  ) {}
+  constructor(private readonly appUserService: AppUserService) {}
 
   /**
    * PATCH /scheduling/app-users/me
@@ -23,8 +19,6 @@ export class AppUserController {
     @Body(new ZodPipe(UpdateAppUserSchema)) dto: UpdateAppUserDto,
     @AppUserContext() appUserContext: AppUserContextType
   ) {
-    await this.appUserService.updateAppUser(appUserContext.user.id, dto)
-    // Invalidate cache after update
-    await this.cacheService.invalidateUserByAuthId(appUserContext.user.id)
+    await this.appUserService.updateAppUser(appUserContext, dto)
   }
 }

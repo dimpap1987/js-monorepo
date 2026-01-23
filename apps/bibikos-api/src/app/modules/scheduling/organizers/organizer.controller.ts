@@ -51,7 +51,7 @@ export class OrganizerController {
     @Body(new ZodPipe(CreateOrganizerSchema)) dto: CreateOrganizerDto,
     @AppUserContext() appUserContext: AppUserContextType
   ) {
-    return this.organizerService.createOrGetOrganizer(appUserContext.appUserId, dto)
+    return this.organizerService.createOrGetOrganizer(appUserContext, dto)
   }
 
   /**

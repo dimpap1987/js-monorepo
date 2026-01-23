@@ -24,6 +24,7 @@ import { ClsPluginTransactional } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { CacheModule } from '@nestjs/cache-manager'
 import { ConfigService } from '@nestjs/config'
+import { APP_GUARD } from '@nestjs/core'
 import { ScheduleModule } from '@nestjs/schedule'
 import RedisStore from 'connect-redis'
 import session from 'express-session'
@@ -32,6 +33,7 @@ import { GracefulShutdownModule } from 'nestjs-graceful-shutdown'
 import passport from 'passport'
 import { RedisClientType } from 'redis'
 import { v4 as uuidv4 } from 'uuid'
+import { UserContextGuard } from '../guards/user-context'
 import { apiLogger } from '../main'
 import { LoggerMiddleware } from '../middlewares/logger.middleware'
 import { AnnouncementsController } from './controllers/announcements'
@@ -39,10 +41,10 @@ import { AppController } from './controllers/app.controller'
 import { AdminProviderModule } from './modules/admin/admin.module'
 import { FilterProviderModule } from './modules/filter.modules'
 import { HealthModule } from './modules/health/health.module'
-import { SchedulingModule } from './modules/scheduling/scheduling.module'
 import { AppUserService } from './modules/scheduling/app-users/app-user.service'
 import { BibikosCacheService } from './modules/scheduling/cache'
 import { SUBSCRIPTION_STATUS_KEY } from './modules/scheduling/cache/constants'
+import { SchedulingModule } from './modules/scheduling/scheduling.module'
 import { UserModule } from './modules/user/user.module'
 import { getContactMessage } from './notifications/contact-form'
 import {
@@ -53,9 +55,6 @@ import {
   getTrialExpiredMessage,
   getTrialStartedMessage,
 } from './notifications/subscription-notifications'
-import { AppService } from './services/app.service'
-import { APP_GUARD } from '@nestjs/core'
-import { UserContextGuard } from '../guards/user-context'
 
 @Module({
   imports: [
@@ -160,7 +159,7 @@ import { UserContextGuard } from '../guards/user-context'
         onRegister: async (user: AuthUserDto) => {
           // Create AppUser when user registers
           try {
-            await appUserService.getOrCreateAppUserByAuthId(user.id)
+            await appUserService.createOrSelectByAuthUserId(user.id)
             apiLogger.log(`Created AppUser for new user: ${user.username} (authUserId: ${user.id})`)
           } catch (error: any) {
             apiLogger.error(`Failed to create AppUser for user ${user.id}: ${error.message}`, error.stack)
@@ -168,12 +167,6 @@ import { UserContextGuard } from '../guards/user-context'
           userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' has joined 🚀`])
         },
         onLogin: async (user) => {
-          // Ensure AppUser exists when user logs in (handles edge cases where creation failed during registration)
-          try {
-            await appUserService.getOrCreateAppUserByAuthId(user.id)
-          } catch (error: any) {
-            apiLogger.error(`Failed to ensure AppUser exists for user ${user.id}: ${error.message}`, error.stack)
-          }
           userPresenceWebsocketService.broadcast(Events.announcements, [`'${user.username}' is online 😎`])
         },
       }),
@@ -316,7 +309,6 @@ import { UserContextGuard } from '../guards/user-context'
   controllers: [AnnouncementsController, AppController],
   providers: [
     LoggerMiddleware,
-    AppService,
     {
       provide: APP_GUARD,
       useClass: UserContextGuard,

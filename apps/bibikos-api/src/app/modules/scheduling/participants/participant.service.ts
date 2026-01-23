@@ -1,6 +1,7 @@
 import { Transactional } from '@nestjs-cls/transactional'
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { AppUserContextType } from '../../../../decorators/app-user.decorator'
+import { BibikosCacheService } from '../cache'
 import { ParticipantResponseDto } from './dto/participant.dto'
 import { ParticipantRepo, ParticipantRepository } from './participant.repository'
 
@@ -10,7 +11,8 @@ export class ParticipantService {
 
   constructor(
     @Inject(ParticipantRepo)
-    private readonly participantRepo: ParticipantRepository
+    private readonly participantRepo: ParticipantRepository,
+    private readonly cacheService: BibikosCacheService
   ) {}
 
   /**
@@ -46,6 +48,7 @@ export class ParticipantService {
     })
 
     this.logger.log(`Created participant profile ${participant.id} for appUser ${appUserContext.appUserId}`)
+    this.cacheService.invalidateUserByAuthId(appUserContext.user.id)
     return this.toResponseDto(participant)
   }
 

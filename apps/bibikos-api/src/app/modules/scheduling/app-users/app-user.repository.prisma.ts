@@ -1,9 +1,12 @@
 import { AppUser, Prisma } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
+import { DATE_CONFIG } from '@js-monorepo/utils/date'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { HttpStatus, Injectable } from '@nestjs/common'
+import { DEFAULT_COUNTRY, DEFAULT_LOCALE } from '../../../../config/env.schema'
 import { AppUserRepository, AppUserWithProfiles } from './app-user.repository'
+import { UpdateAppUserDto } from './dto/app-user.dto'
 
 @Injectable()
 export class AppUserRepositoryPrisma implements AppUserRepository {
@@ -15,7 +18,7 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
     })
   }
 
-  async findByAuthIdWithProfiles(authUserId: number): Promise<AppUserWithProfiles | null> {
+  async findByAuthUserIdWithProfiles(authUserId: number): Promise<AppUserWithProfiles | null> {
     return this.txHost.tx.appUser.findUnique({
       where: { authUserId },
       include: {
@@ -47,17 +50,6 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
     return this.txHost.tx.appUser.update({
       where: { id },
       data,
-    })
-  }
-
-  async upsertByAuthUserId(authUserId: number, data: Omit<Prisma.AppUserCreateInput, 'authUser'>): Promise<AppUser> {
-    return this.txHost.tx.appUser.upsert({
-      where: { authUserId },
-      create: {
-        ...data,
-        authUser: { connect: { id: authUserId } },
-      },
-      update: data,
     })
   }
 
@@ -98,6 +90,19 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
             username: true,
           },
         },
+      },
+    })
+  }
+
+  async createOrSelectByAuthUserId(authUserId: number, userDto?: Partial<UpdateAppUserDto>) {
+    return this.txHost.tx.appUser.upsert({
+      where: { authUserId },
+      update: {},
+      create: {
+        authUser: { connect: { id: authUserId } },
+        locale: userDto?.locale ?? DEFAULT_LOCALE,
+        timezone: userDto?.timezone ?? DATE_CONFIG.DEFAULT_USER_TIMEZONE,
+        countryCode: userDto?.countryCode ?? DEFAULT_COUNTRY,
       },
     })
   }

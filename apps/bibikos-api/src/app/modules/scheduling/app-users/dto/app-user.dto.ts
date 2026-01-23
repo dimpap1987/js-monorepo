@@ -26,7 +26,7 @@ export interface AppUserResponseDto {
   locale: string
   timezone: string
   countryCode?: string | null
-  createdAt: Date
+  createdAt?: Date
   organizerProfileId: number
   participantProfileId: number
 }

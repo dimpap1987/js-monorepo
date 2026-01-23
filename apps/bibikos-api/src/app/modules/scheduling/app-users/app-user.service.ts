@@ -1,5 +1,6 @@
-import { Transactional } from '@nestjs-cls/transactional'
 import { Inject, Injectable, Logger } from '@nestjs/common'
+import { AppUserContextType } from '../../../../decorators/app-user.decorator'
+import { APP_USER_KEY, BibikosCacheService } from '../cache'
 import { AppUserRepo, AppUserRepository, AppUserWithProfiles } from './app-user.repository'
 import { AppUserResponseDto, UpdateAppUserDto } from './dto/app-user.dto'
 
@@ -9,49 +10,47 @@ export class AppUserService {
 
   constructor(
     @Inject(AppUserRepo)
-    private readonly appUserRepo: AppUserRepository
+    private readonly appUserRepo: AppUserRepository,
+    private readonly cacheService: BibikosCacheService
   ) {}
 
-  @Transactional()
-  async getOrCreateAppUserByAuthId(
-    authUserId: number,
-    defaults?: Partial<UpdateAppUserDto>
-  ): Promise<AppUserResponseDto> {
-    const appUser = await this.findByAuthId(authUserId)
-
-    if (appUser) return appUser
-
-    this.logger.log(`Creating AppUser for authUserId: ${authUserId}`)
-
-    const created = await this.appUserRepo.create({
-      authUser: { connect: { id: authUserId } },
-      locale: defaults?.locale ?? 'en-US',
-      timezone: defaults?.timezone ?? 'UTC',
-      countryCode: defaults?.countryCode ?? null,
-    })
-
-    // New user won't have profiles yet
-    return this.toResponseDtoWithProfiles({
-      ...created,
-      organizerProfile: null,
-      participantProfile: null,
-    })
+  async createOrSelectByAuthUserId(authUserId: number, defaults?: Partial<UpdateAppUserDto>) {
+    return this.cacheService.getOrSet(
+      APP_USER_KEY,
+      authUserId,
+      async () => {
+        const user = await this.appUserRepo.createOrSelectByAuthUserId(authUserId, defaults)
+        return this.toResponseDtoWithProfiles(user)
+      },
+      300
+    )
   }
 
-  async findByAuthId(authUserId: number): Promise<AppUserResponseDto | null> {
-    const appUser = await this.appUserRepo.findByAuthIdWithProfiles(authUserId)
-    return this.toResponseDtoWithProfiles(appUser)
+  async findByAuthUserId(authUserId: number): Promise<AppUserResponseDto | null> {
+    return this.cacheService.getOrSet(
+      APP_USER_KEY,
+      authUserId,
+      async () => {
+        const appUser = await this.appUserRepo.findByAuthUserIdWithProfiles(authUserId)
+
+        if (!appUser) return null
+
+        return this.toResponseDtoWithProfiles(appUser)
+      },
+      300
+    )
   }
 
-  async updateAppUser(authUserId: number, data: UpdateAppUserDto): Promise<void> {
-    const updated = await this.appUserRepo.update(authUserId, {
+  async updateAppUser(appUserContext: AppUserContextType, data: UpdateAppUserDto): Promise<void> {
+    const updated = await this.appUserRepo.update(appUserContext.appUserId, {
       ...(data.fullName !== undefined && { fullName: data.fullName }),
       ...(data.locale !== undefined && { locale: data.locale }),
       ...(data.timezone !== undefined && { timezone: data.timezone }),
       ...(data.countryCode !== undefined && { countryCode: data.countryCode }),
     })
 
-    this.logger.log(`Updated AppUser ${updated.id} for authUserId: ${authUserId}`)
+    this.cacheService.invalidateUserByAuthId(appUserContext.user.id)
+    this.logger.log(`Updated AppUser ${updated.id} for authUserId: ${appUserContext.user.id}`)
   }
 
   private toResponseDtoWithProfiles(appUser: AppUserWithProfiles): AppUserResponseDto {
@@ -61,7 +60,7 @@ export class AppUserService {
       locale: appUser.locale,
       timezone: appUser.timezone,
       // countryCode: appUser.countryCode,
-      createdAt: appUser.createdAt,
+      // createdAt: appUser.createdAt,
       organizerProfileId: appUser.organizerProfile?.id,
       participantProfileId: appUser.participantProfile?.id,
     }

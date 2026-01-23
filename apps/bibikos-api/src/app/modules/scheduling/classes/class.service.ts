@@ -136,9 +136,10 @@ export class ClassService {
       waitlistLimit: dto.waitlistLimit ?? null,
       isCapacitySoft: dto.isCapacitySoft ?? false,
       isPrivate: dto.isPrivate ?? false,
-      tags: {
-        connect: dto.tagIds.map((id) => ({ id })),
-      },
+      // TODO
+      // tags: {
+      //   connect: dto.tagIds.map((id) => ({ id })),
+      // },
     })
 
     this.logger.log(`Created class ${classEntity.id} for organizer ${organizerId}`)

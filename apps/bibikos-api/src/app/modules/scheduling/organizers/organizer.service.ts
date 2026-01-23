@@ -8,6 +8,8 @@ import {
   UpdateOrganizerDto,
 } from './dto/organizer.dto'
 import { OrganizerRepo, OrganizerRepository } from './organizer.repository'
+import { BibikosCacheService } from '../cache'
+import { AppUserContextType } from '../../../../decorators/app-user.decorator'
 
 @Injectable()
 export class OrganizerService {
@@ -15,7 +17,8 @@ export class OrganizerService {
 
   constructor(
     @Inject(OrganizerRepo)
-    private readonly organizerRepo: OrganizerRepository
+    private readonly organizerRepo: OrganizerRepository,
+    private readonly cacheService: BibikosCacheService
   ) {}
 
   /**
@@ -57,9 +60,12 @@ export class OrganizerService {
    * A user becomes an organizer when they want to create classes
    */
   @Transactional()
-  async createOrGetOrganizer(appUserId: number, dto?: CreateOrganizerDto): Promise<OrganizerResponseDto> {
+  async createOrGetOrganizer(
+    appUserContext: AppUserContextType,
+    dto?: CreateOrganizerDto
+  ): Promise<OrganizerResponseDto> {
     // Check if already an organizer
-    const existing = await this.organizerRepo.findByAppUserId(appUserId)
+    const existing = await this.organizerRepo.findByAppUserId(appUserContext.appUserId)
     if (existing) {
       return this.toResponseDto(existing)
     }
@@ -78,7 +84,7 @@ export class OrganizerService {
     }
 
     const organizer = await this.organizerRepo.create({
-      appUser: { connect: { id: appUserId } },
+      appUser: { connect: { id: appUserContext.appUserId } },
       displayName: dto?.displayName ?? null,
       bio: dto?.bio ?? null,
       slug: dto?.slug ?? null,
@@ -89,7 +95,8 @@ export class OrganizerService {
       }),
     })
 
-    this.logger.log(`Created organizer profile ${organizer.id} for appUser ${appUserId}`)
+    this.logger.log(`Created organizer profile ${organizer.id} for appUser ${appUserContext.appUserId}`)
+    this.cacheService.invalidateUserByAuthId(appUserContext.user.id)
     return this.toResponseDto(organizer)
   }
 

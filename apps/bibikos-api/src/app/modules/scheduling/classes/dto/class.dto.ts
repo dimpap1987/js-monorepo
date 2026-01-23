@@ -8,7 +8,7 @@ export const CreateClassSchema = z.object({
   waitlistLimit: z.number().int().nonnegative().optional().nullable(),
   isCapacitySoft: z.boolean().optional(),
   isPrivate: z.boolean().optional(),
-  tagIds: z.array(z.number().int()),
+  tagIds: z.array(z.number().int()).optional(), // TODO change to required
 })
 export type CreateClassDto = z.infer<typeof CreateClassSchema>
 

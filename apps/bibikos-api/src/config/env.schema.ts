@@ -1,5 +1,7 @@
 import * as z from 'zod'
 
+export const DEFAULT_COUNTRY = 'GR' as const
+export const DEFAULT_LOCALE = 'en_US' as const
 /**
  * Schema for validating environment variables.
  * Required variables must be present, while OAuth variables are optional.

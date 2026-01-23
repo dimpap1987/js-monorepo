@@ -22,7 +22,7 @@ export class OnboardingService {
   @Transactional()
   async completeOnboarding(appUserContext: AppUserContextType, dto: CompleteOnboardingDto) {
     // Step 1: Create organizer profile
-    const organizer = await this.organizerService.createOrGetOrganizer(appUserContext.appUserId, dto.organizer)
+    const organizer = await this.organizerService.createOrGetOrganizer(appUserContext, dto.organizer)
 
     // Step 2: Create location
     const location = await this.locationService.createLocation(organizer.id, dto.location)

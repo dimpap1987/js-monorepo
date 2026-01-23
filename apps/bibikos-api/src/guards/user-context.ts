@@ -1,11 +1,11 @@
 import { SessionUser } from '@js-monorepo/types/session'
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { AppService } from '../app/services/app.service'
+import { AppUserService } from '../app/modules/scheduling'
 import { AppUserContextType } from '../decorators/app-user.decorator'
 
 @Injectable()
 export class UserContextGuard implements CanActivate {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appUserService: AppUserService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
@@ -18,13 +18,13 @@ export class UserContextGuard implements CanActivate {
       return true
     }
 
-    const result = await this.appService.findUserContext(sessionUser.id)
+    const appUser = await this.appUserService.createOrSelectByAuthUserId(sessionUser.id)
 
     request.userContext = {
       user: { ...sessionUser },
-      appUserId: result.appUserId,
-      participantId: result.participantId,
-      organizerId: result.organizerId,
+      appUserId: appUser.id,
+      participantId: appUser.participantProfileId,
+      organizerId: appUser.organizerProfileId,
     } satisfies AppUserContextType
     return true
   }
