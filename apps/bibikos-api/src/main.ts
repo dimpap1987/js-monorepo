@@ -4,24 +4,23 @@ process.env.TZ = DATE_CONFIG.SERVER_TIMEZONE
 import { Logger, ValidationPipe } from '@nestjs/common'
 export const apiLogger = new Logger('BIBIKOS-API')
 
-import './otel'
+import { RemoveEmptyInterceptor, TimeoutInterceptor } from '@js-monorepo/nest/interceptors'
 import { LOGGER_CONFIG, LoggerConfig, LoggerService } from '@js-monorepo/nest/logger'
 import { rawBodyMiddleware } from '@js-monorepo/payments-server'
-import { getAllowedOriginsFromEnv, isOriginAllowed as isOriginAllowedUtil } from '@js-monorepo/utils/common'
-import { RemoveEmptyInterceptor, TimeoutInterceptor } from '@js-monorepo/nest/interceptors'
 import { RedisIoAdapter } from '@js-monorepo/user-presence'
+import { getAllowedOriginsFromEnv, isOriginAllowed as isOriginAllowedUtil } from '@js-monorepo/utils/common'
 import { NestFactory } from '@nestjs/core'
+import { NestExpressApplication } from '@nestjs/platform-express'
 import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
 import { expand } from 'dotenv-expand'
 import helmet from 'helmet'
 import { ClsService } from 'nestjs-cls'
 import { setupGracefulShutdown } from 'nestjs-graceful-shutdown'
-import { AppModule } from './app/app.module'
-import { NestExpressApplication } from '@nestjs/platform-express'
-import { validateEnv } from './config/env.schema'
 import { ZodError } from 'zod'
-import { registerApp } from './app/modules/scheduling/app-users/decorators/app-user.decorator'
+import { AppModule } from './app/app.module'
+import { validateEnv } from './config/env.schema'
+import './otel'
 
 expand(config()) // add functionality for .env to use interpolation and more
 
@@ -135,8 +134,6 @@ async function bootstrap() {
   await redisIoAdapter.connectToRedis()
 
   app.useWebSocketAdapter(redisIoAdapter)
-
-  registerApp(app)
 
   await app.listen(port, '0.0.0.0')
   logServerMetadata()

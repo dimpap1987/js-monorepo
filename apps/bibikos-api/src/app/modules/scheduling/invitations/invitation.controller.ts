@@ -11,10 +11,8 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common'
-import { AppUserService } from '../app-users/app-user.service'
-import { OrganizerService } from '../organizers/organizer.service'
+import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
 import {
   InvitationResponseDto,
   PendingInvitationDto,
@@ -22,27 +20,12 @@ import {
   SendInvitationDto,
 } from './dto/invitation.dto'
 import { InvitationService } from './invitation.service'
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
-import { SessionUserType } from '@js-monorepo/types/auth'
 
 @Controller('scheduling/invitations')
-@UseGuards(LoggedInGuard)
 export class InvitationController {
   private readonly logger = new Logger(InvitationController.name)
 
-  constructor(
-    private readonly invitationService: InvitationService,
-    private readonly appUserService: AppUserService,
-    private readonly organizerService: OrganizerService
-  ) {}
-
-  /**
-   * Helper to get AppUser ID from session (authUserId -> appUserId)
-   */
-  private async getAppUserId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    return appUser.id
-  }
+  constructor(private readonly invitationService: InvitationService) {}
 
   /**
    * Send an invitation to a user for a private class
@@ -50,10 +33,10 @@ export class InvitationController {
    */
   @Post()
   async sendInvitation(
-    @SessionUser() sessionUser: SessionUserType,
+    @AppUserContext() appUserContext: AppUserContextType,
     @Body() dto: SendInvitationDto
   ): Promise<InvitationResponseDto> {
-    const organizerId = await this.getOrganizerId(sessionUser)
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.invitationService.sendInvitation(organizerId, dto)
   }
 
@@ -62,9 +45,8 @@ export class InvitationController {
    * GET /scheduling/invitations/pending
    */
   @Get('pending')
-  async getPendingInvitations(@SessionUser() sessionUser: SessionUserType): Promise<PendingInvitationDto[]> {
-    const appUserId = await this.getAppUserId(sessionUser)
-    return this.invitationService.getPendingInvitations(appUserId)
+  async getPendingInvitations(@AppUserContext() appUserContext: AppUserContextType): Promise<PendingInvitationDto[]> {
+    return this.invitationService.getPendingInvitations(appUserContext.appUserId)
   }
 
   /**
@@ -72,8 +54,8 @@ export class InvitationController {
    * GET /scheduling/invitations/sent
    */
   @Get('sent')
-  async getSentInvitations(@SessionUser() sessionUser: SessionUserType): Promise<InvitationResponseDto[]> {
-    const organizerId = await this.getOrganizerId(sessionUser)
+  async getSentInvitations(@AppUserContext() appUserContext: AppUserContextType): Promise<InvitationResponseDto[]> {
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.invitationService.getInvitationsByOrganizer(organizerId)
   }
 
@@ -83,10 +65,10 @@ export class InvitationController {
    */
   @Get('class/:classId')
   async getInvitationsByClass(
-    @SessionUser() sessionUser: SessionUserType,
+    @AppUserContext() appUserContext: AppUserContextType,
     @Param('classId', ParseIntPipe) classId: number
   ): Promise<InvitationResponseDto[]> {
-    const organizerId = await this.getOrganizerId(sessionUser)
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.invitationService.getInvitationsByClass(classId, organizerId)
   }
 
@@ -96,12 +78,11 @@ export class InvitationController {
    */
   @Patch(':invitationId/respond')
   async respondToInvitation(
-    @SessionUser() sessionUser: SessionUserType,
+    @AppUserContext() appUserContext: AppUserContextType,
     @Param('invitationId', ParseIntPipe) invitationId: number,
     @Body() dto: RespondToInvitationDto
   ): Promise<InvitationResponseDto> {
-    const appUserId = await this.getAppUserId(sessionUser)
-    return this.invitationService.respondToInvitation(invitationId, appUserId, dto.status)
+    return this.invitationService.respondToInvitation(invitationId, appUserContext.appUserId, dto.status)
   }
 
   /**
@@ -111,21 +92,18 @@ export class InvitationController {
   @Delete(':invitationId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async cancelInvitation(
-    @SessionUser() sessionUser: SessionUserType,
+    @AppUserContext() appUserContext: AppUserContextType,
     @Param('invitationId', ParseIntPipe) invitationId: number
   ): Promise<void> {
-    const organizerId = await this.getOrganizerId(sessionUser)
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.invitationService.cancelInvitation(invitationId, organizerId)
   }
 
-  private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
-
-    if (!organizer) {
+  private async getOrganizerId(appUserContext: AppUserContextType): Promise<number> {
+    if (!appUserContext.organizerId) {
       throw new ApiException(HttpStatus.FORBIDDEN, 'ORGANIZER_PROFILE_REQUIRED')
     }
 
-    return organizer.id
+    return appUserContext?.organizerId
   }
 }

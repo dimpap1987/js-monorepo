@@ -1,7 +1,5 @@
-import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { BibikosCacheService } from '../cache'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { AppUserRepo, AppUserRepository, AppUserWithProfiles } from './app-user.repository'
 import { AppUserResponseDto, UpdateAppUserDto } from './dto/app-user.dto'
 
@@ -11,8 +9,7 @@ export class AppUserService {
 
   constructor(
     @Inject(AppUserRepo)
-    private readonly appUserRepo: AppUserRepository,
-    private readonly cacheService: BibikosCacheService
+    private readonly appUserRepo: AppUserRepository
   ) {}
 
   @Transactional()
@@ -20,7 +17,7 @@ export class AppUserService {
     authUserId: number,
     defaults?: Partial<UpdateAppUserDto>
   ): Promise<AppUserResponseDto> {
-    const appUser = await this.getAppUserByAuthId(authUserId)
+    const appUser = await this.findByAuthId(authUserId)
 
     if (appUser) return appUser
 
@@ -34,46 +31,27 @@ export class AppUserService {
     })
 
     // New user won't have profiles yet
-    const responseDto = this.toResponseDtoWithProfiles({
+    return this.toResponseDtoWithProfiles({
       ...created,
       organizerProfile: null,
       participantProfile: null,
     })
-
-    return responseDto
   }
 
-  async getAppUserByAuthId(authUserId: number): Promise<AppUserResponseDto | null> {
-    return this.cacheService.getOrSetAppUser<AppUserResponseDto | null>(authUserId, async () => {
-      const appUser = await this.appUserRepo.findByAuthUserIdWithProfiles(authUserId)
-      if (!appUser) return null
-      return this.toResponseDtoWithProfiles(appUser)
-    })
+  async findByAuthId(authUserId: number): Promise<AppUserResponseDto | null> {
+    const appUser = await this.appUserRepo.findByAuthIdWithProfiles(authUserId)
+    return this.toResponseDtoWithProfiles(appUser)
   }
 
-  async updateAppUser(authUserId: number, data: UpdateAppUserDto): Promise<AppUserResponseDto> {
-    const appUser = await this.appUserRepo.findByAuthUserIdWithProfiles(authUserId)
-
-    if (!appUser) throw new ApiException(HttpStatus.NOT_FOUND, 'APP_USER_NOT_FOUND')
-
-    const updated = await this.appUserRepo.update(appUser.id, {
+  async updateAppUser(authUserId: number, data: UpdateAppUserDto): Promise<void> {
+    const updated = await this.appUserRepo.update(authUserId, {
       ...(data.fullName !== undefined && { fullName: data.fullName }),
       ...(data.locale !== undefined && { locale: data.locale }),
       ...(data.timezone !== undefined && { timezone: data.timezone }),
       ...(data.countryCode !== undefined && { countryCode: data.countryCode }),
     })
 
-    // Invalidate cache after update
-    await this.cacheService.invalidateAppUser(authUserId)
-
     this.logger.log(`Updated AppUser ${updated.id} for authUserId: ${authUserId}`)
-
-    const responseDto = this.toResponseDtoWithProfiles({
-      ...updated,
-      organizerProfile: appUser.organizerProfile,
-      participantProfile: appUser.participantProfile,
-    })
-    return responseDto
   }
 
   private toResponseDtoWithProfiles(appUser: AppUserWithProfiles): AppUserResponseDto {
@@ -84,8 +62,20 @@ export class AppUserService {
       timezone: appUser.timezone,
       // countryCode: appUser.countryCode,
       createdAt: appUser.createdAt,
-      hasOrganizerProfile: !!appUser.organizerProfile,
-      hasParticipantProfile: !!appUser.participantProfile,
+      organizerProfileId: appUser.organizerProfile?.id,
+      participantProfileId: appUser.participantProfile?.id,
     }
+  }
+
+  async findById(id: number) {
+    return this.appUserRepo.findById(id)
+  }
+
+  async findByAuthUsername(username: string) {
+    return this.appUserRepo.findByAuthUsername(username)
+  }
+
+  async findByAuthEmail(email: string) {
+    return this.appUserRepo.findByAuthEmail(email)
   }
 }

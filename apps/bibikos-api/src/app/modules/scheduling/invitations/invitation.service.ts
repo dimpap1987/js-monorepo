@@ -1,13 +1,12 @@
+import { InvitationStatus } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { NotificationService } from '@js-monorepo/notifications-server'
 import { Events, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { Transactional } from '@nestjs-cls/transactional'
-import { TransactionHost } from '@nestjs-cls/transactional'
-import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { InvitationStatus, PrismaClient } from '@js-monorepo/bibikos-db'
-import { ClassRepo, ClassRepository } from '../classes/class.repository'
-import { OrganizerRepo, OrganizerRepository } from '../organizers/organizer.repository'
+import { forwardRef, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { AppUserService } from '../app-users'
+import { ClassService } from '../classes'
+import { OrganizerService } from '../organizers'
 import { InvitationResponseDto, PendingInvitationDto, SendInvitationDto } from './dto/invitation.dto'
 import { InvitationRepo, InvitationRepository, InvitationWithDetails } from './invitation.repository'
 
@@ -18,13 +17,12 @@ export class InvitationService {
   constructor(
     @Inject(InvitationRepo)
     private readonly invitationRepo: InvitationRepository,
-    @Inject(ClassRepo)
-    private readonly classRepo: ClassRepository,
-    @Inject(OrganizerRepo)
-    private readonly organizerRepo: OrganizerRepository,
+    @Inject(forwardRef(() => ClassService))
+    private readonly classService: ClassService,
+    private readonly organizerService: OrganizerService,
     private readonly notificationService: NotificationService,
     private readonly wsService: UserPresenceWebsocketService,
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma<PrismaClient>>
+    private readonly userService: AppUserService
   ) {}
 
   /**
@@ -33,7 +31,7 @@ export class InvitationService {
   @Transactional()
   async sendInvitation(organizerId: number, dto: SendInvitationDto): Promise<InvitationResponseDto> {
     // Validate class exists and belongs to organizer
-    const classEntity = await this.classRepo.findById(dto.classId)
+    const classEntity = await this.classService.findById(dto.classId)
     if (!classEntity) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'CLASS_NOT_FOUND')
     }
@@ -45,7 +43,7 @@ export class InvitationService {
     }
 
     // Get organizer details for the notification
-    const organizer = await this.organizerRepo.findById(organizerId)
+    const organizer = await this.organizerService.findById(organizerId)
     if (!organizer) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ORGANIZER_NOT_FOUND')
     }
@@ -59,16 +57,10 @@ export class InvitationService {
 
     if (dto.username) {
       // Find user by username (username is already case-insensitive via Citext)
-      invitedUser = await this.txHost.tx.appUser.findFirst({
-        where: { authUser: { username: dto.username } },
-        include: { authUser: { select: { id: true, email: true, username: true } } },
-      })
+      invitedUser = await this.userService.findByAuthUsername(dto.username)
     } else if (dto.email) {
       // Find user by email (case-insensitive search)
-      invitedUser = await this.txHost.tx.appUser.findFirst({
-        where: { authUser: { email: { equals: dto.email, mode: 'insensitive' } } },
-        include: { authUser: { select: { id: true, email: true, username: true } } },
-      })
+      invitedUser = await this.userService.findByAuthEmail(dto.email)
     }
 
     this.logger.log(
@@ -177,7 +169,7 @@ export class InvitationService {
    * Get invitations for a class (organizer view)
    */
   async getInvitationsByClass(classId: number, organizerId: number): Promise<InvitationResponseDto[]> {
-    const classEntity = await this.classRepo.findById(classId)
+    const classEntity = await this.classService.findById(classId)
     if (!classEntity) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'CLASS_NOT_FOUND')
     }
@@ -212,6 +204,10 @@ export class InvitationService {
 
     await this.invitationRepo.delete(invitationId)
     this.logger.log(`Deleted invitation ${invitationId}`)
+  }
+
+  async hasAcceptedInvitation(classId: number, userId: number) {
+    return this.invitationRepo.hasAcceptedInvitation(classId, userId)
   }
 
   /**

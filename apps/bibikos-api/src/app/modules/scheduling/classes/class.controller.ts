@@ -1,7 +1,5 @@
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
-import { SessionUserType } from '@js-monorepo/types/auth'
 import {
   Body,
   Controller,
@@ -14,33 +12,23 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common'
-import { AppUserService } from '../app-users/app-user.service'
-import { OrganizerService } from '../organizers/organizer.service'
+import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
 import { ClassService } from './class.service'
 import { CreateClassDto, CreateClassSchema, UpdateClassDto, UpdateClassSchema } from './dto/class.dto'
 
 @Controller('scheduling/classes')
 export class ClassController {
-  constructor(
-    private readonly classService: ClassService,
-    private readonly organizerService: OrganizerService,
-    private readonly appUserService: AppUserService
-  ) {}
+  constructor(private readonly classService: ClassService) {}
 
   /**
    * Helper to get organizer ID for current user
    */
-  private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
-
-    if (!organizer) {
+  private async getOrganizerId(appUserContext: AppUserContextType): Promise<number> {
+    if (!appUserContext?.organizerId) {
       throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
     }
-
-    return organizer.id
+    return appUserContext.organizerId
   }
 
   /**
@@ -48,9 +36,11 @@ export class ClassController {
    * List all classes for current organizer
    */
   @Get()
-  @UseGuards(LoggedInGuard)
-  async listClasses(@SessionUser() sessionUser: SessionUserType, @Query('includeInactive') includeInactive?: string) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+  async listClasses(
+    @AppUserContext() appUserContext?: AppUserContextType,
+    @Query('includeInactive') includeInactive?: string
+  ) {
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.classService.getClassesByOrganizer(organizerId, includeInactive === 'true')
   }
 
@@ -59,9 +49,8 @@ export class ClassController {
    * Get a specific class (organizer view)
    */
   @Get(':id')
-  @UseGuards(LoggedInGuard)
-  async getClass(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+  async getClass(@Param('id', ParseIntPipe) id: number, @AppUserContext() appUserContext?: AppUserContextType) {
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.classService.getClass(id, organizerId)
   }
 
@@ -87,20 +76,8 @@ export class ClassController {
    * No auth required for public classes, but requires accepted invitation for private classes
    */
   @Get(':id/view')
-  async getClassView(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser?: SessionUserType) {
-    let userId: number | undefined
-
-    // Get user ID if logged in
-    if (sessionUser?.id) {
-      try {
-        const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-        userId = appUser.id
-      } catch {
-        // User not found, continue without user ID
-      }
-    }
-
-    return this.classService.getClassView(id, userId)
+  async getClassView(@Param('id', ParseIntPipe) id: number, @AppUserContext() appUserContext?: AppUserContextType) {
+    return this.classService.getClassView(id, appUserContext?.appUserId)
   }
 
   /**
@@ -108,13 +85,12 @@ export class ClassController {
    * Create a new class
    */
   @Post()
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.CREATED)
   async createClass(
     @Body(new ZodPipe(CreateClassSchema)) dto: CreateClassDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext?: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.classService.createClass(organizerId, dto)
   }
 
@@ -123,14 +99,13 @@ export class ClassController {
    * Update a class
    */
   @Patch(':id')
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.OK)
   async updateClass(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodPipe(UpdateClassSchema)) dto: UpdateClassDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext?: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.classService.updateClass(id, organizerId, dto)
   }
 
@@ -139,10 +114,9 @@ export class ClassController {
    * Soft delete (deactivate) a class
    */
   @Delete(':id')
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteClass(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+  async deleteClass(@Param('id', ParseIntPipe) id: number, @AppUserContext() appUserContext?: AppUserContextType) {
+    const organizerId = await this.getOrganizerId(appUserContext)
     await this.classService.deactivateClass(id, organizerId)
   }
 }

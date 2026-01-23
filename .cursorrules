@@ -187,6 +187,7 @@ The subscription callback fires **after** the render cycle, avoiding conflicts.
 - **Responsive Design**: Mobile-first approach, test on multiple screen sizes
 - **Consistency**: Follow design system patterns, consistent spacing, typography, colors
 - **Maintainability**: Code should be easy to understand and modify by other developers
+- **Nestjs services** should inject other services except its own repository
 
 **CRITICAL: Only senior-level code and best practices are acceptable.**
 

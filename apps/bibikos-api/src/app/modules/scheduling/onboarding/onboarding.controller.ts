@@ -1,18 +1,12 @@
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
-import { SessionUserType } from '@js-monorepo/types/auth'
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
-import { AppUserService } from '../app-users/app-user.service'
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common'
+import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
 import { CompleteOnboardingDto, CompleteOnboardingSchema } from './dto/onboarding.dto'
 import { OnboardingService } from './onboarding.service'
 
 @Controller('scheduling/onboarding')
-@UseGuards(LoggedInGuard)
 export class OnboardingController {
-  constructor(
-    private readonly onboardingService: OnboardingService,
-    private readonly appUserService: AppUserService
-  ) {}
+  constructor(private readonly onboardingService: OnboardingService) {}
 
   /**
    * POST /scheduling/onboarding/complete
@@ -22,9 +16,8 @@ export class OnboardingController {
   @HttpCode(HttpStatus.CREATED)
   async completeOnboarding(
     @Body(new ZodPipe(CompleteOnboardingSchema)) dto: CompleteOnboardingDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    return this.onboardingService.completeOnboarding(appUser.id, dto)
+    return this.onboardingService.completeOnboarding(appUserContext, dto)
   }
 }

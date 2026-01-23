@@ -1,8 +1,6 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { AppUserRepo, AppUserRepository } from '../app-users/app-user.repository'
-import { BibikosCacheService } from '../cache'
 import {
   CreateOrganizerDto,
   OrganizerPublicProfileDto,
@@ -17,16 +15,13 @@ export class OrganizerService {
 
   constructor(
     @Inject(OrganizerRepo)
-    private readonly organizerRepo: OrganizerRepository,
-    @Inject(AppUserRepo)
-    private readonly appUserRepo: AppUserRepository,
-    private readonly cacheService: BibikosCacheService
+    private readonly organizerRepo: OrganizerRepository
   ) {}
 
   /**
    * Get organizer profile by app user ID
    */
-  async getOrganizerByAppUserId(appUserId: number): Promise<OrganizerResponseDto | null> {
+  async findByAppUserId(appUserId: number): Promise<OrganizerResponseDto | null> {
     const organizer = await this.organizerRepo.findByAppUserId(appUserId)
     return organizer ? this.toResponseDto(organizer) : null
   }
@@ -34,7 +29,7 @@ export class OrganizerService {
   /**
    * Get organizer profile by ID
    */
-  async getOrganizerById(organizerId: number): Promise<OrganizerResponseDto | null> {
+  async findById(organizerId: number): Promise<OrganizerResponseDto | null> {
     const organizer = await this.organizerRepo.findById(organizerId)
     return organizer ? this.toResponseDto(organizer) : null
   }
@@ -49,11 +44,14 @@ export class OrganizerService {
     return {
       displayName: organizer.displayName,
       bio: organizer.bio,
-      slug: organizer.slug!,
+      slug: organizer.slug,
       activityLabel: organizer.activityLabel,
     }
   }
 
+  async findBySlug(slug: string) {
+    return this.organizerRepo.findBySlug(slug)
+  }
   /**
    * Create or get organizer profile for an app user
    * A user becomes an organizer when they want to create classes
@@ -64,12 +62,6 @@ export class OrganizerService {
     const existing = await this.organizerRepo.findByAppUserId(appUserId)
     if (existing) {
       return this.toResponseDto(existing)
-    }
-
-    // Verify app user exists
-    const appUser = await this.appUserRepo.findById(appUserId)
-    if (!appUser) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'APP_USER_NOT_FOUND')
     }
 
     // Validate slug uniqueness if provided
@@ -96,9 +88,6 @@ export class OrganizerService {
         defaultLocation: { connect: { id: dto.defaultLocationId } },
       }),
     })
-
-    // Invalidate AppUser cache since hasOrganizerProfile changed
-    await this.cacheService.invalidateAppUser(appUser.authUserId)
 
     this.logger.log(`Created organizer profile ${organizer.id} for appUser ${appUserId}`)
     return this.toResponseDto(organizer)
@@ -142,12 +131,6 @@ export class OrganizerService {
         defaultLocation: dto.defaultLocationId ? { connect: { id: dto.defaultLocationId } } : { disconnect: true },
       }),
     })
-
-    // Invalidate AppUser cache to reflect any changes
-    const appUser = await this.appUserRepo.findById(appUserId)
-    if (appUser) {
-      await this.cacheService.invalidateAppUser(appUser.authUserId)
-    }
 
     this.logger.log(`Updated organizer profile ${organizerId}`)
     return this.toResponseDto(updated)

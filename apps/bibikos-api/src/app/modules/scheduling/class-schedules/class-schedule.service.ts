@@ -2,12 +2,11 @@ import { BookingStatus } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { Transactional } from '@nestjs-cls/transactional'
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { BookingRepo, BookingRepository } from '../bookings/booking.repository'
-import { ClassRepo, ClassRepository } from '../classes/class.repository'
-import { LocationRepo, LocationRepository } from '../locations/location.repository'
+import { forwardRef, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { BookingService } from '../bookings'
+import { ClassService } from '../classes'
+import { OrganizerService } from '../organizers'
 import { ClassScheduleRepo, ClassScheduleRepository } from './class-schedule.repository'
-import { OrganizerRepo, OrganizerRepository } from '../organizers/organizer.repository'
 import {
   CancelClassScheduleDto,
   ClassScheduleResponseDto,
@@ -35,14 +34,10 @@ export class ClassScheduleService {
   constructor(
     @Inject(ClassScheduleRepo)
     private readonly scheduleRepo: ClassScheduleRepository,
-    @Inject(ClassRepo)
-    private readonly classRepo: ClassRepository,
-    @Inject(LocationRepo)
-    private readonly locationRepo: LocationRepository,
-    @Inject(OrganizerRepo)
-    private readonly organizerRepo: OrganizerRepository,
-    @Inject(BookingRepo)
-    private readonly bookingRepo: BookingRepository,
+    private readonly classService: ClassService,
+    private readonly organizerService: OrganizerService,
+    @Inject(forwardRef(() => BookingService))
+    private readonly bookingService: BookingService,
     private readonly wsService: UserPresenceWebsocketService
   ) {}
 
@@ -81,7 +76,7 @@ export class ClassScheduleService {
    */
   async getUpcomingSchedules(classId: number, organizerId: number, limit = 10): Promise<ClassScheduleResponseDto[]> {
     // Verify class ownership
-    const classEntity = await this.classRepo.findById(classId)
+    const classEntity = await this.classService.findById(classId)
     if (!classEntity) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'CLASS_NOT_FOUND')
     }
@@ -137,6 +132,10 @@ export class ClassScheduleService {
     return this.toResponseDto(schedule)
   }
 
+  async findByIdWithClass(scheduleId: number) {
+    return this.scheduleRepo.findByIdWithClass(scheduleId)
+  }
+
   /**
    * Get public schedules by organizer slug (for /coach/:slug page)
    */
@@ -145,7 +144,7 @@ export class ClassScheduleService {
     startDate: string,
     endDate: string
   ): Promise<ClassScheduleResponseDto[]> {
-    const organizer = await this.organizerRepo.findBySlug(slug)
+    const organizer = await this.organizerService.findBySlug(slug)
     if (!organizer) {
       return []
     }
@@ -225,7 +224,7 @@ export class ClassScheduleService {
     const userBookingsMap: Map<number, { id: number; status: string; waitlistPosition: number | null }> = new Map()
     if (participantId) {
       const scheduleIds = schedules.map((s) => s.id)
-      const userBookings = await this.bookingRepo.findByParticipantAndScheduleIds(participantId, scheduleIds, [
+      const userBookings = await this.bookingService.findByParticipantAndScheduleIds(participantId, scheduleIds, [
         BookingStatus.BOOKED,
         BookingStatus.WAITLISTED,
       ])
@@ -245,6 +244,10 @@ export class ClassScheduleService {
     }))
   }
 
+  async findUpcomingByClassIdWithBookingCounts(classId: number, limit?: number) {
+    return this.scheduleRepo.findUpcomingByClassIdWithBookingCounts(classId, limit)
+  }
+
   /**
    * Create a new class schedule
    * If recurrenceRule is provided, generates multiple occurrences
@@ -252,7 +255,7 @@ export class ClassScheduleService {
   @Transactional()
   async createSchedule(organizerId: number, dto: CreateClassScheduleDto): Promise<ClassScheduleResponseDto[]> {
     // Verify class ownership
-    const classEntity = await this.classRepo.findByIdWithLocation(dto.classId)
+    const classEntity = await this.classService.findByIdWithLocation(dto.classId)
     if (!classEntity) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'CLASS_NOT_FOUND')
     }
@@ -422,7 +425,7 @@ export class ClassScheduleService {
     }
 
     // Get participants to notify before cancelling bookings
-    const activeBookings = await this.bookingRepo.findByScheduleId(scheduleId, [
+    const activeBookings = await this.bookingService.findByScheduleId(scheduleId, [
       BookingStatus.BOOKED,
       BookingStatus.WAITLISTED,
     ])
@@ -436,7 +439,7 @@ export class ClassScheduleService {
     })
 
     // Cancel all active bookings for this schedule
-    const cancelledBookings = await this.bookingRepo.cancelAllByScheduleId(
+    const cancelledBookings = await this.bookingService.cancelAllByScheduleId(
       scheduleId,
       dto?.cancelReason ?? 'Class schedule cancelled by organizer'
     )
@@ -534,7 +537,7 @@ export class ClassScheduleService {
     const cancelReason = dto?.cancelReason ?? 'Series cancelled by organizer'
 
     // Get all participants across all schedules to notify
-    const activeBookings = await this.bookingRepo.findByScheduleIds(scheduleIds, [
+    const activeBookings = await this.bookingService.findByScheduleIds(scheduleIds, [
       BookingStatus.BOOKED,
       BookingStatus.WAITLISTED,
     ])
@@ -551,7 +554,7 @@ export class ClassScheduleService {
     const cancelledCount = await this.scheduleRepo.cancelMany(scheduleIds, cancelReason)
 
     // Cancel all bookings for these schedules
-    await this.bookingRepo.cancelAllByScheduleIds(scheduleIds, cancelReason)
+    await this.bookingService.cancelAllByScheduleIds(scheduleIds, cancelReason)
 
     this.logger.log(`Cancelled ${cancelledCount} schedules in series and their bookings`)
 

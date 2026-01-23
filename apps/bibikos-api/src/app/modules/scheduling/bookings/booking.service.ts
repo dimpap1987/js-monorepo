@@ -3,19 +3,9 @@ import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-presence'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import {
-  ClassScheduleRepo,
-  ClassScheduleRepository,
-  ClassScheduleWithClass,
-} from '../class-schedules/class-schedule.repository'
-import { ParticipantRepo, ParticipantRepository } from '../participants/participant.repository'
-import {
-  BookingRepo,
-  BookingRepository,
-  BookingWithAll,
-  BookingWithParticipant,
-  BookingWithSchedule,
-} from './booking.repository'
+import { ClassScheduleService } from '../class-schedules'
+import { ClassScheduleWithClass } from '../class-schedules/class-schedule.repository'
+import { BookingRepo, BookingRepository, BookingWithParticipant, BookingWithSchedule } from './booking.repository'
 import {
   BookingListResponseDto,
   BookingResponseDto,
@@ -32,10 +22,7 @@ export class BookingService {
   constructor(
     @Inject(BookingRepo)
     private readonly bookingRepo: BookingRepository,
-    @Inject(ClassScheduleRepo)
-    private readonly scheduleRepo: ClassScheduleRepository,
-    @Inject(ParticipantRepo)
-    private readonly participantRepo: ParticipantRepository,
+    private readonly scheduleService: ClassScheduleService,
     private readonly wsService: UserPresenceWebsocketService
   ) {}
 
@@ -45,14 +32,8 @@ export class BookingService {
    */
   @Transactional()
   async createBooking(participantId: number, scheduleId: number): Promise<BookingResponseDto> {
-    // Verify participant exists
-    const participant = await this.participantRepo.findById(participantId)
-    if (!participant) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'PARTICIPANT_NOT_FOUND')
-    }
-
     // Verify schedule exists and is not cancelled
-    const schedule = await this.scheduleRepo.findByIdWithClass(scheduleId)
+    const schedule = await this.scheduleService.findByIdWithClass(scheduleId)
     if (!schedule) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'SCHEDULE_NOT_FOUND')
     }
@@ -329,7 +310,7 @@ export class BookingService {
    * Get bookings for a schedule (organizer view)
    */
   async getBookingsForSchedule(scheduleId: number, organizerId: number): Promise<BookingListResponseDto> {
-    const schedule = await this.scheduleRepo.findByIdWithClass(scheduleId)
+    const schedule = await this.scheduleService.findByIdWithClass(scheduleId)
 
     if (!schedule) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'SCHEDULE_NOT_FOUND')
@@ -492,6 +473,26 @@ export class BookingService {
       organizerNotes: booking.organizerNotes,
       createdAt: booking.createdAt,
     }
+  }
+
+  async findByScheduleIds(scheduleIds: number[], statuses?: BookingStatus[]) {
+    return this.bookingRepo.findByScheduleIds(scheduleIds, statuses)
+  }
+
+  async findByScheduleId(scheduleId: number, statuses?: BookingStatus[]) {
+    return this.bookingRepo.findByScheduleId(scheduleId, statuses)
+  }
+
+  async cancelAllByScheduleId(scheduleId: number, cancelReason?: string) {
+    return this.bookingRepo.cancelAllByScheduleId(scheduleId, cancelReason)
+  }
+
+  async cancelAllByScheduleIds(scheduleIds: number[], cancelReason?: string) {
+    return this.bookingRepo.cancelAllByScheduleIds(scheduleIds, cancelReason)
+  }
+
+  async findByParticipantAndScheduleIds(participantId: number, scheduleIds: number[], statuses?: BookingStatus[]) {
+    return this.bookingRepo.findByParticipantAndScheduleIds(participantId, scheduleIds, statuses)
   }
 
   private toParticipantResponseDto(booking: BookingWithParticipant): BookingResponseDto {

@@ -27,6 +27,6 @@ export interface AppUserResponseDto {
   timezone: string
   countryCode?: string | null
   createdAt: Date
-  hasOrganizerProfile: boolean
-  hasParticipantProfile: boolean
+  organizerProfileId: number
+  participantProfileId: number
 }

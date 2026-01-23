@@ -1,7 +1,8 @@
 import { AppUser, Prisma } from '@js-monorepo/bibikos-db'
+import { ApiException } from '@js-monorepo/nest/exceptions'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
-import { Injectable } from '@nestjs/common'
+import { HttpStatus, Injectable } from '@nestjs/common'
 import { AppUserRepository, AppUserWithProfiles } from './app-user.repository'
 
 @Injectable()
@@ -14,7 +15,7 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
     })
   }
 
-  async findByAuthUserIdWithProfiles(authUserId: number): Promise<AppUserWithProfiles | null> {
+  async findByAuthIdWithProfiles(authUserId: number): Promise<AppUserWithProfiles | null> {
     return this.txHost.tx.appUser.findUnique({
       where: { authUserId },
       include: {
@@ -24,10 +25,18 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
     })
   }
 
-  async findById(id: number): Promise<AppUser | null> {
-    return this.txHost.tx.appUser.findUnique({
-      where: { id },
-    })
+  async findById(id: number) {
+    try {
+      const user = await this.txHost.tx.appUser.findUniqueOrThrow({ where: { id } })
+      return user
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new ApiException(HttpStatus.NOT_FOUND, 'USER_NOT_FOUND')
+        }
+      }
+      throw error
+    }
   }
 
   async create(data: Prisma.AppUserCreateInput): Promise<AppUser> {
@@ -49,6 +58,47 @@ export class AppUserRepositoryPrisma implements AppUserRepository {
         authUser: { connect: { id: authUserId } },
       },
       update: data,
+    })
+  }
+
+  async findByAuthEmail(email: string) {
+    return this.txHost.tx.appUser.findFirst({
+      where: {
+        authUser: {
+          email: {
+            equals: email,
+            mode: 'insensitive',
+          },
+        },
+      },
+      include: {
+        authUser: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+          },
+        },
+      },
+    })
+  }
+
+  async findByAuthUsername(username: string) {
+    return this.txHost.tx.appUser.findFirst({
+      where: {
+        authUser: {
+          username,
+        },
+      },
+      include: {
+        authUser: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+          },
+        },
+      },
     })
   }
 }

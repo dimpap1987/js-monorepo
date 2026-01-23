@@ -1,7 +1,5 @@
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
-import { SessionUserType } from '@js-monorepo/types/auth'
 import {
   Body,
   Controller,
@@ -14,11 +12,8 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common'
-import { AppUserService } from '../app-users/app-user.service'
-import { OrganizerService } from '../organizers/organizer.service'
-import { ParticipantService } from '../participants/participant.service'
+import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
 import { ClassScheduleService } from './class-schedule.service'
 import {
   CancelClassScheduleDto,
@@ -31,12 +26,7 @@ import {
 
 @Controller('scheduling/schedules')
 export class ClassScheduleController {
-  constructor(
-    private readonly scheduleService: ClassScheduleService,
-    private readonly organizerService: OrganizerService,
-    private readonly appUserService: AppUserService,
-    private readonly participantService: ParticipantService
-  ) {}
+  constructor(private readonly scheduleService: ClassScheduleService) {}
 
   /**
    * GET /scheduling/schedules/discover
@@ -50,22 +40,11 @@ export class ClassScheduleController {
     @Query('activity') activity?: string,
     @Query('timeOfDay') timeOfDay?: 'morning' | 'afternoon' | 'evening',
     @Query('search') search?: string,
-    @SessionUser() sessionUser?: SessionUserType
+    @AppUserContext() appUserContext?: AppUserContextType
   ) {
     if (!startDate || !endDate) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'START_AND_END_DATE_REQUIRED')
     }
-
-    // Get participant ID and app user ID if user is logged in
-    let participantId: number | undefined
-    let appUserId: number | undefined
-    if (sessionUser?.id) {
-      const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-      appUserId = appUser.id
-      const participant = await this.participantService.getParticipantByAppUserId(appUser.id)
-      participantId = participant?.id
-    }
-
     return this.scheduleService.discoverSchedules(
       {
         startDate,
@@ -74,23 +53,9 @@ export class ClassScheduleController {
         timeOfDay,
         search,
       },
-      participantId,
-      appUserId
+      appUserContext?.participantId,
+      appUserContext?.appUserId
     )
-  }
-
-  /**
-   * Helper to get organizer ID for current user
-   */
-  private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
-
-    if (!organizer) {
-      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
-    }
-
-    return organizer.id
   }
 
   /**
@@ -99,21 +64,23 @@ export class ClassScheduleController {
    * For bookings view, include cancelled schedules that have bookings
    */
   @Get('calendar')
-  @UseGuards(LoggedInGuard)
   async getCalendarSchedules(
+    @AppUserContext() appUserContext: AppUserContextType,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
     @Query('classId') classId?: string,
-    @Query('includeCancelledWithBookings') includeCancelledWithBookings?: string,
-    @SessionUser() sessionUser?: SessionUserType
+    @Query('includeCancelledWithBookings') includeCancelledWithBookings?: string
   ) {
     if (!startDate || !endDate) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'START_AND_END_DATE_REQUIRED')
     }
 
-    const organizerId = await this.getOrganizerId(sessionUser!)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+
     return this.scheduleService.getSchedulesForCalendar(
-      organizerId,
+      appUserContext.organizerId,
       startDate,
       endDate,
       classId ? parseInt(classId, 10) : undefined,
@@ -126,14 +93,19 @@ export class ClassScheduleController {
    * Get upcoming schedules for a class
    */
   @Get('class/:classId/upcoming')
-  @UseGuards(LoggedInGuard)
   async getUpcomingSchedules(
+    @AppUserContext() appUserContext: AppUserContextType,
     @Param('classId', ParseIntPipe) classId: number,
-    @Query('limit') limit?: string,
-    @SessionUser() sessionUser?: SessionUserType
+    @Query('limit') limit?: string
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser!)
-    return this.scheduleService.getUpcomingSchedules(classId, organizerId, limit ? parseInt(limit, 10) : 10)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    return this.scheduleService.getUpcomingSchedules(
+      classId,
+      appUserContext.organizerId,
+      limit ? parseInt(limit, 10) : 10
+    )
   }
 
   /**
@@ -141,10 +113,11 @@ export class ClassScheduleController {
    * Get a specific schedule (organizer view)
    */
   @Get(':id')
-  @UseGuards(LoggedInGuard)
-  async getSchedule(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    return this.scheduleService.getSchedule(id, organizerId)
+  async getSchedule(@AppUserContext() appUserContext: AppUserContextType, @Param('id', ParseIntPipe) id: number) {
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    return this.scheduleService.getSchedule(id, appUserContext.organizerId)
   }
 
   /**
@@ -168,14 +141,15 @@ export class ClassScheduleController {
    * Create a new schedule (one-time or recurring)
    */
   @Post()
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.CREATED)
   async createSchedule(
     @Body(new ZodPipe(CreateClassScheduleSchema)) dto: CreateClassScheduleDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    return this.scheduleService.createSchedule(organizerId, dto)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    return this.scheduleService.createSchedule(appUserContext.organizerId, dto)
   }
 
   /**
@@ -183,15 +157,16 @@ export class ClassScheduleController {
    * Update a schedule (single occurrence)
    */
   @Patch(':id')
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.OK)
   async updateSchedule(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodPipe(UpdateClassScheduleSchema)) dto: UpdateClassScheduleDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    return this.scheduleService.updateSchedule(id, organizerId, dto)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    return this.scheduleService.updateSchedule(id, appUserContext.organizerId, dto)
   }
 
   /**
@@ -199,15 +174,16 @@ export class ClassScheduleController {
    * Cancel a schedule
    */
   @Post(':id/cancel')
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.OK)
   async cancelSchedule(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodPipe(CancelClassScheduleSchema)) dto: CancelClassScheduleDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    await this.scheduleService.cancelSchedule(id, organizerId, dto)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    await this.scheduleService.cancelSchedule(id, appUserContext.organizerId, dto)
     return { success: true }
   }
 
@@ -216,11 +192,15 @@ export class ClassScheduleController {
    * Delete future occurrences of a recurring schedule
    */
   @Delete(':id/future')
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.OK)
-  async deleteFutureOccurrences(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    const deleted = await this.scheduleService.deleteFutureOccurrences(id, organizerId)
+  async deleteFutureOccurrences(
+    @Param('id', ParseIntPipe) id: number,
+    @AppUserContext() appUserContext: AppUserContextType
+  ) {
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    const deleted = await this.scheduleService.deleteFutureOccurrences(id, appUserContext.organizerId)
     return { deleted }
   }
 
@@ -230,14 +210,15 @@ export class ClassScheduleController {
    * Notifies all affected participants
    */
   @Post(':id/cancel-series')
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.OK)
   async cancelFutureSchedules(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodPipe(CancelClassScheduleSchema)) dto: CancelClassScheduleDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    return this.scheduleService.cancelFutureSchedules(id, organizerId, dto)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    return this.scheduleService.cancelFutureSchedules(id, appUserContext.organizerId, dto)
   }
 }

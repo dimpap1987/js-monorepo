@@ -1,8 +1,6 @@
-import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { AppUserRepo, AppUserRepository } from '../app-users/app-user.repository'
-import { BibikosCacheService } from '../cache'
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import { AppUserContextType } from '../../../../decorators/app-user.decorator'
 import { ParticipantResponseDto } from './dto/participant.dto'
 import { ParticipantRepo, ParticipantRepository } from './participant.repository'
 
@@ -12,10 +10,7 @@ export class ParticipantService {
 
   constructor(
     @Inject(ParticipantRepo)
-    private readonly participantRepo: ParticipantRepository,
-    @Inject(AppUserRepo)
-    private readonly appUserRepo: AppUserRepository,
-    private readonly cacheService: BibikosCacheService
+    private readonly participantRepo: ParticipantRepository
   ) {}
 
   /**
@@ -39,27 +34,18 @@ export class ParticipantService {
    * A user automatically becomes a participant when they book a class
    */
   @Transactional()
-  async getOrCreateParticipant(appUserId: number): Promise<ParticipantResponseDto> {
+  async getOrCreateParticipant(appUserContext: AppUserContextType): Promise<ParticipantResponseDto> {
     // Check if already a participant
-    const existing = await this.participantRepo.findByAppUserId(appUserId)
+    const existing = await this.participantRepo.findByAppUserId(appUserContext.appUserId)
     if (existing) {
       return this.toResponseDto(existing)
     }
 
-    // Verify app user exists
-    const appUser = await this.appUserRepo.findById(appUserId)
-    if (!appUser) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'APP_USER_NOT_FOUND')
-    }
-
     const participant = await this.participantRepo.create({
-      appUser: { connect: { id: appUserId } },
+      appUser: { connect: { id: appUserContext.appUserId } },
     })
 
-    // Invalidate AppUser cache since hasParticipantProfile changed
-    await this.cacheService.invalidateAppUser(appUser.authUserId)
-
-    this.logger.log(`Created participant profile ${participant.id} for appUser ${appUserId}`)
+    this.logger.log(`Created participant profile ${participant.id} for appUser ${appUserContext.appUserId}`)
     return this.toResponseDto(participant)
   }
 

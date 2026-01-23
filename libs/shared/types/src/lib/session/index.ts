@@ -40,14 +40,13 @@ export interface SessionSubscription {
 export interface SessionUser {
   id: number
   username: string
-  createdAt?: Date | string
-  lastLoggedIn?: string
-  isAdmin?: boolean
-  status?: UserStatus
+  email: string
+  createdAt: Date | string
+  status: UserStatus
   profile: {
-    id?: number
-    image?: string | null
-    provider?: string
+    id: number
+    image: string | null
+    provider: string
   }
   roles: string[]
 }

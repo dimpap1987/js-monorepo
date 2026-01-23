@@ -1,13 +1,13 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { ClassScheduleRepo, ClassScheduleRepository } from '../class-schedules/class-schedule.repository'
-import { InvitationRepo, InvitationRepository } from '../invitations/invitation.repository'
-import { LocationRepo, LocationRepository } from '../locations/location.repository'
-import { OrganizerRepo, OrganizerRepository } from '../organizers/organizer.repository'
+import { forwardRef, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { ClassScheduleService } from '../class-schedules'
+import { InvitationService } from '../invitations'
+import { LocationService } from '../locations'
+import { OrganizerService } from '../organizers'
 import { ClassRepo, ClassRepository, ClassWithLocation } from './class.repository'
-import { ClassResponseDto, CreateClassDto, UpdateClassDto } from './dto/class.dto'
 import { ClassViewResponseDto } from './dto/class-view.dto'
+import { ClassResponseDto, CreateClassDto, UpdateClassDto } from './dto/class.dto'
 
 @Injectable()
 export class ClassService {
@@ -16,14 +16,11 @@ export class ClassService {
   constructor(
     @Inject(ClassRepo)
     private readonly classRepo: ClassRepository,
-    @Inject(OrganizerRepo)
-    private readonly organizerRepo: OrganizerRepository,
-    @Inject(LocationRepo)
-    private readonly locationRepo: LocationRepository,
-    @Inject(ClassScheduleRepo)
-    private readonly scheduleRepo: ClassScheduleRepository,
-    @Inject(InvitationRepo)
-    private readonly invitationRepo: InvitationRepository
+    private readonly organizerService: OrganizerService,
+    private readonly locationService: LocationService,
+    @Inject(forwardRef(() => ClassScheduleService))
+    private readonly classScheduleService: ClassScheduleService,
+    private readonly invitationService: InvitationService
   ) {}
 
   /**
@@ -83,14 +80,14 @@ export class ClassService {
         throw new ApiException(HttpStatus.FORBIDDEN, 'CLASS_ACCESS_DENIED')
       }
 
-      const hasAccess = await this.invitationRepo.hasAcceptedInvitation(classId, userId)
+      const hasAccess = await this.invitationService.hasAcceptedInvitation(classId, userId)
       if (!hasAccess) {
         throw new ApiException(HttpStatus.FORBIDDEN, 'CLASS_ACCESS_DENIED')
       }
     }
 
     // Get upcoming schedules with booking counts
-    const schedules = await this.scheduleRepo.findUpcomingByClassIdWithBookingCounts(classId, 20)
+    const schedules = await this.classScheduleService.findUpcomingByClassIdWithBookingCounts(classId, 20)
 
     return {
       id: classEntity.id,
@@ -116,13 +113,13 @@ export class ClassService {
   @Transactional()
   async createClass(organizerId: number, dto: CreateClassDto): Promise<ClassResponseDto> {
     // Verify organizer exists
-    const organizer = await this.organizerRepo.findById(organizerId)
+    const organizer = await this.organizerService.findById(organizerId)
     if (!organizer) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ORGANIZER_NOT_FOUND')
     }
 
     // Verify location exists and belongs to organizer
-    const location = await this.locationRepo.findById(dto.locationId)
+    const location = await this.locationService.findById(dto.locationId)
     if (!location) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'LOCATION_NOT_FOUND')
     }
@@ -151,6 +148,14 @@ export class ClassService {
     return this.toResponseDto(created)
   }
 
+  async findById(id: number) {
+    return this.classRepo.findById(id)
+  }
+
+  async findByIdWithLocation(id: number) {
+    return this.classRepo.findByIdWithLocation(id)
+  }
+
   /**
    * Update a class
    */
@@ -169,7 +174,7 @@ export class ClassService {
 
     // If changing location, verify it belongs to organizer
     if (dto.locationId !== undefined && dto.locationId !== classEntity.locationId) {
-      const location = await this.locationRepo.findById(dto.locationId)
+      const location = await this.locationService.findById(dto.locationId)
       if (!location) {
         throw new ApiException(HttpStatus.NOT_FOUND, 'LOCATION_NOT_FOUND')
       }

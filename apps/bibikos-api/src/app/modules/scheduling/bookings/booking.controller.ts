@@ -1,21 +1,7 @@
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
-import { SessionUserType } from '@js-monorepo/types/auth'
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common'
-import { AppUserService } from '../app-users/app-user.service'
-import { OrganizerService } from '../organizers/organizer.service'
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post } from '@nestjs/common'
+import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
 import { ParticipantService } from '../participants/participant.service'
 import { BookingService } from './booking.service'
 import {
@@ -30,37 +16,11 @@ import {
 } from './dto/booking.dto'
 
 @Controller('scheduling/bookings')
-@UseGuards(LoggedInGuard)
 export class BookingController {
   constructor(
     private readonly bookingService: BookingService,
-    private readonly participantService: ParticipantService,
-    private readonly organizerService: OrganizerService,
-    private readonly appUserService: AppUserService
+    private readonly participantService: ParticipantService
   ) {}
-
-  /**
-   * Helper to get participant ID (creates if needed)
-   */
-  private async getOrCreateParticipantId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const participant = await this.participantService.getOrCreateParticipant(appUser.id)
-    return participant.id
-  }
-
-  /**
-   * Helper to get organizer ID
-   */
-  private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
-
-    if (!organizer) {
-      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
-    }
-
-    return organizer.id
-  }
 
   // ============================================
   // PARTICIPANT ENDPOINTS
@@ -74,10 +34,10 @@ export class BookingController {
   @HttpCode(HttpStatus.CREATED)
   async createBooking(
     @Body(new ZodPipe(CreateBookingSchema)) dto: CreateBookingDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const participantId = await this.getOrCreateParticipantId(sessionUser)
-    return this.bookingService.createBooking(participantId, dto.classScheduleId)
+    const participant = await this.participantService.getOrCreateParticipant(appUserContext)
+    return this.bookingService.createBooking(participant.id, dto.classScheduleId)
   }
 
   /**
@@ -85,15 +45,12 @@ export class BookingController {
    * Get current user's bookings
    */
   @Get('my')
-  async getMyBookings(@SessionUser() sessionUser: SessionUserType) {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const participant = await this.participantService.getParticipantByAppUserId(appUser.id)
-
-    if (!participant) {
+  async getMyBookings(@AppUserContext() appUserContext: AppUserContextType) {
+    if (!appUserContext.participantId) {
       return { upcoming: [], past: [] }
     }
 
-    return this.bookingService.getMyBookings(participant.id)
+    return this.bookingService.getMyBookings(appUserContext.participantId)
   }
 
   /**
@@ -105,10 +62,12 @@ export class BookingController {
   async cancelBooking(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodPipe(CancelBookingSchema)) dto: CancelBookingDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const participantId = await this.getOrCreateParticipantId(sessionUser)
-    await this.bookingService.cancelBooking(id, participantId, dto)
+    if (!appUserContext.participantId) {
+      return { success: false }
+    }
+    await this.bookingService.cancelBooking(id, appUserContext.participantId, dto)
     return { success: true }
   }
 
@@ -123,10 +82,12 @@ export class BookingController {
   @Get('schedule/:scheduleId')
   async getBookingsForSchedule(
     @Param('scheduleId', ParseIntPipe) scheduleId: number,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    return this.bookingService.getBookingsForSchedule(scheduleId, organizerId)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    return this.bookingService.getBookingsForSchedule(scheduleId, appUserContext.organizerId)
   }
 
   /**
@@ -138,10 +99,12 @@ export class BookingController {
   async cancelBookingByOrganizer(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodPipe(CancelBookingSchema)) dto: CancelBookingDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    await this.bookingService.cancelBookingByOrganizer(id, organizerId, dto)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    await this.bookingService.cancelBookingByOrganizer(id, appUserContext.organizerId, dto)
     return { success: true }
   }
 
@@ -153,10 +116,12 @@ export class BookingController {
   @HttpCode(HttpStatus.OK)
   async markAttendance(
     @Body(new ZodPipe(MarkAttendanceSchema)) dto: MarkAttendanceDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    const updated = await this.bookingService.markAttendance(organizerId, dto)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    const updated = await this.bookingService.markAttendance(appUserContext.organizerId, dto)
     return { updated }
   }
 
@@ -169,9 +134,11 @@ export class BookingController {
   async updateBookingNotes(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodPipe(UpdateBookingNotesSchema)) dto: UpdateBookingNotesDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
-    return this.bookingService.updateBookingNotes(id, organizerId, dto)
+    if (!appUserContext.organizerId) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
+    }
+    return this.bookingService.updateBookingNotes(id, appUserContext.organizerId, dto)
   }
 }

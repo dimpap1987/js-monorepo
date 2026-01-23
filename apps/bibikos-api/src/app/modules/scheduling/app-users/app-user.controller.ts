@@ -1,14 +1,16 @@
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
-import { SessionUserType } from '@js-monorepo/types/auth'
-import { Body, Controller, HttpCode, HttpStatus, Patch, UseGuards } from '@nestjs/common'
+import { Body, Controller, HttpCode, HttpStatus, Patch } from '@nestjs/common'
+import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
+import { BibikosCacheService } from '../cache'
 import { AppUserService } from './app-user.service'
 import { UpdateAppUserDto, UpdateAppUserSchema } from './dto/app-user.dto'
 
 @Controller('scheduling/app-users')
-@UseGuards(LoggedInGuard)
 export class AppUserController {
-  constructor(private readonly appUserService: AppUserService) {}
+  constructor(
+    private readonly appUserService: AppUserService,
+    private readonly cacheService: BibikosCacheService
+  ) {}
 
   /**
    * PATCH /scheduling/app-users/me
@@ -16,11 +18,13 @@ export class AppUserController {
    * Note: GET /me is not needed as AppUser data is included in the session response
    */
   @Patch('me')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateMe(
     @Body(new ZodPipe(UpdateAppUserSchema)) dto: UpdateAppUserDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    return this.appUserService.updateAppUser(sessionUser.id, dto)
+    await this.appUserService.updateAppUser(appUserContext.user.id, dto)
+    // Invalidate cache after update
+    await this.cacheService.invalidateUserByAuthId(appUserContext.user.id)
   }
 }

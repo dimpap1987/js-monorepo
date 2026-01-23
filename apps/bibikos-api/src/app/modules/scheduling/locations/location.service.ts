@@ -1,7 +1,7 @@
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
-import { OrganizerRepo, OrganizerRepository } from '../organizers/organizer.repository'
+import { OrganizerService } from '../organizers'
 import { CreateLocationDto, LocationResponseDto, UpdateLocationDto } from './dto/location.dto'
 import { LocationRepo, LocationRepository } from './location.repository'
 
@@ -12,8 +12,7 @@ export class LocationService {
   constructor(
     @Inject(LocationRepo)
     private readonly locationRepo: LocationRepository,
-    @Inject(OrganizerRepo)
-    private readonly organizerRepo: OrganizerRepository
+    private readonly organizerService: OrganizerService
   ) {}
 
   /**
@@ -48,7 +47,7 @@ export class LocationService {
   @Transactional()
   async createLocation(organizerId: number, dto: CreateLocationDto): Promise<LocationResponseDto> {
     // Verify organizer exists
-    const organizer = await this.organizerRepo.findById(organizerId)
+    const organizer = await this.organizerService.findById(organizerId)
     if (!organizer) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ORGANIZER_NOT_FOUND')
     }
@@ -66,6 +65,10 @@ export class LocationService {
 
     this.logger.log(`Created location ${location.id} for organizer ${organizerId}`)
     return this.toResponseDto(location)
+  }
+
+  async findById(id: number) {
+    return this.locationRepo.findById(id)
   }
 
   /**

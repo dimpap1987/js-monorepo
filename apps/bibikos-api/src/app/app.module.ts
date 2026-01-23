@@ -53,6 +53,9 @@ import {
   getTrialExpiredMessage,
   getTrialStartedMessage,
 } from './notifications/subscription-notifications'
+import { AppService } from './services/app.service'
+import { APP_GUARD } from '@nestjs/core'
+import { UserContextGuard } from '../guards/user-context'
 
 @Module({
   imports: [
@@ -311,7 +314,14 @@ import {
     }),
   ],
   controllers: [AnnouncementsController, AppController],
-  providers: [LoggerMiddleware],
+  providers: [
+    LoggerMiddleware,
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: UserContextGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   constructor(
@@ -352,7 +362,8 @@ export class AppModule implements NestModule {
         'payments/(.*)',
         'contact',
         'scheduling/organizers/public/(.*)',
-        'scheduling/schedules/discover(.*)'
+        'scheduling/schedules/discover(.*)',
+        'scheduling/classes/(.*)/public'
       )
       .forRoutes('*')
   }

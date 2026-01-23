@@ -1,7 +1,5 @@
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { ZodPipe } from '@js-monorepo/nest/pipes'
-import { SessionUserType } from '@js-monorepo/types/auth'
 import {
   Body,
   Controller,
@@ -14,15 +12,14 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common'
+import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
 import { AppUserService } from '../app-users/app-user.service'
 import { OrganizerService } from '../organizers/organizer.service'
 import { CreateLocationDto, CreateLocationSchema, UpdateLocationDto, UpdateLocationSchema } from './dto/location.dto'
 import { LocationService } from './location.service'
 
 @Controller('scheduling/locations')
-@UseGuards(LoggedInGuard)
 export class LocationController {
   constructor(
     private readonly locationService: LocationService,
@@ -33,15 +30,11 @@ export class LocationController {
   /**
    * Helper to get organizer ID for current user
    */
-  private async getOrganizerId(sessionUser: SessionUserType): Promise<number> {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
-
-    if (!organizer) {
+  private async getOrganizerId(appUserContext: AppUserContextType): Promise<number> {
+    if (!appUserContext.organizerId) {
       throw new ApiException(HttpStatus.FORBIDDEN, 'NOT_AN_ORGANIZER')
     }
-
-    return organizer.id
+    return appUserContext.organizerId
   }
 
   /**
@@ -49,8 +42,11 @@ export class LocationController {
    * List all locations for current organizer
    */
   @Get()
-  async listLocations(@SessionUser() sessionUser: SessionUserType, @Query('includeInactive') includeInactive?: string) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+  async listLocations(
+    @AppUserContext() appUserContext: AppUserContextType,
+    @Query('includeInactive') includeInactive?: string
+  ) {
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.locationService.getLocationsByOrganizer(organizerId, includeInactive === 'true')
   }
 
@@ -59,8 +55,8 @@ export class LocationController {
    * Get a specific location
    */
   @Get(':id')
-  async getLocation(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+  async getLocation(@Param('id', ParseIntPipe) id: number, @AppUserContext() appUserContext: AppUserContextType) {
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.locationService.getLocation(id, organizerId)
   }
 
@@ -72,9 +68,9 @@ export class LocationController {
   @HttpCode(HttpStatus.CREATED)
   async createLocation(
     @Body(new ZodPipe(CreateLocationSchema)) dto: CreateLocationDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.locationService.createLocation(organizerId, dto)
   }
 
@@ -87,9 +83,9 @@ export class LocationController {
   async updateLocation(
     @Param('id', ParseIntPipe) id: number,
     @Body(new ZodPipe(UpdateLocationSchema)) dto: UpdateLocationDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+    const organizerId = await this.getOrganizerId(appUserContext)
     return this.locationService.updateLocation(id, organizerId, dto)
   }
 
@@ -99,8 +95,8 @@ export class LocationController {
    */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteLocation(@Param('id', ParseIntPipe) id: number, @SessionUser() sessionUser: SessionUserType) {
-    const organizerId = await this.getOrganizerId(sessionUser)
+  async deleteLocation(@Param('id', ParseIntPipe) id: number, @AppUserContext() appUserContext: AppUserContextType) {
+    const organizerId = await this.getOrganizerId(appUserContext)
     await this.locationService.deactivateLocation(id, organizerId)
   }
 }

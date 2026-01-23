@@ -1,9 +1,19 @@
-import { LoggedInGuard, SessionUser } from '@js-monorepo/auth/nest/session'
-import { ZodPipe } from '@js-monorepo/nest/pipes'
-import { SessionUserType } from '@js-monorepo/types/auth'
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
 import { ApiException } from '@js-monorepo/nest/exceptions'
-import { AppUserService } from '../app-users/app-user.service'
+import { ZodPipe } from '@js-monorepo/nest/pipes'
+import {
+  Body,
+  Controller,
+  forwardRef,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common'
+import { AppUserContext, AppUserContextType } from '../../../../decorators/app-user.decorator'
 import { ClassScheduleService } from '../class-schedules/class-schedule.service'
 import {
   CreateOrganizerDto,
@@ -17,7 +27,7 @@ import { OrganizerService } from './organizer.service'
 export class OrganizerController {
   constructor(
     private readonly organizerService: OrganizerService,
-    private readonly appUserService: AppUserService,
+    @Inject(forwardRef(() => ClassScheduleService))
     private readonly scheduleService: ClassScheduleService
   ) {}
 
@@ -26,10 +36,8 @@ export class OrganizerController {
    * Get the current user's organizer profile
    */
   @Get('me')
-  @UseGuards(LoggedInGuard)
-  async getMyOrganizerProfile(@SessionUser() sessionUser: SessionUserType) {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    return this.organizerService.getOrganizerByAppUserId(appUser.id)
+  async getMyOrganizerProfile(@AppUserContext() appUserContext: AppUserContextType) {
+    return this.organizerService.findById(appUserContext.organizerId)
   }
 
   /**
@@ -38,14 +46,12 @@ export class OrganizerController {
    * This makes the user an "organizer" who can create classes
    */
   @Post()
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.CREATED)
   async createOrganizerProfile(
     @Body(new ZodPipe(CreateOrganizerSchema)) dto: CreateOrganizerDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    return this.organizerService.createOrGetOrganizer(appUser.id, dto)
+    return this.organizerService.createOrGetOrganizer(appUserContext.appUserId, dto)
   }
 
   /**
@@ -53,20 +59,16 @@ export class OrganizerController {
    * Update current user's organizer profile
    */
   @Patch('me')
-  @UseGuards(LoggedInGuard)
   @HttpCode(HttpStatus.OK)
   async updateMyOrganizerProfile(
     @Body(new ZodPipe(UpdateOrganizerSchema)) dto: UpdateOrganizerDto,
-    @SessionUser() sessionUser: SessionUserType
+    @AppUserContext() appUserContext: AppUserContextType
   ) {
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
-
-    if (!organizer) {
+    if (!appUserContext.organizerId) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'ORGANIZER_PROFILE_NOT_FOUND')
     }
 
-    return this.organizerService.updateOrganizer(organizer.id, appUser.id, dto)
+    return this.organizerService.updateOrganizer(appUserContext.organizerId, appUserContext.appUserId, dto)
   }
 
   /**
@@ -74,16 +76,12 @@ export class OrganizerController {
    * Check if a slug is available
    */
   @Get('slug-check')
-  @UseGuards(LoggedInGuard)
-  async checkSlugAvailability(@Query('slug') slug: string, @SessionUser() sessionUser: SessionUserType) {
+  async checkSlugAvailability(@Query('slug') slug: string, @AppUserContext() appUserContext: AppUserContextType) {
     if (!slug || slug.length < 3) {
       return { available: false, reason: 'Slug must be at least 3 characters' }
     }
 
-    const appUser = await this.appUserService.getOrCreateAppUserByAuthId(sessionUser.id)
-    const organizer = await this.organizerService.getOrganizerByAppUserId(appUser.id)
-
-    const available = await this.organizerService.checkSlugAvailability(slug, organizer?.id)
+    const available = await this.organizerService.checkSlugAvailability(slug, appUserContext?.organizerId)
     return { available }
   }
 
