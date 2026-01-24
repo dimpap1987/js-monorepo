@@ -136,10 +136,13 @@ export class ClassService {
       waitlistLimit: dto.waitlistLimit ?? null,
       isCapacitySoft: dto.isCapacitySoft ?? false,
       isPrivate: dto.isPrivate ?? false,
-      // TODO
-      // tags: {
-      //   connect: dto.tagIds.map((id) => ({ id })),
-      // },
+      ...(dto.tagIds?.length && {
+        tags: {
+          createMany: {
+            data: dto.tagIds.map((tagId) => ({ tagId })),
+          },
+        },
+      }),
     })
 
     this.logger.log(`Created class ${classEntity.id} for organizer ${organizerId}`)
@@ -195,7 +198,10 @@ export class ClassService {
       ...(dto.isPrivate !== undefined && { isPrivate: dto.isPrivate }),
       ...(dto.tagIds && {
         tags: {
-          set: dto.tagIds.map((id) => ({ id })),
+          deleteMany: {},
+          createMany: {
+            data: dto.tagIds.map((tagId) => ({ tagId })),
+          },
         },
       }),
     })
@@ -241,7 +247,10 @@ export class ClassService {
       isPrivate: classEntity.isPrivate,
       createdAt: classEntity.createdAt,
       location: classEntity.location,
-      tags: classEntity.tags.map((tag) => ({ id: tag.id, name: tag.name })),
+      tags: classEntity.tags.map((tagOnClass) => ({
+        id: tagOnClass.tag.id,
+        name: tagOnClass.tag.name,
+      })),
     }
   }
 }

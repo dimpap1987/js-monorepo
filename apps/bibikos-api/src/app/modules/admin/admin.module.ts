@@ -3,6 +3,7 @@ import { FeatureFlagsModule } from '@js-monorepo/feature-flags-server'
 import { PaymentsModule } from '@js-monorepo/payments-server'
 import { UserPresenceModule } from '@js-monorepo/user-presence'
 import { Global, Module, Provider } from '@nestjs/common'
+import { TagsModule } from '../tags'
 import { AdminController } from './admin.controller'
 import { AdminPaymentsService } from './admin-payments.service'
 import { AdminRepo } from './admin.repository'
@@ -21,7 +22,7 @@ const providers: Provider[] = [
 @Global()
 @Module({
   controllers: [AdminController],
-  imports: [UserPresenceModule, PaymentsModule, FeatureFlagsModule],
+  imports: [UserPresenceModule, PaymentsModule, FeatureFlagsModule, TagsModule],
   providers: [...providers, AuthSessionUserCacheService],
   exports: [...providers],
 })

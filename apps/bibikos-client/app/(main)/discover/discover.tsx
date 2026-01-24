@@ -2,7 +2,7 @@
 
 import { useNotifications } from '@js-monorepo/notification'
 import { ContainerTemplate } from '@js-monorepo/templates'
-import { useDeviceStore } from 'apps/bibikos-client/stores/deviceStore'
+import { useDeviceStore } from '../../../stores/deviceStore'
 import { Loader2 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getDateGroup, toScheduleDisplayTimes, type DateGroup } from '../../../lib/datetime'

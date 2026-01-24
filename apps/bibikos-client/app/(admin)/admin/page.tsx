@@ -1,7 +1,7 @@
 import { Card } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { DpVersion } from '@js-monorepo/version'
-import { ADMIN_NAV_LINKS } from './utils'
+import { ADMIN_NAV_SECTIONS } from './utils'
 
 export default function DashboardController() {
   return (
@@ -16,16 +16,30 @@ export default function DashboardController() {
       </div>
 
       <div className="p-2 flex justify-center font-semibold sm:hidden">
-        <div className="grid grid-cols-1 gap-3 w-full max-w-md">
-          {ADMIN_NAV_LINKS?.map(({ href, label }) => (
-            <Card
-              key={href}
-              className="text-center transition-all duration-200 ease-in-out hover:scale-[1.02] hover:shadow-md cursor-pointer border border-border hover:border-primary bg-card"
-            >
-              <DpNextNavLink className="p-6 block text-foreground hover:text-primary transition-colors" href={href}>
-                {label}
-              </DpNextNavLink>
-            </Card>
+        <div className="w-full max-w-md space-y-6">
+          {ADMIN_NAV_SECTIONS.map((section, sectionIndex) => (
+            <div key={section.title ?? sectionIndex} className="space-y-3">
+              {section.title && (
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">
+                  {section.title}
+                </h3>
+              )}
+              <div className="grid grid-cols-1 gap-3">
+                {section.links.map(({ href, label }) => (
+                  <Card
+                    key={href}
+                    className="text-center transition-all duration-200 ease-in-out hover:scale-[1.02] hover:shadow-md cursor-pointer border border-border hover:border-primary bg-card"
+                  >
+                    <DpNextNavLink
+                      className="p-6 block text-foreground hover:text-primary transition-colors"
+                      href={href}
+                    >
+                      {label}
+                    </DpNextNavLink>
+                  </Card>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

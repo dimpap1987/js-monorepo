@@ -1,6 +1,9 @@
-import { Class, ClassTag, Prisma } from '@js-monorepo/bibikos-db'
+import { Class, Prisma, Tag, TagOnClass } from '@js-monorepo/bibikos-db'
 
 export const ClassRepo = Symbol('ClassRepo')
+
+// Tag with its associated Tag entity from junction table
+export type ClassTagWithTag = TagOnClass & { tag: Tag }
 
 export interface ClassWithLocation extends Class {
   location: {
@@ -9,7 +12,7 @@ export interface ClassWithLocation extends Class {
     timezone: string
     isOnline: boolean
   }
-  tags: ClassTag[]
+  tags: ClassTagWithTag[]
 }
 
 export interface ClassWithLocationAndOrganizer extends ClassWithLocation {

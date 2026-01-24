@@ -10,8 +10,6 @@ import { OnboardingModule } from './onboarding/onboarding.module'
 import { OrganizerModule } from './organizers/organizer.module'
 import { ParticipantModule } from './participants/participant.module'
 
-import { ClassTagModule } from './tags/tags.module'
-
 /**
  * SchedulingModule - Class-based scheduling for individual instructors
  *
@@ -31,7 +29,8 @@ import { ClassTagModule } from './tags/tags.module'
  * 6. ClassScheduleModule - Specific occurrences (depends on Class, Location)
  * 7. BookingModule - Registrations (depends on Schedule, Participant)
  * 8. InvitationModule - Private class invitations (depends on Class, Organizer, AppUser)
- * 9. ClassTagModule - Tags for classes
+ *
+ * Note: Tags are managed via the global TagsModule (imported by AdminProviderModule)
  */
 @Module({
   imports: [
@@ -45,7 +44,6 @@ import { ClassTagModule } from './tags/tags.module'
     ClassScheduleModule,
     BookingModule,
     InvitationModule,
-    ClassTagModule,
   ],
 })
 export class SchedulingModule {}

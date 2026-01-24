@@ -68,6 +68,7 @@ model OrganizerProfile {
     classes          Class[]
     locations        Location[]        @relation("OrganizerLocations")
     classInvitations ClassInvitation[]
+    tags             TagOnOrganizer[]
 
     @@index([appUserId])
     @@index([slug])
@@ -87,8 +88,9 @@ model ParticipantProfile {
     appUserId Int      @unique
 
     // Relations
-    appUser  AppUser   @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+    appUser  AppUser          @relation(fields: [appUserId], references: [id], onDelete: Cascade)
     bookings Booking[]
+    tags     TagOnParticipant[]
 
     @@index([appUserId])
     @@map("participant_profiles")
@@ -125,6 +127,7 @@ model Location {
     organizer                    OrganizerProfile   @relation("OrganizerLocations", fields: [organizerId], references: [id], onDelete: Cascade)
     classes                      Class[]
     defaultForOrganizerProfiles  OrganizerProfile[] @relation("DefaultLocation")
+    tags                         TagOnLocation[]
 
     @@index([organizerId])
     @@index([countryCode])
@@ -166,7 +169,7 @@ model Class {
     location    Location          @relation(fields: [locationId], references: [id], onDelete: Restrict)
     schedules   ClassSchedule[]
     invitations ClassInvitation[]
-    tags        ClassTag[]
+    tags        TagOnClass[]
 
     @@index([organizerId])
     @@index([locationId])
@@ -176,19 +179,110 @@ model Class {
 }
 
 // -----------------------------------------------------------------------------
-// ClassTag - Tags for categorizing classes
+// Tag Entity Types - Which entities a tag can be applied to
 // -----------------------------------------------------------------------------
-// Global list of tags that can be assigned to classes
-model ClassTag {
+enum TagEntityType {
+    CLASS
+    ORGANIZER
+    LOCATION
+    PARTICIPANT
+}
+
+// -----------------------------------------------------------------------------
+// TagCategory - Scalable tag categorization
+// -----------------------------------------------------------------------------
+// Examples: ACTIVITY (yoga, pilates), SKILL_LEVEL (beginner), AMENITY (parking)
+model TagCategory {
     id        Int      @id @default(autoincrement())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     name      String   @unique @db.VarChar(50)
+    slug      String   @unique @db.VarChar(50) // URL-safe identifier
 
     // Relations
-    classes Class[]
+    tags Tag[]
 
-    @@map("class_tags")
+    @@map("tag_categories")
+}
+
+// -----------------------------------------------------------------------------
+// Tag - Unified tag entity for all taggable resources
+// -----------------------------------------------------------------------------
+// A tag can be associated with multiple entity types (classes, organizers, etc.)
+// applicableTo controls which entity types this tag can be assigned to
+model Tag {
+    id         Int      @id @default(autoincrement())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    name       String   @unique @db.VarChar(50)
+    categoryId Int?
+
+    // Entity type restrictions - which entities can use this tag
+    // Empty array means applicable to all entity types
+    applicableTo TagEntityType[]
+
+    // Relations
+    category     TagCategory?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+    classes      TagOnClass[]
+    organizers   TagOnOrganizer[]
+    participants TagOnParticipant[]
+    locations    TagOnLocation[]
+
+    @@index([categoryId])
+    @@map("tags")
+}
+
+// -----------------------------------------------------------------------------
+// Junction Tables - Tag associations per entity type
+// -----------------------------------------------------------------------------
+// Separate tables maintain FK constraints and type safety
+
+model TagOnClass {
+    tagId   Int
+    classId Int
+
+    tag   Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+    class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+    @@id([tagId, classId])
+    @@index([classId])
+    @@map("tags_on_classes")
+}
+
+model TagOnOrganizer {
+    tagId       Int
+    organizerId Int
+
+    tag       Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
+    organizer OrganizerProfile @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+    @@id([tagId, organizerId])
+    @@index([organizerId])
+    @@map("tags_on_organizers")
+}
+
+model TagOnParticipant {
+    tagId         Int
+    participantId Int
+
+    tag         Tag                @relation(fields: [tagId], references: [id], onDelete: Cascade)
+    participant ParticipantProfile @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+    @@id([tagId, participantId])
+    @@index([participantId])
+    @@map("tags_on_participants")
+}
+
+model TagOnLocation {
+    tagId      Int
+    locationId Int
+
+    tag      Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+    location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+    @@id([tagId, locationId])
+    @@index([locationId])
+    @@map("tags_on_locations")
 }
 
 // -----------------------------------------------------------------------------

@@ -13,13 +13,7 @@ import {
 import { Avatar, AvatarFallback } from '@js-monorepo/components/ui/avatar'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Button } from '@js-monorepo/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@js-monorepo/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@js-monorepo/components/ui/dialog'
 import { Label } from '@js-monorepo/components/ui/label'
 import { Separator } from '@js-monorepo/components/ui/separator'
 import { Textarea } from '@js-monorepo/components/ui/textarea'

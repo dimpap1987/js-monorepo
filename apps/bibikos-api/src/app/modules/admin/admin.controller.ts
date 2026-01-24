@@ -27,8 +27,19 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { Request } from 'express'
-import { ClassTagService } from '../scheduling/tags'
-import { CreateTagDto, CreateTagSchema, UpdateTagDto, UpdateTagSchema } from '../scheduling/tags/dto/tag.dto'
+import {
+  CreateTagCategoryDto,
+  CreateTagCategorySchema,
+  CreateTagDto,
+  CreateTagSchema,
+  TAG_ENTITY_TYPES,
+  TagEntityTypeDto,
+  TagService,
+  UpdateTagCategoryDto,
+  UpdateTagCategorySchema,
+  UpdateTagDto,
+  UpdateTagSchema,
+} from '../tags'
 import { AdminPaymentsService } from './admin-payments.service'
 import { AdminService } from './admin.service'
 import { SubscriptionFiltersSchema, SubscriptionFiltersType } from './dto/subscription-filters.schema'
@@ -45,7 +56,7 @@ export class AdminController {
     private readonly adminPaymentsService: AdminPaymentsService,
     private readonly authSessionCacheService: AuthSessionUserCacheService,
     private readonly featureFlagsService: FeatureFlagsService,
-    private readonly tagService: ClassTagService
+    private readonly tagService: TagService
   ) {}
 
   @Get('users')
@@ -190,28 +201,75 @@ export class AdminController {
     return { success: true, user: targetUser }
   }
 
-  // Tags
+  // ===== Tag Categories Management =====
 
-  @Get()
+  @Get('tag-categories')
+  async getAllTagCategories() {
+    return this.tagService.getAllCategories()
+  }
+
+  @Get('tag-categories/:id')
+  async getTagCategoryById(@Param('id', ParseIntPipe) id: number) {
+    return this.tagService.getCategoryById(id)
+  }
+
+  @Post('tag-categories')
+  @HttpCode(HttpStatus.CREATED)
+  async createTagCategory(@Body(new ZodPipe(CreateTagCategorySchema)) dto: CreateTagCategoryDto) {
+    return this.tagService.createCategory(dto)
+  }
+
+  @Patch('tag-categories/:id')
+  async updateTagCategory(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ZodPipe(UpdateTagCategorySchema)) dto: UpdateTagCategoryDto
+  ) {
+    return this.tagService.updateCategory(id, dto)
+  }
+
+  @Delete('tag-categories/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteTagCategory(@Param('id', ParseIntPipe) id: number) {
+    return this.tagService.deleteCategory(id)
+  }
+
+  // ===== Tags Management =====
+
+  @Get('tags')
   async getAllTags() {
     return this.tagService.getAllTags()
   }
 
-  @Post()
-  @UseGuards(RolesGuard)
+  @Get('tags/by-category/:categoryId')
+  async getTagsByCategoryId(@Param('categoryId', ParseIntPipe) categoryId: number) {
+    return this.tagService.getTagsByCategoryId(categoryId)
+  }
+
+  @Get('tags/by-entity-type/:entityType')
+  async getTagsByEntityType(@Param('entityType') entityType: string) {
+    if (!TAG_ENTITY_TYPES.includes(entityType as TagEntityTypeDto)) {
+      return []
+    }
+    return this.tagService.getTagsByEntityType(entityType as TagEntityTypeDto)
+  }
+
+  @Get('tags/:id')
+  async getTagById(@Param('id', ParseIntPipe) id: number) {
+    return this.tagService.getTagById(id)
+  }
+
+  @Post('tags')
   @HttpCode(HttpStatus.CREATED)
   async createTag(@Body(new ZodPipe(CreateTagSchema)) dto: CreateTagDto) {
     return this.tagService.createTag(dto)
   }
 
-  @Patch(':id')
-  @UseGuards(RolesGuard)
+  @Patch('tags/:id')
   async updateTag(@Param('id', ParseIntPipe) id: number, @Body(new ZodPipe(UpdateTagSchema)) dto: UpdateTagDto) {
     return this.tagService.updateTag(id, dto)
   }
 
-  @Delete(':id')
-  @UseGuards(RolesGuard)
+  @Delete('tags/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteTag(@Param('id', ParseIntPipe) id: number) {
     return this.tagService.deleteTag(id)
