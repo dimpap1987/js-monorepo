@@ -7,15 +7,63 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
 import { isAfter, isBefore } from 'date-fns'
 import { ArrowUpRight, CheckCircle2, ChevronRight, Clock, Radio, User, Users, X } from 'lucide-react'
-import { useScheduleTime, type ScheduleDateParts } from '../../../../lib/datetime'
-import type { DiscoverSchedule } from '../../../../lib/scheduling'
+import { useScheduleTime, type ScheduleDateParts } from '../../lib/datetime'
 
-interface TimeBadgeProps {
-  dateParts: ScheduleDateParts
+// =============================================================================
+// Types
+// =============================================================================
+
+export interface ScheduleCardData {
+  id: number
+  startTimeUtc: string
+  endTimeUtc: string
+  localTimezone: string
+}
+
+export interface ScheduleCardProps {
+  /** Schedule timing data */
+  schedule: ScheduleCardData
+  /** Class ID for navigation */
+  classId: number
+  /** Class title */
+  title: string
+  /** Max capacity (null = unlimited) */
+  capacity: number | null
+  /** Waitlist limit (0 or null = no waitlist) */
+  waitlistLimit?: number | null
+  /** Current booking counts */
+  bookingCounts: {
+    booked: number
+    waitlisted: number
+  }
+  /** User's booking for this schedule */
+  myBooking?: {
+    id: number
+    status: string
+    waitlistPosition: number | null
+  } | null
+  /** Organizer info (optional - shown in discover, hidden in class detail) */
+  organizer?: {
+    displayName: string | null
+    slug: string | null
+  }
+  /** Tags to display (optional) */
+  tags?: Array<{ id: number; name: string }>
+  /** Show link to class page */
+  showClassLink?: boolean
+  /** Called when user clicks Book/Join Waitlist */
+  onBook: () => void
+  /** Called when user clicks Cancel/Leave (optional - if not provided, no cancel button) */
+  onCancel?: () => void
+  /** Additional className for the card */
   className?: string
 }
 
-function TimeBadge({ dateParts, className }: TimeBadgeProps) {
+// =============================================================================
+// Sub-components
+// =============================================================================
+
+function TimeBadge({ dateParts, className }: { dateParts: ScheduleDateParts; className?: string }) {
   return (
     <div className={cn('flex-shrink-0 w-16 text-center self-center', className)}>
       <div className="bg-primary/10 rounded-lg p-2 text-primary">
@@ -67,44 +115,51 @@ function CapacityInfo({ bookedCount, capacity, isFull, hasWaitlist, spotsLeft }:
 }
 
 interface ScheduleInfoProps {
+  classId: number
   title: string
   timeRange: string
-  organizerName: string | null
-  organizerSlug: string | null
+  organizer?: {
+    displayName: string | null
+    slug: string | null
+  }
   bookedCount: number
   capacity: number | null
   isFull: boolean
   hasWaitlist: boolean
   spotsLeft: number | null
   isHappeningNow: boolean
-  classId: number
-  tags: Array<{ id: number; name: string }>
+  tags?: Array<{ id: number; name: string }>
+  showClassLink: boolean
 }
 
 function ScheduleInfo({
+  classId,
   title,
   timeRange,
-  organizerName,
-  organizerSlug,
+  organizer,
   bookedCount,
   capacity,
   isFull,
   hasWaitlist,
   spotsLeft,
   isHappeningNow,
-  classId,
   tags,
+  showClassLink,
 }: ScheduleInfoProps) {
   return (
     <div className="space-y-2 min-w-0">
       <div className="flex items-center gap-2 justify-between">
-        <DpNextNavLink
-          href={`/class/${classId}`}
-          className="group flex items-center gap-3 rounded-md py-1 px-2 hover:bg-muted cursor-pointer"
-        >
-          <h3 className="truncate group-hover:underline">{title}</h3>
-          <ArrowUpRight className="w-4 h-4 bg-muted" />
-        </DpNextNavLink>
+        {showClassLink ? (
+          <DpNextNavLink
+            href={`/class/${classId}`}
+            className="group flex items-center gap-3 rounded-md py-1 px-2 hover:bg-muted cursor-pointer"
+          >
+            <h3 className="truncate group-hover:underline">{title}</h3>
+            <ArrowUpRight className="w-4 h-4 bg-muted" />
+          </DpNextNavLink>
+        ) : (
+          <h3 className="truncate font-semibold">{title}</h3>
+        )}
         {isHappeningNow && (
           <Badge
             variant="outline"
@@ -120,20 +175,20 @@ function ScheduleInfo({
           <Clock className="w-4 h-4 flex-shrink-0" />
           <span>{timeRange}</span>
         </div>
-        {organizerName && (
+        {organizer?.displayName && (
           <div className="flex items-center gap-1.5 text-sm">
             <User className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
-            {organizerSlug ? (
-              <DpNextNavLink href={`/coach/${organizerSlug}`} className="hover:underline text-primary">
-                {organizerName}
+            {organizer.slug ? (
+              <DpNextNavLink href={`/coach/${organizer.slug}`} className="hover:underline text-primary">
+                {organizer.displayName}
               </DpNextNavLink>
             ) : (
-              <span className="text-muted-foreground">{organizerName}</span>
+              <span className="text-muted-foreground">{organizer.displayName}</span>
             )}
           </div>
         )}
       </div>
-      {tags.length > 0 && (
+      {tags && tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {tags.map((tag) => (
             <Badge key={tag.id} variant="default">
@@ -158,11 +213,20 @@ interface BookButtonProps {
   hasWaitlist: boolean
   isBooked: boolean
   isWaitlisted: boolean
+  waitlistPosition: number | null
   onBook: () => void
-  onCancel: () => void
+  onCancel?: () => void
 }
 
-function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCancel }: BookButtonProps) {
+function BookButton({
+  isFull,
+  hasWaitlist,
+  isBooked,
+  isWaitlisted,
+  waitlistPosition,
+  onBook,
+  onCancel,
+}: BookButtonProps) {
   const handleBookClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -172,7 +236,7 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
   const handleCancelClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    onCancel()
+    onCancel?.()
   }
 
   // User is already booked
@@ -186,15 +250,17 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
           <CheckCircle2 className="w-3 h-3" />
           Booked
         </Badge>
-        <Button
-          variant="ghost"
-          onClick={handleCancelClick}
-          className="gap-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-1 h-10"
-          type="button"
-        >
-          <X className="w-4 h-4" />
-          Cancel
-        </Button>
+        {onCancel && (
+          <Button
+            variant="ghost"
+            onClick={handleCancelClick}
+            className="gap-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-1 h-10"
+            type="button"
+          >
+            <X className="w-4 h-4" />
+            Cancel
+          </Button>
+        )}
       </div>
     )
   }
@@ -208,17 +274,19 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
           className="border-status-warning/20 bg-status-warning-bg text-status-warning gap-1 h-10 flex-1 justify-center"
         >
           <Clock className="w-3 h-3" />
-          Waitlisted
+          Waitlisted {waitlistPosition ? `#${waitlistPosition}` : ''}
         </Badge>
-        <Button
-          variant="ghost"
-          onClick={handleCancelClick}
-          className="gap-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-1 h-10"
-          type="button"
-        >
-          <X className="w-4 h-4" />
-          Leave
-        </Button>
+        {onCancel && (
+          <Button
+            variant="ghost"
+            onClick={handleCancelClick}
+            className="gap-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-1 h-10"
+            type="button"
+          >
+            <X className="w-4 h-4" />
+            Leave
+          </Button>
+        )}
       </div>
     )
   }
@@ -241,49 +309,61 @@ function BookButton({ isFull, hasWaitlist, isBooked, isWaitlisted, onBook, onCan
   )
 }
 
-interface DiscoverScheduleCardProps {
-  schedule: DiscoverSchedule
-  onBook: (schedule: DiscoverSchedule) => void
-  onCancel: (schedule: DiscoverSchedule) => void
-}
+// =============================================================================
+// Main Component
+// =============================================================================
 
-export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverScheduleCardProps) {
+export function ScheduleCard({
+  schedule,
+  classId,
+  title,
+  capacity,
+  waitlistLimit,
+  bookingCounts,
+  myBooking,
+  organizer,
+  tags,
+  showClassLink = true,
+  onBook,
+  onCancel,
+  className,
+}: ScheduleCardProps) {
   const { times, timeRange, dateParts } = useScheduleTime(schedule)
-  const classInfo = schedule.class
-  const bookingCounts = schedule.bookingCounts
 
   const bookedCount = bookingCounts?.booked || 0
-  const capacity = classInfo?.capacity ?? null
   const isFull = capacity !== null ? bookedCount >= capacity : false
-  const hasWaitlist = Boolean(classInfo?.waitlistLimit && classInfo.waitlistLimit > 0)
+  const hasWaitlist = Boolean(waitlistLimit && waitlistLimit > 0)
   const spotsLeft = capacity !== null ? capacity - bookedCount : null
 
-  // Check if class is happening now (using converted times)
+  // Check if class is happening now
   const now = new Date()
   const isHappeningNow = isAfter(now, times.start.date) && isBefore(now, times.end.date)
+
   // Check user's booking status
-  const isBooked = schedule.myBooking?.status === 'BOOKED'
-  const isWaitlisted = schedule.myBooking?.status === 'WAITLISTED'
+  const isBooked = myBooking?.status === 'BOOKED'
+  const isWaitlisted = myBooking?.status === 'WAITLISTED'
 
   return (
-    <Card className={cn('border-border transition-all hover:shadow-md hover:border-primary hover:bg-accent')}>
+    <Card
+      className={cn('border-border transition-all hover:shadow-md hover:border-primary hover:bg-accent', className)}
+    >
       <CardContent className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-4 min-w-0">
             <TimeBadge dateParts={dateParts} />
             <ScheduleInfo
-              classId={schedule.classId}
-              title={classInfo?.title || 'Class'}
+              classId={classId}
+              title={title}
               timeRange={timeRange}
-              organizerName={schedule.organizer.displayName}
-              organizerSlug={schedule.organizer.slug}
+              organizer={organizer}
               bookedCount={bookedCount}
               capacity={capacity}
               isFull={isFull}
               hasWaitlist={hasWaitlist}
               spotsLeft={spotsLeft}
               isHappeningNow={isHappeningNow}
-              tags={schedule.tags}
+              tags={tags}
+              showClassLink={showClassLink}
             />
           </div>
           <div className="w-full sm:w-auto px-5 mt-3">
@@ -292,8 +372,9 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
               hasWaitlist={hasWaitlist}
               isBooked={isBooked}
               isWaitlisted={isWaitlisted}
-              onBook={() => onBook(schedule)}
-              onCancel={() => onCancel(schedule)}
+              waitlistPosition={myBooking?.waitlistPosition ?? null}
+              onBook={onBook}
+              onCancel={onCancel}
             />
           </div>
         </div>

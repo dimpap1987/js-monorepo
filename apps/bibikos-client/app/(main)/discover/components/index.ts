@@ -1,5 +1,4 @@
 export { DiscoverFilters } from './discover-filters'
-export { DiscoverScheduleCard } from './discover-schedule-card'
 export { DiscoverDateGroup } from './discover-date-group'
 export { DiscoverSkeleton } from './discover-skeleton'
 export { DiscoverEmptyState } from './discover-empty-state'

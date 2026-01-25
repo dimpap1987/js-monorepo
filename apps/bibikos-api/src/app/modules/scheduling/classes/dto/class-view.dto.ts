@@ -7,6 +7,11 @@ export interface ClassViewScheduleDto {
     booked: number
     waitlisted: number
   }
+  myBooking: {
+    id: number
+    status: string
+    waitlistPosition: number | null
+  } | null
 }
 
 export interface ClassViewResponseDto {

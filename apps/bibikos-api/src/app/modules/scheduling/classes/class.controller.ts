@@ -58,10 +58,11 @@ export class ClassController {
    * GET /scheduling/classes/:id/view
    * Get class with schedules for booking page
    * No auth required for public classes, but requires accepted invitation for private classes
+   * If logged in, returns user's booking status for each schedule
    */
   @Get(':id/view')
   async getClassView(@Param('id', ParseIntPipe) id: number, @AppUserContext() appUserContext?: AppUserContextType) {
-    return this.classService.getClassView(id, appUserContext?.appUserId)
+    return this.classService.getClassView(id, appUserContext?.appUserId, appUserContext?.participantId)
   }
 
   /**

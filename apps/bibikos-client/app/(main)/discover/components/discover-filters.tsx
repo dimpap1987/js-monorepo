@@ -20,15 +20,15 @@ interface DiscoverFiltersProps {
 }
 
 export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: DiscoverFiltersProps) {
-  const hasActiveFilters = (filters.tagIds && filters.tagIds.length > 0) || filters.timeOfDay || filters.search
+  // const hasActiveFilters = (filters.tagIds && filters.tagIds.length > 0) || filters.timeOfDay || filters.search
 
   const handleTagChange = (tagIds: number[]) => {
     onFilterChange({ tagIds: tagIds.length > 0 ? tagIds : undefined })
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-3 justify-between">
+    <div className="space-y-5">
+      <div className="flex flex-col md:flex-row gap-3 justify-between">
         {/* Search */}
         <div className="relative flex-1 w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -38,7 +38,7 @@ export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: Dis
             onChange={(e) => onFilterChange({ search: e.target.value || undefined })}
             className="pl-9"
           />
-          {hasActiveFilters && (
+          {!!filters.search && (
             <Button
               className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7"
               variant="ghost"
@@ -60,7 +60,7 @@ export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: Dis
             })
           }
         >
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="sm:w-[200px]">
             <SelectValue placeholder="Time of day" />
           </SelectTrigger>
           <SelectContent>

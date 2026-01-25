@@ -1,6 +1,8 @@
+import { BookingStatus } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { forwardRef, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
+import { BookingService } from '../bookings'
 import { ClassScheduleService } from '../class-schedules'
 import { InvitationService } from '../invitations'
 import { LocationService } from '../locations'
@@ -20,7 +22,9 @@ export class ClassService {
     private readonly locationService: LocationService,
     @Inject(forwardRef(() => ClassScheduleService))
     private readonly classScheduleService: ClassScheduleService,
-    private readonly invitationService: InvitationService
+    private readonly invitationService: InvitationService,
+    @Inject(forwardRef(() => BookingService))
+    private readonly bookingService: BookingService
   ) {}
 
   /**
@@ -66,8 +70,9 @@ export class ClassService {
   /**
    * Get class view with schedules for booking
    * For private classes, user must have accepted invitation
+   * If logged in, returns user's booking status for each schedule
    */
-  async getClassView(classId: number, userId?: number): Promise<ClassViewResponseDto> {
+  async getClassView(classId: number, userId?: number, participantId?: number): Promise<ClassViewResponseDto> {
     const classEntity = await this.classRepo.findByIdWithLocationAndOrganizer(classId)
 
     if (!classEntity || !classEntity.isActive) {
@@ -89,6 +94,23 @@ export class ClassService {
     // Get upcoming schedules with booking counts
     const schedules = await this.classScheduleService.findUpcomingByClassIdWithBookingCounts(classId, 20)
 
+    // If user is logged in with a participant profile, fetch their bookings for these schedules
+    const userBookingsMap: Map<number, { id: number; status: string; waitlistPosition: number | null }> = new Map()
+    if (participantId && schedules.length > 0) {
+      const scheduleIds = schedules.map((s) => s.id)
+      const userBookings = await this.bookingService.findByParticipantAndScheduleIds(participantId, scheduleIds, [
+        BookingStatus.BOOKED,
+        BookingStatus.WAITLISTED,
+      ])
+      for (const booking of userBookings) {
+        userBookingsMap.set(booking.classScheduleId, {
+          id: booking.id,
+          status: booking.status,
+          waitlistPosition: booking.waitlistPosition,
+        })
+      }
+    }
+
     return {
       id: classEntity.id,
       title: classEntity.title,
@@ -103,6 +125,7 @@ export class ClassService {
         endTimeUtc: schedule.endTimeUtc,
         localTimezone: schedule.localTimezone,
         bookingCounts: schedule.bookingCounts || { booked: 0, waitlisted: 0 },
+        myBooking: userBookingsMap.get(schedule.id) || null,
       })),
     }
   }

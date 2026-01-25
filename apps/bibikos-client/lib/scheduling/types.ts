@@ -213,6 +213,12 @@ export interface ClassViewSchedule {
     booked: number
     waitlisted: number
   }
+  // User's booking for this schedule (if logged in)
+  myBooking: {
+    id: number
+    status: BookingStatus
+    waitlistPosition: number | null
+  } | null
 }
 
 export interface ClassViewResponse {

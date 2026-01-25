@@ -553,8 +553,9 @@ export function useCreateBooking() {
       queryClient.invalidateQueries({ queryKey: schedulingKeys.bookings() })
       queryClient.invalidateQueries({ queryKey: schedulingKeys.myBookings() })
       queryClient.invalidateQueries({ queryKey: schedulingKeys.schedules() })
-      // Also invalidate discover to update booking counts
+      // Also invalidate discover and class view to update booking status
       queryClient.invalidateQueries({ queryKey: [...schedulingKeys.all, 'discover'] })
+      queryClient.invalidateQueries({ queryKey: [...schedulingKeys.all, 'classes', 'view'] })
     },
   })
 }
@@ -570,8 +571,9 @@ export function useCancelBooking() {
       queryClient.invalidateQueries({ queryKey: schedulingKeys.bookings() })
       queryClient.invalidateQueries({ queryKey: schedulingKeys.myBookings() })
       queryClient.invalidateQueries({ queryKey: schedulingKeys.schedules() })
-      // Also invalidate discover to update booking counts
+      // Also invalidate discover and class view to update booking status
       queryClient.invalidateQueries({ queryKey: [...schedulingKeys.all, 'discover'] })
+      queryClient.invalidateQueries({ queryKey: [...schedulingKeys.all, 'classes', 'view'] })
     },
   })
 }

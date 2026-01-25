@@ -1,16 +1,17 @@
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { Calendar } from 'lucide-react'
-import { ClassScheduleCard } from './class-schedule-card'
+import { ScheduleCard } from '../../../../../components/schedule-card'
 import type { ClassViewSchedule, ClassViewResponse } from '../../../../../lib/scheduling'
 
 interface ClassSchedulesListProps {
   classData: ClassViewResponse
   onBookSchedule: (schedule: ClassViewSchedule) => void
+  onCancelSchedule: (schedule: ClassViewSchedule) => void
 }
 
 function EmptySchedules() {
   return (
-    <Card className="border-border/50">
+    <Card className="border-border">
       <CardContent className="py-16 text-center">
         <Calendar className="w-12 h-12 mx-auto mb-4 text-foreground-muted opacity-50" />
         <h3 className="text-lg font-semibold mb-2">No Upcoming Sessions</h3>
@@ -22,7 +23,7 @@ function EmptySchedules() {
   )
 }
 
-export function ClassSchedulesList({ classData, onBookSchedule }: ClassSchedulesListProps) {
+export function ClassSchedulesList({ classData, onBookSchedule, onCancelSchedule }: ClassSchedulesListProps) {
   const { schedules } = classData
 
   return (
@@ -34,11 +35,17 @@ export function ClassSchedulesList({ classData, onBookSchedule }: ClassSchedules
       {schedules.length > 0 ? (
         <div className="grid gap-4">
           {schedules.map((schedule) => (
-            <ClassScheduleCard
+            <ScheduleCard
               key={schedule.id}
               schedule={schedule}
+              classId={classData.id}
+              title={classData.title}
               capacity={classData.capacity}
+              bookingCounts={schedule.bookingCounts}
+              myBooking={schedule.myBooking}
+              showClassLink={false}
               onBook={() => onBookSchedule(schedule)}
+              onCancel={() => onCancelSchedule(schedule)}
             />
           ))}
         </div>

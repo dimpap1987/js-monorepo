@@ -34,7 +34,7 @@ function TagChip({ tag, isSelected, onToggle }: TagChipProps) {
       type="button"
       onClick={onToggle}
       className={cn(
-        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium',
+        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium shrink-0',
         'border transition-all duration-200 whitespace-nowrap',
         'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
         isSelected
@@ -120,14 +120,24 @@ export function TagFilter({
   const hasSelection = value.length > 0
 
   return (
-    <div className={cn('flex flex-wrap gap-2', className)}>
+    <div
+      className={cn(
+        'flex gap-2 py-2 px-1',
+        // Mobile: horizontal scroll, no wrap, hidden scrollbar
+        'overflow-x-auto flex-nowrap pb-1 -mb-1',
+        'scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none]',
+        // Desktop: wrap normally
+        'md:flex-wrap md:overflow-visible md:pb-0 md:-mb-0',
+        className
+      )}
+    >
       {/* All option */}
       {showAllOption && (
         <button
           type="button"
           onClick={handleClearAll}
           className={cn(
-            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium',
+            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium shrink-0',
             'border transition-all duration-200 whitespace-nowrap',
             'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
             !hasSelection
@@ -145,8 +155,10 @@ export function TagFilter({
         <div key={category ?? 'uncategorized'} className="contents">
           {/* Category separator */}
           {groupByCategory && category && (
-            <div className="flex items-center px-2">
-              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{category}</span>
+            <div className="flex items-center px-2 shrink-0">
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider whitespace-nowrap">
+                {category}
+              </span>
             </div>
           )}
 

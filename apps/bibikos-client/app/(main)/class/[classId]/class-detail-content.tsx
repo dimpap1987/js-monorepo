@@ -4,9 +4,10 @@ import { useSession } from '@js-monorepo/auth/next/client'
 import { useNotifications } from '@js-monorepo/notification'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { ClassViewSchedule, useClassView, useCreateBooking } from '../../../../lib/scheduling'
+import { ClassViewSchedule, useCancelBooking, useClassView, useCreateBooking } from '../../../../lib/scheduling'
 import {
   BookingConfirmationDialog,
+  CancelBookingDialog,
   ClassAccessDenied,
   ClassDetailHero,
   ClassDetailSkeleton,
@@ -26,9 +27,11 @@ export function ClassDetailContent({ classId }: ClassDetailContentProps) {
 
   const [selectedSchedule, setSelectedSchedule] = useState<ClassViewSchedule | null>(null)
   const [confirmBooking, setConfirmBooking] = useState(false)
+  const [confirmCancel, setConfirmCancel] = useState(false)
 
   const { data: classData, isLoading, error } = useClassView(classId)
   const createBookingMutation = useCreateBooking()
+  const cancelBookingMutation = useCancelBooking()
 
   const handleBookSchedule = (schedule: ClassViewSchedule) => {
     setSelectedSchedule(schedule)
@@ -71,6 +74,31 @@ export function ClassDetailContent({ classId }: ClassDetailContentProps) {
     }
   }
 
+  const handleCancelSchedule = (schedule: ClassViewSchedule) => {
+    setSelectedSchedule(schedule)
+    setConfirmCancel(true)
+  }
+
+  const handleConfirmCancel = async () => {
+    if (!selectedSchedule?.myBooking) return
+
+    try {
+      await cancelBookingMutation.mutateAsync({ id: selectedSchedule.myBooking.id })
+      addNotification({
+        message: 'Booking cancelled successfully',
+        type: 'success',
+      })
+      setConfirmCancel(false)
+      setSelectedSchedule(null)
+    } catch (er: unknown) {
+      const errorMessage = er instanceof Error ? er.message : 'Failed to cancel booking'
+      addNotification({
+        message: errorMessage,
+        type: 'error',
+      })
+    }
+  }
+
   if (isLoading) {
     return <ClassDetailSkeleton />
   }
@@ -94,7 +122,11 @@ export function ClassDetailContent({ classId }: ClassDetailContentProps) {
       <ClassDetailHero classData={classData} />
 
       <ContainerTemplate>
-        <ClassSchedulesList classData={classData} onBookSchedule={handleBookSchedule} />
+        <ClassSchedulesList
+          classData={classData}
+          onBookSchedule={handleBookSchedule}
+          onCancelSchedule={handleCancelSchedule}
+        />
       </ContainerTemplate>
 
       <BookingConfirmationDialog
@@ -104,6 +136,13 @@ export function ClassDetailContent({ classId }: ClassDetailContentProps) {
         classData={classData}
         onConfirm={handleConfirmBooking}
         isPending={createBookingMutation.isPending}
+      />
+
+      <CancelBookingDialog
+        open={confirmCancel}
+        onOpenChange={setConfirmCancel}
+        onConfirm={handleConfirmCancel}
+        isPending={cancelBookingMutation.isPending}
       />
     </ContainerTemplate>
   )
