@@ -1,4 +1,5 @@
 export { TagsModule } from './tags.module'
+export { TagsController } from './tags.controller'
 export { TagService } from './tag.service'
 export {
   // Repository interfaces

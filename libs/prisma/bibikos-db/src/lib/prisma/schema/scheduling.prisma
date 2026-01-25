@@ -53,12 +53,6 @@ model OrganizerProfile {
     bio         String? @db.Text
     slug        String? @unique @db.VarChar(100) // For public URL: /coach/john-doe
 
-    // Optional self-description (free text, does NOT affect logic or permissions)
-    activityLabel String? @db.VarChar(255)
-
-    // Policies
-    cancellationPolicy String? @db.Text
-
     // Default location for new classes
     defaultLocationId Int?
 

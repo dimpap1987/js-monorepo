@@ -32,8 +32,6 @@ import {
   CreateTagCategorySchema,
   CreateTagDto,
   CreateTagSchema,
-  TAG_ENTITY_TYPES,
-  TagEntityTypeDto,
   TagService,
   UpdateTagCategoryDto,
   UpdateTagCategorySchema,
@@ -203,16 +201,6 @@ export class AdminController {
 
   // ===== Tag Categories Management =====
 
-  @Get('tag-categories')
-  async getAllTagCategories() {
-    return this.tagService.getAllCategories()
-  }
-
-  @Get('tag-categories/:id')
-  async getTagCategoryById(@Param('id', ParseIntPipe) id: number) {
-    return this.tagService.getCategoryById(id)
-  }
-
   @Post('tag-categories')
   @HttpCode(HttpStatus.CREATED)
   async createTagCategory(@Body(new ZodPipe(CreateTagCategorySchema)) dto: CreateTagCategoryDto) {
@@ -234,29 +222,6 @@ export class AdminController {
   }
 
   // ===== Tags Management =====
-
-  @Get('tags')
-  async getAllTags() {
-    return this.tagService.getAllTags()
-  }
-
-  @Get('tags/by-category/:categoryId')
-  async getTagsByCategoryId(@Param('categoryId', ParseIntPipe) categoryId: number) {
-    return this.tagService.getTagsByCategoryId(categoryId)
-  }
-
-  @Get('tags/by-entity-type/:entityType')
-  async getTagsByEntityType(@Param('entityType') entityType: string) {
-    if (!TAG_ENTITY_TYPES.includes(entityType as TagEntityTypeDto)) {
-      return []
-    }
-    return this.tagService.getTagsByEntityType(entityType as TagEntityTypeDto)
-  }
-
-  @Get('tags/:id')
-  async getTagById(@Param('id', ParseIntPipe) id: number) {
-    return this.tagService.getTagById(id)
-  }
 
   @Post('tags')
   @HttpCode(HttpStatus.CREATED)

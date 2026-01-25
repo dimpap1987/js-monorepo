@@ -67,6 +67,9 @@ export function useOnboardingSubmission() {
           description: classData.description || null,
           capacity: classData.capacity ? Number(classData.capacity) : null,
           waitlistLimit: classData.waitlistLimit ? Number(classData.waitlistLimit) : null,
+          isCapacitySoft: classData.isCapacitySoft ?? false,
+          isPrivate: classData.isPrivate ?? false,
+          tagIds: classData.tagIds,
         },
       })
 

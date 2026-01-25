@@ -19,6 +19,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { TagSelectField } from '../../../../components/tag-select'
 
 // Class Schema - use shared schema but adapt for form (locationId comes from state, handle empty strings)
 const classSchema = CreateClassSchema.omit({ locationId: true }).extend({
@@ -50,6 +51,7 @@ export function ClassStepForm({ initialData, onSubmit, onBack, isLoading = false
       capacity: '',
       waitlistLimit: '',
       isPrivate: false,
+      tagIds: [],
     },
   })
 
@@ -70,7 +72,7 @@ export function ClassStepForm({ initialData, onSubmit, onBack, isLoading = false
             <FormItem>
               <FormLabel>{tClasses('classTitle')}</FormLabel>
               <FormControl>
-                <Input placeholder={tClasses('titlePlaceholder')} {...field} />
+                <Input placeholder={tClasses('titlePlaceholder')} autoFocus {...field} />
               </FormControl>
               <p className="text-sm text-foreground-muted">{tClasses('classTitleDescription')}</p>
             </FormItem>
@@ -96,6 +98,14 @@ export function ClassStepForm({ initialData, onSubmit, onBack, isLoading = false
               </FormControl>
             </FormItem>
           )}
+        />
+
+        <TagSelectField
+          control={form.control}
+          name="tagIds"
+          entityType="CLASS"
+          label={tClasses('activityLabel')}
+          placeholder={tClasses('activityLabelPlaceholder')}
         />
 
         <div className="grid grid-cols-2 gap-4">

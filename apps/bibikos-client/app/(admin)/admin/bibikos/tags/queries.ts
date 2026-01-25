@@ -63,7 +63,7 @@ export const TAGS_QUERY_KEY = ['admin', 'tags']
 // =============================================================================
 
 export const fetchTagCategories = async (): Promise<TagCategory[]> => {
-  const response = await apiClient.get<TagCategory[]>('/admin/tag-categories')
+  const response = await apiClient.get<TagCategory[]>('/tag-categories')
   return handleQueryResponse(response)
 }
 
@@ -123,7 +123,7 @@ export function useDeleteTagCategory() {
 // =============================================================================
 
 export const fetchTags = async (): Promise<Tag[]> => {
-  const response = await apiClient.get<Tag[]>('/admin/tags')
+  const response = await apiClient.get<Tag[]>('/tags')
   return handleQueryResponse(response)
 }
 

@@ -2,6 +2,7 @@ import { Global, Module, Provider } from '@nestjs/common'
 import { TagCategoryRepo, TagRepo } from './repositories/tag.repository'
 import { TagCategoryRepositoryPrisma, TagRepositoryPrisma } from './repositories/tag.repository.prisma'
 import { TagService } from './tag.service'
+import { TagsController } from './tags.controller'
 
 const providers: Provider[] = [
   {
@@ -17,6 +18,7 @@ const providers: Provider[] = [
 
 @Global()
 @Module({
+  controllers: [TagsController],
   providers: [...providers],
   exports: [...providers],
 })

@@ -158,6 +158,7 @@
       "step3Subtitle": "Προσθέστε την πρώτη σας τάξη",
       "displayName": "Εμφανιζόμενο Όνομα",
       "displayNamePlaceholder": "Πώς θα σας βλέπουν οι συμμετέχοντες",
+      "displayNameTooltip": "Αυτό το όνομα θα είναι ορατό σε όλους στο δημόσιο προφίλ σας",
       "activityLabel": "Τι είδους τάξεις διδάσκετε;",
       "activityLabelPlaceholder": "π.χ., Yoga, Pilates, CrossFit, Χορός",
       "bio": "Βιογραφικό (προαιρετικό)",
@@ -210,7 +211,9 @@
       "capacityPlaceholder": "Αφήστε κενό για απεριόριστο",
       "waitlistLimit": "Όριο Λίστας Αναμονής",
       "waitlistPlaceholder": "Αφήστε κενό για απεριόριστο",
-      "softCapacity": "Ευέλικτη χωρητικότητα (επιτρέψτε υπερκράτηση)"
+      "softCapacity": "Ευέλικτη χωρητικότητα (επιτρέψτε υπερκράτηση)",
+      "activityLabel": "Τύπος Τάξης",
+      "activityLabelPlaceholder": "π.χ., Yoga, Pilates, CrossFit, Χορός"
     },
     "schedules": {
       "title": "Πρόγραμμα",

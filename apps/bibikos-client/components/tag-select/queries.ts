@@ -33,7 +33,7 @@ export const TAGS_BY_ENTITY_TYPE_KEY = (entityType: TagEntityType) => ['tags', '
 // =============================================================================
 
 export const fetchTagsByEntityType = async (entityType: TagEntityType): Promise<Tag[]> => {
-  const response = await apiClient.get<Tag[]>(`/admin/tags/by-entity-type/${entityType}`)
+  const response = await apiClient.get<Tag[]>(`/tags/by-entity-type/${entityType}`)
   return handleQueryResponse(response)
 }
 

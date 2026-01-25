@@ -5,11 +5,11 @@ import { Button } from '@js-monorepo/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
 import { Input } from '@js-monorepo/components/ui/form'
 import { Textarea } from '@js-monorepo/components/ui/textarea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@js-monorepo/components/ui/tooltip'
 import { useTranslations } from 'next-intl'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Info } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { TagSelectField } from '../../../../components/tag-select'
 import { CreateOrganizerDto, CreateOrganizerSchema } from '@js-monorepo/schemas'
 
@@ -22,7 +22,7 @@ interface ProfileStepFormProps {
   isLoading?: boolean
 }
 
-export function ProfileStepForm({
+export function   ProfileStepForm({
   defaultDisplayName = '',
   initialData,
   onSubmit,
@@ -55,9 +55,21 @@ export function ProfileStepForm({
           name="displayName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('displayName')}</FormLabel>
+              <FormLabel className="flex items-center gap-1.5">
+                {t('displayName')}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger type="button" className="text-muted-foreground hover:text-foreground">
+                      <Info className="w-4 h-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t('displayNameTooltip')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </FormLabel>
               <FormControl>
-                <Input placeholder={t('displayNamePlaceholder')} {...field} />
+                <Input placeholder={t('displayNamePlaceholder')} autoFocus {...field} />
               </FormControl>
             </FormItem>
           )}

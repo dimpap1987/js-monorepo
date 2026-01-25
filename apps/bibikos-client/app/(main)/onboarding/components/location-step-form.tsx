@@ -81,7 +81,7 @@ export function LocationStepForm({ initialData, onSubmit, onBack, isLoading = fa
             <FormItem>
               <FormLabel>{tOnboarding('venueName')}</FormLabel>
               <FormControl>
-                <Input placeholder={tOnboarding('venueNamePlaceholder')} {...field} />
+                <Input placeholder={tOnboarding('venueNamePlaceholder')} autoFocus {...field} />
               </FormControl>
               <p className="text-sm text-foreground-muted">{tOnboarding('venueNameDescription')}</p>
             </FormItem>

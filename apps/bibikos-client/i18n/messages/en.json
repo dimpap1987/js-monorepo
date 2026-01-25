@@ -158,6 +158,7 @@
       "step3Subtitle": "Add your first class",
       "displayName": "Display Name",
       "displayNamePlaceholder": "How participants will see you",
+      "displayNameTooltip": "This name will be visible to everyone on your public profile",
       "activityLabel": "What kind of classes do you run?",
       "activityLabelPlaceholder": "e.g., Yoga, Pilates, CrossFit, Dance",
       "bio": "Bio (optional)",
@@ -210,7 +211,9 @@
       "capacityPlaceholder": "Leave empty for unlimited",
       "waitlistLimit": "Waitlist Limit",
       "waitlistPlaceholder": "Leave empty for unlimited",
-      "softCapacity": "Soft capacity (allow overbooking)"
+      "softCapacity": "Soft capacity (allow overbooking)",
+      "activityLabel": "Class Type",
+      "activityLabelPlaceholder": "e.g., Yoga, Pilates, CrossFit, Dance"
     },
     "schedules": {
       "title": "Schedule",
