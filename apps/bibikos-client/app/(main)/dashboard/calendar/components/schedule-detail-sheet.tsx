@@ -207,7 +207,7 @@ export function ScheduleDetailSheet({ schedule, classInfo, location, onCancel, o
 
           {/* Cancel Reason */}
           {schedule.isCancelled && schedule.cancelReason && (
-            <div className="rounded-xl bg-destructive/5 border border-destructive/20 p-4">
+            <div className="rounded-xl bg-destructive/5 border border-destructive p-4">
               <div className="flex items-start gap-3">
                 <CalendarX className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
                 <div>

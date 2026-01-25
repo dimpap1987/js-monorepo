@@ -99,14 +99,14 @@ function CapacityInfo({ bookedCount, capacity, isFull, hasWaitlist, spotsLeft }:
           className={cn(
             'text-xs',
             hasWaitlist
-              ? 'border-status-info/20 bg-status-info-bg text-status-info'
-              : 'border-destructive/20 bg-destructive/10 text-destructive'
+              ? 'border-status-info bg-status-info-bg text-status-info'
+              : 'border-destructive bg-destructive/10 text-destructive'
           )}
         >
           {hasWaitlist ? 'Waitlist available' : 'Full'}
         </Badge>
       ) : spotsLeft !== null && spotsLeft <= 3 ? (
-        <Badge variant="outline" className="text-xs border-status-warning/20 bg-status-warning-bg text-status-warning">
+        <Badge variant="outline" className="text-xs border-status-warning bg-status-warning-bg text-status-warning">
           {spotsLeft} {spotsLeft === 1 ? 'spot' : 'spots'} left
         </Badge>
       ) : null}
@@ -245,7 +245,7 @@ function BookButton({
       <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
         <Badge
           variant="outline"
-          className="border-status-success/20 bg-status-success-bg text-status-success gap-1 h-10 flex-1 justify-center"
+          className="border-status-success bg-status-success-bg text-status-success gap-1 h-10 flex-1 justify-center"
         >
           <CheckCircle2 className="w-3 h-3" />
           Booked
@@ -271,7 +271,7 @@ function BookButton({
       <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
         <Badge
           variant="outline"
-          className="border-status-warning/20 bg-status-warning-bg text-status-warning gap-1 h-10 flex-1 justify-center"
+          className="border-status-warning bg-status-warning-bg text-status-warning gap-1 h-10 flex-1 justify-center"
         >
           <Clock className="w-3 h-3" />
           Waitlisted {waitlistPosition ? `#${waitlistPosition}` : ''}

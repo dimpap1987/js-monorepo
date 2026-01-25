@@ -1,4 +1,3 @@
-import { BookingStatus } from '@js-monorepo/bibikos-db'
 import { ApiException } from '@js-monorepo/nest/exceptions'
 import { Transactional } from '@nestjs-cls/transactional'
 import { forwardRef, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
@@ -95,21 +94,8 @@ export class ClassService {
     const schedules = await this.classScheduleService.findUpcomingByClassIdWithBookingCounts(classId, 20)
 
     // If user is logged in with a participant profile, fetch their bookings for these schedules
-    const userBookingsMap: Map<number, { id: number; status: string; waitlistPosition: number | null }> = new Map()
-    if (participantId && schedules.length > 0) {
-      const scheduleIds = schedules.map((s) => s.id)
-      const userBookings = await this.bookingService.findByParticipantAndScheduleIds(participantId, scheduleIds, [
-        BookingStatus.BOOKED,
-        BookingStatus.WAITLISTED,
-      ])
-      for (const booking of userBookings) {
-        userBookingsMap.set(booking.classScheduleId, {
-          id: booking.id,
-          status: booking.status,
-          waitlistPosition: booking.waitlistPosition,
-        })
-      }
-    }
+    const scheduleIds = schedules.map((s) => s.id)
+    const userBookingsMap = await this.bookingService.getUserBookingsMapForSchedules(participantId, scheduleIds)
 
     return {
       id: classEntity.id,

@@ -140,7 +140,7 @@ export function AccountSettings() {
                       <div className="relative group">
                         <Avatar className="h-24 w-24 sm:h-28 sm:w-28 ring-2 ring-border ring-offset-2 ring-offset-background transition-all duration-200 group-hover:ring-primary/50">
                           {profileImageWatch && <AvatarImage src={profileImageWatch} alt="user's picture" />}
-                          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-2xl sm:text-3xl font-bold text-primary">
+                          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-2xl sm:text-3xl font-bold text-primary">
                             {user?.username?.charAt(0).toUpperCase() || 'NA'}
                           </AvatarFallback>
                         </Avatar>
@@ -383,7 +383,7 @@ export function AccountSettings() {
                       {user.roles.map((role: string) => (
                         <span
                           key={role}
-                          className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-bold border border-primary/20 whitespace-nowrap"
+                          className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-bold border border-primary whitespace-nowrap"
                         >
                           {role}
                         </span>

@@ -80,7 +80,7 @@ export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: Dis
         value={filters.tagIds || []}
         onChange={handleTagChange}
         showAllOption={true}
-        allLabel="All Classes"
+        allLabel="All"
       />
     </div>
   )

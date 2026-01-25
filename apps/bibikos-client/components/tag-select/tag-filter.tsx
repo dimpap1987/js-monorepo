@@ -34,12 +34,12 @@ function TagChip({ tag, isSelected, onToggle }: TagChipProps) {
       type="button"
       onClick={onToggle}
       className={cn(
-        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium shrink-0',
+        'inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium shrink-0',
         'border transition-all duration-200 whitespace-nowrap',
-        'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+        'focus:outline-none focus:ring-1 focus:ring-ring focus:ring-inset',
         isSelected
           ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-          : 'bg-background text-foreground border-border hover:bg-accent hover:border-accent-foreground/20'
+          : 'bg-background text-foreground border-border hover:bg-accent hover:border-accent-foreground'
       )}
     >
       {isSelected && <Check className="w-3.5 h-3.5" />}
@@ -142,7 +142,7 @@ export function TagFilter({
             'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
             !hasSelection
               ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-              : 'bg-background text-foreground border-border hover:bg-accent hover:border-accent-foreground/20'
+              : 'bg-background text-foreground border-border hover:bg-accent hover:border-accent-foreground'
           )}
         >
           {!hasSelection && <Check className="w-3.5 h-3.5" />}

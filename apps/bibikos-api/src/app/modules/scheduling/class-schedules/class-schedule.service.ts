@@ -201,21 +201,8 @@ export class ClassScheduleService {
     )
 
     // If user is logged in, fetch their bookings for these schedules
-    const userBookingsMap: Map<number, { id: number; status: string; waitlistPosition: number | null }> = new Map()
-    if (participantId && result.schedules.length > 0) {
-      const scheduleIds = result.schedules.map((s) => s.id)
-      const userBookings = await this.bookingService.findByParticipantAndScheduleIds(participantId, scheduleIds, [
-        BookingStatus.BOOKED,
-        BookingStatus.WAITLISTED,
-      ])
-      for (const booking of userBookings) {
-        userBookingsMap.set(booking.classScheduleId, {
-          id: booking.id,
-          status: booking.status,
-          waitlistPosition: booking.waitlistPosition,
-        })
-      }
-    }
+    const scheduleIds = result.schedules.map((s) => s.id)
+    const userBookingsMap = await this.bookingService.getUserBookingsMapForSchedules(participantId, scheduleIds)
 
     // Determine next cursor (last item's id)
     const nextCursor =

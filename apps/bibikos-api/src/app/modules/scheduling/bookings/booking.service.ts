@@ -495,6 +495,38 @@ export class BookingService {
     return this.bookingRepo.findByParticipantAndScheduleIds(participantId, scheduleIds, statuses)
   }
 
+  /**
+   * Get a map of user's bookings for given schedule IDs.
+   * Useful for enriching schedule lists with user's booking status.
+   * @param participantId - The participant's ID
+   * @param scheduleIds - Array of schedule IDs to check
+   * @param statuses - Booking statuses to include (defaults to BOOKED and WAITLISTED)
+   * @returns Map of scheduleId -> booking info (id, status, waitlistPosition)
+   */
+  async getUserBookingsMapForSchedules(
+    participantId: number | undefined,
+    scheduleIds: number[],
+    statuses: BookingStatus[] = [BookingStatus.BOOKED, BookingStatus.WAITLISTED]
+  ): Promise<Map<number, { id: number; status: BookingStatus; waitlistPosition: number | null }>> {
+    const bookingsMap = new Map<number, { id: number; status: BookingStatus; waitlistPosition: number | null }>()
+
+    if (!participantId || scheduleIds.length === 0) {
+      return bookingsMap
+    }
+
+    const userBookings = await this.findByParticipantAndScheduleIds(participantId, scheduleIds, statuses)
+
+    for (const booking of userBookings) {
+      bookingsMap.set(booking.classScheduleId, {
+        id: booking.id,
+        status: booking.status,
+        waitlistPosition: booking.waitlistPosition,
+      })
+    }
+
+    return bookingsMap
+  }
+
   private toParticipantResponseDto(booking: BookingWithParticipant): BookingResponseDto {
     return {
       id: booking.id,

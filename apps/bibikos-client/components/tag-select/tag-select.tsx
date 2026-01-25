@@ -170,7 +170,7 @@ export function TagSelect({
               <button
                 type="button"
                 onClick={(e) => handleRemoveTag(tag.id, e)}
-                className="rounded-full hover:bg-muted-foreground/20 p-0.5"
+                className="rounded-full hover:bg-muted-foreground p-0.5"
               >
                 <BiX className="h-3 w-3" />
               </button>

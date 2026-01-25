@@ -54,7 +54,7 @@ export function LandingPage() {
         <div className="container relative mx-auto px-4 py-10 sm:py-22">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary mb-8">
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">For Individual Instructors</span>
             </div>
@@ -118,7 +118,7 @@ export function LandingPage() {
               >
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-colors">
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
                     <div>
@@ -149,7 +149,7 @@ export function LandingPage() {
                 <div key={key} className="relative">
                   {/* Connector line */}
                   {index < steps.length - 1 && (
-                    <div className="hidden md:block absolute top-8 left-[calc(50%+40px)] w-[calc(100%-80px)] h-0.5 bg-gradient-to-r from-primary/50 to-primary/20" />
+                    <div className="hidden md:block absolute top-8 left-[calc(50%+40px)] w-[calc(100%-80px)] h-0.5 bg-gradient-to-r from-primary/50 to-primary" />
                   )}
 
                   <div className="text-center">
