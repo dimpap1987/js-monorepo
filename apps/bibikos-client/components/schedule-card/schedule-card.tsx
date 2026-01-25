@@ -6,7 +6,7 @@ import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
 import { isAfter, isBefore } from 'date-fns'
-import { ArrowUpRight, CheckCircle2, ChevronRight, Clock, Radio, User, Users, X } from 'lucide-react'
+import { CheckCircle2, ChevronRight, Clock, Radio, User, Users, X } from 'lucide-react'
 import { useScheduleTime, type ScheduleDateParts } from '../../lib/datetime'
 
 // =============================================================================
@@ -147,7 +147,7 @@ function ScheduleInfo({
   showClassLink,
 }: ScheduleInfoProps) {
   return (
-    <div className="space-y-2 min-w-0">
+    <div className="space-y-4 min-w-0">
       <div className="flex items-center gap-2 justify-between">
         {showClassLink ? (
           <DpNextNavLink
@@ -155,7 +155,6 @@ function ScheduleInfo({
             className="group flex items-center gap-3 rounded-md py-1 px-2 hover:bg-muted cursor-pointer"
           >
             <h3 className="truncate group-hover:underline">{title}</h3>
-            <ArrowUpRight className="w-4 h-4 bg-muted" />
           </DpNextNavLink>
         ) : (
           <h3 className="truncate font-semibold">{title}</h3>
@@ -191,7 +190,7 @@ function ScheduleInfo({
       {tags && tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {tags.map((tag) => (
-            <Badge key={tag.id} variant="default">
+            <Badge key={tag.id} variant="outline">
               {tag.name}
             </Badge>
           ))}
@@ -245,14 +244,14 @@ function BookButton({
       <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
         <Badge
           variant="outline"
-          className="border-status-success bg-status-success-bg text-status-success gap-1 h-10 flex-1 justify-center"
+          className="border-status-success bg-status-success-bg text-status-success gap-1 h-9 flex-1 justify-center"
         >
           <CheckCircle2 className="w-3 h-3" />
           Booked
         </Badge>
         {onCancel && (
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={handleCancelClick}
             className="gap-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 flex-1 h-10"
             type="button"
@@ -345,7 +344,10 @@ export function ScheduleCard({
 
   return (
     <Card
-      className={cn('border-border transition-all hover:shadow-md hover:border-primary hover:bg-accent', className)}
+      className={cn(
+        'border-border rounded-3xl transition-all hover:shadow-md hover:border-primary hover:bg-accent',
+        className
+      )}
     >
       <CardContent className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

@@ -92,10 +92,10 @@ export default function RootComponent({ children }: PropsWithChildren) {
   )
 
   const loginLogoutButton = user ? (
-    <DpLogoutButton onClick={() => authClient.logout()} className="px-4" />
+    <DpLogoutButton onClick={() => authClient.logout()} className="p-6 mb-1" />
   ) : (
     <DpNextNavLink href="/auth/login">
-      <DpLoginButton />
+      <DpLoginButton className="p-6 mb-1" />
     </DpNextNavLink>
   )
 

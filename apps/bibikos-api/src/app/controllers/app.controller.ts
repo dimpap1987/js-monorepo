@@ -43,7 +43,7 @@ export class AppController {
 
     if (!appUserContext) return null
 
-    const [{ result: subscriptionResult }, featureFlags, { result: appUser }] = await Promise.all([
+    const [sub, featureFlags, { result: appUser }] = await Promise.all([
       // Cache subscription status per user for 5 minutes (300 seconds)
       this.cacheService.getOrSet(
         SUBSCRIPTION_STATUS_KEY,
@@ -60,7 +60,7 @@ export class AppController {
       tryCatch(() => this.appUserService.findByAuthUserId(appUserContext.user.id)),
     ])
 
-    const subscription = normalizeSubscription(subscriptionResult)
+    const subscription = normalizeSubscription(sub)
     const sessionAppUser: SessionAppUser = this.mapAppUserToSessionAppUser(appUser)
 
     return {

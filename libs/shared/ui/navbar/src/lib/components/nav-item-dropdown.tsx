@@ -39,7 +39,8 @@ export const NavItemDropdown = ({ item, user }: NavItemDropdownProps) => {
         <DropdownMenuTrigger
           className={cn(
             'p-2 h-full flex items-center gap-1 border-b-2 border-transparent content-center transition-colors',
-            item.isAdmin && 'text-primary font-bold'
+            item.isAdmin && 'text-primary font-bold',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring'
           )}
         >
           {item.name}

@@ -1,7 +1,6 @@
 'use client'
 
 import { cn } from '@js-monorepo/ui/util'
-import { Check } from 'lucide-react'
 import { useMemo } from 'react'
 import { Tag, TagEntityType, useTagsByEntityType } from './queries'
 
@@ -42,7 +41,6 @@ function TagChip({ tag, isSelected, onToggle }: TagChipProps) {
           : 'bg-background text-foreground border-border hover:bg-accent hover:border-accent-foreground'
       )}
     >
-      {isSelected && <Check className="w-3.5 h-3.5" />}
       <span>{tag.name}</span>
     </button>
   )
@@ -145,7 +143,6 @@ export function TagFilter({
               : 'bg-background text-foreground border-border hover:bg-accent hover:border-accent-foreground'
           )}
         >
-          {!hasSelection && <Check className="w-3.5 h-3.5" />}
           <span>{allLabel}</span>
         </button>
       )}

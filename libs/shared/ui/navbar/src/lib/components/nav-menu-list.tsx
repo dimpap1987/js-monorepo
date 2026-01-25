@@ -1,9 +1,8 @@
 'use client'
 
 import { MenuItem } from '@js-monorepo/types/menu'
-import { ReactNode } from 'react'
-import { NavItem } from './nav-item'
 import { UserNavProps } from '../navbar'
+import { NavItem } from './nav-item'
 
 interface NavMenuListProps {
   items: MenuItem[]

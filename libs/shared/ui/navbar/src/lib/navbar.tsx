@@ -3,11 +3,10 @@
 import { AuthRole } from '@js-monorepo/types/auth'
 import { MenuItem, hasRoleAccess } from '@js-monorepo/types/menu'
 import { ReactNode, forwardRef, useMemo } from 'react'
-import './navbar.css'
 
-import { NavUserOptionsProps } from './components/nav-user-options'
 import { NavLeftSection } from './components/nav-left-section'
 import { NavRightSection } from './components/nav-right-section'
+import { NavUserOptionsProps } from './components/nav-user-options'
 
 /* ---------------------- Types ---------------------- */
 export interface NavbarProps {

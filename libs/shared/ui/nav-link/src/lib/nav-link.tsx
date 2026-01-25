@@ -27,6 +27,7 @@ const DpNextNavLink = forwardRef(
         href={href}
         className={cn(
           `cursor-pointer h-full content-center`,
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
           ` ${className} ${activeClassName && isSamePath ? activeClassName : ''}`
         )}
         onClick={(e) => {

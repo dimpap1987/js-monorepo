@@ -24,6 +24,82 @@ interface BookingDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
+function BookingSummary({
+  startTime,
+  endTime,
+  title,
+  organizerName,
+}: {
+  startTime: Date
+  endTime: Date
+  title?: string
+  organizerName?: string | null
+}) {
+  return (
+    <div className="rounded-lg border bg-muted/40 p-4 space-y-3 text-sm">
+      <div className="flex items-center gap-3">
+        <Calendar className="w-4 h-4 text-muted-foreground" />
+        <span>{format(startTime, 'EEEE, MMMM d, yyyy')}</span>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <Clock className="w-4 h-4 text-muted-foreground" />
+        <span>
+          {format(startTime, 'h:mm a')} – {format(endTime, 'h:mm a')}
+        </span>
+      </div>
+
+      {title && <div className="pt-2 border-t text-sm font-medium text-foreground">{title}</div>}
+
+      {organizerName && (
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <User className="w-4 h-4" />
+          <span>{organizerName}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function BookingError({ message }: { message: string }) {
+  return (
+    <div className="flex items-start gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+      <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+      <span>{message}</span>
+    </div>
+  )
+}
+
+function BookingSuccess({
+  startTime,
+  endTime,
+  classInfo,
+  onClose,
+}: {
+  startTime: Date
+  endTime: Date
+  classInfo?: { title?: string }
+  onClose: () => void
+}) {
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2 text-base">
+          <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+          Booking confirmed
+        </DialogTitle>
+        <DialogDescription>You’re all set. We’ll see you there.</DialogDescription>
+      </DialogHeader>
+
+      <BookingSummary startTime={startTime} endTime={endTime} title={classInfo?.title} />
+
+      <DialogFooter>
+        <Button onClick={onClose}>Done</Button>
+      </DialogFooter>
+    </>
+  )
+}
+
 function LoginPrompt({ schedule }: { schedule: DiscoverSchedule }) {
   const startTime = parseISO(schedule.startTimeUtc)
 
@@ -103,111 +179,70 @@ function BookingForm({ schedule, onClose }: BookingFormProps) {
   }
 
   if (bookingState === 'success') {
-    return (
-      <>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-green-500" />
-            Booking confirmed!
-          </DialogTitle>
-          <DialogDescription>You&apos;re all set for your class.</DialogDescription>
-        </DialogHeader>
-        <div className="p-4 space-y-3">
-          <div className="flex items-center gap-3 text-sm">
-            <Calendar className="w-4 h-4 text-muted-foreground" />
-            <span>{format(startTime, 'EEEE, MMMM d, yyyy')}</span>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            <Clock className="w-4 h-4 text-muted-foreground" />
-            <span>
-              {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
-            </span>
-          </div>
-          <div className="text-sm font-medium">{classInfo?.title}</div>
-        </div>
-        <DialogFooter>
-          <Button onClick={onClose}>Done</Button>
-        </DialogFooter>
-      </>
-    )
+    return <BookingSuccess startTime={startTime} endTime={endTime} classInfo={classInfo} onClose={onClose} />
   }
+
+  const isWaitlist = isFull && hasWaitlist
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle>{isFull && hasWaitlist ? 'Join Waitlist' : 'Confirm Booking'}</DialogTitle>
+        <DialogTitle>{isWaitlist ? 'Join waitlist' : 'Confirm booking'}</DialogTitle>
         <DialogDescription>
-          {isFull && hasWaitlist
-            ? "This class is full, but you can join the waitlist and we'll notify you if a spot opens up."
+          {isWaitlist
+            ? "This class is currently full. Join the waitlist and we'll notify you if a spot opens."
             : 'Review the details below and confirm your booking.'}
         </DialogDescription>
       </DialogHeader>
-      <div className="p-4 space-y-3">
-        <div className="flex items-center gap-3 text-sm">
-          <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span>{format(startTime, 'EEEE, MMMM d, yyyy')}</span>
-        </div>
-        <div className="flex items-center gap-3 text-sm">
-          <Clock className="w-4 h-4 text-muted-foreground" />
-          <span>
-            {format(startTime, 'h:mm a')} - {format(endTime, 'h:mm a')}
-          </span>
-        </div>
-        <div className="text-sm font-medium">{classInfo?.title}</div>
-        {schedule.organizer?.displayName && (
-          <div className="flex items-center gap-3 text-sm">
-            <User className="w-4 h-4 text-muted-foreground" />
-            <span>{schedule.organizer.displayName}</span>
-          </div>
-        )}
 
-        {bookingState === 'error' && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-      </div>
+      <BookingSummary
+        startTime={startTime}
+        endTime={endTime}
+        title={classInfo?.title}
+        organizerName={schedule.organizer?.displayName}
+      />
+
+      {bookingState === 'error' && <BookingError message={errorMessage} />}
+
       <DialogFooter className="gap-2">
         <Button variant="outline" onClick={onClose} disabled={bookingState === 'loading'}>
           Cancel
         </Button>
+
         <Button onClick={handleBook} disabled={bookingState === 'loading'}>
           {bookingState === 'loading' && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-          {isFull && hasWaitlist ? 'Join Waitlist' : 'Confirm Booking'}
+          {isWaitlist ? 'Join waitlist' : 'Confirm booking'}
         </Button>
       </DialogFooter>
     </>
   )
 }
 
-export function BookingDialog({ schedule, open, onOpenChange }: BookingDialogProps) {
+function BookingGate({ schedule, onClose }: { schedule: BookingDialogProps['schedule']; onClose: () => void }) {
   const { isLoggedIn } = useSession()
 
+  if (!isLoggedIn) {
+    return <LoginPrompt schedule={schedule} />
+  }
+
+  return <BookingForm schedule={schedule} onClose={onClose} />
+}
+
+export function BookingDialog({ schedule, open, onOpenChange }: BookingDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md p-5">
-        {isLoggedIn ? (
-          <BookingForm schedule={schedule} onClose={() => onOpenChange(false)} />
-        ) : (
-          <LoginPrompt schedule={schedule} />
-        )}
+      <DialogContent className="sm:max-w-md p-6">
+        <BookingGate schedule={schedule} onClose={() => onOpenChange(false)} />
       </DialogContent>
     </Dialog>
   )
 }
 
 export function BookingDrawer({ schedule, open, onOpenChange }: BookingDialogProps) {
-  const { isLoggedIn } = useSession()
-
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="p-5">
-        {isLoggedIn ? (
-          <BookingForm schedule={schedule} onClose={() => onOpenChange(false)} />
-        ) : (
-          <LoginPrompt schedule={schedule} />
-        )}
+      <DrawerContent className="p-6">
+        <BookingGate schedule={schedule} onClose={() => onOpenChange(false)} />
       </DrawerContent>
     </Drawer>
   )

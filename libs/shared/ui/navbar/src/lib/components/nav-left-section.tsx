@@ -21,7 +21,7 @@ export const NavLeftSection = ({ logo, mainItems, user }: NavLeftSectionProps) =
       <NavMenuList
         items={mainItems}
         user={user}
-        className="nav-list-items relative hidden sm:flex font-semibold font-heading items-center gap-1 self-stretch"
+        className="relative hidden sm:flex font-semibold font-heading items-center gap-1 self-stretch"
       />
     </div>
   )

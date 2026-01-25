@@ -27,7 +27,6 @@ export type SidebarPositionType = 'right' | 'left'
 export interface DpNextSidebarProps {
   readonly children?: ReactNode
   readonly items: MenuItem[]
-  readonly header?: string
   readonly user?: Partial<SessionUserType>
   readonly plan?: string | null
   readonly className?: string
@@ -104,7 +103,7 @@ const MenuSideBarItem = memo(
 
 MenuSideBarItem.displayName = 'MenuSideBarItem'
 
-const DpNextSidebarBase = ({ children, user, plan, items = [], header, className }: DpNextSidebarProps) => {
+const DpNextSidebarBase = ({ children, user, plan, items = [], className }: DpNextSidebarProps) => {
   const { setOpenMobile } = useSidebar()
 
   // Split items by position and filter by role access
@@ -118,28 +117,25 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], header, className
 
   return (
     <Sidebar side="right" variant="inset" collapsible="offcanvas" className={className}>
-      <SidebarHeader className="border-b border-border">
-        <div className={cn('flex items-center justify-between mt-4 py-2 px-2')}>
-          {user && (
-            <UserMetadata
-              profileImage={user.profile?.image}
-              username={user.username}
-              createdAt={user.createdAt}
-              plan={plan}
-              className="select-none text-sm p-0"
-            />
-          )}
-        </div>
-        {header && <span className="text-sm font-semibold">dadsad</span>}
+      <SidebarHeader className="border-b border-border gap-1">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setOpenMobile(false)}
-          className="md:hidden absolute top-2 right-2"
+          className="md:hidden w-fit self-end"
           aria-label="close sidebar"
         >
           <X className="h-5 w-5" />
         </Button>
+        {user && (
+          <UserMetadata
+            profileImage={user.profile?.image}
+            username={user.username}
+            createdAt={user.createdAt}
+            plan={plan}
+            className="select-none text-sm p-0"
+          />
+        )}
       </SidebarHeader>
 
       {/* Main Items (top) */}

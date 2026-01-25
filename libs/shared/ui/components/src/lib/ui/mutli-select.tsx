@@ -92,7 +92,7 @@ export function MultiSelectDropdown({
         ref={dropdownTriggerRef}
         asChild
         className={cn(
-          'w-full border-2 border-border rounded-lg text-foreground hide-scrollbar text-foreground',
+          'w-full border-2 border-border rounded-lg text-foreground hide-scrollbar',
           'px-6 py-1 text-base hover:border-primary cursor-pointer shadow-sm transition-colors',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
           classNameTrigger
@@ -103,7 +103,7 @@ export function MultiSelectDropdown({
 
       <DropdownMenuContent
         className={cn(
-          'border rounded shadow-md bg-background text-foreground max-h-[240px] min-w-44 overflow-y-auto bg-background-secondary',
+          'border rounded shadow-md text-foreground max-h-[240px] min-w-44 overflow-y-auto bg-background-secondary',
           className
         )}
         ref={dropdownContentRef}
