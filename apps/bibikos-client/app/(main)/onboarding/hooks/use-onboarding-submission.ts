@@ -49,9 +49,9 @@ export function useOnboardingSubmission() {
       await completeOnboardingMutation.mutateAsync({
         organizer: {
           displayName: step1Data.displayName,
-          activityLabel: step1Data.activityLabel,
           bio: step1Data.bio || null,
           slug: slug,
+          tagIds: step1Data.tagIds,
         },
         location: {
           name: locationData.name,

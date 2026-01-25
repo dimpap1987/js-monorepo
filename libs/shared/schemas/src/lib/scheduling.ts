@@ -1,9 +1,5 @@
 import * as z from 'zod'
 
-// =============================================================================
-// Common Schemas
-// =============================================================================
-
 // Slug validation: lowercase letters, numbers, and hyphens only
 export const slugSchema = z
   .string()
@@ -29,14 +25,18 @@ export const rruleSchema = z
 // =============================================================================
 // Organizer Schemas
 // =============================================================================
+const MIN_ORGANIZER_TAGS = 1
+const MAX_ORGANIZER_TAGS = 5
 
 export const CreateOrganizerSchema = z.object({
-  displayName: z.string().min(1, 'Display name is required').max(255).optional(),
+  displayName: z.string().min(1, 'Display name is required').max(255),
   bio: z.string().max(5000).optional().nullable(),
   slug: slugSchema.optional(),
-  activityLabel: z.string().min(2, 'Activity type is required').max(255),
-  cancellationPolicy: z.string().max(5000).optional().nullable(),
   defaultLocationId: z.number().int().positive().optional().nullable(),
+  tagIds: z
+    .array(z.number().int().positive())
+    .min(MIN_ORGANIZER_TAGS, `Please select at least ${MIN_ORGANIZER_TAGS} tag`)
+    .max(MAX_ORGANIZER_TAGS, `You can select up to ${MAX_ORGANIZER_TAGS} tags`),
 })
 
 export const UpdateOrganizerSchema = CreateOrganizerSchema.partial()
@@ -72,6 +72,9 @@ export type UpdateLocationDto = z.infer<typeof UpdateLocationSchema>
 // Class Schemas
 // =============================================================================
 
+const MIN_CLASS_TAGS = 1
+const MAX_CLASS_TAGS = 5
+
 export const CreateClassSchema = z.object({
   locationId: z.number().int().positive('Location ID is required'),
   title: z.string().min(1, 'Title is required').max(255),
@@ -80,6 +83,11 @@ export const CreateClassSchema = z.object({
   waitlistLimit: z.number().int().min(0, 'Waitlist limit cannot be negative').optional().nullable(),
   isCapacitySoft: z.boolean().default(false),
   isPrivate: z.boolean().default(false),
+  tagIds: z
+    .array(z.number().int().positive())
+    .min(MIN_CLASS_TAGS, `Please select at least ${MIN_CLASS_TAGS} tag`)
+    .max(MAX_CLASS_TAGS, `You can select up to ${MAX_CLASS_TAGS} tags`)
+    .optional(),
 })
 
 export const UpdateClassSchema = CreateClassSchema.partial().extend({

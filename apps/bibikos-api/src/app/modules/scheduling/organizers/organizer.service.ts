@@ -48,7 +48,6 @@ export class OrganizerService {
       displayName: organizer.displayName,
       bio: organizer.bio,
       slug: organizer.slug,
-      activityLabel: organizer.activityLabel,
     }
   }
 
@@ -78,21 +77,19 @@ export class OrganizerService {
       }
     }
 
-    // activityLabel is required when creating an organizer
-    if (!dto?.activityLabel) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'ACTIVITY_LABEL_REQUIRED')
-    }
-
     const organizer = await this.organizerRepo.create({
       appUser: { connect: { id: appUserContext.appUserId } },
       displayName: dto?.displayName ?? null,
       bio: dto?.bio ?? null,
       slug: dto?.slug ?? null,
-      activityLabel: dto.activityLabel,
-      cancellationPolicy: dto?.cancellationPolicy ?? null,
       ...(dto?.defaultLocationId && {
         defaultLocation: { connect: { id: dto.defaultLocationId } },
       }),
+      tags: {
+        createMany: {
+          data: dto.tagIds.map((tagId) => ({ tagId })),
+        },
+      },
     })
 
     this.logger.log(`Created organizer profile ${organizer.id} for appUser ${appUserContext.appUserId}`)
@@ -128,8 +125,6 @@ export class OrganizerService {
       ...(dto.displayName !== undefined && { displayName: dto.displayName }),
       ...(dto.bio !== undefined && { bio: dto.bio }),
       ...(dto.slug !== undefined && { slug: dto.slug }),
-      ...(dto.activityLabel !== undefined && { activityLabel: dto.activityLabel }),
-      ...(dto.cancellationPolicy !== undefined && { cancellationPolicy: dto.cancellationPolicy }),
       ...(dto.defaultLocationId !== undefined && {
         defaultLocation: dto.defaultLocationId ? { connect: { id: dto.defaultLocationId } } : { disconnect: true },
       }),
@@ -152,8 +147,6 @@ export class OrganizerService {
     displayName: string | null
     bio: string | null
     slug: string | null
-    activityLabel: string | null
-    cancellationPolicy: string | null
     defaultLocationId: number | null
     createdAt: Date
   }): OrganizerResponseDto {
@@ -162,8 +155,6 @@ export class OrganizerService {
       displayName: organizer.displayName,
       bio: organizer.bio,
       slug: organizer.slug,
-      activityLabel: organizer.activityLabel,
-      cancellationPolicy: organizer.cancellationPolicy,
       defaultLocationId: organizer.defaultLocationId,
       createdAt: organizer.createdAt,
     }

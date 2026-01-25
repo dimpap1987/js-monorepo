@@ -13,8 +13,6 @@ export interface OrganizerResponseDto {
   displayName: string | null
   bio: string | null
   slug: string | null
-  activityLabel: string | null
-  cancellationPolicy: string | null
   defaultLocationId: number | null
   createdAt: Date
 }
@@ -24,5 +22,4 @@ export interface OrganizerPublicProfileDto {
   displayName: string | null
   bio: string | null
   slug: string
-  activityLabel: string | null
 }

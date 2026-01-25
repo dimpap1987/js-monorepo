@@ -9,13 +9,11 @@ import { useTranslations } from 'next-intl'
 import { ArrowRight } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { CreateOrganizerSchema } from '@js-monorepo/schemas'
 import { z } from 'zod'
+import { TagSelectField } from '../../../../components/tag-select'
+import { CreateOrganizerDto, CreateOrganizerSchema } from '@js-monorepo/schemas'
 
-// Profile Schema - use shared schema but adapt for form (slug is auto-generated)
-const profileSchema = CreateOrganizerSchema.omit({ slug: true, cancellationPolicy: true, defaultLocationId: true })
-
-export type ProfileFormData = z.infer<typeof profileSchema>
+export type ProfileFormData = CreateOrganizerDto
 
 interface ProfileStepFormProps {
   defaultDisplayName?: string
@@ -34,11 +32,11 @@ export function ProfileStepForm({
   const tCommon = useTranslations('common')
 
   const form = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(CreateOrganizerSchema),
     defaultValues: initialData || {
       displayName: defaultDisplayName,
-      activityLabel: '',
       bio: '',
+      tagIds: [],
     },
   })
 
@@ -65,17 +63,12 @@ export function ProfileStepForm({
           )}
         />
 
-        <FormField
+        <TagSelectField
           control={form.control}
-          name="activityLabel"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('activityLabel')}</FormLabel>
-              <FormControl>
-                <Input placeholder={t('activityLabelPlaceholder')} {...field} />
-              </FormControl>
-            </FormItem>
-          )}
+          name="tagIds"
+          entityType="ORGANIZER"
+          label={t('activityLabel')}
+          placeholder={t('activityLabelPlaceholder')}
         />
 
         <FormField

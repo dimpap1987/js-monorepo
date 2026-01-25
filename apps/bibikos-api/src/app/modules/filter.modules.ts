@@ -6,6 +6,7 @@ import {
   BadRequestExceptionFilter,
   GlobalExceptionFilter,
   PrismaClientExceptionFilter,
+  PrismaValidationExceptionFilter,
   ZodExceptionFilter,
 } from '../exceptions/filters'
 
@@ -25,6 +26,10 @@ const providers: Provider[] = [
   {
     provide: APP_FILTER,
     useClass: PrismaClientExceptionFilter,
+  },
+  {
+    provide: APP_FILTER,
+    useClass: PrismaValidationExceptionFilter,
   },
   {
     provide: APP_FILTER,

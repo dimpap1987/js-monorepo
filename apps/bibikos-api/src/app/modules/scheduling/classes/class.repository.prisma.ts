@@ -48,7 +48,6 @@ export class ClassRepositoryPrisma implements ClassRepository {
             id: true,
             displayName: true,
             slug: true,
-            activityLabel: true,
           },
         },
         tags: { include: { tag: true } },

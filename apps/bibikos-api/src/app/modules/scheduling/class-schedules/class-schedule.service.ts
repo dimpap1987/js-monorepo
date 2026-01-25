@@ -180,7 +180,7 @@ export class ClassScheduleService {
   ): Promise<
     CursorPaginationType<
       ClassScheduleResponseDto & {
-        organizer: { id: number; displayName: string | null; slug: string | null; activityLabel: string | null }
+        organizer: { id: number; displayName: string | null; slug: string | null }
         myBooking: { id: number; status: string; waitlistPosition: number | null } | null
       }
     >
@@ -190,7 +190,6 @@ export class ClassScheduleService {
 
     const result = await this.scheduleRepo.findForDiscoverByCursor(
       {
-        activity: filters.activity,
         timeOfDay: filters.timeOfDay,
         search: filters.search,
       },

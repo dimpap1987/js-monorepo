@@ -306,7 +306,7 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
     limit: number,
     appUserId?: number
   ): Promise<DiscoverCursorResult> {
-    const { activity, timeOfDay, search } = filters
+    const { timeOfDay, search } = filters
     const now = new Date()
 
     // Build search filter
@@ -317,11 +317,6 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
             { class: { organizer: { displayName: { contains: search, mode: 'insensitive' } } } },
           ],
         }
-      : {}
-
-    // Build activity filter
-    const activityFilter = activity
-      ? { organizer: { activityLabel: { equals: activity, mode: 'insensitive' as const } } }
       : {}
 
     // Build cursor condition
@@ -379,7 +374,6 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
       where: {
         class: {
           isActive: true,
-          ...activityFilter,
         },
         isCancelled: false,
         ...cursorCondition,
@@ -400,7 +394,6 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
                 id: true,
                 displayName: true,
                 slug: true,
-                activityLabel: true,
               },
             },
           },

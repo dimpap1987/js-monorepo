@@ -28,12 +28,10 @@ export interface DiscoverScheduleResult extends ClassScheduleWithBookingCounts {
     id: number
     displayName: string | null
     slug: string | null
-    activityLabel: string | null
   }
 }
 
 export interface DiscoverCursorFilters {
-  activity?: string
   timeOfDay?: 'morning' | 'afternoon' | 'evening'
   search?: string
 }

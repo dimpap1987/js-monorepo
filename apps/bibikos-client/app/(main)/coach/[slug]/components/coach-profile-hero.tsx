@@ -18,12 +18,6 @@ export function CoachProfileHero({ profile }: CoachProfileHeroProps) {
           <div className="text-center sm:text-left">
             <h1 className="text-3xl sm:text-4xl font-bold mb-2">{profile.displayName || 'Coach'}</h1>
 
-            {profile.activityLabel && (
-              <Badge variant="secondary" className="mb-4">
-                {profile.activityLabel}
-              </Badge>
-            )}
-
             {profile.bio && <p className="text-foreground-muted max-w-2xl leading-relaxed">{profile.bio}</p>}
           </div>
         </div>

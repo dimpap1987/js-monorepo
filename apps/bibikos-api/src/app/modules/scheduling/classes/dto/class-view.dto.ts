@@ -25,7 +25,6 @@ export interface ClassViewResponseDto {
     id: number
     displayName: string | null
     slug: string | null
-    activityLabel: string | null
   }
   schedules: ClassViewScheduleDto[]
 }

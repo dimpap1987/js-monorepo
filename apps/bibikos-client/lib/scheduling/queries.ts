@@ -1,41 +1,42 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  CancelBookingDto,
+  CancelClassScheduleDto,
+  CreateBookingDto,
+  CreateClassDto,
+  CreateClassScheduleDto,
+  CreateLocationDto,
+  CreateOrganizerDto,
+  MarkAttendanceDto,
+  UpdateBookingNotesDto,
+  UpdateClassDto,
+  UpdateClassScheduleDto,
+  UpdateLocationDto,
+  UpdateOrganizerDto,
+} from '@js-monorepo/schemas'
 import { apiClient } from '@js-monorepo/utils/http'
 import { handleQueryResponse } from '@js-monorepo/utils/http/queries'
-// eslint-disable-next-line import/extensions
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useBibikosSession } from '../auth'
 import type {
   AppUser,
-  UpdateAppUserPayload,
-  OrganizerProfile,
-  CreateOrganizerPayload,
-  UpdateOrganizerPayload,
-  OrganizerPublicProfile,
-  ParticipantProfile,
-  Location,
-  CreateLocationPayload,
-  UpdateLocationPayload,
-  Class,
-  CreateClassPayload,
-  UpdateClassPayload,
-  ClassSchedule,
-  CreateSchedulePayload,
-  UpdateSchedulePayload,
-  CancelSchedulePayload,
-  DiscoverFilters,
-  DiscoverSchedulesResponse,
   Booking,
   BookingListResponse,
-  MyBookingsResponse,
-  CreateBookingPayload,
-  CancelBookingPayload,
-  MarkAttendancePayload,
-  UpdateBookingNotesPayload,
+  Class,
   ClassInvitation,
-  PendingInvitation,
-  SendInvitationPayload,
-  RespondToInvitationPayload,
+  ClassSchedule,
   ClassViewResponse,
+  DiscoverFilters,
+  DiscoverSchedulesResponse,
+  Location,
+  MyBookingsResponse,
+  OrganizerProfile,
+  OrganizerPublicProfile,
+  ParticipantProfile,
+  PendingInvitation,
+  RespondToInvitationPayload,
+  SendInvitationPayload,
+  UpdateAppUserPayload,
 } from './types'
-import { useBibikosSession } from '../auth'
 
 // =============================================================================
 // Query Keys
@@ -103,9 +104,9 @@ export function useUpdateAppUser() {
 // =============================================================================
 
 export interface CompleteOnboardingPayload {
-  organizer: CreateOrganizerPayload
-  location: CreateLocationPayload
-  class: Omit<CreateClassPayload, 'locationId'>
+  organizer: CreateOrganizerDto
+  location: CreateLocationDto
+  class: Omit<CreateClassDto, 'locationId'>
 }
 
 export interface CompleteOnboardingResponse {
@@ -150,24 +151,10 @@ export function useOrganizer() {
   })
 }
 
-export function useCreateOrganizer() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async (payload: CreateOrganizerPayload) => {
-      const response = await apiClient.post<OrganizerProfile>('/scheduling/organizers', payload)
-      return handleQueryResponse(response)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: schedulingKeys.organizer() })
-      queryClient.invalidateQueries({ queryKey: schedulingKeys.appUser() })
-    },
-  })
-}
-
 export function useUpdateOrganizer() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: UpdateOrganizerPayload) => {
+    mutationFn: async (payload: UpdateOrganizerDto) => {
       const response = await apiClient.patch<OrganizerProfile>('/scheduling/organizers/me', payload)
       return handleQueryResponse(response)
     },
@@ -276,7 +263,7 @@ export function useLocation(id: number) {
 export function useCreateLocation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: CreateLocationPayload) => {
+    mutationFn: async (payload: CreateLocationDto) => {
       const response = await apiClient.post<Location>('/scheduling/locations', payload)
       return handleQueryResponse(response)
     },
@@ -289,7 +276,7 @@ export function useCreateLocation() {
 export function useUpdateLocation() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...payload }: UpdateLocationPayload & { id: number }) => {
+    mutationFn: async ({ id, ...payload }: UpdateLocationDto & { id: number }) => {
       const response = await apiClient.patch<Location>(`/scheduling/locations/${id}`, payload)
       return handleQueryResponse(response)
     },
@@ -353,7 +340,7 @@ export function useClassView(classId: number) {
 export function useCreateClass() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: CreateClassPayload) => {
+    mutationFn: async (payload: CreateClassDto) => {
       const response = await apiClient.post<Class>('/scheduling/classes', payload)
       return handleQueryResponse(response)
     },
@@ -366,7 +353,7 @@ export function useCreateClass() {
 export function useUpdateClass() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...payload }: UpdateClassPayload & { id: number }) => {
+    mutationFn: async ({ id, ...payload }: UpdateClassDto & { id: number }) => {
       const response = await apiClient.patch<Class>(`/scheduling/classes/${id}`, payload)
       return handleQueryResponse(response)
     },
@@ -451,7 +438,7 @@ export function useSchedulePublic(id: number) {
 export function useCreateSchedule() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: CreateSchedulePayload) => {
+    mutationFn: async (payload: CreateClassScheduleDto) => {
       const response = await apiClient.post<ClassSchedule[]>('/scheduling/schedules', payload)
       return handleQueryResponse(response)
     },
@@ -469,7 +456,7 @@ export function useCreateSchedule() {
 export function useUpdateSchedule() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...payload }: UpdateSchedulePayload & { id: number }) => {
+    mutationFn: async ({ id, ...payload }: UpdateClassScheduleDto & { id: number }) => {
       const response = await apiClient.patch<ClassSchedule>(`/scheduling/schedules/${id}`, payload)
       return handleQueryResponse(response)
     },
@@ -485,7 +472,7 @@ export function useUpdateSchedule() {
 export function useCancelSchedule() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...payload }: CancelSchedulePayload & { id: number }) => {
+    mutationFn: async ({ id, ...payload }: CancelClassScheduleDto & { id: number }) => {
       const response = await apiClient.post(`/scheduling/schedules/${id}/cancel`, payload)
       return handleQueryResponse(response)
     },
@@ -517,7 +504,7 @@ export function useDeleteFutureSchedules() {
 export function useCancelSeriesSchedules() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...payload }: CancelSchedulePayload & { id: number }) => {
+    mutationFn: async ({ id, ...payload }: CancelClassScheduleDto & { id: number }) => {
       const response = await apiClient.post<{ cancelled: number }>(`/scheduling/schedules/${id}/cancel-series`, payload)
       return handleQueryResponse(response)
     },
@@ -558,7 +545,7 @@ export function useMyBookings() {
 export function useCreateBooking() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: CreateBookingPayload) => {
+    mutationFn: async (payload: CreateBookingDto) => {
       const response = await apiClient.post<Booking>('/scheduling/bookings', payload)
       return handleQueryResponse(response)
     },
@@ -575,7 +562,7 @@ export function useCreateBooking() {
 export function useCancelBooking() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...payload }: CancelBookingPayload & { id: number }) => {
+    mutationFn: async ({ id, ...payload }: CancelBookingDto & { id: number }) => {
       const response = await apiClient.post(`/scheduling/bookings/${id}/cancel`, payload)
       return handleQueryResponse(response)
     },
@@ -592,7 +579,7 @@ export function useCancelBooking() {
 export function useCancelBookingByOrganizer() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...payload }: CancelBookingPayload & { id: number }) => {
+    mutationFn: async ({ id, ...payload }: CancelBookingDto & { id: number }) => {
       const response = await apiClient.post(`/scheduling/bookings/${id}/cancel-by-organizer`, payload)
       return handleQueryResponse(response)
     },
@@ -606,7 +593,7 @@ export function useCancelBookingByOrganizer() {
 export function useMarkAttendance() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (payload: MarkAttendancePayload) => {
+    mutationFn: async (payload: MarkAttendanceDto) => {
       const response = await apiClient.post<{ updated: number }>('/scheduling/bookings/attendance', payload)
       return handleQueryResponse(response)
     },
@@ -619,7 +606,7 @@ export function useMarkAttendance() {
 export function useUpdateBookingNotes() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, ...payload }: UpdateBookingNotesPayload & { id: number }) => {
+    mutationFn: async ({ id, ...payload }: UpdateBookingNotesDto & { id: number }) => {
       const response = await apiClient.patch<Booking>(`/scheduling/bookings/${id}/notes`, payload)
       return handleQueryResponse(response)
     },

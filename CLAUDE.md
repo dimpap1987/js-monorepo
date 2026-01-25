@@ -81,6 +81,7 @@ All shared code uses `@js-monorepo/*` path aliases (defined in `tsconfig.base.js
 - `@js-monorepo/schemas` - Zod schemas and types
 - `@js-monorepo/localization` - localization utils
 - `@js-monorepo/seo` - SEO
+- libs/shared/schemas/src/lib/scheduling.ts - Use this file for schemas and infer types and use them across the api and client
 
 ## Authentication
 

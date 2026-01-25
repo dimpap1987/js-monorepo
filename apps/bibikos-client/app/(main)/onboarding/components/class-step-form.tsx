@@ -2,15 +2,22 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@js-monorepo/components/ui/button'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@js-monorepo/components/ui/form'
-import { Input } from '@js-monorepo/components/ui/form'
-import { Textarea } from '@js-monorepo/components/ui/textarea'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  Input,
+} from '@js-monorepo/components/ui/form'
 import { Switch } from '@js-monorepo/components/ui/switch'
-import { useTranslations } from 'next-intl'
+import { Textarea } from '@js-monorepo/components/ui/textarea'
+import { CreateClassSchema } from '@js-monorepo/schemas'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { CreateClassSchema, type CreateClassDto } from '@js-monorepo/schemas'
 import { z } from 'zod'
 
 // Class Schema - use shared schema but adapt for form (locationId comes from state, handle empty strings)

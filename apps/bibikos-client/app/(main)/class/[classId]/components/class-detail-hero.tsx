@@ -38,11 +38,6 @@ export function ClassDetailHero({ classData }: ClassDetailHeroProps) {
                 ) : (
                   <span>{classData.organizer.displayName}</span>
                 )}
-                {classData.organizer.activityLabel && (
-                  <Badge variant="outline" className="ml-2">
-                    {classData.organizer.activityLabel}
-                  </Badge>
-                )}
               </div>
             )}
 

@@ -20,7 +20,6 @@ export interface ClassWithLocationAndOrganizer extends ClassWithLocation {
     id: number
     displayName: string | null
     slug: string | null
-    activityLabel: string | null
   }
 }
 

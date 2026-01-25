@@ -5,6 +5,7 @@ import { ClassService } from '../classes/class.service'
 import { LocationService } from '../locations/location.service'
 import { OrganizerService } from '../organizers/organizer.service'
 import { CompleteOnboardingDto } from './dto/onboarding.dto'
+import { threadId } from 'node:worker_threads'
 
 @Injectable()
 export class OnboardingService {
@@ -34,9 +35,15 @@ export class OnboardingService {
     })
 
     // Step 4: Set this location as default for the organizer
-    await this.organizerService.updateOrganizer(appUserContext, {
-      defaultLocationId: location.id,
-    })
+    // onboarding rule: first location becomes default
+    if (!organizer.defaultLocationId) {
+      await this.organizerService.updateOrganizer(
+        { ...appUserContext, organizerId: organizer.id },
+        {
+          defaultLocationId: location.id,
+        }
+      )
+    }
 
     this.logger.log(
       `Completed onboarding for appUser ${appUserContext.appUserId}: organizer ${organizer.id}, location ${location.id}, class ${classEntity.id}`

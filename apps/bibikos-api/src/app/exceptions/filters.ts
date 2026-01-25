@@ -71,9 +71,25 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       path: request.originalUrl,
       errors: [
         {
-          message: message || INTERNAL_ERROR,
+          message: INTERNAL_ERROR,
         },
       ],
+    })
+  }
+}
+
+@Catch(Prisma.PrismaClientValidationError)
+export class PrismaValidationExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(PrismaValidationExceptionFilter.name)
+  catch(exception: Prisma.PrismaClientValidationError, host: ArgumentsHost) {
+    const ctx = host.switchToHttp()
+    const response = ctx.getResponse()
+
+    this.logger.error(`[Prisma Error] ${exception.message}`, exception.stack)
+
+    response.status(400).json({
+      statusCode: 400,
+      message: 'Something went wrong',
     })
   }
 }
@@ -140,7 +156,7 @@ export class PrismaClientExceptionFilter implements ExceptionFilter {
       path: request.url,
       errors: [
         {
-          message: message ?? 'Something went wrong',
+          message: 'Something went wrong',
         },
       ],
     })

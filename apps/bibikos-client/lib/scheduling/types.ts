@@ -29,28 +29,13 @@ export interface OrganizerProfile {
   displayName: string | null
   bio: string | null
   slug: string | null
-  activityLabel: string | null
-  cancellationPolicy: string | null
   defaultLocationId: number | null
   createdAt: string
 }
-
-export interface CreateOrganizerPayload {
-  displayName?: string
-  bio?: string | null
-  slug?: string
-  activityLabel?: string | null
-  cancellationPolicy?: string | null
-  defaultLocationId?: number | null
-}
-
-export interface UpdateOrganizerPayload extends Partial<CreateOrganizerPayload> {}
-
 export interface OrganizerPublicProfile {
   displayName: string | null
   bio: string | null
   slug: string
-  activityLabel: string | null
 }
 
 // Participant
@@ -74,20 +59,6 @@ export interface Location {
   createdAt: string
 }
 
-export interface CreateLocationPayload {
-  name: string
-  countryCode: string
-  city?: string | null
-  address?: string | null
-  timezone: string
-  isOnline?: boolean
-  onlineUrl?: string | null
-}
-
-export interface UpdateLocationPayload extends Partial<CreateLocationPayload> {
-  isActive?: boolean
-}
-
 // Class
 export interface Class {
   id: number
@@ -107,20 +78,6 @@ export interface Class {
     timezone: string
     isOnline: boolean
   }
-}
-
-export interface CreateClassPayload {
-  locationId: number
-  title: string
-  description?: string | null
-  capacity?: number | null
-  waitlistLimit?: number | null
-  isCapacitySoft?: boolean
-  isPrivate?: boolean
-}
-
-export interface UpdateClassPayload extends Partial<CreateClassPayload> {
-  isActive?: boolean
 }
 
 // Class Schedule
@@ -150,29 +107,12 @@ export interface ClassSchedule {
   }
 }
 
-export interface CreateSchedulePayload {
-  classId: number
-  startTimeUtc: string
-  endTimeUtc: string
-  recurrenceRule?: string | null
-}
-
-export interface UpdateSchedulePayload {
-  startTimeUtc?: string
-  endTimeUtc?: string
-}
-
-export interface CancelSchedulePayload {
-  cancelReason?: string
-}
-
 // Discover Schedule (includes organizer info for public discovery)
 export interface DiscoverSchedule extends ClassSchedule {
   organizer: {
     id: number
     displayName: string | null
     slug: string | null
-    activityLabel: string | null
   }
   // User's booking for this schedule (if logged in)
   myBooking: {
@@ -197,23 +137,6 @@ export interface DiscoverSchedulesResponse {
 
 // Re-export shared booking types from @js-monorepo/types
 export type { BookingStatus, Booking, BookingListResponse, MyBookingsResponse } from '@js-monorepo/types/scheduling'
-
-export interface CreateBookingPayload {
-  classScheduleId: number
-}
-
-export interface CancelBookingPayload {
-  cancelReason?: string
-}
-
-export interface MarkAttendancePayload {
-  bookingIds: number[]
-  status: 'ATTENDED' | 'NO_SHOW'
-}
-
-export interface UpdateBookingNotesPayload {
-  organizerNotes?: string | null
-}
 
 // Calendar Event (for FullCalendar)
 export interface CalendarEvent {
@@ -304,7 +227,6 @@ export interface ClassViewResponse {
     id: number
     displayName: string | null
     slug: string | null
-    activityLabel: string | null
   }
   schedules: ClassViewSchedule[]
 }
