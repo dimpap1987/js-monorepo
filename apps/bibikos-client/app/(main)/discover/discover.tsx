@@ -71,7 +71,7 @@ export default function DiscoverComponent() {
     return groupSchedulesByDate(schedules)
   }, [schedules])
 
-  const hasActiveFilters = Boolean(filters.activity || filters.timeOfDay || filters.search)
+  const hasActiveFilters = Boolean(filters.tagIds?.length || filters.timeOfDay || filters.search)
 
   // Intersection observer for infinite scroll
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -139,8 +139,6 @@ export default function DiscoverComponent() {
     }
   }
 
-  const totalSchedules = schedules.length
-
   return (
     <ContainerTemplate>
       {/* Header */}
@@ -161,16 +159,10 @@ export default function DiscoverComponent() {
         <div className="text-center py-12 text-destructive">
           <p>Failed to load classes. Please try again.</p>
         </div>
-      ) : totalSchedules === 0 ? (
+      ) : schedules.length === 0 ? (
         <DiscoverEmptyState hasFilters={hasActiveFilters} onClearFilters={handleClearFilters} />
       ) : (
         <div className="space-y-8">
-          {/* Results count */}
-          <p className="text-sm text-muted-foreground">
-            {totalSchedules} {totalSchedules === 1 ? 'class' : 'classes'} found
-            {hasNextPage && ' (scroll for more)'}
-          </p>
-
           {/* Grouped schedules */}
           {groupedSchedules && (
             <>

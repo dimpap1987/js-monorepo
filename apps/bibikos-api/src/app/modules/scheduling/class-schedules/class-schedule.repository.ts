@@ -29,11 +29,16 @@ export interface DiscoverScheduleResult extends ClassScheduleWithBookingCounts {
     displayName: string | null
     slug: string | null
   }
+  tags: Array<{
+    id: number
+    name: string
+  }>
 }
 
 export interface DiscoverCursorFilters {
   timeOfDay?: 'morning' | 'afternoon' | 'evening'
   search?: string
+  tagIds?: number[]
 }
 
 export interface DiscoverCursorResult {

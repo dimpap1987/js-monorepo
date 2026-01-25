@@ -7,8 +7,8 @@ import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
 import { isAfter, isBefore } from 'date-fns'
 import { ArrowUpRight, CheckCircle2, ChevronRight, Clock, Radio, User, Users, X } from 'lucide-react'
-import type { DiscoverSchedule } from '../../../../lib/scheduling'
 import { useScheduleTime, type ScheduleDateParts } from '../../../../lib/datetime'
+import type { DiscoverSchedule } from '../../../../lib/scheduling'
 
 interface TimeBadgeProps {
   dateParts: ScheduleDateParts
@@ -78,6 +78,7 @@ interface ScheduleInfoProps {
   spotsLeft: number | null
   isHappeningNow: boolean
   classId: number
+  tags: Array<{ id: number; name: string }>
 }
 
 function ScheduleInfo({
@@ -92,6 +93,7 @@ function ScheduleInfo({
   spotsLeft,
   isHappeningNow,
   classId,
+  tags,
 }: ScheduleInfoProps) {
   return (
     <div className="space-y-2 min-w-0">
@@ -131,6 +133,15 @@ function ScheduleInfo({
           </div>
         )}
       </div>
+      {tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {tags.map((tag) => (
+            <Badge key={tag.id} variant="default">
+              {tag.name}
+            </Badge>
+          ))}
+        </div>
+      )}
       <CapacityInfo
         bookedCount={bookedCount}
         capacity={capacity}
@@ -255,7 +266,7 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
   const isWaitlisted = schedule.myBooking?.status === 'WAITLISTED'
 
   return (
-    <Card className={cn('border-border transition-all hover:shadow-md hover:border-primary/40 hover:bg-accent/80')}>
+    <Card className={cn('border-border transition-all hover:shadow-md hover:border-primary hover:bg-accent')}>
       <CardContent className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-4 min-w-0">
@@ -272,6 +283,7 @@ export function DiscoverScheduleCard({ schedule, onBook, onCancel }: DiscoverSch
               hasWaitlist={hasWaitlist}
               spotsLeft={spotsLeft}
               isHappeningNow={isHappeningNow}
+              tags={schedule.tags}
             />
           </div>
           <div className="w-full sm:w-auto px-5 mt-3">

@@ -30,7 +30,7 @@ export function LocationStepForm({ initialData, onSubmit, onBack, isLoading = fa
 
   const form = useForm<CreateLocationDto>({
     resolver: zodResolver(CreateLocationSchema),
-    mode: 'onChange',
+    mode: 'onTouched',
     defaultValues: initialData || {
       name: '',
       countryCode: GREEK_COUNTRY_CODE,

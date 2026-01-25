@@ -306,7 +306,7 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
     limit: number,
     appUserId?: number
   ): Promise<DiscoverCursorResult> {
-    const { timeOfDay, search } = filters
+    const { timeOfDay, search, tagIds } = filters
     const now = new Date()
 
     // Build search filter
@@ -318,6 +318,20 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
           ],
         }
       : {}
+
+    // Build tag filter
+    const tagFilter: Prisma.ClassScheduleWhereInput =
+      tagIds && tagIds.length > 0
+        ? {
+            class: {
+              tags: {
+                some: {
+                  tagId: { in: tagIds },
+                },
+              },
+            },
+          }
+        : {}
 
     // Build cursor condition
     // Use endTimeUtc >= now to include schedules that haven't ended yet (shows "today" schedules that started earlier)
@@ -379,6 +393,7 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
         ...cursorCondition,
         ...visibilityFilter,
         ...searchFilter,
+        ...tagFilter,
       },
       include: {
         class: {
@@ -394,6 +409,16 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
                 id: true,
                 displayName: true,
                 slug: true,
+              },
+            },
+            tags: {
+              select: {
+                tag: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
               },
             },
           },
@@ -453,7 +478,7 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
 
     // Map results
     const results = filteredSchedules.map((schedule) => {
-      const { organizer, ...classWithoutOrganizer } = schedule.class
+      const { organizer, tags, ...classWithoutOrganizerAndTags } = schedule.class
       return {
         id: schedule.id,
         classId: schedule.classId,
@@ -468,10 +493,11 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
         cancelReason: schedule.cancelReason,
         createdAt: schedule.createdAt,
         updatedAt: schedule.updatedAt,
-        class: classWithoutOrganizer,
+        class: classWithoutOrganizerAndTags,
         _count: schedule._count,
         bookingCounts: countsMap.get(schedule.id) || { booked: 0, waitlisted: 0 },
         organizer,
+        tags: tags.map((t) => t.tag),
       }
     })
 

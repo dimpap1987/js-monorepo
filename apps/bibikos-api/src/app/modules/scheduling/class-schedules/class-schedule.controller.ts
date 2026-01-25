@@ -38,9 +38,9 @@ export class ClassScheduleController {
   async discoverSchedules(
     @Query('cursor') cursor?: string,
     @Query('limit') limit?: string,
-    @Query('activity') activity?: string,
     @Query('timeOfDay') timeOfDay?: 'morning' | 'afternoon' | 'evening',
     @Query('search') search?: string,
+    @Query('tagIds') tagIds?: string,
     @AppUserContext() appUserContext?: AppUserContextType
   ) {
     const parsedCursor = cursor ? parseInt(cursor, 10) : null
@@ -56,11 +56,19 @@ export class ClassScheduleController {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'INVALID_LIMIT')
     }
 
+    // Parse tagIds from comma-separated string
+    const parsedTagIds = tagIds
+      ? tagIds
+          .split(',')
+          .map((id) => parseInt(id.trim(), 10))
+          .filter((id) => !isNaN(id) && id > 0)
+      : undefined
+
     return this.scheduleService.discoverSchedulesByCursor(
       {
-        activity,
         timeOfDay,
         search,
+        tagIds: parsedTagIds,
       },
       parsedCursor,
       parsedLimit,

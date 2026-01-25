@@ -169,9 +169,9 @@ export class ClassScheduleService {
    */
   async discoverSchedulesByCursor(
     filters: {
-      activity?: string
       timeOfDay?: 'morning' | 'afternoon' | 'evening'
       search?: string
+      tagIds?: number[]
     },
     cursor: number | null,
     limit: number,
@@ -181,6 +181,7 @@ export class ClassScheduleService {
     CursorPaginationType<
       ClassScheduleResponseDto & {
         organizer: { id: number; displayName: string | null; slug: string | null }
+        tags: Array<{ id: number; name: string }>
         myBooking: { id: number; status: string; waitlistPosition: number | null } | null
       }
     >
@@ -192,6 +193,7 @@ export class ClassScheduleService {
       {
         timeOfDay: filters.timeOfDay,
         search: filters.search,
+        tagIds: filters.tagIds,
       },
       cursor,
       clampedLimit,
@@ -222,6 +224,7 @@ export class ClassScheduleService {
     const content = result.schedules.map((schedule) => ({
       ...this.toResponseDto(schedule),
       organizer: schedule.organizer,
+      tags: schedule.tags,
       myBooking: userBookingsMap.get(schedule.id) || null,
     }))
 

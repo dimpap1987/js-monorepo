@@ -114,6 +114,10 @@ export interface DiscoverSchedule extends ClassSchedule {
     displayName: string | null
     slug: string | null
   }
+  tags: Array<{
+    id: number
+    name: string
+  }>
   // User's booking for this schedule (if logged in)
   myBooking: {
     id: number
@@ -123,9 +127,9 @@ export interface DiscoverSchedule extends ClassSchedule {
 }
 
 export interface DiscoverFilters {
-  activity?: string
   timeOfDay?: 'morning' | 'afternoon' | 'evening'
   search?: string
+  tagIds?: number[]
 }
 
 export interface DiscoverSchedulesResponse {

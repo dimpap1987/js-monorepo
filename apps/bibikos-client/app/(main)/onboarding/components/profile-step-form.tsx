@@ -22,7 +22,7 @@ interface ProfileStepFormProps {
   isLoading?: boolean
 }
 
-export function   ProfileStepForm({
+export function ProfileStepForm({
   defaultDisplayName = '',
   initialData,
   onSubmit,
@@ -33,6 +33,7 @@ export function   ProfileStepForm({
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(CreateOrganizerSchema),
+    mode: 'onTouched',
     defaultValues: initialData || {
       displayName: defaultDisplayName,
       bio: '',

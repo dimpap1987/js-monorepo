@@ -72,7 +72,7 @@ export const schedulingKeys = {
   bookingsForSchedule: (scheduleId: number) => [...schedulingKeys.all, 'bookings', 'schedule', scheduleId] as const,
   myBookings: () => [...schedulingKeys.all, 'bookings', 'my'] as const,
   discover: (filters: DiscoverFilters) =>
-    [...schedulingKeys.all, 'discover', filters.activity, filters.timeOfDay, filters.search] as const,
+    [...schedulingKeys.all, 'discover', filters.timeOfDay, filters.search, filters.tagIds?.join(',')] as const,
   invitations: () => [...schedulingKeys.all, 'invitations'] as const,
   invitationsPending: () => [...schedulingKeys.all, 'invitations', 'pending'] as const,
   invitationsSent: () => [...schedulingKeys.all, 'invitations', 'sent'] as const,
@@ -197,9 +197,9 @@ export function useDiscoverSchedules(filters: DiscoverFilters, limit = DEFAULT_D
       const params = new URLSearchParams()
       params.append('limit', String(limit))
       if (pageParam) params.append('cursor', String(pageParam))
-      if (filters.activity) params.append('activity', filters.activity)
       if (filters.timeOfDay) params.append('timeOfDay', filters.timeOfDay)
       if (filters.search) params.append('search', filters.search)
+      if (filters.tagIds && filters.tagIds.length > 0) params.append('tagIds', filters.tagIds.join(','))
 
       const response = await apiClient.get<DiscoverSchedulesResponse>(
         `/scheduling/schedules/discover?${params.toString()}`

@@ -44,7 +44,7 @@ export function ClassStepForm({ initialData, onSubmit, onBack, isLoading = false
 
   const form = useForm<ClassFormData>({
     resolver: zodResolver(classSchema),
-    mode: 'onChange',
+    mode: 'onTouched',
     defaultValues: initialData || {
       title: '',
       description: '',
