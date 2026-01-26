@@ -4,10 +4,16 @@ import { useNotifications } from '@js-monorepo/notification'
 import { ContainerTemplate } from '@js-monorepo/templates'
 import { useDeviceStore } from '../../../stores/deviceStore'
 import { Loader2 } from 'lucide-react'
+import { parseISO } from 'date-fns'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getDateGroup, toScheduleDisplayTimes, type DateGroup } from '../../../lib/datetime'
-import type { DiscoverFilters as DiscoverFiltersType, DiscoverSchedule } from '../../../lib/scheduling'
-import { useCancelBooking, useDiscoverSchedules } from '../../../lib/scheduling'
+import { getDateGroup, type DateGroup } from '../../../lib/datetime'
+import type {
+  DiscoverFilters as DiscoverFiltersType,
+  DiscoverClassGroup,
+  DiscoverGroupedSchedule,
+  DiscoverSchedule,
+} from '../../../lib/scheduling'
+import { useCancelBooking, useDiscoverSchedulesGrouped } from '../../../lib/scheduling'
 import {
   BookingDialog,
   CancelBookingDialog,
@@ -15,37 +21,71 @@ import {
   DiscoverEmptyState,
   DiscoverFilters,
   DiscoverSkeleton,
+  TimeSlotPicker,
 } from './components'
 import { BookingDrawer } from './components/booking-dialog'
 import { CancelBookingDrawer } from './components/cancel-booking-dialog'
+import type { GroupedByDate, TimeSlotPickerState } from './types'
 
 function getDefaultFilters(): DiscoverFiltersType {
   return {}
 }
 
-interface GroupedSchedules {
-  today: DiscoverSchedule[]
-  tomorrow: DiscoverSchedule[]
-  thisWeek: DiscoverSchedule[]
-  later: DiscoverSchedule[]
-}
-
-function groupSchedulesByDate(schedules: DiscoverSchedule[]): GroupedSchedules {
-  const groups: GroupedSchedules = {
+/**
+ * Groups class groups by date category (today, tomorrow, thisWeek, later)
+ */
+function groupByDateCategory(groups: DiscoverClassGroup[]): GroupedByDate {
+  const result: GroupedByDate = {
     today: [],
     tomorrow: [],
     thisWeek: [],
     later: [],
   }
 
-  for (const schedule of schedules) {
-    // Convert UTC time to schedule's local timezone for date grouping
-    const { start } = toScheduleDisplayTimes(schedule)
-    const group: DateGroup = getDateGroup(start.date)
-    groups[group].push(schedule)
+  for (const group of groups) {
+    // Parse the date from the group (YYYY-MM-DD in local timezone)
+    // We need to get the date group based on the first schedule's start time
+    if (group.schedules.length === 0) continue
+
+    const firstSchedule = group.schedules[0]
+    const startDate = parseISO(firstSchedule.startTimeUtc)
+    const dateGroup: DateGroup = getDateGroup(startDate)
+    result[dateGroup].push(group)
   }
 
-  return groups
+  return result
+}
+
+/**
+ * Creates a synthetic DiscoverSchedule object for use with existing booking dialogs
+ */
+function createScheduleForBooking(group: DiscoverClassGroup, schedule: DiscoverGroupedSchedule): DiscoverSchedule {
+  return {
+    id: schedule.id,
+    classId: group.classId,
+    startTimeUtc: schedule.startTimeUtc,
+    endTimeUtc: schedule.endTimeUtc,
+    localTimezone: schedule.localTimezone,
+    recurrenceRule: null,
+    occurrenceDate: null,
+    parentScheduleId: null,
+    isCancelled: false,
+    cancelledAt: null,
+    cancelReason: null,
+    createdAt: schedule.startTimeUtc,
+    class: {
+      id: group.classId,
+      title: group.title,
+      capacity: group.capacity,
+      waitlistLimit: group.waitlistLimit,
+      isCapacitySoft: false,
+      location: group.location ?? undefined,
+    },
+    bookingCounts: schedule.bookingCounts,
+    organizer: group.organizer,
+    tags: group.tags,
+    myBooking: schedule.myBooking,
+  }
 }
 
 export default function DiscoverComponent() {
@@ -54,22 +94,26 @@ export default function DiscoverComponent() {
   const [bookingDialogOpen, setBookingDialogOpen] = useState(false)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [scheduleToCancel, setScheduleToCancel] = useState<DiscoverSchedule | null>(null)
+  const [timeSlotPicker, setTimeSlotPicker] = useState<TimeSlotPickerState>({
+    isOpen: false,
+    group: null,
+  })
   const isMobile = useDeviceStore((state) => state.isMobile)
   const { addNotification } = useNotifications()
   const { data, isLoading, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useDiscoverSchedules(filters)
+    useDiscoverSchedulesGrouped(filters)
   const cancelBookingMutation = useCancelBooking()
 
-  // Flatten all pages into a single array of schedules
-  const schedules = useMemo(() => {
+  // Flatten all pages into a single array of groups
+  const groups = useMemo(() => {
     if (!data?.pages) return []
-    return data.pages.flatMap((page) => page.content)
+    return data.pages.flatMap((page) => page.groups)
   }, [data?.pages])
 
-  const groupedSchedules = useMemo(() => {
-    if (schedules.length === 0) return null
-    return groupSchedulesByDate(schedules)
-  }, [schedules])
+  const groupedByDate = useMemo(() => {
+    if (groups.length === 0) return null
+    return groupByDateCategory(groups)
+  }, [groups])
 
   const hasActiveFilters = Boolean(filters.tagIds?.length || filters.timeOfDay || filters.search)
 
@@ -108,13 +152,21 @@ export default function DiscoverComponent() {
     setFilters(getDefaultFilters())
   }
 
-  const handleBook = (schedule: DiscoverSchedule) => {
-    setSelectedSchedule(schedule)
+  const handleOpenTimeSlots = (group: DiscoverClassGroup) => {
+    setTimeSlotPicker({ isOpen: true, group })
+  }
+
+  const handleBookFromGroup = (group: DiscoverClassGroup, schedule: DiscoverGroupedSchedule) => {
+    const syntheticSchedule = createScheduleForBooking(group, schedule)
+    setTimeSlotPicker({ isOpen: false, group: null })
+    setSelectedSchedule(syntheticSchedule)
     setBookingDialogOpen(true)
   }
 
-  const handleCancelRequest = (schedule: DiscoverSchedule) => {
-    setScheduleToCancel(schedule)
+  const handleCancelFromGroup = (group: DiscoverClassGroup, schedule: DiscoverGroupedSchedule) => {
+    const syntheticSchedule = createScheduleForBooking(group, schedule)
+    setTimeSlotPicker({ isOpen: false, group: null })
+    setScheduleToCancel(syntheticSchedule)
     setCancelDialogOpen(true)
   }
 
@@ -159,36 +211,40 @@ export default function DiscoverComponent() {
         <div className="text-center py-12 text-destructive">
           <p>Failed to load classes. Please try again.</p>
         </div>
-      ) : schedules.length === 0 ? (
+      ) : groups.length === 0 ? (
         <DiscoverEmptyState hasFilters={hasActiveFilters} onClearFilters={handleClearFilters} />
       ) : (
         <div className="space-y-8">
-          {/* Grouped schedules */}
-          {groupedSchedules && (
+          {/* Grouped by date */}
+          {groupedByDate && (
             <>
               <DiscoverDateGroup
                 title="Today"
-                schedules={groupedSchedules.today}
-                onBook={handleBook}
-                onCancel={handleCancelRequest}
+                groups={groupedByDate.today}
+                onOpenTimeSlots={handleOpenTimeSlots}
+                onBook={handleBookFromGroup}
+                onCancel={handleCancelFromGroup}
               />
               <DiscoverDateGroup
                 title="Tomorrow"
-                schedules={groupedSchedules.tomorrow}
-                onBook={handleBook}
-                onCancel={handleCancelRequest}
+                groups={groupedByDate.tomorrow}
+                onOpenTimeSlots={handleOpenTimeSlots}
+                onBook={handleBookFromGroup}
+                onCancel={handleCancelFromGroup}
               />
               <DiscoverDateGroup
                 title="This Week"
-                schedules={groupedSchedules.thisWeek}
-                onBook={handleBook}
-                onCancel={handleCancelRequest}
+                groups={groupedByDate.thisWeek}
+                onOpenTimeSlots={handleOpenTimeSlots}
+                onBook={handleBookFromGroup}
+                onCancel={handleCancelFromGroup}
               />
               <DiscoverDateGroup
                 title="Upcoming"
-                schedules={groupedSchedules.later}
-                onBook={handleBook}
-                onCancel={handleCancelRequest}
+                groups={groupedByDate.later}
+                onOpenTimeSlots={handleOpenTimeSlots}
+                onBook={handleBookFromGroup}
+                onCancel={handleCancelFromGroup}
               />
             </>
           )}
@@ -230,7 +286,25 @@ export default function DiscoverComponent() {
             isLoading={cancelBookingMutation.isPending}
           />
         ))}
-      {/* Cancel Booking Dialog */}
+
+      <TimeSlotPicker
+        group={timeSlotPicker.group}
+        open={timeSlotPicker.isOpen}
+        onOpenChange={(open) => {
+          if (!open) setTimeSlotPicker({ isOpen: false, group: null })
+        }}
+        onBook={(schedule) => {
+          if (timeSlotPicker.group) {
+            handleBookFromGroup(timeSlotPicker.group, schedule)
+          }
+        }}
+        onCancel={(schedule) => {
+          if (timeSlotPicker.group) {
+            handleCancelFromGroup(timeSlotPicker.group, schedule)
+          }
+        }}
+        isMobile={isMobile}
+      />
     </ContainerTemplate>
   )
 }

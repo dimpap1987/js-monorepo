@@ -6,7 +6,7 @@ import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
 import { isAfter, isBefore } from 'date-fns'
-import { CheckCircle2, ChevronRight, Clock, MapPin, Radio, User, Users, X } from 'lucide-react'
+import { CheckCircle2, Clock, MapPin, Radio, User, Users, X } from 'lucide-react'
 import { useScheduleTime, type ScheduleDateParts } from '../../lib/datetime'
 
 // =============================================================================
@@ -321,7 +321,6 @@ function BookButton({
       type="button"
     >
       {label}
-      {!isDisabled && <ChevronRight className="w-4 h-4" />}
     </Button>
   )
 }
@@ -361,12 +360,7 @@ export function ScheduleCard({
   const isWaitlisted = myBooking?.status === 'WAITLISTED'
 
   return (
-    <Card
-      className={cn(
-        'border-border rounded-3xl transition-all hover:shadow-md hover:border-primary hover:bg-accent',
-        className
-      )}
-    >
+    <Card className={cn('border-border rounded-3xl transition-all hover:shadow-md hover:border-primary', className)}>
       <CardContent className="p-6 sm:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-4 min-w-0">

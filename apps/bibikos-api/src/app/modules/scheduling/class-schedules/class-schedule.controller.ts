@@ -78,6 +78,49 @@ export class ClassScheduleController {
   }
 
   /**
+   * GET /scheduling/schedules/discover-grouped
+   * Public endpoint to discover classes grouped by class+date
+   * Uses cursor-based pagination for virtual scrolling
+   * No auth required, but if logged in shows user's booking status
+   */
+  @Get('discover-grouped')
+  async discoverSchedulesGrouped(
+    @Query('cursor') cursor?: string,
+    @Query('limit') limit?: string,
+    @Query('timeOfDay') timeOfDay?: 'morning' | 'afternoon' | 'evening',
+    @Query('search') search?: string,
+    @Query('tagIds') tagIds?: string,
+    @AppUserContext() appUserContext?: AppUserContextType
+  ) {
+    const parsedLimit = limit ? parseInt(limit, 10) : 15
+
+    // Validate limit
+    if (isNaN(parsedLimit) || parsedLimit < 1) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'INVALID_LIMIT')
+    }
+
+    // Parse tagIds from comma-separated string
+    const parsedTagIds = tagIds
+      ? tagIds
+          .split(',')
+          .map((id) => parseInt(id.trim(), 10))
+          .filter((id) => !isNaN(id) && id > 0)
+      : undefined
+
+    return this.scheduleService.discoverSchedulesGroupedByCursor(
+      {
+        timeOfDay,
+        search,
+        tagIds: parsedTagIds,
+      },
+      cursor || null,
+      parsedLimit,
+      appUserContext?.participantId,
+      appUserContext?.appUserId
+    )
+  }
+
+  /**
    * GET /scheduling/schedules/calendar
    * Get schedules for calendar view
    * For bookings view, include cancelled schedules that have bookings

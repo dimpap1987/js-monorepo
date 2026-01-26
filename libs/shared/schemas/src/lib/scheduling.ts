@@ -182,3 +182,69 @@ export type OrganizerPublicTag = z.infer<typeof OrganizerPublicTagSchema>
 export type OrganizerPublicBadge = z.infer<typeof OrganizerPublicBadgeSchema>
 export type OrganizerPublicClassType = z.infer<typeof OrganizerPublicClassTypeSchema>
 export type OrganizerPublicProfileResponse = z.infer<typeof OrganizerPublicProfileSchema>
+
+// =============================================================================
+// Discover Grouped Response Schemas
+// =============================================================================
+
+/**
+ * Individual schedule within a group
+ */
+export const DiscoverScheduleSchema = z.object({
+  id: z.number(),
+  startTimeUtc: z.string().datetime(),
+  endTimeUtc: z.string().datetime(),
+  localTimezone: z.string(),
+  bookingCounts: z.object({
+    booked: z.number(),
+    waitlisted: z.number(),
+  }),
+  myBooking: z
+    .object({
+      id: z.number(),
+      status: z.string(),
+      waitlistPosition: z.number().nullable(),
+    })
+    .nullable(),
+})
+
+/**
+ * A group of schedules from the same class on the same day
+ */
+export const DiscoverClassGroupSchema = z.object({
+  classId: z.number(),
+  date: z.string(), // YYYY-MM-DD in local timezone
+  title: z.string(),
+  capacity: z.number().nullable(),
+  waitlistLimit: z.number().nullable(),
+  location: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+    })
+    .nullable(),
+  organizer: z.object({
+    id: z.number(),
+    displayName: z.string().nullable(),
+    slug: z.string().nullable(),
+  }),
+  tags: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+    })
+  ),
+  schedules: z.array(DiscoverScheduleSchema),
+  userBookingsCount: z.number(),
+})
+
+export const DiscoverGroupedResponseSchema = z.object({
+  groups: z.array(DiscoverClassGroupSchema),
+  nextCursor: z.string().nullable(),
+  hasMore: z.boolean(),
+  limit: z.number(),
+})
+
+export type DiscoverSchedule = z.infer<typeof DiscoverScheduleSchema>
+export type DiscoverClassGroup = z.infer<typeof DiscoverClassGroupSchema>
+export type DiscoverGroupedResponse = z.infer<typeof DiscoverGroupedResponseSchema>

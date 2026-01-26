@@ -26,6 +26,7 @@ import type {
   ClassSchedule,
   ClassViewResponse,
   DiscoverFilters,
+  DiscoverGroupedResponse,
   DiscoverSchedulesResponse,
   Location,
   MyBookingsResponse,
@@ -74,6 +75,10 @@ export const schedulingKeys = {
   myBookings: () => [...schedulingKeys.all, 'bookings', 'my'] as const,
   discover: (filters: DiscoverFilters) =>
     [...schedulingKeys.all, 'discover', filters.timeOfDay, filters.search, filters.tagIds?.join(',')] as const,
+  discoverGrouped: (filters?: DiscoverFilters) =>
+    filters
+      ? ([...schedulingKeys.all, 'discover-grouped', filters] as const)
+      : ([...schedulingKeys.all, 'discover-grouped'] as const),
   invitations: () => [...schedulingKeys.all, 'invitations'] as const,
   invitationsPending: () => [...schedulingKeys.all, 'invitations', 'pending'] as const,
   invitationsSent: () => [...schedulingKeys.all, 'invitations', 'sent'] as const,
@@ -208,6 +213,30 @@ export function useDiscoverSchedules(filters: DiscoverFilters, limit = DEFAULT_D
       return handleQueryResponse(response)
     },
     initialPageParam: null as number | null,
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
+  })
+}
+
+/**
+ * Discover schedules grouped by class+date for better UX when classes have multiple time slots
+ */
+export function useDiscoverSchedulesGrouped(filters: DiscoverFilters, limit = DEFAULT_DISCOVER_LIMIT) {
+  return useInfiniteQuery({
+    queryKey: schedulingKeys.discoverGrouped(filters),
+    queryFn: async ({ pageParam }) => {
+      const params = new URLSearchParams()
+      params.append('limit', String(limit))
+      if (pageParam) params.append('cursor', pageParam)
+      if (filters.timeOfDay) params.append('timeOfDay', filters.timeOfDay)
+      if (filters.search) params.append('search', filters.search)
+      if (filters.tagIds && filters.tagIds.length > 0) params.append('tagIds', filters.tagIds.join(','))
+
+      const response = await apiClient.get<DiscoverGroupedResponse>(
+        `/scheduling/schedules/discover-grouped?${params.toString()}`
+      )
+      return handleQueryResponse(response)
+    },
+    initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextCursor : undefined),
   })
 }
@@ -551,6 +580,7 @@ export function useCreateBooking() {
       return handleQueryResponse(response)
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: schedulingKeys.discoverGrouped() })
       queryClient.invalidateQueries({ queryKey: schedulingKeys.bookings() })
       queryClient.invalidateQueries({ queryKey: schedulingKeys.myBookings() })
       queryClient.invalidateQueries({ queryKey: schedulingKeys.schedules() })

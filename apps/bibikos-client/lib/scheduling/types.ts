@@ -171,6 +171,48 @@ export interface DiscoverSchedulesResponse {
   limit: number
 }
 
+// =============================================================================
+// Grouped Discover Types (server-side grouping)
+// =============================================================================
+
+/**
+ * A schedule within a grouped discover response
+ */
+export interface DiscoverGroupedSchedule {
+  id: number
+  startTimeUtc: string
+  endTimeUtc: string
+  localTimezone: string
+  bookingCounts: {
+    booked: number
+    waitlisted: number
+  }
+  myBooking: MyBookingInfo | null
+}
+
+/**
+ * A group of schedules from the same class on the same day
+ */
+export interface DiscoverClassGroup {
+  classId: number
+  date: string // YYYY-MM-DD in local timezone
+  title: string
+  capacity: number | null
+  waitlistLimit: number | null
+  location: { id: number; name: string } | null
+  organizer: { id: number; displayName: string | null; slug: string | null }
+  tags: Array<{ id: number; name: string }>
+  schedules: DiscoverGroupedSchedule[]
+  userBookingsCount: number
+}
+
+export interface DiscoverGroupedResponse {
+  groups: DiscoverClassGroup[]
+  nextCursor: string | null
+  hasMore: boolean
+  limit: number
+}
+
 // Re-export shared booking types from @js-monorepo/types
 export type { BookingStatus, Booking, BookingListResponse, MyBookingsResponse } from '@js-monorepo/types/scheduling'
 

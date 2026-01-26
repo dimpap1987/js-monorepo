@@ -355,7 +355,8 @@ export class AppModule implements NestModule {
         'contact',
         'scheduling/organizers/public/(.*)',
         'scheduling/schedules/discover(.*)',
-        'scheduling/classes/(.*)/view'
+        'scheduling/classes/(.*)/view',
+        'tags/by-entity-type/(.*)'
       )
       .forRoutes('*')
   }

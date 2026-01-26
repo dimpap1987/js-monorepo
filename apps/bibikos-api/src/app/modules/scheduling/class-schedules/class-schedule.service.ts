@@ -14,6 +14,7 @@ import {
   UpdateClassScheduleDto,
 } from './dto/class-schedule.dto'
 import { CursorPaginationType } from '@js-monorepo/types/pagination'
+import type { DiscoverClassGroup as DiscoverClassGroupType, DiscoverGroupedResponse } from '@js-monorepo/schemas'
 
 // Simple RRULE parser for basic recurrence patterns
 // Supports: FREQ=WEEKLY;BYDAY=MO,WE,FR, FREQ=WEEKLY;INTERVAL=2;BYDAY=TU
@@ -234,6 +235,74 @@ export class ClassScheduleService {
     return {
       content,
       nextCursor,
+      hasMore: result.hasMore,
+      limit: clampedLimit,
+    }
+  }
+
+  /**
+   * Discover schedules with cursor-based pagination, grouped by class+date
+   * Returns groups instead of individual schedules for better UX when a class has multiple time slots
+   */
+  async discoverSchedulesGroupedByCursor(
+    filters: {
+      timeOfDay?: 'morning' | 'afternoon' | 'evening'
+      search?: string
+      tagIds?: number[]
+    },
+    cursor: string | null,
+    limit: number,
+    participantId?: number,
+    appUserId?: number
+  ): Promise<DiscoverGroupedResponse> {
+    // Clamp limit to max 50
+    const clampedLimit = Math.min(Math.max(limit, 1), 50)
+
+    const result = await this.scheduleRepo.findForDiscoverGroupedByCursor(
+      {
+        timeOfDay: filters.timeOfDay,
+        search: filters.search,
+        tagIds: filters.tagIds,
+      },
+      cursor,
+      clampedLimit,
+      appUserId
+    )
+
+    // If user is logged in, fetch their bookings for all schedules in all groups
+    const allScheduleIds = result.groups.flatMap((g) => g.schedules.map((s) => s.id))
+    const userBookingsMap = await this.bookingService.getUserBookingsMapForSchedules(participantId, allScheduleIds)
+
+    // Map groups to response format with user bookings
+    const groups: DiscoverClassGroupType[] = result.groups.map((group) => {
+      const schedulesWithBookings = group.schedules.map((schedule) => ({
+        id: schedule.id,
+        startTimeUtc: schedule.startTimeUtc.toISOString(),
+        endTimeUtc: schedule.endTimeUtc.toISOString(),
+        localTimezone: schedule.localTimezone,
+        bookingCounts: schedule.bookingCounts,
+        myBooking: userBookingsMap.get(schedule.id) || null,
+      }))
+
+      const userBookingsCount = schedulesWithBookings.filter((s) => s.myBooking !== null).length
+
+      return {
+        classId: group.classId,
+        date: group.date,
+        title: group.title,
+        capacity: group.capacity,
+        waitlistLimit: group.waitlistLimit,
+        location: group.location,
+        organizer: group.organizer,
+        tags: group.tags,
+        schedules: schedulesWithBookings,
+        userBookingsCount,
+      }
+    })
+
+    return {
+      groups,
+      nextCursor: result.lastCursor,
       hasMore: result.hasMore,
       limit: clampedLimit,
     }

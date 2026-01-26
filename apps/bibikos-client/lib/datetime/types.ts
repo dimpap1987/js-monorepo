@@ -14,6 +14,7 @@ export type UTCDateTimeString = string
  * Minimal schedule time data required for timezone conversion
  */
 export interface ScheduleTimeData {
+  id: number
   startTimeUtc: UTCDateTimeString
   endTimeUtc: UTCDateTimeString
   localTimezone: IANATimezone

@@ -50,6 +50,34 @@ export interface DiscoverCursorResult {
   hasMore: boolean
 }
 
+/**
+ * A group of schedules from the same class on the same day
+ */
+export interface DiscoverClassGroup {
+  classId: number
+  date: string // YYYY-MM-DD in local timezone
+  title: string
+  capacity: number | null
+  waitlistLimit: number | null
+  location: { id: number; name: string } | null
+  organizer: { id: number; displayName: string | null; slug: string | null }
+  tags: Array<{ id: number; name: string }>
+  schedules: Array<{
+    id: number
+    startTimeUtc: Date
+    endTimeUtc: Date
+    localTimezone: string
+    bookingCounts: { booked: number; waitlisted: number }
+  }>
+}
+
+export interface DiscoverGroupedCursorResult {
+  groups: DiscoverClassGroup[]
+  hasMore: boolean
+  /** Cursor format: "classId:date:scheduleId" to resume from the last group's last schedule */
+  lastCursor: string | null
+}
+
 export interface ClassScheduleRepository {
   findById(id: number): Promise<ClassSchedule | null>
   findByIdWithClass(id: number): Promise<ClassScheduleWithClass | null>
@@ -79,6 +107,17 @@ export interface ClassScheduleRepository {
     limit: number,
     appUserId?: number
   ): Promise<DiscoverCursorResult>
+  /**
+   * Cursor-based pagination for discover page with grouping by class+date
+   * Returns groups of schedules from the same class on the same day
+   * Pagination is at the group level
+   */
+  findForDiscoverGroupedByCursor(
+    filters: DiscoverCursorFilters,
+    cursor: string | null,
+    limit: number,
+    appUserId?: number
+  ): Promise<DiscoverGroupedCursorResult>
   create(data: Prisma.ClassScheduleCreateInput): Promise<ClassSchedule>
   createMany(data: Prisma.ClassScheduleCreateManyInput[]): Promise<number>
   update(id: number, data: Prisma.ClassScheduleUpdateInput): Promise<ClassSchedule>
