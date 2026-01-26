@@ -2,6 +2,7 @@
 
 import { BackButton } from '@js-monorepo/back-arrow'
 import { useNotifications } from '@js-monorepo/notification'
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { endOfMonth, format, startOfMonth } from 'date-fns'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -28,7 +29,6 @@ import { useBookingUpdates } from './hooks/use-booking-updates'
 import { useCalendarEvents } from './hooks/use-calendar-events'
 import { ScheduleFormData } from './schemas'
 import { buildRecurrenceRule, calculateEndTime } from './utils/schedule-utils'
-import { ContainerTemplate } from '@js-monorepo/templates'
 
 export function CalendarContent() {
   const router = useRouter()
@@ -187,32 +187,38 @@ export function CalendarContent() {
   // Close schedule detail
   const handleCloseDetail = () => {
     setSelectedSchedule(null)
-    // Remove scheduleId from URL
-    const url = new URL(window.location.href)
-    url.searchParams.delete('scheduleId')
-    router.replace(url.pathname + url.search)
   }
 
-  // Submit new schedule
+  // Submit new schedule(s)
   const handleSubmit = async (data: ScheduleFormData) => {
     try {
-      const startDateTime = new Date(`${data.date}T${data.startTime}`)
-      const endDateTime = calculateEndTime(data.date, data.startTime, data.duration)
       const recurrenceRule = buildRecurrenceRule(data)
 
-      const result = await createScheduleMutation.mutateAsync({
-        classId: data.classId,
-        startTimeUtc: startDateTime.toISOString(),
-        endTimeUtc: endDateTime.toISOString(),
-        recurrenceRule,
+      // Create a schedule for each time slot (each with its own duration)
+      const createPromises = data.timeSlots.map((slot) => {
+        const startDateTime = new Date(`${data.date}T${slot.startTime}`)
+        const endDateTime = calculateEndTime(data.date, slot.startTime, slot.duration)
+
+        return createScheduleMutation.mutateAsync({
+          classId: data.classId,
+          startTimeUtc: startDateTime.toISOString(),
+          endTimeUtc: endDateTime.toISOString(),
+          recurrenceRule,
+        })
       })
+
+      const results = await Promise.all(createPromises)
 
       // Explicitly refetch calendar data
       await refetchSchedules()
 
-      const count = Array.isArray(result) ? result.length : 1
+      // Calculate total count (each result can be an array if recurrence is used)
+      const totalCount = results.reduce((sum, result) => {
+        return sum + (Array.isArray(result) ? result.length : 1)
+      }, 0)
+
       addNotification({
-        message: count > 1 ? `${count} schedules created` : 'Schedule created',
+        message: totalCount > 1 ? `${totalCount} schedules created` : 'Schedule created',
         type: 'success',
       })
       setIsCreateDialogOpen(false)

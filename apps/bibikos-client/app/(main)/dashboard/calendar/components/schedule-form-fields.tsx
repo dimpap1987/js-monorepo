@@ -6,7 +6,7 @@ import { Switch } from '@js-monorepo/components/ui/switch'
 import { Calendar as CalendarIcon, Clock, Repeat } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
-import { Control, UseFormSetValue, UseFormWatch } from 'react-hook-form'
+import { Control, UseFormReturn, UseFormSetValue, UseFormWatch } from 'react-hook-form'
 import {
   Class,
   DURATION_OPTIONS,
@@ -15,6 +15,7 @@ import {
   SCHEDULE_FORM_DEFAULTS,
 } from '../../../../../lib/scheduling'
 import { ScheduleFormData } from '../schemas'
+import { TimeSlotsList } from './time-slots-list'
 
 interface RangeInfo {
   daysDiff: number
@@ -84,6 +85,72 @@ function RecurrenceCountInput({ control }: RecurrenceCountInputProps) {
   )
 }
 
+// Time and duration inputs for range selection mode - works with timeSlots[0]
+interface RangeTimeInputProps {
+  form: UseFormReturn<ScheduleFormData>
+  timeInputRef: React.RefObject<HTMLInputElement | null>
+}
+
+function RangeTimeInput({ form, timeInputRef }: RangeTimeInputProps) {
+  const tSchedules = useTranslations('scheduling.schedules')
+  const [slot, setSlot] = useState(() => form.getValues('timeSlots')[0] || { startTime: '', duration: 60 })
+
+  useEffect(() => {
+    const subscription = form.watch((values, { name }) => {
+      if (name?.startsWith('timeSlots') || name === undefined) {
+        setSlot(values.timeSlots?.[0] || { startTime: '', duration: 60 })
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
+
+  const handleTimeChange = (value: string) => {
+    form.setValue('timeSlots', [{ ...slot, startTime: value }], { shouldValidate: true })
+  }
+
+  const handleDurationChange = (value: number) => {
+    form.setValue('timeSlots', [{ ...slot, duration: value }], { shouldValidate: true })
+  }
+
+  return (
+    <>
+      <FormItem>
+        <FormLabel>{tSchedules('startTime')}</FormLabel>
+        <FormControl>
+          <div className="relative cursor-pointer" onClick={() => timeInputRef.current?.showPicker?.()}>
+            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
+            <Input
+              type="time"
+              value={slot.startTime}
+              onChange={(e) => handleTimeChange(e.target.value)}
+              ref={timeInputRef}
+              className="pl-10 cursor-pointer"
+            />
+          </div>
+        </FormControl>
+      </FormItem>
+
+      <FormItem>
+        <FormLabel>{tSchedules('duration')}</FormLabel>
+        <Select value={slot.duration.toString()} onValueChange={(v) => handleDurationChange(Number(v))}>
+          <FormControl>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            {DURATION_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value.toString()}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormItem>
+    </>
+  )
+}
+
 // Container that manages visibility via subscription - no FormField here
 interface RecurrenceFieldsProps {
   control: Control<ScheduleFormData>
@@ -134,26 +201,17 @@ function RecurrenceFields({ control, setValue, watch, rangeInfo }: RecurrenceFie
 }
 
 interface ScheduleFormFieldsProps {
-  control: Control<ScheduleFormData>
-  setValue: UseFormSetValue<ScheduleFormData>
-  watch: UseFormWatch<ScheduleFormData>
+  form: UseFormReturn<ScheduleFormData>
   classes: Class[]
   locations: Location[]
   isRangeSelection?: boolean
   rangeInfo: RangeInfo | null
 }
 
-export function ScheduleFormFields({
-  control,
-  setValue,
-  watch,
-  classes,
-  locations,
-  isRangeSelection,
-  rangeInfo,
-}: ScheduleFormFieldsProps) {
+export function ScheduleFormFields({ form, classes, locations, isRangeSelection, rangeInfo }: ScheduleFormFieldsProps) {
   const tSchedules = useTranslations('scheduling.schedules')
   const timeInputRef = useRef<HTMLInputElement>(null)
+  const { control, setValue, watch } = form
 
   return (
     <div className="space-y-5">
@@ -192,70 +250,50 @@ export function ScheduleFormFields({
         )}
       />
 
-      {/* Date & Time Row */}
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{isRangeSelection ? tSchedules('startDate') : tSchedules('date')}</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
-                  <Input
-                    type="date"
-                    {...field}
-                    disabled={isRangeSelection}
-                    className={`pl-10 ${isRangeSelection ? 'opacity-60' : ''}`}
-                  />
-                </div>
-              </FormControl>
-            </FormItem>
-          )}
-        />
+      {/* Date & Time Section */}
+      {isRangeSelection ? (
+        // Range selection: show date, time, and duration in a row
+        <div className="grid grid-cols-3 gap-4">
+          <FormField
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{tSchedules('startDate')}</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
+                    <Input type="date" {...field} disabled className="pl-10 opacity-60" />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={control}
-          name="startTime"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{tSchedules('startTime')}</FormLabel>
-              <FormControl>
-                <div className="relative cursor-pointer" onClick={() => timeInputRef.current?.showPicker?.()}>
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
-                  <Input type="time" {...field} ref={timeInputRef} className="pl-10 cursor-pointer" />
-                </div>
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      </div>
+          <RangeTimeInput form={form} timeInputRef={timeInputRef} />
+        </div>
+      ) : (
+        // Single day selection: show date and multiple time slots with individual durations
+        <div className="space-y-4">
+          <FormField
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{tSchedules('date')}</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
+                    <Input type="date" {...field} className="pl-10" />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-      {/* Duration */}
-      <FormField
-        control={control}
-        name="duration"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{tSchedules('duration')}</FormLabel>
-            <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {DURATION_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value.toString()}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormItem>
-        )}
-      />
+          <TimeSlotsList form={form} />
+        </div>
+      )}
 
       {/* Recurrence Fields - isolated to prevent render conflicts */}
       <RecurrenceFields control={control} setValue={setValue} watch={watch} rangeInfo={rangeInfo} />

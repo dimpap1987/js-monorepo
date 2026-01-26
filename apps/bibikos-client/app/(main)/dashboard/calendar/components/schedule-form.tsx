@@ -40,6 +40,7 @@ function getSubmitLabel(
   recurrence: string,
   recurrenceCount: number,
   recurrenceDays: string[],
+  timeSlotsCount: number,
   tSchedules: ReturnType<typeof useTranslations>,
   defaultLabel: string
 ): string {
@@ -53,6 +54,9 @@ function getSubmitLabel(
     }
   } else if (recurrence === RECURRENCE_TYPE.WEEKLY) {
     return tSchedules('createSessions', { count: recurrenceCount })
+  } else if (timeSlotsCount > 1) {
+    // Multiple time slots for single day
+    return tSchedules('createSessions', { count: timeSlotsCount })
   }
   return defaultLabel
 }
@@ -76,6 +80,7 @@ function FormActions({ form, rangeInfo, isSubmitting, onCancel }: FormActionsPro
       form.getValues('recurrence'),
       form.getValues('recurrenceCount'),
       form.getValues('recurrenceDays'),
+      form.getValues('timeSlots')?.length || 1,
       tSchedules,
       defaultLabel
     )
@@ -88,6 +93,7 @@ function FormActions({ form, rangeInfo, isSubmitting, onCancel }: FormActionsPro
         values.recurrence || RECURRENCE_TYPE.NONE,
         values.recurrenceCount || 0,
         (values.recurrenceDays || []).filter((d): d is string => d !== undefined),
+        values.timeSlots?.length || 1,
         tSchedules,
         defaultLabel
       )
@@ -189,8 +195,7 @@ function ScheduleFormContent({
     return {
       classId: initialClassId || 0,
       date: initialDateRange?.startDate || format(new Date(), 'yyyy-MM-dd'),
-      startTime,
-      duration: SCHEDULE_FORM_DEFAULTS.DEFAULT_DURATION,
+      timeSlots: [{ startTime, duration: SCHEDULE_FORM_DEFAULTS.DEFAULT_DURATION }],
       recurrence: rangeInfo ? rangeInfo.suggestedRecurrence : RECURRENCE_TYPE.NONE,
       recurrenceDays: rangeInfo ? rangeInfo.allDayCodes : [],
       recurrenceCount: rangeInfo ? rangeInfo.suggestedCount : SCHEDULE_FORM_DEFAULTS.DEFAULT_RECURRENCE_COUNT,
@@ -246,9 +251,7 @@ function ScheduleFormContent({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <ScheduleFormFields
-            control={form.control}
-            setValue={form.setValue}
-            watch={form.watch}
+            form={form}
             classes={classes}
             locations={locations}
             isRangeSelection={!!rangeInfo}

@@ -306,7 +306,7 @@
 }
 
 .fc-custom-styles .fc-timegrid-slot {
-  height: 3rem;
+  height: 4rem;
   border-bottom: 1px dashed color-mix(in oklch, var(--border) 50%, transparent);
 }
 
@@ -320,6 +320,7 @@
 .fc-custom-styles .fc-timegrid-event {
   border-radius: 0.375rem !important;
   border-left: 3px solid !important;
+  min-height: 50px !important;
 }
 
 .fc-custom-styles .fc-timegrid-event .fc-event-main {

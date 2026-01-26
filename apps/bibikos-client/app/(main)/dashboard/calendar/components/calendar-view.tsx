@@ -129,13 +129,24 @@ export function CalendarView({
       // Only allow selection of today and future dates
       const selectedDate = startOfDay(arg.start)
       if (selectedDate >= todayStart) {
-        // Check if it's a range selection (more than one day)
-        const endDate = arg.end
         const startDateStr = format(arg.start, 'yyyy-MM-dd')
-        // FullCalendar end date is exclusive, so subtract 1 day for the actual end
-        const actualEndDate = new Date(endDate)
-        actualEndDate.setDate(actualEndDate.getDate() - 1)
-        const endDateStr = format(actualEndDate, 'yyyy-MM-dd')
+        const viewType = arg.view.type
+
+        // In timeGrid views, the end date represents the actual time range selection
+        // In dayGrid views, the end date is exclusive (next day) so we subtract 1 day
+        const isDayGridView = viewType.startsWith('dayGrid')
+        let endDateStr: string
+
+        if (isDayGridView) {
+          // FullCalendar dayGrid end date is exclusive, subtract 1 day for actual end
+          const actualEndDate = new Date(arg.end)
+          actualEndDate.setDate(actualEndDate.getDate() - 1)
+          endDateStr = format(actualEndDate, 'yyyy-MM-dd')
+        } else {
+          // timeGrid views: use start date (same day selection)
+          endDateStr = startDateStr
+        }
+
         const isRange = startDateStr !== endDateStr
 
         onDateSelect({
