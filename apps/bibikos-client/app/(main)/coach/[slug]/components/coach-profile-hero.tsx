@@ -3,8 +3,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
-import { Award, Dumbbell, Sparkles, Star, Trophy, Verified } from 'lucide-react'
-import type { OrganizerPublicProfile, OrganizerPublicBadge } from '../../../../../lib/scheduling'
+import { DecorativeBackground } from '@js-monorepo/templates'
+import { Award, Sparkles, Star, Trophy, Verified } from 'lucide-react'
+import type { OrganizerPublicBadge, OrganizerPublicProfile } from '../../../../../lib/scheduling'
 
 interface CoachProfileHeroProps {
   profile: OrganizerPublicProfile
@@ -72,7 +73,7 @@ function ProfileBadges({ badges }: { badges: OrganizerPublicBadge[] }) {
         const Icon = getBadgeIcon(badge.name)
         const style = getBadgeStyle(badge.name)
         return (
-          <Badge key={badge.id} className={`px-3 py-1 text-xs gap-1.5 ${style}`}>
+          <Badge key={badge.id} className={`px-3 py-1.5 text-xs gap-1.5 ${style}`}>
             <Icon className="h-3.5 w-3.5" />
             {badge.name}
           </Badge>
@@ -111,13 +112,8 @@ export function CoachProfileHero({ profile }: CoachProfileHeroProps) {
   return (
     <Card className="overflow-hidden border-0 shadow-none bg-transparent">
       {/* Gradient Background */}
-      <div className="relative bg-gradient-to-br from-primary/5 via-primary/10 to-background">
-        {/* Decorative Elements */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-
-        <CardContent className="relative px-4 py-10 sm:px-8 sm:py-14">
+      <DecorativeBackground>
+        <CardContent className="relative p-4 sm:px-8 sm:py-14">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
             {/* Avatar */}
             <ProfileAvatar profile={profile} />
@@ -126,7 +122,7 @@ export function CoachProfileHero({ profile }: CoachProfileHeroProps) {
             <div className="flex-1 text-center sm:text-left space-y-4">
               {/* Name & Badges */}
               <div className="space-y-3">
-                <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">{profile.displayName || 'Coach'}</h1>
+                <h1 className="tracking-tight">{profile.displayName || 'Instructor'}</h1>
                 <ProfileBadges badges={profile.badges} />
               </div>
 
@@ -143,7 +139,7 @@ export function CoachProfileHero({ profile }: CoachProfileHeroProps) {
             </div>
           </div>
         </CardContent>
-      </div>
+      </DecorativeBackground>
     </Card>
   )
 }
