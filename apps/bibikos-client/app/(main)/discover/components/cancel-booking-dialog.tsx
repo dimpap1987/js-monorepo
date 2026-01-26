@@ -19,10 +19,25 @@ import {
 } from '@js-monorepo/components/ui/drawer'
 import { AlertTriangle, Calendar, Clock, Loader2 } from 'lucide-react'
 import { useScheduleTime } from '../../../../lib/datetime'
-import type { DiscoverSchedule } from '../../../../lib/scheduling'
+
+// Generic schedule type for cancel dialog - works with DiscoverSchedule and OrganizerPublicSchedule
+interface CancelableSchedule {
+  id: number
+  startTimeUtc: string
+  endTimeUtc: string
+  localTimezone: string
+  class?: {
+    title: string
+  }
+  myBooking?: {
+    id: number
+    status: string
+    waitlistPosition: number | null
+  } | null
+}
 
 interface CancelBookingDialogProps {
-  schedule: DiscoverSchedule
+  schedule: CancelableSchedule
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: () => void

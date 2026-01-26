@@ -1,5 +1,4 @@
 export { CoachProfileSkeleton } from './coach-profile-skeleton'
 export { CoachProfileHero } from './coach-profile-hero'
-export { CoachScheduleCard } from './coach-schedule-card'
 export { CoachSchedulesList } from './coach-schedules-list'
-export { BookingConfirmationDialog } from './booking-confirmation-dialog'
+export { BookingConfirmationDialog, BookingConfirmationDrawer } from './booking-confirmation-dialog'

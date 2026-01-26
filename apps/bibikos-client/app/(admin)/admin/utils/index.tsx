@@ -3,7 +3,7 @@ import { HiMiniUsers } from 'react-icons/hi2'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdOutlineContactMail, MdOutlineSubscriptions, MdOutlineToggleOn } from 'react-icons/md'
 import { RiUserSettingsFill } from 'react-icons/ri'
-import { FiPackage } from 'react-icons/fi'
+import { FiPackage, FiAward } from 'react-icons/fi'
 import { BiTagAlt } from 'react-icons/bi'
 
 interface NavLink {
@@ -81,6 +81,12 @@ export const ADMIN_NAV_SECTIONS: NavSection[] = [
         href: '/admin/bibikos/tags',
         icon: BiTagAlt,
         label: 'Tags',
+        activeClassName: defaultActiveClassName,
+      },
+      {
+        href: '/admin/bibikos/organizers',
+        icon: FiAward,
+        label: 'Organizer Badges',
         activeClassName: defaultActiveClassName,
       },
     ],

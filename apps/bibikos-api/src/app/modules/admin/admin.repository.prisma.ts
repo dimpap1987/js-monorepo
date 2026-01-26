@@ -3,7 +3,7 @@ import { Pageable, PaginationType } from '@js-monorepo/types/pagination'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { AdminRepository } from './admin.repository'
+import { AdminOrganizerDto, AdminRepository } from './admin.repository'
 import { UpdateUserSchemaType } from '@js-monorepo/schemas'
 
 @Injectable()
@@ -244,6 +244,112 @@ export class AdminRepositoryPrisma implements AdminRepository {
               },
             },
           },
+        },
+      },
+    })
+  }
+
+  // ===== Organizer Badge Management =====
+
+  async getOrganizers(pageable: Pageable): Promise<PaginationType<AdminOrganizerDto>> {
+    const { page = 1, pageSize = 10 } = pageable
+
+    const [totalCount, organizers] = await Promise.all([
+      this.txHost.tx.organizerProfile.count(),
+      this.txHost.tx.organizerProfile.findMany({
+        take: pageSize,
+        skip: (page - 1) * pageSize,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          appUser: {
+            select: {
+              authUser: {
+                select: {
+                  userProfiles: {
+                    select: {
+                      profileImage: true,
+                    },
+                    take: 1,
+                  },
+                },
+              },
+            },
+          },
+          tags: {
+            include: {
+              tag: {
+                include: {
+                  category: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+    ])
+
+    // Transform to DTO, separating badges from self-selected tags
+    const content: AdminOrganizerDto[] = organizers.map((org) => {
+      const allTags = org.tags.map((tagOnOrg) => ({
+        id: tagOnOrg.tag.id,
+        name: tagOnOrg.tag.name,
+        category: tagOnOrg.tag.category?.name ?? null,
+        applicableTo: tagOnOrg.tag.applicableTo,
+      }))
+
+      // Badges: tags with empty applicableTo array (admin-only)
+      const badges = allTags
+        .filter((tag) => tag.applicableTo.length === 0)
+        .map(({ id, name, category }) => ({ id, name, category }))
+
+      // Self-selected tags: tags with ORGANIZER in applicableTo
+      const selfSelectedTags = allTags
+        .filter((tag) => tag.applicableTo.includes('ORGANIZER'))
+        .map(({ id, name, category }) => ({ id, name, category }))
+
+      return {
+        id: org.id,
+        displayName: org.displayName,
+        slug: org.slug,
+        bio: org.bio,
+        createdAt: org.createdAt,
+        profileImage: org.appUser.authUser.userProfiles[0]?.profileImage ?? null,
+        badges,
+        selfSelectedTags,
+      }
+    })
+
+    return {
+      page,
+      pageSize,
+      content,
+      totalCount,
+      totalPages: Math.ceil(totalCount / pageSize),
+    }
+  }
+
+  async assignBadgeToOrganizer(organizerId: number, tagId: number): Promise<void> {
+    await this.txHost.tx.tagOnOrganizer.upsert({
+      where: {
+        tagId_organizerId: {
+          tagId,
+          organizerId,
+        },
+      },
+      create: {
+        tagId,
+        organizerId,
+      },
+      update: {},
+    })
+  }
+
+  async removeBadgeFromOrganizer(organizerId: number, tagId: number): Promise<void> {
+    await this.txHost.tx.tagOnOrganizer.delete({
+      where: {
+        tagId_organizerId: {
+          tagId,
+          organizerId,
         },
       },
     })

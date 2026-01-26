@@ -24,7 +24,7 @@ export class TagsController {
     return this.tagService.getCategoryById(id)
   }
 
-  @Get('tags')
+  @Get()
   async getAllTags() {
     return this.tagService.getAllTags()
   }

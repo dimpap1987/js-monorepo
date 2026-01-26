@@ -1,20 +1,30 @@
 'use client'
 
-import { useBibikosSession } from '../../../../lib/auth'
+import { useSession } from '@js-monorepo/auth/next/client'
 import { Button } from '@js-monorepo/components/ui/button'
 import { useNotifications } from '@js-monorepo/notification'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { ContainerTemplate } from '@js-monorepo/templates'
+import { addWeeks, endOfWeek, format, startOfDay } from 'date-fns'
 import { AlertCircle } from 'lucide-react'
-import { format, addWeeks, startOfDay, endOfWeek } from 'date-fns'
+import { useRouter } from 'next-nprogress-bar'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 import {
+  OrganizerPublicSchedule,
+  useCancelBooking,
+  useCreateBooking,
   useOrganizerPublicProfile,
   useOrganizerPublicSchedules,
-  useCreateBooking,
-  ClassSchedule,
 } from '../../../../lib/scheduling'
-import { CoachProfileSkeleton, CoachProfileHero, CoachSchedulesList, BookingConfirmationDialog } from './components'
-import { ContainerTemplate } from '@js-monorepo/templates'
+import { useDeviceStore } from '../../../../stores/deviceStore'
+import { CancelBookingDialog, CancelBookingDrawer } from '../../discover/components'
+import {
+  BookingConfirmationDialog,
+  BookingConfirmationDrawer,
+  CoachProfileHero,
+  CoachProfileSkeleton,
+  CoachSchedulesList,
+} from './components'
 
 function CoachNotFound({ onGoHome }: { onGoHome: () => void }) {
   return (
@@ -34,12 +44,16 @@ interface CoachProfileContentProps {
 }
 
 export function CoachProfileContent({ slug }: CoachProfileContentProps) {
-  const { isLoggedIn } = useBibikosSession()
+  const { isLoggedIn } = useSession()
   const router = useRouter()
   const { addNotification } = useNotifications()
+  const isMobile = useDeviceStore((state) => state.isMobile)
+  const tBookings = useTranslations('scheduling.bookings')
 
-  const [selectedSchedule, setSelectedSchedule] = useState<ClassSchedule | null>(null)
+  const [selectedSchedule, setSelectedSchedule] = useState<OrganizerPublicSchedule | null>(null)
   const [confirmBooking, setConfirmBooking] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [scheduleToCancel, setScheduleToCancel] = useState<OrganizerPublicSchedule | null>(null)
 
   const { data: profile, isLoading: isProfileLoading, error: profileError } = useOrganizerPublicProfile(slug)
 
@@ -47,17 +61,47 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
   const startDate = format(startOfDay(today), 'yyyy-MM-dd')
   const endDate = format(endOfWeek(addWeeks(today, 4), { weekStartsOn: 1 }), 'yyyy-MM-dd')
 
-  const { data: schedules, isLoading: isSchedulesLoading } = useOrganizerPublicSchedules(slug, startDate, endDate)
+  const {
+    data: schedules,
+    isLoading: isSchedulesLoading,
+    refetch,
+  } = useOrganizerPublicSchedules(slug, startDate, endDate)
 
   const createBookingMutation = useCreateBooking()
+  const cancelBookingMutation = useCancelBooking()
 
-  const handleBookSchedule = (schedule: ClassSchedule) => {
+  const handleBookSchedule = (schedule: OrganizerPublicSchedule) => {
     setSelectedSchedule(schedule)
     if (!isLoggedIn) {
       router.push(`/auth/login?redirect=/coach/${slug}`)
       return
     }
     setConfirmBooking(true)
+  }
+
+  const handleCancelRequest = (schedule: OrganizerPublicSchedule) => {
+    setScheduleToCancel(schedule)
+    setCancelDialogOpen(true)
+  }
+
+  const handleCancelConfirm = async () => {
+    if (!scheduleToCancel?.myBooking) return
+
+    try {
+      await cancelBookingMutation.mutateAsync({ id: scheduleToCancel.myBooking.id })
+      addNotification({
+        message: tBookings('cancelSuccess'),
+        type: 'success',
+      })
+      setCancelDialogOpen(false)
+      setScheduleToCancel(null)
+      refetch()
+    } catch (error: unknown) {
+      addNotification({
+        message: error instanceof Error ? error.message : tBookings('cancelError'),
+        type: 'error',
+      })
+    }
   }
 
   const handleConfirmBooking = async () => {
@@ -70,23 +114,22 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
 
       if (booking.status === 'WAITLISTED') {
         addNotification({
-          message: `Added to waitlist (position #${booking.waitlistPosition})`,
+          message: tBookings('waitlistSuccess', { position: booking.waitlistPosition }),
           type: 'information',
         })
       } else {
         addNotification({
-          message: 'Booking confirmed!',
+          message: tBookings('bookingSuccess'),
           type: 'success',
         })
       }
 
       setConfirmBooking(false)
       setSelectedSchedule(null)
-      router.push('/dashboard/bookings')
+      refetch()
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to book class'
       addNotification({
-        message: errorMessage,
+        message: error instanceof Error ? error.message : tBookings('bookingError'),
         type: 'error',
       })
     }
@@ -105,16 +148,51 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
       <CoachProfileHero profile={profile} />
 
       <ContainerTemplate>
-        <CoachSchedulesList schedules={schedules} isLoading={isSchedulesLoading} onBookSchedule={handleBookSchedule} />
+        <CoachSchedulesList
+          schedules={schedules}
+          isLoading={isSchedulesLoading}
+          onBookSchedule={handleBookSchedule}
+          onCancelSchedule={handleCancelRequest}
+        />
       </ContainerTemplate>
 
-      <BookingConfirmationDialog
-        open={confirmBooking}
-        onOpenChange={setConfirmBooking}
-        schedule={selectedSchedule}
-        onConfirm={handleConfirmBooking}
-        isPending={createBookingMutation.isPending}
-      />
+      {selectedSchedule &&
+        (isMobile ? (
+          <BookingConfirmationDrawer
+            open={confirmBooking}
+            onOpenChange={setConfirmBooking}
+            schedule={selectedSchedule}
+            onConfirm={handleConfirmBooking}
+            isPending={createBookingMutation.isPending}
+          />
+        ) : (
+          <BookingConfirmationDialog
+            open={confirmBooking}
+            onOpenChange={setConfirmBooking}
+            schedule={selectedSchedule}
+            onConfirm={handleConfirmBooking}
+            isPending={createBookingMutation.isPending}
+          />
+        ))}
+
+      {scheduleToCancel &&
+        (isMobile ? (
+          <CancelBookingDrawer
+            schedule={scheduleToCancel}
+            open={cancelDialogOpen}
+            onOpenChange={setCancelDialogOpen}
+            onConfirm={handleCancelConfirm}
+            isLoading={cancelBookingMutation.isPending}
+          />
+        ) : (
+          <CancelBookingDialog
+            schedule={scheduleToCancel}
+            open={cancelDialogOpen}
+            onOpenChange={setCancelDialogOpen}
+            onConfirm={handleCancelConfirm}
+            isLoading={cancelBookingMutation.isPending}
+          />
+        ))}
     </ContainerTemplate>
   )
 }

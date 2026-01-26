@@ -39,15 +39,46 @@ export class OrganizerService {
 
   /**
    * Get public profile by slug (for /coach/:slug page)
+   * Returns enriched profile with profile image, tags, badges, and class types
    */
   async getPublicProfile(slug: string): Promise<OrganizerPublicProfileDto | null> {
-    const organizer = await this.organizerRepo.findBySlug(slug)
+    const organizer = await this.organizerRepo.findBySlugWithPublicProfile(slug)
     if (!organizer) return null
+
+    // Extract profile image from auth user's profile
+    const profileImage = organizer.appUser.authUser.userProfiles[0]?.profileImage ?? null
+
+    // Separate badges (admin-assigned, empty applicableTo) from self-selected tags
+    const badges = organizer.tags
+      .filter((tagOnOrganizer) => tagOnOrganizer.tag.applicableTo.length === 0)
+      .map((tagOnOrganizer) => ({
+        id: tagOnOrganizer.tag.id,
+        name: tagOnOrganizer.tag.name,
+      }))
+
+    // Self-selected tags (those with ORGANIZER in applicableTo)
+    const tags = organizer.tags
+      .filter((tagOnOrganizer) => tagOnOrganizer.tag.applicableTo.includes('ORGANIZER'))
+      .map((tagOnOrganizer) => ({
+        id: tagOnOrganizer.tag.id,
+        name: tagOnOrganizer.tag.name,
+        category: tagOnOrganizer.tag.category?.name ?? null,
+      }))
+
+    // Get unique class types (distinct titles)
+    const classTypes = organizer.classes.map((cls) => ({
+      id: cls.id,
+      title: cls.title,
+    }))
 
     return {
       displayName: organizer.displayName,
       bio: organizer.bio,
       slug: organizer.slug,
+      profileImage,
+      tags,
+      badges,
+      classTypes,
     }
   }
 

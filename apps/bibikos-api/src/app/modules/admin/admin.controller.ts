@@ -239,4 +239,39 @@ export class AdminController {
   async deleteTag(@Param('id', ParseIntPipe) id: number) {
     return this.tagService.deleteTag(id)
   }
+
+  // ===== Organizer Badge Management =====
+
+  @Get('organizers')
+  async getOrganizers(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe) pageSize: number
+  ) {
+    return this.adminService.getOrganizers(page, pageSize)
+  }
+
+  @Get('badges')
+  async getBadges() {
+    // Get all tags with empty applicableTo (badges only)
+    const allTags = await this.tagService.getAllTags()
+    return allTags.filter((tag) => tag.applicableTo.length === 0)
+  }
+
+  @Post('organizers/:organizerId/badges/:badgeId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async assignBadgeToOrganizer(
+    @Param('organizerId', ParseIntPipe) organizerId: number,
+    @Param('badgeId', ParseIntPipe) badgeId: number
+  ) {
+    return this.adminService.assignBadgeToOrganizer(organizerId, badgeId)
+  }
+
+  @Delete('organizers/:organizerId/badges/:badgeId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeBadgeFromOrganizer(
+    @Param('organizerId', ParseIntPipe) organizerId: number,
+    @Param('badgeId', ParseIntPipe) badgeId: number
+  ) {
+    return this.adminService.removeBadgeFromOrganizer(organizerId, badgeId)
+  }
 }

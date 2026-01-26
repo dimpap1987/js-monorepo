@@ -147,3 +147,38 @@ export type CreateBookingDto = z.infer<typeof CreateBookingSchema>
 export type CancelBookingDto = z.infer<typeof CancelBookingSchema>
 export type MarkAttendanceDto = z.infer<typeof MarkAttendanceSchema>
 export type UpdateBookingNotesDto = z.infer<typeof UpdateBookingNotesSchema>
+
+// =============================================================================
+// Public Profile Response Schemas
+// =============================================================================
+
+export const OrganizerPublicTagSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  category: z.string().nullable().optional(),
+})
+
+export const OrganizerPublicBadgeSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+})
+
+export const OrganizerPublicClassTypeSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+})
+
+export const OrganizerPublicProfileSchema = z.object({
+  displayName: z.string().nullable(),
+  bio: z.string().nullable(),
+  slug: z.string(),
+  profileImage: z.string().nullable(),
+  tags: z.array(OrganizerPublicTagSchema),
+  badges: z.array(OrganizerPublicBadgeSchema),
+  classTypes: z.array(OrganizerPublicClassTypeSchema),
+})
+
+export type OrganizerPublicTag = z.infer<typeof OrganizerPublicTagSchema>
+export type OrganizerPublicBadge = z.infer<typeof OrganizerPublicBadgeSchema>
+export type OrganizerPublicClassType = z.infer<typeof OrganizerPublicClassTypeSchema>
+export type OrganizerPublicProfileResponse = z.infer<typeof OrganizerPublicProfileSchema>

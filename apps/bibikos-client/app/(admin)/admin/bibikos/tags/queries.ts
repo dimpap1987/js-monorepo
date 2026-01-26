@@ -63,7 +63,7 @@ export const TAGS_QUERY_KEY = ['admin', 'tags']
 // =============================================================================
 
 export const fetchTagCategories = async (): Promise<TagCategory[]> => {
-  const response = await apiClient.get<TagCategory[]>('/tag-categories')
+  const response = await apiClient.get<TagCategory[]>('/tags/tag-categories')
   return handleQueryResponse(response)
 }
 

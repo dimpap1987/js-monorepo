@@ -104,18 +104,19 @@ export class OrganizerController {
   /**
    * GET /scheduling/organizers/public/:slug/schedules
    * Get public schedules for an organizer (for /coach/:slug booking page)
-   * No auth required
+   * No auth required, but if logged in, includes user's booking status
    */
   @Get('public/:slug/schedules')
   async getPublicSchedules(
     @Param('slug') slug: string,
     @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string
+    @Query('endDate') endDate: string,
+    @AppUserContext() appUserContext?: AppUserContextType
   ) {
     if (!startDate || !endDate) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'START_AND_END_DATE_REQUIRED')
     }
 
-    return this.scheduleService.getPublicSchedulesBySlug(slug, startDate, endDate)
+    return this.scheduleService.getPublicSchedulesBySlug(slug, startDate, endDate, appUserContext?.participantId)
   }
 }

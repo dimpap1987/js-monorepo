@@ -5,15 +5,14 @@ import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { formatDistanceToNow } from 'date-fns'
 import { Check, Loader2, Mail, MailOpen, Search, User, X } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next-nprogress-bar'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import { useInvitationWebSocket } from '../../../lib/scheduling/hooks/use-invitation-websocket'
 import { usePendingInvitations, useRespondToInvitation } from '../../../lib/scheduling/queries'
 import type { PendingInvitation } from '../../../lib/scheduling/types'
-import { ContainerTemplate } from '@js-monorepo/templates'
 
 function InvitationsSkeleton() {
   return (
@@ -62,9 +61,10 @@ interface InvitationCardProps {
   onAccept: () => void
   onDecline: () => void
   isResponding: boolean
+  loading?: boolean
 }
 
-function InvitationCard({ invitation, onAccept, onDecline, isResponding }: InvitationCardProps) {
+function InvitationCard({ invitation, onAccept, onDecline, isResponding, loading = false }: InvitationCardProps) {
   return (
     <Card className="border-border/50 hover:shadow-md transition-shadow flex flex-col h-full">
       <CardHeader className="pb-3">
@@ -105,7 +105,7 @@ function InvitationCard({ invitation, onAccept, onDecline, isResponding }: Invit
 
         {/* Actions - always at bottom */}
         <div className="flex items-center gap-2 pt-4 mt-auto">
-          <Button onClick={onAccept} disabled={isResponding} className="flex-1 gap-1">
+          <Button onClick={onAccept} loading={loading} disabled={isResponding} className="flex-1 gap-1">
             {isResponding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
             Accept
           </Button>
@@ -131,16 +131,13 @@ export default function MyInvitationsComponent() {
     setRespondingId(invitation.id)
     try {
       await respondMutation.mutateAsync({ invitationId: invitation.id, status })
-
       if (status === 'ACCEPTED') {
-        toast.success('Invitation accepted! Redirecting to class...')
         router.push(`/class/${invitation.classId}`)
       } else {
-        toast.success('Invitation declined')
         refetch()
       }
     } catch (error) {
-      toast.error('Failed to respond to invitation')
+      console.error(error)
     } finally {
       setRespondingId(null)
     }
@@ -172,6 +169,7 @@ export default function MyInvitationsComponent() {
           {invitations.map((invitation: PendingInvitation) => (
             <InvitationCard
               key={invitation.id}
+              loading={respondMutation.isPending}
               invitation={invitation}
               onAccept={() => handleRespond(invitation, 'ACCEPTED')}
               onDecline={() => handleRespond(invitation, 'DECLINED')}

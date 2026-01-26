@@ -274,7 +274,15 @@
       "participants": "Participants",
       "markAttendance": "Mark Attendance",
       "markAsAttended": "Mark Attended",
-      "markAsNoShow": "Mark No-Show"
+      "markAsNoShow": "Mark No-Show",
+      "confirmBooking": "Confirm Booking",
+      "confirmBookingDescription": "Are you sure you want to book this class?",
+      "booking": "Booking...",
+      "bookingSuccess": "Booking confirmed!",
+      "bookingError": "Failed to book class",
+      "waitlistSuccess": "Added to waitlist (position #{position})",
+      "cancelSuccess": "Booking cancelled successfully",
+      "cancelError": "Failed to cancel booking"
     },
     "profile": {
       "title": "Your Profile",

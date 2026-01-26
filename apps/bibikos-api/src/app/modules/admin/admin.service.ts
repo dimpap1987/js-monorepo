@@ -8,7 +8,7 @@ import { Events, Rooms, UserPresenceWebsocketService } from '@js-monorepo/user-p
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common'
 import { BibikosCacheService } from '../scheduling/cache'
 import { ROLES_KEY } from '../scheduling/cache/constants'
-import { AdminRepo, AdminRepository } from './admin.repository'
+import { AdminOrganizerDto, AdminRepo, AdminRepository } from './admin.repository'
 
 @Injectable()
 export class AdminService {
@@ -120,6 +120,43 @@ export class AdminService {
     } catch (e) {
       this.logger.error(`Error deactivating user with id: '${userId}'`, e.stack)
       throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_DEACTIVATING_USER')
+    }
+  }
+
+  // ===== Organizer Badge Management =====
+
+  async getOrganizers(page?: number, pageSize?: number): Promise<PaginationType<AdminOrganizerDto>> {
+    this.logger.debug(`Fetching organizers: page: '${page}' - pageSize: '${pageSize}'`)
+    try {
+      return await this.adminRepository.getOrganizers({
+        page: page ?? 1,
+        pageSize: pageSize ?? 10,
+      })
+    } catch (e) {
+      this.logger.error(`Error fetching organizers`, e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_FETCHING_ORGANIZERS')
+    }
+  }
+
+  async assignBadgeToOrganizer(organizerId: number, tagId: number): Promise<void> {
+    this.logger.debug(`Assigning badge ${tagId} to organizer ${organizerId}`)
+    try {
+      await this.adminRepository.assignBadgeToOrganizer(organizerId, tagId)
+      this.logger.log(`Badge ${tagId} assigned to organizer ${organizerId}`)
+    } catch (e) {
+      this.logger.error(`Error assigning badge ${tagId} to organizer ${organizerId}`, e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_ASSIGNING_BADGE')
+    }
+  }
+
+  async removeBadgeFromOrganizer(organizerId: number, tagId: number): Promise<void> {
+    this.logger.debug(`Removing badge ${tagId} from organizer ${organizerId}`)
+    try {
+      await this.adminRepository.removeBadgeFromOrganizer(organizerId, tagId)
+      this.logger.log(`Badge ${tagId} removed from organizer ${organizerId}`)
+    } catch (e) {
+      this.logger.error(`Error removing badge ${tagId} from organizer ${organizerId}`, e.stack)
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'ERROR_REMOVING_BADGE')
     }
   }
 }

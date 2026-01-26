@@ -10,10 +10,39 @@ export interface OrganizerWithAppUser extends OrganizerProfile {
   }
 }
 
+export interface OrganizerPublicProfileData extends OrganizerProfile {
+  appUser: {
+    id: number
+    authUserId: number
+    fullName: string | null
+    authUser: {
+      userProfiles: Array<{
+        profileImage: string | null
+      }>
+    }
+  }
+  tags: Array<{
+    tag: {
+      id: number
+      name: string
+      applicableTo: string[]
+      category: {
+        name: string
+      } | null
+    }
+  }>
+  classes: Array<{
+    id: number
+    title: string
+    isActive: boolean
+  }>
+}
+
 export interface OrganizerRepository {
   findById(id: number): Promise<OrganizerProfile | null>
   findByAppUserId(appUserId: number): Promise<OrganizerProfile | null>
   findBySlug(slug: string): Promise<OrganizerWithAppUser | null>
+  findBySlugWithPublicProfile(slug: string): Promise<OrganizerPublicProfileData | null>
   create(data: Prisma.OrganizerProfileCreateInput): Promise<OrganizerProfile>
   update(id: number, data: Prisma.OrganizerProfileUpdateInput): Promise<OrganizerProfile>
   isSlugAvailable(slug: string, excludeId?: number): Promise<boolean>

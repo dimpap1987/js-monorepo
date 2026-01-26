@@ -32,10 +32,30 @@ export interface OrganizerProfile {
   defaultLocationId: number | null
   createdAt: string
 }
+export interface OrganizerPublicTag {
+  id: number
+  name: string
+  category?: string | null
+}
+
+export interface OrganizerPublicBadge {
+  id: number
+  name: string
+}
+
+export interface OrganizerPublicClassType {
+  id: number
+  title: string
+}
+
 export interface OrganizerPublicProfile {
   displayName: string | null
   bio: string | null
   slug: string
+  profileImage: string | null
+  tags: OrganizerPublicTag[]
+  badges: OrganizerPublicBadge[]
+  classTypes: OrganizerPublicClassType[]
 }
 
 // Participant
@@ -107,6 +127,18 @@ export interface ClassSchedule {
   }
 }
 
+// User's booking info (shared across multiple schedule types)
+export interface MyBookingInfo {
+  id: number
+  status: BookingStatus
+  waitlistPosition: number | null
+}
+
+// Organizer Public Schedule (for /coach/:slug page)
+export interface OrganizerPublicSchedule extends ClassSchedule {
+  myBooking: MyBookingInfo | null
+}
+
 // Discover Schedule (includes organizer info for public discovery)
 export interface DiscoverSchedule extends ClassSchedule {
   organizer: {
@@ -119,11 +151,7 @@ export interface DiscoverSchedule extends ClassSchedule {
     name: string
   }>
   // User's booking for this schedule (if logged in)
-  myBooking: {
-    id: number
-    status: BookingStatus
-    waitlistPosition: number | null
-  } | null
+  myBooking: MyBookingInfo | null
 }
 
 export interface DiscoverFilters {

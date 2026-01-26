@@ -274,7 +274,15 @@
       "participants": "Συμμετέχοντες",
       "markAttendance": "Σημείωση Παρουσιών",
       "markAsAttended": "Σημείωση Παρουσίας",
-      "markAsNoShow": "Σημείωση Απουσίας"
+      "markAsNoShow": "Σημείωση Απουσίας",
+      "confirmBooking": "Επιβεβαίωση Κράτησης",
+      "confirmBookingDescription": "Είστε σίγουροι ότι θέλετε να κάνετε κράτηση σε αυτό το μάθημα;",
+      "booking": "Κράτηση...",
+      "bookingSuccess": "Η κράτηση επιβεβαιώθηκε!",
+      "bookingError": "Αποτυχία κράτησης",
+      "waitlistSuccess": "Προστέθηκε στη λίστα αναμονής (θέση #{position})",
+      "cancelSuccess": "Η κράτηση ακυρώθηκε επιτυχώς",
+      "cancelError": "Αποτυχία ακύρωσης κράτησης"
     },
     "profile": {
       "title": "Το Προφίλ σας",

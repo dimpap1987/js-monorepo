@@ -31,6 +31,7 @@ import type {
   MyBookingsResponse,
   OrganizerProfile,
   OrganizerPublicProfile,
+  OrganizerPublicSchedule,
   ParticipantProfile,
   PendingInvitation,
   RespondToInvitationPayload,
@@ -179,7 +180,7 @@ export function useOrganizerPublicSchedules(slug: string, startDate: string, end
   return useQuery({
     queryKey: [...schedulingKeys.organizerPublic(slug), 'schedules', startDate, endDate] as const,
     queryFn: async () => {
-      const response = await apiClient.get<ClassSchedule[]>(
+      const response = await apiClient.get<OrganizerPublicSchedule[]>(
         `/scheduling/organizers/public/${slug}/schedules?startDate=${startDate}&endDate=${endDate}`
       )
       return handleQueryResponse(response)

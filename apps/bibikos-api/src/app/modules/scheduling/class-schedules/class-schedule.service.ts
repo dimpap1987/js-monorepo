@@ -139,12 +139,20 @@ export class ClassScheduleService {
 
   /**
    * Get public schedules by organizer slug (for /coach/:slug page)
+   * If participantId is provided, includes user's booking status
    */
   async getPublicSchedulesBySlug(
     slug: string,
     startDate: string,
-    endDate: string
-  ): Promise<ClassScheduleResponseDto[]> {
+    endDate: string,
+    participantId?: number
+  ): Promise<
+    Array<
+      ClassScheduleResponseDto & {
+        myBooking: { id: number; status: string; waitlistPosition: number | null } | null
+      }
+    >
+  > {
     const organizer = await this.organizerService.findBySlug(slug)
     if (!organizer) {
       return []
@@ -160,7 +168,15 @@ export class ClassScheduleService {
     }
 
     const schedules = await this.scheduleRepo.findPublicByOrganizerIdInRange(organizer.id, start, end)
-    return schedules.map(this.toResponseDto)
+
+    // If user is logged in, fetch their bookings for these schedules
+    const scheduleIds = schedules.map((s) => s.id)
+    const userBookingsMap = await this.bookingService.getUserBookingsMapForSchedules(participantId, scheduleIds)
+
+    return schedules.map((schedule) => ({
+      ...this.toResponseDto(schedule),
+      myBooking: userBookingsMap.get(schedule.id) || null,
+    }))
   }
 
   /**
