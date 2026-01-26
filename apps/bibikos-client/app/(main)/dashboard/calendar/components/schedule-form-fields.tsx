@@ -88,7 +88,7 @@ function RecurrenceCountInput({ control }: RecurrenceCountInputProps) {
 // Time and duration inputs for range selection mode - works with timeSlots[0]
 interface RangeTimeInputProps {
   form: UseFormReturn<ScheduleFormData>
-  timeInputRef: React.RefObject<HTMLInputElement | null>
+  timeInputRef: React.RefObject<HTMLInputElement>
 }
 
 function RangeTimeInput({ form, timeInputRef }: RangeTimeInputProps) {
@@ -98,7 +98,11 @@ function RangeTimeInput({ form, timeInputRef }: RangeTimeInputProps) {
   useEffect(() => {
     const subscription = form.watch((values, { name }) => {
       if (name?.startsWith('timeSlots') || name === undefined) {
-        setSlot(values.timeSlots?.[0] || { startTime: '', duration: 60 })
+        const slotInner = values.timeSlots?.[0]
+        setSlot({
+          startTime: slotInner?.startTime ?? '',
+          duration: slotInner?.duration ?? 60,
+        })
       }
     })
     return () => subscription.unsubscribe()
@@ -263,7 +267,7 @@ export function ScheduleFormFields({ form, classes, locations, isRangeSelection,
                 <FormControl>
                   <div className="relative">
                     <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
-                    <Input type="date" {...field} disabled className="pl-10 opacity-60" />
+                    <Input type="date" {...field} readOnly className="pl-10 opacity-60" />
                   </div>
                 </FormControl>
               </FormItem>

@@ -22,9 +22,18 @@ export function TimeSlotsList({ form }: TimeSlotsListProps) {
   useEffect(() => {
     const subscription = form.watch((values, { name }) => {
       if (name?.startsWith('timeSlots') || name === undefined) {
-        setTimeSlots(values.timeSlots || [])
+        const normalizedSlots =
+          values.timeSlots
+            ?.filter((slot): slot is { startTime?: string; duration?: number } => slot != null)
+            .map((slot) => ({
+              startTime: slot.startTime ?? '',
+              duration: slot.duration ?? 60,
+            })) ?? []
+
+        setTimeSlots(normalizedSlots)
       }
     })
+
     return () => subscription.unsubscribe()
   }, [form])
 
