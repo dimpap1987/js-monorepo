@@ -10,6 +10,10 @@ export interface ClassScheduleWithClass extends ClassSchedule {
     waitlistLimit: number | null
     isCapacitySoft: boolean
     organizerId: number
+    location?: {
+      id: number
+      name: string
+    }
   }
 }
 

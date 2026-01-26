@@ -167,6 +167,12 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
             waitlistLimit: true,
             isCapacitySoft: true,
             organizerId: true,
+            location: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
         _count: {
@@ -404,6 +410,12 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
             waitlistLimit: true,
             isCapacitySoft: true,
             organizerId: true,
+            location: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             organizer: {
               select: {
                 id: true,

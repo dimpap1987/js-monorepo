@@ -694,6 +694,10 @@ export class ClassScheduleService {
       capacity: number | null
       waitlistLimit: number | null
       isCapacitySoft: boolean
+      location?: {
+        id: number
+        name: string
+      }
     }
     bookingCounts?: {
       booked: number

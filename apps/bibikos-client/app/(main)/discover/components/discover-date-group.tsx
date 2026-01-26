@@ -32,6 +32,7 @@ export function DiscoverDateGroup({ title, schedules, onBook, onCancel }: Discov
             showClassLink={true}
             onBook={() => onBook(schedule)}
             onCancel={() => onCancel(schedule)}
+            location={schedule.class?.location}
           />
         ))}
       </div>

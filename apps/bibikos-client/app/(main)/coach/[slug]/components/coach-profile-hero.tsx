@@ -72,7 +72,7 @@ function ProfileBadges({ badges }: { badges: OrganizerPublicBadge[] }) {
         const Icon = getBadgeIcon(badge.name)
         const style = getBadgeStyle(badge.name)
         return (
-          <Badge key={badge.id} className={`px-3 py-1.5 text-xs font-medium gap-1.5 ${style}`}>
+          <Badge key={badge.id} className={`px-3 py-1 text-xs gap-1.5 ${style}`}>
             <Icon className="h-3.5 w-3.5" />
             {badge.name}
           </Badge>
@@ -101,7 +101,6 @@ function ClassTypesList({ classTypes }: { classTypes: OrganizerPublicProfile['cl
 
   return (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <Dumbbell className="h-4 w-4 flex-shrink-0" />
       <span className="font-medium">Groups:</span>
       <span>{classTypes.map((c) => c.title).join(', ')}</span>
     </div>

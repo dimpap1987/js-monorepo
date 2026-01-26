@@ -109,6 +109,7 @@ function DateGroupSection({ title, schedules, onBookSchedule, onCancelSchedule }
             bookingCounts={schedule.bookingCounts ?? { booked: 0, waitlisted: 0 }}
             myBooking={schedule.myBooking}
             showClassLink={true}
+            location={schedule.class?.location}
             onBook={() => onBookSchedule(schedule)}
             onCancel={() => onCancelSchedule(schedule)}
           />

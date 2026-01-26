@@ -210,7 +210,7 @@ export function NotificationDropdown({
 
       <DropdownMenu onOpenChange={handleOpenChange}>
         <DropdownMenuTrigger asChild>
-          <NotificationBellButton className="text-2xl" />
+          <NotificationBellButton className="text-2xl shrink-0" />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           className={cn(

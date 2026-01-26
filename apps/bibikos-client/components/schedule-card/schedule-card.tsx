@@ -6,7 +6,7 @@ import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
 import { isAfter, isBefore } from 'date-fns'
-import { CheckCircle2, ChevronRight, Clock, Radio, User, Users, X } from 'lucide-react'
+import { CheckCircle2, ChevronRight, Clock, MapPin, Radio, User, Users, X } from 'lucide-react'
 import { useScheduleTime, type ScheduleDateParts } from '../../lib/datetime'
 
 // =============================================================================
@@ -46,6 +46,10 @@ export interface ScheduleCardProps {
   organizer?: {
     displayName: string | null
     slug: string | null
+  }
+  location?: {
+    id: number
+    name: string
   }
   /** Tags to display (optional) */
   tags?: Array<{ id: number; name: string }>
@@ -122,6 +126,10 @@ interface ScheduleInfoProps {
     displayName: string | null
     slug: string | null
   }
+  location?: {
+    id: number
+    name?: string
+  }
   bookedCount: number
   capacity: number | null
   isFull: boolean
@@ -145,14 +153,15 @@ function ScheduleInfo({
   isHappeningNow,
   tags,
   showClassLink,
+  location,
 }: ScheduleInfoProps) {
   return (
-    <div className="space-y-4 min-w-0">
+    <div className="space-y-3 min-w-0">
       <div className="flex items-center gap-2 justify-between">
         {showClassLink ? (
           <DpNextNavLink
             href={`/class/${classId}`}
-            className="group flex items-center gap-3 rounded-md py-1 px-2 hover:bg-muted cursor-pointer"
+            className="group flex items-center gap-3 rounded-md py-1 px-2 hover:bg-muted"
           >
             <h3 className="truncate group-hover:underline">{title}</h3>
           </DpNextNavLink>
@@ -169,6 +178,15 @@ function ScheduleInfo({
           </Badge>
         )}
       </div>
+      {location?.name && (
+        <DpNextNavLink
+          href={`/locations/${location.id}`}
+          className="group flex items-center justify-start gap-2 text-foreground-muted"
+        >
+          <MapPin className="w-4 h-4" />
+          <span className="truncate group-hover:underline">{location.name}</span>
+        </DpNextNavLink>
+      )}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <Clock className="w-4 h-4 flex-shrink-0" />
@@ -326,9 +344,9 @@ export function ScheduleCard({
   onBook,
   onCancel,
   className,
+  location,
 }: ScheduleCardProps) {
   const { times, timeRange, dateParts } = useScheduleTime(schedule)
-
   const bookedCount = bookingCounts?.booked || 0
   const isFull = capacity !== null ? bookedCount >= capacity : false
   const hasWaitlist = Boolean(waitlistLimit && waitlistLimit > 0)
@@ -366,6 +384,7 @@ export function ScheduleCard({
               isHappeningNow={isHappeningNow}
               tags={tags}
               showClassLink={showClassLink}
+              location={location}
             />
           </div>
           <div className="w-full sm:w-auto px-5 mt-3">
