@@ -6,25 +6,14 @@ import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
 import { Calendar, ChevronRight, MapPin, User } from 'lucide-react'
-import { useScheduleTime, type ScheduleDateParts } from '../../../../lib/datetime'
+import { DateBadge } from '../../../../components/date-badge'
+import { useScheduleTime } from '../../../../lib/datetime'
 import type { DiscoverClassGroup } from '../../../../lib/scheduling'
 
 interface ClassGroupCardProps {
   group: DiscoverClassGroup
   onClick: () => void
   className?: string
-}
-
-function DateBadge({ dateParts, className }: { dateParts: ScheduleDateParts; className?: string }) {
-  return (
-    <div className={cn('flex-shrink-0 w-16 text-center self-center', className)}>
-      <div className="bg-primary/10 rounded-lg p-2 text-primary">
-        <div className="text-xs font-medium uppercase">{dateParts.month}</div>
-        <div className="text-2xl font-bold">{dateParts.day}</div>
-        <div className="text-xs uppercase">{dateParts.dayOfWeek}</div>
-      </div>
-    </div>
-  )
 }
 
 export function ClassGroupCard({ group, onClick, className }: ClassGroupCardProps) {
@@ -39,9 +28,9 @@ export function ClassGroupCard({ group, onClick, className }: ClassGroupCardProp
 
   return (
     <Card className={cn('border-border rounded-3xl transition-all hover:shadow-md hover:border-primary', className)}>
-      <CardContent className="p-6 sm:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex gap-4 min-w-0">
+      <CardContent className="px-6 py-9 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div className="flex gap-4 min-w-0 items-center">
             <DateBadge dateParts={dateParts} />
 
             <div className="space-y-3 min-w-0">
@@ -100,9 +89,9 @@ export function ClassGroupCard({ group, onClick, className }: ClassGroupCardProp
           </div>
 
           {/* Arrow indicator */}
-          <div className="flex flex-col gap-2 items-center justify-end sm:justify-center px-5">
+          <div className="flex flex-col gap-3 items-center justify-end sm:justify-center px-5">
             {/* Schedule count and user bookings badge */}
-            <div className="flex gap-2">
+            <div className="flex justify-end w-full gap-2">
               {group.userBookingsCount > 0 && (
                 <Badge
                   variant="outline"

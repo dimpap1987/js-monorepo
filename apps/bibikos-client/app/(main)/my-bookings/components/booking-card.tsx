@@ -1,20 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Badge } from '@js-monorepo/components/ui/badge'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
-import { Badge } from '@js-monorepo/components/ui/badge'
 import { cn } from '@js-monorepo/ui/util'
 import { isPast } from 'date-fns'
 import { Calendar, Clock, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { DateBadge } from '../../../../components/date-badge'
+import { formatDateWithDay, useDateTimeContext, useScheduleTime } from '../../../../lib/datetime'
 import type { Booking, BookingStatus } from '../../../../lib/scheduling'
-import {
-  useScheduleTime,
-  useDateTimeContext,
-  formatDateWithDay,
-  type ScheduleDateParts,
-} from '../../../../lib/datetime'
 import { CancelBookingDialog } from './cancel-booking-dialog'
 
 interface StatusConfig {
@@ -49,26 +45,6 @@ const STATUS_CONFIG: Record<BookingStatus, StatusConfig> = {
     variant: 'destructive',
     className: 'bg-gray-500/10 text-gray-600 border-gray-500/20',
   },
-}
-
-interface DateBadgeProps {
-  dateParts: ScheduleDateParts
-  isPastBooking: boolean
-}
-
-function DateBadge({ dateParts, isPastBooking }: DateBadgeProps) {
-  return (
-    <div className="flex-shrink-0 w-14 text-center">
-      <div className={`rounded-lg p-2 ${isPastBooking ? 'bg-muted' : 'bg-primary/10'}`}>
-        <div className={`text-xs font-medium uppercase ${isPastBooking ? 'text-muted-foreground' : 'text-primary'}`}>
-          {dateParts.month}
-        </div>
-        <div className={`text-xl font-bold ${isPastBooking ? 'text-muted-foreground' : 'text-primary'}`}>
-          {dateParts.day}
-        </div>
-      </div>
-    </div>
-  )
 }
 
 interface BookingInfoProps {

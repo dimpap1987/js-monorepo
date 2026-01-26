@@ -361,7 +361,7 @@ export function ScheduleCard({
 
   return (
     <Card className={cn('border-border rounded-3xl transition-all hover:shadow-md hover:border-primary', className)}>
-      <CardContent className="p-6 sm:p-8">
+      <CardContent className="px-6 py-9 sm:py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-4 min-w-0">
             <TimeBadge dateParts={dateParts} />

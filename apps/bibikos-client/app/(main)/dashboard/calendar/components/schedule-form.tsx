@@ -230,7 +230,7 @@ function ScheduleFormContent({
 
       {/* Date Range Banner */}
       {rangeInfo && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary">
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-primary">
           <CalendarRange className="w-5 h-5 text-primary flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="font-medium text-sm">

@@ -210,7 +210,7 @@
       "capacity": "Max Capacity",
       "capacityPlaceholder": "Leave empty for unlimited",
       "waitlistLimit": "Waitlist Limit",
-      "waitlistPlaceholder": "Leave empty for unlimited",
+      "waitlistPlaceholder": "Number of people allowed on the waitlist",
       "softCapacity": "Soft capacity (allow overbooking)",
       "activityLabel": "Class Type",
       "activityLabelPlaceholder": "e.g., Yoga, Pilates, CrossFit, Dance"

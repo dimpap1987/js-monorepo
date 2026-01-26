@@ -237,7 +237,7 @@ export function DashboardContent() {
               <DpNextNavLink key={action.href} href={action.href} className="block">
                 <div className="flex items-center justify-between p-4 rounded-xl border border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all group">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center">
                       <action.icon className="w-5 h-5 text-primary" />
                     </div>
                     <span className="font-medium">{action.label}</span>

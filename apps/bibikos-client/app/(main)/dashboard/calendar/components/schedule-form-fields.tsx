@@ -215,6 +215,7 @@ interface ScheduleFormFieldsProps {
 export function ScheduleFormFields({ form, classes, locations, isRangeSelection, rangeInfo }: ScheduleFormFieldsProps) {
   const tSchedules = useTranslations('scheduling.schedules')
   const timeInputRef = useRef<HTMLInputElement>(null)
+  const dateInputRef = useRef<HTMLInputElement>(null)
   const { control, setValue, watch } = form
 
   return (
@@ -285,10 +286,10 @@ export function ScheduleFormFields({ form, classes, locations, isRangeSelection,
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{tSchedules('date')}</FormLabel>
-                <FormControl>
+                <FormControl className="relative cursor-pointer" onClick={() => dateInputRef.current?.showPicker?.()}>
                   <div className="relative">
                     <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground-muted pointer-events-none" />
-                    <Input type="date" {...field} className="pl-10" />
+                    <Input type="date" {...field} className="pl-10" ref={dateInputRef} />
                   </div>
                 </FormControl>
               </FormItem>

@@ -18,7 +18,7 @@ export function DiscoverDateGroup({ title, groups, onOpenTimeSlots, onBook, onCa
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-foreground">{title}</h2>
-      <div className="space-y-5">
+      <div className="space-y-6">
         {groups.map((group) => {
           // Single schedule - render as ScheduleCard
           if (group.schedules.length === 1) {

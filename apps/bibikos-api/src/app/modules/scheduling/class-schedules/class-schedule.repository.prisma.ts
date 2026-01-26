@@ -758,7 +758,7 @@ export class ClassScheduleRepositoryPrisma implements ClassScheduleRepository {
    */
   private getLocalDate(utcDate: Date, timezone: string): string {
     try {
-      const formatter = new Intl.DateTimeFormat('en-CA', {
+      const formatter = new Intl.DateTimeFormat('en-US', {
         timeZone: timezone,
         year: 'numeric',
         month: '2-digit',

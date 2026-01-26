@@ -41,7 +41,7 @@ export function ClassCard({ classItem, locations, onEdit, onDelete, onInvite }: 
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
               <Calendar className="w-5 h-5 text-primary" />
             </div>
             <div className="space-y-1">

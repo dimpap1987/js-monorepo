@@ -80,14 +80,8 @@ export function CalendarContent() {
 
         // Refetch schedules to get updated booking counts
         refetchSchedules()
-
-        // Show notification to organizer
-        addNotification({
-          message: payload.action === 'created' ? 'New booking received!' : 'Booking cancelled',
-          type: payload.action === 'created' ? 'success' : 'information',
-        })
       },
-      [refetchSchedules, addNotification]
+      [refetchSchedules]
     ),
   })
 

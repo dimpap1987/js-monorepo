@@ -210,7 +210,7 @@
       "capacity": "Μέγιστη Χωρητικότητα",
       "capacityPlaceholder": "Αφήστε κενό για απεριόριστο",
       "waitlistLimit": "Όριο Λίστας Αναμονής",
-      "waitlistPlaceholder": "Αφήστε κενό για απεριόριστο",
+      "waitlistPlaceholder": "Αριθμός ατόμων που επιτρέπονται στη λίστα αναμονής",
       "softCapacity": "Ευέλικτη χωρητικότητα (επιτρέψτε υπερκράτηση)",
       "activityLabel": "Τύπος Τάξης",
       "activityLabelPlaceholder": "π.χ., Yoga, Pilates, CrossFit, Χορός"
