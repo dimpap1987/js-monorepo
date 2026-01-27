@@ -174,7 +174,7 @@ export function LandingPage() {
           <div className="relative max-w-4xl mx-auto">
             {/* Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80 rounded-3xl" />
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 rounded-3xl" />
+            <div className="absolute inset-0 opacity-10 rounded-3xl" />
 
             <div className="relative px-8 py-16 sm:px-16 sm:py-10 text-center">
               <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">{t('cta.title')}</h2>

@@ -81,7 +81,7 @@ export function CalendarView({
 
   // Determine initial view based on device type
   const initialView = useMemo(() => {
-    if (isMobile) return 'listWeek'
+    if (isMobile) return 'timeGridDay'
     if (isTablet) return 'timeGridWeek'
     return 'dayGridMonth'
   }, [isMobile, isTablet])
@@ -227,14 +227,17 @@ export function CalendarView({
     [isMobile]
   )
 
+  const now = new Date()
+
   return (
     <Card className="border-border/50 overflow-hidden shadow-sm">
       <CardContent className={isMobile ? 'p-2' : 'p-4 sm:p-6'}>
         <div className={`fc-custom-styles ${isLoading ? 'opacity-60 pointer-events-none' : ''}`}>
           <FullCalendar
             ref={calendarRef}
+            initialDate={now}
+            scrollTime={isMobile ? format(now, 'HH:mm:ss') : '08:00:00'}
             eventClassNames={(arg) => {
-              const now = new Date()
               const eventStart = arg.event.start // could be null
               const eventEnd = arg.event.end || eventStart // fallback to start if end is missing
 
@@ -263,7 +266,7 @@ export function CalendarView({
               meridiem: 'short',
             }}
             slotMinTime="06:00:00"
-            slotMaxTime="22:00:00"
+            slotMaxTime="24:00:00"
             slotDuration="00:30:00"
             slotLabelInterval="01:00:00"
             allDaySlot={false}
