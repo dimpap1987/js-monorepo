@@ -85,9 +85,10 @@ interface CapacityInfoProps {
   isFull: boolean
   hasWaitlist: boolean
   spotsLeft: number | null
+  isBooked?: boolean
 }
 
-function CapacityInfo({ bookedCount, capacity, isFull, hasWaitlist, spotsLeft }: CapacityInfoProps) {
+function CapacityInfo({ bookedCount, capacity, isFull, hasWaitlist, spotsLeft, isBooked = false }: CapacityInfoProps) {
   return (
     <div className="flex items-center justify-between sm:justify-start gap-3 text-sm text-muted-foreground">
       <div className="flex items-center gap-1.5">
@@ -97,23 +98,24 @@ function CapacityInfo({ bookedCount, capacity, isFull, hasWaitlist, spotsLeft }:
           {capacity && ` / ${capacity}`}
         </span>
       </div>
-      {isFull ? (
-        <Badge
-          variant="outline"
-          className={cn(
-            'text-xs',
-            hasWaitlist
-              ? 'border-status-info bg-status-info-bg text-status-info'
-              : 'border-destructive bg-destructive/10 text-destructive'
-          )}
-        >
-          {hasWaitlist ? 'Waitlist available' : 'Full'}
-        </Badge>
-      ) : spotsLeft !== null && spotsLeft <= 3 ? (
-        <Badge variant="outline" className="text-xs border-status-warning bg-status-warning-bg text-status-warning">
-          {spotsLeft} {spotsLeft === 1 ? 'spot' : 'spots'} left
-        </Badge>
-      ) : null}
+      {!isBooked &&
+        (isFull ? (
+          <Badge
+            variant="outline"
+            className={cn(
+              'text-xs',
+              hasWaitlist
+                ? 'border-status-info bg-status-info-bg text-status-info'
+                : 'border-destructive bg-destructive/10 text-destructive'
+            )}
+          >
+            {hasWaitlist ? 'Waitlist available' : 'Full'}
+          </Badge>
+        ) : spotsLeft !== null && spotsLeft <= 3 ? (
+          <Badge variant="outline" className="text-xs border-status-warning bg-status-warning-bg text-status-warning">
+            {spotsLeft} {spotsLeft === 1 ? 'spot' : 'spots'} left
+          </Badge>
+        ) : null)}
     </div>
   )
 }
@@ -138,6 +140,7 @@ interface ScheduleInfoProps {
   isHappeningNow: boolean
   tags?: Array<{ id: number; name: string }>
   showClassLink: boolean
+  isBooked?: boolean
 }
 
 function ScheduleInfo({
@@ -154,6 +157,7 @@ function ScheduleInfo({
   tags,
   showClassLink,
   location,
+  isBooked,
 }: ScheduleInfoProps) {
   return (
     <div className="space-y-3 min-w-0">
@@ -220,6 +224,7 @@ function ScheduleInfo({
         isFull={isFull}
         hasWaitlist={hasWaitlist}
         spotsLeft={spotsLeft}
+        isBooked={isBooked}
       />
     </div>
   )
@@ -291,7 +296,10 @@ function BookButton({
           className="border-status-warning bg-status-warning-bg text-status-warning gap-1 h-10 flex-1 justify-center"
         >
           <Clock className="w-3 h-3" />
-          Waitlisted {waitlistPosition ? `#${waitlistPosition}` : ''}
+          <div className="flex gap-1">
+            <span>Waitlisted</span>
+            {waitlistPosition && `#${waitlistPosition}`}
+          </div>
         </Badge>
         {onCancel && (
           <Button
@@ -379,6 +387,7 @@ export function ScheduleCard({
               tags={tags}
               showClassLink={showClassLink}
               location={location}
+              isBooked={isBooked}
             />
           </div>
           <div className="w-full sm:w-auto px-5 mt-3">

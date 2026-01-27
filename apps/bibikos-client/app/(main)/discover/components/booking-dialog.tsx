@@ -13,9 +13,9 @@ import {
 import { Drawer, DrawerContent } from '@js-monorepo/components/ui/drawer'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { format, parseISO } from 'date-fns'
-import { AlertCircle, Calendar, CheckCircle2, Clock, Loader2, User } from 'lucide-react'
+import { AlertCircle, Calendar, CheckCircle2, Clock, Loader2, User, Users } from 'lucide-react'
 import { useState } from 'react'
-import type { DiscoverSchedule } from '../../../../lib/scheduling'
+import type { Booking, DiscoverSchedule } from '../../../../lib/scheduling'
 import { useCreateBooking } from '../../../../lib/scheduling'
 
 interface BookingDialogProps {
@@ -88,13 +88,48 @@ function BookingSuccess({
           <CheckCircle2 className="w-5 h-5 text-emerald-500" />
           Booking confirmed
         </DialogTitle>
-        <DialogDescription>You’re all set. We’ll see you there.</DialogDescription>
+        <DialogDescription>You&apos;re all set. We&apos;ll see you there.</DialogDescription>
       </DialogHeader>
 
       <BookingSummary startTime={startTime} endTime={endTime} title={classInfo?.title} />
 
       <DialogFooter>
         <Button onClick={onClose}>Done</Button>
+      </DialogFooter>
+    </>
+  )
+}
+
+function WaitlistSuccess({
+  startTime,
+  endTime,
+  classInfo,
+  waitlistPosition,
+  onClose,
+}: {
+  startTime: Date
+  endTime: Date
+  classInfo?: { title?: string }
+  waitlistPosition: number | null
+  onClose: () => void
+}) {
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2 text-base">
+          <Users className="w-5 h-5 text-amber-500" />
+          Added to waitlist
+        </DialogTitle>
+        <DialogDescription>
+          This class just filled up, but you&apos;re on the waitlist
+          {waitlistPosition ? ` at position #${waitlistPosition}` : ''}. We&apos;ll notify you if a spot opens up.
+        </DialogDescription>
+      </DialogHeader>
+
+      <BookingSummary startTime={startTime} endTime={endTime} title={classInfo?.title} />
+
+      <DialogFooter>
+        <Button onClick={onClose}>Got it</Button>
       </DialogFooter>
     </>
   )
@@ -149,6 +184,7 @@ interface BookingFormProps {
 function BookingForm({ schedule, onClose }: BookingFormProps) {
   const [bookingState, setBookingState] = useState<BookingState>('idle')
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const [bookingResult, setBookingResult] = useState<Booking | null>(null)
   const createBooking = useCreateBooking()
 
   const startTime = parseISO(schedule.startTimeUtc)
@@ -166,7 +202,8 @@ function BookingForm({ schedule, onClose }: BookingFormProps) {
     setErrorMessage('')
 
     try {
-      await createBooking.mutateAsync({ classScheduleId: schedule.id })
+      const result = await createBooking.mutateAsync({ classScheduleId: schedule.id })
+      setBookingResult(result)
       setBookingState('success')
     } catch (error: unknown) {
       setBookingState('error')
@@ -178,7 +215,18 @@ function BookingForm({ schedule, onClose }: BookingFormProps) {
     }
   }
 
-  if (bookingState === 'success') {
+  if (bookingState === 'success' && bookingResult) {
+    if (bookingResult.status === 'WAITLISTED') {
+      return (
+        <WaitlistSuccess
+          startTime={startTime}
+          endTime={endTime}
+          classInfo={classInfo}
+          waitlistPosition={bookingResult.waitlistPosition}
+          onClose={onClose}
+        />
+      )
+    }
     return <BookingSuccess startTime={startTime} endTime={endTime} classInfo={classInfo} onClose={onClose} />
   }
 
