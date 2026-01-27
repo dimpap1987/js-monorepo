@@ -16,15 +16,29 @@ export function GoogleIcon({ className }: { className?: string }) {
   return (
     <div className="flex items-center justify-center w-5 h-5 flex-shrink-0">
       <svg
+        className={className}
+        width="24"
+        height="24"
         viewBox="0 0 24 24"
-        width="100%"
-        height="100%"
-        fill="currentColor"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
-        className={className}
       >
-        <path d="M12 2.04c2.64 0 4.99.94 6.85 2.49l-2.78 2.78c-.76-.73-1.94-1.59-4.07-1.59-3.5 0-6.46 2.91-6.46 6.48 0 3.57 2.96 6.48 6.46 6.48 4.06 0 5.58-2.91 5.82-4.41H12v-3.6h9.87c.09.53.13 1.04.13 1.7 0 5.96-3.99 10.23-9.99 10.23C6.47 22.6 2 18.13 2 12.2 2 6.27 6.47 2.04 12 2.04z" />
+        <path
+          d="M23.64 12.204c0-.828-.074-1.624-.212-2.396H12v4.536h6.18c-.268 1.432-1.08 2.64-2.304 3.456v2.88h3.744c2.184-2.016 3.432-4.968 3.432-8.476z"
+          fill="#4285F4"
+        />
+        <path
+          d="M12 24c3.24 0 5.964-1.08 7.952-2.928l-3.744-2.88c-1.044.696-2.388 1.104-4.208 1.104-3.24 0-5.976-2.184-6.948-5.136H1.224v3.216C3.2 21.6 7.36 24 12 24z"
+          fill="#34A853"
+        />
+        <path
+          d="M5.052 14.216c-.216-.648-.336-1.344-.336-2.056s.12-1.408.336-2.056V6.888H1.224C.432 8.28 0 10.04 0 12c0 1.96.432 3.72 1.224 5.112l3.828-2.896z"
+          fill="#FBBC05"
+        />
+        <path
+          d="M12 4.8c1.764 0 3.348.608 4.596 1.8l3.432-3.432C17.964 1.944 15.24.864 12 .864 7.36.864 3.2 3.264 1.224 6.888l3.828 2.872C6.024 7.008 8.76 4.8 12 4.8z"
+          fill="#EA4335"
+        />
       </svg>
     </div>
   )
@@ -87,30 +101,30 @@ export function AppleIcon({ className }: { className?: string }) {
 const providerConfig = {
   google: {
     label: 'Google',
-    bgColor: 'bg-slate-200',
-    textColor: 'text-gray-900',
-    hoverBg: 'hover:bg-slate-100',
+    bgColor: '#ffffff',
+    textColor: '#4285F4',
+    hoverBg: '',
     icon: <GoogleIcon />,
   },
   github: {
     label: 'GitHub',
     bgColor: 'bg-gray-800',
     textColor: 'text-white',
-    hoverBg: 'hover:bg-gray-700',
+    hoverBg: '',
     icon: <GitHubIcon className="text-gray-900" />,
   },
   facebook: {
     label: 'Facebook',
     bgColor: 'bg-blue-600 dark:bg-blue-700',
     textColor: 'text-white',
-    hoverBg: 'hover:bg-blue-700 dark:hover:bg-blue-800',
+    hoverBg: '',
     icon: <FacebookIcon className="text-white" />,
   },
   apple: {
     label: 'Apple',
     bgColor: 'bg-gray-900',
     textColor: 'text-white',
-    hoverBg: 'hover:bg-gray-700',
+    hoverBg: '',
     icon: <AppleIcon />,
   },
 } as const
@@ -130,15 +144,14 @@ export const SocialLoginButton = React.forwardRef<HTMLButtonElement, SocialLogin
         ref={ref}
         disabled={isDisabled}
         className={cn(
-          'relative w-full rounded-lg px-4 py-3.5 text-sm font-medium transition-all duration-200',
-          'border focus:outline-none',
+          'relative w-full rounded-lg px-4 py-3.5 text-sm font-medium transition-all duration-200 border',
           'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
-          'active:scale-[0.98]',
+          'active:scale-[0.98] focus:outline-none',
           config.bgColor,
           config.textColor,
           config.hoverBg,
-          className,
-          'grid grid-cols-[0.6fr_1fr] sm:grid-cols-[0.5fr_1fr] items-center justify-center gap-3'
+          'grid grid-cols-[0.6fr_1fr] sm:grid-cols-[0.5fr_1fr] items-center justify-center gap-3',
+          'hover:scale-105 hover:border-l-2 hover:border-r-2'
         )}
         {...props}
       >
@@ -148,18 +161,16 @@ export const SocialLoginButton = React.forwardRef<HTMLButtonElement, SocialLogin
 
         {/* Icon */}
         {React.cloneElement(config.icon, {
-          width: '24',
-          height: '24',
-          className: 'block w-full h-full',
+          className: 'w-6 h-6',
         })}
 
         {/* Text */}
         <span className="flex items-center">
           {children || (
-            <>
+            <div className="flex gap-1">
               <span className="hidden sm:inline">Continue with </span>
-              {config.label}
-            </>
+              <span>{config.label}</span>
+            </div>
           )}
         </span>
       </button>

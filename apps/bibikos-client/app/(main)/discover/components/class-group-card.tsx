@@ -91,7 +91,7 @@ export function ClassGroupCard({ group, onClick, className }: ClassGroupCardProp
           {/* Arrow indicator */}
           <div className="flex flex-col gap-3 items-center justify-end sm:justify-center px-5">
             {/* Schedule count and user bookings badge */}
-            <div className="flex justify-between flex-row-reverse sm:flex-auto sm:justify-end w-full gap-2">
+            <div className="flex justify-between flex-row-reverse sm:flex-auto sm:flex-row w-full gap-2">
               {group.userBookingsCount > 0 && (
                 <Badge
                   variant="outline"
