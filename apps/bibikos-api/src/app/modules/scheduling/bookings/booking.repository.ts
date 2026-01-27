@@ -66,6 +66,18 @@ export interface BookingWithAll extends Booking {
   }
 }
 
+export type WaitlistedBooking = {
+  id: number
+  waitlistPosition: number
+  participant: {
+    appUser: {
+      authUser: {
+        id: number
+      }
+    }
+  }
+}
+
 export interface BookingRepository {
   findById(id: number): Promise<Booking | null>
   findByIdWithAll(id: number): Promise<BookingWithAll | null>
@@ -89,7 +101,7 @@ export interface BookingRepository {
   create(data: Prisma.BookingCreateInput): Promise<Booking>
   update(id: number, data: Prisma.BookingUpdateInput): Promise<Booking>
   updateMany(ids: number[], data: Prisma.BookingUpdateInput): Promise<number>
-  getNextWaitlistedBooking(scheduleId: number): Promise<Booking | null>
+  getNextWaitlistedBooking(scheduleId: number): Promise<WaitlistedBooking | null>
   decrementWaitlistPositions(scheduleId: number, abovePosition: number): Promise<number>
   cancelAllByScheduleId(scheduleId: number, cancelReason?: string): Promise<number>
   findByScheduleIds(scheduleIds: number[], statuses?: BookingStatus[]): Promise<Booking[]>

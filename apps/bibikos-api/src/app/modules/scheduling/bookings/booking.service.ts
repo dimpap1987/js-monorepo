@@ -14,6 +14,7 @@ import {
   MyBookingsResponseDto,
   UpdateBookingNotesDto,
 } from './dto/booking.dto'
+import { NotificationService } from '@js-monorepo/notifications-server'
 
 @Injectable()
 export class BookingService {
@@ -23,7 +24,8 @@ export class BookingService {
     @Inject(BookingRepo)
     private readonly bookingRepo: BookingRepository,
     private readonly scheduleService: ClassScheduleService,
-    private readonly wsService: UserPresenceWebsocketService
+    private readonly wsService: UserPresenceWebsocketService,
+    private readonly notificationService: NotificationService
   ) {}
 
   /**
@@ -301,8 +303,13 @@ export class BookingService {
       }
 
       this.logger.log(`Promoted booking ${nextInLine.id} from waitlist`)
-
-      // TODO: Notify participant about promotion
+      this.notificationService.sendPushNotification([nextInLine.participant.appUser.authUser.id], {
+        title: 'Your waitlist spot just became a booking!',
+        message: 'A spot opened up for your class and your booking is confirmed. Don’t forget to check the schedule!',
+        data: {
+          url: '/my-bookings', //TODO: maybe another view to accept that booking first?
+        },
+      })
     }
   }
 

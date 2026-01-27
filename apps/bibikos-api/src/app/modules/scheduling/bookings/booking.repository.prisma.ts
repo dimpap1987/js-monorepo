@@ -2,7 +2,13 @@ import { Booking, BookingStatus, Prisma } from '@js-monorepo/bibikos-db'
 import { TransactionHost } from '@nestjs-cls/transactional'
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma'
 import { Injectable } from '@nestjs/common'
-import { BookingRepository, BookingWithAll, BookingWithParticipant, BookingWithSchedule } from './booking.repository'
+import {
+  BookingRepository,
+  BookingWithAll,
+  BookingWithParticipant,
+  BookingWithSchedule,
+  WaitlistedBooking,
+} from './booking.repository'
 
 @Injectable()
 export class BookingRepositoryPrisma implements BookingRepository {
@@ -202,11 +208,28 @@ export class BookingRepositoryPrisma implements BookingRepository {
     return result.count
   }
 
-  async getNextWaitlistedBooking(scheduleId: number): Promise<Booking | null> {
+  async getNextWaitlistedBooking(scheduleId: number): Promise<WaitlistedBooking | null> {
     return this.txHost.tx.booking.findFirst({
       where: {
         classScheduleId: scheduleId,
         status: BookingStatus.WAITLISTED,
+      },
+      select: {
+        id: true,
+        waitlistPosition: true,
+        participant: {
+          include: {
+            appUser: {
+              include: {
+                authUser: {
+                  select: {
+                    id: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       orderBy: {
         waitlistPosition: 'asc',

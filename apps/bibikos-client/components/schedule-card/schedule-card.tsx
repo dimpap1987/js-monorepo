@@ -89,7 +89,7 @@ interface CapacityInfoProps {
 
 function CapacityInfo({ bookedCount, capacity, isFull, hasWaitlist, spotsLeft }: CapacityInfoProps) {
   return (
-    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+    <div className="flex items-center justify-between sm:justify-start gap-3 text-sm text-muted-foreground">
       <div className="flex items-center gap-1.5">
         <Users className="w-4 h-4" />
         <span>
@@ -362,7 +362,7 @@ export function ScheduleCard({
   return (
     <Card className={cn('border-border rounded-3xl transition-all hover:shadow-md hover:border-primary', className)}>
       <CardContent className="px-6 py-9 sm:py-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="flex gap-4 min-w-0">
             <TimeBadge dateParts={dateParts} />
             <ScheduleInfo

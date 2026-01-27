@@ -2,21 +2,18 @@
 self.addEventListener('push', (event) => {
   console.log('Push message received', event)
 
-  const data = event.data.json()
+  const data = event.data ? event.data.json() : {}
   const title = data?.title ?? ''
   const message = data?.message ?? ''
   const url = data?.data?.url
 
-  event.waitUntil(
-    self.registration.showNotification(title, {
-      body: message,
-      tag: 'unique-tag',
-      icon: '/favicon.ico',
-      data: {
-        url,
-      },
-    })
-  )
+  self.registration.showNotification(title || 'New notification', {
+    body: message || 'You have a new message',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
+    tag: `notif-${Date.now()}`,
+    data: { url },
+  })
 })
 
 self.addEventListener('notificationclick', (event) => {
