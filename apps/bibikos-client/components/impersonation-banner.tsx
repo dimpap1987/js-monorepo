@@ -20,7 +20,9 @@ function useImpersonationStatus(enabled: boolean) {
     },
     enabled,
     staleTime: 0,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false, // don't refetch on focus
+    refetchOnReconnect: false, // don't refetch on reconnect
+    refetchOnMount: false, // don't refetch when remounted if cached
   })
 }
 

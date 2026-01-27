@@ -110,6 +110,15 @@ export default function DiscoverComponent() {
     return data.pages.flatMap((page) => page.groups)
   }, [data?.pages])
 
+  // Poll for booking updates every 30 seconds to keep availability current
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch()
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [refetch])
+
   const groupedByDate = useMemo(() => {
     if (groups.length === 0) return null
     return groupByDateCategory(groups)
