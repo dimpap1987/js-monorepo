@@ -72,7 +72,7 @@ export function NotificationContent({
         {/* Link icon */}
         {notificationData.link && (
           <MdOpenInNew
-            className="w-4 h-4 absolute text-primary right-3 top-3 cursor-pointer hover:scale-110 transition-transform"
+            className="w-4 h-4 absolute text-primary right-2 top-3 cursor-pointer hover:scale-110 transition-transform"
             onClick={handleLinkClick}
           />
         )}
@@ -104,7 +104,7 @@ export function NotificationContent({
 
 // Shared styles for notification containers - clean, professional design
 export const notificationContainerStyles = {
-  base: ['group relative rounded-md p-3 sm:p-4', 'transition-all duration-200 ease-out', 'border border-border'].join(
+  base: ['group relative rounded-md p-4 sm:p-6', 'transition-all duration-200 ease-out', 'border border-border'].join(
     ' '
   ),
   unread: ['cursor-pointer', 'bg-card', 'hover:bg-accent', 'focus:!bg-accent', 'border-l-4', 'border-l-primary'].join(

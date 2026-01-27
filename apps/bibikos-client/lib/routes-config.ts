@@ -1,18 +1,18 @@
 import { MenuItem } from '@js-monorepo/types/menu'
+import { FiCalendar } from 'react-icons/fi'
 import { IoMdNotifications } from 'react-icons/io'
 import { MdAccountCircle, MdPalette } from 'react-icons/md'
 import {
-  RiSdCardLine,
-  RiDashboardLine,
-  RiPriceTag3Line,
-  RiCustomerService2Line,
-  RiCalendarLine,
-  RiBookmarkLine,
-  RiUserLine,
-  RiMailLine,
-  RiCompassDiscoverLine,
   RiBookOpenLine,
+  RiCalendarLine,
+  RiCompassDiscoverLine,
+  RiCustomerService2Line,
+  RiDashboardLine,
+  RiMailLine,
   RiMapPinLine,
+  RiPriceTag3Line,
+  RiSdCardLine,
+  RiUserLine,
 } from 'react-icons/ri'
 import { Role, type RouteRole } from './roles'
 
@@ -116,7 +116,7 @@ export const navigationsMenuItems: MenuItem[] = [
     href: '/my-bookings',
     name: 'navigation.myBookings',
     roles: [Role.USER],
-    Icon: RiBookmarkLine,
+    Icon: FiCalendar,
     requiresParticipant: true,
     position: 'main',
   },

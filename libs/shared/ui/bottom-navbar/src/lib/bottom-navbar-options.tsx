@@ -8,7 +8,7 @@ import { IconType } from 'react-icons/lib'
 
 interface BottomNavbarItemProps {
   href: string
-  label: string
+  label?: string
   children: ReactNode
   /** Custom active check function. Defaults to exact pathname match */
   isActiveCheck?: (pathname: string) => boolean
@@ -27,12 +27,10 @@ function BottomNavbarItem({ href, label, children, isActiveCheck, className }: B
     <DpNextNavLink
       href={href}
       className={cn(
-        'w-full',
+        'w-full h-full',
         'flex flex-col items-center justify-center',
-        'h-full py-1.5',
         'transition-transform duration-150 ease-out',
-        'active:scale-95',
-        'tap-highlight-transparent',
+        'tap-highlight-transparent active:scale-95',
         isActive && 'border-t-2 border-primary',
         className
       )}
@@ -51,16 +49,18 @@ function BottomNavbarItem({ href, label, children, isActiveCheck, className }: B
       </div>
 
       {/* Label */}
-      <span
-        className={cn(
-          'mt-1',
-          'text-[10px] font-medium leading-none',
-          'transition-colors duration-150',
-          'max-w-full truncate'
-        )}
-      >
-        {label}
-      </span>
+      {label && (
+        <span
+          className={cn(
+            'mt-1',
+            'text-[10px] font-medium leading-none',
+            'transition-colors duration-150',
+            'max-w-full truncate'
+          )}
+        >
+          {label}
+        </span>
+      )}
 
       {/* Active indicator bar */}
       {isActive && (
@@ -73,7 +73,7 @@ function BottomNavbarItem({ href, label, children, isActiveCheck, className }: B
 /**
  * Standard navbar item with an icon
  */
-function BottomNavbarOptions({ href, Icon, label }: { href: string; Icon: IconType; label: string }) {
+function BottomNavbarOptions({ href, Icon, label }: { href: string; Icon: IconType; label?: string }) {
   return (
     <BottomNavbarItem href={href} label={label}>
       <Icon className="w-full h-full" />
@@ -84,7 +84,7 @@ function BottomNavbarOptions({ href, Icon, label }: { href: string; Icon: IconTy
 /**
  * Navbar item for notifications/alerts with custom children (e.g., bell with badge)
  */
-function BottomNavbarAlert({ href, label, children }: { href: string; label: string; children: ReactNode }) {
+function BottomNavbarAlert({ href, label, children }: { href: string; label?: string; children: ReactNode }) {
   return (
     <BottomNavbarItem
       href={href}

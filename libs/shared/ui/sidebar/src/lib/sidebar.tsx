@@ -117,7 +117,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], className }: DpNe
 
   return (
     <Sidebar side="right" variant="inset" collapsible="offcanvas" className={className}>
-      <SidebarHeader className="border-b border-border gap-1">
+      <SidebarHeader>
         <Button
           variant="ghost"
           size="sm"
@@ -138,6 +138,8 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], className }: DpNe
         )}
       </SidebarHeader>
 
+      <Separator className="opacity-20" />
+
       {/* Main Items (top) */}
       <SidebarContent className="flex-1">
         <SidebarMenu>
@@ -150,7 +152,7 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], className }: DpNe
       {/* Secondary Items (bottom) */}
       {secondaryItems.length > 0 && (
         <>
-          <Separator />
+          <Separator className="opacity-20" />
           <SidebarContent className="flex-none mb-0">
             <SidebarMenu>
               {secondaryItems.map((item) => (
@@ -163,7 +165,6 @@ const DpNextSidebarBase = ({ children, user, plan, items = [], className }: DpNe
 
       {children && (
         <>
-          <Separator className="mb-1" />
           <SidebarFooter className="mb-1 px-2">
             <div className="w-full text-center">{children}</div>
           </SidebarFooter>
