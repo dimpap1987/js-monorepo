@@ -1,20 +1,19 @@
 'use client'
 
 import { useSession } from '@js-monorepo/auth/next/client'
-import { BackButton } from '@js-monorepo/back-arrow'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@js-monorepo/components/ui/card'
 import { Skeleton } from '@js-monorepo/components/ui/skeleton'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
+import { ContainerTemplate } from '@js-monorepo/templates'
 import { cn } from '@js-monorepo/ui/util'
 import { endOfDay, endOfWeek, format, startOfDay, startOfWeek } from 'date-fns'
-import { ArrowRight, Calendar, CalendarPlus, Clock, MapPin, Plus, TrendingUp, Users } from 'lucide-react'
+import { ArrowRight, Calendar, Clock, MapPin, Plus, TrendingUp, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { ClassSchedule, useClasses, useLocations, useOrganizer, useSchedulesCalendar } from '../../../lib/scheduling'
 import { SentInvitationsCard } from './components/sent-invitations-card'
-import { ContainerTemplate } from '@js-monorepo/templates'
 
 function DashboardSkeleton() {
   return (
@@ -165,11 +164,6 @@ export function DashboardContent() {
       icon: Plus,
     },
     {
-      label: t('addSchedule'),
-      href: '/dashboard/calendar?action=new',
-      icon: CalendarPlus,
-    },
-    {
       label: t('viewCalendar'),
       href: '/dashboard/calendar',
       icon: Calendar,
@@ -178,10 +172,8 @@ export function DashboardContent() {
 
   return (
     <ContainerTemplate className="space-y-2 sm:space-y-4">
-      <BackButton />
-
       {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 -mt-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2>
             {t('welcome')}, {organizer.displayName || user?.username}!

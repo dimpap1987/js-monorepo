@@ -1,22 +1,12 @@
 'use client'
 
-import { useBibikosSession } from '../../lib/auth'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
 import { DpNextNavLink } from '@js-monorepo/nav-link'
 import { cn } from '@js-monorepo/ui/util'
+import { ArrowRight, Bell, Calendar, CalendarDays, ClipboardCheck, Globe, Sparkles, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import {
-  Calendar,
-  Users,
-  ClipboardCheck,
-  CalendarDays,
-  Bell,
-  Globe,
-  ArrowRight,
-  CheckCircle2,
-  Sparkles,
-} from 'lucide-react'
+import { useBibikosSession } from '../../lib/auth'
 
 const features = [
   { key: 'scheduling', icon: CalendarDays },
@@ -47,11 +37,7 @@ export function LandingPage() {
     <div className="flex flex-col">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-3xl opacity-30" />
-
-        <div className="container relative mx-auto px-4 py-10 sm:py-22">
+        <div>
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary mb-8">
@@ -78,22 +64,6 @@ export function LandingPage() {
                   {t('hero.ctaSecondary')}
                 </Button>
               </DpNextNavLink>
-            </div>
-
-            {/* Trust indicators */}
-            <div className="flex items-center justify-center gap-8 mt-12 text-foreground-muted">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span className="text-sm">Free to start</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span className="text-sm">No credit card</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span className="text-sm">Cancel anytime</span>
-              </div>
             </div>
           </div>
         </div>

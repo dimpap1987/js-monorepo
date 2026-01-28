@@ -7,12 +7,16 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { AiFillHome } from 'react-icons/ai'
 import { FiCalendar } from 'react-icons/fi'
+import { MdDashboard } from 'react-icons/md'
 import { RiCompassDiscoverLine } from 'react-icons/ri'
+import { useBibikosSession } from '../lib/auth'
 
 export const MobileNavbar = () => {
   const { deviceType } = useDeviceType()
   const t = useTranslations()
   const [mounted, setMounted] = useState(false)
+  const { session } = useBibikosSession()
+  const isOrganizer = session?.appUser?.hasOrganizerProfile ?? false
 
   useEffect(() => {
     setMounted(true)
@@ -23,7 +27,11 @@ export const MobileNavbar = () => {
 
   return (
     <BottomNavbar>
-      <BottomNavbarOptions Icon={AiFillHome} href="/" />
+      {isOrganizer ? (
+        <BottomNavbarOptions Icon={MdDashboard} href="/dashboard" />
+      ) : (
+        <BottomNavbarOptions Icon={AiFillHome} href="/" />
+      )}
       <BottomNavbarOptions Icon={RiCompassDiscoverLine} href="/discover" />
       <BottomNavbarOptions Icon={FiCalendar} href="/my-bookings" />
       <BottomNavbarAlert href="/notifications">

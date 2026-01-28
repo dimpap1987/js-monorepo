@@ -1,14 +1,14 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@js-monorepo/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@js-monorepo/components/ui/dialog'
 import { Form } from '@js-monorepo/components/ui/form'
 import { useTranslations } from 'next-intl'
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { Class, Location } from '../../../../../lib/scheduling'
-import { classSchema, type ClassFormData } from '../schemas'
+import { classSchema, ClassFormData } from '../schemas'
 import { ClassFormFields } from './class-form-fields'
 
 interface ClassFormProps {
@@ -26,6 +26,8 @@ export function ClassForm({ open, onOpenChange, editingClass, locations, onSubmi
 
   const form = useForm<ClassFormData>({
     resolver: zodResolver(classSchema),
+    mode: 'onTouched',
+    shouldUnregister: false, // IMPORTANT
     defaultValues: {
       title: '',
       description: '',
@@ -38,8 +40,10 @@ export function ClassForm({ open, onOpenChange, editingClass, locations, onSubmi
     },
   })
 
-  // Reset form when dialog opens/closes or editing class changes
+  // Reset ONLY when dialog opens
   useEffect(() => {
+    if (!open) return
+
     if (editingClass) {
       form.reset({
         title: editingClass.title,
@@ -63,7 +67,7 @@ export function ClassForm({ open, onOpenChange, editingClass, locations, onSubmi
         isActive: true,
       })
     }
-  }, [editingClass, form, locations])
+  }, [editingClass, open])
 
   const handleSubmit = async (data: ClassFormData) => {
     await onSubmit(data)

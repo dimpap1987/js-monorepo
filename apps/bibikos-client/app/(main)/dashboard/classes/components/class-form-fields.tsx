@@ -90,7 +90,7 @@ export function ClassFormFields({ control, locations, editingClass }: ClassFormF
             <FormItem>
               <FormLabel>{t('capacity')}</FormLabel>
               <FormControl>
-                <Input type="number" min="1" placeholder={t('`capacityPlaceholder`')} {...field} />
+                <Input type="number" min="1" placeholder={t('capacityPlaceholder')} {...field} />
               </FormControl>
             </FormItem>
           )}
