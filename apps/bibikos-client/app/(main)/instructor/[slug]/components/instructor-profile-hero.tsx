@@ -3,6 +3,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@js-monorepo/components/ui/avatar'
 import { Badge } from '@js-monorepo/components/ui/badge'
 import { Card, CardContent } from '@js-monorepo/components/ui/card'
+import { SocialShare } from '@js-monorepo/components/ui/social-share'
+
 import { DecorativeBackground } from '@js-monorepo/templates'
 import { Award, Sparkles, Star, Trophy, Verified } from 'lucide-react'
 import type { OrganizerPublicBadge, OrganizerPublicProfile } from '../../../../../lib/scheduling'
@@ -122,7 +124,10 @@ export function InstructorProfileHero({ profile }: Instructor) {
             <div className="flex-1 text-center sm:text-left space-y-4">
               {/* Name & Badges */}
               <div className="space-y-3">
-                <h1 className="tracking-tight">{profile.displayName || 'Instructor'}</h1>
+                <div className="flex gap-3 justify-center sm:justify-start">
+                  <h1 className="tracking-tight">{profile.displayName || 'Instructor'}</h1>
+                  <SocialShare></SocialShare>
+                </div>
                 <ProfileBadges badges={profile.badges} />
               </div>
 
