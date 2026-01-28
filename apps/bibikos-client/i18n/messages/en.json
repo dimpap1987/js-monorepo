@@ -19,58 +19,58 @@
   },
   "home": {
     "hero": {
-      "title": "Simplify Your Class Scheduling",
-      "subtitle": "The all-in-one platform for fitness instructors, yoga teachers, and wellness coaches to manage classes, bookings, and participants.",
-      "cta": "Start Teaching Today",
-      "ctaSecondary": "Book a Class"
+      "title": "Share Your Availability. Let Others Join.",
+      "subtitle": "A simple scheduling platform for professionals to publish their time and let clients reserve it — no back and forth.",
+      "cta": "Create Your Schedule",
+      "ctaSecondary": "Find a Time"
     },
     "features": {
       "title": "Everything You Need",
-      "subtitle": "Powerful tools designed for individual instructors",
+      "subtitle": "Powerful tools for individuals who work by appointment",
       "scheduling": {
-        "title": "Smart Scheduling",
-        "description": "Create recurring classes with flexible scheduling. Set weekly, bi-weekly, or custom patterns."
+        "title": "Flexible Availability",
+        "description": "Publish your available times once. Set recurring schedules or one-off openings."
       },
       "bookings": {
-        "title": "Easy Bookings",
-        "description": "Participants book instantly via your personal link. Automatic waitlist management included."
+        "title": "Instant Reservations",
+        "description": "Clients reserve a time directly from your personal link. No messages, no coordination."
       },
       "attendance": {
-        "title": "Attendance Tracking",
-        "description": "Mark attendance with one tap. Track no-shows and analyze class performance."
+        "title": "Session Tracking",
+        "description": "See who’s coming, manage no-shows, and keep your schedule organized."
       },
       "calendar": {
-        "title": "Calendar View",
-        "description": "See all your classes at a glance. Drag and drop to reschedule."
+        "title": "Clear Calendar View",
+        "description": "View your schedule at a glance and adjust availability with drag and drop."
       },
       "notifications": {
         "title": "Smart Notifications",
-        "description": "Automatic reminders for participants. Instant alerts for cancellations."
+        "description": "Automatic reminders for clients and instant updates for changes or cancellations."
       },
       "profile": {
-        "title": "Public Profile",
-        "description": "Your own branded page to showcase classes and accept bookings."
+        "title": "Public Schedule Page",
+        "description": "A simple public page where people can view your availability and reserve a time."
       }
     },
     "howItWorks": {
       "title": "How It Works",
       "subtitle": "Get started in minutes",
       "step1": {
-        "title": "Create Your Profile",
-        "description": "Set up your instructor profile with your bio, activity type, and booking link."
+        "title": "Set Your Availability",
+        "description": "Define when you’re available and how people can reserve time with you."
       },
       "step2": {
-        "title": "Add Your Classes",
-        "description": "Create classes with details, capacity limits, and recurring schedules."
+        "title": "Share Your Link",
+        "description": "Send your personal schedule link anywhere — website, social media, or messages."
       },
       "step3": {
-        "title": "Share & Book",
-        "description": "Share your profile link. Participants book directly, you manage everything."
+        "title": "People Reserve Time",
+        "description": "Clients choose a time that works for them. You stay in control."
       }
     },
     "cta": {
-      "title": "Ready to Simplify Your Teaching?",
-      "subtitle": "Join thousands of instructors who save hours every week with ClassOps.",
+      "title": "Ready to Simplify Your Schedule?",
+      "subtitle": "Join professionals who save hours every week by sharing their availability.",
       "button": "Get Started Free"
     }
   },
@@ -168,7 +168,7 @@
       "slugPreview": "classops.com/coach/",
       "venueName": "Studio Name",
       "venueNamePlaceholder": "e.g., Main Studio, Downtown Gym, Online Classes",
-      "venueNameDescription": "Where you teach (e.g., your studio, gym, or online platform). You can use this same venue for multiple classes.",
+      "venueNameDescription": "Where you teach (e.g., your studio, gym. You can use this same place for multiple classes.",
       "onlineLocationDescription": "Zoom, Google Meet, etc.",
       "physicalLocationDescription": "Physical studio or gym",
       "skipForNow": "Skip for now",

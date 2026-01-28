@@ -105,12 +105,7 @@ export class TagRepositoryPrisma implements TagRepository {
 
   async findByEntityType(entityType: TagEntityType): Promise<TagWithCategory[]> {
     return this.txHost.tx.tag.findMany({
-      where: {
-        OR: [
-          { applicableTo: { has: entityType as PrismaTagEntityType } },
-          { applicableTo: { isEmpty: true } }, // Empty array means applicable to all
-        ],
-      },
+      where: { applicableTo: { has: entityType as PrismaTagEntityType } },
       include: { category: true },
       orderBy: { name: 'asc' },
     })

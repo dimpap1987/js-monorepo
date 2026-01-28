@@ -33,7 +33,7 @@ export const NavRightSection = ({
         <NavMenuList
           items={secondaryItems}
           user={user}
-          className="mr-4 md:mr-8 relative flex font-semibold font-heading items-center gap-1 self-stretch"
+          className="hidden lg:flex mr-4 md:mr-8 relative font-semibold font-heading items-center gap-1 self-stretch"
         />
 
         <NavAuthSection

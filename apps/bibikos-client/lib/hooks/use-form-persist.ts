@@ -10,12 +10,12 @@ interface UseFormPersistOptions {
   debounce?: number
   /** Fields to exclude from persistence */
   exclude?: string[]
-  /** Storage to use (default: localStorage) */
+  /** Storage to use (default: sessionStorage) */
   storage?: Storage
 }
 
 /**
- * Persists react-hook-form values to localStorage
+ * Persists react-hook-form values to sessionStorage
  *
  * @example
  * ```tsx
@@ -40,7 +40,7 @@ export function useFormPersist<T extends FieldValues>(form: UseFormReturn<T>, op
   // Get storage (handle SSR)
   const getStorage = useCallback((): Storage | null => {
     if (typeof window === 'undefined') return null
-    return storage || window.localStorage
+    return storage || window.sessionStorage
   }, [storage])
 
   // Restore values from storage on mount
@@ -134,7 +134,7 @@ export function useFormPersist<T extends FieldValues>(form: UseFormReturn<T>, op
 export function clearFormPersistence(keys: string[], storage?: Storage) {
   if (typeof window === 'undefined') return
 
-  const store = storage || window.localStorage
+  const store = storage || window.sessionStorage
   keys.forEach((key) => {
     store.removeItem(key)
   })

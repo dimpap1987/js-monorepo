@@ -13,7 +13,7 @@ interface NavLeftSectionProps {
 
 export const NavLeftSection = ({ logo, mainItems, user }: NavLeftSectionProps) => {
   return (
-    <div className="flex items-center gap-4 md:gap-24 self-stretch">
+    <div className="flex items-center gap-24 self-stretch">
       {/* Logo */}
       {logo}
 

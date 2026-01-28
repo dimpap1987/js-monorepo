@@ -42,26 +42,29 @@ export function LandingPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary mb-8">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">For Individual Instructors</span>
+              <span className="text-sm font-medium text-primary">For Individual Professionals</span>
             </div>
 
             {/* Main heading */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">{t('hero.title')}</h1>
+            <h1 className="tracking-tight mb-6">{t('hero.title')}</h1>
 
             {/* Subtitle */}
             <p className="text-lg sm:text-xl text-foreground-muted max-w-2xl mx-auto mb-10">{t('hero.subtitle')}</p>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <DpNextNavLink href={getCtaHref()}>
+              {/* Primary CTA → Explore / See value first */}
+              <DpNextNavLink href="/discover">
                 <Button size="lg" className="text-lg px-8 py-6 gap-2">
-                  {t('hero.cta')}
+                  {t('hero.ctaSecondary')} {/* e.g. "Explore Your Schedule" */}
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </DpNextNavLink>
-              <DpNextNavLink href="/discover">
+
+              {/* Secondary CTA → Create schedule / commitment */}
+              <DpNextNavLink href={getCtaHref()}>
                 <Button variant="outline" size="lg" className="text-lg px-8 py-6">
-                  {t('hero.ctaSecondary')}
+                  {t('hero.cta')} {/* e.g. "Create Your Schedule" */}
                 </Button>
               </DpNextNavLink>
             </div>
@@ -73,7 +76,7 @@ export function LandingPage() {
       <section className="py-10 sm:py-22 bg-background-secondary/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t('features.title')}</h2>
+            <h2 className="mb-4">{t('features.title')}</h2>
             <p className="text-lg text-foreground-muted max-w-2xl mx-auto">{t('features.subtitle')}</p>
           </div>
 
@@ -109,7 +112,7 @@ export function LandingPage() {
       <section className="py-10 sm:py-22">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t('howItWorks.title')}</h2>
+            <h2 className="mb-4">{t('howItWorks.title')}</h2>
             <p className="text-lg text-foreground-muted max-w-2xl mx-auto">{t('howItWorks.subtitle')}</p>
           </div>
 
@@ -133,32 +136,6 @@ export function LandingPage() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-10 sm:py-22">
-        <div className="container mx-auto px-4">
-          <div className="relative max-w-4xl mx-auto">
-            {/* Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80 rounded-3xl" />
-            <div className="absolute inset-0 opacity-10 rounded-3xl" />
-
-            <div className="relative px-8 py-16 sm:px-16 sm:py-10 text-center">
-              <h2 className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-4">{t('cta.title')}</h2>
-              <p className="text-lg text-primary-foreground/80 max-w-xl mx-auto mb-8">{t('cta.subtitle')}</p>
-              <DpNextNavLink href={getCtaHref()}>
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="text-lg px-8 py-6 gap-2 bg-white text-primary hover:bg-white/90"
-                >
-                  {t('cta.button')}
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </DpNextNavLink>
             </div>
           </div>
         </div>
