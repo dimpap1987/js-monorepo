@@ -7,7 +7,7 @@ import { DecorativeBackground } from '@js-monorepo/templates'
 import { Award, Sparkles, Star, Trophy, Verified } from 'lucide-react'
 import type { OrganizerPublicBadge, OrganizerPublicProfile } from '../../../../../lib/scheduling'
 
-interface CoachProfileHeroProps {
+interface Instructor {
   profile: OrganizerPublicProfile
 }
 
@@ -54,7 +54,7 @@ function ProfileAvatar({ profile }: { profile: OrganizerPublicProfile }) {
     <div className="relative">
       <Avatar className="h-28 w-28 sm:h-36 sm:w-36 ring-4 ring-background shadow-xl">
         {profile.profileImage && (
-          <AvatarImage src={profile.profileImage} alt={profile.displayName || 'Coach'} sizes="144px" />
+          <AvatarImage src={profile.profileImage} alt={profile.displayName || 'Instructor'} sizes="144px" />
         )}
         <AvatarFallback className="text-3xl sm:text-4xl font-semibold bg-gradient-to-br from-primary/80 to-primary text-primary-foreground">
           {getInitials(profile.displayName)}
@@ -108,7 +108,7 @@ function ClassTypesList({ classTypes }: { classTypes: OrganizerPublicProfile['cl
   )
 }
 
-export function CoachProfileHero({ profile }: CoachProfileHeroProps) {
+export function InstructorProfileHero({ profile }: Instructor) {
   return (
     <Card className="overflow-hidden border-0 shadow-none bg-transparent">
       {/* Gradient Background */}

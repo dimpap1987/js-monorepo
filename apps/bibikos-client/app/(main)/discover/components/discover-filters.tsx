@@ -33,7 +33,7 @@ export function DiscoverFilters({ filters, onFilterChange, onClearFilters }: Dis
         <div className="relative flex-1 w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search classes or coaches..."
+            placeholder="Search classes or instructors..."
             value={filters.search || ''}
             onChange={(e) => onFilterChange({ search: e.target.value || undefined })}
             className="pl-9"

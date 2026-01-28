@@ -21,29 +21,29 @@ import { CancelBookingDialog, CancelBookingDrawer } from '../../discover/compone
 import {
   BookingConfirmationDialog,
   BookingConfirmationDrawer,
-  CoachProfileHero,
-  CoachProfileSkeleton,
-  CoachSchedulesList,
+  InstructorProfileHero,
+  InstructorProfileSkeleton,
+  InstructorSchedulesList,
 } from './components'
 
-function CoachNotFound({ onGoHome }: { onGoHome: () => void }) {
+function InstructorNotFound({ onGoHome }: { onGoHome: () => void }) {
   return (
     <ContainerTemplate>
       <AlertCircle className="w-16 h-16 mx-auto mb-4 text-foreground-muted opacity-50" />
-      <h1 className="text-2xl font-bold mb-2">Coach not found</h1>
+      <h1 className="text-2xl font-bold mb-2">Instructor not found</h1>
       <p className="text-foreground-muted mb-6">
-        The coach profile you&apos;re looking for doesn&apos;t exist or has been removed.
+        The instructor profile you&apos;re looking for doesn&apos;t exist or has been removed.
       </p>
       <Button onClick={onGoHome}>Go Home</Button>
     </ContainerTemplate>
   )
 }
 
-interface CoachProfileContentProps {
+interface InstructorProfileContentProps {
   slug: string
 }
 
-export function CoachProfileContent({ slug }: CoachProfileContentProps) {
+export function InstructorProfileContent({ slug }: InstructorProfileContentProps) {
   const { isLoggedIn } = useSession()
   const router = useRouter()
   const { addNotification } = useNotifications()
@@ -73,7 +73,7 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
   const handleBookSchedule = (schedule: OrganizerPublicSchedule) => {
     setSelectedSchedule(schedule)
     if (!isLoggedIn) {
-      router.push(`/auth/login?redirect=/coach/${slug}`)
+      router.push(`/auth/login?redirect=/instructor/${slug}`)
       return
     }
     setConfirmBooking(true)
@@ -136,19 +136,19 @@ export function CoachProfileContent({ slug }: CoachProfileContentProps) {
   }
 
   if (isProfileLoading) {
-    return <CoachProfileSkeleton />
+    return <InstructorProfileSkeleton />
   }
 
   if (profileError || !profile) {
-    return <CoachNotFound onGoHome={() => router.push('/')} />
+    return <InstructorNotFound onGoHome={() => router.push('/')} />
   }
 
   return (
     <ContainerTemplate className="space-y-5">
-      <CoachProfileHero profile={profile} />
+      <InstructorProfileHero profile={profile} />
 
       <ContainerTemplate>
-        <CoachSchedulesList
+        <InstructorSchedulesList
           schedules={schedules}
           isLoading={isSchedulesLoading}
           onBookSchedule={handleBookSchedule}

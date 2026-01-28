@@ -140,7 +140,7 @@ function TimeSlotItem({ schedule, capacity, waitlistLimit, onBook, onCancel }: T
             className="h-9"
             type="button"
           >
-            {isFull ? (hasWaitlist ? 'Waitlist' : 'Full') : 'Book Now'}
+            {isFull ? (hasWaitlist ? 'Waitlist' : 'Full') : 'Reserve Your Spot'}
           </Button>
         )}
       </div>

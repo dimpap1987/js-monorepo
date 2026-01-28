@@ -51,7 +51,7 @@ model OrganizerProfile {
     // Public profile
     displayName String?
     bio         String? @db.Text
-    slug        String? @unique @db.VarChar(100) // For public URL: /coach/john-doe
+    slug        String? @unique @db.VarChar(100) // For public URL: /instructor/john-doe
 
     // Default location for new classes
     defaultLocationId Int?

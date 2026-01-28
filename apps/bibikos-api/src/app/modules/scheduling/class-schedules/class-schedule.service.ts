@@ -139,7 +139,7 @@ export class ClassScheduleService {
   }
 
   /**
-   * Get public schedules by organizer slug (for /coach/:slug page)
+   * Get public schedules by organizer slug (for /instructor/:slug page)
    * If participantId is provided, includes user's booking status
    */
   async getPublicSchedulesBySlug(

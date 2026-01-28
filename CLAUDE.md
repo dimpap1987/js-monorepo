@@ -123,7 +123,7 @@ Each application now manages its own environment variables using a local `.env` 
 
 **Location**: `apps/bibikos-client/lib/datetime/`
 
-**Schedule display** (all pages - Discover, My Bookings, Coach, Class):
+**Schedule display** (all pages - Discover, My Bookings, instructor, Class):
 
 ```typescript
 import { useScheduleTime } from '@/lib/datetime'

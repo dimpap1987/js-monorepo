@@ -138,7 +138,7 @@ export interface MyBookingInfo {
   waitlistPosition: number | null
 }
 
-// Organizer Public Schedule (for /coach/:slug page)
+// Organizer Public Schedule (for /instructor/:slug page)
 export interface OrganizerPublicSchedule extends ClassSchedule {
   myBooking: MyBookingInfo | null
 }

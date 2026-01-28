@@ -6,7 +6,7 @@ export const AppConfig = {
   url: SITE_CONFIG.url,
   version: pkg.version,
   seo: SITE_CONFIG,
-  defaultTheme: 'system',
+  defaultTheme: 'tokyonight',
   locales: ['en', 'el'],
   defaultLocale: 'en',
   environment: process.env.NODE_ENV,

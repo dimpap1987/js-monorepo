@@ -586,7 +586,7 @@ Each venue has one or more **floors**, each with its own **canvas-based visual r
 
 **One-Tap Actions**
 
-- "Book Now" buttons prominent
+- "Reserve Your Spot" buttons prominent
 - Quick actions (modify, cancel)
 - Swipe gestures for common actions
 - Floating action buttons (FAB)

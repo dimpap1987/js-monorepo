@@ -74,7 +74,7 @@ function EmptySchedules() {
         </div>
         <h3 className="text-lg font-semibold mb-2">No Upcoming Classes</h3>
         <p className="text-muted-foreground max-w-md mx-auto">
-          This coach doesn&apos;t have any classes scheduled at the moment. Check back soon!
+          This instructor doesn&apos;t have any classes scheduled at the moment. Check back soon!
         </p>
       </CardContent>
     </Card>
@@ -119,19 +119,19 @@ function DateGroupSection({ title, schedules, onBookSchedule, onCancelSchedule }
   )
 }
 
-interface CoachSchedulesListProps {
+interface InstructorSchedulesListProps {
   schedules: OrganizerPublicSchedule[] | undefined
   isLoading: boolean
   onBookSchedule: (schedule: OrganizerPublicSchedule) => void
   onCancelSchedule: (schedule: OrganizerPublicSchedule) => void
 }
 
-export function CoachSchedulesList({
+export function InstructorSchedulesList({
   schedules,
   isLoading,
   onBookSchedule,
   onCancelSchedule,
-}: CoachSchedulesListProps) {
+}: InstructorSchedulesListProps) {
   const groupedSchedules = useMemo(() => {
     if (!schedules || schedules.length === 0) return null
     return groupSchedulesByDate(schedules)

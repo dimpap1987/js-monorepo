@@ -6,7 +6,7 @@ import { BOOKING_ROOM_URL } from '../contants'
 export function BookButton() {
   return (
     <Button size="lg" className="mx-auto px-6 text-white" onClick={() => window.open(BOOKING_ROOM_URL, '_blank')}>
-      Book Now
+      Reserve Your Spot
     </Button>
   )
 }

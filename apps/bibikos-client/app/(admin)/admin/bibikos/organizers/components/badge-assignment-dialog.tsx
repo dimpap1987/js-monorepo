@@ -138,7 +138,7 @@ export function BadgeAssignmentDialog({ open, onOpenChange, organizer }: BadgeAs
             <ul className="list-disc list-inside space-y-1">
               <li>Badges are special tags with no &quot;Applicable To&quot; setting</li>
               <li>Only admins can assign badges to organizers</li>
-              <li>Badges appear prominently on the coach profile</li>
+              <li>Badges appear prominently on the instructor profile</li>
             </ul>
           </div>
         </div>

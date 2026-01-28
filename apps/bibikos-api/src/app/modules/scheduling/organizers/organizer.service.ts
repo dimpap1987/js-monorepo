@@ -38,7 +38,7 @@ export class OrganizerService {
   }
 
   /**
-   * Get public profile by slug (for /coach/:slug page)
+   * Get public profile by slug (for /instructor/:slug page)
    * Returns enriched profile with profile image, tags, badges, and class types
    */
   async getPublicProfile(slug: string): Promise<OrganizerPublicProfileDto | null> {

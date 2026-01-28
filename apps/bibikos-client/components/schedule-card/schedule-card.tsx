@@ -200,7 +200,7 @@ function ScheduleInfo({
           <div className="flex items-center gap-1.5 text-sm">
             <User className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
             {organizer.slug ? (
-              <DpNextNavLink href={`/coach/${organizer.slug}`} className="hover:underline text-primary">
+              <DpNextNavLink href={`/instructor/${organizer.slug}`} className="hover:underline text-primary">
                 {organizer.displayName}
               </DpNextNavLink>
             ) : (
@@ -318,7 +318,7 @@ function BookButton({
 
   // Default: show book button
   const isDisabled = isFull && !hasWaitlist
-  const label = isFull ? (hasWaitlist ? 'Join Waitlist' : 'Full') : 'Book Now'
+  const label = isFull ? (hasWaitlist ? 'Join Waitlist' : 'Full') : 'Reserve Your Spot'
 
   return (
     <Button

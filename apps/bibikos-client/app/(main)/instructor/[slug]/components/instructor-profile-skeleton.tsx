@@ -78,7 +78,7 @@ function SchedulesListSkeleton() {
   )
 }
 
-export function CoachProfileSkeleton() {
+export function InstructorProfileSkeleton() {
   return (
     <ContainerTemplate className="space-y-5">
       <HeroSkeleton />

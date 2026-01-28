@@ -1,6 +1,6 @@
 import { generateMetadata as baseGenerateMetadata } from '@js-monorepo/seo'
 import { Metadata } from 'next/types'
-import { CoachProfileContent } from './coach-profile-content'
+import { InstructorProfileContent } from './instructor-profile-content'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -9,12 +9,12 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   return baseGenerateMetadata({
-    title: `Coach Profile - ${slug}`,
+    title: `Instructor Profile - ${slug}`,
     description: `Book classes with this instructor`,
   })
 }
 
-export default async function CoachProfilePage({ params }: Props) {
+export default async function InstructorProfilePage({ params }: Props) {
   const { slug } = await params
-  return <CoachProfileContent slug={slug} />
+  return <InstructorProfileContent slug={slug} />
 }

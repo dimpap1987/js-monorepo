@@ -87,7 +87,7 @@ export class OrganizerController {
 
   /**
    * GET /scheduling/organizers/public/:slug
-   * Get public organizer profile (for /coach/:slug page)
+   * Get public organizer profile (for /instructor/:slug page)
    * No auth required
    */
   @Get('public/:slug')
@@ -103,7 +103,7 @@ export class OrganizerController {
 
   /**
    * GET /scheduling/organizers/public/:slug/schedules
-   * Get public schedules for an organizer (for /coach/:slug booking page)
+   * Get public schedules for an organizer (for /instructor/:slug booking page)
    * No auth required, but if logged in, includes user's booking status
    */
   @Get('public/:slug/schedules')

@@ -51,7 +51,7 @@ export const routes: RouteConfig[] = [
     roles: [Role.PUBLIC],
   },
   {
-    path: '/coach',
+    path: '/instructor',
     roles: [Role.PUBLIC],
   },
   {

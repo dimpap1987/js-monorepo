@@ -19,7 +19,7 @@
   },
   "home": {
     "hero": {
-      "title": "Share Your Availability. Let Others Join.",
+      "title": "Share Your Availability - Let Others Join.",
       "subtitle": "A simple scheduling platform for professionals to publish their time and let clients reserve it — no back and forth.",
       "cta": "Create Your Schedule",
       "ctaSecondary": "Find a Time"
@@ -165,7 +165,7 @@
       "bioPlaceholder": "Tell participants about yourself...",
       "slug": "Your Profile URL",
       "slugPlaceholder": "your-name",
-      "slugPreview": "classops.com/coach/",
+      "slugPreview": "classops.com/instructor/",
       "venueName": "Studio Name",
       "venueNamePlaceholder": "e.g., Main Studio, Downtown Gym, Online Classes",
       "venueNameDescription": "Where you teach (e.g., your studio, gym. You can use this same place for multiple classes.",
@@ -262,7 +262,7 @@
       "past": "Past",
       "empty": "No bookings yet",
       "emptyDescription": "Your booked classes will appear here",
-      "book": "Book Now",
+      "book": "Reserve Your Spot",
       "cancelBooking": "Cancel Booking",
       "booked": "Booked",
       "waitlisted": "On Waitlist",

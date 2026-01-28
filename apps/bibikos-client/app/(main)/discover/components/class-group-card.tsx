@@ -62,7 +62,7 @@ export function ClassGroupCard({ group, onClick, className }: ClassGroupCardProp
                     <User className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
                     {group.organizer.slug ? (
                       <DpNextNavLink
-                        href={`/coach/${group.organizer.slug}`}
+                        href={`/instructor/${group.organizer.slug}`}
                         className="hover:underline text-primary"
                         onClick={(e) => e.stopPropagation()}
                       >

@@ -5,7 +5,7 @@ import { LandingPage } from './landing-page'
 
 export const metadata: Metadata = generateMetadata({
   title: 'Home',
-  description: `${AppConfig.appName} - Simplify your class scheduling. The all-in-one platform for fitness instructors, yoga teachers, and wellness coaches.`,
+  description: `${AppConfig.appName} - Simplify your class scheduling. The all-in-one platform for fitness instructors, yoga teachers, and wellness instructors.`,
 })
 
 export default function HomePage() {

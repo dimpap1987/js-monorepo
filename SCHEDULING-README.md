@@ -4,7 +4,7 @@ This document outlines the frontend implementation of the class-based scheduling
 
 ## Overview
 
-The scheduling module provides a complete UI for fitness instructors, yoga teachers, and wellness coaches to manage their classes, schedules, and bookings. It integrates with the backend API implemented in `apps/bibikos-api/src/app/modules/scheduling/`.
+The scheduling module provides a complete UI for fitness instructors, yoga teachers, and wellness instructors to manage their classes, schedules, and bookings. It integrates with the backend API implemented in `apps/bibikos-api/src/app/modules/scheduling/`.
 
 ## Architecture
 
@@ -31,9 +31,9 @@ apps/bibikos-client/
 │   ├── bookings/                   # Participant bookings
 │   │   ├── page.tsx
 │   │   └── bookings-content.tsx
-│   └── coach/[slug]/               # Public instructor profile
+│   └── instructor/[slug]/               # Public instructor profile
 │       ├── page.tsx
-│       └── coach-profile-content.tsx
+│       └── instructor-profile-content.tsx
 ├── lib/scheduling/
 │   ├── index.ts                    # Barrel exports
 │   ├── types.ts                    # TypeScript interfaces
@@ -106,7 +106,7 @@ Features:
 - Cancel booking functionality
 - Empty states with helpful messaging
 
-### 8. Public Coach Profile (`/coach/[slug]`)
+### 8. Public instructor Profile (`/instructor/[slug]`)
 
 - Public instructor profile page
 - Display name, activity type, bio
@@ -171,7 +171,7 @@ Protected routes are defined in `lib/routes-config.ts`:
 | `/dashboard/classes`   | USER   | Class templates           |
 | `/dashboard/locations` | USER   | Location management       |
 | `/my-bookings`         | USER   | Participant bookings      |
-| `/coach/[slug]`        | PUBLIC | Public instructor profile |
+| `/instructor/[slug]`   | PUBLIC | Public instructor profile |
 
 ## Translations
 

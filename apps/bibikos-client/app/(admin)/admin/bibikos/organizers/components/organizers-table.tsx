@@ -150,7 +150,7 @@ export function OrganizersTable() {
                           <div className="font-medium">{organizer.displayName || 'Unnamed'}</div>
                           {organizer.slug && (
                             <Link
-                              href={`/coach/${organizer.slug}`}
+                              href={`/instructor/${organizer.slug}`}
                               target="_blank"
                               className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
                             >

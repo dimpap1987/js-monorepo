@@ -108,7 +108,7 @@ All modules located under: `apps/bibikos-api/src/app/modules/scheduling/`
 
 4. **Public Pages Support**
 
-   - Organizer public profile via slug (`/coach/:slug`)
+   - Organizer public profile via slug (`/instructor/:slug`)
    - Public class and schedule endpoints for booking pages
 
 5. **Ownership Verification**
@@ -325,7 +325,7 @@ All scheduling endpoints are prefixed with `/scheduling/`:
 
 ## Notes for Future Development
 
-1. **User Roles**: A single user can be both Organizer and Participant (coaches attending other classes)
+1. **User Roles**: A single user can be both Organizer and Participant (instructors attending other classes)
 2. **ID Strategy**: Uses Int autoincrement IDs to match existing AuthUser model
 3. **Timestamps**: All times stored in UTC, displayed using location timezone
 4. **Soft Deletes**: Locations and Classes use `isActive` flag instead of hard delete

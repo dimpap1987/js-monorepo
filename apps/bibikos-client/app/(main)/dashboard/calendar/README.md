@@ -4,7 +4,7 @@
 
 ### Overview
 
-The calendar feature allows organizers (coaches/instructors) to create and manage class schedules. Participants can view and book these schedules.
+The calendar feature allows organizers (instructors) to create and manage class schedules. Participants can view and book these schedules.
 
 ---
 

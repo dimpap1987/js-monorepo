@@ -32,7 +32,10 @@ export function ClassDetailHero({ classData }: ClassDetailHeroProps) {
                 <User className="w-4 h-4" />
                 <span>by </span>
                 {classData.organizer.slug ? (
-                  <DpNextNavLink href={`/coach/${classData.organizer.slug}`} className="hover:underline text-primary">
+                  <DpNextNavLink
+                    href={`/instructor/${classData.organizer.slug}`}
+                    className="hover:underline text-primary"
+                  >
                     {classData.organizer.displayName}
                   </DpNextNavLink>
                 ) : (

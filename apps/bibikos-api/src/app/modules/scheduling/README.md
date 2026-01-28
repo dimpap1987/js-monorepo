@@ -2,7 +2,7 @@
 
 ## Overview
 
-The scheduling module provides a complete class booking system for individual instructors/coaches. It supports class management, schedule creation (one-time and recurring), participant bookings, private class invitations, and real-time notifications.
+The scheduling module provides a complete class booking system for individual instructors/instructors. It supports class management, schedule creation (one-time and recurring), participant bookings, private class invitations, and real-time notifications.
 
 ---
 
@@ -374,7 +374,7 @@ npx nx test bibikos-api --testFile=class-schedule.service.spec.ts
 # Create organizer (requires authenticated session)
 curl -X POST http://localhost:3000/scheduling/organizers \
   -H "Content-Type: application/json" \
-  -d '{"displayName": "John Coach", "slug": "john-coach"}'
+  -d '{"displayName": "John instructor", "slug": "john-instructor"}'
 
 # Create location
 curl -X POST http://localhost:3000/scheduling/locations \
